@@ -3,7 +3,7 @@
 This repo is the only source of truth for the game. Real code only.
 
 ## Hard rules
-- **No artifacts as the deliverable.** Never publish the game, specs, or mockups as Claude artifacts. Edit files in this repo, commit, and push. The live site is Cloudflare Pages, which deploys on every push to `main`.
+- **No artifacts as the deliverable.** Never publish the game, specs, or mockups as Claude artifacts. Edit files in this repo, commit, and push. The live site is a Cloudflare Worker (`temple-watch`) that builds and deploys on every push to `main`.
 - **Specs live in the repo**, in `docs/specs/<area>.md`. Game data a spec defines goes in `public/js/data.js` (or a new `public/js/data-<area>.js`), not in prose.
 - **One code owner at a time.** Spec chats edit only `docs/`. The Coordinator chat edits `public/`, `functions/`, and `tests/`. Before pushing, pull first; never force-push.
 - **Run `npm test` before every push.** It must print no `FAIL` and `"err":0`. Fix failures; don't skip tests.
@@ -32,8 +32,9 @@ public/            the game (served as-is by Cloudflare Pages)
   js/input.js      taps/clicks
   js/save.js       local + cloud saves
   js/screens.js    briefing/debrief; boots the game (load last)
+worker.js               Worker entry: /api/save → backend, else static files from public/
 functions/api/save.js   backend: GET/PUT /api/save (KV binding SAVES)
-wrangler.toml           Pages config + KV binding
+wrangler.toml           Worker config: assets dir, KV binding
 tests/                  balance.test.js (40 bot games), sync.test.mjs (cross-device save)
 tools/inline.js         builds dist/temple-watch.html (single file, for tests/offline)
 docs/                   design, specs, chat briefs, changelog

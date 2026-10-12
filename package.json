@@ -5,7 +5,7 @@
   "scripts": {
     "build": "node tools/inline.js",
     "test": "node tools/inline.js && node tests/balance.test.js && node tests/sync.test.mjs",
-    "dev": "npx wrangler pages dev public"
+    "dev": "npx wrangler dev"
   },
   "devDependencies": { "jsdom": "24.1.3" }
 }
