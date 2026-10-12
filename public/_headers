@@ -1,0 +1,3 @@
+# Always check for the newest build: browsers revalidate every file on load.
+/*
+  Cache-Control: no-cache

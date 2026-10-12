@@ -1,6 +1,6 @@
 # Temple Watch: design (locked decisions)
 
-You are the Jedi Council, running the Temple on Coruscant across ~3,600 years. Each roguelike run is a 10–15 hour campaign that can rewrite the Order's fate. Tone: hopeful but costly. Personal-use fan game; browser on phone and laptop; no sound in v1.
+You are the Jedi Council, running the Temple on Coruscant across ~3,600 years. Each roguelike run is a 10–15 hour campaign that can rewrite the Order's fate. Tone: hopeful but costly. Personal-use fan game in the browser. **Desktop first** (laptop, mouse); phone layout gets optimized later. No sound in v1.
 
 ## Story & eras
 - Opening: the Council's vision of the Temple burning, millennia away. Every era is a chance to change it; history can swing far from canon.

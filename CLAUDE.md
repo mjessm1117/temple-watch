@@ -7,6 +7,7 @@ This repo is the only source of truth for the game. Real code only.
 - **Specs live in the repo**, in `docs/specs/<area>.md`. Game data a spec defines goes in `public/js/data.js` (or a new `public/js/data-<area>.js`), not in prose.
 - **One code owner at a time.** Spec chats edit only `docs/`. The Coordinator chat edits `public/`, `functions/`, and `tests/`. Before pushing, pull first; never force-push.
 - **Run `npm test` before every push.** It must print no `FAIL` and `"err":0`. Fix failures; don't skip tests.
+- **Desktop first.** Design and test for a laptop window (~1366×768 and up, mouse). Keep phone working but don't optimize it yet.
 - Small, surgical edits. Plain JavaScript, no frameworks, no build step for the site. Keep files under ~600 lines; split by topic when one grows past that.
 - Commit messages: one line on what changed for the player, e.g. `Add Sentinel path: Shadow Step + Mark Target`.
 
@@ -18,7 +19,7 @@ This repo is the only source of truth for the game. Real code only.
 
 ## Layout
 ```
-public/            the game (served as-is by Cloudflare Pages)
+public/            the game (static files served by the Worker; _headers = no-cache so the newest build always loads)
   index.html       page shell; loads css + js in order
   css/style.css    look and feel (color tokens at top)
   js/data.js       numbers: map, waves, squad, enemies  ← tune here
@@ -36,6 +37,7 @@ worker.js               Worker entry: /api/save → backend, else static files f
 functions/api/save.js   backend: GET/PUT /api/save (KV binding SAVES)
 wrangler.toml           Worker config: assets dir, KV binding
 tests/                  balance.test.js (40 bot games), sync.test.mjs (cross-device save)
+assets/temple-watch.ico  desktop icon used by the launcher on Jess's laptop
 tools/inline.js         builds dist/temple-watch.html (single file, for tests/offline)
 docs/                   design, specs, chat briefs, changelog
 ```
