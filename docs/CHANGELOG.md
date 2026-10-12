@@ -1,4 +1,5 @@
 # Changelog
+- 2026-10-12: Coordinator sweep: specs A–D done; v0.2 split into a/b; Darkness scale unified at 0–100.
 - 2026-10-12: Desktop-first layout (bigger board), no-cache headers so the newest build always loads, game icon + desktop launcher.
 - 2026-10-12: Deploys as a Cloudflare Worker on every push.
 - 2026-10-12: Split into a real multi-file project (public/, functions/, tests/). Backend moved to a Pages Function. No more artifacts.

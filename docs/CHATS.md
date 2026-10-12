@@ -2,6 +2,8 @@
 
 Every chat: read `CLAUDE.md` first, then this file. Output = commits to this repo, never artifacts.
 
+**Specs are done (2026-10-12)** and live in the claude.ai project "Star Wars Game": `claude/spec-combat.md` (A), `claude/spec-campaign.md` (B), `claude/spec-story.md` (C), `claude/spec-ui.md` (D). GitHub is the only code source; the project holds specs only.
+
 | Chat | Writes | Goal |
 | --- | --- | --- |
 | A Combat | `docs/specs/combat.md` + proposed data in `docs/specs/combat-data.js` | Make each turn a real decision |
