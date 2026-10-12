@@ -7,5 +7,6 @@ Tests: 40 bot games, 0 errors; a passive bot wins ~30–35%. The sync test passe
 Jess's verdict: concept OK, too basic. Gaps: only one mission, shallow combat, plain look, no progression.
 
 ## Infrastructure
+- **Live game:** https://temple-watch.mjessm1117.workers.dev/ (Cloudflare Worker `temple-watch`, auto-deploys on push to `main`).
+- Jess's desktop icon: `Temple Watch (latest).url` → live link; icon at `C:\Users\jmolasky\Projects\temple-watch\temple-watch.ico`.
 - Cloudflare account: Ovation. KV namespace `temple-watch-saves` (id in `wrangler.toml`).
-- Pages project: connect this GitHub repo; build output `public`, no build command.
