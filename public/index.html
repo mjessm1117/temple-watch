@@ -14,23 +14,26 @@
 <body>
 <div id="app">
   <header class="top">
-    <div class="brand">TEMPLE WATCH<small>Outpost Aurek-7 · Sith frontier · ~3,600 BBY</small></div>
+    <div class="brand">TEMPLE WATCH<small id="where">Jedi Temple · ~3,660 BBY</small></div>
     <div class="stats">
-      <span>Turn <b id="sTurn">1/8</b></span>
-      <span>Relay <b id="sCons">20</b></span>
-      <span>Next wave <b id="sWave">T3</b></span>
+      <span>Turn <b id="sTurn">–</b></span>
+      <span><span id="sObjL">Objective</span> <b id="sObj">–</b></span>
+      <span id="sWaveW">Next wave <b id="sWave">–</b></span>
+      <span id="sThrW" class="thr" hidden>Threat <b id="sThr">0</b></span>
       <span>Intel <b id="sIntel">0</b></span>
       <span class="dk">Darkness <b id="sDark">0</b></span>
     </div>
     <div class="endrow"><button id="syncBtn" type="button">Sync: <span id="sSync">off</span></button><button id="infoBtn" type="button">Info: off</button></div>
   </header>
+  <div id="banner" class="banner" aria-live="polite"></div>
   <main class="layout">
-    <div><div id="board" class="board" role="grid" aria-label="Battle map"></div></div>
+    <div class="bwrap"><div id="board" class="board" role="grid" aria-label="Battle map"></div><svg id="over" class="over" viewBox="0 0 10 12" preserveAspectRatio="none" aria-hidden="true"></svg></div>
     <aside class="side">
       <div class="panel"><div id="roster" class="roster"></div></div>
-      <div class="panel" id="card"></div>
+      <div class="panel" id="card" aria-live="polite"></div>
       <div class="panel">
         <div id="acts" class="acts"></div>
+        <div id="odds"></div>
         <div id="hint" class="hint"></div>
         <div class="endrow"><button id="endBtn" type="button" class="primary">End turn</button></div>
       </div>
@@ -40,6 +43,8 @@
   <div id="modal" class="modal" hidden></div>
 </div>
 <script src="js/data.js"></script>
+<script src="js/data-campaign.js"></script>
+<script src="js/icons.js"></script>
 <script src="js/util.js"></script>
 <script src="js/save.js"></script>
 <script src="js/state.js"></script>
@@ -49,6 +54,8 @@
 <script src="js/ai.js"></script>
 <script src="js/render.js"></script>
 <script src="js/input.js"></script>
+<script src="js/campaign.js"></script>
+<script src="js/base.js"></script>
 <script src="js/screens.js"></script>
 </body>
 </html>

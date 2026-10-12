@@ -1,42 +1,66 @@
-/* Mission setup, turn flow, win/lose checks. */
-function mk(base,side,extra){const u={...base,...extra,side,max:base.hp,status:'ok',ap:2,guard:false,ow:false,dark:0,focus:base.maxF?2:0};u.dmg=[...base.dmg];return u}
-function spawn(list){
- const spots=[];for(let y=0;y<2;y++)for(let x=0;x<W;x++)if(PASS(tile(x,y))&&!unitAt(x,y))spots.push({x,y});
- spots.sort(()=>Math.random()-.5);
- list.forEach((t,i)=>{const p=spots[i];if(!p)return;S.eCount[t]=(S.eCount[t]||0)+1;const f=FOES[t];
-  S.units.push(mk(f,'e',{type:t,n:`${f.n} ${S.eCount[t]}`,x:p.x,y:p.y}))});
- log(`Contact: ${list.length} hostiles at the north perimeter.`,'bad')}
+/* Mission setup, turn flow, threat clock, evac, win/lose checks. */
+function mk(base,side,extra={}){const u={...base,...extra,side,status:'ok',ap:2,guard:false,ow:false,dark:base.dark||0,miss:0,uid:++S.uidN};
+ u.max=u.hp;u.focus=u.maxF?2:0;u.dmg=[...u.dmg];if(u.abil){u.abil=[...u.abil];for(const k of u.abil)if(AB[k]&&AB[k].passive)u[k]=1}return u}
+function mkFoe(t,x,y){const f=FOES[t],d=S.d;S.eCount[t]=(S.eCount[t]||0)+1;
+ return mk({...f,hp:Math.max(1,f.hp+(f.horror?0:d.enemyHp)),aim:f.aim+d.enemyAim},'e',{type:t,n:f.envoy?f.n:`${f.n} ${S.eCount[t]}`,x,y})}
+function spawn(list){list=[...list];for(let i=0;i<S.d.extra;i++)list.push('trooper');
+ const spots=tilesWhere((c,x,y)=>y<2&&PASS(c)&&!unitAt(x,y)).sort(()=>Math.random()-.5);
+ list.forEach((t,i)=>{const p=spots[i];if(p)S.units.push(mkFoe(t,p.x,p.y))});
+ log(`Contact: ${list.length} hostiles at the north edge.`,'bad')}
 
-function newGame(choice){
- S={grid:MAP.map(r=>r.split('')),units:ROSTER.map(r=>mk(r,'p',{abil:[...r.abil]})),turn:1,phase:'player',sel:null,mode:'move',tg:[],info:S?S.info:false,
-    cons:CONS,log:[],fx:[],intel:0,kills:0,orderDark:0,eCount:{},over:false,peek:null};
- if(choice==='fort')[[3,10],[6,10],[2,9]].forEach(([x,y])=>S.grid[y][x]='c');
- if(choice==='supply'){S.units.find(u=>u.cls==='Medic').kits++;S.units.find(u=>u.cls==='Heavy').nades++}
- if(choice==='calm')S.units.filter(u=>u.jedi).forEach(u=>u.focus=u.maxF);
- spawn(WAVES[1]);log('Hold the relay for 8 turns. The fleet is coming.');
- S.sel=S.units[0];$('#modal').hidden=true;if(choice!=='none')saveGame();render()}
+// squad: battle-ready unit stats (campaign.js battleUnit). o: {diff, hostage, crisis}
+function startMission(id,squad,o={}){const M=MISSIONS[id];
+ S={id,M,type:M.type,grid:M.map.map(r=>r.split('')),units:[],uidN:0,turn:1,phase:'player',sel:null,mode:'move',tg:[],pick:null,info:S?S.info:false,
+    diff:o.diff||'normal',d:DIFF[o.diff||'normal'],obj:M.obj||0,threat:0,clues:0,smoke:[],bmed:null,log:[],fx:[],intel:0,kills:0,orderDark:0,eCount:{},over:false,peek:null,crisis:o.crisis||null};
+ squad.slice(0,6).forEach((r,i)=>{const p=M.start[i];S.units.push(mk(r,'p',{x:p[0],y:p[1]}))});
+ if(S.d.bonusKit){const m=S.units.find(u=>u.kits!=null);if(m)m.kits++}
+ if(M.hostage){const h=o.hostage||VIP;S.units.push(mk({...h,vip:1,bound:1},'p',{x:M.hostage[0],y:M.hostage[1]}))}
+ for(const [t,x,y] of M.foes||[])S.units.push(mkFoe(t,x,y));
+ if(M.waves)spawn(M.waves[1]);
+ log(M.goal);S.sel=players().find(canAct)||null;$('#modal').hidden=true;SCR=null;render();saveGame()}
 
-function select(u){S.sel=u;S.peek=null;S.mode='move';S.tg=[];render()}
-function canAct(u){return u&&u.side==='p'&&u.status==='ok'&&u.ap>0&&S.phase==='player'&&!S.over}
+function select(u){S.sel=u;S.peek=null;S.mode='move';S.tg=[];S.pick=null;render()}
+function canAct(u){return !!u&&u.side==='p'&&u.status==='ok'&&!u.bound&&u.ap>0&&S.phase==='player'&&!S.over}
 function targetsFor(u,k){const ab=AB[k];return(ab.tg?ab.tg(u):[]).map(g=>({...g,x:g.x??g.t.x,y:g.y??g.t.y}))}
 function exec(u,k,g){const ab=AB[k];if(ab.f)u.focus-=ab.f;ab.run(u,g);if(ab.ap===1)u.ap=Math.max(0,u.ap-1);else u.ap=0;after()}
-function after(){S.mode='move';S.tg=[];checkEnd();if(!canAct(S.sel)){const n=players().find(canAct);if(n)S.sel=n}render()}
+function after(){S.mode='move';S.tg=[];S.pick=null;checkEnd();if(!canAct(S.sel)){const n=players().find(canAct);if(n)S.sel=n}render()}
 
-function startPlayerTurn(){
+function startPlayerTurn(){const M=S.M;
  S.phase='player';
- if(S.turn>1&&WAVES[S.turn])spawn(WAVES[S.turn]);
+ if(M.waves&&S.turn>1&&M.waves[S.turn])spawn(M.waves[S.turn]);
+ if(M.par&&S.turn>M.par){S.threat++;threatStep()}
+ S.smoke=S.smoke.filter(s=>--s.t>0);S.bmed=null;
+ for(const u of S.units){u.supp=0;u.marked=0;if(u.side==='p'){u.supT=null;u.hunker=0;u.barrier=0;u.leapAim=0}}
  for(const u of players()){u.guard=false;u.guardStruck=false;u.ow=false;
-  if(u.status==='down'){u.bleed--;u.ap=0;if(u.bleed<=0){u.status='dead';log(`${u.n} has become one with the Force.`,'bad')}else log(`${u.n} is bleeding out: ${u.bleed} turn${u.bleed>1?'s':''} left.`,'bad')}
+  if(u.status==='down'){u.ap=0;if(u.stable)continue;u.bleed--;if(u.bleed<=0){u.status='dead';log(`${u.n} has become one with the Force.`,'bad')}else log(`${u.n} is bleeding out: ${u.bleed} turn${u.bleed>1?'s':''} left.`,'bad')}
   else u.ap=2}
- S.sel=players().find(canAct)||null;S.mode='move';S.tg=[];checkEnd();saveGame();render()}
+ S.sel=players().find(canAct)||null;S.mode='move';S.tg=[];S.pick=null;checkEnd();saveGame();render()}
+// Soft pressure: past the par turn, each turn raises Threat by 1 and the mission gets worse.
+function threatStep(){log(`Threat rises to ${S.threat}.`,'bad');
+ if(S.type==='investigate'){const q=tilesWhere(c=>c==='q');if(q.length){const c=pickOne(q);S.grid[c.y][c.x]='r';fx(c,'WIPED','dmg');log('Imperial slicers wipe a data terminal.','bad')}}
+ if(S.type==='rescue')log('The guards are getting nervous. One may fire on the prisoner.','bad');
+ if(S.threat%2===0&&S.M.reinforce)spawn(S.M.reinforce)}
 async function endTurn(){
  if(S.phase!=='player'||S.over)return;
- S.phase='enemy';S.mode='move';S.tg=[];S.peek=null;render();await sleep(250);
+ evacCheck();if(S.over)return;
+ S.phase='enemy';S.mode='move';S.tg=[];S.pick=null;S.peek=null;S.hostShot=0;render();await sleep(250);
  for(const e of enemies()){if(S.over)break;await eAct(e);checkEnd();render()}
- if(S.over)return;
- if(S.turn>=TURNS)return finish(true,'The Republic fleet drops out of hyperspace. The relay held.');
+ if(S.over)return;S.peek=null;
+ if(S.type==='defend'&&S.turn>=S.M.turns)return finish(true,S.M.win);
  S.turn++;startPlayerTurn()}
-function checkEnd(){if(S.over)return;
- if(S.cons<=0)return finish(false,'The relay fell. The Sith now hold the hyperlane toward the Core.');
- if(!players().some(u=>u.status==='ok'))return finish(false,'The outpost is overrun.');
- if(S.turn>=LAST_WAVE&&!enemies().some(e=>e.status==='ok'||e.status==='stunned'))finish(true,'The last Sith squad is broken. The relay held.')}
+// Evac zones extract the whole squad once the objective is in hand (prisoner on E, or anyone on E after 2 scans: the data is on every comlink).
+function evacCheck(){if(S.type==='defend')return;
+ for(const u of players().filter(u=>u.status==='ok'&&tile(u.x,u.y)==='E')){
+  if(u.vip)return finish(true,S.M.win);
+  if(S.type==='investigate'&&S.clues>=2)return finish(true,S.M.win)}}
+function checkEnd(){if(S.over)return;const M=S.M,sq=players().filter(u=>!u.vip);
+ const foes=enemies().some(e=>e.status==='ok'||e.status==='stunned');
+ if(S.type==='defend'&&S.obj<=0)return finish(false,M.lose);
+ if(!sq.some(u=>u.status==='ok'))return finish(false,'The squad is overwhelmed.');
+ if(S.type==='defend'&&S.turn>=M.lastWave&&!foes)return finish(true,`The last attackers are broken. ${M.win}`);
+ if(S.type==='rescue'){const h=hostage();if(!alive(h))return finish(false,`${h.n} is dead. ${M.lose}`);
+  if(!foes)return finish(true,`The depot is secured. ${M.win}`)}
+ if(S.type==='investigate'){if(S.clues+tilesWhere(c=>c==='q').length<2)return finish(false,`Too much data was wiped. ${M.lose}`);
+  if(!foes&&S.clues>=2)return finish(true,`The district is clear. ${M.win}`)}}
+// Mission over: campaign.js applies results; base.js shows the debrief.
+function finish(win,msg){S.over=true;S.phase='over';S.win=win;S.msg=msg;render();missionOver(win,msg)}

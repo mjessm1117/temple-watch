@@ -14,11 +14,13 @@ function device() {
 }
 async function enterCode(w, code) { const d = w.document; d.querySelector('#syncBtn').click(); d.querySelector('#syncIn').value = code; d.querySelector('#syncOk').click(); await sleep(80); }
 const A = device(); await enterCode(A, 'jedi-council');
-A.document.querySelector('[data-c="supply"]').click(); await sleep(20);
+A.document.querySelector('[data-d="normal"]').click(); await sleep(20);
+A.document.querySelector('[data-act="squad:0"]').click(); A.document.querySelector('#deploy').click(); await sleep(20);
 A.eval('S.units[0].x=2;S.units[0].y=6'); await A.eval('endTurn()'); await sleep(100);
 check(kv.size === 1, 'laptop save reached the server');
+check(JSON.parse([...kv.values()][0]).C.month === 1, 'server save holds the campaign');
 const B = device(); await enterCode(B, 'jedi-council');
-const c = B.document.querySelector('#cont'); check(!!c, 'phone sees Continue mission');
+const c = B.document.querySelector('#cont'); check(!!c, 'phone sees Continue campaign');
 c && c.click();
 check(B.eval('S.turn') === A.eval('S.turn'), 'phone resumes the same turn');
 check(B.eval('S.units[0].x+","+S.units[0].y') === '2,6', 'phone sees the same unit positions');

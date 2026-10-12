@@ -22,7 +22,9 @@ This repo is the only source of truth for the game. Real code only.
 public/            the game (static files served by the Worker; _headers = no-cache so the newest build always loads)
   index.html       page shell; loads css + js in order
   css/style.css    look and feel (color tokens at top)
-  js/data.js       numbers: map, waves, squad, enemies  ← tune here
+  js/data.js       combat numbers: difficulty, enemies, missions (maps, waves, rewards)  ← tune here
+  js/data-campaign.js  classes, ranks, kits, wings, economy, crises, mission plan  ← tune here
+  js/icons.js      stroke icons (spec D) + icon() helper
   js/util.js       helpers, tile rules
   js/state.js      game state S, lookups, log
   js/rules.js      sight, cover, hit %, movement, damage
@@ -31,12 +33,14 @@ public/            the game (static files served by the Worker; _headers = no-ca
   js/ai.js         enemy AI
   js/render.js     board + panels
   js/input.js      taps/clicks
-  js/save.js       local + cloud saves
-  js/screens.js    briefing/debrief; boots the game (load last)
+  js/save.js       local + cloud saves (campaign C + live mission S)
+  js/campaign.js   campaign state C: XP, wounds, calendar, economy, results
+  js/base.js       Temple base, squad select, debrief, slice-end screens
+  js/screens.js    opening vision + difficulty; boots the game (load last)
 worker.js               Worker entry: /api/save → backend, else static files from public/
 functions/api/save.js   backend: GET/PUT /api/save (KV binding SAVES)
 wrangler.toml           Worker config: assets dir, KV binding
-tests/                  balance.test.js (40 bot games), sync.test.mjs (cross-device save)
+tests/                  bot.js (test bot), balance.test.js (bot games per mission), campaign.test.js (full slice), sync.test.mjs (cross-device save)
 assets/temple-watch.ico  desktop icon used by the launcher on Jess's laptop
 tools/inline.js         builds dist/temple-watch.html (single file, for tests/offline)
 docs/                   design, specs, chat briefs, changelog
