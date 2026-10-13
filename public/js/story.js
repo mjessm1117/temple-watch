@@ -65,10 +65,10 @@ function sceneScreen(){SCR=sceneScreen;const s=C.story,id=s.q[0],m=$('#modal');m
  const e=EVENTS.find(e=>e.id===id);if(!e){s.q.shift();return baseScreen()}
  const cant=c=>Object.entries(c.effects).some(([k,v])=>RES_NAMES[k]&&k!=='orderDark'&&v<0&&(C.res[k]||0)+v<0);
  m.innerHTML=`<div class="box"><div class="eyebrow">Council matter · Month ${C.month}</div><h2>A choice</h2><p>${e.text}</p>
-  ${e.choices.map((c,i)=>`<button type="button" class="choice" data-ch="${i}" ${cant(c)?'disabled':''}><b>${c.label}</b><span>${fxText(c.effects)}</span></button>`).join('')}</div>`;
+  ${e.choices.map((c,i)=>`<button type="button" class="choice" data-ch="${i}" ${cant(c)?'disabled':''}><b>${c.label}</b><span>${choiceText(c.effects)}</span></button>`).join('')}</div>`;
  m.onclick=ev=>{const b=ev.target.closest('[data-ch]');if(!b||b.disabled)return;const c=e.choices[+b.dataset.ch];s.seen.push(e.id);done([c.label,...applyFx(c.effects)])}}
 // Preview of a choice's effects, in plain words.
-function fxText(f){const o=[];for(const [k,v] of Object.entries(f)){
+function choiceText(f){const o=[];for(const [k,v] of Object.entries(f)){
  if(RES_NAMES[k])o.push(`${sgn(v)} ${RES_NAMES[k]}`);else if(k==='mission')o.push(`Unlocks a mission: ${CRISES[v].n}`);
  else if(k.startsWith('loyalty'))o.push(`${COUNCIL_SEATS[v.seat].n} ${v.n>0?'approves':'disapproves'}`);
  else if(k==='unitDark')o.push(`A Jedi gains Darkness ${sgn(v.n)}`);else if(k==='recruit')o.push(`${STORY_RECRUITS[v].n} joins`);
