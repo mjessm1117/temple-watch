@@ -7,6 +7,8 @@
 - Deviations: Rescue/Investigate end in a loss at Threat 6 (prevents endless stalemates); reinforcements capped at 3 groups; data from 2 scanned terminals reaches every comlink (anyone on evac extracts); relay map keeps v0.1's three "fortify" crates; Forge has no effect until crafting (v0.2b).
 - Bot results (10 games each, Normal, weak passive bot): relay ~25–30%, shrine ~100%, rescue ~70–80%, envoy ~40–70%. Spec A's smart bot + 200-game tuning is still to do.
 
+**v0.2b story (Chat S, 2026-10-12):** vision shard scene, 6 Era-1 Council events, Vision meter (`C.story.shadow`), Years pass (+5 yrs: aging, Trials, retirement → staff/teach/relic), 3 new crises (Hydian blockade, listening post, Hutt ledger; mirrored maps), Darth Malgus at Docking Ring Nine (assault), era-end screen with history recap, Archive of Legends (local, cap 30).
+
 **Next (v0.2b):** Years pass (aging, Trials, retirement), saber/gear crafting, Docking Ring Nine boss vs Darth Malgus, era end. Also: smart bot and difficulty tuning to spec A §8 bands.
 
 
@@ -32,6 +34,10 @@ Jess's verdict: concept OK, too basic. Gaps: only one mission, shallow combat, p
 - F → H (`turns.js`): in `endTurn`'s enemy loop, after `await eAct(e)`, add `await View3D?.idle?.()` (one line: `if(window.View3D)await View3D.idle();`). Lets each enemy's animation finish before the next acts. Resolves at once in 2D/tests; capped at 4 s.
 - F → H/E (fx contract): `public/js/fx.js` (loaded after `ai.js`) emits `move`, `shot`, `miss`, `hit`, `kill`, `down`, `explode`, `ability` by wrapping `moveAlong`, `resolve`, `damage`, `blast`, `exec`. Keep those names and signatures. New effects: call `fx('coverBreak',{x,y})` when cover degrades (the view also diffs the grid, so it's optional). If you add your own `fx('shot'…)` calls, delete the matching wrapper in `fx.js`.
 - F → E: optional cleanup: rename state.js's floating-text `fx(p,txt,cls)` to `floatText`; `fx.js` keeps the old 3-arg form working until then.
+- S → F: S added 2 script tags to `index.html`: `data-story.js` after data-campaign.js, `story.js` after base.js. Keep them in that order.
+- S → G: story.js wraps `baseScreen`, `endScreen`, `applyResults`, `addRecruit`; keep those names or ping S. Retirees get `status:'retired'`; please show them as Retired in the roster (staff retirees already read "Staffing …"). Retiree staffing uses your `C.staff[wing]=id` + `r.assign`.
+- S → H: mission type `assault` (Malgus, `dock` in data-story.js) is implemented in story.js by wrapping `checkEnd`/`threatStep`/`startMission`: win = unit with `boss` dead, Threat 6 = loss. Fold it into turns.js whenever you like. render.js could show the boss HP as the objective.
+- S → E: S made surgical test edits so npm stays green: campaign.test.js clears story screens and expects `PLAN.length` steps; sync.test.mjs clears the opening scenes; balance.test.js adds blockade/cache/hutt/dock. Weak-bot Malgus win (30 games): Story ~67%, Normal ~27%.
 
 ## Infrastructure
 - **Live game:** https://temple-watch.mjessm1117.workers.dev/ (Cloudflare Worker `temple-watch`, auto-deploys on push to `main`).

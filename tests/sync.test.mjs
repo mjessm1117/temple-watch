@@ -15,6 +15,8 @@ function device() {
 async function enterCode(w, code) { const d = w.document; d.querySelector('#syncBtn').click(); d.querySelector('#syncIn').value = code; d.querySelector('#syncOk').click(); await sleep(80); }
 const A = device(); await enterCode(A, 'jedi-council');
 A.document.querySelector('[data-d="normal"]').click(); await sleep(20);
+// Clear the opening story screens (vision shard, first Council event).
+for(let k=0;k<4;k++){const b=A.document.querySelector('#scOk')||A.document.querySelector('[data-ch]');if(!b)break;b.click();await sleep(20)}
 A.document.querySelector('[data-act="squad:0"]').click(); A.document.querySelector('#deploy').click(); await sleep(20);
 A.eval('S.units[0].x=2;S.units[0].y=6'); await A.eval('endTurn()'); await sleep(100);
 check(kv.size === 1, 'laptop save reached the server');

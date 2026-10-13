@@ -3,7 +3,7 @@ const {JSDOM}=require('jsdom');const fs=require('fs'),path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'..','dist','temple-watch.html'),'utf8').replace('const sleep=ms=>new Promise(r=>setTimeout(r,ms));','const sleep=()=>Promise.resolve();');
 const bot=fs.readFileSync(path.join(__dirname,'bot.js'),'utf8');
 const N=+process.env.GAMES||10,diff=process.env.DIFF||'normal';let fail=0;
-(async()=>{for(const id of ['relay','shrine','rescue','envoy']){const res={mission:id,win:0,lose:0,err:0,dead:0,turns:0};
+(async()=>{for(const id of ['relay','shrine','rescue','envoy','blockade','cache','hutt','dock']){const res={mission:id,win:0,lose:0,err:0,dead:0,turns:0};
  for(let g=0;g<N;g++){const w=new JSDOM(html,{runScripts:'dangerously'}).window;const errs=[];w.addEventListener('error',e=>errs.push(e.message));
   try{w.eval(bot);w.eval(`startMission('${id}',START_ROSTER.map((r,i)=>battleUnit({id:'u'+i,rank:1,xp:0,dark:0,picks:[],...r})),{diff:'${diff}'})`);
    for(let i=0;i<40&&!w.eval('S.over');i++){w.eval('AI()');await w.eval('endTurn()')}
