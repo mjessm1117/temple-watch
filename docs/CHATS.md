@@ -48,3 +48,47 @@ Spec chats (A–D) may run at the same time; each touches only its own files. E 
 3. Build it in `public/` and `functions/`. Keep `npm test` green; add tests for new systems.
 4. Push to `main` (Cloudflare deploys it). Tell Jess what changed in ≤5 lines.
 5. Update `docs/STATUS.md` and add a dated line to `docs/CHANGELOG.md`.
+
+---
+
+# Wave 2 (2026-10-12): from Jess's v0.2a notes
+
+Jess's notes: battle mechanics are good. He wants cover to read more clearly, **real 3D (low-poly, animated, not realistic)**, and kills that feel impactful. After a battle there must be a way to **upgrade troops**. The Temple hub needs **real team management**: loadouts & gear, training & assignments, recruiting choices, bonds & personal quests.
+
+Every wave-2 chat: `git pull` before you start and before every push. `npm test` must stay green (no `FAIL`, `"err":0`). Edit **only the files you own**. If you need a change in someone else's file, add a line under "Requests" in `docs/STATUS.md` and don't make the edit yourself.
+
+| Chat | Owns (edit only these) | Goal |
+| --- | --- | --- |
+| F 3D Battle | `public/js/view3d/*` (new), `public/vendor/*` (new), `public/models/*` (new), `render.js`, `input.js`, `css/style.css`, `index.html` | 3D board, animation, kill impact, clear cover |
+| G Temple & Progression | `base.js`, `campaign.js`, `data-campaign.js`, new `public/js/temple-*.js` | Post-battle upgrades + deep hub management |
+| H Maps & Missions | `data.js`, `rules.js`, `abilities.js`, `turns.js`, `ai.js`, `icons.js` | More maps, destructible cover, new objectives and enemies |
+| S Story (start **after G pushes**) | new `public/js/story.js`, `public/js/data-story.js` | v0.2b: vision scenes, events, Years pass, Malgus boss, era end |
+| E Coordinator | `tests/`, `docs/STATUS.md`, `docs/CHANGELOG.md`; merges and fixes anything | Integrate, play-test, tune, report to Jess |
+
+**Shared contract (all chats):** game logic never depends on the view. Logic files call `fx(type, data)` for anything visual (`move`, `shot`, `hit`, `miss`, `kill`, `down`, `ability`, `explode`, `coverBreak`, `turn`). F defines `fx` in `public/js/fx.js` (loaded right after `util.js`), with a no-op default. F may add one-line `fx(...)` calls to H's files, and H pulls before editing.
+
+## F. 3D Battle
+1. Three.js r160+, vendored into `public/vendor/` (no CDN, no build step). Load it as a module that exposes `window.View3D`. **If WebGL is missing (as in the jsdom tests), fall back to the current 2D board.** Tests must still pass.
+2. Camera: XCOM-style tilt with 90° rotate (Q/E or buttons), zoom on the mouse wheel, click-to-select through raycast. Laptop first.
+3. Low-poly look: CC0 models (Quaternius/Kenney via GitHub) or primitives. Jedi need glowing sabers in the unit color, troops wear Republic colors, Sith are red/black. Credit the asset sources in `public/models/CREDITS.md`.
+4. **Cover clarity:** half cover as waist-high crates and walls, full cover as tall pillars and walls. When moving, show shield icons on the tile edges (half = outline, full = solid). The hit-% panel names the cover.
+5. **Kill impact:** blaster bolts travel the shot, then hit flash + knockback; kills get a slow-mo beat (≈250 ms), a ragdoll-style fall, a sparks/smoke burst, and a camera nudge. A big `KILL` popup. Saber strikes swing. Force powers get distinct effects (push wave, lightning, choke lift).
+6. Respect `prefers-reduced-motion`. Target 60 fps on a mid laptop. Keep each file under ~600 lines.
+
+## G. Temple & Progression
+1. **Post-battle upgrades:** the debrief offers a promotion pick for every promoted unit, **troops included**. Use spec A troop kits: Soldier, Scout, Medic, Heavy, choosing 1 of 2 at R2 and at R3. Show what changed.
+2. **Loadouts & gear:** a per-unit equipment screen. Troops get a weapon tier, armor, and 1 mod (spec B §5.4). Jedi get saber tiers T2 and crystal color (spec B §5.3), using the Kyber Forge and the Armory wing. Stats flow into the battle through `battleUnit()`.
+3. **Training & assignments:** bench units into wings to train (XP), heal faster, or staff the wing for its bonus (spec B §2). Every assignment costs that unit's availability.
+4. **Recruiting:** each month, choose from 3 candidates showing class, trait, origin and age. Name the recruit and set the color (spec B §5.5). Cap the roster by Barracks.
+5. **Bonds & personal quests** (spec C §7): bond levels grow from shared missions and revives. Expose the in-battle bonus as numbers on `battleUnit()` (e.g. `u.bondAim`) and file a Request for H to apply them. Personal quest offers become missions in the crisis list, using existing mission types.
+6. The hub needs a clear Temple screen with tabs: Roster · Armory · Wings · Recruit · Council (seats are display only).
+
+## H. Maps & Missions
+1. Give each mission type at least 2 hand-made maps, 6+ in total, and pick one at random per crisis. Mark the tile height for F: half = 1, full = 2.
+2. Destructible cover: explosions and Heavy shots degrade full → half → rubble (spec A §1, §4). Add barrels, doors, consoles, beacons and evac if any are missing.
+3. Enemies: Imperial Agent (concealed sniper) and Terentatek (a horror that only hurts Force users), from spec A §3.
+4. New objectives: sabotage (plant charges, then extract) and a VIP escort. Both use soft pressure (Threat bar), not hard timers.
+5. Apply G's bond numbers when they land. Keep the Normal smart-bot win rate at 55–70% (spec A §8), and update `tests/balance.test.js` to cover every map.
+
+## S. Story (after G)
+Use spec C §10 and spec B §8 v0.2b, from the "Years pass" step through the Malgus boss: the vision opening scene, the 6 Era-1 events in the hub, the `shadow` meter, the Years pass jump (aging, Trials, retirement), Darth Malgus at Docking Ring Nine (put the map in `data-story.js`), the era-end screen with Legends, and an Archive entry on death. Order Darkness runs 0–100 (Dark Council ending at ≥80).
