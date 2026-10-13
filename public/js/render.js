@@ -30,13 +30,18 @@ function actsHTML(){const u=S.sel;if(!canAct(u)||S.peek)return '';
   if(!why&&!ab.instant&&!targetsFor(u,k).length){if(ab.ctx)return '';why='No targets'}
   const cost=[ab.f?ab.f+' Focus':'',ab.ap===1?'1 action':'ends turn'].filter(Boolean).join(' · ');
   return `<button type="button" data-a="${k}" class="act ${S.mode===k?'on':''}" ${why?'disabled':''} title="${ab.tip.replace(/"/g,'')}">${icon(ab.ic)}<span>${ab.name}<small>${why||cost}</small></span></button>`}).join('')}
+// Names what the target hides behind, for the odds panel ("Half cover · crate").
+const COVER_N={'#':'wall',O:'objective',d:'door',D:'locked door',c:'crate',r:'rubble',x:'barrel',k:'console',q:'terminal',Q:'terminal'};
+function coverName(t,a){if(t.barrier)return 'Force Barrier';let best=null,bv=0;const dx=Math.sign(a.x-t.x),dy=Math.sign(a.y-t.y);
+ for(const [x,y] of [dx?[t.x+dx,t.y]:null,dy?[t.x,t.y+dy]:null].filter(Boolean)){const c=tile(x,y),v=FULL(c)?2:HALF(c)?1:0;if(v>bv){bv=v;best=c}}
+ return COVER_N[best]||'cover'}
 // Odds panel: every modifier on its own line, then Confirm (two-step aiming, spec D §5).
 function oddsHTML(){const u=S.sel,g=S.pick;if(!g||!canAct(u))return '';const ab=AB[S.mode];let head,lines=[],total=g.chance;
  if(g.t&&g.t.side==='e'&&(S.mode==='shoot'||ab.melee)){const o=odds(u,g.t,ab.melee?{melee:true,mod:S.mode==='sweep'?-10:u.leapAim||0}:{});lines=o.lines;total=o.total}
  if(g.barrel)head='Barrel · 3×3 blast, 3 damage';else if(g.area)head=ab.name+' · 3×3 area';else if(g.spot)head='Leap here';else if(g.t)head=g.t.n;else head=ab.name;
  const dm=ab.dm&&g.t&&g.t.side==='e'?ab.dm(u):null,kill=dm&&Math.max(1,dm[1]+(u.jedi&&u.dark>=5?1:0)-(g.t.armor||0))>=g.t.hp;
  return `<div class="odds"><div class="oh"><b>${head}</b>${total!=null?`<span class="tot">${total}%</span>`:''}</div>
- ${lines.map(([k,v])=>`<div class="ol"><span>${k}</span><span>${k==='Aim'?v:(v>0?'+':'')+v}</span></div>`).join('')}
+ ${lines.map(([k,v])=>`<div class="ol"><span>${/cover$/.test(k)&&g.t?k+' · '+coverName(g.t,u):k}</span><span>${k==='Aim'?v:(v>0?'+':'')+v}</span></div>`).join('')}
  ${dm?`<div class="ol dm"><span>Damage</span><span>${dm[0]}–${dm[1]}${kill?' · kills on hit':''}</span></div>`:''}
  <button type="button" id="confirm" class="primary">Confirm ${ab.name}</button></div>`}
 function hintText(){if(S.over)return '';if(S.phase==='enemy')return 'The enemy is moving…';const u=S.sel;
@@ -45,7 +50,7 @@ function hintText(){if(S.over)return '';if(S.phase==='enemy')return 'The enemy i
  if(u.status==='down')return `${u.n} is down. An adjacent ally can Stabilize; a medkit revives.`;
  if(!canAct(u))return players().some(canAct)?'This unit has acted. Pick another.':'All units have acted. End the turn.';
  if(S.pick)return 'Check the odds, then Confirm. Tap another target to switch.';
- if(S.mode==='move')return 'Tap a lit tile to move (1 action). Squares mark cover: hollow = half, solid = full.';
+ if(S.mode==='move')return window.View3D&&View3D.on?'Click a lit tile to move (1 action). Shields mark cover: outline = half, solid = full.':'Tap a lit tile to move (1 action). Squares mark cover: hollow = half, solid = full.';
  return AB[S.mode].tip+' Tap a highlighted target, or tap the ability again to cancel.'}
 function statsRender(){const M=S.M,set=(id,v)=>{$(id).textContent=v},show=(id,on)=>{$(id).hidden=!on};
  $('#where').textContent=`${M.n} · ${M.where}`;
@@ -91,4 +96,5 @@ function render(){if(!S)return;
  $('#roster').innerHTML=S.units.filter(u=>u.side==='p').map((u,i)=>`<button type="button" data-u="${i}" class="${u===S.sel&&!S.peek?'on':''} ${!canAct(u)?'done':''}" style="--uc:${u.vip?'var(--good)':u.col||'var(--troop)'}">${icon(unitIcon(u))}${shortName(u)}${u.status==='down'?' ✚':u.status==='dead'?' †':''}</button>`).join('');
  $('#card').innerHTML=cardHTML();$('#acts').innerHTML=actsHTML();$('#odds').innerHTML=oddsHTML();$('#hint').textContent=hintText();
  $('#endBtn').disabled=S.phase!=='player'||S.over;
- $('#log').innerHTML=S.log.slice(0,12).map(l=>`<p class="${l.cls}">${l.t}</p>`).join('')}
+ $('#log').innerHTML=S.log.slice(0,12).map(l=>`<p class="${l.cls}">${l.t}</p>`).join('');
+ if(window.View3D)View3D.sync()}

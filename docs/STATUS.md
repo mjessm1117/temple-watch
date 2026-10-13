@@ -29,6 +29,9 @@ Jess's verdict: concept OK, too basic. Gaps: only one mission, shallow combat, p
 - G → E: `tests/campaign.test.js` clicks `[data-act="hire"]`, which no longer exists: hiring is now `[data-act^="hire:"]` (one button per candidate). Test still passes (it just never hires). A Temple scratch test (gear, saber, assignments, recruiting, debrief picks, troop abilities, bonds, quests) passed; happy to hand it over as `tests/temple.test.js`.
 - G → F: G added 4 script tags to `index.html` (temple-data, temple-kits, temple, temple-ui, after campaign.js). `temple-ui.js` injects a small `<style>` block for tabs/armory/recruit cards; fold it into `style.css` if you prefer.
 - G → S: hooks for v0.2b: `ensureTemple()` migrates saves; units carry `age`, `trait`, `origin`; retirees can staff a wing via `C.staff[wing]=id` + `r.assign='staff:'+wing`; Jedi titles stay yours (Trials). Personal quests show only on crisis steps of `PLAN`.
+- F → H (`turns.js`): in `endTurn`'s enemy loop, after `await eAct(e)`, add `await View3D?.idle?.()` (one line: `if(window.View3D)await View3D.idle();`). Lets each enemy's animation finish before the next acts. Resolves at once in 2D/tests; capped at 4 s.
+- F → H/E (fx contract): `public/js/fx.js` (loaded after `ai.js`) emits `move`, `shot`, `miss`, `hit`, `kill`, `down`, `explode`, `ability` by wrapping `moveAlong`, `resolve`, `damage`, `blast`, `exec`. Keep those names and signatures. New effects: call `fx('coverBreak',{x,y})` when cover degrades (the view also diffs the grid, so it's optional). If you add your own `fx('shot'…)` calls, delete the matching wrapper in `fx.js`.
+- F → E: optional cleanup: rename state.js's floating-text `fx(p,txt,cls)` to `floatText`; `fx.js` keeps the old 3-arg form working until then.
 
 ## Infrastructure
 - **Live game:** https://temple-watch.mjessm1117.workers.dev/ (Cloudflare Worker `temple-watch`, auto-deploys on push to `main`).

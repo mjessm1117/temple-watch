@@ -164,3 +164,30 @@ button.primary{background:color-mix(in srgb,var(--holo) 22%,var(--raise));border
 .squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px}
 .sq{text-align:left;font-family:var(--body);font-weight:500}.sq small{display:block;color:var(--dim);font-size:11px}
 .flag{border-left:2px solid var(--dark);padding-left:10px;color:var(--fg)}
+
+/* 3D battle view (js/view3d/). Body class v3d swaps the 2D grid for the WebGL canvas; 2D stays as the fallback. */
+.v3{display:none}
+.v3d .v3{display:block;position:relative;width:100%;height:clamp(420px,calc(100vh - 150px),900px);border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#070d0f}
+.v3d .board,.v3d .over{display:none}
+.v3d .layout .bwrap{max-width:none}
+.v3 canvas{display:block;width:100%;height:100%;cursor:pointer;touch-action:none}
+.v3l{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.v3u,.v3t,.v3f{position:absolute;left:0;top:0;width:0;height:0;will-change:transform}
+.v3l .in{position:absolute;left:0;top:0;white-space:nowrap}
+.v3u .in{display:flex;align-items:center;gap:3px;transform:translate(-50%,-100%)}
+.v3u .hp{position:static;height:auto;display:flex;gap:1px;padding:2px;background:#0a1113d9;border:1px solid #22363c;border-radius:3px}
+.v3u .hp b{flex:none;width:6px;height:5px;background:var(--line);border-radius:1px}.v3u .hp b.on{background:var(--uc)}
+.v3u .bdg{display:inline-flex;align-items:center;gap:2px;background:#0a1113e6;border:1px solid var(--line);border-radius:4px;padding:1px 3px;color:var(--fg);font:500 10px var(--mono)}
+.v3u .bdg svg{width:13px;height:13px}
+.v3u em{font:500 11px var(--mono);font-style:normal;color:var(--fg);text-shadow:0 1px 2px #000}
+.v3t .in{transform:translate(-50%,-100%);font:600 12px var(--mono);padding:1px 6px;border-radius:4px;background:var(--sith);color:#0a1113}
+.v3t.best .in{background:var(--fg)}.v3t.al .in{background:var(--good)}
+.v3f .in{transform:translate(-50%,-50%);font:600 15px var(--disp);color:#fff;text-shadow:0 0 4px #000,0 1px 2px #000}
+.v3f.dmg .in{color:#ffd0c8}.v3f.miss .in{color:var(--dim)}.v3f.defl .in{color:var(--holo)}.v3f.heal .in{color:var(--good)}.v3f.boom .in{color:#ffb050}
+.v3f.big .in{font:700 36px var(--disp);letter-spacing:.16em;color:#fff;text-shadow:0 0 14px var(--sith),0 0 4px var(--sith),0 2px 0 #000;animation:killpop .35s ease-out}
+@keyframes killpop{from{transform:translate(-50%,-50%) scale(1.8);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.v3c{position:absolute;left:8px;bottom:8px;display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.v3c button{min-height:30px;min-width:32px;padding:2px 8px;background:#0f191cd9;font-size:15px}
+.v3c span{font:500 11px var(--body);color:var(--dim);margin-left:6px;text-shadow:0 1px 2px #000}
+@media(max-width:700px){.v3c span{display:none}}
+@media(prefers-reduced-motion:reduce){.v3f.big .in{animation:none}}
