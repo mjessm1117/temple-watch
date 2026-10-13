@@ -1,4 +1,5 @@
 # Changelog
+- 2026-10-12: Wave 2 merged: 3D battles, Temple management, sabotage/escort/listening-post crises in the campaign, objective HUD for every mission type (boss HP for Malgus), new tiles in 3D, retirees shown, pinch-zoom on phones.
 - 2026-10-12: Wave 2 planned: 3D battle, Temple management, maps/missions, story (see docs/CHATS.md).
 - 2026-10-12: v0.2a: campaign slice (Temple base, 4 wings, 5 resources, crisis pick, XP ranks 1–3, wounds), 3 new missions (rescue, shrine defend, investigate), Guardian/Consular kits + troop abilities, Imperial Agent + Terentatek, doors/barrels/consoles/evac, Threat clock, difficulty levels, spec D look (icon tokens, odds panel + Confirm, enemy intent, turn banner).
 - 2026-10-12: Coordinator sweep: specs A–D done; v0.2 split into a/b; Darkness scale unified at 0–100.

@@ -25,12 +25,17 @@ export class CamRig{
  bind(dom,pick,onTile){let down=null,dragged=false;
   dom.addEventListener('contextmenu',e=>e.preventDefault());
   dom.addEventListener('wheel',e=>{e.preventDefault();this.zoom(e.deltaY>0?1.12:1/1.12)},{passive:false});
-  dom.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY,b:e.button};dragged=false;dom.setPointerCapture(e.pointerId)});
-  dom.addEventListener('pointermove',e=>{
+  // Two-finger pinch zooms on phones/tablets; one finger pans, tap selects.
+  const pts=new Map();let pinch=0;const gap=()=>{const[a,b]=[...pts.values()];return Math.hypot(a.x-b.x,a.y-b.y)||1};
+  dom.addEventListener('pointerdown',e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2){pinch=gap();down=null;dragged=true;return}
+   down={x:e.clientX,y:e.clientY,b:e.button};dragged=false;dom.setPointerCapture(e.pointerId)});
+  const lift=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=0};dom.addEventListener('pointercancel',lift);
+  dom.addEventListener('pointermove',e=>{if(pts.has(e.pointerId))pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+   if(pinch&&pts.size===2){const g=gap();this.zoom(pinch/g);pinch=g;return}
    if(down){const dx=e.clientX-down.x,dy=e.clientY-down.y;if(!dragged&&Math.hypot(dx,dy)>7)dragged=true;
     if(dragged){const s=.9/Math.max(300,dom.clientWidth)*30;this.pan(-dx*s,dy*s);down.x=e.clientX;down.y=e.clientY;return}}
    const t=pick(e);onTile(t?t.x:-1,t?t.y:-1,'hover')});
-  dom.addEventListener('pointerup',e=>{const was=down;down=null;if(!was||dragged||was.b!==0)return;const t=pick(e);if(t)onTile(t.x,t.y,'click')});
+  dom.addEventListener('pointerup',e=>{lift(e);const was=down;down=null;if(!was||dragged||was.b!==0)return;const t=pick(e);if(t)onTile(t.x,t.y,'click')});
   dom.addEventListener('pointerleave',()=>onTile(-1,-1,'hover'));
   const typing=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)};
   document.addEventListener('keydown',e=>{if(typing()||!document.getElementById('modal').hidden)return;const key=e.key.toLowerCase();

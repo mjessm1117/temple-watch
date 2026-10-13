@@ -80,6 +80,7 @@ function checkEnd(){if(S.over)return;const M=S.M,sq=players().filter(u=>!u.vip);
  if(S.type==='sabotage'&&!foes&&armed()>=M.need)return finish(true,`The garrison is down. ${M.win}`)}
 // For the HUD and the debrief: the objective readout and whether the mission bonus was earned.
 function objStat(){const M=S.M,h=hostage();
+ if(S.type==='assault'){const b=S.units.find(u=>u.boss);return{label:b?b.n:'Target',val:!b||b.hp<=0?'down':`${b.hp}/${b.max} HP`}}
  if(S.type==='defend')return{label:M.objName,val:`${S.obj}/${M.obj}`};
  if(S.type==='rescue')return{label:'Prisoner',val:h.status==='dead'?'dead':h.bound?'locked in':`${h.hp}/${h.max} HP`};
  if(S.type==='escort')return{label:'VIP',val:h.status==='dead'?'dead':`${h.hp}/${h.max} HP`};

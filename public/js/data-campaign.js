@@ -36,10 +36,13 @@ const START_ROSTER=[
 const RECRUIT_NAMES=['Bryn Kallo','Daro Vesk','Ina Quell','Mako Strand','Tal Reyes','Juno Pell','Ferra Dask','Oren Kade','Sev Morran','Lio Brask'];
 // Crises offered on the galaxy list. Pick one; the others expire with their ignore penalty.
 const CRISES={
+ archive:{n:'Imperial listening post',kind:'Investigate',src:'Navy request',mission:'archive',text:'An Imperial post is reading our fleet traffic. Copy its data and get out.',ignore:{favor:-5}},
+ sabotage:{n:'Strike the fuel depot',kind:'Sabotage',src:'Senate request',mission:'sabotage',text:'Blow the depot fuelling the Balmorra fleet. Plant 2 charges, then extract.',ignore:{favor:-8}},
+ escort:{n:'Get the senator out',kind:'Escort',src:'Senate request',mission:'escort',text:'A senator marked for death must reach a shuttle across hostile ground.',ignore:{favor:-8}},
  rescue:{n:'Hostages at Ord Mantell',kind:'Rescue',src:'Senate request',mission:'rescue',
   text:'Sith raiders seized a Senate aide at a supply depot. The Senate wants her back.',ignore:{favor:-8}},
  shrine:{n:'Beast at the Dantooine shrine',kind:'Defend',src:'Civilian',mission:'shrine',
   text:'Pilgrims report Sith troopers, and something that hunts Jedi, closing on a kyber shrine.',ignore:{favor:-3,orderDark:4}}};
 // v0.2a slice: S1 story → pick a crisis → S2 story. v0.2b adds Years pass and the Docking Ring Nine boss.
-const PLAN=[{story:'relay'},{crises:['rescue','shrine']},{story:'envoy'}];
+const PLAN=[{story:'relay'},{crises:['rescue','shrine','archive']},{story:'envoy'}];
 const RES_NAMES={credits:'Credits',intel:'Intel',kyber:'Kyber',favor:'Senate Favor',recruits:'Recruits',orderDark:'Order Darkness'};

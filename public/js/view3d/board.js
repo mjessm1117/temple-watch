@@ -1,7 +1,8 @@
 // Map geometry from S.grid + floor highlights. Half cover is waist-high (crates, consoles, barrels), full cover is tall (walls, pillars, doors).
 // Rebuilds only tiles whose character changed; anything that lost cover reports back so effects can throw debris.
 const HALF_H=.55,FULL_H=1.55;
-export const tileH=c=>'#OdD'.includes(c)?FULL_H:'cxkqQ'.includes(c)?HALF_H:c==='r'?.2:0;
+const ALIAS={B:'#',h:'c',b:'k',C:'q',X:'Q'};
+export const tileH=c=>{const h=(TILES[c]||{}).h||0;return h>=2?FULL_H:h>=1?HALF_H:h>0?.2:0};
 export class Board{
  constructor(THREE,scene){this.T=THREE;this.scene=scene;this.root=new THREE.Group();scene.add(this.root);this.tiles=new Map();this.grid=null;
   const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.8,metalness:.15,flatShading:true,...o});
@@ -29,7 +30,7 @@ export class Board{
  sync(grid){if(!this.grid||grid.length!==this.rows||grid[0].length!==this.cols){this.build(grid);return[]}const lost=[];
   for(let y=0;y<this.rows;y++)for(let x=0;x<this.cols;x++){const c=grid[y][x],o=this.grid[y][x];if(c===o)continue;
    if(tileH(c)<tileH(o))lost.push({x,y,h:tileH(o),c:o});this.grid[y][x]=c;this.setTile(x,y,c)}return lost}
- setTile(x,y,c){const k=x+','+y,old=this.tiles.get(k);if(old){this.root.remove(old);this.anim=this.anim.filter(a=>a.g!==old)}
+ setTile(x,y,c){c=ALIAS[c]||c;const k=x+','+y,old=this.tiles.get(k);if(old){this.root.remove(old);this.anim=this.anim.filter(a=>a.g!==old)}
   const g=this.make(c,x,y);if(!g)return this.tiles.delete(k);g.position.copy(this.pos(x,y));g.traverse(o=>{if(o.isMesh){o.castShadow=o.userData.noShadow?false:true;o.receiveShadow=true}});
   this.root.add(g);this.tiles.set(k,g)}
  make(c,x,y){const T=this.T,g=new T.Group(),m=this.m,add=(geo,mat,sx,sy,sz,px=0,py=0,pz=0,ry=0)=>{const o=new T.Mesh(geo,mat);o.scale.set(sx,sy,sz);o.position.set(px,py,pz);o.rotation.y=ry;g.add(o);return o};

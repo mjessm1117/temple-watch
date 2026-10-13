@@ -38,7 +38,7 @@ function hostageFor(o){const r=o.hostage&&C.roster.find(r=>r.id===o.hostage);if(
 // Mission over → apply results right away (so a reload never repeats a mission), then show the debrief.
 function applyResults(win){const M=S.M,o=C.options[C.chosen]||{},out={res:{},rows:[],promo:[]},dep=[];
  if(win){for(const [k,v] of Object.entries(M.reward||{}))gain(k,Math.round(k==='credits'?v*DIFF[C.diff].income:v),out.res);
-  const bonus=S.type==='defend'?S.obj*4>=M.obj*3:S.type==='rescue'?S.turn<=M.par:S.clues>=3;
+  const bonus=missionBonus();
   if(bonus){for(const [k,v] of Object.entries(M.bonus||{}))gain(k,v,out.res);out.bonus=M.bonusTxt}
   if(S.envoyTaken){C.flags.e1_strike_known=1;out.flag='The envoy talks: the peace talks are a feint. The Empire plans a strike on Coruscant.'}}
  else gain('favor',-3,out.res);

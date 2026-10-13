@@ -55,9 +55,7 @@ function hintText(){if(S.over)return '';if(S.phase==='enemy')return 'The enemy i
 function statsRender(){const M=S.M,set=(id,v)=>{$(id).textContent=v},show=(id,on)=>{$(id).hidden=!on};
  $('#where').textContent=`${M.n} · ${M.where}`;
  set('#sTurn',S.type==='defend'?`${S.turn}/${M.turns}`:S.turn);
- if(S.type==='defend'){set('#sObjL',M.objName);set('#sObj',`${S.obj}/${M.obj}`)}
- else if(S.type==='rescue'){const h=hostage();set('#sObjL','Prisoner');set('#sObj',h.status==='dead'?'dead':h.bound?'locked in':`${h.hp}/${h.max} HP`)}
- else{set('#sObjL','Clues');set('#sObj',`${S.clues}/3 (need 2)`)}
+ {const o=objStat();set('#sObjL',o.label);set('#sObj',o.val)}
  const nw=M.waves&&Object.keys(M.waves).map(Number).find(t=>t>S.turn);show('#sWaveW',!!M.waves);if(M.waves)set('#sWave',nw?'T'+nw:'none');
  show('#sThrW',!!M.par);if(M.par)$('#sThr').innerHTML=S.threat?`${pips(Math.max(4,S.threat),S.threat,'t')}`:`rises after T${M.par}`;
  set('#sIntel',S.intel);
@@ -84,7 +82,7 @@ function render(){if(!S)return;
  const best=Math.max(-1,...S.tg.filter(g=>g.t&&g.t.side==='e'&&g.chance!=null).map(g=>g.chance));
  let h='';
  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const c=S.grid[y][x],k=x+','+y,g=S.tg.find(t=>t.x===x&&t.y===y),u=unitAt(x,y),pk=S.pick&&S.pick.x===x&&S.pick.y===y;
-  h+=`<div class="cell ${TILE_CLS[c]||''}${R[k]>0?' reach':''}${g?(g.area?' aim':g.spot?' spot':' tgt')+(g.ally?' ally':''):''}${pk?' picked':''}" data-x="${x}" data-y="${y}">`;
+  h+=`<div class="cell ${TILE_CLS[c]||(TILES[c]&&TILES[c].as)||''}${R[k]>0?' reach':''}${g?(g.area?' aim':g.spot?' spot':' tgt')+(g.ally?' ally':''):''}${pk?' picked':''}" data-x="${x}" data-y="${y}">`;
   if(TILE_IC[c])h+=icon(TILE_IC[c],'ti');
   if(R[k]>0)h+=coverMark(x,y);
   if(u)h+=token(u);

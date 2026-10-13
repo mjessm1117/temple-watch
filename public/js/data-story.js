@@ -53,7 +53,7 @@ Object.assign(CRISES,{
   text:'A Hutt is selling Ilum-grade crystals to anyone. His ledgers name the buyers.',ignore:{}}});
 
 // v0.2b flow (spec B §8.1): … envoy → YEARS PASS → crisis → crisis → Malgus.
-PLAN.push({years:1},{crises:['blockade','rescue']},{crises:['cache','shrine']},{story:'dock'});
+PLAN.push({years:1},{crises:['blockade','sabotage']},{crises:['cache','escort']},{story:'dock'});
 
 // Years pass (+5 years) rules (spec B §1.5). Retire chances are percent per jump.
 const YEARS={jump:5,recruits:3,
