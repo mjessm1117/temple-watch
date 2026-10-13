@@ -28,7 +28,7 @@ function after(){S.mode='move';S.tg=[];S.pick=null;checkEnd();if(!canAct(S.sel))
 function startPlayerTurn(){const M=S.M;
  S.phase='player';
  if(M.waves&&S.turn>1&&M.waves[S.turn])spawn(M.waves[S.turn]);
- if(M.par&&S.turn>M.par){S.threat++;threatStep()}
+ if(M.par&&S.turn>M.par){S.threat++;threatStep();if(S.over)return}
  S.smoke=S.smoke.filter(s=>--s.t>0);S.bmed=null;
  for(const u of S.units){u.supp=0;u.marked=0;if(u.side==='p'){u.supT=null;u.hunker=0;u.barrier=0;u.leapAim=0}}
  for(const u of players()){u.guard=false;u.guardStruck=false;u.ow=false;
@@ -38,8 +38,11 @@ function startPlayerTurn(){const M=S.M;
 // Soft pressure: past the par turn, each turn raises Threat by 1 and the mission gets worse.
 function threatStep(){log(`Threat rises to ${S.threat}.`,'bad');
  if(S.type==='investigate'){const q=tilesWhere(c=>c==='q');if(q.length){const c=pickOne(q);S.grid[c.y][c.x]='r';fx(c,'WIPED','dmg');log('Imperial slicers wipe a data terminal.','bad')}}
- if(S.type==='rescue')log('The guards are getting nervous. One may fire on the prisoner.','bad');
- if(S.threat%2===0&&S.M.reinforce)spawn(S.M.reinforce)}
+ if(S.type==='rescue')log(S.threat>=5?'The Sith are prepping a shuttle. Next turn the prisoner is gone.':'The guards are getting nervous. One may fire on the prisoner.','bad');
+ if(S.type==='investigate'&&S.threat>=5)log('The district is locking down. Next turn the trail goes cold.','bad');
+ if(S.threat>=6)return finish(false,S.type==='rescue'?`The Sith fly the prisoner out. ${S.M.lose}`:`The district locks down. ${S.M.lose}`);
+ // Reinforcements every 2 Threat, at most 3 groups, so a stalled fight can't snowball forever.
+ if(S.threat%2===0&&S.threat<=6&&S.M.reinforce)spawn(S.M.reinforce)}
 async function endTurn(){
  if(S.phase!=='player'||S.over)return;
  evacCheck();if(S.over)return;

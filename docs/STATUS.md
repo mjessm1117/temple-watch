@@ -4,7 +4,7 @@
 - Look (spec D): class-icon tokens, segmented HP, status badges, red/white odds tags, two-step aim with an odds breakdown + Confirm, tap-enemy intent line, turn banner, hover move path, new color tokens.
 - Combat (spec A cut): bleed-out by difficulty (Story 6 / Normal 4 / Hard 3 / Legend 2), Stabilize, capture on loss → rescue crisis, hidden aim assist, crits, armor, barrels, doors, locked doors + console/Hack, clue terminals, evac zones, Threat clock (Rescue par 5, Investigate par 6), Guardian + Consular kits (rank 2/3 = pick 1 of 2), troop R1 abilities (Suppress, Hunker, Mark, Smoke, Hack, Shredder), Imperial Agent (hidden), Terentatek (hurts only Jedi; devours a Jedi left down and unstabilized for a turn).
 - Campaign (spec B cut): 5 resources, 4 wings (Medical L1–2, Training, Forge, Comms), monthly stipend/upkeep/pay, hire troopers, XP ranks 1–3, wounds in days, emergency levy when <4 fit units, Archive of fallen names.
-- Deviations: data from 2 scanned terminals reaches every comlink (anyone on evac extracts); relay map keeps v0.1's three "fortify" crates; Forge has no effect until crafting (v0.2b).
+- Deviations: Rescue/Investigate end in a loss at Threat 6 (prevents endless stalemates); reinforcements capped at 3 groups; data from 2 scanned terminals reaches every comlink (anyone on evac extracts); relay map keeps v0.1's three "fortify" crates; Forge has no effect until crafting (v0.2b).
 - Bot results (10 games each, Normal, weak passive bot): relay ~25–30%, shrine ~100%, rescue ~70–80%, envoy ~40–70%. Spec A's smart bot + 200-game tuning is still to do.
 
 **Next (v0.2b):** Years pass (aging, Trials, retirement), saber/gear crafting, Docking Ring Nine boss vs Darth Malgus, era end. Also: smart bot and difficulty tuning to spec A §8 bands.

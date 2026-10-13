@@ -39,7 +39,7 @@ const MISSIONS={
   hostage:[5,2],foes:[['trooper',2,4],['trooper',6,4],['heavy',5,0],['agent',8,1]],reinforce:['trooper','trooper'],
   start:[[3,11],[4,11],[5,11],[6,11],[2,10],[7,10]],
   brief:'Sith raiders hold a prisoner in a locked cell. A Medic can Hack the door from 4 tiles; a Jedi can try the console. Then walk the prisoner to an evac zone (E).',
-  goal:'Open the cell (Hack or console), then get the prisoner to an evac zone. Threat rises after turn 5.',
+  goal:'Open the cell (Hack or console), then get the prisoner to an evac zone. Threat rises after turn 5; at Threat 6 they fly the prisoner out.',
   win:'The prisoner is out. The shuttle lifts off under fire.',lose:'The prisoner is lost.',
   reward:{credits:90,favor:5},bonus:{recruits:1},bonusTxt:'Done by turn 5'},
  envoy:{n:"The Envoy's Trail",where:'Lower city · Coruscant',type:'investigate',story:1,par:6,
@@ -47,6 +47,6 @@ const MISSIONS={
   foes:[['trooper',2,1],['trooper',7,1],['heavy',6,0],['agent',8,4],['envoy',5,1]],reinforce:['trooper','trooper'],
   start:[[3,11],[4,11],[5,11],[6,11],[2,10],[7,10]],
   brief:'A Republic envoy is leaking the peace-talk schedule. Scan his data terminals (Jedi or Medic, adjacent). Once 2 are copied, anyone who reaches an evac zone gets the data out. Capture him if you can.',
-  goal:'Scan 2 of 3 terminals, then get anyone to an evac zone. Threat rises after turn 6: terminals get wiped.',
+  goal:'Scan 2 of 3 terminals, then get anyone to an evac zone. Threat rises after turn 6: terminals get wiped, and at Threat 6 the trail goes cold.',
   win:'The data is out. The Council reads it that night.',lose:'The trail goes cold.',
   reward:{credits:70},bonus:{intel:2},bonusTxt:'All 3 terminals'}};
