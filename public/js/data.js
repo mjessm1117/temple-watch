@@ -10,7 +10,7 @@ const DIFF={
  legend:{n:'Legend',enemyHp:1, enemyAim:10, extra:1,bleed:2,assist:0, bonusKit:0,income:.7}};
 const FOES={
  trooper:{n:'Sith Trooper',ic:'e_trooper',hp:4,aim:65,mob:5,dmg:[2,4],range:8,init:8},
- heavy:{n:'Sith Heavy',ic:'e_heavy',hp:6,aim:60,mob:4,dmg:[3,4],range:7,armor:1,nades:1,init:6},
+ heavy:{n:'Sith Heavy',ic:'e_heavy',hp:6,aim:60,mob:4,dmg:[3,4],range:7,armor:1,nades:1,shredder:1,init:6},
  agent:{n:'Imperial Agent',ic:'e_agent',hp:5,aim:80,mob:5,dmg:[4,5],range:11,hid:1,snipe:20,init:14},
  acolyte:{n:'Sith Acolyte',ic:'e_acolyte',hp:8,aim:75,mob:6,dmg:[4,5],range:1.5,deflect:20,guardDef:20,force:1,lightning:[3,4],noCap:1,init:13},
  terentatek:{n:'Terentatek',ic:'e_horror',hp:14,aim:80,mob:6,dmg:[5,7],range:1.5,horror:1,noCap:1,init:12},
@@ -50,3 +50,63 @@ const MISSIONS={
   goal:'Scan 2 of 3 terminals, then get anyone to an evac zone. Threat rises after turn 6: terminals get wiped, and at Threat 6 the trail goes cold.',
   win:'The data is out. The Council reads it that night.',lose:'The trail goes cold.',
   reward:{credits:70},bonus:{intel:2},bonusTxt:'All 3 terminals'}};
+
+// ---- Wave 2 (Chat H): tile table, map variants, new mission types ----
+// Every tile: name, cover (0 none · 1 half · 2 full), h = 3D height for the view (half 1, full 2), walk, breaks = what one blast/Heavy hit turns it into.
+// The 2D board can borrow an old look with `as`.
+const TILES={
+ '.':{n:'Floor',cover:0,h:0,walk:1},'_':{n:'Open door',cover:0,h:0,walk:1},E:{n:'Evac zone',cover:0,h:0,walk:1},
+ r:{n:'Rubble',cover:1,h:.5,walk:1},
+ c:{n:'Crate',cover:1,h:1,breaks:'r'},h:{n:'Broken wall',cover:1,h:1,breaks:'r',as:'c'},
+ x:{n:'Barrel',cover:1,h:1},k:{n:'Console',cover:1,h:1},q:{n:'Data terminal',cover:1,h:1},Q:{n:'Copied terminal',cover:1,h:1},
+ b:{n:'Alarm beacon',cover:1,h:1,as:'k'},C:{n:'Charge site',cover:1,h:1,as:'q'},X:{n:'Armed charge',cover:1,h:1,as:'qd'},
+ '#':{n:'Wall',cover:2,h:2},B:{n:'Blast wall',cover:2,h:2,breaks:'h',as:'w'},
+ O:{n:'Objective',cover:2,h:2},d:{n:'Door',cover:2,h:2},D:{n:'Locked door',cover:2,h:2}};
+const BEACON_HP=4;
+// Escort VIPs (free from the start; walk them to an evac zone).
+const ESCORTS={
+ senator:{n:'Senator Ondo Ral',cls:'VIP',ic:'vip',hp:6,aim:50,mob:3,dmg:[1,2],range:6,init:5,abil:['stabilize','door']},
+ defector:{n:'Lt. Corin Varn',cls:'VIP',ic:'vip',hp:7,aim:60,mob:4,dmg:[2,3],range:6,init:6,abil:['stabilize','door']}};
+// Map variants: a crisis picks the base map or one of `alts` at random. Alts only swap the layout (map, start, foes, hostage, where).
+MISSIONS.shrine.alts=[{where:'Grove terraces · Dantooine',
+ map:["..........",".c..B..c..","....c.....",".B.x...B..","......c...",".c.B..B.c.","..........",".h..cc..h.","..c....c..","...#OO#...","...cOOc...",".........."],
+ start:[[2,10],[7,10],[2,11],[7,11],[1,9],[8,9]]}];
+MISSIONS.rescue.alts=[{where:'Cliffside cell block · Ord Mantell',
+ map:["..........",".c..cc..c.","...####...",".k.#..#.x.","...##D#...",".B......B.","...c..c...",".h..x...h.","...B..B...",".c..cc..c.","..........","EE..c...EE"],
+ hostage:[4,3],foes:[['trooper',2,1],['trooper',7,1],['trooper',2,4],['heavy',5,6],['agent',8,6]],
+ start:[[3,11],[5,11],[6,11],[7,11],[2,10],[7,10]]}];
+Object.assign(MISSIONS,{
+ archive:{n:'The Listening Post',where:'Imperial listening post · Balmorra',type:'investigate',par:6,
+  map:["..q#....#.","...#.c..#q",".c.B....B.","....x.....",".h..##..h.","....q.....",".c.B..B.c.","..........",".x..cc..c.","..........",".c..h..c..","EE......EE"],
+  foes:[['trooper',1,1],['trooper',6,1],['heavy',5,3],['agent',7,6],['trooper',8,3]],reinforce:['trooper','trooper'],
+  start:[[3,11],[4,11],[5,11],[6,11],[2,10],[8,10]],
+  alts:[{where:'Data vault · Nar Shaddaa',
+   map:["...c..c...",".q..##..q.","##d#..#d##","..........",".B.x..b.B.","...h..h...",".c..q...c.","...B..B...",".h......h.","..c.cc.c..","..........","EE......EE"],
+   foes:[['trooper',2,0],['trooper',7,0],['heavy',5,3],['agent',9,5]],start:[[3,11],[4,11],[5,11],[6,11],[2,10],[7,10]]}],
+  brief:'An Imperial post is reading Republic fleet traffic. Copy its data terminals (Jedi or Medic, adjacent), then get anyone to an evac zone. Blast walls crack under explosions.',
+  goal:'Scan 2 of 3 terminals, then reach an evac zone. Threat rises after turn 6: terminals get wiped. Shoot alarm beacons before they call help.',
+  win:'The fleet codes are ours. Navy Intelligence owes the Order a favor.',lose:'The post burns its data. The trail goes cold.',
+  reward:{credits:60,intel:1},bonus:{intel:2},bonusTxt:'All 3 terminals'},
+ sabotage:{n:'Fuel Depot Strike',where:'Imperial fuel depot · Balmorra',type:'sabotage',par:7,need:2,field:['plant'],
+  map:["EE.#..#.EE","E..#..#..E","...B..B...",".c..xx..c.",".C..##..C.",".h......h.","...c..b...",".B..cc..B.","..........",".c.h..h.c.","..........","..c....c.."],
+  foes:[['trooper',2,2],['trooper',7,2],['heavy',4,1],['trooper',6,5],['agent',9,6],['trooper',8,8]],reinforce:['trooper','heavy'],
+  start:[[3,11],[4,11],[5,11],[6,11],[2,10],[7,10]],
+  alts:[{where:'Ion cannon battery · Balmorra',
+   map:["EE......EE","E..c..c..E",".B.#..#.B.",".C.#..#.C.",".x......x.","..h.C..h..",".c..BB..c.","..........",".B.c..c.B.","..........",".c..x...c.",".........."],
+   foes:[['trooper',4,1],['trooper',7,1],['heavy',5,4],['agent',0,5],['trooper',2,7]],start:[[3,11],[4,11],[5,11],[6,11],[2,10],[7,10]]}],
+  brief:'The Empire fuels its Balmorra fleet from this depot. Plant charges on 2 sites (anyone, adjacent, 1 action), then get every standing squad member onto the far evac zone. The charges blow when you are clear.',
+  goal:'Plant 2 charges (adjacent, 1 action), then get everyone still standing onto the north evac zone. Threat rises after turn 7: techs defuse an armed charge each step.',
+  win:'The depot goes up behind you. The Balmorra fleet sits dry for a month.',lose:'The depot holds. The fleet sails on schedule.',
+  reward:{credits:80,favor:3},bonus:{credits:40},bonusTxt:'Done by turn 7'},
+ escort:{n:'The Senator\'s Walk',where:'Lower city · Coruscant',type:'escort',par:6,vip:'senator',
+  map:["..c....EEE","....B.....",".h..x..b..","...B..h...",".c....B.c.","...cc.....",".B.....h..","...x.c....",".c....B.c.","...h......","..........",".c..cc..c."],
+  hostage:[4,10],foes:[['trooper',2,1],['trooper',6,1],['heavy',5,3],['agent',9,3],['trooper',8,6],['trooper',0,6]],reinforce:['trooper','trooper'],
+  start:[[2,10],[3,10],[5,10],[6,10],[1,9],[7,9]],
+  alts:[{where:'Ravine crossing · Ord Mantell',vip:'defector',
+   map:["EE..c.....","E...B..c..","..h...x...","###d##..##","..........",".c.B..c.B.","....x.....",".h..##..h.","..........","##..B.###.","..........",".c..cc..c."],
+   hostage:[5,10],foes:[['trooper',6,0],['trooper',9,2],['heavy',2,4],['agent',8,4],['trooper',5,6]],
+   start:[[2,10],[3,10],[6,10],[7,10],[0,11],[9,10]]}],
+  brief:'Someone the Empire wants dead must reach a shuttle at the far evac zone. They take one move a turn on your phase. Keep them alive.',
+  goal:'Walk the VIP to an evac zone. Threat rises after turn 6: more hunters arrive and they shoot the VIP on sight.',
+  win:'The shuttle lifts off with its passenger.',lose:'The Empire gets its kill.',
+  reward:{credits:70,favor:6},bonus:{recruits:1},bonusTxt:'Done by turn 6'}});

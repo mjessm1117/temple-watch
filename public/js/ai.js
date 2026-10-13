@@ -36,6 +36,9 @@ async function eAct(e){
   else log(`${e.n} stands confused.`);return}
  // Hidden agents wait until someone comes within 6 or they get a 70%+ shot.
  if(e.hid&&!players().some(p=>p.status==='ok'&&!p.vip&&dist(p,e)<=6)){const a=eAttacks(e,e);if(!a||a.kind!=='shot'||a.chance<70)return}
+ // An enemy beside an idle alarm beacon trips it once the squad is in sight: reinforcements in 2 turns unless it is wrecked.
+ if(!S.beacon&&!S.beaconUsed&&!e.hid){const b=tilesWhere((c,x,y)=>c==='b'&&cheb(e,{x,y})===1)[0];
+  if(b&&players().some(p=>p.status==='ok'&&dist(p,e)<=9&&los(p,e))){S.beacon={x:b.x,y:b.y,turn:S.turn+2};S.beaconUsed=1;S.peek=e;fx(b,'ALARM','dmg');log(`${e.n} trips an alarm beacon! Help arrives in 2 turns unless you wreck it.`,'bad');render();await sleep(500);return}}
  S.peek=e.hid?null:e;let a=eAttacks(e,e);
  if(a&&a.score>=65)await eDo(e,a);
  else{const R=reach(e);let best=null,bs=-1e9;
@@ -45,7 +48,7 @@ async function eAct(e){
  if(e.horror&&e.status==='ok'){const j=S.units.find(u=>u.side==='p'&&u.jedi&&u.status==='down'&&!u.stable&&S.turn>u.downT&&cheb(u,e)===1);
   if(j){j.status='dead';j.consumed=1;fx(j,'TAKEN','dmg');log(`${e.n} drags ${j.n} into the dark. ${j.n} is gone.`,'bad')}}}
 // What this enemy would do right now, for the intent preview (spec D §5). Can change once you move.
-function intentOf(e){const a=eAttacks(e,e);if(!a)return{txt:e.horror?'Hunting the nearest Jedi':S.type==='defend'&&e.range>=2?`Advancing on the ${S.M.objName.toLowerCase()}`:'Moving to a better position'};
+function intentOf(e){if(!S.beacon&&!S.beaconUsed&&tilesWhere((c,x,y)=>c==='b'&&cheb(e,{x,y})===1).length)return{txt:'Trip the alarm beacon'};const a=eAttacks(e,e);if(!a)return{txt:e.horror?'Hunting the nearest Jedi':S.type==='defend'&&e.range>=2?`Advancing on the ${S.M.objName.toLowerCase()}`:'Moving to a better position'};
  if(a.kind==='console')return{txt:`Shoot the ${S.M.objName.toLowerCase()} · ${a.chance}%`,to:a.c};
  if(a.kind==='nade')return{txt:'Throw a grenade',area:a};
  return{txt:`${a.kind==='melee'?'Attack':a.kind==='lightning'?'Lightning':'Shoot'} ${a.t.n} · ${a.chance}%`,to:a.t}}

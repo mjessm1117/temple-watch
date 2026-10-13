@@ -10,6 +10,14 @@ const inCover=t=>t.barrier||N4.some(([dx,dy])=>inb(t.x+dx,t.y+dy)&&(FULL(tile(t.
 const flanked=(t,a)=>!t.hunker&&inCover(t)&&coverVal(t,a)===0;
 const onSmoke=t=>S.smoke.some(s=>cheb(s,t)<=1);
 const bmedNear=u=>{const c=S.bmed!=null&&byId(S.bmed);return !!c&&alive(c)&&c.status==='ok'&&dist(c,u)<=6};
+// Bonds (spec C §7, numbers from the Temple: u.bonds=[{rid,lvl}], u.bondAim, u.bondReact).
+const bondMates=a=>(a.bonds||[]).filter(b=>b.lvl>=1).map(b=>b.rid);
+const bondNear=a=>a.side==='p'&&a.bondAim&&players().some(p=>p!==a&&p.status==='ok'&&bondMates(a).includes(p.rid)&&dist(a,p)<=3)?a.bondAim:0;
+// Bond level 2: once per mission, a partner who sees an ally get hit answers with a free shot or strike.
+function bondAnswer(t,src){if(!src||src.side!=='e'||!alive(src)||src.status!=='ok')return;
+ for(const p of players().filter(p=>p!==t&&p.status==='ok'&&p.bondReact&&!p.bondUsed&&(p.bonds||[]).some(b=>b.lvl>=2&&b.rid===t.rid))){
+  const melee=p.range<2;if(melee?cheb(p,src)!==1:dist(p,src)>p.range||!los(p,src))continue;
+  p.bondUsed=1;log(`${p.n} answers for ${t.n}!`,'good');resolve(p,src,hitChance(p,src,{melee}),p.dmg,{melee,label:melee?'strike':'shot'});return}}
 const defLineNear=t=>t.side==='p'&&S.units.some(g=>g!==t&&g.defLine&&g.side==='p'&&g.status==='ok'&&cheb(g,t)===1);
 // Every modifier as its own line, so the odds panel can show the math.
 function odds(a,t,{melee=false,mod=0,noCover=false}={}){const L=[['Aim',a.aim]];
@@ -24,6 +32,7 @@ function odds(a,t,{melee=false,mod=0,noCover=false}={}){const L=[['Aim',a.aim]];
  if(a.supp)L.push(['Suppressed',-30]);
  if(bmedNear(a))L.push(['Battle Meditation',a.side==='p'?10:-10]);
  if(a.side==='p'&&t.marked)L.push(['Marked',15]);
+ const bd=bondNear(a);if(bd)L.push(['Bond',bd]);
  if(mod)L.push([mod>0?'Ability bonus':'Ability penalty',mod]);
  const raw=L.reduce((s,l)=>s+l[1],0);return{lines:L,total:Math.max(5,Math.min(95,Math.round(raw)))}}
 const hitChance=(a,t,o)=>odds(a,t,o).total;
@@ -59,7 +68,8 @@ function damage(t,d,src){
   else{t.status='dead';log(`${t.n} is killed.`);S.kills++;if(src&&src.side==='p')src.kills=(src.kills||0)+1;
    if(t.envoy&&src&&src.jedi){addDark(src,1);log('The envoy is dead. The Council wanted him alive.','dark')}
    if(wasSurr&&src&&src.side==='p'){if(src.jedi){addDark(src,2);log(`${src.n} struck down a foe who had surrendered.`,'dark')}else{S.orderDark++;log('Killing a prisoner stains the Order.','dark')}}}}
- else if(t.side==='e'&&!t.noCap&&t.status==='ok'&&t.hp<=2&&rnd(t.envoy?80:40)){t.status='surrender';t.ow=false;t.supT=null;log(`${t.n} drops his blaster and surrenders.`,'good')}}
+ else if(t.side==='e'&&!t.noCap&&t.status==='ok'&&t.hp<=2&&rnd(t.envoy?80:40)){t.status='surrender';t.ow=false;t.supT=null;log(`${t.n} drops his blaster and surrenders.`,'good')}
+ if(t.side==='p'&&t.rid)bondAnswer(t,src)}
 // Roll an attack. Aim assist (Story/Normal): each miss in a row adds hidden aim to that unit's next roll.
 function resolve(a,t,chance,dr,{melee=false,ignoreDeflect=false,label='shot'}={}){
  let ch=chance;if(a.side==='p'&&a.miss&&S.d.assist)ch=Math.min(95,ch+a.miss*S.d.assist);
@@ -75,17 +85,25 @@ function resolve(a,t,chance,dr,{melee=false,ignoreDeflect=false,label='shot'}={}
  log(`${a.n}'s ${label} hits ${t.n} for ${d}.`,t.side==='p'?'bad':'');damage(t,d,a);
  if(a.shredder&&alive(t))shred(a,t);return true}
 function shred(a,t){if(t.armor){t.armor--;log(`${t.n}'s armor is shredded.`)}
- const dx=Math.sign(a.x-t.x),dy=Math.sign(a.y-t.y);for(const [x,y] of [[t.x+dx,t.y],[t.x,t.y+dy]])if((dx||dy)&&inb(x,y)&&S.grid[y][x]==='c'){S.grid[y][x]='.';log('The crate it hid behind is torn apart.');break}}
-// Explosion: 3×3. Crates and rubble are cleared; barrels chain.
+ const dx=Math.sign(a.x-t.x),dy=Math.sign(a.y-t.y);for(const [x,y] of [[t.x+dx,t.y],[t.x,t.y+dy]])if((dx||dy)&&inb(x,y)&&TILES[S.grid[y][x]].breaks){degrade(x,y);break}}
+// Destructible cover: blast wall → broken wall → rubble; crates → rubble. Plain walls only fall to Collapse.
+const tileH=(x,y)=>(TILES[tile(x,y)]||{}).h||0;
+function degrade(x,y){const c=S.grid[y][x],t=TILES[c];if(!t||!t.breaks)return false;S.grid[y][x]=t.breaks;fx('coverBreak',{x,y,from:c,to:t.breaks});
+ fx({x,y},t.breaks==='r'?'CRUMBLE':'CRACK','boom');log(t.breaks==='r'?`The ${t.n.toLowerCase()} crumbles to rubble.`:`The ${t.n.toLowerCase()} cracks. Only half cover now.`);return true}
+// Alarm beacons: shoot or blast them (4 HP). Destroyed → rubble, and any call for help is cancelled.
+function hitBeacon(x,y,d){const k=x+','+y;S.bhp=S.bhp||{};S.bhp[k]=(S.bhp[k]??BEACON_HP)-d;fx({x,y},'-'+d,'dmg');
+ if(S.bhp[k]>0)return log(`The beacon sparks (${S.bhp[k]} left).`);S.grid[y][x]='r';log('The alarm beacon is wrecked.','good');
+ if(S.beacon&&S.beacon.x===x&&S.beacon.y===y){S.beacon=null;log('Their call for help dies with it.','good')}}
+// Explosion: 3×3. Breakable cover drops one step (full → half → rubble); beacons take the damage; barrels chain.
 function blast(x,y,d,src,seen=new Set()){seen.add(x+','+y);fx({x,y},'BOOM','boom');
  for(const u of S.units.filter(u=>alive(u)&&u.status!=='down'&&cheb(u,{x,y})<=1))damage(u,d,src);
  for(let yy=y-1;yy<=y+1;yy++)for(let xx=x-1;xx<=x+1;xx++){if(!inb(xx,yy))continue;const c=S.grid[yy][xx];
-  if(c==='c'||c==='r')S.grid[yy][xx]='.';else if(c==='x'&&!seen.has(xx+','+yy)){S.grid[yy][xx]='.';log('A barrel goes up!','bad');blast(xx,yy,3,src,seen)}}}
+  if(TILES[c].breaks)degrade(xx,yy);else if(c==='b')hitBeacon(xx,yy,d);else if(c==='x'&&!seen.has(xx+','+yy)){S.grid[yy][xx]='.';log('A barrel goes up!','bad');blast(xx,yy,3,src,seen)}}}
 function explodeBarrel(x,y,src){S.grid[y][x]='.';log('The barrel explodes!','bad');blast(x,y,3,src)}
 function nearCrate(u){let b=null;for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(S.grid[y][x]==='c'&&dist(u,{x,y})<=4&&(!b||dist(u,{x,y})<dist(u,b)))b={x,y};return b}
 function push(u,t){const dx=Math.sign(t.x-u.x),dy=Math.sign(t.y-u.y);
  for(let i=0;i<2;i++){const nx=t.x+dx,ny=t.y+dy,c=tile(nx,ny),o=inb(nx,ny)&&unitAt(nx,ny);
-  if(!inb(nx,ny)||!PASS(c)||o){log(`${t.n} slams into ${o?o.n:c==='c'?'a crate':c==='x'?'a barrel':'a wall'}.`);if(c==='c')S.grid[ny][nx]='.';damage(t,2,u);if(o&&o.side==='e'&&alive(o))damage(o,1,u);if(c==='x')explodeBarrel(nx,ny,u);return}
+  if(!inb(nx,ny)||!PASS(c)||o){log(`${t.n} slams into ${o?o.n:TILES[c]&&inb(nx,ny)?'a '+TILES[c].n.toLowerCase():'a wall'}.`);if(inb(nx,ny)&&TILES[c].breaks)degrade(nx,ny);damage(t,2,u);if(o&&o.side==='e'&&alive(o))damage(o,1,u);if(c==='x')explodeBarrel(nx,ny,u);return}
   t.x=nx;t.y=ny}log(`${u.n} hurls ${t.n} back.`)}
 // Locked doors open everywhere at once (one security system per map). Frees a bound hostage.
 function unlock(u){for(const p of tilesWhere(c=>c==='D'))S.grid[p.y][p.x]='_';const h=hostage();

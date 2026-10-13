@@ -46,7 +46,9 @@ const ICONS={
  sweep:"M4 18a10 10 0 0 1 16 0M12 8V3M9 5l3-3 3 3",
  barrel:"M7 4h10v16H7zM7 9h10M7 15h10",
  evac:"M12 4v12M7 11l5 5 5-5M5 20h14",
- kyber:"M12 2l5 7-5 13-5-13zM7 9h10"};
+ kyber:"M12 2l5 7-5 13-5-13zM7 9h10",
+ charge:"M6 9h12v11H6zM9 9V6h6v3M12 13v3M15 3l3-1",
+ beacon:"M12 10v11M8 21h8M9 7a4 4 0 0 1 6 0M6 4a8 8 0 0 1 12 0"};
 (function(){const s=Object.entries(ICONS).map(([k,d])=>`<symbol id="i-${k}" viewBox="0 0 24 24"><path d="${d}"/></symbol>`).join('');
  const el=document.createElement('div');el.innerHTML=`<svg width="0" height="0" style="position:absolute" aria-hidden="true">${s}</svg>`;document.body.prepend(el.firstChild)})();
 const icon=(k,c='ic')=>`<svg class="${c}" aria-hidden="true"><use href="#i-${k}"/></svg>`;

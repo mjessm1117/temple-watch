@@ -1,11 +1,25 @@
-// Plays bot games on every v0.2a mission (Normal). Prints win rate per mission; any "err" > 0 is a bug.
+// Plays bot games on every mission map variant (Normal). Prints win rate per map; any "err" > 0 is a bug. Also checks every map is legal.
 const {JSDOM}=require('jsdom');const fs=require('fs'),path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'..','dist','temple-watch.html'),'utf8').replace('const sleep=ms=>new Promise(r=>setTimeout(r,ms));','const sleep=()=>Promise.resolve();');
 const bot=fs.readFileSync(path.join(__dirname,'bot.js'),'utf8');
 const N=+process.env.GAMES||10,diff=process.env.DIFF||'normal';let fail=0;
-(async()=>{for(const id of ['relay','shrine','rescue','envoy','blockade','cache','hutt','dock']){const res={mission:id,win:0,lose:0,err:0,dead:0,turns:0};
+const w0=new JSDOM(html,{runScripts:'dangerously'}).window,maps=w0.eval(`(()=>{const out=[],bad=[];
+ for(const [id,B] of Object.entries(MISSIONS))[B,...(B.alts||[])].forEach((v,i)=>{const M={...B,...v},g=M.map,at=(x,y)=>g[y]&&g[y][x],ok=p=>!!p&&PASS(at(p[0],p[1]));
+  out.push([id,i]);const tag=id+'#'+i,need=['rescue','investigate','sabotage','escort'].includes(M.type);
+  if(g.length!==H||g.some(r=>r.length!==W))bad.push(tag+' size');for(const r of g)for(const c of r)if(!TILES[c])bad.push(tag+' tile '+c);
+  if(M.start.length<6||!M.start.every(ok))bad.push(tag+' start');if(!(M.foes||[]).every(f=>ok([f[1],f[2]])))bad.push(tag+' foe');
+  if(M.hostage&&!ok(M.hostage))bad.push(tag+' hostage');if(need&&!g.join('').includes('E'))bad.push(tag+' no evac');
+  if(M.type==='sabotage'&&(g.join('').match(/C/g)||[]).length<M.need)bad.push(tag+' charges');
+  if(M.type==='investigate'&&(g.join('').match(/q/g)||[]).length<3)bad.push(tag+' clues');
+  // Every start tile must reach an evac zone with no units in the way (locked doors count as open).
+  if(need){const seen=new Set([M.start[0]+'']),q=[M.start[0]];let hit=0;while(q.length){const [x,y]=q.shift();if(at(x,y)==='E'){hit=1;break}
+   for(const [dx,dy] of N4){const nx=x+dx,ny=y+dy,c=at(nx,ny);if(c&&(PASS(c)||'dD'.includes(c))&&!seen.has(nx+','+ny)){seen.add(nx+','+ny);q.push([nx,ny])}}}if(!hit)bad.push(tag+' evac unreachable')}});
+ return{out,bad}})()`);w0.close();
+if(maps.bad.length){console.log('FAIL maps:',maps.bad.join(', '));process.exit(1)}
+console.log(`maps ok: ${maps.out.length}`);
+(async()=>{for(const [id,mi] of maps.out){const res={mission:id,map:mi,win:0,lose:0,err:0,dead:0,turns:0};
  for(let g=0;g<N;g++){const w=new JSDOM(html,{runScripts:'dangerously'}).window;const errs=[];w.addEventListener('error',e=>errs.push(e.message));
-  try{w.eval(bot);w.eval(`startMission('${id}',START_ROSTER.map((r,i)=>battleUnit({id:'u'+i,rank:1,xp:0,dark:0,picks:[],...r})),{diff:'${diff}'})`);
+  try{w.eval(bot);w.eval(`startMission('${id}',START_ROSTER.map((r,i)=>battleUnit({id:'u'+i,rank:1,xp:0,dark:0,picks:[],...r})),{diff:'${diff}',map:${mi}})`);
    for(let i=0;i<40&&!w.eval('S.over');i++){w.eval('AI()');await w.eval('endTurn()')}
    if(!w.eval('S.over'))errs.push('mission never ended');}catch(e){errs.push(e.stack)}
   if(errs.length){res.err++;console.log(id,errs[0])}

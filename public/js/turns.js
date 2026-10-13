@@ -4,17 +4,21 @@ function mk(base,side,extra={}){const u={...base,...extra,side,status:'ok',ap:2,
 function mkFoe(t,x,y){const f=FOES[t],d=S.d;S.eCount[t]=(S.eCount[t]||0)+1;
  return mk({...f,hp:Math.max(1,f.hp+(f.horror?0:d.enemyHp)),aim:f.aim+d.enemyAim},'e',{type:t,n:f.envoy?f.n:`${f.n} ${S.eCount[t]}`,x,y})}
 function spawn(list){list=[...list];for(let i=0;i<S.d.extra;i++)list.push('trooper');
- const spots=tilesWhere((c,x,y)=>y<2&&PASS(c)&&!unitAt(x,y)).sort(()=>Math.random()-.5);
+ const spots=tilesWhere((c,x,y)=>y<2&&PASS(c)&&c!=='E'&&!unitAt(x,y)).sort(()=>Math.random()-.5);
  list.forEach((t,i)=>{const p=spots[i];if(p)S.units.push(mkFoe(t,p.x,p.y))});
  log(`Contact: ${list.length} hostiles at the north edge.`,'bad')}
 
-// squad: battle-ready unit stats (campaign.js battleUnit). o: {diff, hostage, crisis}
-function startMission(id,squad,o={}){const M=MISSIONS[id];
- S={id,M,type:M.type,grid:M.map.map(r=>r.split('')),units:[],uidN:0,turn:1,phase:'player',sel:null,mode:'move',tg:[],pick:null,info:S?S.info:false,
+// squad: battle-ready unit stats (campaign.js battleUnit). o: {diff, hostage, crisis, map (variant index; random if unset)}
+// A mission's layout is the base map or one of its `alts`; S.mapIx records which (the grid itself is saved in S.grid).
+function startMission(id,squad,o={}){const B=MISSIONS[id],n=1+(B.alts||[]).length,mi=o.map!=null?o.map%n:ri(0,n-1),M=mi?{...B,...B.alts[mi-1]}:B;
+ S={id,mapIx:mi,M,type:M.type,grid:M.map.map(r=>r.split('')),units:[],uidN:0,turn:1,phase:'player',sel:null,mode:'move',tg:[],pick:null,info:S?S.info:false,
     diff:o.diff||'normal',d:DIFF[o.diff||'normal'],obj:M.obj||0,threat:0,clues:0,smoke:[],bmed:null,log:[],fx:[],intel:0,kills:0,orderDark:0,eCount:{},over:false,peek:null,crisis:o.crisis||null};
  squad.slice(0,6).forEach((r,i)=>{const p=M.start[i];S.units.push(mk(r,'p',{x:p[0],y:p[1]}))});
+ // Mission field actions (e.g. Plant charge) go to the whole squad.
+ if(M.field)for(const u of players())for(const k of M.field)if(!u.abil.includes(k))u.abil.push(k);
  if(S.d.bonusKit){const m=S.units.find(u=>u.kits!=null);if(m)m.kits++}
- if(M.hostage){const h=o.hostage||VIP;S.units.push(mk({...h,vip:1,bound:1},'p',{x:M.hostage[0],y:M.hostage[1]}))}
+ if(M.hostage){const esc=S.type==='escort',h=esc?ESCORTS[M.vip]:o.hostage||VIP;S.units.push(mk({...h,vip:1,bound:esc?0:1},'p',{x:M.hostage[0],y:M.hostage[1]}))}
+ if(S.type==='escort')hostage().ap=1;
  for(const [t,x,y] of M.foes||[])S.units.push(mkFoe(t,x,y));
  if(M.waves)spawn(M.waves[1]);
  log(M.goal);S.sel=players().find(canAct)||null;$('#modal').hidden=true;SCR=null;render();saveGame()}
@@ -29,25 +33,29 @@ function startPlayerTurn(){const M=S.M;
  S.phase='player';
  if(M.waves&&S.turn>1&&M.waves[S.turn])spawn(M.waves[S.turn]);
  if(M.par&&S.turn>M.par){S.threat++;threatStep();if(S.over)return}
+ if(S.beacon&&S.turn>=S.beacon.turn){S.beacon=null;log('The beacon\'s call is answered.','bad');spawn(M.reinforce||['trooper','trooper'])}
  S.smoke=S.smoke.filter(s=>--s.t>0);S.bmed=null;
  for(const u of S.units){u.supp=0;u.marked=0;if(u.side==='p'){u.supT=null;u.hunker=0;u.barrier=0;u.leapAim=0}}
  for(const u of players()){u.guard=false;u.guardStruck=false;u.ow=false;
   if(u.status==='down'){u.ap=0;if(u.stable)continue;u.bleed--;if(u.bleed<=0){u.status='dead';log(`${u.n} has become one with the Force.`,'bad')}else log(`${u.n} is bleeding out: ${u.bleed} turn${u.bleed>1?'s':''} left.`,'bad')}
-  else u.ap=2}
+  else u.ap=u.vip&&S.type==='escort'?1:2}
  S.sel=players().find(canAct)||null;S.mode='move';S.tg=[];S.pick=null;checkEnd();saveGame();render()}
 // Soft pressure: past the par turn, each turn raises Threat by 1 and the mission gets worse.
+const THREAT_LOSE={rescue:'The Sith fly the prisoner out.',investigate:'The district locks down.',sabotage:'The garrison locks the depot down.',escort:'Hunters seal every route out.'};
 function threatStep(){log(`Threat rises to ${S.threat}.`,'bad');
+ if(S.type==='sabotage'&&enemies().some(e=>e.status==='ok')){const x=tilesWhere(c=>c==='X');if(x.length){const c=pickOne(x);S.grid[c.y][c.x]='C';fx(c,'DEFUSED','dmg');log('An Imperial tech defuses a charge.','bad')}}
+ if(S.type==='escort')log('More hunters are on the way. They shoot the VIP on sight.','bad');
  if(S.type==='investigate'){const q=tilesWhere(c=>c==='q');if(q.length){const c=pickOne(q);S.grid[c.y][c.x]='r';fx(c,'WIPED','dmg');log('Imperial slicers wipe a data terminal.','bad')}}
  if(S.type==='rescue')log(S.threat>=5?'The Sith are prepping a shuttle. Next turn the prisoner is gone.':'The guards are getting nervous. One may fire on the prisoner.','bad');
- if(S.type==='investigate'&&S.threat>=5)log('The district is locking down. Next turn the trail goes cold.','bad');
- if(S.threat>=6)return finish(false,S.type==='rescue'?`The Sith fly the prisoner out. ${S.M.lose}`:`The district locks down. ${S.M.lose}`);
+ if(S.type!=='rescue'&&S.threat>=5)log('Last warning: next turn the window closes.','bad');
+ if(S.threat>=6)return finish(false,`${THREAT_LOSE[S.type]||''} ${S.M.lose}`.trim());
  // Reinforcements every 2 Threat, at most 3 groups, so a stalled fight can't snowball forever.
  if(S.threat%2===0&&S.threat<=6&&S.M.reinforce)spawn(S.M.reinforce)}
 async function endTurn(){
  if(S.phase!=='player'||S.over)return;
  evacCheck();if(S.over)return;
  S.phase='enemy';S.mode='move';S.tg=[];S.pick=null;S.peek=null;S.hostShot=0;render();await sleep(250);
- for(const e of enemies()){if(S.over)break;await eAct(e);checkEnd();render()}
+ for(const e of enemies()){if(S.over)break;await eAct(e);if(window.View3D)await View3D.idle();checkEnd();render()}
  if(S.over)return;S.peek=null;
  if(S.type==='defend'&&S.turn>=S.M.turns)return finish(true,S.M.win);
  S.turn++;startPlayerTurn()}
@@ -55,15 +63,28 @@ async function endTurn(){
 function evacCheck(){if(S.type==='defend')return;
  for(const u of players().filter(u=>u.status==='ok'&&tile(u.x,u.y)==='E')){
   if(u.vip)return finish(true,S.M.win);
-  if(S.type==='investigate'&&S.clues>=2)return finish(true,S.M.win)}}
+  if(S.type==='investigate'&&S.clues>=2)return finish(true,S.M.win);
+}
+ // Sabotage is a full extraction: every squad member still standing must be on an evac tile.
+ if(S.type==='sabotage'&&armed()>=S.M.need){const up=players().filter(u=>!u.vip&&u.status==='ok');if(up.length&&up.every(u=>tile(u.x,u.y)==='E'))return finish(true,S.M.win)}}
+const armed=()=>tilesWhere(c=>c==='X').length;
 function checkEnd(){if(S.over)return;const M=S.M,sq=players().filter(u=>!u.vip);
  const foes=enemies().some(e=>e.status==='ok'||e.status==='stunned');
  if(S.type==='defend'&&S.obj<=0)return finish(false,M.lose);
  if(!sq.some(u=>u.status==='ok'))return finish(false,'The squad is overwhelmed.');
  if(S.type==='defend'&&S.turn>=M.lastWave&&!foes)return finish(true,`The last attackers are broken. ${M.win}`);
- if(S.type==='rescue'){const h=hostage();if(!alive(h))return finish(false,`${h.n} is dead. ${M.lose}`);
-  if(!foes)return finish(true,`The depot is secured. ${M.win}`)}
+ if(S.type==='rescue'||S.type==='escort'){const h=hostage();if(!alive(h))return finish(false,`${h.n} is dead. ${M.lose}`);
+  if(!foes)return finish(true,`${S.type==='escort'?'The route is clear.':'The depot is secured.'} ${M.win}`)}
  if(S.type==='investigate'){if(S.clues+tilesWhere(c=>c==='q').length<2)return finish(false,`Too much data was wiped. ${M.lose}`);
-  if(!foes&&S.clues>=2)return finish(true,`The district is clear. ${M.win}`)}}
+  if(!foes&&S.clues>=2)return finish(true,`The district is clear. ${M.win}`)}
+ if(S.type==='sabotage'&&!foes&&armed()>=M.need)return finish(true,`The garrison is down. ${M.win}`)}
+// For the HUD and the debrief: the objective readout and whether the mission bonus was earned.
+function objStat(){const M=S.M,h=hostage();
+ if(S.type==='defend')return{label:M.objName,val:`${S.obj}/${M.obj}`};
+ if(S.type==='rescue')return{label:'Prisoner',val:h.status==='dead'?'dead':h.bound?'locked in':`${h.hp}/${h.max} HP`};
+ if(S.type==='escort')return{label:'VIP',val:h.status==='dead'?'dead':`${h.hp}/${h.max} HP`};
+ if(S.type==='sabotage')return{label:'Charges',val:`${armed()}/${M.need} armed`};
+ return{label:'Clues',val:`${S.clues}/3 (need 2)`}}
+function missionBonus(){const M=S.M;return S.type==='defend'?S.obj*4>=M.obj*3:S.type==='investigate'?S.clues>=3:S.turn<=M.par}
 // Mission over: campaign.js applies results; base.js shows the debrief.
 function finish(win,msg){S.over=true;S.phase='over';S.win=win;S.msg=msg;render();missionOver(win,msg)}
