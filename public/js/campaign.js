@@ -2,25 +2,26 @@
 let C=null;
 const isJedi=r=>!!CLASS[r.cls].jedi;
 function newCampaign(diff){
- C={v:2,diff,month:1,day:1,step:0,res:{...START_RES},orderDark:0,wings:{medical:1,training:0,forge:0,comms:0},build:null,
+ C={v:2,diff,month:1,day:1,step:0,res:{...START_RES},orderDark:0,wings:{medical:1,training:0,forge:0,armory:0,comms:0,barracks:1},build:null,
   roster:START_ROSTER.map((r,i)=>({id:'u'+(i+1),rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0,...r})),nid:START_ROSTER.length+1,
   options:[],news:[],flags:{},legends:[]};
- C.options=optionsFor(0);S=null;saveGame();baseScreen()}
-function abilFor(r){const K=KITS[r.cls];
- if(isJedi(r))return['strike',...K[1],...r.picks,...(r.rank>=2?['choke']:[]),'push','guard','meditate','subdue','stabilize','door','console','scan'];
- return['shoot',...K[1],'overwatch','subdue','stabilize','door']}
+ ensureTemple();C.options=optionsFor(0);S=null;saveGame();baseScreen()}
+function abilFor(r){const K=KITS[r.cls],P=r.picks.filter(k=>AB[k]);
+ if(isJedi(r))return['strike',...K[1],...P,...(r.rank>=2?['choke']:[]),'push','guard','meditate','subdue','stabilize','door','console','scan'];
+ return['shoot',...K[1],...P,'overwatch','subdue','stabilize','door']}
 // Roster entry → battle stats. Each rank above 1: +1 HP, +5 aim; Jedi +1 Focus (R2), +10 deflect (R3); troops +1 kit/grenade (R3).
 function battleUnit(r){const b=CLASS[r.cls],g=r.rank-1,u={...b,n:r.n,cls:r.cls,col:r.col,rid:r.id,rank:r.rank,title:r.title,dark:r.dark||0,dmg:[...b.dmg]};
  u.hp+=g;u.aim+=5*g;if(b.jedi){if(r.rank>=2)u.maxF++;if(r.rank>=3)u.deflect+=10}else if(r.rank>=3){if(u.kits!=null)u.kits++;if(u.nades!=null)u.nades++}
- u.abil=abilFor(r);return u}
-const fit=r=>r.status==='active'&&!r.wound;
-const healMult=()=>C.wings.medical>=2?2:C.wings.medical?1.5:1;
+ u.abil=abilFor(r);return templeMods(u,r)}
+const able=r=>r.status==='active'&&!r.wound,fit=r=>able(r)&&!r.assign;
+const healMult=()=>(C.wings.medical>=2?2:C.wings.medical?1.5:1)*(C.staff&&C.staff.medical?1.25:1);
 const odark=()=>Math.min(100,C.orderDark+4*C.roster.filter(r=>isJedi(r)&&r.status==='active').reduce((s,r)=>s+r.dark,0));
 
 // Mission options for a plan step. A captured unit adds a rescue crisis that doesn't use up the step.
 function optionsFor(step){const P=PLAN[step],o=[];if(!P)return o;
  if(P.story)o.push({mission:P.story,story:1,adv:1});
  for(const id of P.crises||[])o.push({...CRISES[id],crisis:id,adv:1});
+ if(P.crises)o.push(...questOptions());
  for(const r of C.roster.filter(r=>r.status==='captured')){
   const res=o.find(x=>x.crisis==='rescue');if(res){Object.assign(res,{n:`Rescue ${r.n}`,hostage:r.id,text:`${r.n} was taken after the last fight. Get them back before they vanish.`,ignore:{lose:r.id}})}
   else o.push({...CRISES.rescue,crisis:'rescue',n:`Rescue ${r.n}`,hostage:r.id,text:`${r.n} is held at a Sith depot. ${r.capT} mission${r.capT>1?'s':''} left to act.`,ignore:{},adv:0})}
@@ -35,7 +36,7 @@ function hostageFor(o){const r=o.hostage&&C.roster.find(r=>r.id===o.hostage);if(
  const u=battleUnit(r);return{...u,hp:Math.ceil(u.hp/2),dmg:[2,3],range:6,abil:['shoot','stabilize','door'],rid:r.id}}
 
 // Mission over → apply results right away (so a reload never repeats a mission), then show the debrief.
-function applyResults(win){const M=S.M,o=C.options[C.chosen]||{},out={res:{},rows:[],promo:[]};
+function applyResults(win){const M=S.M,o=C.options[C.chosen]||{},out={res:{},rows:[],promo:[]},dep=[];
  if(win){for(const [k,v] of Object.entries(M.reward||{}))gain(k,Math.round(k==='credits'?v*DIFF[C.diff].income:v),out.res);
   const bonus=S.type==='defend'?S.obj*4>=M.obj*3:S.type==='rescue'?S.turn<=M.par:S.clues>=3;
   if(bonus){for(const [k,v] of Object.entries(M.bonus||{}))gain(k,v,out.res);out.bonus=M.bonusTxt}
@@ -47,31 +48,29 @@ function applyResults(win){const M=S.M,o=C.options[C.chosen]||{},out={res:{},row
    else if(u.status==='dead'){r.status='dead';fate='Died in the rescue'}else fate='Still captive'}
   else if(u.status==='dead'){r.status='dead';C.legends.push({n:r.n,cls:r.cls,how:u.consumed?'Taken by a Terentatek':'Fell in battle',where:M.n});fate='One with the Force'}
   else if(u.status==='down'&&!win){r.status='captured';r.capT=3;fate='Captured by the Sith'}
-  else{xp=XP.survive+(u.kills||0)*XP.kill+(u.caps||0)*XP.capture+(M.story&&win?XP.story:0);if(C.wings.training)xp=Math.round(xp*1.1);
+  else{xp=XP.survive+(u.kills||0)*XP.kill+(u.caps||0)*XP.capture+(M.story&&win?XP.story:0);xp=Math.round(xp*(C.wings.training?1.1:1)*(C.staff.training?1.1:1)*(r.trait&&TRAITS[r.trait].xp||1));if(win&&r.trait&&TRAITS[r.trait].intel)gain('intel',TRAITS[r.trait].intel,out.res);
    const w=u.downed?(C.wings.medical>=2?WOUND.graveL2:WOUND.grave):u.hp*2<=u.max?WOUND.serious:u.hurt?WOUND.light:0;
    r.wound=Math.ceil(w/healMult());fate=w===0?'Unhurt':`${u.downed?'Grave':u.hp*2<=u.max?'Serious':'Light'} wound · ${r.wound} days`}
   r.dark=u.dark;if(!u.vip){r.missions++;r.kills+=u.kills||0;r.xp+=xp}
-  const before=r.rank;while(r.rank<3&&r.xp>=RANKS[r.rank].xp)r.rank++;
-  if(r.rank>before){out.promo.push(r.n);if(isJedi(r)&&KITS[r.cls][r.rank])r.pick=r.rank}
+  const before=r.rank;if(r.status==='active'&&promote(r))out.promo.push(r.id);dep.push({r,u});
   out.rows.push({n:r.n,xp,fate,rank:r.rank>before?r.rank:0,dark:isJedi(r)?r.dark:null})}
- advance(o);return out}
+ templeAfterMission(dep,win,o,out);advance(o);return out}
 // Time passes: builds finish, wounds heal, the month turns over (stipend, upkeep, pay, recruits).
 function advance(o){C.news=[];C.day+=DAYS;while(C.day>30){C.day-=30;C.month++;monthTick()}
  if(C.build){C.wings[C.build]++;C.news.push(`${WINGS[C.build].n} level ${C.wings[C.build]} is ready.`);C.build=null}
  for(const r of C.roster){if(r.wound)r.wound=Math.max(0,r.wound-DAYS);
   if(r.status==='captured'&&o.hostage!==r.id&&--r.capT<=0){r.status='dead';C.legends.push({n:r.n,cls:r.cls,how:'Never came back from captivity'});C.news.push(`${r.n} is lost. The trail went cold.`)}}
  // Never lose (spec B §7): with fewer than 4 fit units, the Council grants an emergency levy.
- if(C.roster.filter(fit).length<4&&C.step<PLAN.length){for(let i=0;i<3;i++)addTroop();gain('favor',-10);C.news.push('Emergency levy: the Senate sends 3 green troopers. Senate Favor −10.')}
- if(o.adv)C.step++;C.chosen=null;C.options=optionsFor(C.step);saveGame()}
+ templeAdvance();
+ if(C.roster.filter(able).length<4&&C.step<PLAN.length){for(let i=0;i<3;i++)addTroop();gain('favor',-10);C.news.push('Emergency levy: the Senate sends 3 green troopers. Senate Favor −10.')}
+ ensureTemple();if(o.adv)C.step++;C.chosen=null;C.options=optionsFor(C.step);saveGame()}
 function monthTick(){const f=C.res.favor,st=Math.round((100+2*f)*DIFF[C.diff].income),
  up=Object.entries(C.wings).reduce((s,[k,l])=>s+(WINGS[k].up[l]||0),0),pay=TROOP_PAY*C.roster.filter(r=>r.status==='active'&&!isJedi(r)).length,rec=1+Math.floor(f/40);
- C.res.credits+=st-up-pay;C.res.recruits+=rec;C.news.push(`Month ${C.month}: Senate stipend +${st}, upkeep −${up}, troop pay −${pay}, recruits +${rec}.`)}
+ C.res.credits+=st-up-pay;C.res.recruits+=rec;C.news.push(`Month ${C.month}: Senate stipend +${st}, upkeep −${up}, troop pay −${pay}, recruits +${rec}. New recruit candidates are in.`);templeMonth()}
 function buildWing(k){const l=C.wings[k],cost=WINGS[k].cost[l+1];if(C.build||cost==null||C.res.credits<cost)return;C.res.credits-=cost;C.build=k;saveGame()}
-function hireTroop(){if(C.res.recruits<1||C.res.credits<HIRE_COST||C.roster.filter(r=>r.status==='active').length>=ROSTER_CAP)return;
- C.res.recruits--;C.res.credits-=HIRE_COST;addTroop();saveGame()}
 function addTroop(){const used=new Set(C.roster.map(r=>r.n)),n=RECRUIT_NAMES.find(x=>!used.has(x))||'Recruit '+C.nid;
  C.roster.push({id:'u'+C.nid++,n,cls:pickOne(['Soldier','Scout','Medic','Heavy']),rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0})}
-function pickAbility(id,k){const r=C.roster.find(r=>r.id===id);if(!r||!r.pick||!KITS[r.cls][r.pick].includes(k))return;r.picks.push(k);r.pick=0;saveGame()}
-function launchMission(i,ids){const o=C.options[i],sq=ids.map(id=>battleUnit(C.roster.find(r=>r.id===id)));chooseOption(i);
+function pickAbility(id,k){const r=C.roster.find(r=>r.id===id),p=r&&pendingRank(r);if(!p||!KITS[r.cls][p].includes(k))return;r.picks.push(k);r.pick=pendingRank(r);saveGame()}
+function launchMission(i,ids){ensureTemple();const o=C.options[i],sq=ids.map(id=>battleUnit(C.roster.find(r=>r.id===id)));chooseOption(i);
  startMission(o.mission,sq,{diff:C.diff,hostage:hostageFor(o),crisis:o.crisis||null})}
-function defaultSquad(o){const ok=C.roster.filter(r=>fit(r)&&r.id!==(o&&o.hostage)),J=ok.filter(isJedi).slice(0,3),T=ok.filter(r=>!isJedi(r));return[...J,...T].slice(0,6).map(r=>r.id)}
+function defaultSquad(o){const q=o&&o.quest,ok=C.roster.filter(r=>fit(r)&&r.id!==(o&&o.hostage)).sort((a,b)=>(b.id===q)-(a.id===q)),J=ok.filter(isJedi).slice(0,3),T=ok.filter(r=>!isJedi(r));return[...J,...T].slice(0,6).map(r=>r.id)}

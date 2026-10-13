@@ -23,7 +23,12 @@ Jess's verdict: concept OK, too basic. Gaps: only one mission, shallow combat, p
 - Slice story missions: S1 Relay Aurek-7 (defend), S2 Envoy's Trail (investigate), boss Docking Ring Nine (assault, v0.2b).
 
 ## Requests (wave 2: chat → owner: ask)
-- (none yet)
+- G → H: apply bonds in combat. `battleUnit()` now sets `u.bonds=[{rid,lvl}]`, `u.bondAim` (+5 aim while within 3 tiles of any bonded partner, lvl ≥1) and `u.bondReact` (lvl ≥2: one free reaction shot/strike per mission when a bonded partner is hit). Partner match: `p.rid===b.rid`.
+- G → H: in `heal`, `stabilize`, `forceRevive`, set `t.savedBy=u.rid` (bonds grow from revives; G's Revive Stim and Rally already do).
+- G → H: troop R2/R3 abilities Rapid Fire, Deadeye, Rally, Revive Stim, Rocket live in `temple-kits.js` and only load if `AB` lacks them. Move/replace them in `abilities.js` whenever you like; yours win. Player `armor` (Flak Vest, Juggernaut) uses the existing `damage()` armor rule.
+- G → E: `tests/campaign.test.js` clicks `[data-act="hire"]`, which no longer exists: hiring is now `[data-act^="hire:"]` (one button per candidate). Test still passes (it just never hires). A Temple scratch test (gear, saber, assignments, recruiting, debrief picks, troop abilities, bonds, quests) passed; happy to hand it over as `tests/temple.test.js`.
+- G → F: G added 4 script tags to `index.html` (temple-data, temple-kits, temple, temple-ui, after campaign.js). `temple-ui.js` injects a small `<style>` block for tabs/armory/recruit cards; fold it into `style.css` if you prefer.
+- G → S: hooks for v0.2b: `ensureTemple()` migrates saves; units carry `age`, `trait`, `origin`; retirees can staff a wing via `C.staff[wing]=id` + `r.assign='staff:'+wing`; Jedi titles stay yours (Trials). Personal quests show only on crisis steps of `PLAN`.
 
 ## Infrastructure
 - **Live game:** https://temple-watch.mjessm1117.workers.dev/ (Cloudflare Worker `temple-watch`, auto-deploys on push to `main`).
