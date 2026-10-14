@@ -59,14 +59,16 @@ baseScreen=function(){if(!C)return _baseScreen();storyInit();const s=C.story,P=P
  if(s.q.length)return sceneScreen();
  _baseScreen();storyHud()};
 function storyHud(){const s=C.story,bar=document.querySelector('#modal .resbar');
- if(bar&&!bar.querySelector('.vis'))bar.insertAdjacentHTML('beforeend',`<span class="vis" title="The Vision: how surely the Council's vision of the burning Temple is coming true. Lower is better. ${s.shadow}/10">Vision <b>${SHADOW.word(s.shadow)}</b></span>`);
+ if(bar&&!bar.querySelector('#memBtn')){bar.insertAdjacentHTML('beforeend','<button type="button" class="vis" id="memBtn" title="The names of the fallen and the retired, across every campaign on this device.">Archive of Legends</button>');
+  bar.querySelector('#memBtn').onclick=ev=>{ev.stopPropagation();memorialScreen(baseScreen)}}
+ if(bar&&!bar.querySelector('.vis:not(#memBtn)'))bar.insertAdjacentHTML('beforeend',`<span class="vis" title="The Vision: how surely the Council's vision of the burning Temple is coming true. Lower is better. ${s.shadow}/10">Vision <b>${SHADOW.word(s.shadow)}</b></span>`);
  const eb=document.querySelector('#modal .base .eyebrow');if(eb)eb.textContent=eb.textContent.replace(/~[\d,]+ BBY/,bbyTxt(s.bby))}
 function sceneScreen(){SCR=sceneScreen;const s=C.story,id=s.q[0],m=$('#modal');m.hidden=false;
  const done=lines=>{s.q.shift();if(lines&&lines.length)C.news.push(lines.join(' · ')+'.');saveGame();baseScreen()};
  if(id==='shard'){const a=actNow();m.innerHTML=`<div class="box"><div class="eyebrow">Jedi Council · Act ${a} · ${bbyTxt(s.bby)}</div><h2>${ERA1.shard.t}</h2><p>${a>1&&SHARDS[a]||ERA1.shard.text}</p>
-  <p class="muted">The Vision meter shows how surely it is coming true. It starts <b>${SHADOW.word(s.shadow)}</b>. Win the fights that matter to dim it.</p>
+  ${(loreSee(['zym','gnost','darach','coruscant']),'')}<p class="muted">The Vision meter shows how surely it is coming true. It starts <b>${SHADOW.word(s.shadow)}</b>. Win the fights that matter to dim it.</p>
   <button type="button" class="primary" id="scOk">Continue</button></div>`;m.onclick=null;$('#scOk').onclick=()=>done();return}
- const e=EVENTS.find(e=>e.id===id);if(!e){s.q.shift();return baseScreen()}
+ const e=EVENTS.find(e=>e.id===id);if(!e){s.q.shift();return baseScreen()}loreSee(EVENT_LORE[e.id]);
  const cant=c=>Object.entries(c.effects).some(([k,v])=>RES_NAMES[k]&&k!=='orderDark'&&v<0&&(C.res[k]||0)+v<0);
  m.innerHTML=`<div class="box"><div class="eyebrow">Council matter · Month ${C.month}</div><h2>A choice</h2><p>${e.text}</p>
   ${e.choices.map((c,i)=>`<button type="button" class="choice" data-ch="${i}" ${cant(c)?'disabled':''}><b>${c.label}</b><span>${choiceText(c.effects)}</span></button>`).join('')}</div>`;
@@ -137,7 +139,7 @@ applyResults=function(win){storyInit();const s=C.story,n0=C.legends.length,M=S.M
  for(const L of C.legends.slice(n0)){const r=C.roster.find(r=>r.n===L.n)||L;archive(r,L.how,L.where)}
  if(M.eraBoss){if(win){C.flags.boss_or_won=1;shadowAdd(-1);gain('favor',10,out.res);if(beatPar){for(const [k,v] of Object.entries(M.bonus))gain(k,v,out.res);out.bonus=M.bonusTxt}out.flag=STORY_TEXT.bossWin}
   else{C.flags.temple_scarred=1;shadowAdd(1);gain('favor',-10,out.res);const w=Object.keys(C.wings).filter(k=>C.wings[k]>0).sort((a,b)=>C.wings[b]-C.wings[a])[0];if(w)C.wings[w]--;out.flag=STORY_TEXT.bossLose}}
- const e=EPI[id]&&EPI[id][win?'win':'lose'];if(e)out.flag=(out.flag?out.flag+' ':'')+e;
+ const v=(DEBRIEF_IF[id]||[]).find(x=>C.flags[x[0]]&&x[win?1:2]),e=v?v[win?1:2]:EPI[id]&&EPI[id][win?'win':'lose'];if(e)out.flag=(out.flag?out.flag+' ':'')+e;
  saveGame();return out};
 
 // ── Archive of Legends: shared across campaigns on this device, newest first, cap 30 ──
@@ -158,8 +160,44 @@ endScreen=function(){if(!C||!C.story)return _endScreen();SCR=endScreen;const s=C
  <div><span>Senate Favor</span><span>${C.res.favor}</span></div><div><span>Still serving</span><span>${C.roster.filter(r=>r.status==='active').map(r=>r.n).join(', ')||'none'}</span></div>
  <div><span>Retired</span><span>${ret.map(r=>`${r.n} (${(r.role||'').toLowerCase()})`).join(', ')||'none'}</span></div>
  <div><span>Fallen</span><span>${C.legends.map(l=>l.n).join(', ')||'none'}</span></div><div><span>Archive of Legends</span><span>${archiveLoad().length} names</span></div></div>
+ <h3>Where they went</h3><div class="news">${C.roster.filter(r=>r.status==='active'||r.status==='retired').map(epiCard).join('')||'<p>No one is left to remember it.</p>'}</div>
  ${hist?`<h3>What history changed</h3><div class="news">${hist}</div>`:''}
  <p class="muted">Centuries pass. Your heroes become Legends. To be continued: ${ERA1.next}.</p>
  ${typeof startEra==='function'?'<button type="button" class="primary" id="nextEra">Continue to the next era</button>':''}
+ <button type="button" id="memorial">Archive of Legends</button>
  <button type="button" class="${typeof startEra==='function'?'':'primary'}" id="restart">New campaign</button></div>`;
- m.onclick=null;$('#restart').onclick=()=>{C=null;briefing(true)};const nx=$('#nextEra');if(nx)nx.onclick=()=>startEra(2)};
+ m.onclick=null;$('#restart').onclick=()=>{C=null;briefing(true)};$('#memorial').onclick=()=>memorialScreen(endScreen);const nx=$('#nextEra');if(nx)nx.onclick=()=>startEra(2)};
+
+// ── Wave 3 follow-up: Codex reveals, barks, epilogue cards, memorial ──
+// Codex: planets and characters count as met when a mission or event shows them.
+function loreSee(ids){if(!ids||typeof codexSee!=='function'||typeof CODEX==='undefined')return;
+ for(const x of ids.flat())codexSee(CODEX.planet&&CODEX.planet[x]?'planet':'character',x)}
+const _startMissionL=startMission;
+startMission=function(id,sq,o){_startMissionL(id,sq,o);const L=MISSION_LORE[id];if(L)loreSee([L[0],...(L[1]||[])]);
+ if(S)for(const u of S.units)if(u.side==='p'&&CODEX.character)for(const [k,v] of Object.entries({kira:'Kira Venn',tor:'Tor Saalen',dax:'Sgt. Rhal Dax',ilsa:'Ilsa Myr',bren:'Doc Bren',grak:'Grak Ordo',satele:'Satele Shan',jace:'Jace Malcom'}))if(u.n===v)loreSee([k])};
+// Flag-aware briefs: the mission brief grows one line from the first matching flag (BRIEF_IF).
+for(const [id,list] of Object.entries(BRIEF_IF)){const M=MISSIONS[id];if(!M)continue;const base=M.brief;
+ Object.defineProperty(M,'brief',{configurable:true,enumerable:true,get(){const f=typeof C!=='undefined'&&C?C.flags:{},x=list.find(([k])=>f[k]);return x?base+' '+x[1]:base}})}
+
+// Barks: one line in the log on kill, down, crit and panic. At most one per unit per turn (down and panic always speak).
+let barkT={};
+function bark(u,ev){if(!u||u.side!=='p'||u.vip||!S||S.over)return;const k=u.rid+'|'+S.turn;
+ if(ev!=='down'&&ev!=='panic'&&(barkT[k]||!rnd(60)))return;
+ const r=C&&C.roster.find(r=>r.id===u.rid),dflt=u.jedi?BARKS.jedi:BARKS.troop,set=HERO_BARKS[u.n]||(r&&r.trait&&BARKS[r.trait])||dflt,L=set[ev]||dflt[ev];
+ if(!L)return;barkT[k]=1;const txt=pickOne(L);log(`${u.n}: “${txt}”`,'bark');fx('bark',{u,txt,ev})}
+const _logL=log;log=function(t,c){if(S&&typeof t==='string'&&/critical hit/i.test(t))S._crit=1;return _logL(t,c)};
+onFx((type,d)=>{if(!S)return;if(type==='hit'){if(S._crit){S._crit=0;bark(d.src,'crit')}}else if(type==='kill')bark(d.src,'kill');else if(type==='down')bark(d.t,'down')});
+const _panicL=panicCheck;panicCheck=function(u,...a){const was=u&&u.panic,r=_panicL(u,...a);if(u&&!was&&u.panic)bark(u,'panic');return r};
+
+// Era-end card per surviving or retired unit.
+function epiCard(r){const rule=EPILOGUE.find(([t])=>t(r));
+ return `<p><b>${r.n}</b> · ${r.cls}${isJedi(r)&&r.title?' '+r.title:''} · Rank ${r.rank||1}${r.age?' · age '+r.age:''} · ${r.missions||0} missions, ${r.kills||0} foes<br>${rule[1](r)}</p>`}
+
+// Archive of Legends memorial: every name on this device, newest first. `back` = screen to return to.
+function memorialScreen(back){SCR=()=>memorialScreen(back);const m=$('#modal'),a=archiveLoad();m.hidden=false;
+ m.innerHTML=`<div class="box wide"><div class="eyebrow">Jedi Temple · Hall of Remembrance</div><h2>Archive of Legends</h2>
+ <p class="muted">A candle for every name. The Archive keeps them across campaigns, so the next Order remembers what this one paid.</p>
+ ${a.length?`<div class="news">${a.map(e=>`<p><b>${e.n}</b> · ${e.cls}${e.rank>1?' · rank '+e.rank:''} · ${e.era||ERA1.n}, ${bbyTxt(e.bby)}<br>${e.how}${e.where?' at '+e.where:''}${e.kills?` · ${e.kills} foes`:''}</p>`).join('')}</div>`
+  :'<p>No names yet. May it stay that way.</p>'}
+ <button type="button" class="primary" id="memBack">Back</button></div>`;
+ m.onclick=null;$('#memBack').onclick=()=>back()}

@@ -95,3 +95,10 @@ Era 1 = 12 missions in 3 Acts (3,660 → 3,657 → 3,653 BBY; jumps +3/+4 so Act
 - L → X: `assault` still lives in story.js (wrapper reads `M.escape/near/push` texts now; `M.eraBoss` marks the era boss). Themes set on all L missions.
 - L → E: `tests/campaign.test.js` mission cap 24 → 60 (12-mission era + rescue loops when the odd-run bot keeps picking the rescue option). Old saves made mid-slice will land on a shifted PLAN step.
 - L → R: `startEra(2)` is called from the era-end button; Era 1 history is in `C.flags` (`boss_or_won`, `temple_scarred`, `e1_*`).
+
+## Wave 3 follow-up — Chat L, 2026-10-14
+Codex now matches P/X/R ids: 0 gaps across AB, PERKS (under `ability`), FOES (incl. Era 2), TILES (`^` `M`), WINGS, RESEARCH, MISSIONS (incl. `r_*`), STATUS + SCARS + stress levels, ARMOR/MODS/UTIL/FORMS/CRYSTAL_FX/SABER_TRAITS. Planets and characters unlock via `codexSee` on mission start (`MISSION_LORE`), Council events (`EVENT_LORE`) and the Act shard. Stealth + patrols on `vault` and `adraasHunt`. Barks (kill/down/crit/panic, per trait + named heroes) go to the log with class `bark` and `fx('bark',{u,txt,ev})`. Flag-aware brief lines (`BRIEF_IF`) and debrief lines (`DEBRIEF_IF`). 5 Act I → Act III event chains (Hutt deal, Archive copy, traitor list, Taris refugees, Mandalorian duel → recruit Varra Ordo). Era-end "Where they went" card per surviving/retired unit. Archive of Legends memorial screen (hub resbar button + era-end button).
+## Requests (wave 3 follow-up, from L)
+- L → U: `gearItem`/`codexIds` look for `UTILITY`/`STANCES`; P's tables are `UTIL`, `FORMS`, `CRYSTAL_FX`. Weapons/sabers are keyed in CODEX.gear by their `n` (e.g. `'Military blaster'`), which your name match already finds. Stress levels are `status:stress0|1|2`; scars are `status:<SCARS id>`; tree perks are `ability:<PERKS id>`. Optional: style `.bark` log lines (italic, unit color) and show `fx('bark')` as a speech pop.
+- L → F: optional `fx('bark',{u,txt})` speech bubble over the unit.
+- L → X: stealth pods on `vault` (Ossus) and `adraasHunt` (Adraas sleeps in pod 1). Weak-bot win rates are in E's next balance run.
