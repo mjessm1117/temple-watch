@@ -48,7 +48,20 @@ const ICONS={
  evac:"M12 4v12M7 11l5 5 5-5M5 20h14",
  kyber:"M12 2l5 7-5 13-5-13zM7 9h10",
  charge:"M6 9h12v11H6zM9 9V6h6v3M12 13v3M15 3l3-1",
- beacon:"M12 10v11M8 21h8M9 7a4 4 0 0 1 6 0M6 4a8 8 0 0 1 12 0"};
+ beacon:"M12 10v11M8 21h8M9 7a4 4 0 0 1 6 0M6 4a8 8 0 0 1 12 0",
+ // wave 3 (X): tactics + new abilities
+ disarm:"M3 10h12l2-2h3v4h-4l-2 2H3zM15 16l5 5M20 16l-5 5",
+ flurry:"M4 20L14 4M10 20L20 4",
+ conceal:"M2 12c3-5 6-7 10-7s7 2 10 7c-3 5-6 7-10 7s-7-2-10-7zM4 4l16 16",
+ calm:"M12 21c-4 0-7-3-7-7 0-2 1.5-3 3-3 1.5 0 2.5 1 4 1s2.5-1 4-1c1.5 0 3 1 3 3 0 4-3 7-7 7zM7 6v2M17 6v2M10 3v2M14 3v2",
+ pull:"M21 12h-8M17 8l-4 4 4 4M10 5c-2 2-3 4-3 7s1 5 3 7M6 3c-3 3-4 6-4 9s1 6 4 9",
+ tremor:"M2 19h20M3 15l3-4 3 4 3-7 3 7 3-4 3 4",
+ dash:"M13 4l5 8-5 8M6 4l5 8-5 8",
+ drone:"M8 13a4 4 0 1 0 8 0a4 4 0 1 0-8 0M2 6h6M16 6h6M5 6v4M19 6v4",
+ ion:"M13 2L5 13h6l-2 9 8-11h-6z",
+ sense:"M11 12a1 1 0 1 0 2 0a1 1 0 1 0-2 0M8 12a4 4 0 0 1 8 0M5 12a7 7 0 0 1 14 0M2 12a10 10 0 0 1 20 0",
+ panic:"M12 3l10 18H2zM12 10v5M12 18v.5",
+ elev:"M3 20h18M6 20v-6h6v-6h6v12"};
 (function(){const s=Object.entries(ICONS).map(([k,d])=>`<symbol id="i-${k}" viewBox="0 0 24 24"><path d="${d}"/></symbol>`).join('');
  const el=document.createElement('div');el.innerHTML=`<svg width="0" height="0" style="position:absolute" aria-hidden="true">${s}</svg>`;document.body.prepend(el.firstChild)})();
 const icon=(k,c='ic')=>`<svg class="${c}" aria-hidden="true"><use href="#i-${k}"/></svg>`;

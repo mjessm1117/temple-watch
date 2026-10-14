@@ -8,22 +8,22 @@ function pierceTarget(u,t){const dx=t.x-u.x,dy=t.y-u.y;
  for(const p of line(t.x,t.y,t.x+dx*3,t.y+dy*3).slice(1)){if(dist(u,p)>5||FULL(tile(p.x,p.y)))break;const o=unitAt(p.x,p.y);if(o&&o.side==='e'&&!o.hid)return o}return null}
 const AB={
  shoot:{name:'Shoot',ic:'shoot',tip:'Fire your weapon. Ends turn. Barrels and alarm beacons in sight can be shot (always hits).',dm:u=>u.dmg,
-  tg:u=>[...enemyT(u,u.range,t=>hitChance(u,t)),...tilesWhere((c,x,y)=>(c==='x'||c==='b')&&dist(u,{x,y})<=u.range&&los(u,{x,y})).map(p=>({...p,[tile(p.x,p.y)==='x'?'barrel':'beacon']:1,chance:100}))],
+  tg:u=>[...foesIn(u,t=>dist(u,t)<=u.range&&seenFor(u,t)).map(t=>({t,chance:hitChance(u,t)})),...tilesWhere((c,x,y)=>(c==='x'||c==='b')&&dist(u,{x,y})<=u.range&&los(u,{x,y})).map(p=>({...p,[tile(p.x,p.y)==='x'?'barrel':'beacon']:1,chance:100}))],
   run:(u,g)=>g.barrel?(log(`${u.n} shoots the barrel.`),explodeBarrel(g.x,g.y,u)):g.beacon?(log(`${u.n} shoots the alarm beacon.`),hitBeacon(g.x,g.y,ri(u.dmg[0],u.dmg[1]))):resolve(u,g.t,g.chance,u.dmg)},
  strike:{name:'Strike',ic:'strike',melee:1,tip:'Dash in and cut. Ignores cover. Ends turn.',dm:u=>u.dmg,tg:u=>{const R=reach(u);return foesIn(u,()=>true).map(t=>{let spot=null;
    if(cheb(u,t)===1)spot={path:[]};else{let best=99;for(const [k,dd] of Object.entries(R.d)){const [x,y]=k.split(',').map(Number);if(dd>0&&dd<best&&cheb({x,y},t)===1){best=dd;spot={x,y}}}if(spot)spot.path=pathTo(u,spot.x,spot.y,R.prev)}
    return spot?{t,chance:hitChance(u,t,{melee:true,mod:u.leapAim||0}),spot}:null}).filter(Boolean)},
-  run:(u,g)=>{moveAlong(u,g.spot.path);if(u.status==='ok'&&alive(g.t))resolve(u,g.t,g.chance,u.dmg,{melee:true,label:'strike'});u.leapAim=0}},
+  run:(u,g)=>{moveAlong(u,g.spot.path);if(u.status==='ok'&&alive(g.t)&&cheb(u,g.t)===1)resolve(u,g.t,g.chance,u.dmg,{melee:true,label:'strike'});u.leapAim=0}},
  guard:{name:'Guard',ic:'guard',tip:'Deflect more bolts and cut enemies who come close, until your next turn.',instant:1,run:u=>{u.guard=true;u.guardStruck=false;log(`${u.n} takes a Guard stance.`)}},
  overwatch:{name:'Overwatch',ic:'overwatch',tip:'Shoot the first enemy that moves in sight (−15 aim).',instant:1,run:u=>{u.ow=true;log(`${u.n} is on overwatch.`)}},
  push:{name:'Push',ic:'push',f:2,tip:'Shove an enemy 2 tiles, out of cover. Slamming into things deals 2.',tg:u=>enemyT(u,4,90),run:(u,g)=>{if(!rnd(90)){log(`${u.n}'s Push slips.`);return}push(u,g.t)}},
- collapse:{name:'Collapse',ic:'collapse',f:3,tip:'Bring down a wall. Enemies beside it take 4. It becomes rubble.',tg:u=>tilesWhere((c,x,y)=>'#Bh'.includes(c)&&dist(u,{x,y})<=5&&los(u,{x,y})),
+ collapse:{name:'Collapse',loud:1,ic:'collapse',f:3,tip:'Bring down a wall. Enemies beside it take 4. It becomes rubble.',tg:u=>tilesWhere((c,x,y)=>'#Bh'.includes(c)&&dist(u,{x,y})<=5&&los(u,{x,y})),
   run:(u,g)=>{S.grid[g.y][g.x]='r';fx(g,'CRASH','boom');log(`${u.n} tears the wall down.`);for(const e of enemies().filter(e=>cheb(e,g)<=1))damage(e,4,u)}},
  choke:{name:'Choke',ic:'choke',f:2,dm:()=>[4,5],tip:'4–5 damage, ignores cover. Darkness +2.',tg:u=>enemyT(u,5,85),run:(u,g)=>{addDark(u,2);resolve(u,g.t,85,[4,5],{ignoreDeflect:1,label:'Force choke'})}},
  stun:{name:'Stun',ic:'stunned',f:2,tip:'Cloud an enemy’s mind. They lose their next turn and are easier to capture.',tg:u=>enemyT(u,5,75,t=>t.status==='ok'),run:(u,g)=>{if(rnd(75)){g.t.status='stunned';g.t.ow=false;fx(g.t,'STUN');log(`${g.t.n} is stunned.`,'good')}else log(`${g.t.n} resists the stun.`)}},
  subdue:{name:'Subdue',ic:'captured',tip:'Capture an adjacent enemy who is stunned, surrendered, or at half health. Gives intel.',tg:u=>foesIn(u,t=>cheb(u,t)===1&&!t.noCap&&(t.status!=='ok'||t.hp*2<=t.max)).map(t=>({t,chance:t.status==='ok'?60:85})),
   run:(u,g)=>{if(rnd(g.chance)){g.t.status='captured';S.intel++;u.caps=(u.caps||0)+1;if(g.t.envoy){S.envoyTaken=1;S.intel++;log(`${u.n} takes the envoy alive. +2 intel.`,'good')}else log(`${u.n} captures ${g.t.n}. +1 intel.`,'good')}else{log(`${g.t.n} breaks free.`);if(g.t.status==='surrender')g.t.status='ok'}}},
- meditate:{name:'Meditate',ic:'meditate',tip:'+2 Focus. Ends turn.',instant:1,avail:u=>u.focus>=u.maxF?'Focus full':null,run:u=>{u.focus=Math.min(u.maxF,u.focus+2);log(`${u.n} meditates.`)}},
+ meditate:{name:'Meditate',ic:'meditate',tip:'+2 Focus. Ends turn.',instant:1,avail:u=>u.focus>=u.maxF?'Focus full':null,run:u=>{u.focus=Math.min(u.maxF,u.focus+(u.wildBond?3:2));log(`${u.n} meditates.`)}},
  heal:{name:'Medkit',ic:'medic',ap:1,tip:'Heal 4, or revive a downed ally at 2 HP. Adjacent only. Costs 1 action.',avail:u=>u.kits>0?null:'No medkits',
   tg:u=>allyT(u,p=>cheb(u,p)<=1&&!p.bound&&(p.status==='down'||p.hp<p.max)),
   run:(u,g)=>{u.kits--;const t=g.t;if(t.status==='down'){t.status='ok';t.hp=2;t.bleed=0;t.stable=0;t.ap=0;t.savedBy=u.rid;log(`${u.n} gets ${t.n} back on their feet.`,'good')}else{t.hp=Math.min(t.max,t.hp+4);log(`${u.n} patches up ${t.n}.`,'good')}fx(t,'+','heal')}},
@@ -71,3 +71,79 @@ const AB={
  hack:{name:'Hack',ic:'hack',ctx:1,tip:'Slice a console or locked door within 4. Opens every locked door. Ends turn.',tg:u=>tilesWhere(c=>c==='D').length?tilesWhere((c,x,y)=>(c==='k'||c==='D')&&dist(u,{x,y})<=4).map(p=>({...p,chance:100})):[],
   run:u=>unlock(u)},
  shredder:{name:'Shredder',passive:1,tip:'Hits strip 1 armor and tear apart the crate the target hides behind.'}};
+// Spotter (Scout): allies may shoot an enemy they can't see if a Spotter within 11 can.
+const seenFor=(u,t)=>los(u,t)||players().some(p=>p!==u&&p.spotter&&p.status==='ok'&&dist(p,t)<=11&&los(p,t));
+
+/* ---- Ability engine (wave 3). Chat P can define tree abilities as data: defineAbility(id, def). An existing id is kept unless def.replace.
+ def: name, ic, desc (one mechanical sentence), f (Focus), ap (1 = one action, 0 = free, unset = ends turn),
+  once (1/mission) · cooldown (turns) · uses ('kits'|'nades'|any counter on the unit; spends 1) · loud (breaks concealment)
+  kind: 'attack' (default) · 'ally' · 'self' · 'passive'
+  attack: range (default weapon), melee, noLos, area (3×3, auto-hits), tags ([...] targets must have one), dmg ([lo,hi] | 'weapon'), dmgMod,
+          aimMod, chance (fixed %), ignoreCover, ignoreDeflect, shots (n), noDmg (effect only, rolls chance)
+  effects (on hit, or on the ally/self target): status ('stunned'|'disarmed'|'rooted'|'marked'|'supp') + statusChance,
+          heal, stabilize, revive (HP), buff {aim, def, shield, ap, …} (aim/def last until your next turn), focus (+Focus), dark (Darkness to user)
+  passive: mod {stat:n} added to the unit at mission start (aim, hp, mob, crit, armor, deflect, will…); the unit also gets u[id]=1. */
+function defineAbility(id,d){if(AB[id]&&!d.replace)return AB[id];
+ const a={name:d.name||id,ic:d.ic||'strike',desc:d.desc,tip:d.desc,f:d.f,ap:d.ap,loud:d.loud,melee:d.melee};
+ const mark=u=>{if(d.once)(u.used=u.used||{})[id]=1;if(d.cooldown)(u.cd=u.cd||{})[id]=S.turn+d.cooldown;if(d.uses)u[d.uses]--};
+ a.avail=u=>d.once&&(u.used||{})[id]?'Used this mission':d.cooldown&&(u.cd||{})[id]>=S.turn?'Cooling down':d.uses&&!(u[d.uses]>0)?'None left':null;
+ if(d.kind==='passive'||d.passive){a.passive=1;a.mod=d.mod;delete a.avail}
+ else if(d.kind==='self'){a.instant=1;a.run=u=>{mark(u);applyEff(u,u,d)}}
+ else if(d.kind==='ally'){a.tg=u=>allyT(u,p=>!p.bound&&(d.self||p!==u)&&dist(u,p)<=(d.range||1.5)&&(d.revive||d.stabilize?p.status==='down'&&(d.revive||!p.stable):p.status==='ok'));
+  a.run=(u,g)=>{mark(u);applyEff(u,g.t,d)}}
+ else{const rng=u=>d.range||u.range,dm=u=>Array.isArray(d.dmg)?d.dmg:[u.dmg[0]+(d.dmgMod||0),u.dmg[1]+(d.dmgMod||0)];a.dm=dm;
+  const ch=(u,t)=>d.chance??Math.max(5,hitChance(u,t,{melee:d.melee,mod:d.aimMod||0,noCover:d.ignoreCover}));
+  const ok=t=>!d.tags||d.tags.some(g=>tagsOf(t).includes(g));
+  if(d.area){a.loud=1;a.tg=u=>tilesWhere((c,x,y)=>dist(u,{x,y})<=rng(u)&&!FULL(c)&&(d.noLos||los(u,{x,y}))).map(p=>({...p,area:1}));
+   a.run=(u,g)=>{mark(u);fx(g,'BOOM','boom');for(const t of enemies().filter(t=>cheb(t,g)<=1&&!t.hid&&ok(t)))hitWith(u,t,d,dm(u),100)}}
+  else{a.tg=u=>foesIn(u,t=>ok(t)&&(d.melee?cheb(u,t)===1:dist(u,t)<=rng(u)&&(d.noLos||los(u,t)))).map(t=>({t,chance:ch(u,t)}));
+   a.run=(u,g)=>{mark(u);for(let i=0;i<(d.shots||1);i++)if(alive(g.t))hitWith(u,g.t,d,dm(u),g.chance)}}}
+ return AB[id]=a}
+function hitWith(u,t,d,dmg,chance){const label=(d.name||'attack').toLowerCase();
+ if(d.noDmg){if(rnd(chance))applyEff(u,t,d);else{log(`${t.n} resists ${u.n}'s ${label}.`);fx(t,'MISS','miss')}return}
+ if(resolve(u,t,chance,dmg,{melee:d.melee,ignoreDeflect:d.ignoreDeflect||d.area,label})&&alive(t))applyEff(u,t,d)}
+function applyEff(u,t,d){
+ if(d.status&&t.status==='ok'&&(!d.statusChance||rnd(d.statusChance))){if(d.status==='stunned'){t.status='stunned';t.ow=false}else t[d.status]=1;
+  const n=(STATUS[d.status]||{}).n||d.status;fx(t,n.toUpperCase());log(`${t.n}: ${n}.`,t.side==='e'?'good':'bad')}
+ if(d.heal&&t.status==='ok'){t.hp=Math.min(t.max,t.hp+d.heal);fx(t,'+'+d.heal,'heal');log(`${u.n} heals ${t.n}.`,'good')}
+ if(d.stabilize&&t.status==='down'&&!t.stable){t.stable=1;t.savedBy=u.rid;fx(t,'STABLE','heal');log(`${u.n} stabilizes ${t.n}.`,'good')}
+ if(d.revive&&t.status==='down'){t.status='ok';t.hp=Math.min(t.max,d.revive);t.bleed=0;t.stable=0;t.ap=0;t.savedBy=u.rid;fx(t,'+'+d.revive,'heal');log(`${u.n} revives ${t.n}.`,'good')}
+ for(const [k,n] of Object.entries(d.buff||{})){const f=k==='aim'?'buffAim':k==='def'?'buffDef':k;t[f]=(t[f]||0)+n}
+ if(d.buff)fx(t,'BOOST','heal');
+ if(d.focus&&t.maxF)t.focus=Math.min(t.maxF,t.focus+d.focus);
+ if(d.dark)addDark(u,d.dark)}
+
+// ---- Spec A §2 kits not built in wave 2: Sentinel, Wayseeker, and the remaining troop abilities.
+Object.assign(AB,{
+ sense:{name:'Sense',passive:1,desc:'Finds hidden enemies within 8 tiles instead of 4.'},
+ executioner:{name:'Executioner',passive:1,desc:'+25 aim against enemies at half health or less.'},
+ shadowStep:{name:'Shadow Step',ic:'conceal',f:1,ap:1,desc:'Blink to a free tile within 5 (no reaction fire) and stay concealed until you attack or an enemy comes within 2. 1 action.',
+  tg:u=>tilesWhere((c,x,y)=>PASS(c)&&!unitAt(x,y)&&dist(u,{x,y})<=5&&cheb(u,{x,y})>1).map(p=>({...p,spot:1})),
+  run:(u,g)=>{u.x=g.x;u.y=g.y;reveal();const e=enemies().find(e=>e.status==='ok'&&cheb(e,u)<=2&&los(e,u));
+   if(e&&!S.conc)log(`${u.n} steps out of the shadows right in front of ${e.n}.`,'bad');else{u.conc=1;fx(u,'HIDDEN');log(`${u.n} vanishes into the shadows.`,'good')}}},
+ pathfinder:{name:'Pathfinder',passive:1,desc:'+1 movement.'},
+ wildBond:{name:'Wild Bond',passive:1,desc:'Starts every mission at full Focus; Meditate restores 3.'},
+ beastCalm:{name:'Beast Calm',ic:'calm',f:2,desc:'Soothe a creature or horror within 5: it loses its next turn (75%, horrors 50%).',
+  tg:u=>enemyT(u,5,t=>t.horror?50:75,t=>t.status==='ok'&&(t.horror||tagsOf(t).includes('creature'))),
+  run:(u,g)=>{if(rnd(g.chance)){g.t.status='stunned';fx(g.t,'CALMED');log(`${g.t.n} goes still under ${u.n}'s hand.`,'good')}else log(`${g.t.n} shakes off the calm.`)}},
+ pull:{name:'Force Pull',ic:'pull',f:1,ap:1,desc:'Yank an enemy within 6 up to 3 tiles toward you, out of cover. Slamming into things deals 2. 1 action.',tg:u=>enemyT(u,6,90,t=>cheb(u,t)>1),
+  run:(u,g)=>{if(!rnd(90))return log(`${u.n}'s Pull slips.`);const t=g.t,e0=uEl(t);pushN(u,t,Math.sign(u.x-t.x),Math.sign(u.y-t.y),Math.min(3,cheb(u,t)-1));
+   const drop=e0-uEl(t);if(drop>0&&alive(t))damage(t,drop,u);log(`${u.n} pulls ${t.n} in.`)}},
+ tremor:{name:'Tremor',ic:'tremor',f:3,loud:1,dm:()=>[2,2],desc:'Shake a 3×3 area within 5: enemies take 2, crates and cracked walls there crumble a step.',
+  tg:u=>tilesWhere((c,x,y)=>dist(u,{x,y})<=5&&los(u,{x,y})).map(p=>({...p,area:1})),
+  run:(u,g)=>{fx(g,'QUAKE','boom');log(`${u.n} splits the ground.`);for(const e of enemies().filter(e=>cheb(e,g)<=1&&!e.hid)){e.ow=false;damage(e,2,u)}
+   for(let y=g.y-1;y<=g.y+1;y++)for(let x=g.x-1;x<=g.x+1;x++)if(inb(x,y)&&TILES[S.grid[y][x]].breaks)degrade(x,y)}},
+ runGun:{name:'Run & Gun',ic:'dash',ap:0,desc:'Free: gain an extra action this turn (dash, then still shoot). Once every 2 turns.',
+  avail:u=>u.rgT&&S.turn<=u.rgT+1?'Cooling down':null,instant:1,run:u=>{u.rgT=S.turn;u.ap++;log(`${u.n} sprints.`)}},
+ spotter:{name:'Spotter',passive:1,desc:'Allies may shoot enemies within their range that this unit sees (within 11), even without their own line of sight.'},
+ ghost:{name:'Ghost',passive:1,desc:'Once per mission, after a kill this unit slips back into concealment.'},
+ ionNade:{name:'Ion Grenade',ic:'ion',loud:1,dm:()=>[1,4],desc:'Uses a grenade. 3×3 within 6: droids take 4 and are stunned, everyone else takes 1. Spares cover.',avail:u=>u.nades>0?null:'Out of grenades',
+  tg:u=>tilesWhere((c,x,y)=>dist(u,{x,y})<=6&&!FULL(c)).map(p=>({...p,area:1})),
+  run:(u,g)=>{u.nades--;fx(g,'ION','boom');log(`${u.n} throws an ion grenade.`);for(const t of S.units.filter(t=>alive(t)&&t.status!=='down'&&cheb(t,g)<=1)){const dr=tagsOf(t).includes('droid');damage(t,dr?4:1,u);if(dr&&alive(t)&&t.status==='ok'){t.status='stunned';fx(t,'STUN')}}}},
+ holdLine:{name:'Hold the Line',ic:'overwatch',instant:1,desc:'Overwatch that fires at every enemy that moves in range (−15 each) until your next turn.',run:u=>{u.ow='all';u.owHit=[];log(`${u.n} holds the line.`)}}});
+defineAbility('disarm',{name:'Disarm',ic:'disarm',f:2,range:5,chance:80,noDmg:1,status:'disarmed',desc:'80%: an enemy within 5 can’t shoot, throw or use lightning on its next turn (it can still move and strike).'});
+defineAbility('flurry',{name:'Flurry',ic:'flurry',f:1,melee:1,aimMod:-10,shots:2,desc:'Two strikes on an adjacent enemy at −10 aim each.'});
+defineAbility('protocol',{name:'Combat Protocol',ic:'hack',range:8,noLos:1,dmg:[3,3],chance:100,ignoreDeflect:1,tags:['droid'],desc:'3 damage to a droid within 8, no line of sight needed. Never misses.'});
+defineAbility('shieldDrone',{name:'Shield Drone',ic:'drone',kind:'ally',self:1,ap:1,once:1,range:1.5,buff:{shield:4},desc:'You or an adjacent ally gets a shield that soaks the next 4 damage. Once per mission. 1 action.'});
+// Mechanical one-liners for the codex/tooltips (U's describe()). Older abilities used `tip`.
+for(const a of Object.values(AB)){a.desc=a.desc||a.tip;a.tip=a.tip||a.desc}
