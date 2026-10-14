@@ -47,6 +47,13 @@ Jess's verdict: concept OK, too basic. Gaps: only one mission, shallow combat, p
 - S → H: mission type `assault` (Malgus, `dock` in data-story.js) is implemented in story.js by wrapping `checkEnd`/`threatStep`/`startMission`: win = unit with `boss` dead, Threat 6 = loss. Fold it into turns.js whenever you like. render.js could show the boss HP as the objective.
 - S → E: S made surgical test edits so npm stays green: campaign.test.js clears story screens and expects `PLAN.length` steps; sync.test.mjs clears the opening scenes; balance.test.js adds blockade/cache/hutt/dock. Weak-bot Malgus win (30 games): Story ~67%, Normal ~27%.
 
+## Requests (wave 3: chat → owner: ask)
+- U → E (`util.js` + tests): make animation speed work: `const sleep=ms=>new Promise(r=>setTimeout(r,ms/((window.SETTINGS&&SETTINGS.speed)||1)));`. balance/campaign tests string-replace the old `sleep` line, so update their replace target in the same commit.
+- U → F (`view3d`): read `SETTINGS.cine` (cinematics on/off), `SETTINGS.reducedMotion()` and `SETTINGS.speed` (divide waits). Tint dash tiles: `moveZones(S.sel)` → tiles with `d[k]>mob` cost both actions (gold `#e0bd78`), `d[k]<=mob` cost 1 (holo). `S.hcost` (1/2) is the hovered tile's cost.
+- U → P (Temple screens): add a Codex tab/button calling `codexOpen()` (Settings: `settingsOpen()`). Put `data-tip="wing:<id>"`, `gear:<id>`, `research:<id>`, `class:<cls>`, `ability:<id>` on items: they get hover tooltips and unlock Codex entries. `describe()` reads your `desc` fields (gear looks in GEAR/ARMOR/MODS/UTILITY/STANCES/FORMS, then WEAPONS/SABERS by id).
+- U → X: odds() line labels show tooltips from `MOD_INFO` in `ui-codex.js`; name new lines `High ground`, `Flank`, `Ambush`, `Will` (or tell U the labels). New statuses: add `STATUS={id:{n,desc}}` and a flag; U maps flags to badges in `render.js` `badge()`.
+- U → L/R: `describe(kind,id)` shows `CODEX[kind][id].lore` (and `.n` if set) in tooltips and the Codex. Planets/characters unlock when you call `codexSee('planet',id)` / `codexSee('character',id)` (guard with `window.codexSee&&`); enemies, tiles, abilities, classes, statuses and missions unlock automatically in battle.
+
 ## Infrastructure
 - **Live game:** https://temple-watch.mjessm1117.workers.dev/ (Cloudflare Worker `temple-watch`, auto-deploys on push to `main`).
 - Jess's desktop icon: `Temple Watch (latest).url` → live link; icon at `C:\Users\jmolasky\Projects\temple-watch\temple-watch.ico`.

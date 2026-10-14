@@ -25,19 +25,21 @@
       <span>Intel <b id="sIntel">0</b></span>
       <span class="dk">Darkness <b id="sDark">0</b></span>
     </div>
-    <div class="endrow"><button id="viewBtn" type="button" hidden>View: 3D</button><button id="syncBtn" type="button">Sync: <span id="sSync">off</span></button><button id="infoBtn" type="button">Info: off</button></div>
+    <div class="endrow"><button id="codexBtn" type="button" title="Codex (C)">Codex</button><button id="setBtn" type="button" title="Settings">Settings</button><button id="keysBtn" type="button" title="Keys (?)" aria-label="Keyboard keys">?</button><button id="viewBtn" type="button" hidden>View: 3D</button><button id="syncBtn" type="button">Sync: <span id="sSync">off</span></button><button id="infoBtn" type="button">Info: off</button></div>
   </header>
   <div id="banner" class="banner" aria-live="polite"></div>
   <main class="layout">
     <div class="bwrap"><div id="board" class="board" role="grid" aria-label="Battle map"></div><svg id="over" class="over" viewBox="0 0 10 12" preserveAspectRatio="none" aria-hidden="true"></svg></div>
-    <aside class="side">
+    <aside class="side" aria-label="Unit orders">
+      <button id="sheetBtn" class="grab" type="button" aria-label="Show or hide the orders panel"><i></i></button>
       <div class="panel"><div id="roster" class="roster"></div></div>
       <div class="panel" id="card" aria-live="polite"></div>
       <div class="panel">
         <div id="acts" class="acts"></div>
         <div id="odds"></div>
         <div id="hint" class="hint"></div>
-        <div class="endrow"><button id="endBtn" type="button" class="primary">End turn</button></div>
+        <div class="endrow"><button id="undoBtn" type="button" hidden title="Undo last move (U)">Undo move</button><button id="endBtn" type="button" class="primary" title="End turn (End)">End turn</button></div>
+        <p class="keyline">Keys: <kbd>1–9</kbd> ability · <kbd>Tab</kbd> next unit · <kbd>Space</kbd> aim/confirm · <kbd>Esc</kbd> cancel · <kbd>U</kbd> undo · <kbd>End</kbd> end turn · <kbd>C</kbd> codex · <kbd>?</kbd> all</p>
       </div>
       <div class="panel"><div id="log" class="log" aria-live="polite"></div></div>
     </aside>
@@ -49,6 +51,7 @@
 <script src="js/data-story.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/util.js"></script>
+<script src="js/ui-settings.js"></script>
 <script src="js/save.js"></script>
 <script src="js/state.js"></script>
 <script src="js/rules.js"></script>
@@ -57,6 +60,7 @@
 <script src="js/ai.js"></script>
 <script src="js/fx.js"></script>
 <script src="js/render.js"></script>
+<script src="js/ui-codex.js"></script>
 <script src="js/input.js"></script>
 <script src="js/campaign.js"></script>
 <script src="js/temple-data.js"></script>

@@ -191,3 +191,55 @@ button.primary{background:color-mix(in srgb,var(--holo) 22%,var(--raise));border
 .v3c span{font:500 11px var(--body);color:var(--dim);margin-left:6px;text-shadow:0 1px 2px #000}
 @media(max-width:700px){.v3c span{display:none}}
 @media(prefers-reduced-motion:reduce){.v3f.big .in{animation:none}}
+
+/* ---- Wave 3 UI (Chat U): zones, cost preview, tooltips, codex, settings, keys, phone sheet ---- */
+:root{--dash:#e0bd78}
+.cell.dash{background:color-mix(in srgb,var(--dash) 11%,var(--panel));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--dash) 35%,transparent)}
+.cell.c.dash,.cell.w.dash{background:var(--panel)}
+.over .mv.dash{stroke:var(--dash)}.mvc rect{fill:var(--holo)}.mvc.dash rect{fill:var(--dash)}
+.mvc text{font:600 .2px var(--mono);fill:#0a1113;text-anchor:middle}
+/* Cost preview: hovering an ability or a move tile outlines the actions/Focus it would spend. */
+.side:has(.act[data-cost="1"]:hover) .apr .s1,.side:has(.act[data-cost="end"]:hover) .apr i.on,
+body[data-mv="1"] .apr .s1,body[data-mv="2"] .apr i.on,
+.side:has(.act[data-f="1"]:hover) .fr i.on[data-k="1"],
+.side:has(.act[data-f="2"]:hover) .fr i.on:is([data-k="1"],[data-k="2"]),
+.side:has(.act[data-f="3"]:hover) .fr i.on:is([data-k="1"],[data-k="2"],[data-k="3"]),
+.side:has(.act[data-f="4"]:hover) .fr i.on:is([data-k="1"],[data-k="2"],[data-k="3"],[data-k="4"]){background:transparent;box-shadow:inset 0 0 0 1.5px var(--uc,var(--holo));animation:pip 1s ease-in-out infinite}
+@keyframes pip{50%{opacity:.35}}
+.act{position:relative}.act kbd{position:absolute;top:3px;left:4px;font:500 9px var(--mono);color:var(--dim);background:none;border:0;padding:0}
+kbd{font:500 11px var(--mono);background:var(--raise);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px;color:var(--fg)}
+.keyline{margin:0;font-size:11px;color:var(--dim);line-height:1.9}.keyline kbd{font-size:10px}
+@media(hover:none){.keyline,.act kbd{display:none}}
+#undoBtn{margin-right:auto}
+[data-tip]{cursor:help}button[data-tip],.tok[data-tip]{cursor:pointer}
+.row>[data-tip],.grid2>[data-tip],.usub [data-tip]{text-decoration:underline dotted color-mix(in srgb,var(--dim) 60%,transparent);text-underline-offset:3px}
+.udesc{margin:0;font-size:12px;color:var(--dim)}
+.tip{position:fixed;z-index:30;max-width:300px;background:#0c1619f2;border:1px solid var(--holo);border-radius:6px;padding:8px 10px;font-size:12.5px;line-height:1.4;pointer-events:none;box-shadow:0 6px 24px #0008;display:grid;gap:4px}
+.tip b{font:600 13px var(--disp);color:var(--holo);letter-spacing:.03em}.tip span{color:var(--fg)}.tip i{color:var(--dim);font-style:italic}
+.uilayer{position:fixed;inset:0;z-index:20;background:#05090be6;display:grid;place-items:center;padding:16px;overflow:auto}
+.ui-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;width:min(520px,100%);display:grid;gap:12px;max-height:calc(100vh - 32px);overflow:auto}
+.ui-card.wide{width:min(860px,100%)}
+.ui-head{display:flex;align-items:center;gap:12px}.ui-head h2{margin:0;font:600 18px var(--disp);letter-spacing:.08em;color:var(--holo);margin-right:auto}
+.small{font-size:12px}
+.setrow{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px}
+.setrow small{display:block;color:var(--dim);font-size:12px;max-width:280px}.seg{display:flex;gap:4px}
+.cxtabs{display:flex;flex-wrap:wrap;gap:6px}.cxtabs small{font:500 10px var(--mono);color:var(--dim)}
+.cxlist{display:grid;gap:8px}@media(min-width:880px){.cxlist{grid-template-columns:1fr 1fr}}
+.cxe{display:flex;gap:10px;background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:10px}.cxe .ic{width:22px;height:22px;flex:none;color:var(--holo)}
+.cxe b{font:600 14px var(--disp)}.cxe p{margin:4px 0 0;font-size:13px}.cxe .lore{color:var(--dim);font-style:italic}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;align-items:center}.keys dd{margin:0;font-size:13px}
+.grab{display:none}
+html.rm *,html.rm *::before,html.rm *::after{animation:none!important;transition:none!important}
+/* Phone (≤600px): orders panel becomes a bottom sheet; big tap targets. */
+@media(max-width:600px){
+ body{padding-inline:10px;padding-bottom:calc(46vh + 12px)}
+ .top .stats{gap:4px 10px}.top .endrow button{min-height:40px;padding:6px 9px}
+ .side{position:fixed;left:0;right:0;bottom:0;z-index:6;max-height:46vh;overflow:auto;background:var(--bg);border-top:1px solid var(--holo);border-radius:14px 14px 0 0;padding:0 8px calc(8px + env(safe-area-inset-bottom,0px));gap:6px;box-shadow:0 -8px 24px #000a;overscroll-behavior:contain}
+ .side .panel{padding:8px}.side .panel:last-child{display:none}
+ .grab{display:grid;place-items:center;position:sticky;top:0;z-index:1;width:100%;min-height:28px;background:var(--bg);border:0;border-radius:0;padding:6px 0}
+ .grab i{width:44px;height:5px;border-radius:3px;background:var(--line)}
+ body.sheet-min .side{max-height:132px}body.sheet-min{padding-bottom:144px}
+ .roster{flex-wrap:nowrap;overflow-x:auto}.roster button{min-height:44px;flex:none}
+ .act{min-height:60px}.endrow button,#confirm{min-height:48px}
+ .tip{max-width:calc(100vw - 16px)}
+}
