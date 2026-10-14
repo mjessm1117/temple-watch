@@ -35,7 +35,12 @@ function chooseAbility(k){const u=S.sel;if(!canAct(u)||!AB[k])return;
 $('#acts').addEventListener('click',ev=>{const b=ev.target.closest('button[data-a]');if(!b||b.disabled)return;chooseAbility(b.dataset.a)});
 $('#odds').addEventListener('click',ev=>{if(ev.target.closest('#confirm')&&S.pick&&canAct(S.sel))exec(S.sel,S.mode,S.pick)});
 $('#roster').addEventListener('click',ev=>{const b=ev.target.closest('button[data-u]');if(b)select(S.units.filter(u=>u.side==='p')[+b.dataset.u])});
-$('#endBtn').addEventListener('click',()=>{const e=$('#endBtn');if(players().some(canAct)&&e.dataset.confirm!=='1'){e.dataset.confirm='1';e.textContent='Units can still act. End turn?';setTimeout(()=>{e.dataset.confirm='';e.textContent='End turn'},2500);return}
+// Ending with units that can still act: first press names them and lights them in the roster; second press ends.
+let endT=0;$('#endBtn').addEventListener('click',()=>{const e=$('#endBtn'),A=players().filter(canAct);
+ if(A.length&&e.dataset.confirm!=='1'){e.dataset.confirm='1';e.classList.add('warn');document.body.classList.add('endwarn');
+  e.textContent=`${A.length===1?A[0].n.split(' ')[0]+' can':A.length+' units can'} still act. End turn?`;
+  clearTimeout(endT);endT=setTimeout(()=>{e.dataset.confirm='';e.classList.remove('warn');document.body.classList.remove('endwarn');e.textContent='End turn'},3500);return}
+ clearTimeout(endT);e.classList.remove('warn');document.body.classList.remove('endwarn');
  e.dataset.confirm='';e.textContent='End turn';S.undo=null;endTurn()});
 $('#undoBtn').addEventListener('click',undoMove);
 // Hotkeys: 1–9 abilities · Tab/Shift+Tab next unit · Space/Enter aim then confirm · ←/→ cycle targets · Esc cancel · U undo · End end turn · C codex · I info · ? keys

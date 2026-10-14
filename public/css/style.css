@@ -243,3 +243,85 @@ html.rm *,html.rm *::before,html.rm *::after{animation:none!important;transition
  .act{min-height:60px}.endrow button,#confirm{min-height:48px}
  .tip{max-width:calc(100vw - 16px)}
 }
+
+/* Temple screens (moved from temple-ui.js) */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}.tabs button{border-radius:6px 6px 0 0;border-bottom:none}
+.tabs button.on{color:var(--holo);border-color:var(--holo)}.tpanel{display:grid;gap:8px}
+.tw{display:grid;gap:14px}@media(min-width:880px){.tw{grid-template-columns:240px 1fr}}
+.ulist{display:grid;gap:4px;align-content:start}.ulist button{display:flex;gap:8px;align-items:center;text-align:left}.ulist small,.rmain small{display:block;color:var(--dim)}
+.gear{display:grid;gap:10px}.gear .grow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.gear .grow>b{min-width:90px;font:600 12px var(--disp);letter-spacing:.08em;color:var(--dim);text-transform:uppercase}
+.stl{font:500 12px var(--mono);color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:8px}
+.sw{width:26px;height:26px;min-height:0;padding:0;border-radius:50%;background:var(--c);border:2px solid var(--line)}.sw.on{border-color:var(--fg);box-shadow:0 0 0 2px var(--holo)}
+.cands{display:grid;gap:10px}@media(min-width:880px){.cands{grid-template-columns:repeat(3,1fr)}}
+.cand{border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;gap:6px;background:var(--raise)}.cand input{font-size:14px;padding:6px}
+.cand label{display:inline-block}.cand input[type=radio]{position:absolute;opacity:0}.cand input[type=radio]:checked+.sw{border-color:var(--fg);box-shadow:0 0 0 2px var(--holo)}
+.seats{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}.seat{border:1px solid var(--line);border-radius:8px;padding:8px;font-size:12px}.seat.vac{color:var(--dim);border-style:dashed}
+.rrow select{max-width:220px;font-size:12px;background:var(--raise);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:4px}
+.bd{color:var(--good);font-size:12px}.up{color:var(--good)}
+.tree{display:grid;gap:4px;margin-top:6px}.trow{display:grid;grid-template-columns:70px 1fr 1fr;gap:6px;align-items:stretch;font-size:12px}
+.trow.lock{opacity:.5}.topt{border:1px solid var(--line);border-radius:6px;padding:4px 6px;display:grid;grid-template-columns:auto 1fr;gap:0 6px;align-items:center}
+.topt small{grid-column:2;color:var(--dim)}.topt.on{border-color:var(--holo);box-shadow:0 0 0 1px var(--holo) inset}.topt svg{width:16px;height:16px}
+
+/* ---- Wave 3 follow-up (Chat U): stealth, heights, area odds, HUD panels, calendar, tips, colorblind ---- */
+.conc{color:var(--good);border:1px solid color-mix(in srgb,var(--good) 55%,transparent);border-radius:4px;padding:0 6px}
+.cell.vis{background:color-mix(in srgb,var(--sith) 13%,var(--panel))}
+.cell.vis.reach,.cell.vis.dash{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--sith) 70%,transparent)}
+.cell.el1{background-image:linear-gradient(#ffffff0d,#ffffff0d)}.cell.el2{background-image:linear-gradient(#ffffff1c,#ffffff1c)}
+.cell.el1,.cell.el2{box-shadow:inset 0 -3px 0 #0006}
+.elv{position:absolute;left:2px;bottom:1px;font:600 9px var(--mono);color:var(--dim);font-style:normal;z-index:2}
+.cell.cliff{background:repeating-linear-gradient(45deg,#ffffff08 0 3px,transparent 3px 7px),var(--panel);opacity:.55}
+.over .area.hov{stroke-dasharray:4 3;fill:color-mix(in srgb,var(--holo) 7%,transparent)}
+.ach rect{fill:var(--sith)}.ach.kl rect{fill:var(--fg)}.ach.al rect{fill:var(--warn)}
+.ach text{font:600 .17px var(--mono);fill:#fff;text-anchor:middle}.ach.kl text,.ach.al text{fill:#0a1113}
+.ol.warn{color:var(--warn)}
+details.fold>summary{cursor:pointer;font:600 12px var(--disp);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);list-style:none;display:flex;gap:6px;align-items:center}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::before{content:'▸';transition:transform .15s}details.fold[open]>summary::before{transform:rotate(90deg)}
+details.fold:not([open]){gap:0}
+.objs{display:grid;gap:4px;font-size:13px}.objs p{margin:0}.obj1{color:var(--fg)}
+.orow{display:flex;justify-content:space-between;gap:10px;color:var(--dim);font-size:12px}.orow b{color:var(--fg);font:500 12px var(--mono);text-align:right}
+.orow.ok b{color:var(--good)}.orow.hot b{color:var(--sith)}
+.ocall{font-size:12px;color:var(--good)}.ocall.bad{color:var(--sith)}
+.pods{display:grid;gap:4px}.podh{font:600 11px var(--disp);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-top:4px}
+.podr{display:grid;grid-template-columns:18px 1fr auto;gap:2px 8px;align-items:center;text-align:left;padding:5px 8px;min-height:36px;font:500 12px var(--body);border-left:3px solid var(--sith);--uc:var(--sith)}
+.podr .ic{width:16px;height:16px;color:var(--sith)}.podr .pips{grid-column:2}.podr small{grid-row:1/3;grid-column:3;color:var(--dim);font:500 11px var(--mono)}
+.podr .pips i{width:6px;height:6px}
+.logf{display:flex;gap:4px;flex-wrap:wrap}.logf button{min-height:28px;padding:2px 8px;font-size:11px}
+.tipcard{background:color-mix(in srgb,var(--holo) 10%,var(--panel));border:1px solid var(--holo);border-radius:8px;padding:10px 12px;display:grid;gap:6px}
+.tipcard>b{font:600 12px var(--disp);letter-spacing:.1em;text-transform:uppercase;color:var(--holo)}.tipcard p{margin:0;font-size:13px}
+.tipcard .endrow{display:flex;gap:6px;justify-content:flex-end}
+#endBtn.warn{border-color:var(--warn);color:var(--warn);background:color-mix(in srgb,var(--warn) 14%,var(--raise))}
+body.endwarn .roster button:not(.done){border-color:var(--warn);animation:pip 1s ease-in-out infinite}
+blockquote.mq{margin:0 0 8px;padding:6px 12px;border-left:3px solid var(--holo);color:var(--dim);font-style:italic}
+.calstrip{display:grid;grid-template-columns:auto repeat(4,minmax(0,1fr));gap:6px;margin:8px 0;font-size:12px}
+.calstrip>div{background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:6px 8px;display:grid;gap:3px;align-content:start}
+.calnow b{font:600 13px var(--disp);color:var(--holo)}.calnow small,.calslot>small{color:var(--dim);font:500 10px var(--mono)}
+.calslot span{line-height:1.3}.calslot .mo{color:var(--holo)}.calslot .up,.calslot .ok{color:var(--good)}.calslot .bad{color:var(--sith)}
+@media(max-width:700px){.calstrip{grid-template-columns:repeat(2,minmax(0,1fr))}.calnow{grid-column:1/-1}}
+/* Colorblind: enemies orange + notched corner; good/allies blue. */
+html.cb{--sith:#ff9e2c;--good:#5fb0ff;--dash:#f5e663}
+html.cb .tok.en::after{content:'';position:absolute;top:0;right:0;border:6px solid transparent;border-top-color:var(--sith);border-right-color:var(--sith)}
+html.cb .cell.vis{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--sith) 26%,var(--panel)) 0 4px,var(--panel) 4px 8px)}
+/* Desktop: header on one line; side panel scrolls on its own so orders stay in view. */
+.top .endrow{display:flex;gap:6px;flex-wrap:wrap}.top .endrow button{min-height:32px;padding:5px 9px;white-space:nowrap;font-size:12px}
+@media(min-width:880px){.layout .side{position:sticky;top:8px;max-height:calc(100vh - 16px);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}}
+/* Phone pass (390×844): one-line header, compact banner, shorter sheet with orders first. */
+@media(max-width:600px){
+ body{padding-block:8px calc(34vh + 10px)}#app{gap:8px}
+ #app>*,.top>*{min-width:0;max-width:100%}
+ .top{gap:4px 8px}.brand{font-size:16px}.brand small{font-size:10px}
+ .top .stats{flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;width:100%;font-size:11px;scrollbar-width:none}
+ .top .endrow{flex-wrap:nowrap;overflow-x:auto;width:100%;scrollbar-width:none}.top .endrow button{min-height:40px;flex:none}
+ #keysBtn{display:none}
+ .banner{padding:4px 8px;font-size:12px}
+ .side{max-height:34vh;display:flex;flex-direction:column}
+ .side>.grab{order:0}.side>#tips{order:1}.side>.panel:has(#roster){order:2}.side>.panel:has(#acts){order:3}.side>#card{order:4}.side>#objP{order:5}.side>#podP{order:6}.side>.panel:has(#log){order:7;display:grid}
+ .tipcard{padding:8px 10px;gap:4px}.tipcard p{font-size:12px}.tipcard .endrow button{min-height:40px}
+ .side .panel{flex:none}
+ .keyline{display:none}
+ .uilayer{padding:8px;place-items:start center}.ui-card{max-height:calc(100vh - 16px)}
+ .podr{min-height:44px}.logf button{min-height:36px}
+ .calstrip{font-size:11px}
+}
+ @media(max-width:600px){.calslot:has(>.muted){display:none}}
+@media(min-width:601px){.top{flex-wrap:nowrap}.top .stats{flex:1 1 auto;justify-content:center;min-width:0}.top .endrow{flex:none}.brand{flex:0 1 auto;min-width:0}.brand small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}

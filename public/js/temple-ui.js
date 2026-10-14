@@ -1,19 +1,5 @@
 /* Temple hub: Operations (missions) on top, then tabs Roster · Armory · Wings · Recruit · Council. All tabs render; inactive ones are hidden. */
 let TAB='roster',ARM=null;
-(function(){const st=document.createElement('style');st.textContent=`
-.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}.tabs button{border-radius:6px 6px 0 0;border-bottom:none}
-.tabs button.on{color:var(--holo);border-color:var(--holo)}.tpanel{display:grid;gap:8px}
-.tw{display:grid;gap:14px}@media(min-width:880px){.tw{grid-template-columns:240px 1fr}}
-.ulist{display:grid;gap:4px;align-content:start}.ulist button{display:flex;gap:8px;align-items:center;text-align:left}.ulist small,.rmain small{display:block;color:var(--dim)}
-.gear{display:grid;gap:10px}.gear .grow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.gear .grow>b{min-width:90px;font:600 12px var(--disp);letter-spacing:.08em;color:var(--dim);text-transform:uppercase}
-.stl{font:500 12px var(--mono);color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:8px}
-.sw{width:26px;height:26px;min-height:0;padding:0;border-radius:50%;background:var(--c);border:2px solid var(--line)}.sw.on{border-color:var(--fg);box-shadow:0 0 0 2px var(--holo)}
-.cands{display:grid;gap:10px}@media(min-width:880px){.cands{grid-template-columns:repeat(3,1fr)}}
-.cand{border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;gap:6px;background:var(--raise)}.cand input{font-size:14px;padding:6px}
-.cand label{display:inline-block}.cand input[type=radio]{position:absolute;opacity:0}.cand input[type=radio]:checked+.sw{border-color:var(--fg);box-shadow:0 0 0 2px var(--holo)}
-.seats{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}.seat{border:1px solid var(--line);border-radius:8px;padding:8px;font-size:12px}.seat.vac{color:var(--dim);border-style:dashed}
-.rrow select{max-width:220px;font-size:12px;background:var(--raise);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:4px}
-.bd{color:var(--good);font-size:12px}.up{color:var(--good)}`;document.head.appendChild(st)})();
 
 const cost=(cr,ky)=>`${cr} Cr${ky?` + ${ky} Ky`:''}`;
 const needTxt=n=>n&&!hasWing(n)?` · needs ${WINGS[n[0]].n} ${n[1]}`:'';
@@ -70,7 +56,7 @@ function baseScreen(){SCR=baseScreen;S=null;ensureTemple();const m=$('#modal');m
  if(C.step>=PLAN.length&&!C.options.length)return endScreen();
  const pend=C.roster.filter(r=>r.status==='active'&&pendingRank(r)).length;
  m.innerHTML=`<div class="box wide base">${resRow()}
- <div><div class="eyebrow">Old Republic · ~3,660 BBY · ${DIFF[C.diff].n}</div><h2>Jedi Temple, Coruscant</h2></div>
+ <div><div class="eyebrow">${eraLabel()} · ${DIFF[C.diff].n}</div><h2>Jedi Temple, Coruscant</h2></div>
  ${C.news.length?`<div class="news">${C.news.map(n=>`<p>${n}</p>`).join('')}</div>`:''}
  <section><h3>Galaxy · choose the next mission</h3><div class="opts">${C.options.map(optionHTML).join('')}</div></section>
  <nav class="tabs" role="tablist">${window.codexOpen?'<button type="button" id="hubCx" title="Codex (C)">Codex</button>':''}${window.settingsOpen?'<button type="button" id="hubSet">Settings</button>':''}${TABS.map(([k,n])=>`<button type="button" role="tab" class="${TAB===k?'on':''}" aria-selected="${TAB===k}" data-tab="${k}">${n}${k==='roster'&&pend?` (${pend})`:''}</button>`).join('')}</nav>
@@ -89,6 +75,3 @@ function hubClick(ev){if(ev.target.closest('#hubCx'))return codexOpen();if(ev.ta
 function treeHTML(r){const K=KITS[r.cls];if(!K)return '';const P=picksOf(r);
  return `<div><b class="eyebrow">Skill tree · ${r.cls}</b>${CLASS[r.cls].desc?` <small class="muted">${CLASS[r.cls].desc}</small>`:''}<div class="tree">${Object.entries(K).map(([rk,opts])=>`<div class="trow ${+rk>r.rank?'lock':''}"><span>R${rk}${RANKS[rk-1]?` <small>${RANKS[rk-1].xp} XP</small>`:''}</span>${opts.map(k=>{const a=pickInfo(k),on=P[rk-1]===k;
   return `<span class="topt ${on?'on':''}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}<b>${a.name}</b><small>${a.desc||a.tip||''}</small></span>`}).join('')}</div>`).join('')}</div></div>`}
-(function(){const st=document.createElement('style');st.textContent=`.tree{display:grid;gap:4px;margin-top:6px}.trow{display:grid;grid-template-columns:70px 1fr 1fr;gap:6px;align-items:stretch;font-size:12px}
-.trow.lock{opacity:.5}.topt{border:1px solid var(--line);border-radius:6px;padding:4px 6px;display:grid;grid-template-columns:auto 1fr;gap:0 6px;align-items:center}
-.topt small{grid-column:2;color:var(--dim)}.topt.on{border-color:var(--holo);box-shadow:0 0 0 1px var(--holo) inset}.topt svg{width:16px;height:16px}`;document.head.appendChild(st)})();

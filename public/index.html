@@ -16,7 +16,7 @@
 <body>
 <div id="app">
   <header class="top">
-    <div class="brand">TEMPLE WATCH<small id="where">Jedi Temple · ~3,660 BBY</small></div>
+    <div class="brand">TEMPLE WATCH<small id="where">Jedi Temple</small></div>
     <div class="stats">
       <span>Turn <b id="sTurn">–</b></span>
       <span><span id="sObjL">Objective</span> <b id="sObj">–</b></span>
@@ -24,6 +24,7 @@
       <span id="sThrW" class="thr" hidden>Threat <b id="sThr">0</b></span>
       <span>Intel <b id="sIntel">0</b></span>
       <span class="dk">Darkness <b id="sDark">0</b></span>
+      <span id="sConc" class="conc" hidden data-tip="status:concealed">Concealed</span>
     </div>
     <div class="endrow"><button id="codexBtn" type="button" title="Codex (C)">Codex</button><button id="setBtn" type="button" title="Settings">Settings</button><button id="keysBtn" type="button" title="Keys (?)" aria-label="Keyboard keys">?</button><button id="viewBtn" type="button" hidden>View: 3D</button><button id="syncBtn" type="button">Sync: <span id="sSync">off</span></button><button id="infoBtn" type="button">Info: off</button></div>
   </header>
@@ -32,6 +33,7 @@
     <div class="bwrap"><div id="board" class="board" role="grid" aria-label="Battle map"></div><svg id="over" class="over" viewBox="0 0 10 12" preserveAspectRatio="none" aria-hidden="true"></svg></div>
     <aside class="side" aria-label="Unit orders">
       <button id="sheetBtn" class="grab" type="button" aria-label="Show or hide the orders panel"><i></i></button>
+      <div id="tips" class="tipcard" hidden></div>
       <div class="panel"><div id="roster" class="roster"></div></div>
       <div class="panel" id="card" aria-live="polite"></div>
       <div class="panel">
@@ -41,7 +43,9 @@
         <div class="endrow"><button id="undoBtn" type="button" hidden title="Undo last move (U)">Undo move</button><button id="endBtn" type="button" class="primary" title="End turn (End)">End turn</button></div>
         <p class="keyline">Keys: <kbd>1–9</kbd> ability · <kbd>Tab</kbd> next unit · <kbd>Space</kbd> aim/confirm · <kbd>Esc</kbd> cancel · <kbd>U</kbd> undo · <kbd>End</kbd> end turn · <kbd>C</kbd> codex · <kbd>?</kbd> all</p>
       </div>
-      <div class="panel"><div id="log" class="log" aria-live="polite"></div></div>
+      <details class="panel fold" id="objP" open><summary>Objectives</summary><div id="objs" class="objs"></div></details>
+      <details class="panel fold" id="podP"><summary>Contacts <b id="podN"></b></summary><div id="pods" class="pods"></div></details>
+      <div class="panel"><div id="logF" class="logf" role="group" aria-label="Log filter"></div><div id="log" class="log" aria-live="polite"></div></div>
     </aside>
   </main>
   <div id="modal" class="modal" hidden></div>
@@ -63,6 +67,7 @@
 <script src="js/fx.js"></script>
 <script src="js/render.js"></script>
 <script src="js/ui-codex.js"></script>
+<script src="js/ui-hud.js"></script>
 <script src="js/input.js"></script>
 <script src="js/campaign.js"></script>
 <script src="js/temple-data.js"></script>

@@ -15,14 +15,16 @@ const STAT_INFO={aim:['Aim','Base chance to hit before cover, range and other mo
  damage:['Damage','Damage range on a hit. Armor removes some; minimum 1.'],range:['Range','Max shooting distance. Hit chance drops past 60% of it.'],
  deflect:['Deflect','Chance a Jedi blocks a blaster bolt.'],crit:['Crit','Chance a hit deals +2 damage. Flanking adds more.'],medkits:['Medkits','Heals or revives an adjacent ally.'],
  grenades:['Grenades','3×3 blast; breaks half cover.'],hp:['HP','Health. At 0 a unit goes down and starts to bleed out.'],actions:['Actions','Two per turn. Moves cost 1; most attacks end the turn.'],
- focus:['Focus','Fuel for Force powers. Meditate to regain it.'],will:['Will','Resistance to panic from deaths, horrors and heavy damage.'],stress:['Stress','Builds over missions; high stress lowers will.']};
+ focus:['Focus','Fuel for Force powers. Meditate to regain it.'],will:['Will','Resistance to panic from deaths, horrors and heavy damage.'],stress:['Stress','Builds over missions; high stress lowers will.'],threat:['Threat','Rises each turn past par. At 6 the mission fails.']};
 const MOD_INFO={'Aim':'The shooter\'s base aim.','Half cover':'Target behind half cover: −20.','Full cover':'Target behind full cover: −40.','Range':'Past 60% of weapon range, aim drops 3 per tile.',
  'Close quarters':'Melee bonus.','Smoke':'Target in smoke.','Exposed target':'Snipers punish targets with no cover.','Hunkered down':'Target is hunkered.','Defensive Line':'A Guardian beside the target shields it.',
  'Helpless':'Stunned or surrendered target.','Suppressed':'The shooter is pinned by suppressing fire.','Battle Meditation':'A Consular\'s meditation steadies allies and shakes foes.',
  'Marked':'A Scout marked this target.','Bond':'Fighting near a bonded partner.','Ability bonus':'Bonus from the ability used.','Ability penalty':'Penalty from the ability used.',
- 'Height':'Shooting down from higher ground.','High ground':'Shooting down from higher ground.','Flank':'Target has no cover against this angle.','Ambush':'First shot from concealment.','Will':'Shaken nerves.'};
+ 'Height':'Shooting down from higher ground.','High ground':'+15 when shooting down at a lower target.','Cover seen from above':'Shooting down past cover: it protects less (up to +10).',
+ 'Executioner':'+25 against targets at half HP or less.','Boosted':'An ally\'s buff raises this unit\'s aim.','Target shielded':'A buff on the target makes it harder to hit.',
+ 'Sith Lord nearby':'A Sith Lord within 4 tiles drives nearby Sith to shoot straighter.','Vs':'Trained against this kind of foe.','Beast lore':'Knows how beasts fight.','Fear of horrors':'A scar: this unit fears horrors.','Flank':'Target has no cover against this angle.','Ambush':'First shot from concealment.','Will':'Shaken nerves.'};
 function loreOf(kind,id){const C=uiGv('CODEX');return C&&C[kind]&&C[kind][id]&&C[kind][id].lore||''}
-function gearItem(id){for(const n of ['GEAR','ARMOR','MODS','UTILITY','STANCES','FORMS','SABER_TRAITS','TRAITS','PERKS']){const t=uiGv(n);if(t&&!Array.isArray(t)&&t[id]&&typeof t[id]==='object')return t[id]}
+function gearItem(id){for(const n of ['GEAR','ARMOR','MODS','UTIL','UTILITY','STANCES','FORMS','CRYSTAL_FX','SABER_TRAITS','TRAITS','PERKS','SCARS']){const t=uiGv(n);if(t&&!Array.isArray(t)&&t[id]&&typeof t[id]==='object')return t[id]}
  for(const n of ['WEAPONS','SABERS']){const t=uiGv(n);if(Array.isArray(t)){const i=t.find((w,ix)=>w.id===id||String(ix)===String(id)||w.n===id);if(i)return i}}return null}
 function foeAuto(f){return [`HP ${f.hp} · Aim ${f.aim} · Move ${f.mob} · Damage ${f.dmg[0]}–${f.dmg[1]} · Range ${f.range<2?'melee':f.range}`,f.armor?`Armor ${f.armor}.`:'',f.horror||f.forceOnly?'Hurts only Force users; troops are immune.':'',f.hid?'Starts hidden.':''].filter(Boolean).join(' ')}
 function describe(kind,id){let name=id,desc='',ic=null,t;
@@ -51,7 +53,7 @@ function codexScan(){if(!S)return;codexSee('mission',S.id);
 function codexIds(kind){const src={ability:'AB',enemy:'FOES',class:'CLASS',tile:'TILES',wing:'WINGS',research:'RESEARCH',mission:'MISSIONS'}[kind];
  let ids=src&&uiGv(src)?Object.keys(uiGv(src)):[];
  if(kind==='status')ids=Object.keys({...STATUS_INFO,...(uiGv('STATUS')||{})});
- if(kind==='gear')for(const n of ['GEAR','ARMOR','MODS','UTILITY','STANCES','FORMS']){const t=uiGv(n);if(t&&!Array.isArray(t))ids.push(...Object.keys(t).filter(k=>k!=='none'))}
+ if(kind==='gear')for(const n of ['GEAR','ARMOR','MODS','UTIL','UTILITY','STANCES','FORMS']){const t=uiGv(n);if(t&&!Array.isArray(t))ids.push(...Object.keys(t).filter(k=>k!=='none'))}
  if(kind==='tile')ids=ids.filter(c=>c!=='.');
  const C=uiGv('CODEX');if(C&&C[kind])for(const k of Object.keys(C[kind]))if(!ids.includes(k))ids.push(k);
  return [...new Set(ids)]}
