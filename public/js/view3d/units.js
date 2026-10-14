@@ -13,12 +13,14 @@ const KIND={
  acolyte:{body:0x2a1e24,robe:0x121216,skin:0x8f8f96,weapon:'saber',saber:0xff3b2e,hood:1,belt:0x5a1414},
  envoy:{body:0x8a8f96,robe:0x5d636b,skin:0xc29a7a,weapon:'pistol',belt:0x3d4248},
  civ:{body:0x8a7a5a,robe:0x6d6047,skin:0xc29a7a,weapon:null,belt:0x7fd99a,short:1}};
-const ENEMY={e_trooper:'sith',e_heavy:'sithHeavy',e_agent:'agent',e_acolyte:'acolyte',e_horror:'beast',e_envoy:'envoy'},BYTYPE={malgus:'malgus',mando:'mando'};
+const ENEMY={e_trooper:'sith',e_heavy:'sithHeavy',e_agent:'agent',e_acolyte:'acolyte',e_horror:'beast',e_envoy:'envoy'},BYTYPE={malgus:'malgus',mando:'mando',bh_trooper:'bhTrooper',bh_sniper:'sniper',bh_marauder:'marauder',sith_lord:'sithLord',kaan:'kaan',bane:'bane',
+ sith_spawn:'spawn',nexus:'nexus',nexus_core:'nexusCore'};
 // Later eras: names pick a look when the icon is generic (e.g. Brotherhood Sith Lords get robes and red sabers).
 const byName=n=>/sith lord|marauder|kaan|bane|dark acolyte|nightsister/i.test(n||'')?'acolyte':/sniper|bounty|agent/i.test(n||'')?'agent':/mandalorian/i.test(n||'')?'mando':null;
-export const kindOf=u=>u.vip?'civ':u.jedi?'jedi':u.side==='e'?(BYTYPE[u.type]||(u.horror?'beast':null)||byName(u.n)||ENEMY[u.ic]||'sith'):({Scout:'scout',Medic:'medic',Heavy:'heavy'}[u.cls]||'trooper');
+export const kindOf=u=>u.vip?'civ':u.jedi?'jedi':u.side==='e'?(BYTYPE[u.type]||(u.nexus?'nexus':null)||(u.horror?'beast':null)||byName(u.n)||ENEMY[u.ic]||'sith'):({Scout:'scout',Medic:'medic',Heavy:'heavy'}[u.cls]||'trooper');
 // Block-figure stand-ins for kinds that only exist as rigged models.
-const BLOCK={malgus:'acolyte',mando:'trooper'};
+const BLOCK={malgus:'acolyte',mando:'trooper',bhTrooper:'sith',sniper:'agent',marauder:'acolyte',sithLord:'acolyte',kaan:'acolyte',bane:'acolyte'};
+export const isNexus=k=>k==='nexus'||k==='nexusCore';
 let WHITE;const lerp=(a,b,k)=>a+(b-a)*k,sm=k=>k*k*(3-2*k);
 
 export class UV{
@@ -29,7 +31,7 @@ export class UV{
  mat(c,o={}){const m=new this.T.MeshStandardMaterial({color:c,roughness:.65,metalness:.2,flatShading:true,...o});m.userData.e0=m.emissive.clone();this.mats.push(m);return m}
  part(parent,geo,m,sx,sy,sz,x=0,y=0,z=0){const o=new this.T.Mesh(geo,m);o.scale.set(sx,sy,sz);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o}
  pivot(parent,x,y,z=0){const g=new this.T.Group();g.position.set(x,y,z);parent.add(g);return g}
- build(){if(this.kind==='beast')return this.buildBeast();const K=KIND[BLOCK[this.kind]||this.kind],G=this.U.geo,b=this.body,bulk=K.bulk||1;
+ build(){if(this.kind==='beast'||this.kind==='spawn')return this.buildBeast();if(isNexus(this.kind))return this.buildNexus();const K=KIND[BLOCK[this.kind]||this.kind],G=this.U.geo,b=this.body,bulk=K.bulk||1;
   const mb=this.mat(K.body),ma=this.mat(K.accent||K.belt||K.body),ms=this.mat(K.skin||0xc99f7c),mr=K.robe?this.mat(K.robe):null;
   const legM=K.helm?mb:mr||mb;
   for(const s of [-1,1]){const l=this.pivot(b,s*.085*bulk,.47);this.part(l,G.box,legM,.12*bulk,.46,.13*bulk,0,-.23);this.part(l,G.box,ma,.13*bulk,.07,.15*bulk,0,-.43,.01);this.p[s<0?'legL':'legR']=l}
@@ -55,7 +57,14 @@ export class UV{
    case 'pistol':this.part(w,G.box,mw,.05,.18,.07,0,-.06);break;
    case 'blaster':this.part(w,G.box,mw,.06,.34,.08,0,-.1);this.part(w,G.box,mw,.04,.1,.08,0,.04,-.03);break}
   this.headY=1.2;this.idleArm=K.weapon==='saber'?-.7:K.weapon==='rifle'||K.weapon==='cannon'?-.9:-.15}
+ // Dark Nexus (Era 2): an immobile rift of black-violet crystals over a cracked basin; the core is bigger.
+ buildNexus(){const G=this.U.geo,b=this.body,core=this.kind==='nexusCore',k=core?1.35:1,T=this.T,dark=this.mat(0x1a1020,{metalness:.5,roughness:.3}),
+  glow=this.mat(0x8a4dff,{emissive:0x8a4dff,emissiveIntensity:2.2}),rock=this.mat(0x2a2228);this.static=1;this.p.spin=this.pivot(b,0,0);
+  this.part(b,G.ico,rock,.55*k,.12,.55*k,0,.06);for(let i=0;i<7;i++){const a=i/7*6.28,r=i?.24*k:0,h=(i?.5:.95)*k;const c=this.part(this.p.spin,G.cone,i%2?glow:dark,.09*k+(!i)*.06,h,.09*k+(!i)*.06,Math.cos(a)*r,h/2+.08,Math.sin(a)*r);c.rotation.z=i?Math.cos(a)*.35:0;c.rotation.x=i?Math.sin(a)*.35:0}
+  const ring=new T.Mesh(new T.TorusGeometry(.42*k,.025,6,28),new T.MeshBasicMaterial({color:0xb294f5,transparent:true,opacity:.7,blending:T.AdditiveBlending,depthWrite:false}));ring.rotation.x=Math.PI/2;ring.position.y=.6*k;b.add(ring);this.p.ring=ring;
+  this.headY=1.2*k;this.idleArm=0}
  buildBeast(){const G=this.U.geo,b=this.body,mb=this.mat(0x4d3a2c),md=this.mat(0x2e221a),mh=this.mat(0xd8cbb0),me=this.mat(0xff3b2e,{emissive:0xff3b2e,emissiveIntensity:2});
+  if(this.kind==='spawn'){mb.color.setHex(0x8a8592);md.color.setHex(0x4a3f58)}
   this.part(b,G.ico,mb,.48,.42,.62,0,.78,-.05);this.part(b,G.ico,md,.34,.3,.4,0,1.02,-.22);
   const h=this.pivot(b,0,.86,.48);this.p.head=h;this.part(h,G.box,mb,.4,.34,.38,0,0,.1);this.part(h,G.box,md,.36,.12,.3,0,-.17,.14);
   for(const s of [-1,1]){this.part(h,G.cone,mh,.06,.3,.06,s*.17,.08,.2).rotation.set(1.2,0,s*.5);this.part(h,G.box,me,.06,.04,.03,s*.1,.06,.29)}
@@ -69,6 +78,7 @@ export class UV{
   this.halo.position.y=.6;this.halo.visible=false;this.root.add(this.halo);
   this.bleed=new T.Mesh(G.sel,new T.MeshBasicMaterial({color:0xef6a5d,transparent:true,opacity:.7,depthWrite:false}));this.bleed.position.y=.06;this.bleed.visible=false;this.root.add(this.bleed)}
  busy(){return this.tw.length>0}
+ ghost(on){if(this.ghosted===on)return;this.ghosted=on;for(const m of this.mats){m.transparent=on||!!m.userData.tr;m.opacity=on?.45:1;m.depthWrite=!on;m.needsUpdate=true}}
  add(d,fn,done){this.tw.push({t:0,d:Math.max(.001,d),fn,done})}
  faceTo(p){const r=this.root.position;if(Math.hypot(p.x-r.x,p.z-r.z)>.01)this.face=Math.atan2(p.x-r.x,p.z-r.z)}
  walk(pts,tile){const per=this.U.reduce?.06:.17,segs=pts.length-1;if(segs<1){this.setTile(tile);return 0}
@@ -84,7 +94,12 @@ export class UV{
  fall(state,from){this.state=state;const r=this.root.position,dx=from?r.x-from.x:0,dz=from?r.z-from.z:1;this.lieAxis.set(dz,0,-dx).normalize();
   if(!this.lieAxis.lengthSq())this.lieAxis.set(1,0,0);const d=state==='dead'?.62:.8;
   this.add(d,k=>{this.lie=state==='dead'?(k<.8?sm(k/.8)*1.08:1.08-.08*Math.sin((k-.8)/.2*Math.PI)):sm(k);this.pose.flail=state==='dead'?Math.sin(k*Math.PI):0},
-   ()=>{this.pose.flail=0;if(state==='dead')this.add(1.6,()=>{},()=>this.sink())});return d*1000}
+   ()=>{this.pose.flail=0;if(state==='dead')this.corpse()});return d*1000}
+ // Bodies stay for the whole mission: darkened, blade off, base ring dimmed. Past 24 bodies the oldest sinks away.
+ corpse(){if(this.isCorpse||this.gone)return;this.isCorpse=1;for(const m of this.mats){if(m.userData.c0==null)m.userData.c0=m.color.getHex();m.color.multiplyScalar(.5);m.emissive&&m.emissive.multiplyScalar(.2)}
+  if(this.glows)for(const g of this.glows)g.visible=false;if(this.p.blade)this.p.blade.visible=false;this.root.traverse(o=>{if(o.userData.blade)o.visible=false});
+  this.ringM.opacity=.25;this.ringM.transparent=true;this.sel.visible=this.halo.visible=this.bleed.visible=false;this.U.bodies.push(this);
+  const old=this.U.bodies.filter(b=>!b.gone);if(old.length>24)old[0].sink();this.frozen=1}
  sink(){this.add(.9,k=>{this.root.position.y=-k*.5;this.root.scale.setScalar(this.sc*(1-k*.6))},()=>{this.root.visible=false;this.gone=1})}
  stand(){this.state='ok';const s=this.lie;this.add(.5,k=>{this.lie=s*(1-sm(k))})}
  lift(d=.9){this.add(d,k=>{this.pose.lift=k<.3?sm(k/.3)*.5:k<.8?.5+Math.sin(k*40)*.02:.5*(1-sm((k-.8)/.2));this.pose.legs=k<.8?Math.sin(k*30)*.5:0})}
@@ -94,7 +109,8 @@ export class UV{
   this.knockV.multiplyScalar(Math.max(0,1-dt*7));b.position.set(this.knockV.x,po.lift||0,this.knockV.z);
   if(po.lunge){b.position.x+=Math.sin(b.rotation.y)*po.lunge;b.position.z+=Math.cos(b.rotation.y)*po.lunge}
   const breathe=Math.sin(t*2+this.uid)*.012;
-  if(this.kind==='beast'){for(let i=0;i<4;i++)P['leg'+i].rotation.x=(po.legs||0)*.6*(i%3?1:-1);P.head.rotation.x=Math.sin(t*1.5+this.uid)*.06-(po.lunge||0)*.4;b.position.y+=breathe}
+  if(this.static){P.spin.rotation.y+=dt*.6;P.ring.rotation.z+=dt*1.4;P.ring.position.y=this.headY*.5+Math.sin(t*2)*.06;P.spin.scale.setScalar(1+.04*Math.sin(t*3))}
+  else if(this.kind==='beast'||this.kind==='spawn'){for(let i=0;i<4;i++)P['leg'+i].rotation.x=(po.legs||0)*.6*(i%3?1:-1);P.head.rotation.x=Math.sin(t*1.5+this.uid)*.06-(po.lunge||0)*.4;b.position.y+=breathe}
   else{const L=po.legs||0;P.legL.rotation.x=L*.6;P.legR.rotation.x=-L*.6;P.armL.rotation.x=-L*.4+(this.idleArm<-.5?-.6:0)+(po.flail||0)*-2;P.armL.rotation.z=-(po.flail||0)*.8;
    P.armR.rotation.x=(po.armR||0)+(po.armR?0:this.idleArm)+L*.3+(po.flail||0)*-2.4;P.armR.rotation.z=(po.flail||0)*.8;b.position.y+=breathe;b.rotation.z=0;
   }
@@ -111,12 +127,12 @@ export class Units{
    robe:new T.CylinderGeometry(.62,1,1,8),disc:new T.CylinderGeometry(.38,.4,.05,28),ring:new T.RingGeometry(.32,.39,32).rotateX(-Math.PI/2),sel:new T.RingGeometry(.44,.5,36).rotateX(-Math.PI/2),
    sq:new T.BoxGeometry(.68,.05,.68),sqRing:new T.RingGeometry(.38,.46,4,1,Math.PI/4).rotateX(-Math.PI/2),sqSel:new T.RingGeometry(.52,.58,4,1,Math.PI/4).rotateX(-Math.PI/2),
    halo:new T.CylinderGeometry(.46,.46,1.2,28,1,true)};
-  WHITE=this.white=new T.Color(1,1,1)}
+  WHITE=this.white=new T.Color(1,1,1);this.bodies=[]}
  // Swap block figures for rigged ones once their model file has loaded (skips anything mid-animation or dead).
  upgrade(){if(!this.Rig)return;for(const [id,v] of this.map){if(v instanceof this.Rig||v.gone||v.state==='dead'||v.busy()||!this.Rig.can(v.u))continue;
   const pos=v.root.position.clone();this.scene.remove(v.root);const n=new this.Rig(this,v.u);n.root.position.copy(pos);n.face=n.body.rotation.y=v.face;n.vx=v.vx;n.vy=v.vy;this.map.set(id,n)}}
  get(u){let v=this.map.get(u.uid);if(!v){v=this.Rig&&this.Rig.can(u)?new this.Rig(this,u):new UV(this,u);this.map.set(u.uid,v)}v.u=u;return v}
- clear(){for(const v of this.map.values())this.scene.remove(v.root);this.map.clear()}
+ clear(){for(const v of this.map.values())this.scene.remove(v.root);this.map.clear();this.bodies=[]}
  busy(){for(const v of this.map.values())if(v.busy())return true;return false}
  // Bring every figure in line with S (only called when no event animation is pending).
  reconcile(units){const seen=new Set();

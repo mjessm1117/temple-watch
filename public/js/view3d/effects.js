@@ -23,7 +23,21 @@ export class Effects{
   this.glow=new PS(T,scene,900,true);this.smoke=new PS(T,scene,500,false);
   this.lights=[0,1].map(()=>{const l=new T.PointLight(0xffa040,0,7,1.6);scene.add(l);return l});this.li=0;
   this.boltGeo=new T.CylinderGeometry(.03,.03,.5,6).rotateX(Math.PI/2);this.glowGeo=new T.CylinderGeometry(.075,.075,.62,6).rotateX(Math.PI/2);
-  this.sph=new T.IcosahedronGeometry(1,1);this.box=new T.BoxGeometry(1,1,1);this.ringGeo=new T.TorusGeometry(1,.05,6,32).rotateX(Math.PI/2)}
+  this.sph=new T.IcosahedronGeometry(1,1);this.box=new T.BoxGeometry(1,1,1);this.ringGeo=new T.TorusGeometry(1,.05,6,32).rotateX(Math.PI/2);
+  this.scorchGeo=new T.CircleGeometry(1,18).rotateX(-Math.PI/2);this.scorchMat=new T.MeshBasicMaterial({map:this.scorchTex(),transparent:true,depthWrite:false,opacity:.85,polygonOffset:true,polygonOffsetFactor:-2})}
+ // Debris and scorch marks stay for the mission (oldest dropped past 220). clearKept() runs when a new mission builds.
+ // Settled pieces go into two instanced pools (ring buffers): 2 draw calls however long the fight runs.
+ pools(){if(this.pool)return this.pool;const T=this.T,mk=(geo,mat,n)=>{const m=new T.InstancedMesh(geo,mat,n);m.count=0;m.frustumCulled=false;m.userData.i=0;this.scene.add(m);return m};
+  const deb=mk(this.box,new T.MeshStandardMaterial({color:0xffffff,flatShading:true,roughness:.9}),300);deb.receiveShadow=true;deb.instanceColor=new T.InstancedBufferAttribute(new Float32Array(900),3);
+  const sc=mk(this.scorchGeo,this.scorchMat,80);sc.renderOrder=1;return this.pool={deb,sc}}
+ put(m,o,color){const i=m.userData.i++%m.instanceMatrix.count;o.updateMatrix();m.setMatrixAt(i,o.matrix);if(color)m.setColorAt(i,color);m.count=Math.min(m.instanceMatrix.count,m.count+1);
+  m.instanceMatrix.needsUpdate=true;if(m.instanceColor)m.instanceColor.needsUpdate=true}
+ keep(o){this.put(this.pools().deb,o,o.material.color)}
+ clearKept(){if(!this.pool)return;for(const m of Object.values(this.pool)){m.count=0;m.userData.i=0}}
+ scorch(p,r=.6){const o=new this.T.Object3D();o.position.set(p.x,.012+Math.random()*.004,p.z);o.scale.setScalar(r*(.8+Math.random()*.4));o.rotation.y=Math.random()*6.3;this.put(this.pools().sc,o)}
+ scorchTex(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),gr=g.createRadialGradient(32,32,2,32,32,32);
+  gr.addColorStop(0,'rgba(8,6,5,.95)');gr.addColorStop(.55,'rgba(20,14,10,.6)');gr.addColorStop(1,'rgba(20,14,10,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);
+  const t=new this.T.CanvasTexture(c);t.colorSpace=this.T.SRGBColorSpace;return t}
  setScale(px){this.glow.u.uScale.value=this.smoke.u.uScale.value=260*px}
  basic(c,o=.9){return new this.T.MeshBasicMaterial({color:c,transparent:true,opacity:o,blending:this.T.AdditiveBlending,depthWrite:false})}
  add(obj,d,fn,done){if(obj)this.scene.add(obj);this.items.push({obj,t:0,d,fn,done})}
@@ -31,23 +45,27 @@ export class Effects{
  sparks(p,color=0xffd27a,n=18){this.glow.emit(p,n,{color,spread:3.2,life:.45,size:.09,grav:-9,jit:.08})}
  puff(p,n=8,color=0x58666b){this.smoke.emit(p,n,{color,spread:.6,up:.8,life:1.1,size:.3,grow:.9,grav:.2,drag:2,jit:.2})}
  // Blaster bolt: travels the line of fire. Miss = flies on past, deflect = sent off sideways.
- bolt(a,b,{color=0xef6a5d,hit=true,deflect=false}={}){const T=this.T,dir=b.clone().sub(a),len=dir.length(),sp=this.reduce?60:26,end=b.clone();
+ // deflect = true (sent off at random) or a Vector3 (reflected back into that point: Guard / Reflect Mastery). w = thickness.
+ bolt(a,b,{color=0xef6a5d,hit=true,deflect=false,w=1}={}){const T=this.T,dir=b.clone().sub(a),len=dir.length(),sp=this.reduce?60:26,end=b.clone();
   if(!hit&&!deflect){const side=new T.Vector3(-dir.z,0,dir.x).normalize().multiplyScalar((Math.random()<.5?-1:1)*.45);end.add(side).add(dir.clone().normalize().multiplyScalar(1.4))}
   const g=new T.Group(),m=new T.Mesh(this.boltGeo,new T.MeshBasicMaterial({color:new T.Color(color).lerp(new T.Color(0xffffff),.6)})),h=new T.Mesh(this.glowGeo,this.basic(color,.6));
-  g.add(m,h);g.position.copy(a);g.lookAt(end);this.glow.emit(a,5,{color,spread:1,life:.15,size:.12});const d=a.distanceTo(end)/sp,tHit=len/sp;
-  this.add(g,d,k=>g.position.lerpVectors(a,end,k),()=>{this.scene.remove(g);if(!hit&&!deflect)this.puff(end,3)});
-  if(deflect)this.add(null,tHit,()=>{},()=>{this.sparks(b,0x9fe7ff,14);const out=b.clone().add(new T.Vector3((Math.random()-.5)*6,1.5,(Math.random()-.5)*6));this.bolt(b,out,{color,hit:false})});
+  g.add(m,h);g.scale.set(w,w,1);g.position.copy(a);g.lookAt(end);this.glow.emit(a,5,{color,spread:1,life:.15,size:.12});const d=a.distanceTo(end)/sp,tHit=len/sp;
+  this.add(g,d,k=>g.position.lerpVectors(a,end,k),()=>{this.scene.remove(g);if(!hit&&!deflect){this.puff(end,3);if(end.y<1.2)this.scorch(end,.18)}});
+  if(deflect)this.add(null,tHit,()=>{},()=>{this.sparks(b,0x9fe7ff,14);this.flash(b,0x9fe7ff,2);
+   if(deflect.isVector3){this.bolt(b,deflect,{color,hit:true,w});this.add(null,b.distanceTo(deflect)/sp,()=>{},()=>{this.sparks(deflect,color,16);this.puff(deflect,4)});return}
+   const out=b.clone().add(new T.Vector3((Math.random()-.5)*6,1.5,(Math.random()-.5)*6));this.bolt(b,out,{color,hit:false,w})});
   return tHit*1000}
  // Kill beat: sparks + smoke burst, camera nudge, light flash.
  burst(p,color=0xffb070){this.sparks(p,color,30);this.puff(p,14,0x3e4a4f);this.flash(p,color,2.5);if(!this.reduce){this.rig.nudge(p,.35);this.rig.shake(.05)}}
  explosion(p){const T=this.T,f=new T.Mesh(this.sph,this.basic(0xffa040,1));f.position.copy(p).setY(.4);
   this.add(f,.45,k=>{f.scale.setScalar(.15+k*.95);f.material.opacity=.85*(1-k);f.material.color.setHSL(.08-.06*k,1,.6-.3*k)},()=>this.scene.remove(f));
   this.glow.emit(p.clone().setY(.4),60,{color:0xffb050,spread:5,life:.6,size:.13,grav:-7});this.puff(p.clone().setY(.5),26,0x2f383c);this.flash(p,0xff9030,7);
-  this.ring(p,0xffb050,.2,1.8,.4);this.debris(p,10,0x4a3d2c);if(!this.reduce)this.rig.shake(.22);return 450}
+  this.ring(p,0xffb050,.2,1.8,.4);this.debris(p,10,0x4a3d2c);this.scorch(p,1.1);if(!this.reduce)this.rig.shake(.22);return 450}
  debris(p,n=8,color=0x5a6a70){const T=this.T,mat=new T.MeshStandardMaterial({color,flatShading:true});
   for(let i=0;i<n;i++){const o=new T.Mesh(this.box,mat),s=.06+Math.random()*.1;o.scale.set(s,s,s);o.position.copy(p).setY(.3+Math.random()*.3);o.castShadow=true;
    const v=new T.Vector3((Math.random()-.5)*4,2+Math.random()*3,(Math.random()-.5)*4),w=new T.Vector3(Math.random()*9,Math.random()*9,0);
-   this.add(o,1.4,(k,dt)=>{v.y-=12*dt;o.position.addScaledVector(v,dt);if(o.position.y<s/2){o.position.y=s/2;v.y*=-.3;v.x*=.6;v.z*=.6}o.rotation.x+=w.x*dt;o.rotation.y+=w.y*dt;if(k>.8)o.scale.setScalar(s*(1-k)*5)},()=>this.scene.remove(o))}}
+   this.add(o,1.4,(k,dt)=>{v.y-=12*dt;o.position.addScaledVector(v,dt);if(o.position.y<s/2){o.position.y=s/2;v.y*=-.3;v.x*=.6;v.z*=.6;w.multiplyScalar(.7)}o.rotation.x+=w.x*dt*(1-k);o.rotation.y+=w.y*dt*(1-k)},
+    ()=>{this.scene.remove(o);o.position.y=s/2;this.keep(o)})}}
  ring(p,color,r0=.2,r1=1.2,d=.4,y=.15){const o=new this.T.Mesh(this.ringGeo,this.basic(color,.9));o.position.copy(p).setY(y);
   this.add(o,d,k=>{o.scale.setScalar(r0+(r1-r0)*k);o.material.opacity=.9*(1-k)},()=>this.scene.remove(o));return d*1000}
  // Force push: a cone of rings rolling from caster to target.

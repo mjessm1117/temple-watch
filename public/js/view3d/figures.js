@@ -10,12 +10,12 @@ const FILE={human:new URL('../../models/human.glb',import.meta.url).href,beast:n
 // Our names → clip names in each file (human.glb clips were renamed at build time).
 const CLIPS={beast:{idle:'Idle',walk:'Walk',run:'Run',swing:'Punch',swing2:'Weapon',claw:'Punch',hit:'HitReact',knock:'HitReact',death:'Death',death2:'Death',toLay:'Death',
  getUp:'Jump_Land',jumpStart:'Jump',jumpLoop:'Jump_Idle',jumpLand:'Jump_Land',cast:'Weapon',lifted:'Duck',cheer:'Yes'}};
-export const fileOf=kind=>kind==='beast'?'beast':'human';
-export function loadModel(name){if(cache[name])return cache[name].p;const c=cache[name]={ok:null};
+export const fileOf=kind=>kind==='beast'||kind==='spawn'?'beast':kind==='nexus'||kind==='nexusCore'?null:'human';
+export function loadModel(name){if(!name)return Promise.resolve(null);if(cache[name])return cache[name].p;const c=cache[name]={ok:null};
  const L=new GLTFLoader();L.setMeshoptDecoder(MeshoptDecoder);
  c.p=L.loadAsync(FILE[name]).then(g=>{c.ok={scene:g.scene,clips:g.animations};return c.ok}).catch(e=>{console.warn('3D model failed, using block figures:',name,e);c.ok=false;return null});
  return c.p}
-export const modelOf=name=>cache[name]&&cache[name].ok||null;
+export const modelOf=name=>name&&cache[name]&&cache[name].ok||null;
 export function initFigures(THREE){T=THREE}
 
 // Looks. main/joint = mannequin colors; gear = list of bone-attached parts.
@@ -31,13 +31,21 @@ const LOOK={
  agent:{main:0x3a434b,joint:0x1c2126,accent:0x6a1f1f,gear:['cap','coat','longrifle']},
  acolyte:{main:0x24191f,joint:0x0e0b0d,saber:0xff3b2e,gear:['robe','hood','belt','saber']},
  malgus:{main:0x1d1d22,joint:0x0b0b0d,accent:0x5a1414,saber:0xff3b2e,visor:0xff3b2e,bulk:1.15,gear:['mask','pads','chest','cape','saber']},
+ // Era 2 (Ruusan, ~1,000 BBY): Brotherhood of Darkness.
+ bhTrooper:{main:0x4a3a34,joint:0x1e1614,accent:0x8a2a1a,visor:0xff6a2a,gear:['helmet','pads','chest','rifle','kama']},
+ sniper:{main:0x5a5a48,joint:0x2a2a20,accent:0x6a6a3a,gear:['hood','coat','longrifle']},
+ marauder:{main:0x3a1c1c,joint:0x120808,accent:0x6a1414,saber:0xff3b2e,gear:['tabard','belt','pads','saber']},
+ sithLord:{main:0x1e1a22,joint:0x0b0a0d,accent:0x4a1020,saber:0xff3b2e,gear:['robe','hood','cape','belt','saber']},
+ kaan:{main:0x2a2018,joint:0x100c08,accent:0xb8862a,saber:0xff3b2e,bulk:1.05,gear:['robe','cowl','cape','belt','saber']},
+ bane:{main:0x24201c,joint:0x0d0b0a,accent:0x3a2a1a,saber:0xff2a1a,visor:0xff3b2e,bulk:1.18,gear:['mask','pads','chest','robe','saber']},
  envoy:{main:0x8a8f96,joint:0x4a4f56,gear:['robe','belt','pistol']},
  civ:{main:0x9a8a66,joint:0x5a4f3a,gear:['robe','belt']}};
 
 const mat=(c,o={})=>new T.MeshStandardMaterial({color:c,roughness:.6,metalness:.25,flatShading:true,...o});
 const glow=c=>new T.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:1.8,roughness:.4});
 // A part placed in model space (T-pose, meters, facing +z), then re-parented to a bone keeping its world transform.
-function part(fig,bone,geo,m,s,p,r){const o=new T.Mesh(geo,m);o.scale.set(...s);o.position.set(...p);if(r)o.rotation.set(...r);o.castShadow=true;
+function part(fig,bone,geo,m,s,p,r){const o=new T.Mesh(geo,m);o.scale.set(...s);o.position.set(...p);if(r)o.rotation.set(...r);o.castShadow=false; // the skinned body casts; small gear doesn't (saves shadow draws)
+
  fig.add(o);o.updateMatrixWorld(true);const b=fig.getObjectByName(bone);if(b)b.attach(o);return o}
 
 let G=null;const geos=()=>G||(G={box:new T.BoxGeometry(1,1,1),cyl:new T.CylinderGeometry(1,1,1,10),cone:new T.ConeGeometry(1,1,10,1,true),
@@ -47,17 +55,18 @@ let G=null;const geos=()=>G||(G={box:new T.BoxGeometry(1,1,1),cyl:new T.Cylinder
 // Builds one figure. Returns {obj, mixer, acts, glows, mats, scale}. color = saber/unit color (hex string or number).
 export function makeFigure(kind,color){const file=fileOf(kind),M=modelOf(file);if(!M)return null;
  const obj=skClone(M.scene),mats=[],g=geos();obj.updateMatrixWorld(true);
- if(file==='beast'){obj.traverse(o=>{if(o.isMesh){o.material=new T.MeshStandardMaterial({color:0x6e5644,roughness:.85,metalness:.05,flatShading:true});o.material.flatShading=true;o.castShadow=true;mats.push(o.material)}});
-  const eye=glow(0xff3b2e);mats.push(eye);for(const s of [-1,1])part(obj,'Head',g.sph,eye,[.09,.06,.05],[s*.36,2.95,.62]);
-  const horn=mat(0xd8cbb0);mats.push(horn);for(const s of [-1,1])part(obj,'Head',g.cone,horn,[.12,.6,.12],[s*.6,3.45,.2],[.3,0,s*-.5]);
+ if(file==='beast'){obj.traverse(o=>{if(o.isMesh){o.material=new T.MeshStandardMaterial({color:kind==='spawn'?0x8a8494:0x6e5644,roughness:.85,metalness:.05,flatShading:true});o.material.flatShading=true;o.castShadow=true;mats.push(o.material)}});
+  const eye=glow(kind==='spawn'?0xb26bff:0xff3b2e);mats.push(eye);for(const s of [-1,1])part(obj,'Head',g.sph,eye,[.09,.06,.05],[s*.36,2.95,.62]);
+  const horn=mat(kind==='spawn'?0x3a2a4a:0xd8cbb0);mats.push(horn);if(kind==='spawn')for(let i=0;i<5;i++)part(obj,'Torso',g.cone,horn,[.1,.5,.1],[(i-2)*.22,2.5-Math.abs(i-2)*.1,-.45],[-.6,0,(i-2)*-.2]);
+  else for(const s of [-1,1])part(obj,'Head',g.cone,horn,[.12,.6,.12],[s*.6,3.45,.2],[.3,0,s*-.5]);
   for(const m of [eye,horn])m.userData.e0=m.emissive.clone();
-  return finish(obj,M,kind,mats,[],.42)}
+  return finish(obj,M,kind,mats,[],kind==='spawn'?.36:.42)}
  const L=LOOK[kind]||LOOK.trooper,tint=new T.Color(),[mm,mj]=[mat(L.main),mat(L.joint,{metalness:.35})];mats.push(mm,mj);
  obj.traverse(o=>{if(o.isMesh){o.castShadow=true;o.material=/Joint/.test(o.material.name)?mj:mm}});
  const ma=mat(L.accent||L.joint),mw=mat(0x24282c,{metalness:.7,roughness:.35}),mv=L.visor?glow(L.visor):mat(0x14202a,{metalness:.6});mats.push(ma,mw,mv);
  const glows=[],bulk=L.bulk||1;
  for(const k of L.gear)switch(k){
-  case 'robe':part(obj,'pelvis',g.skirt,mm,[.2,.62,.17],[0,.66,.0]);break;
+  case 'robe':part(obj,'pelvis',g.skirt,mm,[.2,.62,.17],[0,.66,.0]).castShadow=true;break;
   case 'cape':part(obj,'spine_03',g.box,ma,[.4,.9,.02],[0,1.0,-.13],[.08,0,0]);break;
   case 'kama':part(obj,'pelvis',g.box,ma,[.34,.3,.03],[0,.78,-.12],[.1,0,0]);break;
   case 'coat':part(obj,'pelvis',g.skirt,mm,[.18,.42,.15],[0,.8,0]);part(obj,'spine_03',g.box,ma,[.38,.05,.24],[0,1.43,0]);break;
@@ -81,7 +90,7 @@ export function makeFigure(kind,color){const file=fileOf(kind),M=modelOf(file);i
    const bl=part(obj,'hand_r',g.core,core,[.016,.95,.016],[hx,hy,.6],[Math.PI/2,0,0]);
    for(const [r,o] of [[.045,.7],[.09,.22]]){const gm=new T.MeshBasicMaterial({color:c,transparent:true,opacity:o,blending:T.AdditiveBlending,depthWrite:false});
     const gl=part(obj,'hand_r',g.core,gm,[r,1,r],[hx,hy,.6],[Math.PI/2,0,0]);gl.castShadow=false;gl.userData.o=o;glows.push(gl)}
-   bl.castShadow=false;break}
+   bl.castShadow=false;bl.userData.blade=1;break}
   // Guns: barrel runs along the fingers (-x in T-pose), grip under the palm.
   case 'rifle':gun(obj,g,mw,ma,.6,.07,.1);break;
   case 'longrifle':gun(obj,g,mw,ma,.85,.06,.06);part(obj,'hand_r',g.cyl,mw,[.025,.16,.025],[-.88,1.39,0],[0,0,Math.PI/2]);break;

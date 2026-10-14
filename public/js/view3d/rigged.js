@@ -37,7 +37,7 @@ export class RV extends UV{
  knock(from,amt=.28){super.knock(from,amt);if(amt>.3)this.hitAnim(1)}
  fall(state,from){this.state=state;if(from)this.faceTo(from);this.moving=0;const dead=state==='dead';
   const ms=this.act(dead?(this.uid%2?'death':'death2'):'toLay',{once:1,hold:1,speed:dead?1.4:2.4,fade:.08});
-  if(dead)this.add(ms/1000+1.4,()=>{},()=>this.sink());return Math.min(ms,dead?900:700)}
+  if(dead)this.add(ms/1000+.1,()=>{},()=>this.corpse());return Math.min(ms,dead?900:700)}
  stand(){this.state='ok';this.one=null;this.act('getUp',{once:1,speed:1.4})}
  lift(d=.9){this.add(d,k=>{this.pose.lift=k<.3?sm(k/.3)*.5:k<.8?.5+Math.sin(k*40)*.02:.5*(1-sm((k-.8)/.2))},()=>{this.pose.lift=0})}
  leap(a,b,tile){const d=this.U.reduce?.2:.6;this.faceTo(b);this.act('jumpStart',{once:1,hold:1,speed:3,fade:.05});
@@ -48,7 +48,7 @@ export class RV extends UV{
   this.knockV.multiplyScalar(Math.max(0,1-dt*7));b.position.set(this.knockV.x,this.pose.lift||0,this.knockV.z);
   if((this.coverT-=dt)<=0){this.coverT=.4;const u=this.u;this.cover=typeof N4!=='undefined'&&u.status==='ok'&&N4.some(([dx,dy])=>{const c=tile(u.x+dx,u.y+dy);return inb(u.x+dx,u.y+dy)&&(HALF(c)||FULL(c))})}
   if(!this.one&&this.state==='ok'){const n=this.baseName();if(n!==this.curName)this.act(n,{fade:n==='run'?.1:.25})}
-  this.F.mixer.update(dt);
+  if(!this.frozen)this.F.mixer.update(dt);
   if(this.flashK>0){this.flashK=Math.max(0,this.flashK-dt*5);for(const m of this.mats)if(m.userData.e0)m.emissive.copy(m.userData.e0).lerp(this.U.white,this.flashK*.85)}
   if(this.glows)for(const g of this.glows)g.material.opacity=g.userData.o*(.85+.15*Math.sin(t*23+this.uid));
   if(this.sel.visible){const s=1+.06*Math.sin(t*4);this.sel.scale.set(s,1,s)}

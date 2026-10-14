@@ -7,7 +7,7 @@ export class Labels{
    if(!n){n={el:this.node('v3u','')};this.units.set(it.key,n)}if(n.html!==it.html){n.el.firstChild.innerHTML=it.html;n.html=it.html}n.pos=it.pos}
   for(const [k,n] of this.units)if(!keep.has(k)){n.el.remove();this.units.delete(k)}}
  setTags(list){for(const t of this.tags)t.el.remove();this.tags=list.map(t=>({el:this.node('v3t '+(t.cls||''),t.html),p:t.p}))}
- float(p,txt,cls='',big=false){const el=this.node('v3f '+cls+(big?' big':''),txt);this.floats.push({el,p:p.clone(),t:0,d:big?1.1:1.15})}
+ float(p,txt,cls='',big=false,color=null){const el=this.node('v3f '+cls+(big?' big':''),txt);if(color){el.firstChild.style.color=color;el.firstChild.style.textShadow='0 0 10px '+color+'99, 0 2px 4px #000'}this.floats.push({el,p:p.clone(),t:0,d:big?1.1:1.15})}
  clear(){this.el.innerHTML='';this.units.clear();this.tags=[];this.floats=[]}
  update(dt,proj){const place=(el,p,dy=0)=>{const s=p&&proj(p);if(!s){el.style.visibility='hidden';return}el.style.visibility='';el.style.transform=`translate(${s.x}px,${s.y+dy}px)`};
   for(const n of this.units.values())place(n.el,n.pos());for(const t of this.tags)place(t.el,t.p);

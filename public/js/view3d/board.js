@@ -1,3 +1,4 @@
+import {mergeGeometries} from '../../vendor/BufferGeometryUtils.js';
 // Map geometry from S.grid + floor highlights. Half cover is waist-high (crates, consoles, barrels), full cover is tall (walls, pillars, doors).
 // Rebuilds only tiles whose character changed; anything that lost cover reports back so effects can throw debris.
 const HALF_H=.55,FULL_H=1.55;
@@ -16,7 +17,7 @@ export class Board{
   this.box=new THREE.BoxGeometry(1,1,1);this.cyl=new THREE.CylinderGeometry(.5,.5,1,10);
   const hm=(c,o)=>new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false});
   this.hm={reach:hm(0x79d3e2,.3),dash:hm(0xe0bd78,.3),hover:hm(0x79d3e2,.55),hoverDash:hm(0xe0bd78,.55),tgt:hm(0xef6a5d,.85),ally:hm(0x7fd99a,.85),spot:hm(0x79d3e2,.7),pick:hm(0xffffff,.95),
-   area:hm(0x79d3e2,.2),iarea:hm(0xef6a5d,.22),path:hm(0x79d3e2,.95),smoke:hm(0x8aa2a5,.22)};
+   area:hm(0x79d3e2,.2),iarea:hm(0xef6a5d,.22),path:hm(0x79d3e2,.95),smoke:hm(0x8aa2a5,.22),vis:new THREE.MeshBasicMaterial({map:this.hatch(),transparent:true,opacity:.85,depthWrite:false})};
   this.plane=new THREE.PlaneGeometry(.92,.92).rotateX(-Math.PI/2);this.ring=new THREE.RingGeometry(.34,.44,24).rotateX(-Math.PI/2);
   this.dot=new THREE.CircleGeometry(.06,10).rotateX(-Math.PI/2);this.hl=new THREE.Group();scene.add(this.hl);this.pool={};
   this.shieldTex=[this.shieldTexture(false),this.shieldTexture(true)];this.lines=new THREE.Group();scene.add(this.lines);this.anim=[]}
@@ -30,13 +31,20 @@ export class Board{
   this.floorMat=new T.MeshStandardMaterial({map:this.floorTexture(),roughness:.9,metalness:.1});const floor=new T.Mesh(new T.PlaneGeometry(this.cols,this.rows).rotateX(-Math.PI/2),this.floorMat);
   floor.position.y=.001;floor.receiveShadow=true;this.root.add(floor);
   const rim=new T.Mesh(new T.BoxGeometry(this.cols+.7,.05,this.rows+.7),this.m.trim);rim.position.y=-.03;this.root.add(rim);
-  for(let y=0;y<this.rows;y++)for(let x=0;x<this.cols;x++)this.setTile(x,y,grid[y][x])}
- clear(){for(const c of [...this.root.children])this.root.remove(c);this.tiles.clear();this.anim=[]}
+  for(let y=0;y<this.rows;y++)for(let x=0;x<this.cols;x++)this.setTile(x,y,grid[y][x]);this.batch()}
+ clear(){for(const c of [...this.root.children])this.root.remove(c);this.tiles.clear();this.anim=[];this.bRoot=null}
  // Returns tiles that lost cover since the last sync (for debris).
  sync(grid){if(!this.grid||grid.length!==this.rows||grid[0].length!==this.cols){this.build(grid);return[]}const lost=[];
   for(let y=0;y<this.rows;y++)for(let x=0;x<this.cols;x++){const c=grid[y][x],o=this.grid[y][x];if(c===o)continue;
-   if(tileH(c)<tileH(o))lost.push({x,y,h:tileH(o),c:o});this.grid[y][x]=c;this.setTile(x,y,c)}return lost}
- setTile(x,y,c){const e=elevOf(c);c=ALIAS[c]||c;const k=x+','+y,old=this.tiles.get(k);if(old){this.root.remove(old);this.anim=this.anim.filter(a=>a.g!==old);this.tops=this.tops.filter(t=>t.parent!==old)}
+   if(tileH(c)<tileH(o))lost.push({x,y,h:tileH(o),c:o});this.grid[y][x]=c;this.setTile(x,y,c)}if(this.dirty)this.batch();return lost}
+ // Static tile pieces → one merged mesh per material + shadow flag (~200 meshes become ~15 draw calls). Animated bits and raised tops stay live.
+ batch(){this.dirty=0;const T=this.T;if(this.bRoot){this.root.remove(this.bRoot);this.bRoot.traverse(o=>o.geometry&&o.geometry.dispose())}this.bRoot=new T.Group();
+  const live=new Set(this.anim.map(a=>a.o)),tops=new Set(this.tops),B=new Map();this.root.updateMatrixWorld(true);
+  for(const g of this.tiles.values())g.traverse(o=>{if(!o.isMesh||live.has(o)||tops.has(o))return;o.visible=false;const k=o.material.uuid+(o.castShadow?'s':'');
+   if(!B.has(k))B.set(k,{m:o.material,cast:o.castShadow,g:[]});let ge=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();ge.applyMatrix4(o.matrixWorld);
+   for(const a of Object.keys(ge.attributes))if(a!=='position'&&a!=='normal'&&a!=='uv')ge.deleteAttribute(a);if(!ge.attributes.uv)ge.setAttribute('uv',new T.Float32BufferAttribute(new Float32Array(ge.attributes.position.count*2),2));B.get(k).g.push(ge)});
+  for(const b of B.values()){const ge=mergeGeometries(b.g,false);if(!ge)continue;const m=new T.Mesh(ge,b.m);m.castShadow=b.cast;m.receiveShadow=true;this.bRoot.add(m)}this.root.add(this.bRoot)}
+ setTile(x,y,c){this.dirty=1;const e=elevOf(c);c=ALIAS[c]||c;const k=x+','+y,old=this.tiles.get(k);if(old){this.root.remove(old);this.anim=this.anim.filter(a=>a.g!==old);this.tops=this.tops.filter(t=>t.parent!==old)}
   let g=this.make(c,x,y);if(e>0)g=this.platform(g||new this.T.Group(),x,y,e,c);if(!g)return this.tiles.delete(k);g.position.copy(this.pos(x,y));g.traverse(o=>{if(o.isMesh){o.castShadow=o.userData.noShadow?false:true;o.receiveShadow=true}});
   this.root.add(g);this.tiles.set(k,g)}
  make(c,x,y){const T=this.T,g=new T.Group(),m=this.m,add=(geo,mat,sx,sy,sz,px=0,py=0,pz=0,ry=0)=>{const o=new T.Mesh(geo,mat);o.scale.set(sx,sy,sz);o.position.set(px,py,pz);o.rotation.y=ry;g.add(o);return o};
@@ -63,8 +71,10 @@ export class Board{
   const blk=new T.Mesh(this.box,m.wall);blk.scale.set(1,h,1);blk.position.y=-h/2;g.add(blk);
   for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const n=(G[y+dy]||[])[x+dx];if(n==null)continue;const ne=elevOf(n);if(ne>=e)continue;
    const lip=new T.Mesh(this.box,m.trim);lip.scale.set(dx?.04:1,.04,dy?.04:1);lip.position.set(dx*.5,.02,dy*.5);lip.userData.noShadow=1;g.add(lip);
-   if((TILES[c]||{}).ramp&&(TILES[n]||{}).walk){const d=(e-ne)*EH,len=.9,r=new T.Mesh(this.box,m.wallTop);r.scale.set(dx?len:.8,.06,dy?len:.8);
-    const ang=Math.atan2(d,len);r.position.set(dx*(.5+len/2-.04),-d/2,dy*(.5+len/2-.04));if(dx)r.rotation.z=dx*ang;else r.rotation.x=-dy*ang;g.add(r)}}
+   // One-level drop to walkable ground: a ramp if the tile is marked ramp, otherwise two steps. Two levels = cliff (lip only).
+   if(e-ne===1&&(TILES[n]||{}).walk){const d=EH;if((TILES[c]||{}).ramp){const len=.46,r=new T.Mesh(this.box,m.wallTop);r.scale.set(dx?Math.hypot(len,d):.7,.05,dy?Math.hypot(len,d):.7);
+     const ang=Math.atan2(d,len);r.position.set(dx*(.5+len/2),-d/2,dy*(.5+len/2));if(dx)r.rotation.z=dx*ang;else r.rotation.x=-dy*ang;r.castShadow=false;g.add(r)}
+    else for(let i=1;i<=2;i++){const st=new T.Mesh(this.box,m.wallTop),dep=.16*i;st.scale.set(dx?dep:.6,d*(3-i)/3,dy?dep:.6);st.position.set(dx*(.5+dep/2),-d+d*(3-i)/6,dy*(.5+dep/2));g.add(st)}}}
   return g}
  isNS(x,y){const w=c=>'#OdD_'.includes(c);const g=this.grid;return w((g[y-1]||[])[x]||'#')&&w((g[y+1]||[])[x]||'#')}
  update(dt,t){for(const a of this.anim){if(a.spin)a.o.rotation.y+=dt*a.spin;if(a.pulse){const s=.75+.15*Math.sin(t*3);a.o.scale.set(s,1,s)}}
@@ -76,6 +86,10 @@ export class Board{
   g.strokeStyle=P[2];g.lineWidth=1.5;for(let x=0;x<=this.cols;x++){g.beginPath();g.moveTo(x*s,0);g.lineTo(x*s,c.height);g.stroke()}
   for(let y=0;y<=this.rows;y++){g.beginPath();g.moveTo(0,y*s);g.lineTo(c.width,y*s);g.stroke()}
   const t=new this.T.CanvasTexture(c);t.colorSpace=this.T.SRGBColorSpace;t.anisotropy=4;return t}
+ // Enemy sight while concealed: red diagonal hatching with a border, readable on every theme.
+ hatch(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');g.fillStyle='rgba(255,59,46,.18)';g.fillRect(0,0,64,64);
+  g.strokeStyle='rgba(255,70,50,.75)';g.lineWidth=5;for(let i=-64;i<128;i+=16){g.beginPath();g.moveTo(i,0);g.lineTo(i+64,64);g.stroke()}
+  g.lineWidth=3;g.strokeRect(1.5,1.5,61,61);const t=new this.T.CanvasTexture(c);t.colorSpace=this.T.SRGBColorSpace;return t}
  shieldTexture(full){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');g.beginPath();
   g.moveTo(32,6);g.lineTo(54,14);g.lineTo(54,32);g.bezierCurveTo(54,46,44,54,32,59);g.bezierCurveTo(20,54,10,46,10,32);g.lineTo(10,14);g.closePath();
   g.lineWidth=6;g.strokeStyle='#79d3e2';g.fillStyle='#79d3e2';if(full)g.fill();g.stroke();
@@ -85,6 +99,7 @@ export class Board{
   if(!o){o=mat.isSpriteMaterial?new this.T.Sprite(mat):new this.T.Mesh(geo,mat);o.renderOrder=2;p.list.push(o);this.hl.add(o)}o.visible=true;return o}
  highlight(h){for(const p of Object.values(this.pool)){p.i=0;for(const o of p.list)o.visible=false}
   for(const c of [...this.lines.children]){this.lines.remove(c);c.geometry.dispose();c.material.dispose()}const hm=this.hm,lift=(x,y,dy=.012)=>this.pos(x,y,dy);
+  for(const t of h.vision||[])this.take('vis',this.plane,hm.vis).position.copy(lift(t.x,t.y,.008));
   for(const t of h.reach)this.take(t.dash?'dash':'reach',this.plane,t.dash?hm.dash:hm.reach).position.copy(lift(t.x,t.y));
   if(h.hover)this.take(h.hover.dash?'hovD':'hov',this.plane,h.hover.dash?hm.hoverDash:hm.hover).position.copy(lift(h.hover.x,h.hover.y,.014));
   for(const t of h.targets){const o=this.take('t_'+t.kind,t.kind==='spot'?this.plane:this.ring,hm[t.kind]);o.position.copy(lift(t.x,t.y,.02))}
