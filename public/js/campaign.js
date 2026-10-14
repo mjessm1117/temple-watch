@@ -2,19 +2,20 @@
 let C=null;
 const isJedi=r=>!!CLASS[r.cls].jedi;
 function newCampaign(diff){
- C={v:2,diff,month:1,day:1,step:0,res:{...START_RES},orderDark:0,wings:{medical:1,training:0,forge:0,armory:0,comms:0,barracks:1},build:null,
+ C={v:2,treeV:1,diff,month:1,day:1,step:0,res:{...START_RES},orderDark:0,wings:{medical:1,training:0,forge:0,armory:0,comms:0,archives:0,gardens:0,barracks:1},build:null,
   roster:START_ROSTER.map((r,i)=>({id:'u'+(i+1),rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0,...r})),nid:START_ROSTER.length+1,
   options:[],news:[],flags:{},legends:[]};
  ensureTemple();C.options=optionsFor(0);S=null;saveGame();baseScreen()}
-function abilFor(r){const K=KITS[r.cls],P=r.picks.filter(k=>AB[k]);
- if(isJedi(r))return['strike',...K[1],...P,...(r.rank>=2?['choke']:[]),'push','guard','meditate','subdue','stabilize','door','console','scan'];
- return['shoot',...K[1],...P,'overwatch','subdue','stabilize','door']}
-// Roster entry → battle stats. Each rank above 1: +1 HP, +5 aim; Jedi +1 Focus (R2), +10 deflect (R3); troops +1 kit/grenade (R3).
-function battleUnit(r){const b=CLASS[r.cls],g=r.rank-1,u={...b,n:r.n,cls:r.cls,col:r.col,rid:r.id,rank:r.rank,title:r.title,dark:r.dark||0,dmg:[...b.dmg]};
- u.hp+=g;u.aim+=5*g;if(b.jedi){if(r.rank>=2)u.maxF++;if(r.rank>=3)u.deflect+=10}else if(r.rank>=3){if(u.kits!=null)u.kits++;if(u.nades!=null)u.nades++}
+function abilFor(r){const P=picksOf(r).filter(k=>AB[k]),B=BASE_KIT[r.cls]||[];
+ if(isJedi(r))return['strike',...B,...P,...(r.rank>=2?['choke']:[]),'push','guard','meditate','subdue','stabilize','door','console','scan'];
+ return['shoot',...B,...P,'overwatch','subdue','stabilize','door']}
+// Roster entry → battle stats: class base + RANK_GAIN for every rank reached (data-campaign.js), then gear/perks/stress (templeMods).
+function battleUnit(r){const b=CLASS[r.cls],u={...b,n:r.n,cls:r.cls,col:r.col,rid:r.id,rank:r.rank,title:r.title,dark:r.dark||0,dmg:[...b.dmg]};delete u.desc;
+ for(let k=2;k<=r.rank;k++){const G=RANK_GAIN[k]||{};u.hp+=G.hp||0;u.aim+=G.aim||0;u.will+=G.will||0;
+  for(const [s,v] of Object.entries((b.jedi?G.jedi:G.troop)||{}))if(u[s]!=null)u[s]+=v}
  u.abil=abilFor(r);return templeMods(u,r)}
 const able=r=>r.status==='active'&&!r.wound,fit=r=>able(r)&&!r.assign;
-const healMult=()=>(C.wings.medical>=2?2:C.wings.medical?1.5:1)*(C.staff&&C.staff.medical?1.25:1);
+const healMult=()=>(C.wings.medical>=3?2.5:C.wings.medical>=2?2:C.wings.medical?1.5:1)*(C.staff&&C.staff.medical?1.25:1);
 const odark=()=>Math.min(100,C.orderDark+4*C.roster.filter(r=>isJedi(r)&&r.status==='active').reduce((s,r)=>s+r.dark,0));
 
 // Mission options for a plan step. A captured unit adds a rescue crisis that doesn't use up the step.
@@ -48,7 +49,7 @@ function applyResults(win){const M=S.M,o=C.options[C.chosen]||{},out={res:{},row
    else if(u.status==='dead'){r.status='dead';fate='Died in the rescue'}else fate='Still captive'}
   else if(u.status==='dead'){r.status='dead';C.legends.push({n:r.n,cls:r.cls,how:u.consumed?'Taken by a Terentatek':'Fell in battle',where:M.n});fate='One with the Force'}
   else if(u.status==='down'&&!win){r.status='captured';r.capT=3;fate='Captured by the Sith'}
-  else{xp=XP.survive+(u.kills||0)*XP.kill+(u.caps||0)*XP.capture+(M.story&&win?XP.story:0);xp=Math.round(xp*(C.wings.training?1.1:1)*(C.staff.training?1.1:1)*(r.trait&&TRAITS[r.trait].xp||1));if(win&&r.trait&&TRAITS[r.trait].intel)gain('intel',TRAITS[r.trait].intel,out.res);
+  else{xp=XP.survive+(u.kills||0)*XP.kill+(u.caps||0)*XP.capture+(M.story&&win?XP.story:0);xp=Math.round(xp*xpMult(r));if(win&&r.trait&&TRAITS[r.trait].intel)gain('intel',TRAITS[r.trait].intel,out.res);
    const w=u.downed?(C.wings.medical>=2?WOUND.graveL2:WOUND.grave):u.hp*2<=u.max?WOUND.serious:u.hurt?WOUND.light:0;
    r.wound=Math.ceil(w/healMult());fate=w===0?'Unhurt':`${u.downed?'Grave':u.hp*2<=u.max?'Serious':'Light'} wound · ${r.wound} days`}
   r.dark=u.dark;if(!u.vip){r.missions++;r.kills+=u.kills||0;r.xp+=xp}
@@ -67,7 +68,7 @@ function advance(o){C.news=[];C.day+=DAYS;while(C.day>30){C.day-=30;C.month++;mo
 function monthTick(){const f=C.res.favor,st=Math.round((100+2*f)*DIFF[C.diff].income),
  up=Object.entries(C.wings).reduce((s,[k,l])=>s+(WINGS[k].up[l]||0),0),pay=TROOP_PAY*C.roster.filter(r=>r.status==='active'&&!isJedi(r)).length,rec=1+Math.floor(f/40);
  C.res.credits+=st-up-pay;C.res.recruits+=rec;C.news.push(`Month ${C.month}: Senate stipend +${st}, upkeep −${up}, troop pay −${pay}, recruits +${rec}. New recruit candidates are in.`);templeMonth()}
-function buildWing(k){const l=C.wings[k],cost=WINGS[k].cost[l+1];if(C.build||cost==null||C.res.credits<cost)return;C.res.credits-=cost;C.build=k;saveGame()}
+function buildWing(k){const l=C.wings[k],cost=WINGS[k].cost[l+1];if(C.build||cost==null||C.res.credits<cost||!researched(WINGS[k].req&&WINGS[k].req[l+1]))return;C.res.credits-=cost;C.build=k;saveGame()}
 function addTroop(){const used=new Set(C.roster.map(r=>r.n)),n=RECRUIT_NAMES.find(x=>!used.has(x))||'Recruit '+C.nid;
  C.roster.push({id:'u'+C.nid++,n,cls:pickOne(['Soldier','Scout','Medic','Heavy']),rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0})}
 function pickAbility(id,k){const r=C.roster.find(r=>r.id===id),p=r&&pendingRank(r);if(!p||!KITS[r.cls][p].includes(k))return;r.picks.push(k);r.pick=pendingRank(r);saveGame()}

@@ -12,7 +12,7 @@ function squadScreen(i,keep){SCR=()=>squadScreen(i,1);const o=C.options[i],M=MIS
  const qr=o.quest&&unit(o.quest),ok=sel.length>=1&&sel.length<=6&&nj<=3&&(nj>=1||!can.some(r=>isJedi(r)&&fit(r)))&&(!qr||pickSquad.includes(qr.id));
  m.innerHTML=`<div class="box"><div class="eyebrow">${M.where}</div><h2>${o.n||M.n}</h2><p>${M.brief}</p>
  <p class="muted">Up to 6 units, 1–3 Jedi. Wounded or assigned units can't deploy.${qr?` ${qr.n} must go (personal quest)${fit(qr)?'':': free them up at the Temple first'}.`:''} ${sel.length}/6 picked · ${nj} Jedi.</p>
- <div class="squad">${can.map(r=>`<button type="button" class="sq ${pickSquad.includes(r.id)?'on':''}" data-sq="${r.id}" ${fit(r)?'':'disabled'}><span class="mini" style="--uc:${r.col||'var(--troop)'}">${icon(r.cls.toLowerCase())}</span><span>${r.n}<small>${r.cls} · Rank ${r.rank}${r.wound?` · wounded ${r.wound}d`:''}${r.assign?' · '+assignName(r):''}${r.fear?' · afraid':''}</small></span></button>`).join('')}</div>
+ <div class="squad">${can.map(r=>`<button type="button" class="sq ${pickSquad.includes(r.id)?'on':''}" data-sq="${r.id}" ${fit(r)?'':'disabled'}><span class="mini" style="--uc:${r.col||'var(--troop)'}">${icon(r.cls.toLowerCase())}</span><span>${r.n}<small>${r.cls} · Rank ${r.rank}${r.wound?` · wounded ${r.wound}d`:''}${r.assign?' · '+assignName(r):''}${r.fear?' · afraid':''}${r.stress>=STRESS.shaken?` · ${stressLv(r.stress).n.toLowerCase()} (stress ${r.stress})`:''}${r.scars&&r.scars.length?' · scars '+r.scars.length:''}</small></span></button>`).join('')}</div>
  <div class="endrow"><button type="button" id="sqBack">Back</button><button type="button" class="primary" id="deploy" ${ok?'':'disabled'}>Launch mission</button></div></div>`;
  m.onclick=ev=>{const b=ev.target.closest('[data-sq]');if(!b||b.disabled)return;const id=b.dataset.sq;
   pickSquad=pickSquad.includes(id)?pickSquad.filter(x=>x!==id):pickSquad.length<6?[...pickSquad,id]:pickSquad;squadScreen(i,1)};
@@ -37,6 +37,7 @@ function debrief(win,msg,out){const m=$('#modal');m.hidden=false;SCR=null;lastDe
  <div class="sum">${rows}<div><span>Enemies killed / captured</span><span>${S.kills} / ${S.units.filter(u=>u.side==='e'&&u.status==='captured').length}</span></div>
  ${out?`<div><span>Rewards</span><span>${fmtRes(out.res)||'none'}${out.bonus?` · bonus: ${out.bonus}`:''}</span></div>`:''}</div>
  ${out&&out.quest?`<p class="flag">${out.quest}</p>`:''}${out&&out.bonds&&out.bonds.length?`<div class="news">${out.bonds.map(b=>`<p>${b}</p>`).join('')}</div>`:''}
+ ${out&&out.prog&&out.prog.length?`<div class="news">${out.prog.map(b=>`<p>${b}</p>`).join('')}</div>`:''}
  ${promoHTML(out)}
  ${win?'':'<p class="muted">The war goes on. Losses stand, but the Order endures.</p>'}
  <button type="button" class="primary" id="toBase">${C?'Return to the Temple':'Play again'}</button></div>`;

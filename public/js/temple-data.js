@@ -15,16 +15,24 @@ const PERKS={
  juggernaut:{name:'Juggernaut',ic:'hunker',tip:'+2 HP and +1 armor.',mod:{hp:2,armor:1}}};
 
 // Troop gear (spec B §5.4). Tiers upgrade in order. need = [wing, level]. Prices for armor and mods are ours [Default].
-const WEAPONS=[{n:'Standard blaster',slots:0},
- {n:'Military blaster',cost:50,need:['armory',1],mod:{dmg:1},slots:1},
- {n:'Elite blaster',cost:120,need:['armory',2],mod:{dmg:1,aim:5},slots:2}];
-const ARMOR={none:{n:'No armor',cost:0},light:{n:'Light armor',cost:30,mod:{hp:1}},heavy:{n:'Heavy armor',cost:60,need:['armory',1],mod:{hp:2,mob:-1}}};
+const WEAPONS=[{n:'Standard blaster',slots:0,desc:'Issue rifle. No mod slots.'},
+ {n:'Military blaster',cost:50,need:['armory',1],mod:{dmg:1},slots:1,desc:'+1 damage, 1 mod slot.'},
+ {n:'Elite blaster',cost:120,need:['armory',2],mod:{dmg:1,aim:5},slots:2,desc:'+1 more damage, +5 aim, 2 mod slots.'}];
+// Armor sets. who = troop | jedi | any; res = research needed (temple-prog.js).
+const ARMOR={none:{n:'No armor',cost:0,who:'any',desc:'Nothing extra.'},
+ light:{n:'Light armor',cost:30,who:'troop',mod:{hp:1},desc:'+1 HP.'},
+ medium:{n:'Medium armor',cost:50,who:'troop',need:['armory',1],mod:{hp:1,armor:1},desc:'+1 HP, +1 armor.'},
+ heavy:{n:'Heavy armor',cost:80,who:'troop',need:['armory',2],mod:{hp:2,armor:1,mob:-1},desc:'+2 HP, +1 armor, −1 move.'},
+ robes:{n:'Battle robes',cost:30,who:'jedi',mod:{hp:1},desc:'+1 HP.'},
+ armoredRobes:{n:'Armored robes',cost:70,who:'jedi',res:'armorWeave',mod:{hp:1,armor:1},desc:'+1 HP, +1 armor.'}};
 const MODS={scope:{n:'Scope',cost:25,mod:{aim:10},tip:'+10 aim'},barrel:{n:'Long barrel',cost:25,mod:{range:2},tip:'+2 range'},
- cell:{n:'Power cell',cost:25,mod:{dmgHi:1},tip:'+1 max damage'}};
+ cell:{n:'Power cell',cost:25,mod:{dmgHi:1},tip:'+1 max damage'},stock:{n:'Stock',cost:30,res:'eliteMods',mod:{aim:5,crit:5},tip:'+5 aim, +5% crit'},
+ trigger:{n:'Hair trigger',cost:30,res:'eliteMods',mod:{crit:10},tip:'+10% crit'}};
+for(const m of Object.values(MODS))m.desc=m.tip+'.';
 // Lightsabers (spec B §5.3). Each tier adds to the one before (our reading of the table).
-const SABERS=[{n:'Training saber'},
- {n:'Attuned saber',kyber:2,cost:60,need:['forge',1],mod:{dmg:1,deflect:5}},
- {n:'Master-forged saber',kyber:4,cost:120,need:['forge',2],mod:{dmg:1,deflect:10},trait:1}];
+const SABERS=[{n:'Training saber',desc:'Base damage.'},
+ {n:'Attuned saber',kyber:2,cost:60,need:['forge',1],mod:{dmg:1,deflect:5},desc:'+1 damage, +5 deflect.'},
+ {n:'Master-forged saber',kyber:4,cost:120,need:['forge',2],mod:{dmg:1,deflect:10},trait:1,desc:'+1 more damage, +10 deflect, and a trait slot.'}];
 const SABER_TRAITS={focused:{n:'Focused',mod:{maxF:1},tip:'+1 max Focus'},swift:{n:'Swift',mod:{mob:1},tip:'+1 move'},
  warden:{n:'Guardian',mod:{guardDef:10},tip:'+10 deflect while on Guard'}};
 // Crystal = ring color (spec D). Purple avoids the Darkness role color.

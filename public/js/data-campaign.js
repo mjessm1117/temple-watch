@@ -1,36 +1,48 @@
-/* Campaign data: classes, ranks, ability kits, wings, economy, the v0.2a mission plan. Spec: docs/specs/campaign.md */
-// Rank-1 stats per class. Each rank above 1: +1 HP, +5 aim; Jedi +1 max Focus at R2, +10 deflect at R3; troops +1 kit/grenade at R3.
+/* Campaign data: classes, ranks, ability trees, wings, economy, the mission plan. Spec: docs/specs/campaign.md §5, combat.md §2 */
+// Rank-1 stats per class. Rank gains above 1 come from RANK_GAIN (cumulative). Sentinel/Wayseeker paths: spec A §2.2.
 const CLASS={
- Guardian:{jedi:1,hp:8,aim:75,mob:5,dmg:[4,6],range:1.5,deflect:20,guardDef:70,maxF:4,init:14},
- Consular:{jedi:1,hp:6,aim:75,mob:5,dmg:[3,4],range:1.5,deflect:10,guardDef:50,maxF:4,init:12},
- Soldier:{hp:7,aim:70,mob:5,dmg:[3,5],range:8,init:10},
- Scout:{hp:5,aim:80,mob:6,dmg:[4,6],range:11,crit:15,init:15},
- Medic:{hp:6,aim:65,mob:5,dmg:[2,3],range:6,kits:2,init:9},
- Heavy:{hp:8,aim:60,mob:4,dmg:[3,5],range:7,nades:2,init:7}};
-// Rank 1 = always known. Ranks 2 and 3 = pick ONE of the two. Troop picks mix spec A abilities (temple-kits.js) and stat perks (PERKS in temple-data.js).
+ Guardian:{jedi:1,hp:8,aim:75,mob:5,dmg:[4,6],range:1.5,deflect:20,guardDef:70,maxF:4,init:14,will:70,desc:'Front-line Jedi. Tough, protects allies, best at holding ground.'},
+ Consular:{jedi:1,hp:6,aim:75,mob:5,dmg:[3,4],range:1.5,deflect:10,guardDef:50,maxF:4,init:12,will:75,desc:'Force support. Heals, shields and controls the fight.'},
+ Sentinel:{jedi:1,hp:7,aim:75,mob:6,dmg:[4,5],range:1.5,deflect:15,guardDef:60,maxF:4,crit:10,init:15,will:70,desc:'Skirmisher Jedi. Fast, precise, finishes wounded enemies.'},
+ Wayseeker:{jedi:1,hp:7,aim:72,mob:6,dmg:[3,5],range:1.5,deflect:15,guardDef:55,maxF:5,init:13,will:75,lockEra:3,desc:'Wandering Jedi who reshape the battlefield. Unlocks in the High Republic era.'},
+ Soldier:{hp:7,aim:70,mob:5,dmg:[3,5],range:8,init:10,will:55,desc:'Republic trooper. Reliable rifle, suppression and overwatch.'},
+ Scout:{hp:5,aim:80,mob:6,dmg:[4,6],range:11,crit:15,init:15,will:50,desc:'Long-range marksman. Marks targets and lands critical hits.'},
+ Medic:{hp:6,aim:65,mob:5,dmg:[2,3],range:6,kits:2,init:9,will:55,desc:'Field medic and tech. Revives the fallen and hacks consoles.'},
+ Heavy:{hp:8,aim:60,mob:4,dmg:[3,5],range:7,nades:2,init:7,will:60,desc:'Heavy weapons. Grenades, rockets and armor-shredding fire.'}};
+// Always-known abilities per class (besides the Jedi/troop basics in campaign.js abilFor).
+const BASE_KIT={Medic:['heal','scan','hack'],Heavy:['grenade']};
+// Ability trees, ranks 1–7: each rank offers two, you pick one (14 per class). Ids live in AB (abilities.js / temple-kits.js / temple-prog.js) or PERKS (stat picks).
 const KITS={
- Guardian:{1:['saberThrow','defLine'],2:['leap','reflectM'],3:['collapse','sweep']},
- Consular:{1:['stun','forceHeal'],2:['barrier','battleMed'],3:['mindTrick','forceRevive']},
- Soldier:{1:['suppress','hunker'],2:['rapidFire','flakVest'],3:['rally','veteran']},
- Scout:{1:['mark'],2:['deadeye','longshot'],3:['killshot','fieldcraft']},
- Medic:{1:['heal','smoke','hack','scan'],2:['reviveStim','fieldKit'],3:['combatMedic','traumaBag']},
- Heavy:{1:['grenade','suppress','shredder'],2:['bandolier','flakVest'],3:['rocket','juggernaut']}};
-const RANKS=[{xp:0},{xp:30},{xp:80}];
+ Guardian:{1:['saberThrow','defLine'],2:['leap','reflectM'],3:['collapse','sweep'],4:['gIron','gDuelist'],5:['gBulwark','gVanguard'],6:['mightyBlow','gWarden'],7:['gUnbreakable','gMasterBlade']},
+ Consular:{1:['stun','forceHeal'],2:['barrier','battleMed'],3:['mindTrick','forceRevive'],4:['cSerene','cResolve'],5:['massHeal','forceWave'],6:['cWellspring','cSeer'],7:['stasisField','cMaster']},
+ Sentinel:{1:['flurry','sKeenEye'],2:['shadowStep','sExecutioner'],3:['saberThrow','sTracker'],4:['sVigil','sEdge'],5:['sweep','sGhost'],6:['precisionStrike','sHunter'],7:['sBlademaster','sUntouchable']},
+ Wayseeker:{1:['wPathfinder','wWild'],2:['tremor','barrier'],3:['forceHeal','saberThrow'],4:['wRoots','wStalker'],5:['forceWave','leap'],6:['wBond','wSeer'],7:['stasisField','wPrimal']},
+ Soldier:{1:['suppress','hunker'],2:['rapidFire','flakVest'],3:['rally','veteran'],4:['soGunner','soTough'],5:['soMarksman','soSteel'],6:['chainShot','soIronWill'],7:['soCommander','soLegend']},
+ Scout:{1:['mark','scEagle'],2:['deadeye','longshot'],3:['killshot','fieldcraft'],4:['scQuick','scSniper'],5:['scAssassin','scSurvivor'],6:['scSpotter','scDeadly'],7:['scLegend','scPhantom']},
+ Medic:{1:['smoke','mDrilled'],2:['reviveStim','fieldKit'],3:['combatMedic','traumaBag'],4:['shieldDrone','mSurgeon'],5:['medBeacon','mStoic'],6:['mFieldSurgeon','mMarksman'],7:['mAngel','mVeteran']},
+ Heavy:{1:['suppress','shredder'],2:['bandolier','flakVest'],3:['rocket','juggernaut'],4:['hDemo','hBrute'],5:['chainShot','hBulwark'],6:['hGunner','hHeavyWeapons'],7:['hTitan','hWarlord']}};
+// XP to reach each rank (spec B §5.1).
+const RANKS=[{xp:0},{xp:30},{xp:80},{xp:160},{xp:280},{xp:450},{xp:700}];
+// Stat gains on reaching a rank (ranks 2–3 match v0.2; 4–7 per spec B §5.1, trimmed so R7 isn't untouchable).
+const RANK_GAIN={2:{hp:1,aim:5,will:3,jedi:{maxF:1}},3:{hp:1,aim:5,will:3,jedi:{deflect:10},troop:{kits:1,nades:1}},4:{hp:1,aim:5,will:3},
+ 5:{aim:5,will:3,jedi:{maxF:1}},6:{hp:1,will:3,troop:{kits:1,nades:1}},7:{aim:5,will:5,jedi:{deflect:10}}};
 const XP={survive:10,kill:5,capture:8,story:10};
-// Wings (spec B §2). cost[l] = price to reach level l. staff = bonus while a unit is assigned to the wing's one staff slot.
+// Wings (spec B §2). cost[l] = price to reach level l. req[l] = research needed for that level. staff = bonus while a unit staffs the one slot.
 const WINGS={
- medical:{n:'Medical Halls',cost:[0,150,200],up:[0,10,15],eff:['Not built','Wounds heal 1.5× faster','Wounds heal 2× faster; grave wounds halved'],staff:'+25% healing speed'},
- training:{n:'Training Salle',cost:[0,150],up:[0,10],eff:['Not built','+10% XP from missions; bench units here to train'],staff:'+10% more XP from missions'},
- forge:{n:'Kyber Forge',cost:[0,200,300],up:[0,15,15],eff:['Not built','Craft tier 2 sabers','Craft tier 3 sabers (trait slot)'],staff:'Saber crafts cost 1 less Kyber'},
- armory:{n:'Armory',cost:[0,200,300],up:[0,15,15],eff:['Not built','Military blasters (T2, 1 mod) and heavy armor','Elite blasters (T3, 2 mods)'],staff:'Troop gear costs 20% less'},
- comms:{n:'Comms Hub',cost:[0,150],up:[0,10],eff:['Not built','See crisis rewards before you choose'],staff:'+1 Intel per month'},
- barracks:{n:'Barracks',cost:[0,0,200,300],up:[0,5,5,5],eff:['Not built','Roster cap 10','Roster cap 14','Roster cap 18'],cap:[0,10,14,18],staff:'+1 Recruit per month'}};
+ medical:{n:'Medical Halls',cost:[0,150,200,350],req:[0,0,0,'bacta'],up:[0,10,15,15],eff:['Not built','Wounds heal 1.5× faster','Wounds heal 2× faster; grave wounds halved','Bacta tanks: wounds heal 2.5× faster; resting here treats one wound scar'],staff:'+25% healing speed',desc:'Heals wounds between missions. Assign wounded units to Recover here.'},
+ training:{n:'Training Salle',cost:[0,150,250],req:[0,0,'curriculum'],up:[0,10,15],eff:['Not built','+10% XP from missions; bench units here to train','+20% XP from missions; training gives 2× XP'],staff:'+10% more XP from missions',desc:'Faster XP for the whole roster, and a place to train benched units.'},
+ forge:{n:'Kyber Forge',cost:[0,200,300],up:[0,15,15],eff:['Not built','Craft tier 2 sabers','Craft tier 3 sabers (trait slot)'],staff:'Saber crafts cost 1 less Kyber',desc:'Crafts better lightsabers from Kyber crystals.'},
+ armory:{n:'Armory',cost:[0,200,300],up:[0,15,15],eff:['Not built','Military blasters (T2, 1 mod), medium armor, utility gear','Elite blasters (T3, 2 mods), heavy armor'],staff:'Troop gear costs 20% less',desc:'Better blasters, armor, mods and utility gear.'},
+ comms:{n:'Comms Hub',cost:[0,150],up:[0,10],eff:['Not built','See crisis rewards before you choose'],staff:'+1 Intel per month',desc:'Intelligence: see rewards in advance and gather Intel.'},
+ archives:{n:'Archives',cost:[0,250,300],up:[0,10,10],eff:['Not built','Research one project at a time','Research 50% faster'],staff:'+25% research speed',desc:'Research: new gear, saber forms, abilities and wing upgrades.'},
+ gardens:{n:'Meditation Gardens',cost:[0,150,250],up:[0,5,10],eff:['Not built','Units assigned to Meditate shed stress fast','Meditation can also heal a trauma'],staff:'All units shed 5 more stress per mission',desc:'Removes stress, and at level 2 treats traumas.'},
+ barracks:{n:'Barracks',cost:[0,0,200,300],req:[0,0,0,'logistics'],up:[0,5,5,5],eff:['Not built','Roster cap 10','Roster cap 14','Roster cap 18'],cap:[0,10,14,18],staff:'+1 Recruit per month',desc:'Houses the roster. Higher levels raise the roster cap.'}};
 const WOUND={light:3,serious:10,grave:40,graveL2:20};
 const DAYS=15;            // days that pass per mission
 const TROOP_PAY=5,HIRE_COST=30,TRAIN_XP=12;   // TRAIN_XP = XP per mission period benched in the Training Salle [Default]
 const START_RES={credits:300,intel:0,kyber:1,favor:50,recruits:2};
 const START_ROSTER=[
- {n:'Kira Venn',cls:'Guardian',title:'Knight',rank:2,xp:30,picks:['leap'],col:'#62b3ff'},
+ {n:'Kira Venn',cls:'Guardian',title:'Knight',rank:2,xp:30,picks:['saberThrow','leap'],col:'#62b3ff'},
  {n:'Tor Saalen',cls:'Consular',title:'Padawan',col:'#72e0a4'},
  {n:'Sgt. Rhal Dax',cls:'Soldier'},{n:'Ilsa Myr',cls:'Scout'},{n:'Doc Bren',cls:'Medic'},{n:'Grak Ordo',cls:'Heavy'}];
 const RECRUIT_NAMES=['Bryn Kallo','Daro Vesk','Ina Quell','Mako Strand','Tal Reyes','Juno Pell','Ferra Dask','Oren Kade','Sev Morran','Lio Brask'];
