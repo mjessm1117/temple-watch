@@ -30,7 +30,7 @@ function armoryTab(){const L=C.roster.filter(r=>r.status==='active');if(!L.some(
   h+=`<div class="grow"><b>Mods ${g.mods.length}/${slots}</b>${slots?Object.entries(MODS).filter(([,m])=>researched(m.res)).map(([k,m])=>g.mods.includes(k)?`<button type="button" class="on" data-act="dropmod:${r.id}:${k}" title="Remove (no refund)">${m.n} · ${m.tip} ✕</button>`
    :`<button type="button" data-act="mod:${r.id}:${k}" ${g.mods.length>=slots||C.res.credits<priceOf(m.cost)?'disabled':''}>${m.n} · ${m.tip} · ${cost(priceOf(m.cost))}</button>`).join(''):'<span class="muted">Upgrade the weapon to fit mods.</span>'}</div>`;
   h+=`<div class="grow"><b>Color</b>${TROOP_COLS.map(c=>`<button type="button" class="sw ${(r.col||TROOP_COLS[0])===c?'on':''}" style="--c:${c}" data-act="col:${r.id}:${c}" aria-label="Token color ${c}"></button>`).join('')}</div>`}
- h+=armoryProg(r)+treeHTML(r);const picks=r.picks.map(k=>pickInfo(k).name).join(', ');
+ h+=armoryProg(r)+presetHTML(r)+identHTML(r)+treeHTML(r)+recordHTML(r);const picks=r.picks.map(k=>pickInfo(k).name).join(', ');
  return `<div class="tw"><div class="ulist">${list}</div><div class="gear"><div><b>${r.n}</b> <small class="muted">${r.cls} · Rank ${r.rank}${picks?' · '+picks:''}</small></div><div class="stl">${statLine(r)}</div>${h}
  <p class="muted">${isJedi(r)?'Sabers need the Kyber Forge and Kyber crystals.':'Military gear and heavy armor need the Armory.'} Stats shown are what this unit takes into battle.</p></div></div>`}
 
@@ -42,16 +42,15 @@ function wingsTab(){return Object.entries(WINGS).map(([k,w])=>{const l=C.wings[k
 function recruitTab(){const full=rosterCount()>=rosterCap();
  return `<p class="muted">Roster ${rosterCount()}/${rosterCap()} (Barracks). New candidates every month. Troopers cost ${HIRE_COST} Cr + 1 Recruit; Padawans come from the Temple, free.${full?' <span class="bad">Roster full: upgrade the Barracks.</span>':''}</p>
  <div class="cands">${C.cands.map((c,i)=>{const k=candCost(c),no=full||C.res.credits<k.credits||C.res.recruits<k.recruits,cols=c.jedi?Object.values(CRYSTALS):TROOP_COLS;
-  return `<div class="cand"><div><span class="mini" style="--uc:${cols[0]}">${icon(c.cls.toLowerCase())}</span> <b>${c.jedi?'Padawan':'Trooper'} · ${c.cls}</b></div>
-  <small>${c.species}, age ${c.age} · ${c.origin}</small><small>Trait: <b>${TRAITS[c.trait].n}</b> (${TRAITS[c.trait].tip})</small>
+  return `<div class="cand"><div><span class="mini" style="--uc:${cols[0]}">${icon(c.cls.toLowerCase())}</span> <b data-tip="class:${c.cls}">${c.jedi?'Padawan':'Trooper'} · ${c.cls}</b></div>
+  <small>Age ${c.age}</small><small>Trait: <b>${TRAITS[c.trait].n}</b> (${TRAITS[c.trait].tip})</small>
   <input id="rn${i}" type="text" maxlength="24" placeholder="${freeName(c.jedi)}" aria-label="Name">
+  ${candFields(c,i)}
   <div>${cols.map((col,j)=>`<label><input type="radio" name="rc${i}" value="${col}" ${j?'':'checked'}><span class="sw" style="--c:${col};display:inline-block"></span></label>`).join(' ')}</div>
   <button type="button" class="primary" data-act="hire:${i}" ${no?'disabled':''}>Recruit · ${k.credits?`${k.credits} Cr + 1 Recruit`:'free'}</button></div>`}).join('')||'<p class="muted">No candidates left this month.</p>'}</div>`}
 
-function councilTab(){return `<div class="seats">${COUNCIL.map(c=>c.seat?`<div class="seat"><b>${c.n}</b><div class="muted">${c.seat} · ${c.stance}</div><div>Perk: ${c.perk}</div><small class="muted">${c.lore}</small></div>`:'<div class="seat vac">Vacant seat</div>').join('')}</div>
- <p class="muted">Display only for now: seat perks and Council votes switch on in a later update.</p>`}
 
-const TABS=[['roster','Roster',rosterTab],['armory','Armory',armoryTab],['wings','Wings',wingsTab],['research','Research',researchTab],['ops','Sith Ops',opsTab],['recruit','Recruit',recruitTab],['council','Council',councilTab]];
+const TABS=[['roster','Roster',rosterTab],['armory','Armory',armoryTab],['wings','Wings',wingsTab],['research','Research',researchTab],['ops','Sith Ops',opsTab],['council','Council',councilTab],['market','Black Market',marketTab],['recruit','Recruit',recruitTab]];
 function baseScreen(){SCR=baseScreen;S=null;ensureTemple();const m=$('#modal');m.hidden=false;
  if(C.step>=PLAN.length&&!C.options.length)return endScreen();
  const pend=C.roster.filter(r=>r.status==='active'&&pendingRank(r)).length;
@@ -61,14 +60,14 @@ function baseScreen(){SCR=baseScreen;S=null;ensureTemple();const m=$('#modal');m
  <section><h3>Galaxy · choose the next mission</h3><div class="opts">${C.options.map(optionHTML).join('')}</div></section>
  <nav class="tabs" role="tablist">${window.codexOpen?'<button type="button" id="hubCx" title="Codex (C)">Codex</button>':''}${window.settingsOpen?'<button type="button" id="hubSet">Settings</button>':''}${TABS.map(([k,n])=>`<button type="button" role="tab" class="${TAB===k?'on':''}" aria-selected="${TAB===k}" data-tab="${k}">${n}${k==='roster'&&pend?` (${pend})`:''}</button>`).join('')}</nav>
  ${TABS.map(([k,,f])=>`<section class="tpanel" ${TAB===k?'':'hidden'}>${f()}</section>`).join('')}</div>`;
- m.onclick=hubClick;m.onchange=ev=>{const s=ev.target.closest('[data-assign]');if(s){assign(s.dataset.assign,s.value);baseScreen()}}}
+ m.onclick=hubClick;m.onchange=ev=>{const s=ev.target.closest('[data-assign]');if(s){assign(s.dataset.assign,s.value);baseScreen()}const p=ev.target.closest('[data-pair]');if(p){setPair(p.dataset.pair,p.value);baseScreen()}}}
 function hubClick(ev){if(ev.target.closest('#hubCx'))return codexOpen();if(ev.target.closest('#hubSet'))return settingsOpen();const t=ev.target.closest('[data-tab]');if(t){TAB=t.dataset.tab;return baseScreen()}
  const b=ev.target.closest('[data-act]');if(!b||b.disabled)return;const [a,x,y]=b.dataset.act.split(':');
  if(a==='squad')return squadScreen(+x);
  if(progClick(a,x,y));else if(a==='build')buildWing(x);else if(a==='pick')pickAbility(x,y);else if(a==='grief')griefChoice(x,y==='1');
  else if(a==='arm'){ARM=x;TAB='armory'}else if(a==='wpn')buyWeapon(x);else if(a==='armor')buyArmor(x,y);else if(a==='mod')buyMod(x,y);else if(a==='dropmod')dropMod(x,y);
  else if(a==='saber')craftSaber(x);else if(a==='trait')setTrait(x,y);else if(a==='col')setColor(x,y);
- else if(a==='hire'){const i=+x,c=$('#modal').querySelector(`input[name="rc${i}"]:checked`);hireCand(i,$('#rn'+i).value,c&&c.value)}
+ else if(a==='hire'){candEdit(+x);const i=+x,c=$('#modal').querySelector(`input[name="rc${i}"]:checked`);hireCand(i,$('#rn'+i).value,c&&c.value)}
  baseScreen()}
 
 // Full skill tree for one unit (Armory): every rank, both options, the chosen one lit.

@@ -14,13 +14,13 @@ const BASE_KIT={Medic:['heal','scan','hack'],Heavy:['grenade']};
 // Ability trees, ranks 1–7: each rank offers two, you pick one (14 per class). Ids live in AB (abilities.js / temple-kits.js / temple-prog.js) or PERKS (stat picks).
 const KITS={
  Guardian:{1:['saberThrow','defLine'],2:['leap','reflectM'],3:['collapse','sweep'],4:['gIron','gDuelist'],5:['gBulwark','gVanguard'],6:['mightyBlow','gWarden'],7:['gUnbreakable','gMasterBlade']},
- Consular:{1:['stun','forceHeal'],2:['barrier','battleMed'],3:['mindTrick','forceRevive'],4:['cSerene','cResolve'],5:['massHeal','forceWave'],6:['cWellspring','cSeer'],7:['stasisField','cMaster']},
- Sentinel:{1:['flurry','sKeenEye'],2:['shadowStep','sExecutioner'],3:['saberThrow','sTracker'],4:['sVigil','sEdge'],5:['sweep','sGhost'],6:['precisionStrike','sHunter'],7:['sBlademaster','sUntouchable']},
- Wayseeker:{1:['wPathfinder','wWild'],2:['tremor','barrier'],3:['forceHeal','saberThrow'],4:['wRoots','wStalker'],5:['forceWave','leap'],6:['wBond','wSeer'],7:['stasisField','wPrimal']},
- Soldier:{1:['suppress','hunker'],2:['rapidFire','flakVest'],3:['rally','veteran'],4:['soGunner','soTough'],5:['soMarksman','soSteel'],6:['chainShot','soIronWill'],7:['soCommander','soLegend']},
- Scout:{1:['mark','scEagle'],2:['deadeye','longshot'],3:['killshot','fieldcraft'],4:['scQuick','scSniper'],5:['scAssassin','scSurvivor'],6:['scSpotter','scDeadly'],7:['scLegend','scPhantom']},
+ Consular:{1:['stun','forceHeal'],2:['barrier','battleMed'],3:['mindTrick','forceRevive'],4:['pull','cResolve'],5:['massHeal','forceWave'],6:['cWellspring','cSeer'],7:['stasisField','cMaster']},
+ Sentinel:{1:['flurry','sense'],2:['shadowStep','sExecutioner'],3:['saberThrow','executioner'],4:['disarm','sEdge'],5:['sweep','sGhost'],6:['precisionStrike','sHunter'],7:['sBlademaster','sUntouchable']},
+ Wayseeker:{1:['pathfinder','wildBond'],2:['tremor','barrier'],3:['forceHeal','saberThrow'],4:['beastCalm','wStalker'],5:['forceWave','pull'],6:['wBond','wSeer'],7:['stasisField','wPrimal']},
+ Soldier:{1:['suppress','hunker'],2:['rapidFire','flakVest'],3:['rally','veteran'],4:['holdLine','soTough'],5:['soMarksman','soSteel'],6:['chainShot','soIronWill'],7:['soCommander','soLegend']},
+ Scout:{1:['mark','scEagle'],2:['deadeye','longshot'],3:['killshot','fieldcraft'],4:['runGun','scSniper'],5:['scAssassin','scSurvivor'],6:['spotter','scDeadly'],7:['scLegend','ghost']},
  Medic:{1:['smoke','mDrilled'],2:['reviveStim','fieldKit'],3:['combatMedic','traumaBag'],4:['shieldDrone','mSurgeon'],5:['medBeacon','mStoic'],6:['mFieldSurgeon','mMarksman'],7:['mAngel','mVeteran']},
- Heavy:{1:['suppress','shredder'],2:['bandolier','flakVest'],3:['rocket','juggernaut'],4:['hDemo','hBrute'],5:['chainShot','hBulwark'],6:['hGunner','hHeavyWeapons'],7:['hTitan','hWarlord']}};
+ Heavy:{1:['suppress','shredder'],2:['bandolier','flakVest'],3:['rocket','juggernaut'],4:['ionNade','hBrute'],5:['chainShot','hBulwark'],6:['hGunner','hHeavyWeapons'],7:['hTitan','hWarlord']}};
 // XP to reach each rank (spec B §5.1).
 const RANKS=[{xp:0},{xp:30},{xp:80},{xp:160},{xp:280},{xp:450},{xp:700}];
 // Stat gains on reaching a rank (ranks 2–3 match v0.2; 4–7 per spec B §5.1, trimmed so R7 isn't untouchable).
@@ -37,9 +37,12 @@ const WINGS={
  archives:{n:'Archives',cost:[0,250,300],up:[0,10,10],eff:['Not built','Research one project at a time','Research 50% faster'],staff:'+25% research speed',desc:'Research: new gear, saber forms, abilities and wing upgrades.'},
  gardens:{n:'Meditation Gardens',cost:[0,150,250],up:[0,5,10],eff:['Not built','Units assigned to Meditate shed stress fast','Meditation can also heal a trauma'],staff:'All units shed 5 more stress per mission',desc:'Removes stress, and at level 2 treats traumas.'},
  barracks:{n:'Barracks',cost:[0,0,200,300],req:[0,0,0,'logistics'],up:[0,5,5,5],eff:['Not built','Roster cap 10','Roster cap 14','Roster cap 18'],cap:[0,10,14,18],staff:'+1 Recruit per month',desc:'Houses the roster. Higher levels raise the roster cap.'}};
+const CAPTIVE=2;          // missions until an ignored captive escapes home on their own
 const WOUND={light:3,serious:10,grave:40,graveL2:20};
 const DAYS=15;            // days that pass per mission
-const TROOP_PAY=5,HIRE_COST=30,TRAIN_XP=12;   // TRAIN_XP = XP per mission period benched in the Training Salle [Default]
+const MISSION_CR=0.6;      // mission credit rewards × this (data.js rewards stay as written) [Tuned wave 3]
+const STIPEND=[60,1.5];   // monthly Senate stipend = (a + b×Favor) × difficulty income. Spec B said 100+2×Favor; cut so credits stay tight [Tuned wave 3]
+const TROOP_PAY=7,HIRE_COST=30,TRAIN_XP=12;   // TRAIN_XP = XP per mission period benched in the Training Salle [Default]
 const START_RES={credits:300,intel:0,kyber:1,favor:50,recruits:2};
 const START_ROSTER=[
  {n:'Kira Venn',cls:'Guardian',title:'Knight',rank:2,xp:30,picks:['saberThrow','leap'],col:'#62b3ff'},

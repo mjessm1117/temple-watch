@@ -11,28 +11,20 @@ Object.assign(PERKS,{
  gWarden:{name:'Warden',ic:'guard',desc:'+15 deflect.',mod:{deflect:15}},
  gUnbreakable:{name:'Unbreakable',ic:'hunker',desc:'+3 HP and +1 armor.',mod:{hp:3,armor:1}},
  gMasterBlade:{name:'Master Blade',ic:'strike',desc:'+2 damage and +10% crit chance.',mod:{dmg:2,crit:10}},
- cSerene:{name:'Serene Mind',ic:'meditate',desc:'+1 max Focus.',mod:{maxF:1}},
  cResolve:{name:'Resolve',ic:'guard',desc:'+2 HP and +10 will.',mod:{hp:2,will:10}},
  cWellspring:{name:'Wellspring',ic:'meditate',desc:'+1 max Focus and +5 deflect.',mod:{maxF:1,deflect:5}},
  cSeer:{name:'Battle Seer',ic:'mark',desc:'+10 aim and +1 move.',mod:{aim:10,mob:1}},
  cMaster:{name:'Master of the Force',ic:'meditate',desc:'+1 max Focus and +2 HP.',mod:{maxF:1,hp:2}},
- sKeenEye:{name:'Keen Eye',ic:'mark',desc:'+1 move and +10% crit chance.',mod:{mob:1,crit:10}},
- sExecutioner:{name:'Executioner',ic:'strike',desc:'+5 aim and +15% crit chance.',mod:{aim:5,crit:15}},
- sTracker:{name:'Tracker',ic:'scan',desc:'+10 aim and +5 deflect.',mod:{aim:10,deflect:5}},
- sVigil:{name:'Vigil',ic:'guard',desc:'+2 HP and +10 deflect.',mod:{hp:2,deflect:10}},
+ sExecutioner:{name:'Killer Instinct',ic:'strike',desc:'+5 aim and +15% crit chance.',mod:{aim:5,crit:15}},
  sEdge:{name:'Keen Edge',ic:'strike',desc:'+1 damage.',mod:{dmg:1}},
  sGhost:{name:'Ghost Step',ic:'leap',desc:'+1 move and +10% crit chance.',mod:{mob:1,crit:10}},
  sHunter:{name:'Hunter',ic:'mark',desc:'+15 aim.',mod:{aim:15}},
  sBlademaster:{name:'Blademaster',ic:'strike',desc:'+2 damage and +15% crit chance.',mod:{dmg:2,crit:15}},
  sUntouchable:{name:'Untouchable',ic:'guard',desc:'+20 deflect and +1 armor.',mod:{deflect:20,armor:1}},
- wPathfinder:{name:'Pathfinder',ic:'leap',desc:'+1 move.',mod:{mob:1}},
- wWild:{name:'Wild Focus',ic:'meditate',desc:'+1 max Focus.',mod:{maxF:1}},
- wRoots:{name:'Deep Roots',ic:'guard',desc:'+2 HP.',mod:{hp:2}},
  wStalker:{name:'Stalker',ic:'mark',desc:'+5 aim and +10% crit chance.',mod:{aim:5,crit:10}},
  wBond:{name:'Wild Bond',ic:'meditate',desc:'+1 max Focus and +10 will.',mod:{maxF:1,will:10}},
  wSeer:{name:'Far Sight',ic:'mark',desc:'+10 aim.',mod:{aim:10}},
  wPrimal:{name:'Primal',ic:'strike',desc:'+2 damage and +1 move.',mod:{dmg:2,mob:1}},
- soGunner:{name:'Gunner',ic:'shoot',desc:'+1 damage.',mod:{dmg:1}},
  soTough:{name:'Tough',ic:'hunker',desc:'+2 HP.',mod:{hp:2}},
  soMarksman:{name:'Marksman',ic:'mark',desc:'+10 aim and +2 range.',mod:{aim:10,range:2}},
  soSteel:{name:'Nerves of Steel',ic:'guard',desc:'+1 armor and +15 will.',mod:{armor:1,will:15}},
@@ -40,14 +32,11 @@ Object.assign(PERKS,{
  soCommander:{name:'Commander',ic:'guard',desc:'+10 aim, +2 HP and +1 move.',mod:{aim:10,hp:2,mob:1}},
  soLegend:{name:'Living Legend',ic:'shoot',desc:'+2 damage and +10% crit chance.',mod:{dmg:2,crit:10}},
  scEagle:{name:'Eagle Eye',ic:'mark',desc:'+2 range and +5 aim.',mod:{range:2,aim:5}},
- scQuick:{name:'Quick Feet',ic:'leap',desc:'+1 move and +5% crit chance.',mod:{mob:1,crit:5}},
  scSniper:{name:'Sniper',ic:'mark',desc:'+10 aim.',mod:{aim:10}},
  scAssassin:{name:'Assassin',ic:'shoot',desc:'+20% crit chance.',mod:{crit:20}},
  scSurvivor:{name:'Survivor',ic:'hunker',desc:'+2 HP.',mod:{hp:2}},
- scSpotter:{name:'Spotter',ic:'mark',desc:'+10 aim and +1 range.',mod:{aim:10,range:1}},
  scDeadly:{name:'Deadly',ic:'shoot',desc:'+1 damage.',mod:{dmg:1}},
  scLegend:{name:'Ghost of the Rim',ic:'shoot',desc:'+2 damage and +10% crit chance.',mod:{dmg:2,crit:10}},
- scPhantom:{name:'Phantom',ic:'leap',desc:'+2 move and +5 aim.',mod:{mob:2,aim:5}},
  mDrilled:{name:'Drilled',ic:'shoot',desc:'+5 aim and +1 HP.',mod:{aim:5,hp:1}},
  mSurgeon:{name:'Surgeon',ic:'medic',desc:'+1 medkit and +1 HP.',mod:{kits:1,hp:1}},
  mStoic:{name:'Stoic',ic:'guard',desc:'+2 HP and +10 will.',mod:{hp:2,will:10}},
@@ -55,7 +44,6 @@ Object.assign(PERKS,{
  mMarksman:{name:'Sharpshooting Medic',ic:'shoot',desc:'+10 aim and +1 damage.',mod:{aim:10,dmg:1}},
  mAngel:{name:'Angel of Mercy',ic:'medic',desc:'+2 medkits and +2 HP.',mod:{kits:2,hp:2}},
  mVeteran:{name:'Veteran Medic',ic:'hunker',desc:'+1 armor, +1 move and +10 aim.',mod:{armor:1,mob:1,aim:10}},
- hDemo:{name:'Demolitions',ic:'grenade',desc:'+1 grenade and +1 HP.',mod:{nades:1,hp:1}},
  hBrute:{name:'Brute',ic:'hunker',desc:'+2 HP.',mod:{hp:2}},
  hBulwark:{name:'Walking Bulwark',ic:'hunker',desc:'+1 armor and +10 will.',mod:{armor:1,will:10}},
  hGunner:{name:'Steady Gunner',ic:'shoot',desc:'+10 aim.',mod:{aim:10}},
@@ -110,7 +98,7 @@ const UTIL=window.UTILITY={none:{n:'Empty',cost:0,desc:'No utility item.'},
  visor:{n:'Targeting visor',cost:50,res:'visors',mod:{aim:5,crit:5},desc:'+5 aim and +5% crit chance.'},
  shield:{n:'Personal shield',cost:60,res:'shields',mod:{armor:1},desc:'+1 armor: every hit does 1 less (min 1).'}};
 // Crystal = saber color + a small stat (spec D colors). Recolor freely in the Armory.
-const CRYSTAL_FX={blue:{n:'Blue',mod:{aim:5},desc:'Steady: +5 aim.'},green:{n:'Green',mod:{deflect:5,guardDef:5},desc:'Calm: +5 deflect, +5 more on Guard.'},
+const CRYSTAL_FX=window.GEAR={blue:{n:'Blue',mod:{aim:5},desc:'Steady: +5 aim.'},green:{n:'Green',mod:{deflect:5,guardDef:5},desc:'Calm: +5 deflect, +5 more on Guard.'},
  yellow:{n:'Yellow',mod:{crit:10},desc:'Keen: +10% crit chance.'},violet:{n:'Violet',mod:{dmgHi:1},desc:'Fierce: +1 max damage.'},white:{n:'White',mod:{will:10,deflect:5},desc:'Pure: +10 will, +5 deflect.'}};
 // Lightsaber forms: one stance per Jedi, one passive each. Forms I–III known from the start; IV–VII need research.
 const FORMS={
@@ -168,3 +156,8 @@ const SCARS={
  nightmares:{n:'Nightmares',kind:'trauma',stressX:1.5,desc:'Gains 50% more stress.'},
  anger:{n:'Burning anger',kind:'trauma',mod:{crit:10,will:-10},dark:1,desc:'+10% crit, −10 will; a Jedi gains 1 Darkness after every mission.'}};
 const SCAR={grave:40,trauma:30,breaking:25,max:3,treat:35};  // % chances; treat = per period meditating in Gardens 2 (traumas) or resting in Medical 3 (wounds)
+
+// Statuses for describe('status',id) / Codex: stress levels and scars (STATUS lives in data.js; we only add rows).
+if(typeof STATUS!=='undefined'){Object.assign(STATUS,{stress:{n:'Stress',desc:'0–100. Missions add it; benching, Medical and the Gardens remove it. 50+ Shaken, 80+ Breaking.'},
+ shaken:{n:'Shaken',desc:STRESS_LV[1].desc},breaking:{n:'Breaking',desc:STRESS_LV[2].desc},scar:{n:'Scar',desc:'A lasting wound or trauma. Medical 3 treats wounds; Gardens 2 treats traumas.'}});
+ for(const [k,v] of Object.entries(SCARS))STATUS[k]={n:v.n,desc:v.desc}}

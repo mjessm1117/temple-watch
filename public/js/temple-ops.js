@@ -2,8 +2,8 @@
    Data: temple-prog.js. Hooks: temple.js calls progMods (battleUnit), progAfterMission (applyResults), progAdvance (advance), progMonth (month turn). */
 for(const t of Object.values(SABER_TRAITS))t.desc=t.desc||t.tip+'.';
 const researched=id=>!id||!!(C&&C.research&&C.research.done.includes(id));
-const okGear=it=>it&&hasWing(it.need)&&researched(it.res);
-function ensureProg(){C.research=C.research||{done:[],cur:null,prog:0};C.ops=C.ops||{list:[],mods:[],n:0};
+const okGear=it=>it&&hasWing(it.need)&&(researched(it.res)||unlockedG(it.id))&&(!it.market||unlockedG(it.id));
+function ensureProg(){C.research=C.research||{done:[],cur:null,prog:0};C.ops=C.ops||{list:[],mods:[],n:0};if((C.ops.era||1)!==(C.era||1)){C.ops={list:[],mods:[],n:C.ops.n,era:C.era||1}}
  for(const r of C.roster){if(r.stress==null)r.stress=0;r.scars=r.scars||[];if(!r.gear.util)r.gear.util='none';if(!r.gear.form)r.gear.form='shiiCho'}}
 
 // Campaign → battle modifiers (contract): Chat X reads this in startMission. Unit-level numbers go through battleUnit instead.
@@ -18,7 +18,7 @@ function progMods(u,r){const g=r.gear,it=UTIL[g.util];
  if(it&&it.mod){if(it.give){const k=it.give==='grenade'?'nades':'kits';if(u[k]==null)u[k]=0;if(!u.abil.includes(it.give))u.abil.splice(1,0,it.give)}addMod(u,it.mod)}
  if(isJedi(r)){const cr=crystalOf(r);if(cr)addMod(u,CRYSTAL_FX[cr].mod);if(FORMS[g.form])addMod(u,FORMS[g.form].mod)}
  if(r.cls==='Medic'&&researched('fieldMed'))u.kits++;
- if(researched('sithTactics'))u.aim+=5;if(researched('beastLore'))u.aimVsHorror=(u.aimVsHorror||0)+10;
+ if(researched('sithTactics'))u.aim+=5;if(isJedi(r))u.aim+=perkVal('jediAim');if(researched('beastLore'))u.aimVsHorror=(u.aimVsHorror||0)+10;
  addMod(u,stressLv(r.stress).mod);for(const s of r.scars)addMod(u,SCARS[s].mod);
  u.stress=r.stress;u.scars=[...r.scars];u.will=Math.max(5,u.will||50);return u}
 
@@ -26,7 +26,7 @@ function progMods(u,r){const g=r.gear,it=UTIL[g.util];
 function addStress(r,n){if(n>0&&r.scars.includes('nightmares'))n=Math.round(n*SCARS.nightmares.stressX);if(n>0&&r.trait==='steady')n=Math.round(n*.75);
  r.stress=Math.max(0,Math.min(100,(r.stress||0)+n))}
 function giveScar(r,kind,out){const have=r.scars;if(have.length>=SCAR.max)return;
- let pool=Object.keys(SCARS).filter(k=>SCARS[k].kind===kind&&!have.includes(k));if(!pool.length)return;const k=pickOne(pool);have.push(k);
+ let pool=Object.keys(SCARS).filter(k=>SCARS[k].kind===kind&&!have.includes(k));if(!pool.length)return;const k=pickOne(pool);have.push(k);lifeLog(r,`${kind==='wound'?'Scarred':'Traumatized'}: ${SCARS[k].n}`);quote(r,'scar');
  out.prog.push(`<span class="bad">${r.n}: new ${kind==='wound'?'scar':'trauma'} · ${SCARS[k].n}</span> (${SCARS[k].desc})`)}
 function progAfterMission(dep,win,out){out.prog=out.prog||[];ensureProg();
  const deaths=dep.filter(d=>!d.u.vip&&d.r.status==='dead').length,horror=S.units.some(u=>u.side==='e'&&u.horror);
@@ -58,7 +58,7 @@ function progAdvance(){ensureProg();const R=C.research;
 // Month turns over: ignored ops land, new ops appear.
 function progMonth(){ensureProg();for(const o of C.ops.list.filter(o=>o.st==='open'))opHits(o);C.ops.list=C.ops.list.filter(o=>o.st==='team');
  const n=C.month>=3?2:1,keys=Object.keys(SITH_OPS);for(let i=0;i<n;i++){const k=pickOne(keys.filter(k=>!C.ops.list.some(o=>o.k===k)));C.ops.list.push({id:'op'+(++C.ops.n),k,st:'open'})}
- C.news.push(`Imperial Intelligence is moving: ${n} Sith op${n>1?'s':''} this month. See the Sith Ops tab.`)}
+ C.news.push(`Imperial Intelligence is moving: ${n} Sith op${n>1?'s':''} this month. See the Sith Ops tab.`);lifeMonth()}
 function opHits(o){const D=SITH_OPS[o.k];o.st='hit';C.news.push(`<span class="bad">Ignored Sith op: ${D.n}.</span> ${D.desc.replace('If ignored: ','')}`);
  if(D.mod)C.ops.mods.push({k:o.k,mod:D.mod,left:D.missions});for(const [k,v] of Object.entries(D.res||{}))gain(k,v);if(C.res.kyber<0)C.res.kyber=0;
  if(D.hurt){const r=pickOne(C.roster.filter(able));if(r){r.wound=Math.max(r.wound,10);addStress(r,20)}}}
@@ -92,16 +92,16 @@ function opsTab(){const L=C.ops.list,fitU=C.roster.filter(fit),mods=C.ops.mods;
  :'<p class="muted">No Sith ops yet. They start next month.</p>'}`}
 // Armory rows added for every unit: armor (by who), utility slot; Jedi also get crystal stats and a form.
 function armoryProg(r){const g=r.gear,J=isJedi(r);let h='';
- h+=`<div class="grow"><b>Armor</b>${Object.entries(ARMOR).filter(([,a])=>a.who==='any'||a.who===(J?'jedi':'troop')).map(([k,a])=>`<button type="button" class="${g.armor===k?'on':''}" data-act="armor:${r.id}:${k}" data-tip="gear:${k}" ${g.armor!==k&&(!okGear(a)||C.res.credits<priceOf(a.cost))?'disabled':''}>${a.n} · ${a.desc}${g.armor===k?'':' · '+priceOf(a.cost)+' Cr'}${lockTxt(a)}</button>`).join('')}</div>`;
- h+=`<div class="grow"><b>Utility</b>${Object.entries(UTIL).map(([k,it])=>`<button type="button" class="${g.util===k?'on':''}" data-act="util:${r.id}:${k}" data-tip="gear:${k}" ${g.util!==k&&(!okGear(it)||C.res.credits<priceOf(it.cost))?'disabled':''}>${it.n}${k==='none'?'':' · '+it.desc}${g.util===k||!it.cost?'':' · '+priceOf(it.cost)+' Cr'}${lockTxt(it)}</button>`).join('')}</div>`;
+ h+=`<div class="grow"><b>Armor</b>${Object.entries(ARMOR).filter(([,a])=>(a.who==='any'||a.who===(J?'jedi':'troop'))&&(!a.market||unlockedG(a.id))).map(([k,a])=>`<button type="button" class="${g.armor===k?'on':''}" data-act="armor:${r.id}:${k}" data-tip="gear:${k}" ${g.armor!==k&&(!okGear(a)||C.res.credits<priceOf(a.cost))?'disabled':''}>${a.n} · ${a.desc}${g.armor===k?'':' · '+priceOf(a.cost)+' Cr'}${lockTxt(a)}</button>`).join('')}</div>`;
+ h+=`<div class="grow"><b>Utility</b>${Object.entries(UTIL).filter(([,it])=>!it.market||unlockedG(it.id)).map(([k,it])=>`<button type="button" class="${g.util===k?'on':''}" data-act="util:${r.id}:${k}" data-tip="gear:${k}" ${g.util!==k&&(!okGear(it)||C.res.credits<priceOf(it.cost))?'disabled':''}>${it.n}${k==='none'?'':' · '+it.desc}${g.util===k||!it.cost?'':' · '+priceOf(it.cost)+' Cr'}${lockTxt(it)}</button>`).join('')}</div>`;
  if(J){h+=`<div class="grow"><b>Form</b>${Object.entries(FORMS).map(([k,f])=>`<button type="button" class="${g.form===k?'on':''}" data-act="form:${r.id}:${k}" data-tip="gear:${k}" ${researched(f.res)?'':'disabled'}>${f.n} · ${f.desc}${lockTxt(f)}</button>`).join('')}</div>`;
   const cr=crystalOf(r);if(cr)h+=`<p class="muted">Crystal: <b>${CRYSTAL_FX[cr].n}</b> · ${CRYSTAL_FX[cr].desc} ${Object.values(CRYSTAL_FX).filter(c=>c.n!==CRYSTAL_FX[cr].n).map(c=>`${c.n}: ${c.desc}`).join(' · ')}</p>`}
  return h}
-const lockTxt=it=>!researched(it.res)?` · research ${RESEARCH[it.res].n}`:needTxt(it.need);
+const lockTxt=it=>it.market&&!unlockedG(it.id)?' · black market':!researched(it.res)&&!unlockedG(it.id)?` · research ${RESEARCH[it.res].n}`:needTxt(it.need);
 // Roster extras: stress, scars, Master button.
 function rosterProg(r){const lv=stressLv(r.stress),sc=r.scars.map(k=>`<span title="${SCARS[k].desc}">${SCARS[k].n}</span>`).join(', ');
  return `<small>Stress ${r.stress}/100 · <span class="${lv.at?'warn':''}" title="${lv.desc}">${lv.n}</span> · Will ${battleUnit(r).will}${sc?` · <span class="bad">Scars: ${sc}</span>`:''}</small>
- ${isJedi(r)&&r.title==='Knight'&&r.rank>=5?`<div class="picks">The Council will hear you. <button type="button" data-act="master:${r.id}">Name ${r.n} a Jedi Master</button></div>`:''}`}
-function progClick(a,x,y){if(a==='res')startResearch(x);else if(a==='opi')counterOp(x);else if(a==='opteam')sendTeam(x);
+ ${isJedi(r)&&r.title==='Knight'&&r.rank>=5?`<div class="picks">The Council will hear you. <button type="button" data-act="master:${r.id}">Name ${r.n} a Jedi Master</button></div>`:''}${pairHTML(r)}`}
+function progClick(a,x,y){if(lifeClick(a,x,y))return true;if(a==='res')startResearch(x);else if(a==='opi')counterOp(x);else if(a==='opteam')sendTeam(x);
  else if(a==='opt'){OPTEAM=OPTEAM.includes(x)?OPTEAM.filter(i=>i!==x):[...OPTEAM,x].slice(-2)}
  else if(a==='util')setUtil(x,y);else if(a==='form')setForm(x,y);else if(a==='master')raiseMaster(x);else return false;return true}

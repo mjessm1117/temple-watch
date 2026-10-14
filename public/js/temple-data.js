@@ -15,9 +15,9 @@ const PERKS={
  juggernaut:{name:'Juggernaut',ic:'hunker',tip:'+2 HP and +1 armor.',mod:{hp:2,armor:1}}};
 
 // Troop gear (spec B §5.4). Tiers upgrade in order. need = [wing, level]. Prices for armor and mods are ours [Default].
-const WEAPONS=[{n:'Standard blaster',slots:0,desc:'Issue rifle. No mod slots.'},
- {n:'Military blaster',cost:50,need:['armory',1],mod:{dmg:1},slots:1,desc:'+1 damage, 1 mod slot.'},
- {n:'Elite blaster',cost:120,need:['armory',2],mod:{dmg:1,aim:5},slots:2,desc:'+1 more damage, +5 aim, 2 mod slots.'}];
+const WEAPONS=[{id:'t1',n:'Standard blaster',slots:0,desc:'Issue rifle. No mod slots.'},
+ {id:'t2',n:'Military blaster',cost:50,need:['armory',1],mod:{dmg:1},slots:1,desc:'+1 damage, 1 mod slot.'},
+ {id:'t3',n:'Elite blaster',cost:120,need:['armory',2],mod:{dmg:1,aim:5},slots:2,desc:'+1 more damage, +5 aim, 2 mod slots.'}];
 // Armor sets. who = troop | jedi | any; res = research needed (temple-prog.js).
 const ARMOR={none:{n:'No armor',cost:0,who:'any',desc:'Nothing extra.'},
  light:{n:'Light armor',cost:30,who:'troop',mod:{hp:1},desc:'+1 HP.'},
@@ -30,9 +30,9 @@ const MODS={scope:{n:'Scope',cost:25,mod:{aim:10},tip:'+10 aim'},barrel:{n:'Long
  trigger:{n:'Hair trigger',cost:30,res:'eliteMods',mod:{crit:10},tip:'+10% crit'}};
 for(const m of Object.values(MODS))m.desc=m.tip+'.';
 // Lightsabers (spec B §5.3). Each tier adds to the one before (our reading of the table).
-const SABERS=[{n:'Training saber',desc:'Base damage.'},
- {n:'Attuned saber',kyber:2,cost:60,need:['forge',1],mod:{dmg:1,deflect:5},desc:'+1 damage, +5 deflect.'},
- {n:'Master-forged saber',kyber:4,cost:120,need:['forge',2],mod:{dmg:1,deflect:10},trait:1,desc:'+1 more damage, +10 deflect, and a trait slot.'}];
+const SABERS=[{id:'saber1',n:'Training saber',desc:'Base damage.'},
+ {id:'saber2',n:'Attuned saber',kyber:2,cost:60,need:['forge',1],mod:{dmg:1,deflect:5},desc:'+1 damage, +5 deflect.'},
+ {id:'saber3',n:'Master-forged saber',kyber:4,cost:120,need:['forge',2],mod:{dmg:1,deflect:10},trait:1,desc:'+1 more damage, +10 deflect, and a trait slot.'}];
 const SABER_TRAITS={focused:{n:'Focused',mod:{maxF:1},tip:'+1 max Focus'},swift:{n:'Swift',mod:{mob:1},tip:'+1 move'},
  warden:{n:'Guardian',mod:{guardDef:10},tip:'+10 deflect while on Guard'}};
 // Crystal = ring color (spec D). Purple avoids the Darkness role color.
@@ -59,9 +59,3 @@ const QUESTS={
  debt:{n:'Old debt',who:'troop',mission:'rescue',text:'A Hutt broker holds a debt over {n}. Settle it the Jedi way: free his captive.',res:{credits:120},txt:'+120 Credits'},
  home:{n:'Homeworld burns',who:'any',mission:'shrine',text:'Raiders are torching {n}’s home village. Hold the line until the militia comes.',res:{favor:6,intel:2},txt:'+6 Senate Favor, +2 Intel'}};
 
-// Council (spec B §4, spec C §6). Display only in v0.2: seat perks and votes are not active yet.
-const COUNCIL=[
- {n:'Grand Master Zym',seat:'Master of the Order',stance:'Guardian',perk:'+5 aim for Jedi in assaults',lore:'Legends · date Med'},
- {n:'Gnost-Dural',seat:'Keeper of the Archives',stance:'Sentinel',perk:'+1 Intel per mission',lore:'Legends · date High; Council seat is our invention'},
- {n:'Kao Cen Darach',seat:'Council Master',stance:'Consular',perk:'+5 Favor on Senate crises',lore:'Legends · date Med'},
- {n:'Vacant'},{n:'Vacant'},{n:'Vacant'},{n:'Vacant'}];

@@ -5,8 +5,9 @@ const RANK_TITLE=['','Recruit','Private','Corporal','Sergeant','Lieutenant','Cap
 function ensureTemple(){if(!C)return;const w=C.wings;for(const k of Object.keys(WINGS))if(w[k]==null)w[k]=k==='barracks'?1:0;
  C.bonds=C.bonds||{};C.quests=C.quests||{};C.staff=C.staff||{};if(!C.cands)C.cands=genCands();
  for(const r of C.roster){r.gear=r.gear||{w:0,armor:'none',mods:[],saber:0,trait:null};r.bonus=r.bonus||{};r.picks=r.picks||[];
-  if(r.age==null)r.age=ageFor(r);if(!C.treeV&&KITS[r.cls])r.picks=[KITS[r.cls][1][0],...r.picks];if(r.trait===undefined)r.trait=null;if(r.fear==null)r.fear=0;r.pick=pendingRank(r)}
- C.treeV=1;ensureProg()}
+  if(r.age==null)r.age=ageFor(r);if(!C.treeV&&KITS[r.cls])r.picks=[KITS[r.cls][1][0],...r.picks];
+  if(KITS[r.cls])r.picks=r.picks.map((k,i)=>KITS[r.cls][i+1]?(KITS[r.cls][i+1].includes(k)?k:KITS[r.cls][i+1][0]):k).slice(0,7);if(r.trait===undefined)r.trait=null;if(r.fear==null)r.fear=0;r.pick=pendingRank(r)}
+ C.treeV=1;ensureProg();ensureLife()}
 const ri2=([a,b])=>a+Math.floor(Math.random()*(b-a+1));
 const ageFor=r=>ri2(isJedi(r)?AGES[r.title==='Knight'?'Knight':'Padawan']:AGES.troop);
 function addMod(u,m){for(const [k,v] of Object.entries(m||{})){
@@ -71,7 +72,7 @@ function hireCand(i,name,col){const c=C.cands[i],k=c&&candCost(c);if(!c||rosterC
  C.res.credits-=k.credits;C.res.recruits-=k.recruits;C.cands.splice(i,1);addRecruit(c,name,col);saveGame()}
 function addRecruit(c,name,col){const n=(name||'').replace(/[<>&"]/g,'').trim().slice(0,24)||freeName(c.jedi);
  C.roster.push({id:'u'+C.nid++,n,cls:c.cls,title:c.jedi?'Padawan':RANK_TITLE[1],col:/^#[0-9a-f]{6}$/i.test(col||'')?col:(c.jedi?CRYSTALS.blue:TROOP_COLS[0]),
-  rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0,trait:c.trait,origin:c.origin,species:c.species,age:c.age,
+  rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0,trait:c.trait,origin:c.origin,species:c.species,age:c.age,look:c.look||null,bio:c.bio||'',
   gear:{w:0,armor:'none',mods:[],saber:0,trait:null},bonus:{},fear:0})}
 
 // --- bonds (spec C §7) ---
@@ -102,7 +103,7 @@ function templeAfterMission(dep,win,o,out){out.bonds=[];
   if(v.lvl<BOND.max&&++v.n>=BOND.missions)bondUp(live[i].r.id,live[j].r.id,BOND.missions+' missions together',out)}
  for(const {r} of dep.filter(d=>d.r.status==='dead'))for(const b of bondsOf(r).filter(b=>b.lvl>=3)){const p=unit(b.rid);p.fear=BOND.fear;
   out.bonds.push(`${p.n} lost ${r.n}. Fear: −10 aim for ${BOND.fear} missions.`);if(isJedi(p))p.grief=r.n}
- if(win&&o.quest)questReward(o,out);progAfterMission(dep,win,out)}
+ if(win&&o.quest)questReward(o,out);progAfterMission(dep,win,out);lifeAfterMission(dep,win,o,out)}
 // Jedi choice after a bonded partner dies (spec C §7): grieve (keep the fear) or use the anger (Darkness +2, no fear).
 function griefChoice(id,dark){const r=unit(id);if(!r||!r.grief)return;if(dark){r.dark=Math.min(10,r.dark+2);r.fear=0}r.grief=null;saveGame()}
 
