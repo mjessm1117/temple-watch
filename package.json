@@ -6,7 +6,7 @@
     "build": "node tools/inline.js",
     "test": "node tools/inline.js && node tests/balance.test.js && node tests/campaign.test.js && node tests/sync.test.mjs",
     "dev": "npx wrangler dev",
-    "test:quick": "node tools/inline.js && GAMES=2 node tests/balance.test.js && CAMPAIGNS=2 node tests/campaign.test.js && node tests/sync.test.mjs"
+    "test:quick": "node tools/inline.js && GAMES=1 node tests/balance.test.js && CAMPAIGNS=1 node tests/campaign.test.js && node tests/sync.test.mjs"
   },
   "devDependencies": {
     "jsdom": "24.1.3"

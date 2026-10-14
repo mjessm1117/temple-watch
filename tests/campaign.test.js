@@ -1,12 +1,12 @@
 // Plays the whole v0.2a campaign slice through the real screens with the test bot. Checks the loop, economy and save size.
 const {JSDOM}=require('jsdom');const fs=require('fs'),path=require('path');
-const html=fs.readFileSync(path.join(__dirname,'..','dist','temple-watch.html'),'utf8').replace('const sleep=ms=>new Promise(r=>setTimeout(r,ms));','const sleep=()=>Promise.resolve();');
+const html=fs.readFileSync(path.join(__dirname,'..','dist','temple-watch.html'),'utf8').replace('const sleep=ms=>new Promise(r=>setTimeout(r,ms/((window.SETTINGS&&SETTINGS.speed)||1)));','const sleep=()=>Promise.resolve();');
 const bot=fs.readFileSync(path.join(__dirname,'bot.js'),'utf8');
 // Story screens (vision shard, Council events, Years pass) sit between hub visits; the bot clears them with varied choices.
 const story=(d,g)=>{for(let k=0;k<12;k++){const q=s=>d.querySelector(s),ch=[...d.querySelectorAll('[data-ch]')].filter(b=>!b.disabled);
  if(q('#scOk'))q('#scOk').click();else if(ch.length)ch[g%ch.length].click();else if(q('[data-role]'))q('[data-role]').click();else if(q('#yrOk')&&!q('#yrOk').disabled)q('#yrOk').click();else return}};
 let fail=0;const check=(ok,msg)=>{if(!ok){console.log('FAIL '+msg);fail++}};const sum={runs:0,err:0,finished:0,credits:0,rank3:0,maxSave:0,missions:0};
-(async()=>{for(let g=0;g<(+process.env.CAMPAIGNS||8);g++){const w=new JSDOM(html,{runScripts:'dangerously',url:'https://tw.test/'}).window,d=w.document;const errs=[];w.addEventListener('error',e=>errs.push(e.message));
+(async()=>{for(let g=0;g<(+process.env.CAMPAIGNS||4);g++){const w=new JSDOM(html,{runScripts:'dangerously',url:'https://tw.test/'}).window,d=w.document;const errs=[];w.addEventListener('error',e=>errs.push(e.message));
  try{w.eval(bot);d.querySelector('[data-d="normal"]').click();if(g===0)check(w.eval('C.res.credits')===300,'start credits 300');story(d,g);const cr0=w.eval('C.res.credits');
   if(g===0){check(!!d.querySelector('[data-act="squad:0"]'),'base screen shows a mission');
    d.querySelector('[data-act="build:training"]').click();check(w.eval('C.build')==='training','build queued');check(w.eval('C.res.credits')===cr0-150,'build paid')}

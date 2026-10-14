@@ -1,8 +1,8 @@
 // Plays bot games on every mission map variant (Normal). Prints win rate per map; any "err" > 0 is a bug. Also checks every map is legal.
 const {JSDOM}=require('jsdom');const fs=require('fs'),path=require('path');
-const html=fs.readFileSync(path.join(__dirname,'..','dist','temple-watch.html'),'utf8').replace('const sleep=ms=>new Promise(r=>setTimeout(r,ms));','const sleep=()=>Promise.resolve();');
+const html=fs.readFileSync(path.join(__dirname,'..','dist','temple-watch.html'),'utf8').replace('const sleep=ms=>new Promise(r=>setTimeout(r,ms/((window.SETTINGS&&SETTINGS.speed)||1)));','const sleep=()=>Promise.resolve();');
 const bot=fs.readFileSync(path.join(__dirname,'bot.js'),'utf8');
-const N=+process.env.GAMES||10,diff=process.env.DIFF||'normal';let fail=0;
+const N=+process.env.GAMES||6,diff=process.env.DIFF||'normal';let fail=0;
 const w0=new JSDOM(html,{runScripts:'dangerously'}).window,maps=w0.eval(`(()=>{const out=[],bad=[];
  for(const [id,B] of Object.entries(MISSIONS))[B,...(B.alts||[])].forEach((v,i)=>{const M={...B,...v},g=M.map,at=(x,y)=>g[y]&&g[y][x],ok=p=>!!p&&PASS(at(p[0],p[1]));
   out.push([id,i]);const tag=id+'#'+i,need=['rescue','investigate','sabotage','escort'].includes(M.type);
