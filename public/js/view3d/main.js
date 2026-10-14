@@ -3,10 +3,15 @@
 // No WebGL (old GPU, jsdom tests) → nothing here runs and the 2D board stays.
 import * as THREE from '../../vendor/three.module.min.js';
 import {CamRig} from './camera.js';
-import {Board} from './board.js';
+import {Board,EH} from './board.js';
 import {Units} from './units.js';
 import {Effects} from './effects.js';
 import {Labels} from './labels.js';
+import {THEMES,themeOf,Scenery} from './themes.js';
+import {Cine} from './cine.js';
+import {RV} from './rigged.js';
+import {initFigures,loadModel,fileOf} from './figures.js';
+import {kindOf} from './units.js';
 
 const btn=document.getElementById('viewBtn'),modal=document.getElementById('modal'),KEY='tw_view';
 const glOK=(()=>{try{const c=document.createElement('canvas');return !!(window.WebGLRenderingContext&&(c.getContext('webgl2')||c.getContext('webgl')))}catch(e){return false}})();
@@ -18,60 +23,83 @@ onFx((type,d)=>{if(on&&V&&S)Q.push({type,d})});
 const unitColor=u=>u.side==='e'?'#ef6a5d':u.vip?'#7fd99a':u.col||'#e0bd78';
 
 function init(){const wrap=document.querySelector('.bwrap'),host=document.createElement('div');host.className='v3';wrap.appendChild(host);
- const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+ const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});const phone=matchMedia('(pointer:coarse)').matches;renderer.setPixelRatio(Math.min(devicePixelRatio,phone?1.5:2));
  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;
  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;host.appendChild(renderer.domElement);
  const scene=new THREE.Scene();scene.background=new THREE.Color(0x070d0f);scene.fog=new THREE.Fog(0x070d0f,24,48);
- scene.add(new THREE.HemisphereLight(0xa8dce8,0x0b1518,1.1));
- const key=new THREE.DirectionalLight(0xfff0dc,2.4);key.position.set(5,11,6);key.castShadow=true;key.shadow.mapSize.set(2048,2048);
+ const hemi=new THREE.HemisphereLight(0xa8dce8,0x0b1518,1.1);scene.add(hemi);
+ const key=new THREE.DirectionalLight(0xfff0dc,2.4);key.position.set(5,11,6);key.castShadow=true;key.shadow.mapSize.set(phone?1024:2048,phone?1024:2048);
  Object.assign(key.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:1,far:30});key.shadow.bias=-.0006;key.shadow.normalBias=.02;scene.add(key);
- const rim=new THREE.DirectionalLight(0x79d3e2,.8);rim.position.set(-6,5,-8);scene.add(rim);
- const rig=new CamRig(THREE),board=new Board(THREE,scene),units=new Units(THREE,scene,board,unitColor),fx3=new Effects(THREE,scene,rig),labels=new Labels(host);
+ const rim=new THREE.DirectionalLight(0x79d3e2,.8);rim.position.set(-6,5,-8);scene.add(rim);const scenery=new Scenery(THREE,scene),lights={hemi,key,rim};
+ initFigures(THREE);const rig=new CamRig(THREE),board=new Board(THREE,scene),units=new Units(THREE,scene,board,unitColor);units.Rig=RV;const fx3=new Effects(THREE,scene,rig),labels=new Labels(host);
  const ctl=document.createElement('div');ctl.className='v3c';
- ctl.innerHTML=`<button type="button" data-c="l" title="Rotate left (Q)">⟲</button><button type="button" data-c="r" title="Rotate right (E)">⟳</button><button type="button" data-c="i" title="Zoom in (wheel)">+</button><button type="button" data-c="o" title="Zoom out (wheel)">−</button><button type="button" data-c="f" title="Reset view">⌂</button><span>Drag or WASD to pan · wheel zoom · Q/E rotate</span>`;
- ctl.addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(!c)return;({l:()=>rig.rotate(-1),r:()=>rig.rotate(1),i:()=>rig.zoom(1/1.2),o:()=>rig.zoom(1.2),f:()=>fit()})[c.dataset.c]()});
+ ctl.innerHTML=`<button type="button" data-c="l" title="Rotate left (Q)">⟲</button><button type="button" data-c="r" title="Rotate right (E)">⟳</button><button type="button" data-c="i" title="Zoom in (wheel)">+</button><button type="button" data-c="o" title="Zoom out (wheel)">−</button><button type="button" data-c="f" title="Reset view">⌂</button><button type="button" data-c="c" title="Cinematic cameras on/off" class="cineb"></button><span>Drag or WASD to pan · wheel zoom · Q/E rotate</span>`;
+ ctl.addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(!c)return;({l:()=>rig.rotate(-1),r:()=>rig.rotate(1),i:()=>rig.zoom(1/1.2),o:()=>rig.zoom(1.2),f:()=>fit(),c:()=>View3D.cinematics=!V.cine.enabled})[c.dataset.c]()});
  host.appendChild(ctl);
  const ray=new THREE.Raycaster(),ndc=new THREE.Vector2(),ground=new THREE.Plane(new THREE.Vector3(0,1,0),0),hit=new THREE.Vector3();
  const pick=e=>{if(!S||!board.rows)return null;const r=renderer.domElement.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ndc,rig.cam);
   const roots=[...units.map.values()].filter(v=>!v.gone&&v.root.visible&&v.state!=='dead').map(v=>v.root),h=ray.intersectObjects(roots,true)[0];
   if(h){let o=h.object;while(o&&!roots.includes(o))o=o.parent;const v=[...units.map.values()].find(v=>v.root===o);if(v&&alive(v.u))return{x:v.u.x,y:v.u.y}}
+  const top=board.tops&&board.tops.length&&ray.intersectObjects(board.tops,false)[0];if(top)return{...top.object.userData};
   if(!ray.ray.intersectPlane(ground,hit))return null;const x=Math.floor(hit.x+board.cols/2),y=Math.floor(hit.z+board.rows/2);return x>=0&&y>=0&&x<board.cols&&y<board.rows?{x,y}:null};
  rig.bind(renderer.domElement,pick,(x,y,kind)=>{if(kind==='click')boardClick(x,y);else boardHover(x,y)});
  const resize=()=>{const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);rig.cam.aspect=w/h;rig.cam.updateProjectionMatrix();fx3.setScale(renderer.getPixelRatio()*h/2.2)};
  new ResizeObserver(resize).observe(host);
  const fit=()=>{if(!board.rows)return;rig.fit(board.cols,board.rows,rig.cam.aspect);const c=[[-1,-1],[1,-1],[-1,1],[1,1]].map(([a,b])=>new THREE.Vector3(a*board.cols/2,0,b*board.rows/2));
   for(let d=6;d<=32;d+=.5){rig.dist=d;rig.update(0);rig.cam.updateMatrixWorld();if(c.every(p=>{const v=p.clone().project(rig.cam);return Math.abs(v.x)<.97&&Math.abs(v.y)<.94}))break}rig.distGoal=rig.dist};
- V={renderer,scene,rig,board,units,fx3,labels,host,resize,fit};resize();
- const setReduce=()=>{units.reduce=fx3.reduce=reduceMQ.matches};setReduce();reduceMQ.addEventListener('change',setReduce);
- let last=performance.now();const loop=now=>{requestAnimationFrame(loop);const real=Math.min(.05,(now-last)/1000);last=now;if(!on||document.hidden||!S)return;frame(real,now/1000)};requestAnimationFrame(loop)}
+ V={renderer,scene,rig,board,units,fx3,labels,host,resize,fit,scenery,lights,cine:new Cine(THREE,rig,host,labels.el)};cineBtn();resize();
+ const setReduce=()=>{units.reduce=fx3.reduce=V.cine.reduce=reduceMQ.matches};setReduce();reduceMQ.addEventListener('change',setReduce);
+ let last=performance.now(),slowN=0;const loop=now=>{requestAnimationFrame(loop);const raw=(now-last)/1000,real=Math.min(.05,raw);last=now;if(!on||document.hidden||!S)return;frame(real,now/1000);
+  // Adaptive quality: if frames run slow for ~2 s, drop resolution a step (to 1×), then soften shadows.
+  if(raw>1/42&&raw<.5)slowN++;else slowN=Math.max(0,slowN-2);if(slowN>120){slowN=0;const pr=renderer.getPixelRatio();
+   if(pr>1){renderer.setPixelRatio(Math.max(1,pr-.25));resize()}else if(renderer.shadowMap.type!==THREE.BasicShadowMap){renderer.shadowMap.type=THREE.BasicShadowMap;key.shadow.mapSize.set(1024,1024);key.shadow.map?.dispose();key.shadow.map=null}}};requestAnimationFrame(loop)}
 
 const P=(o,y=0)=>V.board.pos(o.x,o.y,y);
-const vpos=(u,y=.8)=>{const v=V.units.get(u);return v.root.position.clone().setY(y)};
+const vpos=(u,y=.8)=>{const v=V.units.get(u),p=v.root.position;return p.clone().setY(Math.max(0,V.board.elev(v.vx,v.vy)*EH)+y)};
+const SET=()=>window.SETTINGS||{};let rmT=0;
 function frame(real,t){const {rig,board,units,fx3,labels,renderer,scene}=V;if(S!==lastS)rebuild();
- const slow=slowT>0&&!units.reduce;if(slowT>0)slowT-=real;const dt=slow?real*.25:real;
- pump(dt*1000);rig.update(real);board.update(dt,t);units.update(dt,t);fx3.update(dt);
+ if((rmT-=real)<=0){rmT=.5;const rm=SET().reducedMotion?SET().reducedMotion():reduceMQ.matches;units.reduce=fx3.reduce=V.cine.reduce=rm;cineBtn()}
+ const spd=Math.max(.25,+SET().speed||1),slow=slowT>0&&!units.reduce;if(slowT>0)slowT-=real;const dt=(slow?real*.25:real)*spd;
+ pump(dt*1000);rig.update(real);V.cine.update(real);board.update(dt,t);V.scenery.update(dt,t);units.update(dt,t);fx3.update(dt);
  if((labelT-=real)<=0){labelT=.08;unitLabels()}
  if(S.smoke&&S.smoke.length&&Math.random()<real*3)for(const s of S.smoke)fx3.puff(P(s,.3),1,0x8aa2a5);
  labels.update(real,proj);if(modal.hidden)renderer.render(scene,rig.cam)}
 const proj=p=>{const v=p.clone().project(V.rig.cam);if(v.z>1)return null;const c=V.renderer.domElement;return{x:(v.x+1)/2*c.clientWidth,y:(1-v.y)/2*c.clientHeight}};
-function rebuild(){lastS=S;Q.length=0;busy=0;hpShow.clear();V.units.clear();V.labels.clear();V.board.build(S.grid);V.fit();V.units.reconcile(S.units);ui()}
+function rebuild(){lastS=S;Q.length=0;busy=0;hpShow.clear();V.units.clear();V.labels.clear();const th=themeOf(S.M);V.board.setTheme(THEMES[th]);V.board.build(S.grid);
+ V.scenery.apply(th,V.board.cols,V.board.rows,V.lights,V.renderer);
+ seen.clear();for(const u of S.units)if(u.side==='e'&&!u.hid&&alive(u))seen.add(u.uid);
+ if(S.turn===1&&S.phase==='player'&&!flown.has(S)&&S.units.every(u=>u.hp===u.max)){flown.add(S);V.cine.flyover(V.board.cols,V.board.rows,`<div style="font:600 26px 'Chakra Petch',sans-serif;letter-spacing:.12em;color:#dbe7e4">${(S.M.n||'').toUpperCase()}</div><div style="font:500 13px 'IBM Plex Sans',sans-serif;color:#8aa2a5;margin-top:4px">${S.M.where||''}</div>`)}V.fit();V.units.reconcile(S.units);ui();models()}
+// Lazy-load only the model files this mission's units need; swap figures in once loaded (block figures show meanwhile).
+function models(){const want=new Set(S.units.map(u=>fileOf(kindOf(u))));
+ const later=[...Object.values(S.M&&S.M.waves||{}).flat(),...(S.M&&S.M.reinforce||[])];
+ for(const t of later)if(typeof t==='string'&&FOES[t])want.add(fileOf(kindOf({...FOES[t],side:'e',type:t})));
+ for(const f of want)loadModel(f).then(m=>{if(m&&V&&S)V.units.upgrade()})}
 
 // Event queue: each beat waits for the previous one. A backlog (fast enemy turns) plays faster.
 function pump(ms){const sp=(Q.length>6?3:Q.length>2?1.8:1)*(V.units.reduce?2:1);busy-=ms*sp;
  while(busy<=0&&Q.length){const e=Q.shift();let d=0;try{d=play(e.type,e.d)||0}catch(err){console.error(err)}busy=Math.max(busy,0)+d}
  if(busy<=0&&!Q.length){busy=0;settle();while(waiters.length)waiters.shift()()}}
 function settle(){const lost=V.board.sync(S.grid);for(const l of lost)V.fx3.debris(P(l,.3),6);
- V.units.reconcile(S.units);for(const u of S.units)hpShow.set(u.uid,u.hp)}
+ V.units.reconcile(S.units);for(const u of S.units)hpShow.set(u.uid,u.hp);reveals()}
+// Enemy-reveal pan: the first time new enemies become visible (waves, hidden agents, ambushes).
+const seen=new Set(),flown=new WeakSet();
+function reveals(){const fresh=S.units.filter(u=>u.side==='e'&&!u.hid&&alive(u)&&!seen.has(u.uid));if(!fresh.length)return;for(const u of fresh)seen.add(u.uid);
+ if(!V.cine.ready('reveal',4))return;const c=fresh.reduce((a,u)=>a.add(P(u)),new THREE.Vector3()).multiplyScalar(1/fresh.length);
+ const n={};for(const u of fresh){const k=u.n.replace(/ \d+$/,'');n[k]=(n[k]||0)+1}const horror=fresh.some(u=>u.horror||u.boss);
+ V.cine.reveal(c,`<div style="font:600 18px 'Chakra Petch',sans-serif;letter-spacing:.14em;color:${horror?'#ef6a5d':'#e0bd78'}">${horror?'THREAT SIGHTED':'CONTACT'}</div><div style="font:500 13px 'IBM Plex Sans',sans-serif;color:#dbe7e4">${Object.entries(n).map(([k,v])=>v>1?k+' ×'+v:k).join(' · ')}</div>`)}
 function play(type,d){const {units,fx3,labels,board,rig}=V;
  switch(type){
   case 'move':{if(d.u.hid||!d.path.length)return 0;const v=units.get(d.u);if(v.state!=='ok')return 0;return v.walk([P(d.from),...d.path.map(p=>P(p))],d.path.at(-1))+40}
   case 'shot':{const a=units.get(d.a),tv=units.get(d.t),pa=P(d.from,.9),pt=tv.root.position.clone().setY(.8);a.faceTo(pt);
-   if(d.label==='Force choke'){a.aim(pt,1);tv.lift(1.05);fx3.choke(pt);return 520}
-   if(d.label==='lightning'){a.aim(pt,.7);return fx3.lightning(pa.setY(1),pt,.55)+60}
-   if(d.label==='thrown saber')return fx3.saber(pa,pt,unitColor(d.a))+40;
+   if(d.label==='Force choke'){a.cast(pt,1);tv.lift(1.05);fx3.choke(pt);return 520}
+   if((d.label==='lightning'||d.label==='Force choke')&&Math.random()<.5&&V.cine.ready('force',9))V.cine.forcecam(a.root.position.clone(),pt);
+   if(d.label==='lightning'){a.cast(pt,1);return fx3.lightning(pa.setY(1),pt,.55)+60}
+   if(d.label==='thrown saber'){a.throwAt(pt);}if(d.label==='thrown saber')return fx3.saber(pa,pt,unitColor(d.a))+40;
+   const lethal=d.hit&&Q.some((e,i)=>e.type==='kill'&&e.d.t===d.t&&!Q.slice(0,i).some(o=>o.type==='shot'));
+   if(lethal&&d.a.side==='p'&&(enemies().length<=1||Math.random()<.5)&&V.cine.ready('kill',7))V.cine.killcam(a.root.position.clone(),tv.root.position.clone(),d.melee?1.2:1.5);
    if(d.melee){a.swing(pt);return 210}
-   a.aim(pt,.6);const deflect=!d.hit&&Q.some((e,i)=>e.type==='text'&&e.d.txt==='DEFLECT'&&!Q.slice(0,i).some(o=>o.type==='shot'));
-   return fx3.bolt(pa.setY(.95),pt,{color:d.a.side==='e'?0xff5a4a:0x6fd0ff,hit:d.hit,deflect})+60}
+   a.shoot(pt);const deflect=!d.hit&&Q.some((e,i)=>e.type==='text'&&e.d.txt==='DEFLECT'&&!Q.slice(0,i).some(o=>o.type==='shot'));
+   if(deflect)setTimeout(()=>tv.block(),120);return fx3.bolt(pa.setY(.95),pt,{color:d.a.side==='e'?0xff5a4a:0x6fd0ff,hit:d.hit,deflect})+60}
   case 'hit':{const v=units.get(d.t),at=d.src?vpos(d.src):null;v.flash();if(at)v.knock(at,d.d>=4?.34:.24);fx3.sparks(vpos(d.t,.8),d.src&&d.src.side==='e'?0xff8a6a:0x9fe7ff,16);
    hpShow.set(d.t.uid,d.hp);return 130}
   case 'kill':{const v=units.get(d.t),p=vpos(d.t,.8);v.fall('dead',d.src?vpos(d.src):null);fx3.burst(p);labels.float(p.clone().setY(1.7),'KILL','kill',true);
@@ -82,25 +110,27 @@ function play(type,d){const {units,fx3,labels,board,rig}=V;
   case 'text':{labels.float(P(d,1.55),d.txt,d.cls||'');return 0}
   case 'ability':return abilityFx(d);
  }return 0}
-const HEAL=new Set(['heal','forceHeal','stabilize','forceRevive','reviveStim']),SHIELD=new Set(['guard','barrier','hunker','defLine','smoke']);
+const FORCE=new Set(['push','collapse','choke','stun','mindTrick','saberThrow','tremor','pull','battleMed','leap','beastCalm']),HEAL=new Set(['heal','forceHeal','stabilize','forceRevive','reviveStim']),SHIELD=new Set(['guard','barrier','hunker','defLine','smoke']);
 function abilityFx(d){const {units,fx3,rig}=V,u=units.get(d.u),k=d.k,g=d.g,tp=g&&(g.t?vpos(g.t,.8):P(g,.8));
  if(tp)u.faceTo(tp);
+ if(tp&&FORCE.has(k)&&d.u.side==='p'&&Math.random()<.6&&V.cine.ready('force',9))V.cine.forcecam(u.root.position.clone(),tp);
  if(k==='leap'&&g)return u.leap(P(d.from),P(g),g);
- if(k==='push'&&tp){u.aim(tp,.5);return fx3.wave(P(d.from,.8),tp)}
- if(k==='grenade'&&g){u.aim(tp,.5);return fx3.arc(P(d.from,1),P(g,.15),.5)}
- if(k==='collapse'&&g){u.aim(tp,.6);fx3.debris(P(g,1.6),16,0x3a4a50);fx3.puff(P(g,.4),18,0x4a5559);if(!units.reduce)rig.shake(.15);return 450}
- if(k==='choke'||k==='stun'||k==='mindTrick'){u.aim(tp,.7);if(k!=='choke')fx3.ring(tp,0xe0bd78,.2,.7,.5,.9);return k==='choke'?0:350}
- if(HEAL.has(k)&&tp){fx3.motes(tp,0x7fd99a);return 300}
+ if(k==='push'&&tp){u.cast(tp,.5);return fx3.wave(P(d.from,.8),tp)}
+ if(k==='grenade'&&g){u.throwAt(tp);return fx3.arc(P(d.from,1),P(g,.15),.5)}
+ if(k==='collapse'&&g){u.cast(tp,.6);fx3.debris(P(g,1.6),16,0x3a4a50);fx3.puff(P(g,.4),18,0x4a5559);if(!units.reduce)rig.shake(.15);return 450}
+ if(k==='choke'||k==='stun'||k==='mindTrick'){u.cast(tp,.7);if(k!=='choke')fx3.ring(tp,0xe0bd78,.2,.7,.5,.9);return k==='choke'?0:350}
+ if(HEAL.has(k)&&tp){if(g&&g.t!==d.u)u.use(tp);else u.cast(null,.5);fx3.motes(tp,0x7fd99a);return 300}
  if(SHIELD.has(k)){fx3.ring(tp||vpos(d.u),k==='barrier'?0x7fd99a:0x79d3e2,.3,.9,.5,.4);return 250}
- if(k==='meditate'||k==='battleMed'){fx3.motes(vpos(d.u),0x79d3e2,26);if(k==='battleMed')fx3.ring(vpos(d.u),0x79d3e2,.4,6,.9,.3);return 350}
+ if(k==='meditate'||k==='battleMed'){u.cast(null,1);fx3.motes(vpos(d.u),0x79d3e2,26);if(k==='battleMed')fx3.ring(vpos(d.u),0x79d3e2,.4,6,.9,.3);return 350}
  if(k==='overwatch'||k==='suppress'||k==='mark'){u.aim(tp||u.root.position.clone().add(new THREE.Vector3(0,0,-1)),.5);if(tp&&k==='mark')fx3.ring(tp,0xef6a5d,.2,.6,.5,.9);return 200}
- if(tp&&(k==='hack'||k==='console'||k==='scan'||k==='door'))return fx3.motes(tp,0x79d3e2,12);
+ if(tp&&(k==='hack'||k==='console'||k==='scan'||k==='door'))u.use(tp);if(tp&&(k==='hack'||k==='console'||k==='scan'||k==='door'))return fx3.motes(tp,0x79d3e2,12);
  return 0}
 
 // UI layer: reach tiles, cover shields, targets, path, aim/intent lines, % tags. Rebuilt on every render and hover.
 function ui(){if(!V||!S)return;const {board,units,labels}=V,sel=S.sel,can=canAct(sel)&&!S.peek&&S.phase==='player';
  const h={reach:[],hover:null,targets:[],path:[],area:null,iarea:null,smoke:S.smoke||[],shields:[],lines:[]};
- if(can&&S.mode==='move'){const R=reach(sel).d;for(const k in R){if(!(R[k]>0))continue;const [x,y]=k.split(',').map(Number),hot=!!HOV&&HOV.x===x&&HOV.y===y;h.reach.push({x,y});if(hot)h.hover={x,y};
+ // Blue = 1 action, gold = dash (both actions), from Chat U's moveZones().
+ if(can&&S.mode==='move'){const Z=typeof moveZones==='function'?moveZones(sel):{...reach(sel),mob:1e9},R=Z.d;for(const k in R){if(!(R[k]>0))continue;const [x,y]=k.split(',').map(Number),hot=!!HOV&&HOV.x===x&&HOV.y===y,dash=R[k]>Z.mob;h.reach.push({x,y,dash});if(hot)h.hover={x,y,dash};
    for(const [dx,dy] of N4){if(!inb(x+dx,y+dy))continue;const c=tile(x+dx,y+dy);if(FULL(c)||HALF(c))h.shields.push({x,y,dx,dy,full:FULL(c),hot})}}}
  for(const g of S.tg){const pk=S.pick&&S.pick.x===g.x&&S.pick.y===g.y;h.targets.push({x:g.x,y:g.y,kind:pk?'pick':g.area||g.spot?'spot':g.ally?'ally':'tgt'})}
  if(S.hpath&&S.hpath.length&&sel){const pts=[sel,...S.hpath].map(p=>P(p));for(let i=0;i<pts.length-1;i++)for(let f=0;f<1;f+=.25)h.path.push(pts[i].clone().lerp(pts[i+1],f));h.path.push(pts.at(-1))}
@@ -121,7 +151,12 @@ function unitLabels(){const L=[];for(const u of S.units){const v=V.units.map.get
 
 function setOn(v){on=v&&glOK;document.body.classList.toggle('v3d',on);btn.textContent='View: '+(on?'3D':'2D');store.set(on?'3d':'2d');
  if(on&&!V)init();if(on&&V){lastS=null;V.resize()}if(typeof render==='function'&&S)render()}
-window.View3D={get dbg(){return V},sync(){if(!on||!V||!S)return;if(S!==lastS)rebuild();ui()},
+function cineBtn(){const b=V.host.querySelector('.cineb');if(b){b.textContent='Cine: '+(V.cine.enabled?'on':'off');b.setAttribute('aria-pressed',V.cine.enabled)}}
+window.View3D={get dbg(){return V},
+ // Settings hook (Chat U): View3D.cinematics = true/false. Stored per browser.
+ get cinematics(){return V?V.cine.enabled:(()=>{try{return localStorage.getItem('tw_cine')!=='off'}catch(e){return true}})()},
+ set cinematics(v){if(V){V.cine.setEnabled(v);cineBtn()}else try{localStorage.setItem('tw_cine',v?'on':'off')}catch(e){}},
+ skipCinematic(){if(V)V.cine.skip()},sync(){if(!on||!V||!S)return;if(S!==lastS)rebuild();ui()},
  // Resolves once every queued animation has played (logic may await this between enemy actions; 2D/tests resolve at once).
  idle(){return on&&V&&S&&(Q.length||busy>0)&&!document.hidden?new Promise(r=>{waiters.push(r);setTimeout(r,4000)}):Promise.resolve()},hover(){if(on&&V&&S)ui()},get on(){return on}};
 if(glOK){btn.hidden=false;btn.addEventListener('click',()=>setOn(!on));setOn(store.get()!=='2d')}

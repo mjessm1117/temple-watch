@@ -13,11 +13,15 @@ const KIND={
  acolyte:{body:0x2a1e24,robe:0x121216,skin:0x8f8f96,weapon:'saber',saber:0xff3b2e,hood:1,belt:0x5a1414},
  envoy:{body:0x8a8f96,robe:0x5d636b,skin:0xc29a7a,weapon:'pistol',belt:0x3d4248},
  civ:{body:0x8a7a5a,robe:0x6d6047,skin:0xc29a7a,weapon:null,belt:0x7fd99a,short:1}};
-const ENEMY={e_trooper:'sith',e_heavy:'sithHeavy',e_agent:'agent',e_acolyte:'acolyte',e_horror:'beast',e_envoy:'envoy'};
-export const kindOf=u=>u.vip?'civ':u.jedi?'jedi':u.side==='e'?(ENEMY[u.ic]||'sith'):({Scout:'scout',Medic:'medic',Heavy:'heavy'}[u.cls]||'trooper');
+const ENEMY={e_trooper:'sith',e_heavy:'sithHeavy',e_agent:'agent',e_acolyte:'acolyte',e_horror:'beast',e_envoy:'envoy'},BYTYPE={malgus:'malgus',mando:'mando'};
+// Later eras: names pick a look when the icon is generic (e.g. Brotherhood Sith Lords get robes and red sabers).
+const byName=n=>/sith lord|marauder|kaan|bane|dark acolyte|nightsister/i.test(n||'')?'acolyte':/sniper|bounty|agent/i.test(n||'')?'agent':/mandalorian/i.test(n||'')?'mando':null;
+export const kindOf=u=>u.vip?'civ':u.jedi?'jedi':u.side==='e'?(BYTYPE[u.type]||(u.horror?'beast':null)||byName(u.n)||ENEMY[u.ic]||'sith'):({Scout:'scout',Medic:'medic',Heavy:'heavy'}[u.cls]||'trooper');
+// Block-figure stand-ins for kinds that only exist as rigged models.
+const BLOCK={malgus:'acolyte',mando:'trooper'};
 let WHITE;const lerp=(a,b,k)=>a+(b-a)*k,sm=k=>k*k*(3-2*k);
 
-class UV{
+export class UV{
  constructor(U,u){this.U=U;this.T=U.T;this.uid=u.uid;this.u=u;this.kind=kindOf(u);this.mats=[];this.tw=[];this.flashK=0;this.knockV=new this.T.Vector3();
   this.vx=u.x;this.vy=u.y;this.state=u.status==='down'?'down':'ok';this.lie=this.state==='down'?1:0;this.lieAxis=new this.T.Vector3(1,0,0);this.face=u.side==='e'?0:Math.PI;
   this.root=new this.T.Group();this.body=new this.T.Group();this.root.add(this.body);this.p={};this.build();this.base();
@@ -25,7 +29,7 @@ class UV{
  mat(c,o={}){const m=new this.T.MeshStandardMaterial({color:c,roughness:.65,metalness:.2,flatShading:true,...o});m.userData.e0=m.emissive.clone();this.mats.push(m);return m}
  part(parent,geo,m,sx,sy,sz,x=0,y=0,z=0){const o=new this.T.Mesh(geo,m);o.scale.set(sx,sy,sz);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o}
  pivot(parent,x,y,z=0){const g=new this.T.Group();g.position.set(x,y,z);parent.add(g);return g}
- build(){if(this.kind==='beast')return this.buildBeast();const K=KIND[this.kind],G=this.U.geo,b=this.body,bulk=K.bulk||1;
+ build(){if(this.kind==='beast')return this.buildBeast();const K=KIND[BLOCK[this.kind]||this.kind],G=this.U.geo,b=this.body,bulk=K.bulk||1;
   const mb=this.mat(K.body),ma=this.mat(K.accent||K.belt||K.body),ms=this.mat(K.skin||0xc99f7c),mr=K.robe?this.mat(K.robe):null;
   const legM=K.helm?mb:mr||mb;
   for(const s of [-1,1]){const l=this.pivot(b,s*.085*bulk,.47);this.part(l,G.box,legM,.12*bulk,.46,.13*bulk,0,-.23);this.part(l,G.box,ma,.13*bulk,.07,.15*bulk,0,-.43,.01);this.p[s<0?'legL':'legR']=l}
@@ -75,6 +79,7 @@ class UV{
  swing(at){this.faceTo(at);if(this.kind==='beast'){this.add(.32,k=>{this.pose.lunge=Math.sin(k*Math.PI)*.45},()=>{this.pose.lunge=0});return}
   this.add(.34,k=>{this.pose.armR=k<.35?lerp(0,-2.4,sm(k/.35)):lerp(-2.4,1.1,sm((k-.35)/.65))},()=>{this.pose.armR=0})}
  flash(){this.flashK=1}
+ shoot(at){this.aim(at,.6)} cast(at,d=.7){if(at)this.aim(at,d)} throwAt(at){this.aim(at,.5)} use(at){if(at)this.faceTo(at)} block(){} hitAnim(){} cheer(){}
  knock(from,amt=.28){const r=this.root.position;this.knockV.set(r.x-from.x,0,r.z-from.z).normalize().multiplyScalar(amt)}
  fall(state,from){this.state=state;const r=this.root.position,dx=from?r.x-from.x:0,dz=from?r.z-from.z:1;this.lieAxis.set(dz,0,-dx).normalize();
   if(!this.lieAxis.lengthSq())this.lieAxis.set(1,0,0);const d=state==='dead'?.62:.8;
@@ -106,8 +111,11 @@ export class Units{
    robe:new T.CylinderGeometry(.62,1,1,8),disc:new T.CylinderGeometry(.38,.4,.05,28),ring:new T.RingGeometry(.32,.39,32).rotateX(-Math.PI/2),sel:new T.RingGeometry(.44,.5,36).rotateX(-Math.PI/2),
    sq:new T.BoxGeometry(.68,.05,.68),sqRing:new T.RingGeometry(.38,.46,4,1,Math.PI/4).rotateX(-Math.PI/2),sqSel:new T.RingGeometry(.52,.58,4,1,Math.PI/4).rotateX(-Math.PI/2),
    halo:new T.CylinderGeometry(.46,.46,1.2,28,1,true)};
-  WHITE=new T.Color(1,1,1)}
- get(u){let v=this.map.get(u.uid);if(!v){v=new UV(this,u);this.map.set(u.uid,v)}v.u=u;return v}
+  WHITE=this.white=new T.Color(1,1,1)}
+ // Swap block figures for rigged ones once their model file has loaded (skips anything mid-animation or dead).
+ upgrade(){if(!this.Rig)return;for(const [id,v] of this.map){if(v instanceof this.Rig||v.gone||v.state==='dead'||v.busy()||!this.Rig.can(v.u))continue;
+  const pos=v.root.position.clone();this.scene.remove(v.root);const n=new this.Rig(this,v.u);n.root.position.copy(pos);n.face=n.body.rotation.y=v.face;n.vx=v.vx;n.vy=v.vy;this.map.set(id,n)}}
+ get(u){let v=this.map.get(u.uid);if(!v){v=this.Rig&&this.Rig.can(u)?new this.Rig(this,u):new UV(this,u);this.map.set(u.uid,v)}v.u=u;return v}
  clear(){for(const v of this.map.values())this.scene.remove(v.root);this.map.clear()}
  busy(){for(const v of this.map.values())if(v.busy())return true;return false}
  // Bring every figure in line with S (only called when no event animation is pending).
