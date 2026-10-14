@@ -14,8 +14,12 @@ const bbyTxt=n=>`~${n.toLocaleString('en-US')} BBY`;
 const sgn=n=>(n>0?'+':'')+n;
 
 // ── Events ──
+const actNow=()=>1+PLAN.slice(0,C.step).filter(p=>p.years).length;
 function trig(t){const s=C.story;
  if(t.type==='era_start')return true;
+ if(t.type==='act')return actNow()>=(t.min||1);
+ if(t.type==='all')return t.all.every(trig);
+ if(t.type==='notFlag')return !C.flags[t.flag];
  if(t.type==='month')return C.month>=(t.min||1);
  if(t.type==='after_mission')return s.done>=(t.min||1);
  if(t.type==='flag')return !!C.flags[t.flag];
@@ -49,7 +53,7 @@ baseScreen=function(){if(!C)return _baseScreen();storyInit();const s=C.story,P=P
  if(P&&P.years)return yearsScreen();
  const key=C.step+'|'+s.done;
  if(s.visit!==key){s.visit=key;
-  if(!s.shard){s.shard=1;s.q.push('shard')}
+  if((s.shard||0)<actNow()){s.shard=actNow();s.q.push('shard')}
   const e=EVENTS.find(e=>!s.seen.includes(e.id)&&!s.q.includes(e.id)&&trig(e.trigger));if(e)s.q.push(e.id);
   if(s.q.length)saveGame()}
  if(s.q.length)return sceneScreen();
@@ -59,7 +63,7 @@ function storyHud(){const s=C.story,bar=document.querySelector('#modal .resbar')
  const eb=document.querySelector('#modal .base .eyebrow');if(eb)eb.textContent=eb.textContent.replace(/~[\d,]+ BBY/,bbyTxt(s.bby))}
 function sceneScreen(){SCR=sceneScreen;const s=C.story,id=s.q[0],m=$('#modal');m.hidden=false;
  const done=lines=>{s.q.shift();if(lines&&lines.length)C.news.push(lines.join(' · ')+'.');saveGame();baseScreen()};
- if(id==='shard'){m.innerHTML=`<div class="box"><div class="eyebrow">Jedi Council · ${bbyTxt(s.bby)}</div><h2>${ERA1.shard.t}</h2><p>${ERA1.shard.text}</p>
+ if(id==='shard'){const a=actNow();m.innerHTML=`<div class="box"><div class="eyebrow">Jedi Council · Act ${a} · ${bbyTxt(s.bby)}</div><h2>${ERA1.shard.t}</h2><p>${a>1&&SHARDS[a]||ERA1.shard.text}</p>
   <p class="muted">The Vision meter shows how surely it is coming true. It starts <b>${SHADOW.word(s.shadow)}</b>. Win the fights that matter to dim it.</p>
   <button type="button" class="primary" id="scOk">Continue</button></div>`;m.onclick=null;$('#scOk').onclick=()=>done();return}
  const e=EVENTS.find(e=>e.id===id);if(!e){s.q.shift();return baseScreen()}
@@ -77,10 +81,10 @@ function choiceText(f){const o=[];for(const [k,v] of Object.entries(f)){
  return o.join(' · ')||'Nothing changes'}
 
 // ── Years pass (+5 years): aging, Trials, retirement ──
-function yearsJump(){const s=C.story,y={rows:[],ret:[]};s.bby-=YEARS.jump;
+function yearsJump(){const s=C.story,y={rows:[],ret:[]},J5=PLAN[C.step].years>1?PLAN[C.step].years:YEARS.jump;s.bby-=J5;
  for(const r of C.roster){
   if(r.status==='captured'){r.status='dead';C.legends.push({n:r.n,cls:r.cls,how:'Never came back from captivity'});archive(r,'Never came back from captivity');y.rows.push([r.n,'Lost in captivity']);continue}
-  if(r.status!=='active')continue;const J=isJedi(r),notes=[];r.age+=YEARS.jump;r.wound=0;
+  if(r.status!=='active')continue;const J=isJedi(r),notes=[];r.age+=J5;r.wound=0;
   if(J&&r.title==='Padawan'&&r.rank>=2){if(r.dark>=YEARS.trialsFail.dark&&rnd(YEARS.trialsFail.chance))notes.push('fails the Trials, stays a Padawan');else{r.title='Knight';notes.push('<b class="up">passes the Trials: Knight</b>')}}
   const p=YEARS.retire(r,J);if(p&&rnd(p)){r.status='retired';y.ret.push({id:r.id,role:null});notes.push(`<b>retires</b> (${p}% at this age)`)}
   y.rows.push([r.n,`Age ${r.age}${notes.length?' · '+notes.join(' · '):''}`])}
@@ -90,8 +94,9 @@ function yearsScreen(){SCR=yearsScreen;const s=C.story,m=$('#modal');m.hidden=fa
  const roleBtns=x=>{const r=C.roster.find(r=>r.id===x.id);return `<div class="rrow"><div class="rmain"><b>${r.n}</b><small>${r.cls} · Rank ${r.rank} · age ${r.age}</small>
   ${x.role?`<p class="ready">${x.role}</p>`:`<div class="picks">${built.map(k=>`<button type="button" data-role="${x.id}:staff:${k}">Staff ${WINGS[k].n}</button>`).join('')}
   <button type="button" data-role="${x.id}:teach">${YEARS.roles.teach}</button><button type="button" data-role="${x.id}:relic">${YEARS.roles.relic}</button></div>`}</div></div>`};
- m.innerHTML=`<div class="box wide"><div class="eyebrow">Act II · ${bbyTxt(s.bby)}</div><h2>Years pass</h2>
- <p>Five years go by. The war cools into a cold peace that no one trusts. Wounds heal. Padawans face the Trials. Some veterans hang up their gear.</p>
+ const P=PLAN[C.step],A=ACTS[P.act]||ACTS[2];
+ m.innerHTML=`<div class="box wide"><div class="eyebrow">Act ${P.act||2} · ${bbyTxt(s.bby)}</div><h2>${A.t}</h2>
+ <p>${A.text}</p>
  <div class="sum">${y.rows.map(([n,t])=>`<div><span>${n}</span><span>${t}</span></div>`).join('')}<div><span>New recruits</span><span>+${YEARS.recruits}</span></div></div>
  ${y.ret.length?`<h3>Retirees · choose what each one does</h3>${y.ret.map(roleBtns).join('')}`:''}
  <button type="button" class="primary" id="yrOk" ${y.ret.some(x=>!x.role)?'disabled':''}>Back to the Temple</button></div>`;
@@ -100,7 +105,7 @@ function yearsScreen(){SCR=yearsScreen;const s=C.story,m=$('#modal');m.hidden=fa
   else if(role==='teach'){s.teach[r.cls]=r.n;x.role=`Teaches the next ${r.cls} recruit`}
   else{x.role='Leaves a relic to the Archive';r.relic=1}
   r.role=x.role;if(r.rank>=2)archive(r,`Retired at ${r.age}. ${x.role}.`);saveGame();yearsScreen()};
- $('#yrOk').onclick=ev=>{ev.stopPropagation();s.yrs=null;C.step++;C.options=optionsFor(C.step);C.news=[`Five years have passed. It is now ${bbyTxt(s.bby)}.`];saveGame();baseScreen()}}
+ $('#yrOk').onclick=ev=>{ev.stopPropagation();s.yrs=null;C.step++;C.options=optionsFor(C.step);C.news=[`Years have passed. It is now ${bbyTxt(s.bby)}.`];saveGame();baseScreen()}}
 
 // A retired teacher's next recruit of that class starts at rank 2 (spec B §1.5).
 const _addRecruit=addRecruit;
@@ -109,25 +114,30 @@ addRecruit=function(c,name,col){_addRecruit(c,name,col);const s=C.story,r=C.rost
 
 // ── Malgus assault (mission type 'assault'): win = boss dead; Threat 6 = he reaches the Temple lifts ──
 const _startMission=startMission;
-startMission=function(id,sq,o){_startMission(id,sq,o);
- if(S.M.boss&&C&&C.flags.e1_ambush_ready){const b=S.units.find(u=>u.boss);if(b){b.hp=Math.max(1,b.hp-3);log(STORY_TEXT.ambush,'good');render()}}};
+startMission=function(id,sq,o){_startMission(id,sq,o);if(!S.M.eraBoss||!C)return;const f=C.flags;
+ if(f.e1_ambush_ready){const b=S.units.find(u=>u.boss);if(b){b.hp=Math.max(1,b.hp-3);log(STORY_TEXT.ambush,'good')}}
+ if(f.e1_adraas_down){const i=S.units.findIndex(u=>u.side!=='p'&&!u.boss&&/Trooper/.test(u.n));if(i>=0){S.units.splice(i,1);log(STORY_TEXT.adraas,'good')}}
+ if(f.e1_docks_guarded)log(STORY_TEXT.guards,'good');render()};
 const _checkEnd=checkEnd;
 checkEnd=function(){if(!S||S.type!=='assault')return _checkEnd();if(S.over)return;
  const b=S.units.find(u=>u.boss);if(b&&b.status==='dead')return finish(true,S.M.win);
  if(!players().some(u=>!u.vip&&u.status==='ok'))return finish(false,`The squad is overwhelmed. ${S.M.lose}`)};
 const _threatStep=threatStep;
-threatStep=function(){if(S.type!=='assault')return _threatStep();log(`Threat rises to ${S.threat}.`,'bad');
- if(S.threat>=6)return finish(false,`Malgus reaches the Temple lifts. ${S.M.lose}`);
- log(S.threat>=5?'Malgus is at the lift doors. Next turn he is inside.':'Malgus pushes toward the Temple lifts.','bad');
- if(S.threat%2===0&&S.M.reinforce)spawn(S.M.reinforce)};
+threatStep=function(){if(S.type!=='assault')return _threatStep();const M=S.M;log(`Threat rises to ${S.threat}.`,'bad');
+ if(S.threat>=6)return finish(false,`${M.escape} ${M.lose}`);
+ log(S.threat>=5?M.near:M.push,'bad');
+ if(S.threat%2===0&&M.reinforce&&!(M.eraBoss&&C&&C.flags.e1_docks_guarded))spawn(M.reinforce)};
 
 // ── Results hook: Archive entries for the fallen, boss outcome ──
 const _applyResults=applyResults;
 applyResults=function(win){storyInit();const s=C.story,n0=C.legends.length,M=S.M,beatPar=win&&M.boss&&S.turn<=M.par;
- const out=_applyResults(win);s.done++;
+ const out=_applyResults(win);s.done++;const id=Object.keys(MISSIONS).find(k=>MISSIONS[k]===M||MISSIONS[k].n===M.n);
+ if(win&&M.winFlag)C.flags[M.winFlag]=1;if(!win&&M.loseFlag)C.flags[M.loseFlag]=1;
+ if(win&&M.winRecruit){const l=applyFx({recruit:M.winRecruit});if(l.length)C.news.push(l.join(' · ')+'.')}
  for(const L of C.legends.slice(n0)){const r=C.roster.find(r=>r.n===L.n)||L;archive(r,L.how,L.where)}
- if(M.boss){if(win){C.flags.boss_or_won=1;shadowAdd(-1);gain('favor',10,out.res);if(beatPar){for(const [k,v] of Object.entries(M.bonus))gain(k,v,out.res);out.bonus=M.bonusTxt}out.flag=STORY_TEXT.bossWin}
+ if(M.eraBoss){if(win){C.flags.boss_or_won=1;shadowAdd(-1);gain('favor',10,out.res);if(beatPar){for(const [k,v] of Object.entries(M.bonus))gain(k,v,out.res);out.bonus=M.bonusTxt}out.flag=STORY_TEXT.bossWin}
   else{C.flags.temple_scarred=1;shadowAdd(1);gain('favor',-10,out.res);const w=Object.keys(C.wings).filter(k=>C.wings[k]>0).sort((a,b)=>C.wings[b]-C.wings[a])[0];if(w)C.wings[w]--;out.flag=STORY_TEXT.bossLose}}
+ const e=EPI[id]&&EPI[id][win?'win':'lose'];if(e)out.flag=(out.flag?out.flag+' ':'')+e;
  saveGame();return out};
 
 // ── Archive of Legends: shared across campaigns on this device, newest first, cap 30 ──
@@ -150,5 +160,6 @@ endScreen=function(){if(!C||!C.story)return _endScreen();SCR=endScreen;const s=C
  <div><span>Fallen</span><span>${C.legends.map(l=>l.n).join(', ')||'none'}</span></div><div><span>Archive of Legends</span><span>${archiveLoad().length} names</span></div></div>
  ${hist?`<h3>What history changed</h3><div class="news">${hist}</div>`:''}
  <p class="muted">Centuries pass. Your heroes become Legends. To be continued: ${ERA1.next}.</p>
- <button type="button" class="primary" id="restart">New campaign</button></div>`;
- m.onclick=null;$('#restart').onclick=()=>{C=null;briefing(true)}};
+ ${typeof startEra==='function'?'<button type="button" class="primary" id="nextEra">Continue to the next era</button>':''}
+ <button type="button" class="${typeof startEra==='function'?'':'primary'}" id="restart">New campaign</button></div>`;
+ m.onclick=null;$('#restart').onclick=()=>{C=null;briefing(true)};const nx=$('#nextEra');if(nx)nx.onclick=()=>startEra(2)};

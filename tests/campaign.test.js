@@ -10,7 +10,7 @@ let fail=0;const check=(ok,msg)=>{if(!ok){console.log('FAIL '+msg);fail++}};cons
  try{w.eval(bot);d.querySelector('[data-d="normal"]').click();if(g===0)check(w.eval('C.res.credits')===300,'start credits 300');story(d,g);const cr0=w.eval('C.res.credits');
   if(g===0){check(!!d.querySelector('[data-act="squad:0"]'),'base screen shows a mission');
    d.querySelector('[data-act="build:training"]').click();check(w.eval('C.build')==='training','build queued');check(w.eval('C.res.credits')===cr0-150,'build paid')}
-  for(let m=0;m<24&&(story(d,g),w.eval('C.options.length'));m++){
+  for(let m=0;m<60&&(story(d,g),w.eval('C.options.length'));m++){
    const b=d.querySelector('[data-act="hire"]');if(g%2&&b&&!b.disabled)b.click();
    for(const p of d.querySelectorAll('[data-act^="pick:"]'))if(p.isConnected)p.click();
    d.querySelector(`[data-act="squad:${g%2&&w.eval('C.options.length')>1?1:0}"]`).click();d.querySelector('#deploy').click();
