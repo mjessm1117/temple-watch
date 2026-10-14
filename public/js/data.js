@@ -134,3 +134,45 @@ const STATUS={
  tricked:{n:'Mind-tricked',desc:'Will attack its own side on its next turn.'}};
 // Missions without a theme (other chats' files) fall back here; the view reads S.theme.
 const THEME_OF={dock:'dock',blockade:'plains',cache:'ruins',hutt:'city'};
+// Timed loot drops (turns.js). w = weight. desc = what picking it up does.
+const LOOT={intel:{n:'Intel cache',w:3,desc:'+1 Intel.'},credits:{n:'Credit chit',w:3,desc:'10–25 Credits after the mission.'},
+ kit:{n:'Medkit',w:3,desc:'+1 medkit for this mission.'},nade:{n:'Grenade',w:2,desc:'+1 grenade for this mission.'},
+ cell:{n:'Focus cell',w:2,desc:'+2 Focus (Jedi) or +2 HP (troops).'}};
+// Assault Threat text when the mission doesn't set escape/near/push.
+const ASSAULT_TXT={_:{escape:'The target gets away.',near:'The target is about to get away.',push:'The target pulls back.'},
+ r_bomb:{escape:'The thought bomb fires.',near:'The ritual is almost complete. Next turn it fires.',push:'Kaan\'s Lords chant louder.'},
+ r_nexus:{escape:'The nexus erupts.',near:'The nexus is about to erupt.',push:'The nexus pulses.'}};
+// Per-map balance (Chat X): enemy aim/HP offsets so the weak test bot wins ~55–70% on Normal. Key 'id:variant' (or 'id' for all variants).
+// extra/fewer = add/remove that many of the mission's rank-and-file foe.
+const TUNE={
+ "relay:0":{aim:-7},
+ "rescue:0":{aim:8},
+ "envoy:0":{aim:3,hp:1,extra:2},
+ "archive:0":{aim:20,hp:2},
+ "archive:1":{aim:-5},
+ "sabotage:1":{aim:15,hp:1,extra:2},
+ "escort:0":{aim:13},
+ "escort:1":{aim:10,hp:1},
+ "blockade:0":{aim:-12,hp:-1},
+ "cache:0":{aim:15,hp:2,extra:1},
+ "hutt:0":{aim:15,hp:2},
+ "dock:0":{aim:-15},
+ "vault:0":{aim:-18},
+ "ilum:0":{aim:10},
+ "adraasHunt:0":{aim:0},
+ "taris:0":{aim:2,hp:1,extra:3},
+ "thul:0":{aim:5,hp:1},
+ "thul:1":{aim:13},
+ "depot:1":{aim:10,hp:2,extra:1},
+ "fort:0":{aim:15,hp:1,extra:2},
+ "fort:1":{aim:10,hp:1,extra:2},
+ "r_ravine:0":{aim:20,hp:2,extra:1},
+ "r_caves:0":{aim:10,hp:1},
+ "r_bomb:0":{aim:-6},
+ "r_hospital:0":{aim:10,hp:1},
+ "r_snipers:0":{aim:15,hp:1,extra:3},
+ "r_dump:0":{aim:7},
+ "depot:0":{aim:5},
+ "shrine:0":{aim:3},
+ "r_nexus:0":{aim:10},
+ "shrine:1":{aim:0}};

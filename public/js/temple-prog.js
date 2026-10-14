@@ -53,41 +53,7 @@ Object.assign(PERKS,{
 for(const p of Object.values(PERKS)){p.desc=p.desc||p.tip;p.tip=p.tip||p.desc}
 
 // --- Tree abilities the engine didn't have yet. Added only if AB lacks them, so Chat X's versions win. Ids are stable.
-const PROG_AB={
- flurry:{name:'Flurry',ic:'strike',f:1,melee:1,dm:u=>u.dmg,desc:'Two strikes on one adjacent enemy, each at −10 aim. Ends turn.',
-  tg:u=>foesIn(u,t=>cheb(u,t)===1).map(t=>({t,chance:hitChance(u,t,{melee:true,mod:-10})})),
-  run:(u,g)=>{for(let i=0;i<2&&alive(g.t)&&g.t.status==='ok';i++)resolve(u,g.t,hitChance(u,g.t,{melee:true,mod:-10}),u.dmg,{melee:true,label:'flurry'})}},
- shadowStep:{name:'Shadow Step',ic:'leap',f:1,ap:1,desc:'Dash up to 5 tiles, past cover and units. Your next Strike this turn gets +20 aim. 1 action.',
-  tg:u=>tilesWhere((c,x,y)=>PASS(c)&&!unitAt(x,y)&&dist(u,{x,y})<=5&&cheb(u,{x,y})>1).map(p=>({...p,spot:1})),
-  run:(u,g)=>{u.x=g.x;u.y=g.y;u.leapAim=20;log(`${u.n} slips through the shadows.`);reveal();reactions(u)}},
- mightyBlow:{name:'Mighty Blow',ic:'strike',f:2,melee:1,dm:u=>[u.dmg[0]+2,u.dmg[1]+2],desc:'A heavy strike on an adjacent enemy: +2 damage. Ends turn.',
-  tg:u=>foesIn(u,t=>cheb(u,t)===1).map(t=>({t,chance:hitChance(u,t,{melee:true})})),
-  run:(u,g)=>resolve(u,g.t,g.chance,[u.dmg[0]+2,u.dmg[1]+2],{melee:true,label:'mighty blow'})},
- precisionStrike:{name:'Precision Strike',ic:'strike',f:2,melee:1,dm:u=>[u.dmg[0]+1,u.dmg[1]+1],desc:'Strike an adjacent enemy at +20 aim and +1 damage. Ends turn.',
-  tg:u=>foesIn(u,t=>cheb(u,t)===1).map(t=>({t,chance:hitChance(u,t,{melee:true,mod:20})})),
-  run:(u,g)=>resolve(u,g.t,g.chance,[u.dmg[0]+1,u.dmg[1]+1],{melee:true,label:'precision strike'})},
- massHeal:{name:'Mass Heal',ic:'medic',f:3,ap:1,instant:1,desc:'Heal 2 on every ally within 4, and stabilize downed allies there. 1 action.',
-  run:u=>{log(`${u.n} pours the Force into the squad.`,'good');for(const p of S.units.filter(p=>p.side==='p'&&alive(p)&&dist(u,p)<=4)){
-   if(p.status==='down'){if(!p.stable){p.stable=1;p.savedBy=u.rid;fx(p,'STABLE','heal')}}else if(p.hp<p.max){p.hp=Math.min(p.max,p.hp+2);fx(p,'+2','heal')}}}},
- forceWave:{name:'Force Wave',ic:'push',f:3,instant:1,desc:'Every visible enemy within 2 takes 2 damage (ignores cover) and may be stunned (40%). Ends turn.',
-  run:u=>{log(`${u.n} releases a wave of Force.`);for(const e of foesIn(u,t=>dist(u,t)<=2.9)){damage(e,2,u);if(alive(e)&&e.status==='ok'&&rnd(40)){e.status='stunned';e.ow=false;fx(e,'STUN')}}}},
- stasisField:{name:'Stasis Field',ic:'stunned',f:4,instant:1,desc:'60% chance to stun each visible enemy within 3. Ends turn.',
-  run:u=>{log(`${u.n} freezes the air itself.`,'good');for(const e of foesIn(u,t=>dist(u,t)<=3.2&&t.status==='ok'))if(rnd(60)){e.status='stunned';e.ow=false;fx(e,'STUN')}}},
- tremor:{name:'Tremor',ic:'collapse',f:3,dm:()=>[2,2],desc:'Shake a 3×3 area within 5: half cover there turns to rubble, enemies take 2 and lose overwatch. Ends turn.',
-  tg:u=>tilesWhere((c,x,y)=>dist(u,{x,y})<=5&&los(u,{x,y})&&!FULL(c)).map(p=>({...p,area:1})),
-  run:(u,g)=>{log(`${u.n} makes the ground heave.`);for(let y=g.y-1;y<=g.y+1;y++)for(let x=g.x-1;x<=g.x+1;x++){if(!inb(x,y))continue;const c=S.grid[y][x];
-   if(HALF(c)&&c!=='r'&&!'xbCXkqQdDE'.includes(c)){S.grid[y][x]='r';fx({x,y},'CRACK','boom')}const e=unitAt(x,y);if(e&&e.side==='e'&&alive(e)){e.ow=false;damage(e,2,u)}}}},
- chainShot:{name:'Chain Shot',ic:'shoot',dm:u=>u.dmg,desc:'Shoot at −10 aim; on a hit, shoot the same target again at −10. Ends turn.',
-  tg:u=>enemyT(u,u.range,t=>Math.max(5,hitChance(u,t)-10)),
-  run:(u,g)=>{const h=g.t.hp;resolve(u,g.t,g.chance,u.dmg,{label:'first shot'});if(alive(g.t)&&g.t.status==='ok'&&g.t.hp<h)resolve(u,g.t,Math.max(5,hitChance(u,g.t)-10),u.dmg,{label:'follow-up shot'})}},
- shieldDrone:{name:'Shield Drone',ic:'barrier',ap:1,desc:'Send a drone to an ally within 4: they count as in full cover from every side until your next turn. Once per mission. 1 action.',
-  avail:u=>u.droneUsed?'Used this mission':null,tg:u=>allyT(u,p=>p.status==='ok'&&dist(u,p)<=4&&!p.barrier),
-  run:(u,g)=>{u.droneUsed=1;g.t.barrier=1;fx(g.t,'SHIELD','heal');log(`${u.n}'s drone shields ${g.t.n}.`,'good')}},
- medBeacon:{name:'Med Beacon',ic:'medic',ap:1,instant:1,desc:'Heal 2 on every ally within 3 and stabilize downed allies there. Once per mission. 1 action.',
-  avail:u=>u.beaconUsed?'Used this mission':null,
-  run:u=>{u.beaconUsed=1;log(`${u.n} drops a med beacon.`,'good');for(const p of S.units.filter(p=>p.side==='p'&&alive(p)&&dist(u,p)<=3)){
-   if(p.status==='down'){if(!p.stable){p.stable=1;p.savedBy=u.rid;fx(p,'STABLE','heal')}}else if(p.hp<p.max){p.hp=Math.min(p.max,p.hp+2);fx(p,'+2','heal')}}}}};
-for(const [k,v] of Object.entries(PROG_AB))if(!AB[k]){v.tip=v.desc;AB[k]=v}
+// Tree abilities (flurry … medBeacon) now live in abilities.js (Chat X).
 for(const a of Object.values(AB))if(!a.desc&&a.tip)a.desc=a.tip;
 
 // --- Gear (spec B §5.3–5.4, extended). need = [wing, level]; res = research id that unlocks it. who = troop | jedi | any.

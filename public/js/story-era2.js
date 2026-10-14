@@ -1,7 +1,6 @@
 /* Era 2: Ruusan. Era jump (spec B §1.4), time-skip scene, Era 2 plan, Ruusan foe mechanics, Kaan/Bane outcomes, era-end stub.
    Data: data-era2.js. Load after story.js, before screens.js. Like story.js, it hooks in by wrapping globals:
-   trig, archive, baseScreen, endScreen, applyResults (story layer); newCampaign, continueGame (campaign/save); startMission, threatStep (turns.js);
-   odds, damage, resolve (rules.js); eAct, intentOf (ai.js). Entry point: startEra(2), called by the Era 1 ending. */
+   trig, archive, baseScreen, endScreen, applyResults (story layer); newCampaign, continueGame (campaign/save); startMission (turns.js). Entry point: startEra(2), called by the Era 1 ending. */
 const era=()=>C&&C.era||1;
 
 // ── Plan swap: PLAN holds the current era's steps. Era 1's steps are kept in PLAN.era1 so a new campaign can restore them. ──
@@ -70,12 +69,6 @@ function era2End(){SCR=endScreen;const s=C.story,m=$('#modal'),od=odark();m.hidd
 const _startMission2=startMission;
 startMission=function(id,sq,o){_startMission2(id,sq,o);if(!S.M.era||!C||!C.eraMod)return;
  for(const e of enemies())if(!e.horror&&!e.nexus){e.hp+=C.eraMod;e.max+=C.eraMod}render()};
-const _threatStep2=threatStep;
-threatStep=function(){if(!S.M.era||S.type!=='assault')return _threatStep2();log(`Threat rises to ${S.threat}.`,'bad');
- const bomb=S.id==='r_bomb';
- if(S.threat>=6)return finish(false,`${bomb?'The thought bomb fires.':'The nexus erupts.'} ${S.M.lose}`);
- log(S.threat>=5?(bomb?'The ritual is almost complete. Next turn it fires.':'The nexus is about to erupt.'):(bomb?'Kaan\'s Lords chant louder.':'The nexus pulses.'),'bad');
- if(S.threat%2===0&&S.M.reinforce)spawn(S.M.reinforce)};
 const _applyResults2=applyResults;
 applyResults=function(win){const M=S.M,id=S.id,clues=S.clues,bane=S.units.find(u=>u.bane);const out=_applyResults2(win);if(!M.era)return out;
  const s=C.story;
@@ -88,27 +81,8 @@ applyResults=function(win){const M=S.M,id=S.id,clues=S.clues,bane=S.units.find(u
   else{C.flags.e2_bomb_fired=1;gain('favor',-10,out.res);out.flag=STORY_TEXT2.bossLose+' '+BANE[k].line}}
  saveGame();return out};
 
-// ── Ruusan foe mechanics (Requests to X: fold into rules.js/ai.js whenever you like) ──
-// Brotherhood troopers: +lordAura aim within 4 tiles of a living Sith Lord.
-const _odds=odds;odds=function(a,t,o){const r=_odds(a,t,o);
- if(a.lordAura&&a.side==='e'&&enemies().some(e=>e!==a&&e.sithLord&&e.status==='ok'&&dist(e,a)<=4)){r.lines.push(['Sith Lord nearby',a.lordAura]);r.total=Math.max(5,Math.min(95,r.total+a.lordAura))}return r};
-// Marauders grow angrier when hit (max +3). Fanatics never surrender.
-const _damage=damage;damage=function(t,d,src){const st=t.status;_damage(t,d,src);
- if(t.fanatic&&t.status==='surrender'&&st!=='surrender'){t.status='ok';log(`${t.n} refuses to surrender.`,'bad')}
- if(t.rage&&t.status==='ok'&&(t.rageN||0)<3){t.rageN=(t.rageN||0)+1;t.dmg=[t.dmg[0]+1,t.dmg[1]+1];log(`${t.n}'s rage grows (+${t.rageN} damage).`,'bad')}};
-const _resolve=resolve;resolve=function(a,...r){a.fired=1;return _resolve(a,...r)};
-// Snipers overwatch when they don't fire. A nexus never acts; every N turns it spawns a Sith Spawn beside it.
-const _eAct=eAct;
-eAct=async function(e){
- // Bane watches from the ridge: he fights only what reaches him, and walks away on turn BANE.leaves.
- if(e.bane){if(e.status==='ok'&&S.turn>=BANE.leaves){S.units=S.units.filter(u=>u!==e);log('Darth Bane turns his back on the ritual and walks away over the ridge.','dark');return}
-  if(e.status==='ok'&&!players().some(p=>p.status==='ok'&&cheb(p,e)<=1))return}
- if(e.nexus){if(e.status==='ok'&&S.turn%e.nexus===0&&S.lastSpawn!==S.turn){
-  const p=N4.map(([dx,dy])=>({x:e.x+dx,y:e.y+dy})).find(p=>inb(p.x,p.y)&&PASS(tile(p.x,p.y))&&!unitAt(p.x,p.y));
-  if(p){S.lastSpawn=S.turn;S.units.push(mkFoe('sith_spawn',p.x,p.y));fx(p,'SPAWN','dmg');log(`${e.n} pulses. A Sith Spawn crawls out.`,'dark')}}return}
- e.fired=0;if(e.autoOW)e.ow=false;await _eAct(e);
- if(e.autoOW&&e.status==='ok'&&!e.fired&&!S.over){e.ow=true;log(`${e.n} settles in on overwatch.`)}};
-const _intentOf=intentOf;intentOf=function(e){if(e.bane&&!players().some(p=>p.status==='ok'&&cheb(p,e)<=1))return{txt:`Watching from the ridge. Leaves on turn ${BANE.leaves}`};return e.nexus?{txt:`Spawns a Sith Spawn every ${e.nexus} turns`}:_intentOf(e)};
+
+// Ruusan foe flags (lordAura, fanatic, rage, autoOW, nexus, bane) and Era 2 assault Threat text now live in rules.js / ai.js / turns.js (Chat X).
 
 // Codex lore for Era 2 ids, once L's CODEX exists.
 addEventListener('load',()=>{if(typeof CODEX==='undefined')return;for(const [k,v] of Object.entries(ERA2_LORE)){CODEX[k]=CODEX[k]||{};for(const [id,o] of Object.entries(v))if(!CODEX[k][id])CODEX[k][id]=o}});

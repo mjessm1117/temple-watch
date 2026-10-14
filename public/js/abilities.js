@@ -117,10 +117,10 @@ function applyEff(u,t,d){
 Object.assign(AB,{
  sense:{name:'Sense',passive:1,desc:'Finds hidden enemies within 8 tiles instead of 4.'},
  executioner:{name:'Executioner',passive:1,desc:'+25 aim against enemies at half health or less.'},
- shadowStep:{name:'Shadow Step',ic:'conceal',f:1,ap:1,desc:'Blink to a free tile within 5 (no reaction fire) and stay concealed until you attack or an enemy comes within 2. 1 action.',
+ shadowStep:{name:'Shadow Step',ic:'conceal',f:1,ap:1,desc:'Blink to a free tile within 5 (no reaction fire); your next Strike this turn gets +20 aim, and you stay concealed until you attack or an enemy comes within 2. 1 action.',
   tg:u=>tilesWhere((c,x,y)=>PASS(c)&&!unitAt(x,y)&&dist(u,{x,y})<=5&&cheb(u,{x,y})>1).map(p=>({...p,spot:1})),
   run:(u,g)=>{u.x=g.x;u.y=g.y;reveal();const e=enemies().find(e=>e.status==='ok'&&cheb(e,u)<=2&&los(e,u));
-   if(e&&!S.conc)log(`${u.n} steps out of the shadows right in front of ${e.n}.`,'bad');else{u.conc=1;fx(u,'HIDDEN');log(`${u.n} vanishes into the shadows.`,'good')}}},
+   u.leapAim=20;if(e&&!S.conc)log(`${u.n} steps out of the shadows right in front of ${e.n}.`,'bad');else{u.conc=1;fx(u,'HIDDEN');log(`${u.n} vanishes into the shadows.`,'good')}}},
  pathfinder:{name:'Pathfinder',passive:1,desc:'+1 movement.'},
  wildBond:{name:'Wild Bond',passive:1,desc:'Starts every mission at full Focus; Meditate restores 3.'},
  beastCalm:{name:'Beast Calm',ic:'calm',f:2,desc:'Soothe a creature or horror within 5: it loses its next turn (75%, horrors 50%).',
@@ -129,10 +129,6 @@ Object.assign(AB,{
  pull:{name:'Force Pull',ic:'pull',f:1,ap:1,desc:'Yank an enemy within 6 up to 3 tiles toward you, out of cover. Slamming into things deals 2. 1 action.',tg:u=>enemyT(u,6,90,t=>cheb(u,t)>1),
   run:(u,g)=>{if(!rnd(90))return log(`${u.n}'s Pull slips.`);const t=g.t,e0=uEl(t);pushN(u,t,Math.sign(u.x-t.x),Math.sign(u.y-t.y),Math.min(3,cheb(u,t)-1));
    const drop=e0-uEl(t);if(drop>0&&alive(t))damage(t,drop,u);log(`${u.n} pulls ${t.n} in.`)}},
- tremor:{name:'Tremor',ic:'tremor',f:3,loud:1,dm:()=>[2,2],desc:'Shake a 3×3 area within 5: enemies take 2, crates and cracked walls there crumble a step.',
-  tg:u=>tilesWhere((c,x,y)=>dist(u,{x,y})<=5&&los(u,{x,y})).map(p=>({...p,area:1})),
-  run:(u,g)=>{fx(g,'QUAKE','boom');log(`${u.n} splits the ground.`);for(const e of enemies().filter(e=>cheb(e,g)<=1&&!e.hid)){e.ow=false;damage(e,2,u)}
-   for(let y=g.y-1;y<=g.y+1;y++)for(let x=g.x-1;x<=g.x+1;x++)if(inb(x,y)&&TILES[S.grid[y][x]].breaks)degrade(x,y)}},
  runGun:{name:'Run & Gun',ic:'dash',ap:0,desc:'Free: gain an extra action this turn (dash, then still shoot). Once every 2 turns.',
   avail:u=>u.rgT&&S.turn<=u.rgT+1?'Cooling down':null,instant:1,run:u=>{u.rgT=S.turn;u.ap++;log(`${u.n} sprints.`)}},
  spotter:{name:'Spotter',passive:1,desc:'Allies may shoot enemies within their range that this unit sees (within 11), even without their own line of sight.'},
@@ -142,8 +138,35 @@ Object.assign(AB,{
   run:(u,g)=>{u.nades--;fx(g,'ION','boom');log(`${u.n} throws an ion grenade.`);for(const t of S.units.filter(t=>alive(t)&&t.status!=='down'&&cheb(t,g)<=1)){const dr=tagsOf(t).includes('droid');damage(t,dr?4:1,u);if(dr&&alive(t)&&t.status==='ok'){t.status='stunned';fx(t,'STUN')}}}},
  holdLine:{name:'Hold the Line',ic:'overwatch',instant:1,desc:'Overwatch that fires at every enemy that moves in range (−15 each) until your next turn.',run:u=>{u.ow='all';u.owHit=[];log(`${u.n} holds the line.`)}}});
 defineAbility('disarm',{name:'Disarm',ic:'disarm',f:2,range:5,chance:80,noDmg:1,status:'disarmed',desc:'80%: an enemy within 5 can’t shoot, throw or use lightning on its next turn (it can still move and strike).'});
-defineAbility('flurry',{name:'Flurry',ic:'flurry',f:1,melee:1,aimMod:-10,shots:2,desc:'Two strikes on an adjacent enemy at −10 aim each.'});
 defineAbility('protocol',{name:'Combat Protocol',ic:'hack',range:8,noLos:1,dmg:[3,3],chance:100,ignoreDeflect:1,tags:['droid'],desc:'3 damage to a droid within 8, no line of sight needed. Never misses.'});
-defineAbility('shieldDrone',{name:'Shield Drone',ic:'drone',kind:'ally',self:1,ap:1,once:1,range:1.5,buff:{shield:4},desc:'You or an adjacent ally gets a shield that soaks the next 4 damage. Once per mission. 1 action.'});
+// Tree abilities designed by Chat P (were PROG_AB in temple-prog.js). Ids kept.
+Object.assign(AB,{
+ flurry:{name:'Flurry',ic:'flurry',f:1,melee:1,dm:u=>u.dmg,desc:'Two strikes on one adjacent enemy, each at −10 aim. Ends turn.',
+  tg:u=>foesIn(u,t=>cheb(u,t)===1).map(t=>({t,chance:hitChance(u,t,{melee:true,mod:-10})})),
+  run:(u,g)=>{for(let i=0;i<2&&alive(g.t)&&g.t.status==='ok';i++)resolve(u,g.t,hitChance(u,g.t,{melee:true,mod:-10}),u.dmg,{melee:true,label:'flurry'})}},
+ mightyBlow:{name:'Mighty Blow',ic:'strike',f:2,melee:1,dm:u=>[u.dmg[0]+2,u.dmg[1]+2],desc:'A heavy strike on an adjacent enemy: +2 damage. Ends turn.',
+  tg:u=>foesIn(u,t=>cheb(u,t)===1).map(t=>({t,chance:hitChance(u,t,{melee:true})})),run:(u,g)=>resolve(u,g.t,g.chance,[u.dmg[0]+2,u.dmg[1]+2],{melee:true,label:'mighty blow'})},
+ precisionStrike:{name:'Precision Strike',ic:'strike',f:2,melee:1,dm:u=>[u.dmg[0]+1,u.dmg[1]+1],desc:'Strike an adjacent enemy at +20 aim and +1 damage. Ends turn.',
+  tg:u=>foesIn(u,t=>cheb(u,t)===1).map(t=>({t,chance:hitChance(u,t,{melee:true,mod:20})})),run:(u,g)=>resolve(u,g.t,g.chance,[u.dmg[0]+1,u.dmg[1]+1],{melee:true,label:'precision strike'})},
+ massHeal:{name:'Mass Heal',ic:'medic',f:3,ap:1,instant:1,desc:'Heal 2 on every ally within 4, and stabilize downed allies there. 1 action.',
+  run:u=>{log(`${u.n} pours the Force into the squad.`,'good');healArea(u,4)}},
+ forceWave:{name:'Force Wave',ic:'push',f:3,instant:1,loud:1,desc:'Every visible enemy within 2 takes 2 damage (ignores cover) and may be stunned (40%). Ends turn.',
+  run:u=>{log(`${u.n} releases a wave of Force.`);for(const e of foesIn(u,t=>dist(u,t)<=2.9)){damage(e,2,u);if(alive(e)&&e.status==='ok'&&rnd(40)){e.status='stunned';e.ow=false;fx(e,'STUN')}}}},
+ stasisField:{name:'Stasis Field',ic:'stunned',f:4,instant:1,loud:1,desc:'60% chance to stun each visible enemy within 3. Ends turn.',
+  run:u=>{log(`${u.n} freezes the air itself.`,'good');for(const e of foesIn(u,t=>dist(u,t)<=3.2&&t.status==='ok'))if(rnd(60)){e.status='stunned';e.ow=false;fx(e,'STUN')}}},
+ tremor:{name:'Tremor',ic:'tremor',f:3,loud:1,dm:()=>[2,2],desc:'Shake a 3×3 area within 5: cover there drops a step (crates to rubble), enemies take 2 and lose overwatch. Ends turn.',
+  tg:u=>tilesWhere((c,x,y)=>dist(u,{x,y})<=5&&los(u,{x,y})&&!FULL(c)).map(p=>({...p,area:1})),
+  run:(u,g)=>{fx(g,'QUAKE','boom');log(`${u.n} makes the ground heave.`);for(let y=g.y-1;y<=g.y+1;y++)for(let x=g.x-1;x<=g.x+1;x++){if(!inb(x,y))continue;
+   if(TILES[S.grid[y][x]].breaks)degrade(x,y);const e=unitAt(x,y);if(e&&e.side==='e'&&!e.hid&&alive(e)){e.ow=false;damage(e,2,u)}}}},
+ chainShot:{name:'Chain Shot',ic:'shoot',dm:u=>u.dmg,desc:'Shoot at −10 aim; on a hit, shoot the same target again at −10. Ends turn.',
+  tg:u=>enemyT(u,u.range,t=>Math.max(5,hitChance(u,t)-10)),
+  run:(u,g)=>{const h=g.t.hp;resolve(u,g.t,g.chance,u.dmg,{label:'first shot'});if(alive(g.t)&&g.t.status==='ok'&&g.t.hp<h)resolve(u,g.t,Math.max(5,hitChance(u,g.t)-10),u.dmg,{label:'follow-up shot'})}},
+ shieldDrone:{name:'Shield Drone',ic:'drone',ap:1,desc:'Send a drone to an ally within 4: they count as in full cover from every side until your next turn. Once per mission. 1 action.',
+  avail:u=>u.droneUsed?'Used this mission':null,tg:u=>allyT(u,p=>p.status==='ok'&&dist(u,p)<=4&&!p.barrier),
+  run:(u,g)=>{u.droneUsed=1;g.t.barrier=1;fx(g.t,'SHIELD','heal');log(`${u.n}'s drone shields ${g.t.n}.`,'good')}},
+ medBeacon:{name:'Med Beacon',ic:'medic',ap:1,instant:1,desc:'Heal 2 on every ally within 3 and stabilize downed allies there. Once per mission. 1 action.',
+  avail:u=>u.beaconUsed?'Used this mission':null,run:u=>{u.beaconUsed=1;log(`${u.n} drops a med beacon.`,'good');healArea(u,3)}}});
+function healArea(u,r){for(const p of S.units.filter(p=>p.side==='p'&&alive(p)&&dist(u,p)<=r)){
+ if(p.status==='down'){if(!p.stable){p.stable=1;p.savedBy=u.rid;fx(p,'STABLE','heal')}}else if(p.hp<p.max){p.hp=Math.min(p.max,p.hp+2);fx(p,'+2','heal')}}}
 // Mechanical one-liners for the codex/tooltips (U's describe()). Older abilities used `tip`.
 for(const a of Object.values(AB)){a.desc=a.desc||a.tip;a.tip=a.tip||a.desc}

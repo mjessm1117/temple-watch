@@ -1,5 +1,5 @@
 // Test bot, injected into the game page. One-ply greedy: objective first, then rescue allies, then the best attack, else advance or hold.
-window.AI=function(){for(let n=0;n<24;n++){const u=players().find(canAct);if(!u||S.over)break;S.sel=u;act(u)}};
+window.AI=function(){if(S.conc&&stealthTurn())return;for(let n=0;n<24;n++){const u=players().find(canAct);if(!u||S.over)break;S.sel=u;act(u)}};
 function pick(u,k){if(!u.abil.includes(k))return null;const ab=AB[k];if(ab.passive||(ab.f&&u.focus<ab.f)||(ab.avail&&ab.avail(u)))return null;
  if(ab.instant)return[k,null];const t=targetsFor(u,k).sort((a,b)=>(b.chance||0)-(a.chance||0))[0];return t?[k,t]:null}
 function goalFor(u){
@@ -28,3 +28,22 @@ function act(u){const go=c=>{exec(u,c[0],c[1]);return true};
  if(c)return go(c);
  if(S.type!=='defend'&&u.ap===2){const e=enemies().filter(e=>!e.hid&&e.status==='ok').sort((a,b)=>dist(u,a)-dist(u,b))[0];if(e&&dist(u,e)>(u.range<2?1.5:u.range*.6)&&moveToward(u,e))return true}
  return go([u.jedi?'guard':u.abil.includes('hunker')&&u.hp*2<=u.max?'hunker':'overwatch',null])}
+
+// Concealed (stealth missions): creep only through tiles outside enemy sight (red tiles), toward the objective or an ambush spot.
+// Once someone has a 55%+ shot (or from turn 3), everyone else sets overwatch/guard and the best shot springs the ambush.
+function safePath(u,R,k,red){let c=k;while(c&&c!==u.x+','+u.y){if(red.has(c))return false;c=R.prev[c]}return true}
+function bestShot(u,pos){const a={...u,...pos};let b=0;if(u.range<2||!u.abil.includes('shoot'))return 0;
+ for(const e of enemies())if(!e.hid&&e.status==='ok'&&dist(a,e)<=u.range&&los(a,e))b=Math.max(b,hitChance(a,e));return b}
+function stealthTurn(){const red=new Set(visionTiles().map(p=>p.x+','+p.y)),sq=players().filter(u=>canAct(u)&&!u.vip);
+ for(const u of [...sq,...sq.filter(u=>goalFor(u))]){if(!S.conc)return false;
+  for(const k of ['hack','console','scan','plant','door']){const c=pick(u,k);if(c){exec(u,c[0],c[1]);break}}if(!S.conc)return false;if(!canAct(u))continue;
+  const g=goalFor(u),foe=enemies().filter(e=>!e.hid&&e.status==='ok').sort((a,b)=>dist(u,a)-dist(u,b))[0],tgt=g||foe;if(!tgt)continue;
+  const R=reach(u);let best=null,bs=-1e9;
+  for(const k of Object.keys(R.d)){if(!R.d[k]||!safePath(u,R,k,red))continue;const [x,y]=k.split(',').map(Number),p={x,y};
+   const s=g?-dist(p,g):bestShot(u,p)+(inCover(p)?8:0)-dist(p,tgt)*.5;if(s>bs){bs=s;best=p}}
+  if(best){moveAlong(u,pathTo(u,best.x,best.y,R.prev));u.ap--;after()}}
+ if(!S.conc)return false;
+ const sh=players().filter(u=>canAct(u)&&!u.vip).map(u=>({u,c:pick(u,'shoot')})).filter(o=>o.c&&o.c[1].t).sort((a,b)=>b.c[1].chance-a.c[1].chance)[0];
+ if(sh&&(sh.c[1].chance>=55||S.turn>=3)){for(const u of players().filter(u=>canAct(u)&&!u.vip&&u!==sh.u))exec(u,u.jedi?'guard':'overwatch',null);exec(sh.u,'shoot',sh.c[1]);return true}
+ if(S.turn>=4)return false;
+ for(const u of players().filter(u=>canAct(u)&&!u.vip))exec(u,u.jedi?'guard':'overwatch',null);return true}

@@ -119,16 +119,8 @@ const _startMission=startMission;
 startMission=function(id,sq,o){_startMission(id,sq,o);if(!S.M.eraBoss||!C)return;const f=C.flags;
  if(f.e1_ambush_ready){const b=S.units.find(u=>u.boss);if(b){b.hp=Math.max(1,b.hp-3);log(STORY_TEXT.ambush,'good')}}
  if(f.e1_adraas_down){const i=S.units.findIndex(u=>u.side!=='p'&&!u.boss&&/Trooper/.test(u.n));if(i>=0){S.units.splice(i,1);log(STORY_TEXT.adraas,'good')}}
- if(f.e1_docks_guarded)log(STORY_TEXT.guards,'good');render()};
-const _checkEnd=checkEnd;
-checkEnd=function(){if(!S||S.type!=='assault')return _checkEnd();if(S.over)return;
- const b=S.units.find(u=>u.boss);if(b&&b.status==='dead')return finish(true,S.M.win);
- if(!players().some(u=>!u.vip&&u.status==='ok'))return finish(false,`The squad is overwhelmed. ${S.M.lose}`)};
-const _threatStep=threatStep;
-threatStep=function(){if(S.type!=='assault')return _threatStep();const M=S.M;log(`Threat rises to ${S.threat}.`,'bad');
- if(S.threat>=6)return finish(false,`${M.escape} ${M.lose}`);
- log(S.threat>=5?M.near:M.push,'bad');
- if(S.threat%2===0&&M.reinforce&&!(M.eraBoss&&C&&C.flags.e1_docks_guarded))spawn(M.reinforce)};
+ if(f.e1_docks_guarded){S.noReinf=1;log(STORY_TEXT.guards,'good')}render()};
+// Assault win/Threat rules now live in turns.js (Chat X).
 
 // ── Results hook: Archive entries for the fallen, boss outcome ──
 const _applyResults=applyResults;

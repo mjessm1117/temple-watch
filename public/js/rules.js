@@ -39,6 +39,8 @@ function odds(a,t,{melee=false,mod=0,noCover=false}={}){const L=[['Aim',a.aim]];
  if(a.executioner&&t.hp*2<=t.max)L.push(['Executioner',25]);
  if(a.aimVs)for(const g of tagsOf(t))if(a.aimVs[g])L.push([`Vs ${g}`,a.aimVs[g]]);
  if(a.aimVsHorror&&t.horror)L.push([a.aimVsHorror>0?'Beast lore':'Fear of horrors',a.aimVsHorror]);
+ if(a.lead){const P=byId(a.lead);if(P&&alive(P)&&P.status==='ok'&&dist(P,a)<=5)L.push(['Pod leader',5])}
+ if(a.lordAura&&a.side==='e'&&enemies().some(e=>e!==a&&e.sithLord&&e.status==='ok'&&dist(e,a)<=4))L.push(['Sith Lord nearby',a.lordAura]);
  if(a.buffAim)L.push(['Boosted',a.buffAim]);if(t.buffDef)L.push(['Target shielded',-t.buffDef]);
  if(t.hunker)L.push(['Hunkered down',-30]);
  if(defLineNear(t))L.push(['Defensive Line',-15]);
@@ -60,7 +62,7 @@ function reach(u){const d={},prev={},q=[[u.x,u.y]],mob=u.rooted?0:u.mob;d[u.x+',
    d[k]=cd+1;prev[k]=x+','+y;q.push([nx,ny])}}
  return{d,prev}}
 function pathTo(u,x,y,prev){const p=[];let k=x+','+y;const s=u.x+','+u.y;while(k&&k!==s){const [a,b]=k.split(',').map(Number);p.unshift({x:a,y:b});k=prev[k]}return p}
-function moveAlong(u,path){for(const s of path){u.x=s.x;u.y=s.y;if(u.side==='p'){reveal();if(watchCheck(u))break}reactions(u);if(u.status!=='ok')break}}
+function moveAlong(u,path){for(const s of path){u.x=s.x;u.y=s.y;if(u.side==='p'){reveal();lootAt(u);if(watchCheck(u))break}reactions(u);if(u.status!=='ok')break}}
 // Concealed enemies show up when a squad member gets within 4 with line of sight.
 // Sentinels with Sense find them at 8.
 function reveal(){for(const e of enemies().filter(e=>e.hid))if(players().some(p=>p.status==='ok'&&dist(p,e)<=(p.sense?8:4)&&los(p,e))){e.hid=0;fx(e,'SPOTTED');log(`${e.n} spotted!`,'bad');horrorSeen(e)}}
@@ -83,20 +85,25 @@ function addDark(u,n){const b=u.dark;u.dark=Math.max(0,Math.min(10,u.dark+n));
 function damage(t,d,src){
  if(src&&src.horror&&!t.jedi){fx(t,'IMMUNE');log(`${src.n} ignores ${t.n}. It hunts only the Force.`);return}
  if(t.armor)d=Math.max(1,d-t.armor);
+ // Thought Shield (Sith Lords): Force powers do half damage.
+ if(S.forceAct&&t.sithLord&&src&&src.side==='p'){d=Math.ceil(d/2);fx(t,'SHIELDED','defl');log(`${t.n}'s Thought Shield blunts the Force.`)}
  if(t.shield>0){const a=Math.min(t.shield,d);t.shield-=a;d-=a;fx(t,'SHIELD','defl');log(`${t.n}'s shield soaks ${a}.`);if(!d)return}
  const wasSurr=t.status==='surrender';t.hp-=d;fx(t,'-'+d,'dmg');if(t.side==='p')t.hurt=1;
  if(S.bmed===t.uid){S.bmed=null;log(`${t.n}'s Battle Meditation breaks.`)}
  if(t.hp<=0){t.hp=0;
   if(t.side==='p'){t.status='down';t.bleed=S.d.bleed;t.stable=0;t.downed=1;t.downT=S.turn;t.guard=t.ow=t.hunker=false;t.supT=null;t.panic=null;log(`${t.n} is down. Bleeding out in ${t.bleed} turns.`,'bad');if(!t.vip)allyFell(t,15,`${t.n} going down`)}
   else{t.status='dead';log(`${t.n} is killed.`);S.kills++;if(src&&src.side==='p'){src.kills=(src.kills||0)+1;if(src.ghost&&!src.ghostUsed&&!S.conc){src.ghostUsed=1;src.conc=1;fx(src,'GHOST');log(`${src.n} melts back into the shadows.`,'good')}}
+   leaderDown(t);dropLoot(t);
    if(t.envoy&&src&&src.jedi){addDark(src,1);log('The envoy is dead. The Council wanted him alive.','dark')}
    if(wasSurr&&src&&src.side==='p'){if(src.jedi){addDark(src,2);log(`${src.n} struck down a foe who had surrendered.`,'dark')}else{S.orderDark++;log('Killing a prisoner stains the Order.','dark')}}}}
- else if(t.side==='e'&&!t.noCap&&t.status==='ok'&&t.hp<=2&&rnd(t.envoy?80:40)){t.status='surrender';t.ow=false;t.supT=null;log(`${t.n} drops his blaster and surrenders.`,'good')}
+ else if(t.side==='e'&&!t.noCap&&!t.fanatic&&t.status==='ok'&&t.hp<=2&&rnd(t.envoy?80:40)){t.status='surrender';t.ow=false;t.supT=null;log(`${t.n} drops his blaster and surrenders.`,'good')}
  if(t.side==='e'&&alive(t)&&asleep(t)&&!S.amb)alertPod(t.pod);
+ // Marauder rage: +1 damage per hit taken (max +3).
+ if(t.rage&&t.status==='ok'&&(t.rageN||0)<3){t.rageN=(t.rageN||0)+1;t.dmg=[t.dmg[0]+1,t.dmg[1]+1];log(`${t.n}'s rage grows (+${t.rageN} damage).`,'bad')}
  if(t.side==='p'&&t.status==='ok'&&!t.vip&&d>=Math.max(3,t.max/2))panicCheck(t,20,'a brutal hit');
  if(t.side==='p'&&t.rid)bondAnswer(t,src)}
 // Roll an attack. Aim assist (Story/Normal): each miss in a row adds hidden aim to that unit's next roll.
-function resolve(a,t,chance,dr,{melee=false,ignoreDeflect=false,label='shot'}={}){
+function resolve(a,t,chance,dr,{melee=false,ignoreDeflect=false,label='shot'}={}){a.fired=1;
  let ch=chance;if(a.side==='p'&&a.miss&&S.d.assist)ch=Math.min(95,ch+a.miss*S.d.assist);
  if(a.hid){a.hid=0;log(`${a.n} was hiding in plain sight!`,'bad')}if(a.side==='p'&&a.conc&&!S.conc){a.conc=0;log(`${a.n} strikes from the shadows.`)}
  if(!rnd(ch)){if(a.side==='p')a.miss=(a.miss||0)+1;log(`${a.n}'s ${label} misses ${t.n}.`);fx(t,'MISS','miss');return false}
