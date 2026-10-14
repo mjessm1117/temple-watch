@@ -6,7 +6,7 @@ This repo is the only source of truth for the game. Real code only.
 - **No artifacts as the deliverable.** Never publish the game, specs, or mockups as Claude artifacts. Edit files in this repo, commit, and push. The live site is a Cloudflare Worker (`temple-watch`) that builds and deploys on every push to `main`.
 - **Specs live in the repo**, in `docs/specs/<area>.md`. Game data a spec defines goes in `public/js/data.js` (or a new `public/js/data-<area>.js`), not in prose.
 - **One code owner at a time.** Spec chats edit only `docs/`. The Coordinator chat edits `public/`, `functions/`, and `tests/`. Before pushing, pull first; never force-push.
-- **Run `npm test` before every push.** It must print no `FAIL` and `"err":0`. Fix failures; don't skip tests.
+- **While iterating, run `npm run test:quick` (~1–2 min). Run the full `npm test` (~6 min) once before every push.** It must print no `FAIL` and `"err":0`. Fix failures; don't skip tests.
 - **Desktop first.** Design and test for a laptop window (~1366×768 and up, mouse). Keep phone working but don't optimize it yet.
 - Small, surgical edits. Plain JavaScript, no frameworks, no build step for the site. Keep files under ~600 lines; split by topic when one grows past that.
 - Commit messages: one line on what changed for the player, e.g. `Add Sentinel path: Shadow Step + Mark Target`.
@@ -48,5 +48,5 @@ docs/                   design, specs, chat briefs, changelog
 Scripts are classic `<script>` tags sharing globals, loaded in the order in `index.html`. A new file must be added there, and before any file that calls it at load time.
 
 ## Commands
-- `npm install` once, then `npm test`
+- `npm install` once, then `npm run test:quick` while working and `npm test` before pushing
 - `npm run dev` runs a local server with the backend (needs Wrangler)
