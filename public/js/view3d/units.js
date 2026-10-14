@@ -70,10 +70,10 @@ export class UV{
   for(const s of [-1,1]){this.part(h,G.cone,mh,.06,.3,.06,s*.17,.08,.2).rotation.set(1.2,0,s*.5);this.part(h,G.box,me,.06,.04,.03,s*.1,.06,.29)}
   for(const [i,x,z] of [[0,-.28,.32],[1,.28,.32],[2,-.28,-.36],[3,.28,-.36]]){const l=this.pivot(b,x,.62,z);this.part(l,G.box,md,.17,.6,.18,0,-.3);this.part(l,G.cone,mh,.05,.12,.05,0,-.62,.1).rotation.x=Math.PI;this.p['leg'+i]=l}
   this.headY=1.25;this.idleArm=0}
- base(){const T=this.T,G=this.U.geo,e=this.u.side==='e',col=new T.Color(e?0xef6a5d:this.U.color(this.u));
+ base(){const T=this.T,G=this.U.geo,e=this.u.side==='e',col=new T.Color(this.U.color(this.u));
   const d=new T.Mesh(e?G.sq:G.disc,new T.MeshStandardMaterial({color:0x0c1416,roughness:.6}));d.position.y=.025;d.receiveShadow=true;this.root.add(d);
   const r=new T.Mesh(e?G.sqRing:G.ring,new T.MeshBasicMaterial({color:col}));r.position.y=.053;this.root.add(r);this.ringM=r.material;
-  this.sel=new T.Mesh(e?G.sqSel:G.sel,new T.MeshBasicMaterial({color:e?0xef6a5d:0x79d3e2,transparent:true,opacity:.9,depthWrite:false}));this.sel.position.y=.06;this.sel.visible=false;this.root.add(this.sel);
+  this.sel=new T.Mesh(e?G.sqSel:G.sel,new T.MeshBasicMaterial({color:e?col:0x79d3e2,transparent:true,opacity:.9,depthWrite:false}));this.sel.position.y=.06;this.sel.visible=false;this.root.add(this.sel);
   this.halo=new T.Mesh(G.halo,new T.MeshBasicMaterial({color:0x79d3e2,transparent:true,opacity:.13,depthWrite:false,side:T.DoubleSide,blending:T.AdditiveBlending}));
   this.halo.position.y=.6;this.halo.visible=false;this.root.add(this.halo);
   this.bleed=new T.Mesh(G.sel,new T.MeshBasicMaterial({color:0xef6a5d,transparent:true,opacity:.7,depthWrite:false}));this.bleed.position.y=.06;this.bleed.visible=false;this.root.add(this.bleed)}

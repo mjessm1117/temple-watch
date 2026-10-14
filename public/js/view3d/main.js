@@ -23,7 +23,9 @@ const reduceMQ=matchMedia('(prefers-reduced-motion: reduce)');
 let on=false,V=null;
 const Q=[],waiters=[];let busy=0,slowT=0,lastS=null,labelT=0;const hpShow=new Map();
 onFx((type,d)=>{if(on&&V&&S)Q.push({type,d})});
-const unitColor=u=>u.side==='e'?'#ef6a5d':u.vip?'#7fd99a':u.col||'#e0bd78';
+// Colorblind mode (Chat U's SETTINGS.cb): enemy red → orange, ally/good green → blue, dash gold → yellow.
+const cb=()=>!!(window.SETTINGS&&SETTINGS.cb);
+const unitColor=u=>u.side==='e'?(cb()?'#ff9e2c':'#ef6a5d'):u.vip?(cb()?'#5fb0ff':'#7fd99a'):u.col||'#e0bd78';
 
 function init(){const wrap=document.querySelector('.bwrap'),host=document.createElement('div');host.className='v3';wrap.appendChild(host);
  const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});const phone=matchMedia('(pointer:coarse)').matches;renderer.setPixelRatio(Math.min(devicePixelRatio,phone?1.5:2));
@@ -115,6 +117,7 @@ function play(type,d){const {units,fx3,labels,board,rig}=V;
   case 'coverBreak':{const lost=board.sync(S.grid);for(const l of lost)fx3.debris(P(l,.3),8);return 200}
   case 'text':return textFx(d);
   case 'ability':return abilityFx(d);
+  case 'bark':{const u=d.u;if(!u||u.hid)return 0;labels.bubble('b'+u.uid,()=>{const p=V.units.anchor(u);return p&&p.setY(p.y+.75)},d.txt,Math.min(4,1.6+d.txt.length/40));return 0}
  }return 0}
 // Status call-outs (Chat X): each gets a color and a small effect on the unit it pops over.
 const TXT={AMBUSH:['#e0bd78',1],REVEALED:['#ef6a5d',1],SPOTTED:['#ef6a5d',0],'!':['#ef6a5d',1],PANIC:['#c9a7ff',1],ANGER:['#ff6a4a',0],FROZEN:['#9fe7ff',0],
@@ -135,7 +138,7 @@ function textFx(d){const {labels,fx3,units,rig}=V,t=TXT[d.txt],p=P(d,.8),u=S.uni
  return 0}
 // Blaster colors by faction: Republic blue, Empire red, Brotherhood orange, mercenaries green.
 const BOLT={bhTrooper:0xff8a2a,sniper:0x8aff5a,mando:0x8aff5a};
-const boltColor=u=>u.side==='p'?0x4fb4ff:BOLT[kindOf(u)]||0xff3b2e;
+const boltColor=u=>u.side==='p'?0x4fb4ff:BOLT[kindOf(u)]||(cb()?0xff9e2c:0xff3b2e);
 const FORCE=new Set(['push','collapse','choke','stun','mindTrick','saberThrow','tremor','pull','battleMed','leap','beastCalm','forceWave','stasisField','massHeal','forceRevive','disarm']),HEAL=new Set(['heal','forceHeal','stabilize','forceRevive','reviveStim']),SHIELD=new Set(['guard','barrier','hunker','defLine','smoke']);
 function abilityFx(d){const {units,fx3,rig}=V,u=units.get(d.u),k=d.k,g=d.g,tp=g&&(g.t?vpos(g.t,.8):P(g,.8));
  if(tp)u.faceTo(tp);
@@ -150,9 +153,9 @@ function abilityFx(d){const {units,fx3,rig}=V,u=units.get(d.u),k=d.k,g=d.g,tp=g&
  if(tp&&(k==='hack'||k==='console'||k==='scan'||k==='door'))u.use(tp);if(tp&&(k==='hack'||k==='console'||k==='scan'||k==='door'))return fx3.motes(tp,0x79d3e2,12);
  return 0}
 
-let visK='',visS=null,visT=[];
+let visK='',visS=null,visT=[],lastCb=false;const board0=()=>V.board;
 // UI layer: reach tiles, cover shields, targets, path, aim/intent lines, % tags. Rebuilt on every render and hover.
-function ui(){if(!V||!S)return;const {board,units,labels}=V,sel=S.sel,can=canAct(sel)&&!S.peek&&S.phase==='player';
+function ui(){if(!V||!S)return;if(cb()!==lastCb){lastCb=cb();board0().palette(lastCb);lastS=null;return View3D.sync()}const {board,units,labels}=V,sel=S.sel,can=canAct(sel)&&!S.peek&&S.phase==='player';
  const h={reach:[],hover:null,targets:[],path:[],area:null,iarea:null,smoke:S.smoke||[],shields:[],lines:[]};
  // Blue = 1 action, gold = dash (both actions), from Chat U's moveZones().
  if(can&&S.mode==='move'){const Z=typeof moveZones==='function'?moveZones(sel):{...reach(sel),mob:1e9},R=Z.d;for(const k in R){if(!(R[k]>0))continue;const [x,y]=k.split(',').map(Number),hot=!!HOV&&HOV.x===x&&HOV.y===y,dash=R[k]>Z.mob;h.reach.push({x,y,dash});if(hot)h.hover={x,y,dash};
@@ -169,7 +172,11 @@ function ui(){if(!V||!S)return;const {board,units,labels}=V,sel=S.sel,can=canAct
  const shoot=S.info&&canAct(sel)&&S.mode==='move'&&sel.abil.includes('shoot')?targetsFor(sel,'shoot').filter(g=>g.t):[];
  const list=[...S.tg.filter(g=>!g.area&&!g.spot&&g.chance!=null),...shoot.filter(s=>!S.tg.some(g=>g.x===s.x&&g.y===s.y))].filter(g=>!g.t||!g.t.hid);
  const best=Math.max(-1,...list.filter(g=>g.t&&g.t.side==='e').map(g=>g.chance));
- labels.setTags(list.map(g=>({p:g.t?vpos(g.t,(units.get(g.t).headY||1.2)+.55):P(g,1),html:g.chance+'%',cls:g.ally?'al':g.chance===best&&g.t&&g.t.side==='e'?'best':''})))}
+
+ // Area abilities (Chat U's areaHits): chips over every unit the hovered area would hit.
+ if(S.mode!=='move'&&HOV&&typeof areaHits==='function'){const g=S.tg.find(g=>g.area&&g.x===HOV.x&&g.y===HOV.y);
+  if(g)for(const a of areaHits(sel,S.mode,g)){if(!a.t||a.t.hid)continue;list.push({t:a.t,chance:a.chance,ally:a.ally,x:a.t.x,y:a.t.y,kill:a.kill})}}
+ labels.setTags(list.map(g=>({p:g.t?vpos(g.t,(units.get(g.t).headY||1.2)+.55):P(g,1),html:g.chance+'%'+(g.kill?' ☠':''),cls:g.ally?'al':g.chance===best&&g.t&&g.t.side==='e'?'best':''})))}
 function unitLabels(){const L=[];for(const u of S.units){const v=V.units.map.get(u.uid);if(!v||v.gone||v.state==='dead'||u.hid||!alive(u)&&u.status!=='dead')continue;
   const hp=Math.max(0,Math.min(u.max,hpShow.has(u.uid)?hpShow.get(u.uid):u.hp)),b=v.state==='down'?'down':badge(u);
   const html=`<i class="hp" style="--uc:${unitColor(u)}">${Array.from({length:u.max},(_,i)=>`<b class="${i<hp?'on':''}"></b>`).join('')}</i>${b?`<span class="bdg">${icon(b)}${u.status==='down'&&!u.stable?`<small>${u.bleed}</small>`:''}</span>`:''}${S.info?`<em>${hp}</em>`:''}`;

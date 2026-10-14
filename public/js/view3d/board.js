@@ -87,9 +87,11 @@ export class Board{
   for(let y=0;y<=this.rows;y++){g.beginPath();g.moveTo(0,y*s);g.lineTo(c.width,y*s);g.stroke()}
   const t=new this.T.CanvasTexture(c);t.colorSpace=this.T.SRGBColorSpace;t.anisotropy=4;return t}
  // Enemy sight while concealed: red diagonal hatching with a border, readable on every theme.
- hatch(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');g.fillStyle='rgba(255,59,46,.18)';g.fillRect(0,0,64,64);
-  g.strokeStyle='rgba(255,70,50,.75)';g.lineWidth=5;for(let i=-64;i<128;i+=16){g.beginPath();g.moveTo(i,0);g.lineTo(i+64,64);g.stroke()}
+ hatch(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const c0=this.cbHatch?'255,158,44':'255,59,46';g.fillStyle=`rgba(${c0},.18)`;g.fillRect(0,0,64,64);
+  g.strokeStyle=`rgba(${c0},.75)`;g.lineWidth=5;for(let i=-64;i<128;i+=16){g.beginPath();g.moveTo(i,0);g.lineTo(i+64,64);g.stroke()}
   g.lineWidth=3;g.strokeRect(1.5,1.5,61,61);const t=new this.T.CanvasTexture(c);t.colorSpace=this.T.SRGBColorSpace;return t}
+ palette(cb){const h=this.hm;h.tgt.color.setHex(cb?0xff9e2c:0xef6a5d);h.iarea.color.setHex(cb?0xff9e2c:0xef6a5d);h.ally.color.setHex(cb?0x5fb0ff:0x7fd99a);
+  h.dash.color.setHex(cb?0xf5e663:0xe0bd78);h.hoverDash.color.setHex(cb?0xf5e663:0xe0bd78);this.cbHatch=cb;h.vis.map.dispose();h.vis.map=this.hatch();h.vis.needsUpdate=true}
  shieldTexture(full){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');g.beginPath();
   g.moveTo(32,6);g.lineTo(54,14);g.lineTo(54,32);g.bezierCurveTo(54,46,44,54,32,59);g.bezierCurveTo(20,54,10,46,10,32);g.lineTo(10,14);g.closePath();
   g.lineWidth=6;g.strokeStyle='#79d3e2';g.fillStyle='#79d3e2';if(full)g.fill();g.stroke();
