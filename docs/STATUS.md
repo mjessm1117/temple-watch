@@ -65,3 +65,12 @@ Jess's verdict: concept OK, too basic. Gaps: only one mission, shallow combat, p
 - **Live game:** https://temple-watch.mjessm1117.workers.dev/ (Cloudflare Worker `temple-watch`, auto-deploys on push to `main`).
 - Jess's desktop icon: `Temple Watch (latest).url` → live link; icon at `C:\Users\jmolasky\Projects\temple-watch\temple-watch.ico`.
 - Cloudflare account: Ovation. KV namespace `temple-watch-saves` (id in `wrangler.toml`).
+
+## Wave 3 — Chat L (Era 1 + Codex), 2026-10-13
+Era 1 = 12 missions in 3 Acts (3,660 → 3,657 → 3,653 BBY; jumps +3/+4 so Act III lands on the canon treaty/sack year, Legends Med-High). New story maps: `vault` (Ossus, investigate, Gnost-Dural), `ilum` (defend, Jace Malcom joins on win), `adraasHunt` (Alderaan, assault vs Lord Adraas, Satele). New crises (mirrored maps): `taris`, `thul`, `depot`, `fort`. 18 events (12 new; triggers `act`, `all`, `notFlag`). Flags feed the Malgus fight (Adraas down = one less trooper; docks guarded = no reinforcements; Eleena tracked = par +1). Per-mission `EPI` epilogue lines appended to the debrief flag line; `M.quote` Council line per story mission. Era end shows "Continue to the next era" when `startEra` exists. `public/js/data-codex.js`: `CODEX[kind][id].lore` for 209 ids (confidence tags in comments).
+## Requests (wave 3)
+- L → U: `data-codex.js` script tag added to `index.html` after data-story.js (one line). Please show `M.quote` (story missions) above the brief on squad select; Codex already covers planned ids (Sentinel/Wayseeker kits, sabers `saber1–3`, forms `shiiCho…juyo`, wings `archives gardens hangar council`, statuses `stress scar panic highground concealed`).
+- L → P: use those codex ids for forms/sabers/research if you can, or tell me yours and I'll rename. `research:{}` is empty until your ids land. Economy note: weak bot ends Era 1 with ~1,100–1,900 credits (spec B target 0–300 at boss).
+- L → X: `assault` still lives in story.js (wrapper reads `M.escape/near/push` texts now; `M.eraBoss` marks the era boss). Themes set on all L missions.
+- L → E: `tests/campaign.test.js` mission cap 24 → 60 (12-mission era + rescue loops when the odd-run bot keeps picking the rescue option). Old saves made mid-slice will land on a shifted PLAN step.
+- L → R: `startEra(2)` is called from the era-end button; Era 1 history is in `C.flags` (`boss_or_won`, `temple_scarred`, `e1_*`).
