@@ -11,8 +11,10 @@ function skillPower(r,k){const L=learnedAt(r)[k];if(!L)return 0;const s=specOf(r
 // Called from templeMods (battleUnit): power map + spec trait.
 function treeMods(u,r){u.pw={};for(const k of Object.keys(learnedAt(r)))u.pw[k]=skillPower(r,k);u.specT=r.spec||null;
  const T=r.spec&&SPEC_TRAITS[r.spec];if(T&&T.mod)addMod(u,T.mod);return u}
-function unitPower(r){const u=battleUnit(r),d=(u.dmg[0]+u.dmg[1])/2,pw=Object.values(u.pw||{}).reduce((s,v)=>s+v,0);
- return Math.round(u.hp*2+(u.aim-50)/2+d*3+(u.armor||0)*5+(u.crit||0)/5+(u.maxF||0)*2+(u.mob||0)+(u.deflect||0)/5+pw*2+(r.spec?4:0))}
+// Weights (POWER_W, data-trees.js): range, medkits and grenades count, so troops aren't undersold next to Jedi Focus/deflect.
+function unitPower(r){const u=battleUnit(r),W=POWER_W,d=(u.dmg[0]+u.dmg[1])/2,pw=Object.values(u.pw||{}).reduce((s,v)=>s+v,0);
+ return Math.round(u.hp*W.hp+(u.aim-50)*W.aim+d*W.dmg+(u.armor||0)*W.armor+(u.crit||0)*W.crit+(u.maxF||0)*W.focus+(u.mob||0)*W.mob+(u.deflect||0)*W.deflect
+  +Math.min(u.range||0,W.rangeCap)*W.range+(u.kits||0)*W.kit+(u.nades||0)*W.nade+pw*W.skill+Object.keys(u.pw||{}).filter(k=>AB[k]&&!AB[k].passive).length*W.active+(r.spec?W.spec:0))}
 const pwTag=n=>n>1?` <b class="pw" title="Power ${ROMAN[n]}">${ROMAN[n]}</b>`:'';
 
 // --- engine hooks -------------------------------------------------------------------------------

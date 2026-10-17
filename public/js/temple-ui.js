@@ -12,6 +12,7 @@ function rosterTab(){const act=C.roster.filter(r=>r.status!=='dead');
   <small><span class="pwr">${icon('st_power')}${unitPower(r)}</span> · ${r.title?r.title+' · ':''}${r.cls}${specOf(r)?' ('+specOf(r).n+')':''} · Rank ${r.rank} · ${r.xp}${next?'/'+next:''} XP${isJedi(r)?` · Darkness ${r.dark}`:''}${r.trait?` · ${TRAITS[r.trait].n}`:''} · age ${r.age}${r.fear?` · <span class="bad">afraid (${r.fear})</span>`:''}</small>
   ${bs.length?`<small class="bd">Bonds: ${bs.map(b=>`${b.n} ${'★'.repeat(b.lvl)}`).join(', ')}</small>`:''}
   ${p?`<div class="picks">Rank ${p}: ${p===3?'choose a specialization (permanent)':'choose one'} ${treeOpts(r,p).map(k=>{const a=pickCard(r,p,k);return `<button type="button" data-act="pick:${r.id}:${k}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}${a.name}</button>`}).join('')}<small>${treeOpts(r,p).map(k=>{const a=pickCard(r,p,k);return `${a.name}: ${a.desc}`}).join(' · ')}</small></div>`:''}
+  ${TREES[r.cls]?`<button type="button" class="tbtn" data-act="tree:${r.id}">${icon('st_power')} Skill tree${p?' · pick waiting':''}</button>`:''}
   ${rosterProg(r)}
   ${r.grief?`<div class="picks">${r.n} lost ${r.grief}. <button type="button" data-act="grief:${r.id}:0">Grieve (keep fear)</button><button type="button" data-act="grief:${r.id}:1">Use the anger (Darkness +2, no fear)</button></div>`:''}
   ${r.status==='active'?`<select data-assign="${r.id}" aria-label="Assignment for ${r.n}">${assignOpts(r).map(([v,t])=>`<option value="${v}" ${(r.assign||'')===v?'selected':''}>${t}</option>`).join('')}</select>`:''}</div>
@@ -63,7 +64,7 @@ function baseScreen(){SCR=baseScreen;S=null;ensureTemple();const m=$('#modal');m
  m.onclick=hubClick;m.onchange=ev=>{const s=ev.target.closest('[data-assign]');if(s){assign(s.dataset.assign,s.value);baseScreen()}const p=ev.target.closest('[data-pair]');if(p){setPair(p.dataset.pair,p.value);baseScreen()}}}
 function hubClick(ev){if(typeof galaxyClick==='function'&&galaxyClick(ev))return;if(ev.target.closest('#hubCx'))return codexOpen();if(ev.target.closest('#hubSet'))return settingsOpen();const t=ev.target.closest('[data-tab]');if(t){TAB=t.dataset.tab;return baseScreen()}
  const b=ev.target.closest('[data-act]');if(!b||b.disabled)return;const [a,x,y]=b.dataset.act.split(':');
- if(a==='squad')return squadScreen(+x);
+ if(a==='squad')return squadScreen(+x);if(a==='tree')return treeScreen(x);
  if(progClick(a,x,y));else if(a==='build')buildWing(x);else if(a==='pick')pickAbility(x,y);else if(a==='alt')setAlt(x,y);else if(a==='borrow')borrowSkill(x,y);else if(a==='grief')griefChoice(x,y==='1');
  else if(a==='arm'){ARM=x;TAB='armory'}else if(a==='wpn')buyWeapon(x);else if(a==='armor')buyArmor(x,y);else if(a==='mod')buyMod(x,y);else if(a==='dropmod')dropMod(x,y);
  else if(a==='saber')craftSaber(x);else if(a==='trait')setTrait(x,y);else if(a==='col')setColor(x,y);
@@ -74,7 +75,7 @@ function hubClick(ev){if(typeof galaxyClick==='function'&&galaxyClick(ev))return
 const optHTML=(k,on,r)=>{const a=pickInfo(k);return `<span class="topt ${on?'on':''}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}<b>${a.name}${on&&r&&AB[k]?pwTag(skillPower(r,k)):''}</b><small>${a.desc||a.tip||''}</small></span>`};
 const rowHTML=(r,rk,opts,P)=>`<div class="trow ${rk>r.rank?'lock':''}"><span>R${rk}${RANKS[rk-1]?` <small>${RANKS[rk-1].xp} XP</small>`:''}</span>${opts.map(k=>optHTML(k,P[rk-1]===k,r)).join('')}</div>`;
 function treeHTML(r){const T=TREES[r.cls];if(!T)return '';const P=r.picks.length?r.picks:picksOf(r);
- return `<div><b class="eyebrow">Skill tree · ${r.cls}${specOf(r)?' · '+specOf(r).n:''}</b> <span class="pwr">${icon('st_power')} Power ${unitPower(r)}</span> <small class="muted">Skill power: I at learning, +1 every 2 ranks (max III), signature +1. Each level: +1 damage/heal, +5% hit.</small><br>${CLASS[r.cls].desc?` <small class="muted">${CLASS[r.cls].desc}</small>`:''}<div class="tree">${[1,2].map(rk=>rowHTML(r,rk,T.trunk[rk],P)).join('')}</div>
+ return `<div><b class="eyebrow">Skill tree · ${r.cls}${specOf(r)?' · '+specOf(r).n:''}</b> <button type="button" class="tbtn" data-act="tree:${r.id}">Open full tree</button> <span class="pwr">${icon('st_power')} Power ${unitPower(r)}</span> <small class="muted">Skill power: I at learning, +1 every 2 ranks (max III), signature +1. Each level: +1 damage/heal, +5% hit.</small><br>${CLASS[r.cls].desc?` <small class="muted">${CLASS[r.cls].desc}</small>`:''}<div class="tree">${[1,2].map(rk=>rowHTML(r,rk,T.trunk[rk],P)).join('')}</div>
  <div class="specs">${Object.entries(T.specs).map(([id,s])=>`<div class="spec ${r.spec===id?'on':r.spec?'off':''}"><b>${icon(s.ic||'guard')} ${s.n}</b><small class="muted">${s.desc} Rank 3, permanent.</small>${SPEC_TRAITS[id]?`<small class="strait"><b>${SPEC_TRAITS[id].n}:</b> ${SPEC_TRAITS[id].desc}</small>`:''}
   <div class="tree">${rowHTML(r,3,[s.sig],r.spec===id?P:[])}${[4,5,6,7].map(rk=>rowHTML(r,rk,s[rk],r.spec===id?P:[])).join('')}</div></div>`).join('')}</div>${xtrainHTML(r)}</div>`}
 function xtrainHTML(r){const lv=C.wings.training||0,n=xtrainSlots(r),B=r.borrow||[];let h;

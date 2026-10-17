@@ -30,8 +30,19 @@ Lore: Sage/Shadow and Vanguard are SWTOR advanced-class names [sourced, High]; W
 |---|---|
 | Skill power I–IV | Every tree/borrowed skill starts at **I**, +1 level every 2 ranks after it's learned (max **III**). The spec's signature skill gets +1 (max **IV**). |
 | Per level above I | +1 damage on enemies, +1 healing, +5% hit chance on ability targets (cap 95%). Shown as a roman badge on battle buttons and in the tree; odds panel shows a "Power" line. |
-| Unit Power | One number: HP×2 + (aim−50)/2 + avg dmg×3 + armor×5 + crit/5 + Focus×2 + move + deflect/5 + skill power×2 + 4 if specialized. Shown on Temple roster, Armory and squad select. Measured: starting troops 32–49, starting Jedi 57–79; R7 Soldier 108, R7 Guardian 152. Jedi read higher (deflect + Focus count). |
+| Unit Power | Weighted sum, weights in `POWER_W` (data-trees.js): HP×2, (aim−50)×.5, avg dmg×3, armor×5, crit×.2, Focus×1.5, move×1, deflect×.2, range×1.5 (cap 12), medkit×3, grenade×3, skill power×2, active ability×4, spec +4. Shown on roster, Armory, squad select, tree screen. |
 Engine: `public/js/power.js` wraps `odds`, `damage`, `exec`, `targetsFor`, `startPlayerTurn` (keep those names and signatures).
+
+## Balance pass (2026-10-17)
+Problem: R7 Guardian 152 vs R7 Soldier 108. About half the gap was the meter: it ignored range, medkits, grenades and active abilities, so troops and ability-heavy builds read low. Fixed the meter, then trimmed stats.
+- Meter: added range, medkits, grenades, active abilities; Focus 2→1.5.
+- Nerfs: Iron Body +2 HP → +1 HP +10 will; Unbreakable +3 HP → +2 HP (+1 armor); Master Blade +2 dmg/+10 crit → +1 dmg/+15 crit; Titan loses +1 armor; Fortress +2 armor → +1.
+- Buffs: Commander +1 HP and +1 armor; Calm Hands +1 HP; Vessel of the Force +2 HP; Field Surgeon trait +1 medkit.
+- Result: all 32 R7 builds (16 specs × 2 pick paths) land at 146–158 Power (median 151, ±5%). Before: 122–155 on the fixed meter. `tests/trees.test.js` fails if any build leaves ±8% of the median.
+- Caveat: Power is a stat estimate, not a win rate. It can't see trait or ability strength in play. Bot games at R7 still win everything.
+
+## Tree screen (ui-tree.js)
+Open from the Roster (**Skill tree** button) or Armory (**Open full tree**). Top: core ranks 1–2. Below: the two specs side by side, each with its trait and ranks 3–7. Every node shows its icon, chips for what it unlocks (+2 HP, +10 Aim, New ability · 2 Focus), and its state: taken (lit), pick now (glowing gold, click it), locked (shows the XP needed), not taken (struck out), closed (other branch). Rank 3 asks for a confirm because it's permanent. Cross-training sits at the bottom.
 
 ## Spec traits (passive from rank 3)
 | Spec | Trait | Effect |
@@ -48,7 +59,7 @@ Engine: `public/js/power.js` wraps `odds`, `damage`, `exec`, `targetsFor`, `star
 | Vanguard | Close Assault | +15 aim, +1 damage within 4 tiles |
 | Sniper | Patience | +10 aim, +1 damage at 7+ tiles |
 | Infiltrator | Opening Strike | First hit each mission +20 aim, +2 damage |
-| Field Surgeon | Triage | Heals +2 HP |
+| Field Surgeon | Triage | Heals +2 HP; +1 medkit |
 | Combat Tech | Field Repairs | Turn start: self + adjacent allies +1 HP |
 | Demolitionist | Blast Radius | Grenade/Ion/Rocket +1 damage |
 | Bulwark | Iron Wall | +1 armor; enemies −10 aim vs allies next to it |

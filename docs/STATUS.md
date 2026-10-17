@@ -137,3 +137,4 @@ Branching trees: trunk R1–2 → pick 1 of 2 specializations at R3 (permanent) 
 - **Field ops** (`fieldops.js`): 1–2 a month, expire in 30 days; 2–3 units leave for 15–30 days; odds = 45 + 5×ranks + 10×right class (max 2) + 8 for a third − 12×(stars−1), clamp 10–92. Fail = stress +15 each, one wounded; never death. Sith ops (2-unit teams) unchanged.
 - **Second squad:** design only, `docs/specs/second-squad.md`.
 - Tests: new `tests/layer.test.js`; campaign bot clicks a pin before the squad screen and sends field ops in odd runs.
+- F(trees) round 2 (2026-10-17): R7 balance band 146–158 Power across all 32 builds (meter now counts range/kits/grenades/abilities, plus small perk nerfs/buffs); new full-screen skill tree (`ui-tree.js`, Roster → Skill tree). CHANGELOG: "Skill tree screen: see every pick and what it unlocks, pick by clicking. Specializations rebalanced so troops and Jedi top out at similar strength."
