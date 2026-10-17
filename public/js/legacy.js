@@ -16,7 +16,7 @@ function ensureLegacy(){if(!C)return;
 // ── 1. Bonds ──
 const bondNeed=l=>BOND.need[l]!=null?BOND.need[l]:Infinity;
 const bondOf=(a,b)=>C.bonds[bkey(a,b)];
-function bondPts(a,b,pts,why,out){if(!a||!b||a===b||!pts||!unit(a)||!unit(b))return;   // Council masters (not on the roster) don't bondconst k=bkey(a,b),v=C.bonds[k]=C.bonds[k]||{lvl:0,n:0,dr:[],offer:null,owed:0};
+function bondPts(a,b,pts,why,out){if(!a||!b||a===b||!pts||!unit(a)||!unit(b))return;/* Council masters (not on the roster) don't bond */const k=bkey(a,b),v=C.bonds[k]=C.bonds[k]||{lvl:0,n:0,dr:[],offer:null,owed:0};
  const o=out||{bonds:[]};v.n=(v.n||0)+pts;
  while(v.lvl<BOND.max&&v.n>=bondNeed(v.lvl)){v.n-=bondNeed(v.lvl);bondUp(a,b,why,o,1)}if(v.lvl>=BOND.max)v.n=0;
  if(!out&&o.bonds.length&&C.news)C.news.push(...o.bonds)}
