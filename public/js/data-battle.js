@@ -186,19 +186,19 @@ const SIDES={
 Object.assign(BV_TILES,{
  i:{n:'Ice',desc:'Slick ice. Step onto it and you keep sliding the same way (up to 3 tiles) until something stops you.',cover:0,h:0,walk:1,slide:1,as:'ice'},
  o:{n:'Oil slick',desc:'Slick fuel. Step onto it and you keep sliding the same way (up to 3 tiles) until something stops you.',cover:0,h:0,walk:1,slide:1,as:'oil'},
- l:{n:'Lava',desc:'Molten rock: 3 damage when you step in or are pushed in, and again at the start of each round you stand in it.',cover:0,h:0,walk:1,hurt:3,as:'lava'},
- n:{n:'Live conduit',desc:'Exposed power line. On even turns it is live: 2 damage to anyone stepping on or standing there.',cover:0,h:0,walk:1,hurt:2,pulse:1,as:'cond'},
- u:{n:'Toxic pool',desc:'Corrosive runoff: 1 damage when you step in, and again at the start of each round you stand in it.',cover:0,h:0,walk:1,hurt:1,as:'tox'},
+ l:{n:'Lava',desc:'Molten rock: 2 damage when you step in or are pushed in, and again at the start of each round you stand in it.',cover:0,h:0,walk:1,hurt:2,linger:1,as:'lava'},
+ n:{n:'Live conduit',desc:'Exposed power line. On even turns it is live: 1 damage to anyone stepping on or standing there.',cover:0,h:0,walk:1,hurt:1,linger:1,pulse:1,as:'cond'},
+ u:{n:'Toxic pool',desc:'Corrosive runoff: 1 damage when you step in.',cover:0,h:0,walk:1,hurt:1,as:'tox'},
  m:{n:'Mud',desc:'Deep mud. Stepping in ends your move for this action.',cover:0,h:0,walk:1,stop:1,as:'mud'},
  w:{n:'Deep water',desc:'Too deep to wade. Nothing walks through it; sight and shots pass over.',cover:0,h:0,walk:0,as:'wat'},
- j:{n:'Thorn brake',desc:'Razor thorns: 1 damage when you push through, and you stop there.',cover:0,h:0,walk:1,hurt:1,stop:1,as:'thorn'}});
+ j:{n:'Thorn brake',desc:'Razor thorns: you stop there.',cover:0,h:0,walk:1,stop:1,as:'thorn'}});
 // Per theme: which hazards appear and how many patches (2–3 tiles each). Twist "Unstable ground" already covers falling floors.
 const HAZARDS={
- snow:{tiles:['i','i','V'],patches:4,n:'Ice and crevasses'},
- caves:{tiles:['l','l','V'],patches:3,n:'Lava and chasms'},
- dock:{tiles:['n','o','o'],patches:3,n:'Live conduits and fuel slicks'},
- city:{tiles:['n','o'],patches:3,n:'Live conduits and fuel slicks'},
- jungle:{tiles:['m','j','w'],patches:4,n:'Mud, thorns and deep water'},
+ snow:{tiles:['i','i','V'],patches:3,n:'Ice and crevasses'},
+ caves:{tiles:['l','V','V'],patches:2,n:'Lava and chasms'},
+ dock:{tiles:['n','o','o'],patches:2,n:'Live conduits and fuel slicks'},
+ city:{tiles:['n','o'],patches:2,n:'Live conduits and fuel slicks'},
+ jungle:{tiles:['m','j','w'],patches:3,n:'Mud, thorns and deep water'},
  plains:{tiles:['m','w'],patches:3,n:'Mud and deep water'},
- ruins:{tiles:['u','u','V'],patches:3,n:'Toxic pools and sinkholes'},
+ ruins:{tiles:['u','u','V'],patches:2,n:'Toxic pools and sinkholes'},
  temple:{tiles:['u','V'],patches:2,n:'Toxic runoff and broken floors'}};

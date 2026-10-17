@@ -3,6 +3,8 @@ import {addProp} from './props.js';
 // Map geometry from S.grid + floor highlights. Half cover is waist-high (crates, consoles, barrels), full cover is tall (walls, pillars, doors).
 // Rebuilds only tiles whose character changed; anything that lost cover reports back so effects can throw debris.
 const HALF_H=.55,FULL_H=1.55;
+// Hazard tile colors (biome hazards, Chat H): lava, conduit, toxic, oil, ice, mud, thorns, water, chasm.
+const HZ3D={l:0xff6a2a,n:0x5fe6ff,u:0x8fd14a,o:0x8a6bd1,i:0xbfe9ff,m:0x8a6a44,j:0x4f7a35,w:0x2f78c4,V:0x050708};
 const ALIAS={B:'#',h:'c',b:'k',C:'q',X:'Q'};
 // Raised ground (contract: TILES[c].elev 0–2, set by Chat X). Each level lifts the tile, its cover and its units by EH.
 export const EH=.45,elevOf=c=>(TILES[c]||{}).elev||0;
@@ -63,7 +65,11 @@ export class Board{
    case 'q':case 'Q':if(!addProp(g,'q',.45,HALF_H))add(this.box,m.metal,.42,HALF_H,.42,0,HALF_H/2);{const s=add(new T.OctahedronGeometry(.16),c==='q'?m.clue:m.done,1,1.4,1,0,HALF_H+.25);s.userData.noShadow=1;this.anim.push({g,o:s,spin:1.2})}break;
    case 'r':if(addProp(g,'r',.85,.3,seed))break;for(let i=0;i<4;i++){const o=add(this.box,m.rubble,.22+.08*((seed+i)%3),.12+.05*(i%2),.25,((seed*3+i*5)%7-3)*.09,.07,((seed*5+i*3)%7-3)*.09,i+seed);o.rotation.x=.2*i}break;
    case 'E':{const p=add(this.plane,m.evac,1,1,1,0,.02);p.userData.noShadow=1;const r=add(this.ring,m.done,.8,1,.8,0,.025);r.userData.noShadow=1;this.anim.push({g,o:r,pulse:1})}break;
-   default:return null}
+   default:{const t=TILES[c],col=HZ3D[c];if(!t||!col)return null;
+    // Hazard tiles (hazards.js): a tinted floor patch, a bright edge, and a glow for anything that hurts, so they read from any angle.
+    const mat=new T.MeshBasicMaterial({color:col,transparent:true,opacity:t.walk?.55:.85,depthWrite:false});
+    const p=add(this.plane,mat,1.05,1,1.05,0,.015);p.userData.noShadow=1;const r=add(this.frame,new T.MeshBasicMaterial({color:col,transparent:true,opacity:.95,depthWrite:false}),.8,1,.8,0,.02);r.userData.noShadow=1;
+    if(t.hurt)this.anim.push({g,o:r,pulse:1});break}}
   return g}
  // A raised tile: a block down to the floor with the floor texture on top, lit lips on sides that drop, ramps where TILES[c].ramp.
  platform(g,x,y,e,c){const T=this.T,h=e*EH,m=this.m,G=this.grid,cap=new T.PlaneGeometry(1,1).rotateX(-Math.PI/2),uv=cap.attributes.uv;

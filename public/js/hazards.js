@@ -46,7 +46,7 @@ push=function(u,t){const x0=t.x,y0=t.y;_hzPush(u,t);if(!hzSet()||!alive(t)||t.st
  if(!hzEnter(t)&&HZ(tile(t.x,t.y)).slide)hzSlide(t,Math.sign(t.x-x0),Math.sign(t.y-y0))};
 // Round start: everyone standing in a live hurting tile takes it again.
 const _hzSPT=startPlayerTurn;
-startPlayerTurn=function(){if(hzSet()&&!S.over)for(const u of S.units.filter(u=>alive(u)&&u.status==='ok'&&hzLive(tile(u.x,u.y)))){
+startPlayerTurn=function(){if(hzSet()&&!S.over)for(const u of S.units.filter(u=>alive(u)&&u.status==='ok'&&hzLive(tile(u.x,u.y))&&HZ(tile(u.x,u.y)).linger)){
   fx(u,HZ(tile(u.x,u.y)).n.toUpperCase(),'dmg');log(`${u.n} is still in the ${HZ(tile(u.x,u.y)).n.toLowerCase()}.`,u.side==='p'?'bad':'good');damage(u,HZ(tile(u.x,u.y)).hurt,null);if(S.over)return}
  _hzSPT()};
 // AI: stay out of hurting tiles and off slick ones.
