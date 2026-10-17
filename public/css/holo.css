@@ -1,0 +1,74 @@
+/* Holo war-table polish (Chat G). Loaded after style.css; only restyles, never changes layout logic.
+   Same color roles as spec D. Corner brackets, glow edges, readout chips, scanlines. Remove this file to get the flat look back. */
+:root{--edge:color-mix(in srgb,var(--holo) 28%,var(--line));--glow:color-mix(in srgb,var(--holo) 35%,transparent);
+ --panelG:linear-gradient(180deg,color-mix(in srgb,var(--holo) 5%,var(--panel)) 0%,var(--panel) 40%,color-mix(in srgb,#000 18%,var(--panel)) 100%);
+ --scan:repeating-linear-gradient(0deg,transparent 0 3px,color-mix(in srgb,var(--holo) 3%,transparent) 3px 4px);
+ --brk:linear-gradient(var(--holo),var(--holo))}
+html,body{background:radial-gradient(1200px 700px at 50% -10%,#10222a 0%,var(--bg) 60%) fixed,var(--bg)}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.35;
+ background:linear-gradient(var(--grid) 1px,transparent 1px) 0 0/48px 48px,linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/48px 48px;
+ mask-image:radial-gradient(ellipse at 50% 0%,#000 0%,transparent 75%)}
+
+/* Brand + header readouts */
+.brand{text-shadow:0 0 14px var(--glow)}
+.top .stats>span{border:1px solid var(--line);border-radius:4px;padding:3px 8px;background:color-mix(in srgb,var(--raise) 70%,transparent)}
+.top .stats>span.dk{border-color:color-mix(in srgb,var(--dark) 35%,var(--line))}
+
+/* Framed panels: gradient body, tinted edge, four corner brackets */
+.panel,.box,.tipcard{position:relative;background:var(--scan),var(--panelG);border-color:var(--edge);
+ box-shadow:inset 0 1px 0 color-mix(in srgb,var(--holo) 14%,transparent),0 8px 24px #0006}
+.panel::after,.box::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:.75;
+ background:var(--brk) top left/12px 2px,var(--brk) top left/2px 12px,var(--brk) top right/12px 2px,var(--brk) top right/2px 12px,
+  var(--brk) bottom left/12px 2px,var(--brk) bottom left/2px 12px,var(--brk) bottom right/12px 2px,var(--brk) bottom right/2px 12px;background-repeat:no-repeat}
+.tipcard{box-shadow:0 0 0 1px var(--glow),0 0 22px color-mix(in srgb,var(--holo) 18%,transparent)}
+
+/* Section titles: holo tick + fading rule */
+details.fold>summary,.base h3,.box h3{color:var(--holo);display:flex;align-items:center;gap:8px}
+.base h3::after,.box h3::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--edge),transparent)}
+.box .eyebrow{color:color-mix(in srgb,var(--holo) 55%,var(--dim))}
+.box h2{text-shadow:0 0 18px var(--glow)}
+
+/* Buttons: soft bevel, glow on hover, primary lit */
+button{background:linear-gradient(180deg,color-mix(in srgb,#fff 4%,var(--raise)),var(--raise));transition:border-color .12s,box-shadow .12s,background .12s}
+button:hover:not(:disabled){box-shadow:0 0 0 1px var(--glow),0 0 12px color-mix(in srgb,var(--holo) 22%,transparent)}
+button.on{box-shadow:inset 0 -2px 0 var(--holo)}
+button.primary{background:linear-gradient(180deg,color-mix(in srgb,var(--holo) 30%,var(--raise)),color-mix(in srgb,var(--holo) 16%,var(--raise)));text-shadow:0 0 8px var(--glow);box-shadow:0 0 14px color-mix(in srgb,var(--holo) 20%,transparent)}
+.act:not(:disabled){border-color:var(--edge)}
+.act:hover:not(:disabled){transform:translateY(-1px)}
+
+/* Turn banner: scanlines + glow */
+.banner{background:var(--scan),color-mix(in srgb,var(--holo) 12%,var(--panel));box-shadow:0 0 18px color-mix(in srgb,var(--holo) 16%,transparent);text-shadow:0 0 10px var(--glow)}
+.banner.foe{box-shadow:0 0 18px color-mix(in srgb,var(--sith) 18%,transparent);text-shadow:0 0 10px color-mix(in srgb,var(--sith) 40%,transparent)}
+
+/* Board frame */
+.bwrap>canvas,.bwrap .board,#view3d{box-shadow:0 0 0 1px var(--edge),0 0 30px #0008}
+
+/* Modals: blurred table behind */
+.modal{backdrop-filter:blur(3px) saturate(.8)}
+
+/* Temple base */
+.base>div:has(>h2){border-left:3px solid var(--holo);padding-left:12px}
+.base h2{font-size:28px}
+.resbar{gap:6px;border-bottom:none;padding-bottom:0}
+.resbar>span{border:1px solid var(--line);border-radius:4px;padding:4px 9px;background:linear-gradient(180deg,var(--raise),color-mix(in srgb,#000 15%,var(--raise)))}
+.resbar>span b{color:var(--holo);text-shadow:0 0 8px var(--glow)}
+.resbar>span.dk b{color:var(--dark);text-shadow:none}
+.resbar .cal{border-color:var(--edge)}
+.calstrip>div{background:var(--scan),var(--raise);border-color:var(--line)}
+.calnow{border-color:var(--edge)!important;box-shadow:inset 3px 0 0 var(--holo)}
+.news{background:color-mix(in srgb,var(--holo) 6%,transparent);padding:8px 12px;border-radius:0 6px 6px 0}
+.opt{position:relative;background:var(--scan),var(--panelG);border-color:var(--edge);box-shadow:inset 3px 0 0 var(--line);transition:box-shadow .15s,border-color .15s}
+.opt:hover{border-color:var(--holo);box-shadow:inset 3px 0 0 var(--holo),0 0 18px color-mix(in srgb,var(--holo) 14%,transparent)}
+.opt:has(.tag.story){box-shadow:inset 3px 0 0 var(--holo)}
+.tag.story{box-shadow:0 0 8px var(--glow)}
+.tabs{gap:2px;border-bottom:1px solid var(--edge)}
+.tabs button{border-color:transparent;background:transparent;color:var(--dim)}
+.tabs button:hover:not(:disabled){color:var(--fg);box-shadow:none;border-color:transparent}
+.tabs button.on{background:linear-gradient(0deg,color-mix(in srgb,var(--holo) 16%,transparent),transparent);border-color:var(--edge);box-shadow:inset 0 -2px 0 var(--holo);text-shadow:0 0 8px var(--glow)}
+.rrow,.wing{border-bottom-color:color-mix(in srgb,var(--line) 70%,transparent);padding-inline:6px;border-radius:4px;transition:background .12s}
+.rrow:hover,.wing:hover{background:color-mix(in srgb,var(--holo) 5%,transparent)}
+.mini{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--uc,var(--holo)) 45%,transparent))}
+.cand,.seat{background:var(--scan),var(--panelG);border-color:var(--edge)}
+.stl{background:var(--scan),var(--raise);border-color:var(--edge)}
+
+@media(prefers-reduced-motion:reduce){button,.opt,.rrow,.wing{transition:none}.act:hover:not(:disabled){transform:none}}

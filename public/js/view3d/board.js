@@ -1,4 +1,5 @@
 import {mergeGeometries} from '../../vendor/BufferGeometryUtils.js';
+import {addProp} from './props.js';
 // Map geometry from S.grid + floor highlights. Half cover is waist-high (crates, consoles, barrels), full cover is tall (walls, pillars, doors).
 // Rebuilds only tiles whose character changed; anything that lost cover reports back so effects can throw debris.
 const HALF_H=.55,FULL_H=1.55;
@@ -51,16 +52,16 @@ export class Board{
   const seed=(x*73+y*37)%7;
   switch(c){
    case '#':add(this.box,m.wall,1,FULL_H,1,0,FULL_H/2);add(this.box,m.wallTop,1.02,.08,1.02,0,FULL_H);for(const [sx,sz,px,pz] of [[1.02,.03,0,.5],[1.02,.03,0,-.5],[.03,1.02,.5,0],[.03,1.02,-.5,0]])add(this.box,m.trim,sx,.03,sz,px,FULL_H+.05,pz).userData.noShadow=1;break;
-   case 'O':{add(this.cyl,m.metal,.8,.5,.8,0,.25);add(this.cyl,m.wall,.22,FULL_H,.22,0,FULL_H/2+.2);const r=add(new T.TorusGeometry(.32,.03,6,24),m.screen,1,1,1,0,1.25);r.rotation.x=Math.PI/2;
+   case 'O':{if(!addProp(g,'O',.9,FULL_H+.3)){add(this.cyl,m.metal,.8,.5,.8,0,.25);add(this.cyl,m.wall,.22,FULL_H,.22,0,FULL_H/2+.2)}const r=add(new T.TorusGeometry(.32,.03,6,24),m.screen,1,1,1,0,1.25);r.rotation.x=Math.PI/2;
     r.userData.noShadow=1;this.anim.push({g,o:r,spin:1.5});add(new T.OctahedronGeometry(.12),m.screen,1,1,1,0,FULL_H+.35).userData.noShadow=1;break}
    case 'd':case 'D':case '_':{add(this.box,m.wall,.16,FULL_H,1,-.42,FULL_H/2);add(this.box,m.wall,.16,FULL_H,1,.42,FULL_H/2);add(this.box,m.wallTop,1,.2,1,0,FULL_H-.1);
     if(c!=='_'){add(this.box,m.metal,.68,FULL_H-.2,.14,0,(FULL_H-.2)/2);add(this.box,c==='D'?m.lock:m.screen,.5,.05,.16,0,.95).userData.noShadow=1}
     if(this.isNS(x,y))g.rotation.y=Math.PI/2;break}
-   case 'c':add(this.box,m.crate,.78,HALF_H,.78,0,HALF_H/2,0,seed*.08);add(this.box,m.band,.8,.07,.8,0,HALF_H*.7,0,seed*.08);add(this.box,m.band,.8,.07,.8,0,HALF_H*.25,0,seed*.08);break;
-   case 'x':add(this.cyl,m.barrel,.5,HALF_H+.05,.5,0,(HALF_H+.05)/2);add(this.cyl,m.stripe,.52,.08,.52,0,.36);add(this.cyl,m.dark,.36,.04,.36,0,HALF_H+.07);break;
-   case 'k':add(this.box,m.metal,.7,HALF_H,.45,0,HALF_H/2);{const s=add(this.box,m.screen,.6,.32,.04,0,HALF_H+.18,.12);s.rotation.x=-.4;s.userData.noShadow=1}break;
-   case 'q':case 'Q':add(this.box,m.metal,.42,HALF_H,.42,0,HALF_H/2);{const s=add(new T.OctahedronGeometry(.16),c==='q'?m.clue:m.done,1,1.4,1,0,HALF_H+.25);s.userData.noShadow=1;this.anim.push({g,o:s,spin:1.2})}break;
-   case 'r':for(let i=0;i<4;i++){const o=add(this.box,m.rubble,.22+.08*((seed+i)%3),.12+.05*(i%2),.25,((seed*3+i*5)%7-3)*.09,.07,((seed*5+i*3)%7-3)*.09,i+seed);o.rotation.x=.2*i}break;
+   case 'c':if(addProp(g,'c',.8,HALF_H,seed*Math.PI/2))break;add(this.box,m.crate,.78,HALF_H,.78,0,HALF_H/2,0,seed*.08);add(this.box,m.band,.8,.07,.8,0,HALF_H*.7,0,seed*.08);add(this.box,m.band,.8,.07,.8,0,HALF_H*.25,0,seed*.08);break;
+   case 'x':if(addProp(g,'x',.55,HALF_H+.05,seed))break;add(this.cyl,m.barrel,.5,HALF_H+.05,.5,0,(HALF_H+.05)/2);add(this.cyl,m.stripe,.52,.08,.52,0,.36);add(this.cyl,m.dark,.36,.04,.36,0,HALF_H+.07);break;
+   case 'k':if(addProp(g,'k',.75,HALF_H+.25))break;add(this.box,m.metal,.7,HALF_H,.45,0,HALF_H/2);{const s=add(this.box,m.screen,.6,.32,.04,0,HALF_H+.18,.12);s.rotation.x=-.4;s.userData.noShadow=1}break;
+   case 'q':case 'Q':if(!addProp(g,'q',.45,HALF_H))add(this.box,m.metal,.42,HALF_H,.42,0,HALF_H/2);{const s=add(new T.OctahedronGeometry(.16),c==='q'?m.clue:m.done,1,1.4,1,0,HALF_H+.25);s.userData.noShadow=1;this.anim.push({g,o:s,spin:1.2})}break;
+   case 'r':if(addProp(g,'r',.85,.3,seed))break;for(let i=0;i<4;i++){const o=add(this.box,m.rubble,.22+.08*((seed+i)%3),.12+.05*(i%2),.25,((seed*3+i*5)%7-3)*.09,.07,((seed*5+i*3)%7-3)*.09,i+seed);o.rotation.x=.2*i}break;
    case 'E':{const p=add(this.plane,m.evac,1,1,1,0,.02);p.userData.noShadow=1;const r=add(this.ring,m.done,.8,1,.8,0,.025);r.userData.noShadow=1;this.anim.push({g,o:r,pulse:1})}break;
    default:return null}
   return g}
