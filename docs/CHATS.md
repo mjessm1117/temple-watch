@@ -173,3 +173,15 @@ Same rules: `git pull` first, edit only files you own, cross-file needs go under
 | K Coordinator | active | `tests/bot.js` + other tests, `package.json`, `tools/inline.js`, `docs/STATUS.md`, `docs/CHATS.md`, `docs/CHANGELOG.md`; merge fixes anywhere |
 
 Economy numbers (`STIPEND`, `MISSION_CR`, wing costs, Council vote costs) stay with the campaign data owner (`data-campaign.js`, `data-life.js`); field-op and side-objective payouts stay with I (`data-galaxy.js`) and H (`data-battle.js`). One retune pass at a time: K measures, owners change numbers.
+
+---
+
+# Wave 5 (2026-10-17): Jess's play-test notes
+
+Rules unchanged: `git pull` first, own files only, cross-file needs go under "Requests" in `docs/STATUS.md`, `npm test` green before push. Run M, N, Q in parallel. K merges.
+
+| Chat | Owns | Goal |
+| --- | --- | --- |
+| M Maps & Tactics | `data.js`, `data-battle.js`, `rules.js`, `abilities.js`, `turns.js`, `ai.js`, `battle.js`, `hazards.js`, `util.js` (grid size), `tests/balance.test.js`, `tests/bot.js`; camera/board sizing in `view3d/board.js` + `view3d/main.js` only | Bigger maps with routes and movement objectives, enemies from several sides, stronger terrain/angles/sight lines, overwatch that visibly works |
+| N Command Console | `css/*`, `render.js`, `input.js`, `ui-*.js`, `index.html`, `temple-map.js`; screen markup in `base.js`/`temple-ui.js`/`galaxy.js` (look only, no logic) | Temple + HUD feel like a real command console, with more color |
+| Q Squad & Legacy | `campaign.js`, `data-campaign.js`, `temple*.js`, `data-life.js`, `data-trees.js`, `power.js`, new `data-legacy.js`/`legacy.js`; lore text in `data-codex.js` | Zero Company-style bonds and class ideas, characters with growing lore, retirement to Council or general, Council masters joining missions |
