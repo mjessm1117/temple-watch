@@ -17,7 +17,7 @@ check(!st.sig.length,'SIG for unknown missions: '+st.sig);
   // Mechanics on a clean floor: ice slides up to 3 tiles, lava hurts 3, mud can't be crossed, conduits pulse.
   startMission('relay',sq(),{twist:'none',hazards:false});S.bv.hz='snow';const u=players()[0];S.units=S.units.filter(o=>o===u);for(let x=0;x<10;x++)S.grid[3][x]=x>=3&&x<=6?'i':'.';
   u.x=1;u.y=3;moveAlong(u,[{x:2,y:3},{x:3,y:3}]);if(u.x!==6)bad.push('ice slide ended at '+u.x);
-  const hp=u.hp;S.grid[3][8]='l';moveAlong(u,[{x:8,y:3}]);if(u.hp!==hp-3)bad.push('lava hp '+hp+'→'+u.hp);
+  const hp=u.hp;S.grid[3][8]='l';moveAlong(u,[{x:8,y:3}]);if(u.hp!==hp-TILES.l.hurt)bad.push('lava hp '+hp+'→'+u.hp);
   S.grid[5][1]='m';S.grid[4][1]='.';S.grid[6][1]='.';u.x=1;u.y=6;u.mob=5;const R=reach(u);if(R.d['1,4']!=null&&R.prev['1,4']==='1,5')bad.push('walked through mud');
   S.turn=1;if(hzLive('n'))bad.push('conduit live on odd turn');S.turn=2;if(!hzLive('n'))bad.push('conduit dead on even turn');
   return{bad,n}})()`);w1.close();check(!hz.bad.length,'hazards: '+hz.bad.slice(0,5).join(', '));console.log(JSON.stringify({hazardMaps:hz.n}))}else w1.close()}
