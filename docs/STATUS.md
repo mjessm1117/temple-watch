@@ -131,3 +131,15 @@ Codex now matches P/X/R ids: 0 gaps across AB, PERKS (under `ability`), FOES (in
 ## Skill trees (Chat F · Skill Trees, 2026-10-16)
 Branching trees: trunk R1–2 → pick 1 of 2 specializations at R3 (permanent) → R4–7 inside the spec. Cross-training via the Training Salle (L1: 1 borrowed skill from R4, L2: 2nd from R6; Jedi any class, troops troop-only). Old saves respec from R3 for free. `KITS` is gone: use `treeOpts(r,rank)` / `TREES` (`data-trees.js`). Spec: `docs/specs/trees.md`. New test: `tests/trees.test.js`.
 - F(trees) → E: CHANGELOG: "Skill trees branch: pick a specialization at rank 3 (16 new specs), choose within it to rank 7, and cross-train a second class at the Training Salle. Units past rank 2 get a free respec."
+
+## Battle variety (Chat H, wave 4, 2026-10-17)
+Files: `data-battle.js` (TWISTS, GUESTS, BV_TILES, BEATS, SIG, SIDES: tune here), `battle.js` (engine, wraps startMission/startPlayerTurn/endTurn/checkEnd/threatStep/damage/blast/los/mkFoe/eAct/lootAt/exec/applyResults/launchMission), `battle-ui.js` (briefing cards, mission-card chips, HUD rows, comm box, debrief report). Test: `tests/variety.test.js`.
+- **Twists** roll on the crisis option (`o.twist`), filtered by mission theme; shown on the card, briefing, top strip and Objectives. `startMission(id,sq,{twist:'none'|id})` forces one.
+- **Beats**: max 3 generic per mission + every signature beat. Choices queue in `S.bv.q`; End turn waits for an answer (`bvPick(0|1)`; the bot answers at random). History in `S.bv.hist`.
+- **Signatures**: relay uplink pad · envoy runs for a speeder · vault holocron carry · Ilum sapper charges · Adraas shield pylons · Malgus lift locks (max 2) · Muster braziers → allies · Ravine wounded Jedi · Caves spreading rot · Sixth Battle jailer's key · Seventh Battle artillery spotter · Thought Bomb ritual stones.
+- **Side objectives** (crises only, `o.side`): paid on a win via `applyResults` (`out.bvRes`).
+- Weak-bot Normal, signature only, 30 games vs pre-change build: Adraas 80→retuned (base 60), Malgus 65 (70), Kaan 57 (47), Ilum 73 (73). Bot variance ±15 at this size.
+## Requests (wave 4, from H)
+- H → F (3D): new tiles borrow models via `TILES[c].as3d` (one-line change in `view3d/board.js` setTile). Chasm `V` has no model yet (shows plain floor); a dark pit + edge lips would read better. Shell zones (`S.bv.bar.zones`, 3×3) and sapper timers (`S.bv.bombs`) are 2D-only overlays today.
+- H → U: comm box `#bvComm` sits under the turn banner; style/position freely. Log lines of class `beat`.
+- H → L/R: beat/choice text lives in `SIG[id].beats` (data-battle.js); add lines for new story missions there. Flags set on a win: `sig_relay_boost`, `sig_vault_holocron`.

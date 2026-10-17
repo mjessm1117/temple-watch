@@ -112,14 +112,14 @@ const SIG={
    {on:'turn',n:6,who:'Sgt. Jace Malcom',txt:'I can bring the outer roof down on their approach. Costs us the outer cave, but it\'ll slow them.',choice:{
     a:{label:'Bring it down',txt:'The outer cave roars shut (cave mouth −3). Two attackers are buried in the fall: stunned.',do:{obj:-3,foeStun:2}},
     b:{label:'Hold the line',txt:'Malcom grins. "Thought you\'d say that." +10 aim this turn.',do:{aim:10}}}}]},
- adraasHunt:{n:'Shield pylons',desc:'Two pylons (P) shield Lord Adraas: nothing hurts him while one stands. Shoot, blast or wreck them (4 HP each). Threat starts a turn later.',
-  pylons:{at:[[1,3],[8,3]],hp:4,shieldBoss:1,par:1,doneEv:'pylonsDown'},
+ adraasHunt:{n:'Shield pylons',desc:'Two pylons (P) shield Lord Adraas: nothing hurts him while one stands. Shoot, blast or wreck them (3 HP each). Threat starts a turn later.',
+  pylons:{at:[[1,3],[8,3]],hp:3,shieldBoss:1,par:1,doneEv:'pylonsDown'},
   beats:[{on:'turn',n:1,who:'Satele Shan',txt:'Adraas is hiding behind generator pylons. Bring them down or nothing will touch him.'},
    {on:'pylonsDown',who:'Satele Shan',txt:'His shield is down. Now!',do:{aim:10}},
    {on:'bossHalf',who:'Lord Adraas',txt:'You fight well for Republic dogs. Walk away and I let you live.',choice:{
     a:{label:'Press the attack',txt:'Everyone goes for him: +15 aim this turn. Satele\'s calm doesn\'t reach everyone (Darkness +1).',do:{aim:15,dark:1}},
     b:{label:'Talk to his men',txt:'Satele speaks to his troopers, not to him. One of them lowers his rifle and surrenders.',do:{surrender:1}}}}]},
- dock:{n:'Lock the lifts',desc:'Malgus wants the Temple lifts. Each turn you start with someone on a lift control (U) banks a lock; a lock cancels one Threat rise.',
+ dock:{n:'Lock the lifts',desc:'Malgus wants the Temple lifts. Each turn you start with someone on a lift control (U) banks a lock; a lock cancels one Threat rise (2 at most).',
   pads:{at:[[1,5],[8,5]],each:{lock:1}},
   beats:[{on:'turn',n:1,who:'Grand Master Zym',txt:'Malgus is going for the Temple lifts. Hold the lift controls and he cannot rise.'},
    {on:'turn',n:3,who:'Darth Malgus',txt:'Your Temple walls will not save you. Nothing will.'},

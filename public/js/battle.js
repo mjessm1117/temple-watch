@@ -74,7 +74,7 @@ startPlayerTurn=function(){if(S.bv&&S.bv.mobB){for(const u of players())if(u.mob
  bvFire('turn',{n:S.turn});bvFire('threat',{n:S.threat});checkEnd();render()};
 const _bvEnd=endTurn;endTurn=async function(){if(S&&S.bv&&S.bv.q.length&&!S.over){render();return}return _bvEnd()};
 // Threat rises can be cancelled by banked locks (dock: lift controls).
-const _bvThr=threatStep;threatStep=function(){if(S.bv&&S.bv.locks>0&&S.threat>0){S.bv.locks--;S.threat--;fx(players()[0]||{x:5,y:5},'LOCKED','heal');log('The lifts stay locked: Threat does not rise this turn.','good');return}return _bvThr()};
+const _bvThr=threatStep;threatStep=function(){if(S.bv&&S.bv.locks>0&&S.threat>0&&(S.bv.lockUsed||0)<2){S.bv.locks--;S.bv.lockUsed=(S.bv.lockUsed||0)+1;S.threat--;fx(players()[0]||{x:5,y:5},'LOCKED','heal');log('The lifts stay locked: Threat does not rise this turn.','good');return}return _bvThr()};
 const _bvCheck=checkEnd;
 checkEnd=function(){if(!S||S.over)return _bvCheck();if(S.bv){bvWatch();if(S.over)return}
  // Guests can't carry a mission alone: once every real squad member is down, it's lost.
