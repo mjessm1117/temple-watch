@@ -29,8 +29,9 @@ startMission=function(id,sq,o={}){const tw=o.twist||BV_NEXT||rollTwist(id),sd=o.
  bvFire('twist');bvFire('turn',{n:1});render();saveGame()};
 function bvSetup(){const T=TWISTS[S.bv.tw]||{},G=SIG[S.bv.sig]||{},b=S.bv;
  if(T.range)for(const u of S.units)bvRange(u);
- if(T.droids){const spots=tilesWhere((c,x,y)=>c==='.'&&y<=3&&!unitAt(x,y)).sort(()=>Math.random()-.5);
-  for(let i=0;i<T.droids&&spots[i];i++){const e=mkFoe('wardroid',spots[i].x,spots[i].y);if(S.M.stealth)e.pod='ion';S.units.push(e)}}
+ // Ion storm swaps rank-and-file for war droids (same head count), so it changes the fight without making it bigger.
+ if(T.droids){const G=enemies().filter(e=>!e.boss&&!e.key&&!e.envoy&&!e.horror&&!e.vip&&!isElite(e)&&!e.force).sort(()=>Math.random()-.5);
+  for(const o of G.slice(0,T.droids)){const e=mkFoe('wardroid',o.x,o.y);e.pod=o.pod;e.lead=o.lead;S.units[S.units.indexOf(o)]=e}}
  if(T.guest){const L=Object.entries(GUESTS).filter(([k,g])=>g.line&&g.era===(S.M.era||1)),g=pickOne(L);if(g){const u=bvGuest(g[0]);if(u)b.guest=u.uid}}
  if(G.pads){b.pad={n:0,done:0,at:G.pads.at.map(a=>bvPlace('U',a)).filter(Boolean)}}
  if(G.runner){const e=enemies().find(e=>e.type===G.runner.type);const p=bvPlace('G',G.runner.to);if(e&&p)b.run={uid:e.uid,to:p,mob:G.runner.mob,on:0}}
