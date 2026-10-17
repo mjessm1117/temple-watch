@@ -47,7 +47,8 @@ const PARENTOF=Object.fromEntries(Object.entries(CHILD).map(([a,b])=>[b,a]));
 function frames(nodeOf,RW){const _n=nodeOf;const P=n=>pOf(RW(nodeOf(n))),left=P('thigh_l').sub(P('thigh_r')).normalize(),up=P('Head').sub(P('pelvis')).normalize(),fwd=new T.Vector3().crossVectors(left,up).normalize();
  const F={};const make=(d)=>{const sec=Math.abs(d.dot(fwd))>.85?left:fwd,z=new T.Vector3().crossVectors(d,sec).normalize(),y=new T.Vector3().crossVectors(z,d);return new T.Quaternion().setFromRotationMatrix(new T.Matrix4().makeBasis(d,y,z))};
  for(const b of Object.keys(MAP)){if(!nodeOf(b))continue;let a=b,c=CHILD[a];while(!c&&PARENTOF[a]){a=PARENTOF[a];c=CHILD[a]}
-  if(!c||!nodeOf(c)||!nodeOf(a))continue;F[b]=make(P(c).sub(P(a)).normalize())}return F}
+  if(!c||!nodeOf(c)||!nodeOf(a)){const pa=PARENTOF[b];if(pa&&nodeOf(pa))F[b]=make(P(b).sub(P(pa)).normalize());continue} // no child bone (e.g. rig without fingers): use parent→bone
+  F[b]=make(P(c).sub(P(a)).normalize())}return F}
 const FS=frames(n=>gs.by[n],sRW),FT=frames(n=>gt.by[M+(MAP[n]||FINGERS[n])],tRW);
 const ALIGN={};for(const b of Object.keys(FS))if(FT[b])ALIGN[b]=FS[b].clone().multiply(FT[b].clone().invert());
 const tgtBones=Object.values(MAP).map(n=>gt.by[M+n]).filter(Boolean);
@@ -82,6 +83,26 @@ for(const clip of S.getRoot().listAnimations()){
   A.addSampler(sm).addChannel(D.createAnimationChannel().setTargetNode(gt.by[n]).setTargetPath('rotation').setSampler(sm))}
  const sm=D.createAnimationSampler().setInput(inp).setOutput(D.createAccessor().setArray(hipPos).setType('VEC3').setBuffer(buf)).setInterpolation('LINEAR');
  A.addSampler(sm).addChannel(D.createAnimationChannel().setTargetNode(hipsT).setTargetPath('translation').setSampler(sm))}
+// Meshy's finger/leaf bones have bind matrices that don't match their rest pose, so hand vertices spike when the arm moves.
+// Fingers don't animate here, so re-bind every finger/leaf influence to its hand (or parent) joint.
+{const sk=gt.r.listSkins()[0],J=sk.listJoints(),idx=new Map(J.map((j,i)=>[j,i]));
+ const target=j=>{let n=j;while(n&&/Thumb|Index|Middle|Ring|Pinky|_End|headfront|HeadTop/.test(n.getName()))n=gt.par.get(n);return n&&idx.has(n)?idx.get(n):idx.get(j)};
+ const remap=J.map(target);let moved=0,cut=0;
+ // Bind-pose joint positions (from inverse bind matrices) to tell which limb a vertex really belongs to.
+ const IBM=sk.getInverseBindMatrices().getArray(),BP=J.map((j,k)=>new T.Vector3().setFromMatrixPosition(new T.Matrix4().fromArray(Array.from(IBM.slice(k*16,k*16+16))).invert()));
+ // Limb of each joint: arm/leg + side, or core. Meshy's auto-rig bleeds weights across limbs that touch in the bind pose (hand↔thigh/toe).
+ const limb=J.map(j=>{const n=j.getName(),sd=/Left/.test(n)?'L':/Right/.test(n)?'R':'';return /UpLeg|Leg|Foot|Toe/.test(n)?'leg'+sd:/Shoulder|Arm|Hand|Thumb|Index|Middle|Ring|Pinky/.test(n)?'arm'+sd:'core'});
+ for(const me of gt.r.listMeshes())for(const pr of me.listPrimitives()){const A=pr.getAttribute('JOINTS_0'),Wt=pr.getAttribute('WEIGHTS_0');if(!A||!Wt)continue;
+  const P=pr.getAttribute('POSITION'),pv=[],a=[],w=[];for(let i=0;i<A.getCount();i++){A.getElement(i,a);Wt.getElement(i,w);const acc=new Map();
+   for(let k=0;k<4;k++){if(!w[k])continue;const t=remap[a[k]];if(t!==a[k])moved++;acc.set(t,(acc.get(t)||0)+w[k])}
+   let e=[...acc.entries()].sort((x,y)=>y[1]-x[1]);P.getElement(i,pv);const vp=new T.Vector3(...pv);
+   const near=e.filter(([j,ww])=>ww>.05).sort((x,y)=>BP[x[0]].distanceTo(vp)-BP[y[0]].distanceTo(vp))[0]||e[0];const L0=limb[near[0]];
+   if(BP[near[0]].distanceTo(vp)>.45){let bj=0,bd=1e9;for(let k=0;k<J.length;k++){if(remap[k]!==k)continue;const d=BP[k].distanceTo(vp);if(d<bd){bd=d;bj=k}}
+    if(limb[bj]!==limb[near[0]]){e=[[bj,1]];cut++}}
+   if(L0!=='core'){const n0=e.length;e=e.filter(([j])=>limb[j]===L0||limb[j]==='core');cut+=n0-e.length}
+   e=e.slice(0,4);const sum=e.reduce((s,x)=>s+x[1],0)||1;
+   A.setElement(i,[0,1,2,3].map(k=>e[k]?e[k][0]:0));Wt.setElement(i,[0,1,2,3].map(k=>e[k]?e[k][1]/sum:0))}}
+ console.log('rebound',moved,'finger influences; cut',cut,'cross-limb')}
 // grip_r: child of the right hand whose frame matches the source hand's rest frame, so code-built weapons sit the same way.
 {const h=gt.by[M+'RightHand'],sh=gs.by.hand_r;const X=qOf(sRW(sh)).invert().multiply(ALIGN.hand_r).multiply(qOf(tRW(h)));
  const g=D.createNode('grip_r').setRotation(X.invert().toArray());h.addChild(g)}

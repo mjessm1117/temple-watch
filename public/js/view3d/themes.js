@@ -1,4 +1,5 @@
 import {mergeGeometries} from '../../vendor/BufferGeometryUtils.js';
+import {addProp} from './props.js';
 // Mission themes (wave-3 contract: MISSIONS[id].theme = dock city jungle snow temple ruins plains caves).
 // A theme sets the sky dome, fog, lights, board palette, scenery ringing the board, and drifting ambient particles.
 // Missions without a theme get one guessed from their `where` line, so old saves still look right.
@@ -57,7 +58,7 @@ export class Scenery{
   for(const g of props){g.updateMatrixWorld(true);g.traverse(m=>{if(!m.isMesh)return;if(live.has(m)){const c=m.clone();m.matrixWorld.decompose(c.position,c.quaternion,c.scale);this.root.add(c);this.anim.find(a=>a.o===m).o=c;return}
    const k=m.material.uuid+(g.userData.cast?'s':'');if(!buckets.has(k))buckets.set(k,{mat:m.material,cast:g.userData.cast,geos:[]});const geo=m.geometry.clone().applyMatrix4(m.matrixWorld);
    if(geo.index)buckets.get(k).geos.push(geo.toNonIndexed());else buckets.get(k).geos.push(geo)})}
-  for(const b of buckets.values()){for(const g of b.geos){for(const a of Object.keys(g.attributes))if(a!=='position'&&a!=='normal')g.deleteAttribute(a)}const geo=mergeGeometries(b.geos,false);if(!geo)continue;
+  for(const b of buckets.values()){for(const g of b.geos){for(const a of Object.keys(g.attributes))if(a!=='position'&&a!=='normal'&&a!=='uv')g.deleteAttribute(a);if(!g.attributes.uv)g.setAttribute('uv',new T.Float32BufferAttribute(new Float32Array(g.attributes.position.count*2),2))}const geo=mergeGeometries(b.geos,false);if(!geo)continue;
    const o=new T.Mesh(geo,b.mat);o.castShadow=b.cast;o.receiveShadow=true;this.root.add(o)}}
  prop(k,r,th){const T=this.T,g=new T.Group(),G=this.g,M=this.M,add=(geo,m,sx,sy,sz,x=0,y=0,z=0)=>{const o=new T.Mesh(geo,m);o.scale.set(sx,sy,sz);o.position.set(x,y,z);g.add(o);return o};
   const s=.7+r()*.6;
@@ -70,13 +71,13 @@ export class Scenery{
    case 'drift':add(G.ico,M(0xf2f6f8),1.6*s,.4*s,1.2*s,0,.05);break;
    case 'stalag':{const h=(1+r()*2.5)*s;add(G.cone,M(th.wall),.6*s,h,.6*s,0,h/2);break}
    case 'crystal':{const h=.8*s,c=th.trim;add(G.oct,M(c,{emissive:c,emissiveIntensity:.9}),.35*s,h,.35*s,0,h/2);break}
-   case 'pillar':{const h=3.2*s;add(G.cyl,M(th.wall),.7,h,.7,0,h/2);add(G.box,M(th.wallTop),.95,.2,.95,0,h);add(G.box,M(th.wallTop),.95,.2,.95,0,.1);break}
+   case 'pillar':{const h=3.2*s;if(addProp(g,'pillar',.95,h,r()*6))break;add(G.cyl,M(th.wall),.7,h,.7,0,h/2);add(G.box,M(th.wallTop),.95,.2,.95,0,h);add(G.box,M(th.wallTop),.95,.2,.95,0,.1);break}
    case 'brokenPillar':{const h=(.6+r()*2)*s;add(G.cyl,M(th.wall),.7,h,.7,0,h/2).rotation.z=(r()-.5)*.25;add(G.box,M(th.wallTop),.95,.2,.95,0,.1);
     if(r()<.4)add(G.cyl,M(th.wall),.7,1.6,.7,1.1,.35).rotation.z=Math.PI/2;break}
-   case 'statue':add(G.box,M(th.wallTop),1,.4,1,0,.2);add(G.cone,M(th.wall),1,2.2,1,0,1.5);add(G.ico,M(th.wall),.5,.55,.5,0,2.8);break;
-   case 'brazier':{add(G.cyl,M(0x3a3028),.4,.8,.4,0,.4);const f=add(G.ico,M(0xffa040,{emissive:0xff7a20,emissiveIntensity:2}),.35,.45,.35,0,.95);this.anim.push({o:f,flick:1});break}
-   case 'container':{const c=[0x8a4a2a,0x2a5a7a,0x6a6f74,0x7a6a2a][Math.floor(r()*4)];add(G.box,M(c,{metalness:.4}),2.4,1.1,1,0,.55);if(r()<.5)add(G.box,M(c,{metalness:.4}),2.4,1.1,1,0,1.65).rotation.y=.1;break}
-   case 'gantry':{const h=4.5*s;for(const x of [-1.2,1.2])add(G.box,M(th.metal,{metalness:.5}),.25,h,.25,x,h/2);add(G.box,M(0xe0bd78,{metalness:.4}),2.8,.3,.4,0,h);break}
+   case 'statue':if(addProp(g,'statue',1.2,3,0))break;add(G.box,M(th.wallTop),1,.4,1,0,.2);add(G.cone,M(th.wall),1,2.2,1,0,1.5);add(G.ico,M(th.wall),.5,.55,.5,0,2.8);break;
+   case 'brazier':{if(!addProp(g,'brazier',.6,.9,r()*6))add(G.cyl,M(0x3a3028),.4,.8,.4,0,.4);const f=add(G.ico,M(0xffa040,{emissive:0xff7a20,emissiveIntensity:2}),.35,.45,.35,0,.95);this.anim.push({o:f,flick:1});break}
+   case 'container':{if(addProp(g,'container',2.4,1.1,0))break;const c=[0x8a4a2a,0x2a5a7a,0x6a6f74,0x7a6a2a][Math.floor(r()*4)];add(G.box,M(c,{metalness:.4}),2.4,1.1,1,0,.55);if(r()<.5)add(G.box,M(c,{metalness:.4}),2.4,1.1,1,0,1.65).rotation.y=.1;break}
+   case 'gantry':{const h=4.5*s;if(addProp(g,'gantry',2.8,h,0))break;for(const x of [-1.2,1.2])add(G.box,M(th.metal,{metalness:.5}),.25,h,.25,x,h/2);add(G.box,M(0xe0bd78,{metalness:.4}),2.8,.3,.4,0,h);break}
    case 'light':{add(G.cyl,M(th.metal),.12,2.6,.12,0,1.3);add(G.box,M(th.trim,{emissive:th.trim,emissiveIntensity:1.6}),.35,.12,.35,0,2.65);break}
    case 'tower':{const h=(4+r()*12)*s,w=1.6+r()*2;add(G.box,M(th.wall,{metalness:.3}),w,h,w,0,h/2);
     for(let y=1;y<h-.5;y+=1.1)if(r()<.7)add(G.box,M(r()<.5?0xffd27a:th.trim,{emissive:r()<.5?0xffb050:th.trim,emissiveIntensity:1.2}),w+.04,.12,w*.6,0,y);break}

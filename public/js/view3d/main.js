@@ -80,7 +80,7 @@ function models(){const want=new Set(S.units.map(u=>fileOf(kindOf(u))));
  const later=[...Object.values(S.M&&S.M.waves||{}).flat(),...(S.M&&S.M.reinforce||[])];
  for(const t of later)if(typeof t==='string'&&FOES[t])want.add(fileOf(kindOf({...FOES[t],side:'e',type:t})));
  want.delete(null);for(const f of want)loadModel(f).then(m=>{if(m&&V&&S){V.units.upgrade();ui()}})
- loadProps(THREE,new Set(S.grid.map(r=>[...r]).flat())).then(n=>{if(n&&V&&S)V.board.build(S.grid)})}
+ loadProps(THREE,new Set(S.grid.map(r=>[...r]).flat()),['pillar','statue','brazier','container','gantry']).then(n=>{if(n&&V&&S){V.board.build(S.grid);V.scenery.apply(V.scenery.name,V.board.cols,V.board.rows,V.lights,V.renderer)}})}
 
 // Event queue: each beat waits for the previous one. A backlog (fast enemy turns) plays faster.
 function pump(ms){const sp=(Q.length>6?3:Q.length>2?1.8:1)*(V.units.reduce?2:1);busy-=ms*sp;
