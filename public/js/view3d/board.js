@@ -45,7 +45,7 @@ export class Board{
    if(!B.has(k))B.set(k,{m:o.material,cast:o.castShadow,g:[]});let ge=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();ge.applyMatrix4(o.matrixWorld);
    for(const a of Object.keys(ge.attributes))if(a!=='position'&&a!=='normal'&&a!=='uv')ge.deleteAttribute(a);if(!ge.attributes.uv)ge.setAttribute('uv',new T.Float32BufferAttribute(new Float32Array(ge.attributes.position.count*2),2));B.get(k).g.push(ge)});
   for(const b of B.values()){const ge=mergeGeometries(b.g,false);if(!ge)continue;const m=new T.Mesh(ge,b.m);m.castShadow=b.cast;m.receiveShadow=true;this.bRoot.add(m)}this.root.add(this.bRoot)}
- setTile(x,y,c){this.dirty=1;const e=elevOf(c);c=ALIAS[c]||c;const k=x+','+y,old=this.tiles.get(k);if(old){this.root.remove(old);this.anim=this.anim.filter(a=>a.g!==old);this.tops=this.tops.filter(t=>t.parent!==old)}
+ setTile(x,y,c){this.dirty=1;const e=elevOf(c);c=ALIAS[c]||(TILES[c]&&TILES[c].as3d)||c;const k=x+','+y,old=this.tiles.get(k);if(old){this.root.remove(old);this.anim=this.anim.filter(a=>a.g!==old);this.tops=this.tops.filter(t=>t.parent!==old)}
   let g=this.make(c,x,y);if(e>0)g=this.platform(g||new this.T.Group(),x,y,e,c);if(!g)return this.tiles.delete(k);g.position.copy(this.pos(x,y));g.traverse(o=>{if(o.isMesh){o.castShadow=o.userData.noShadow?false:true;o.receiveShadow=true}});
   this.root.add(g);this.tiles.set(k,g)}
  make(c,x,y){const T=this.T,g=new T.Group(),m=this.m,add=(geo,mat,sx,sy,sz,px=0,py=0,pz=0,ry=0)=>{const o=new T.Mesh(geo,mat);o.scale.set(sx,sy,sz);o.position.set(px,py,pz);o.rotation.y=ry;g.add(o);return o};
