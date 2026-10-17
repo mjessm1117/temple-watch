@@ -11,16 +11,7 @@ const CLASS={
  Heavy:{hp:8,aim:60,mob:4,dmg:[3,5],range:7,nades:2,init:7,will:60,desc:'Heavy weapons. Grenades, rockets and armor-shredding fire.'}};
 // Always-known abilities per class (besides the Jedi/troop basics in campaign.js abilFor).
 const BASE_KIT={Medic:['heal','scan','hack'],Heavy:['grenade']};
-// Ability trees, ranks 1–7: each rank offers two, you pick one (14 per class). Ids live in AB (abilities.js / temple-kits.js / temple-prog.js) or PERKS (stat picks).
-const KITS={
- Guardian:{1:['saberThrow','defLine'],2:['leap','reflectM'],3:['collapse','sweep'],4:['gIron','gDuelist'],5:['gBulwark','gVanguard'],6:['mightyBlow','gWarden'],7:['gUnbreakable','gMasterBlade']},
- Consular:{1:['stun','forceHeal'],2:['barrier','battleMed'],3:['mindTrick','forceRevive'],4:['pull','cResolve'],5:['massHeal','forceWave'],6:['cWellspring','cSeer'],7:['stasisField','cMaster']},
- Sentinel:{1:['flurry','sense'],2:['shadowStep','sExecutioner'],3:['saberThrow','executioner'],4:['disarm','sEdge'],5:['sweep','sGhost'],6:['precisionStrike','sHunter'],7:['sBlademaster','sUntouchable']},
- Wayseeker:{1:['pathfinder','wildBond'],2:['tremor','barrier'],3:['forceHeal','saberThrow'],4:['beastCalm','wStalker'],5:['forceWave','pull'],6:['wBond','wSeer'],7:['stasisField','wPrimal']},
- Soldier:{1:['suppress','hunker'],2:['rapidFire','flakVest'],3:['rally','veteran'],4:['holdLine','soTough'],5:['soMarksman','soSteel'],6:['chainShot','soIronWill'],7:['soCommander','soLegend']},
- Scout:{1:['mark','scEagle'],2:['deadeye','longshot'],3:['killshot','fieldcraft'],4:['runGun','scSniper'],5:['scAssassin','scSurvivor'],6:['spotter','scDeadly'],7:['scLegend','ghost']},
- Medic:{1:['smoke','mDrilled'],2:['reviveStim','fieldKit'],3:['combatMedic','traumaBag'],4:['shieldDrone','mSurgeon'],5:['medBeacon','mStoic'],6:['mFieldSurgeon','mMarksman'],7:['mAngel','mVeteran']},
- Heavy:{1:['suppress','shredder'],2:['bandolier','flakVest'],3:['rocket','juggernaut'],4:['ionNade','hBrute'],5:['chainShot','hBulwark'],6:['hGunner','hHeavyWeapons'],7:['hTitan','hWarlord']}};
+// Skill trees (trunk → 2 specializations at rank 3 → ranks 4–7) and cross-training live in data-trees.js.
 // XP to reach each rank (spec B §5.1).
 const RANKS=[{xp:0},{xp:30},{xp:80},{xp:160},{xp:280},{xp:450},{xp:700}];
 // Stat gains on reaching a rank (ranks 2–3 match v0.2; 4–7 per spec B §5.1, trimmed so R7 isn't untouchable).

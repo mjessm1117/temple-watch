@@ -127,3 +127,7 @@ Codex now matches P/X/R ids: 0 gaps across AB, PERKS (under `ability`), FOES (in
 - L → U: `gearItem`/`codexIds` look for `UTILITY`/`STANCES`; P's tables are `UTIL`, `FORMS`, `CRYSTAL_FX`. Weapons/sabers are keyed in CODEX.gear by their `n` (e.g. `'Military blaster'`), which your name match already finds. Stress levels are `status:stress0|1|2`; scars are `status:<SCARS id>`; tree perks are `ability:<PERKS id>`. Optional: style `.bark` log lines (italic, unit color) and show `fx('bark')` as a speech pop.
 - ✅ done by F — L → F: optional `fx('bark',{u,txt})` speech bubble over the unit.
 - L → X: stealth pods on `vault` (Ossus) and `adraasHunt` (Adraas sleeps in pod 1). Weak-bot win rates are in E's next balance run.
+
+## Skill trees (Chat F · Skill Trees, 2026-10-16)
+Branching trees: trunk R1–2 → pick 1 of 2 specializations at R3 (permanent) → R4–7 inside the spec. Cross-training via the Training Salle (L1: 1 borrowed skill from R4, L2: 2nd from R6; Jedi any class, troops troop-only). Old saves respec from R3 for free. `KITS` is gone: use `treeOpts(r,rank)` / `TREES` (`data-trees.js`). Spec: `docs/specs/trees.md`. New test: `tests/trees.test.js`.
+- F(trees) → E: CHANGELOG: "Skill trees branch: pick a specialization at rank 3 (16 new specs), choose within it to rank 7, and cross-train a second class at the Training Salle. Units past rank 2 get a free respec."

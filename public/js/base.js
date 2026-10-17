@@ -24,8 +24,8 @@ let lastDeb=null;
 function promoHTML(out){if(!out||!out.promo.length)return '';
  return `<section><h3>Promotions</h3>${out.promo.map(id=>{const r=unit(id),p=pendingRank(r),done=out.picked&&out.picked[id];
   return `<div class="rrow"><span class="mini" style="--uc:${r.col||'var(--troop)'}">${icon(r.cls.toLowerCase())}</span><div class="rmain"><b>${r.n} · Rank ${r.rank}</b>
-  ${p?`<div class="picks">Rank ${p}: choose one ${KITS[r.cls][p].map(k=>{const a=pickInfo(k);return `<button type="button" data-act="dpick:${id}:${k}" title="${(a.tip||'').replace(/"/g,'')}">${icon(a.ic||'guard')}${a.name}</button>`}).join('')}</div>
-   <small>${KITS[r.cls][p].map(k=>`${pickInfo(k).name}: ${pickInfo(k).tip}`).join(' · ')}</small>`:''}
+  ${p?`<div class="picks">Rank ${p}: ${p===3?'choose a specialization (permanent)':'choose one'} ${treeOpts(r,p).map(k=>{const a=pickCard(r,p,k);return `<button type="button" data-act="dpick:${id}:${k}" title="${a.desc.replace(/"/g,'')}">${icon(a.ic||'guard')}${a.name}</button>`}).join('')}</div>
+   <small>${treeOpts(r,p).map(k=>{const a=pickCard(r,p,k);return `${a.name}: ${a.desc}`}).join(' · ')}</small>`:''}
   ${done?`<small class="up">${done}</small>`:''}</div></div>`}).join('')}</section>`}
 function debriefPick(id,k){const r=unit(id),a=battleUnit({...r,rank:pendingRank(r)-1,picks:r.picks}),out=lastDeb[2];pickAbility(id,k);
  out.picked=out.picked||{};out.picked[id]=`Took ${pickInfo(k).name}. ${statDiff(a,battleUnit(r))}`;debrief(...lastDeb)}

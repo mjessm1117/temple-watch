@@ -75,7 +75,7 @@ function monthTick(){const f=C.res.favor,st=Math.round((STIPEND[0]+STIPEND[1]*f)
 function buildWing(k){const l=C.wings[k],cost=WINGS[k].cost[l+1];if(C.build||cost==null||C.res.credits<cost||!researched(WINGS[k].req&&WINGS[k].req[l+1]))return;C.res.credits-=cost;C.build=k;saveGame()}
 function addTroop(){const used=new Set(C.roster.map(r=>r.n)),n=RECRUIT_NAMES.find(x=>!used.has(x))||'Recruit '+C.nid;
  C.roster.push({id:'u'+C.nid++,n,cls:pickOne(['Soldier','Scout','Medic','Heavy']),rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0})}
-function pickAbility(id,k){const r=C.roster.find(r=>r.id===id),p=r&&pendingRank(r);if(!p||!KITS[r.cls][p].includes(k))return;r.picks.push(k);r.pick=pendingRank(r);saveGame()}
+function pickAbility(id,k){const r=C.roster.find(r=>r.id===id),p=r&&pendingRank(r);if(!p||!treeOpts(r,p).includes(k))return;r.picks.push(k);if(p===3)r.spec=Object.keys(TREES[r.cls].specs).find(n=>TREES[r.cls].specs[n].sig===k);r.pick=pendingRank(r);saveGame()}
 function launchMission(i,ids){ensureTemple();const o=C.options[i],sq=ids.map(id=>battleUnit(C.roster.find(r=>r.id===id)));chooseOption(i);
  startMission(o.mission,sq,{diff:C.diff,hostage:hostageFor(o),crisis:o.crisis||null})}
 function defaultSquad(o){const q=o&&o.quest,ok=C.roster.filter(r=>fit(r)&&r.id!==(o&&o.hostage)).sort((a,b)=>(b.id===q)-(a.id===q)),J=ok.filter(isJedi).slice(0,3),T=ok.filter(r=>!isJedi(r));return[...J,...T].slice(0,6).map(r=>r.id)}

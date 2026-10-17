@@ -5,9 +5,8 @@ const RANK_TITLE=['','Recruit','Private','Corporal','Sergeant','Lieutenant','Cap
 function ensureTemple(){if(!C)return;const w=C.wings;for(const k of Object.keys(WINGS))if(w[k]==null)w[k]=k==='barracks'?1:0;
  C.bonds=C.bonds||{};C.quests=C.quests||{};C.staff=C.staff||{};if(!C.cands)C.cands=genCands();
  for(const r of C.roster){r.gear=r.gear||{w:0,armor:'none',mods:[],saber:0,trait:null};r.bonus=r.bonus||{};r.picks=r.picks||[];
-  if(r.age==null)r.age=ageFor(r);if(!C.treeV&&KITS[r.cls])r.picks=[KITS[r.cls][1][0],...r.picks];
-  if(KITS[r.cls])r.picks=r.picks.map((k,i)=>KITS[r.cls][i+1]?(KITS[r.cls][i+1].includes(k)?k:KITS[r.cls][i+1][0]):k).slice(0,7);if(r.trait===undefined)r.trait=null;if(r.fear==null)r.fear=0;r.pick=pendingRank(r)}
- C.treeV=1;ensureProg();ensureLife()}
+  if(r.age==null)r.age=ageFor(r);if(!C.treeV&&TREES[r.cls])r.picks=[TREES[r.cls].trunk[1][0],...r.picks];fixTree(r);if(r.trait===undefined)r.trait=null;if(r.fear==null)r.fear=0;r.pick=pendingRank(r)}
+ C.treeV=2;ensureProg();ensureLife()}
 const ri2=([a,b])=>a+Math.floor(Math.random()*(b-a+1));
 const ageFor=r=>ri2(isJedi(r)?AGES[r.title==='Knight'?'Knight':'Padawan']:AGES.troop);
 function addMod(u,m){for(const [k,v] of Object.entries(m||{})){
@@ -22,8 +21,26 @@ function templeMods(u,r){if(!r.gear)return u;const g=r.gear;
  u.bondAim=u.bonds.length?BOND.aim:0;u.bondReact=u.bonds.some(b=>b.lvl>=2)?1:0;progMods(u,r);u.mob=Math.max(2,u.mob);return u}
 
 // --- promotions: one pick per rank (1–7); a unit can owe picks for several ranks. An unpicked rank 1 fights with its first option. ---
-const picksOf=r=>r.picks.length||!KITS[r.cls]?r.picks:[KITS[r.cls][1][0]];
-function pendingRank(r){const k=r.picks.length+1;return k<=r.rank&&KITS[r.cls]&&KITS[r.cls][k]?k:0}
+// Trees (data-trees.js): trunk ranks 1–2, rank 3 = pick a spec (its signature skill), ranks 4–7 inside the spec. Borrowed skills ride along.
+const picksOf=r=>[...(r.picks.length||!TREES[r.cls]?r.picks:[TREES[r.cls].trunk[1][0]]),...(r.borrow||[])];
+const specOf=r=>{const T=TREES[r.cls];return T&&r.spec?T.specs[r.spec]:null};
+function treeOpts(r,k){const T=TREES[r.cls];if(!T)return[];if(k<=2)return T.trunk[k]||[];if(k===3)return Object.values(T.specs).map(s=>s.sig);const s=specOf(r);return s&&s[k]||[]}
+function pendingRank(r){const k=r.picks.length+1;return k<=r.rank&&treeOpts(r,k).length?k:0}
+// Old saves / preset units: a bad trunk pick becomes option 1; a bad spec pick drops it and everything after (free respec).
+function fixTree(r){const T=TREES[r.cls];if(!T)return;r.picks=r.picks.slice(0,7);r.spec=null;
+ for(let i=0;i<r.picks.length;i++){const k=i+1,o=treeOpts(r,k);if(k<=2){if(!o.includes(r.picks[i]))r.picks[i]=o[0];continue}
+  if(!o.includes(r.picks[i])){r.picks.length=i;break}if(k===3)r.spec=Object.keys(T.specs).find(n=>T.specs[n].sig===r.picks[i])}
+ r.borrow=(r.borrow||[]).filter(k=>xtrainPool(r,1).includes(k)).slice(0,xtrainSlots(r))}
+// A pick button's label: rank 3 shows the spec name with its signature skill.
+function pickCard(r,p,k){const a=pickInfo(k);if(p!==3)return{name:a.name,ic:a.ic,desc:a.desc||a.tip||''};
+ const s=Object.values(TREES[r.cls].specs).find(s=>s.sig===k);return{name:`${s.n} · ${a.name}`,ic:s.ic,desc:`${s.desc} Comes with ${a.name}: ${a.desc||a.tip||''}`}}
+// --- cross-training (multiclass): free, gated by the Training Salle. XTRAIN in data-trees.js.
+const xtrainSlots=r=>XTRAIN.minRank.filter((m,i)=>(C.wings.training||0)>i&&r.rank>=m).length;
+const xtrainClasses=r=>Object.keys(TREES).filter(c=>c!==r.cls&&(CLASS[c].lockEra||0)<=(C.era||1)&&(isJedi(r)||!CLASS[c].jedi));
+function xtrainPool(r,keep){if(!r.alt||!TREES[r.alt])return[];const T=TREES[r.alt].trunk,own=keep?r.picks:[...r.picks,...(r.borrow||[])];
+ return[...T[1],...T[2]].filter(k=>!own.includes(k)&&!(isJedi(r)&&!CLASS[r.alt].jedi&&XTRAIN.noGun.includes(k)))}
+function setAlt(id,c){const r=unit(id);if(!r||(r.borrow||[]).length||!xtrainClasses(r).includes(c))return;r.alt=c;saveGame()}
+function borrowSkill(id,k){const r=unit(id);if(!r)return;r.borrow=r.borrow||[];if(r.borrow.length>=xtrainSlots(r)||!xtrainPool(r).includes(k))return;r.borrow.push(k);saveGame()}
 function promote(r){const b=r.rank;while(r.rank<RANKS.length&&r.xp>=RANKS[r.rank].xp)r.rank++;
  if(r.rank>b&&!isJedi(r))r.title=RANK_TITLE[r.rank];r.pick=pendingRank(r);return r.rank>b}
 const pickInfo=k=>PERKS[k]||AB[k]||{name:k,tip:''};

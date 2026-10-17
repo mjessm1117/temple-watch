@@ -11,7 +11,7 @@ function rosterTab(){const act=C.roster.filter(r=>r.status!=='dead');
   return `<div class="rrow"><span class="mini" style="--uc:${r.col||'var(--troop)'}">${icon(r.cls.toLowerCase())}</span><div class="rmain"><b data-tip="class:${r.cls}">${r.n}</b>
   <small>${r.title?r.title+' · ':''}${r.cls} · Rank ${r.rank} · ${r.xp}${next?'/'+next:''} XP${isJedi(r)?` · Darkness ${r.dark}`:''}${r.trait?` · ${TRAITS[r.trait].n}`:''} · age ${r.age}${r.fear?` · <span class="bad">afraid (${r.fear})</span>`:''}</small>
   ${bs.length?`<small class="bd">Bonds: ${bs.map(b=>`${b.n} ${'★'.repeat(b.lvl)}`).join(', ')}</small>`:''}
-  ${p?`<div class="picks">Rank ${p}: choose one ${KITS[r.cls][p].map(k=>{const a=pickInfo(k);return `<button type="button" data-act="pick:${r.id}:${k}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}${a.name}</button>`}).join('')}<small>${KITS[r.cls][p].map(k=>`${pickInfo(k).name}: ${pickInfo(k).desc||pickInfo(k).tip}`).join(' · ')}</small></div>`:''}
+  ${p?`<div class="picks">Rank ${p}: ${p===3?'choose a specialization (permanent)':'choose one'} ${treeOpts(r,p).map(k=>{const a=pickCard(r,p,k);return `<button type="button" data-act="pick:${r.id}:${k}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}${a.name}</button>`}).join('')}<small>${treeOpts(r,p).map(k=>{const a=pickCard(r,p,k);return `${a.name}: ${a.desc}`}).join(' · ')}</small></div>`:''}
   ${rosterProg(r)}
   ${r.grief?`<div class="picks">${r.n} lost ${r.grief}. <button type="button" data-act="grief:${r.id}:0">Grieve (keep fear)</button><button type="button" data-act="grief:${r.id}:1">Use the anger (Darkness +2, no fear)</button></div>`:''}
   ${r.status==='active'?`<select data-assign="${r.id}" aria-label="Assignment for ${r.n}">${assignOpts(r).map(([v,t])=>`<option value="${v}" ${(r.assign||'')===v?'selected':''}>${t}</option>`).join('')}</select>`:''}</div>
@@ -64,13 +64,24 @@ function baseScreen(){SCR=baseScreen;S=null;ensureTemple();const m=$('#modal');m
 function hubClick(ev){if(ev.target.closest('#hubCx'))return codexOpen();if(ev.target.closest('#hubSet'))return settingsOpen();const t=ev.target.closest('[data-tab]');if(t){TAB=t.dataset.tab;return baseScreen()}
  const b=ev.target.closest('[data-act]');if(!b||b.disabled)return;const [a,x,y]=b.dataset.act.split(':');
  if(a==='squad')return squadScreen(+x);
- if(progClick(a,x,y));else if(a==='build')buildWing(x);else if(a==='pick')pickAbility(x,y);else if(a==='grief')griefChoice(x,y==='1');
+ if(progClick(a,x,y));else if(a==='build')buildWing(x);else if(a==='pick')pickAbility(x,y);else if(a==='alt')setAlt(x,y);else if(a==='borrow')borrowSkill(x,y);else if(a==='grief')griefChoice(x,y==='1');
  else if(a==='arm'){ARM=x;TAB='armory'}else if(a==='wpn')buyWeapon(x);else if(a==='armor')buyArmor(x,y);else if(a==='mod')buyMod(x,y);else if(a==='dropmod')dropMod(x,y);
  else if(a==='saber')craftSaber(x);else if(a==='trait')setTrait(x,y);else if(a==='col')setColor(x,y);
  else if(a==='hire'){candEdit(+x);const i=+x,c=$('#modal').querySelector(`input[name="rc${i}"]:checked`);hireCand(i,$('#rn'+i).value,c&&c.value)}
  baseScreen()}
 
-// Full skill tree for one unit (Armory): every rank, both options, the chosen one lit.
-function treeHTML(r){const K=KITS[r.cls];if(!K)return '';const P=picksOf(r);
- return `<div><b class="eyebrow">Skill tree · ${r.cls}</b>${CLASS[r.cls].desc?` <small class="muted">${CLASS[r.cls].desc}</small>`:''}<div class="tree">${Object.entries(K).map(([rk,opts])=>`<div class="trow ${+rk>r.rank?'lock':''}"><span>R${rk}${RANKS[rk-1]?` <small>${RANKS[rk-1].xp} XP</small>`:''}</span>${opts.map(k=>{const a=pickInfo(k),on=P[rk-1]===k;
-  return `<span class="topt ${on?'on':''}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}<b>${a.name}</b><small>${a.desc||a.tip||''}</small></span>`}).join('')}</div>`).join('')}</div></div>`}
+// Full skill tree for one unit (Armory): trunk ranks 1–2, then both specializations side by side, then cross-training.
+const optHTML=(k,on)=>{const a=pickInfo(k);return `<span class="topt ${on?'on':''}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}<b>${a.name}</b><small>${a.desc||a.tip||''}</small></span>`};
+const rowHTML=(r,rk,opts,P)=>`<div class="trow ${rk>r.rank?'lock':''}"><span>R${rk}${RANKS[rk-1]?` <small>${RANKS[rk-1].xp} XP</small>`:''}</span>${opts.map(k=>optHTML(k,P[rk-1]===k)).join('')}</div>`;
+function treeHTML(r){const T=TREES[r.cls];if(!T)return '';const P=r.picks.length?r.picks:picksOf(r);
+ return `<div><b class="eyebrow">Skill tree · ${r.cls}</b>${CLASS[r.cls].desc?` <small class="muted">${CLASS[r.cls].desc}</small>`:''}<div class="tree">${[1,2].map(rk=>rowHTML(r,rk,T.trunk[rk],P)).join('')}</div>
+ <div class="specs">${Object.entries(T.specs).map(([id,s])=>`<div class="spec ${r.spec===id?'on':r.spec?'off':''}"><b>${icon(s.ic||'guard')} ${s.n}</b><small class="muted">${s.desc} Rank 3, permanent.</small>
+  <div class="tree">${rowHTML(r,3,[s.sig],r.spec===id?P:[])}${[4,5,6,7].map(rk=>rowHTML(r,rk,s[rk],r.spec===id?P:[])).join('')}</div></div>`).join('')}</div>${xtrainHTML(r)}</div>`}
+function xtrainHTML(r){const lv=C.wings.training||0,n=xtrainSlots(r),B=r.borrow||[];let h;
+ if(!lv)h='<small class="muted">Build the Training Salle to cross-train: borrow skills from a second class.</small>';
+ else if(r.rank<XTRAIN.minRank[0])h=`<small class="muted">Cross-training opens at rank ${XTRAIN.minRank[0]}.</small>`;
+ else{h=`<small class="muted">Borrowed ${B.length}/${n}${lv<2?' · Training Salle L2 adds a 2nd at rank 6':r.rank<XTRAIN.minRank[1]?' · 2nd slot at rank 6':''}. ${isJedi(r)?'Jedi can learn any class.':'Troops can learn other troop classes, never the Force.'}</small>`;
+  if(B.length)h+=`<div class="tree"><div class="trow"><span>${r.alt}</span>${B.map(k=>optHTML(k,1)).join('')}</div></div>`;
+  if(!B.length)h+=`<div class="picks">Second class: ${xtrainClasses(r).map(c=>`<button type="button" class="${r.alt===c?'on':''}" data-act="alt:${r.id}:${c}" data-tip="class:${c}">${icon(c.toLowerCase())}${c}</button>`).join('')}</div>`;
+  if(r.alt&&B.length<n)h+=`<div class="picks">Borrow from ${r.alt}: ${xtrainPool(r).map(k=>{const a=pickInfo(k);return `<button type="button" data-act="borrow:${r.id}:${k}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}${a.name}</button>`}).join('')}</div>`}
+ return `<div class="xtrain"><b class="eyebrow">Cross-training</b> ${h}</div>`}
