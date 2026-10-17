@@ -168,3 +168,14 @@ const SIG={
    {on:'bossHalf',who:'Lord Kaan',txt:'Join us. In the Brotherhood we are all equals in darkness.',choice:{
     a:{label:'Strike him down',txt:'+15 aim this turn. It feels good. Too good (Darkness +1).',do:{aim:15,dark:1}},
     b:{label:'Hold the light',txt:'Hoth\'s Jedi link minds against him: every Jedi +2 Focus and the squad heals 2.',do:{focus:2,heal:2}}}}]}};
+
+// ---- 4. Side objectives: crisis missions roll one optional goal (shown on the mission card, briefing and HUD). Paid on a win.
+// types: only these mission types. check (battle.js): fail-on-event (noDown, quiet, vipSafe) or checked when the mission is won.
+const SIDES={
+ noDown:{n:'Nobody goes down',desc:'Win without any squad member going down.',res:{intel:1,credits:15}},
+ prisoner:{n:'Take a prisoner',desc:'Capture at least one enemy (Subdue).',res:{intel:1,credits:15}},
+ elite:{n:'Cut off the head',desc:'Kill or capture an elite (heavies, agents, Force users).',res:{credits:30}},
+ sweep:{n:'Clean sweep',desc:'Win with no enemy left standing.',res:{credits:30}},
+ quiet:{n:'Quiet hands',desc:'Win without using a Force power (anything that costs Focus).',res:{favor:3}},
+ pristine:{n:'Not a scratch',desc:'Win with the objective above 90%.',res:{credits:30},types:['defend']},
+ vipSafe:{n:'Not a hair harmed',desc:'The VIP or prisoner takes no damage.',res:{favor:3},types:['rescue','escort']}};

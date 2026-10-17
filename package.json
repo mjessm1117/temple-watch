@@ -4,9 +4,9 @@
   "description": "XCOM-style Jedi Temple tactics game (personal fan project).",
   "scripts": {
     "build": "node tools/inline.js",
-    "test": "node tools/inline.js && node tests/balance.test.js && node tests/campaign.test.js && node tests/sync.test.mjs && node tests/era2.test.js && node tests/trees.test.js",
+    "test": "node tools/inline.js && node tests/balance.test.js && node tests/campaign.test.js && node tests/sync.test.mjs && node tests/era2.test.js && node tests/trees.test.js && node tests/variety.test.js",
     "dev": "npx wrangler dev",
-    "test:quick": "node tools/inline.js && GAMES=1 node tests/balance.test.js && CAMPAIGNS=1 node tests/campaign.test.js && node tests/sync.test.mjs && FULL=0 RUNS=1 node tests/era2.test.js && node tests/trees.test.js"
+    "test:quick": "node tools/inline.js && GAMES=1 node tests/balance.test.js && CAMPAIGNS=1 node tests/campaign.test.js && node tests/sync.test.mjs && FULL=0 RUNS=1 node tests/era2.test.js && node tests/trees.test.js && RUNS=1 node tests/variety.test.js"
   },
   "devDependencies": {
     "jsdom": "24.1.3"

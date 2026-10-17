@@ -18,12 +18,14 @@ function bvPlace(ch,at){const [x,y]=at;let p=tile(x,y)==='.'&&!unitAt(x,y)?{x,y}
 function rollTwist(id){const B=MISSIONS[id],th=(B&&B.theme)||THEME_OF[id]||'plains',L=Object.entries(TWISTS).filter(([k,t])=>!t.themes||t.themes.includes(th));
  const tot=L.reduce((s,[,t])=>s+t.w,0);let r=Math.random()*tot;for(const [k,t] of L)if((r-=t.w)<0)return k;return 'ally'}
 function twistFor(o){if(!o)return null;if(!o.twist||!TWISTS[o.twist])o.twist=rollTwist(o.mission);return o.twist}
-let BV_NEXT=null;
+function rollSide(id){const B=MISSIONS[id];if(!B||B.story)return null;const L=Object.keys(SIDES).filter(k=>!SIDES[k].types||SIDES[k].types.includes(B.type));return pickOne(L)}
+function sideFor(o){if(!o||o.story)return null;if(o.side===undefined||(o.side&&!SIDES[o.side]))o.side=rollSide(o.mission);return o.side}
+let BV_NEXT=null,BV_SIDE;
 
 // ---- Mission setup
 const _bvStart=startMission;
-startMission=function(id,sq,o={}){const tw=o.twist||BV_NEXT||rollTwist(id);BV_NEXT=null;_bvStart(id,sq,o);S.M={...S.M};
- S.bv={tw:TWISTS[tw]?tw:null,sig:SIG[id]?id:null,fired:{},gen:0,q:[],comm:null,res:{},flags:[],locks:0,foeAim:0};bvSetup();
+startMission=function(id,sq,o={}){const tw=o.twist||BV_NEXT||rollTwist(id),sd=o.side!==undefined?o.side:BV_SIDE!==undefined?BV_SIDE:rollSide(id);BV_NEXT=null;BV_SIDE=undefined;_bvStart(id,sq,o);S.M={...S.M};
+ S.bv={tw:TWISTS[tw]?tw:null,sig:SIG[id]?id:null,fired:{},gen:0,q:[],comm:null,res:{},flags:[],locks:0,foeAim:0,side:SIDES[sd]?sd:null,sideFail:0};bvSetup();
  bvFire('twist');bvFire('turn',{n:1});render();saveGame()};
 function bvSetup(){const T=TWISTS[S.bv.tw]||{},G=SIG[S.bv.sig]||{},b=S.bv;
  if(T.range)for(const u of S.units)bvRange(u);
@@ -196,12 +198,14 @@ function bvDrop(u){const r=S.bv.relic;r.by=null;u.mob++;const p=tile(u.x,u.y)===
 const _bvDmg=damage;damage=function(t,d,src){if(!S||!S.bv)return _bvDmg(t,d,src);
  if(bvShielded(t)){fx(t,'SHIELDED','defl');log(`${t.n} is untouchable while the pylons stand.`);return}
  const st=t.status,hp=t.hp;_bvDmg(t,d,src);if(S.over)return;
- if(t.vip&&t.hp<hp)bvFire('vipHit');
- if(t.side==='p'&&!t.vip&&!t.guest&&st==='ok'&&t.status==='down')bvFire('down',{unit:t.uid});
+ if(t.vip&&t.hp<hp){bvFire('vipHit');if(S.bv.side==='vipSafe')S.bv.sideFail=1}
+ if(t.side==='p'&&!t.vip&&!t.guest&&st==='ok'&&t.status==='down'){bvFire('down',{unit:t.uid});if(S.bv.side==='noDown')S.bv.sideFail=1}
  if(t.boss&&alive(t)&&t.hp*2<=t.max)bvFire('bossHalf');
  if(S.bv.relic&&S.bv.relic.by===t.uid&&t.status!=='ok')bvDrop(t)};
 const _bvBlast=blast;blast=function(x,y,d,src,seen){_bvBlast(x,y,d,src,seen);if(S.bv&&S.bv.pyl)for(let yy=y-1;yy<=y+1;yy++)for(let xx=x-1;xx<=x+1;xx++)if(inb(xx,yy)&&S.grid[yy][xx]==='P')hitPylon(xx,yy,d)};
 // Shooting pylons: they show up as targets like barrels and beacons (always hit).
+// Quiet hands: any Focus-costing power by the squad fails it.
+const _bvExec=exec;exec=function(u,k,g){if(S.bv&&S.bv.side==='quiet'&&u.side==='p'&&AB[k]&&AB[k].f)S.bv.sideFail=1;return _bvExec(u,k,g)};
 const _bvShTg=AB.shoot.tg,_bvShRun=AB.shoot.run;
 AB.shoot.tg=u=>{const L=_bvShTg(u);if(S.bv&&S.bv.pyl)for(const k of Object.keys(S.bv.pyl)){const [x,y]=k.split(',').map(Number);if(dist(u,{x,y})<=u.range&&los(u,{x,y}))L.push({x,y,pylon:1,chance:100})}return L};
 AB.shoot.run=(u,g)=>g.pylon?(log(`${u.n} shoots the ${TILES.P.n.toLowerCase()}.`),hitPylon(g.x,g.y,ri(u.dmg[0],u.dmg[1]))):_bvShRun(u,g);
@@ -231,10 +235,14 @@ function sigStat(){const b=S.bv,G=SIG[b&&b.sig];if(!G)return null;let v='';
  if(b.key)v=b.key.done?'cell open ✓':'jailer holds it';
  if(b.bar)v=b.bar.uid!=null?'spotter alive':'guns blind ✓';
  return{n:G.n,v,desc:G.desc}}
-function sigWon(){const b=S.bv,G=SIG[b.sig],res={...b.res},flags=[...b.flags];
+function sideOk(){const b=S.bv,k=b&&b.side;if(!k||b.sideFail)return false;const E=S.units.filter(u=>u.side==='e');
+ return k==='prisoner'?E.some(e=>e.status==='captured'):k==='elite'?E.some(e=>(isElite(e)||e.force)&&!alive(e)):k==='sweep'?!enemies().some(e=>e.status==='ok'):k==='pristine'?S.obj*10>=S.M.obj*9:true}
+function sideStat(){const b=S.bv,k=b&&b.side;if(!k)return null;const D=SIDES[k],live=['noDown','quiet','vipSafe','pristine'].includes(k);
+ return{n:D.n,desc:D.desc,v:b.sideFail?'failed ✗':sideOk()?(live?'on track':'done ✓'):'not yet',res:D.res}}
+function sigWon(){const b=S.bv,G=SIG[b.sig]||{},res={...b.res},flags=[...b.flags];if(sideOk())for(const [k,v] of Object.entries(SIDES[b.side].res))res[k]=(res[k]||0)+v;
  if(b.relic&&b.relic.by!=null){const u=byId(b.relic.by);if(u&&u.status==='ok'){for(const [k,v] of Object.entries(G.relic.res))res[k]=(res[k]||0)+v;flags.push(G.relic.flag)}}
  if(b.wd)for(const id of b.wd){const u=byId(id);if(u&&u.status==='ok')for(const [k,v] of Object.entries(G.wounded.res))res[k]=(res[k]||0)+v}
  return{res,flags}}
 const _bvApply=applyResults;applyResults=function(win){const out=_bvApply(win);if(!S.bv||!win||!out)return out;const {res,flags}=sigWon();
- for(const [k,v] of Object.entries(res))gain(k,v,out.res);for(const f of flags)C.flags[f]=1;if(Object.keys(res).length&&SIG[S.bv.sig])out.sig=SIG[S.bv.sig].n;return out};
-const _bvLaunch=launchMission;launchMission=function(i,ids){BV_NEXT=twistFor(C.options[i]);return _bvLaunch(i,ids)};
+ for(const [k,v] of Object.entries(res))gain(k,v,out.res);for(const f of flags)C.flags[f]=1;if(Object.keys(res).length)out.bvRes=res;return out};
+const _bvLaunch=launchMission;launchMission=function(i,ids){BV_NEXT=twistFor(C.options[i]);BV_SIDE=sideFor(C.options[i]);return _bvLaunch(i,ids)};
