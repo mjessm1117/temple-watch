@@ -30,7 +30,7 @@ const PLANETS={
  'Ilum':{x:72,y:160,reg:'unknown'}};              // H: Unknown Regions (canon + Legends)
 // Pin look by mission type / option kind. ic = icons.js key.
 const PIN={story:{c:'var(--holo)',ic:'relay'},crisis:{c:'var(--troop)',ic:'strike'},rescue:{c:'var(--sith)',ic:'captured'},quest:{c:'var(--good)',ic:'kyber'},
- redeem:{c:'var(--dark)',ic:'darkness'},field:{c:'#a7c7cc',ic:'scan'}};
+ redeem:{c:'var(--dark)',ic:'darkness'},field:{c:'#a7c7cc',ic:'scan'},sith:{c:'var(--sith)',ic:'e_trooper'}};
 const TYPE_IC={defend:'guard',rescue:'captured',investigate:'scan',assault:'strike',sabotage:'charge',escort:'evac'};
 // Risk bands from the enemy-power estimate in galaxy.js (riskOf). Normal: most Era 1 maps read Moderate; the hardest Ruusan maps Severe.
 const RISK=[[0,'Low',1],[35,'Moderate',2],[50,'High',3],[65,'Severe',4]];
@@ -53,3 +53,8 @@ const FIELD={base:45,perRank:5,match:10,matchMax:2,three:8,star:12,min:10,max:92
 // Field op planets per era (no Coruscant: ops leave the Temple).
 const FIELD_PLANETS={1:['Balmorra','Ord Mantell','Dantooine','Taris','Nar Shaddaa','Ossus','Alderaan','Hydian Way'],
  2:['Ruusan','Ord Mantell','Dantooine','Nar Shaddaa','Ossus','Hydian Way','Balmorra']};
+// ── Region Unrest 0–5 (spec B §6.1, cut down). Ignored crises, hits and lapses raise it; wins and field-op successes lower it. ──
+const UNREST={max:5,ignore:1,lose:1,win:-1,opHit:1,lapse:1,fieldWin:-1,
+ hostile:3,aimAt3:5,fieldAt3:-10,   // at Unrest ≥3: enemies there +5 aim; field ops there −10 odds
+ favorAt:4,favor:-1};               // each region at Unrest ≥4 costs 1 Senate Favor a month
+const UNREST_WORD=['Calm','Uneasy','Restless','Hostile','Burning','Fallen'];

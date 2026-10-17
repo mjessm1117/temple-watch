@@ -34,5 +34,11 @@ check(E('sent&&C.field.list[0].st==="team"'),'field op team sent');check(E("C.ro
 check(E("!fit(C.roster.find(r=>r.assign==='field:fz'))"),'team away cannot deploy');
 E("C.field.list[0].fresh=0;var n0=C.field.log.length;fieldAdvance()");check(E("C.field.log.length")===E('n0')+1&&E("C.roster.filter(r=>r.assign==='field:fz').length")===0,'field op resolves, report logged, team home');
 check(E("fieldOdds('pirates',[]).ch")===0&&E("fieldOdds('convoy',C.roster.slice(0,3).map(r=>r.id)).ch")>40,'field odds');
+// Region Unrest + Sith op pins
+E("C.unrest=null;ignoreCrisis({n:'X',mission:'rescue'})");check(E("unrestOf('mid')")===1,'ignored crisis raises Unrest in its region');
+E("C.unrest.r.mid=4;C.news=[];templeMonth()");check(E("C.news.some(n=>/Unrest in/.test(n))"),'Unrest 4+ costs Senate Favor at month end');
+E("C.unrest.r.mid=3;C.options=optionsFor(C.step);var rix=C.options.findIndex(o=>regionOf(MISSIONS[o.mission].where)==='mid');if(rix>=0)launchMission(rix,defaultSquad(C.options[rix]))");
+check(E("rix<0||S.unrestAim===5"),'hostile region: enemies +5 aim');
+E("S=null;C.ops.list.push({id:'opz',k:'snipers',st:'open'});baseScreen()");check(!!d.querySelector('g[data-pin="sopz"]'),'Sith op shows as a pin');
 check(errs.length===0,'no page errors '+(errs[0]||''));
 console.log(JSON.stringify({err:errs.length}));process.exit(fail?1:0);

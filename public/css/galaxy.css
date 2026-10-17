@@ -34,3 +34,6 @@
 .dkline{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}.dkline .dkt{color:var(--dark)}
 .gpanel .picks{display:flex;flex-wrap:wrap;gap:6px}
 @media(prefers-reduced-motion:reduce){.greg{transition:none}}
+.greg.u2{fill:color-mix(in srgb,var(--warn) 7%,transparent)}.greg.u3{fill:color-mix(in srgb,var(--sith) 9%,transparent)}
+.greg.u4,.greg.u5{fill:color-mix(in srgb,var(--sith) 16%,transparent);stroke:color-mix(in srgb,var(--sith) 45%,var(--grid))}
+.greg.on{fill:color-mix(in srgb,var(--holo) 16%,transparent);stroke:var(--holo)}
