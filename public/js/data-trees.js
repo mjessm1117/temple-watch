@@ -13,7 +13,7 @@ Object.assign(PERKS,{
  gWMStorm:{name:'Bladestorm',ic:'sweep',desc:'+1 damage, +1 move and +15% crit chance.',mod:{dmg:1,mob:1,crit:15}},
  cSageLight:{name:'Inner Light',ic:'meditate',desc:'+2 HP, +10 will and +5 deflect.',mod:{hp:2,will:10,deflect:5}},
  cSageEmpathy:{name:'Empathy',ic:'medic',desc:'+1 max Focus and +2 HP.',mod:{maxF:1,hp:2}},
- cSageAvatar:{name:'Vessel of the Force',ic:'meditate',desc:'+2 max Focus.',mod:{maxF:2}},
+ cSageAvatar:{name:'Vessel of the Force',ic:'meditate',desc:'+2 max Focus and +2 HP.',mod:{maxF:2,hp:2}},
  cShWhisper:{name:'Whisper Strike',ic:'strike',desc:'+10 aim and +10% crit chance.',mod:{aim:10,crit:10}},
  cShVeil:{name:'Shadow Veil',ic:'conceal',desc:'+1 move and +15 deflect.',mod:{mob:1,deflect:15}},
  cShMaster:{name:'Master of Shadows',ic:'strike',desc:'+2 damage and +1 max Focus.',mod:{dmg:2,maxF:1}},
@@ -42,7 +42,7 @@ Object.assign(PERKS,{
  scInfKnife:{name:'Close Work',ic:'shoot',desc:'+1 damage and +10 aim.',mod:{dmg:1,aim:10}},
  scInfPhantom:{name:'Phantom',ic:'dash',desc:'+2 move and +2 HP.',mod:{mob:2,hp:2}},
  scInfStrike:{name:'First Strike',ic:'shoot',desc:'+2 damage and +1 move.',mod:{dmg:2,mob:1}},
- mSurgCalm:{name:'Calm Hands',ic:'medic',desc:'+2 HP and +20 will.',mod:{hp:2,will:20}},
+ mSurgCalm:{name:'Calm Hands',ic:'medic',desc:'+3 HP and +20 will.',mod:{hp:3,will:20}},
  mSurgMiracle:{name:'Miracle Worker',ic:'medic',desc:'+3 medkits.',mod:{kits:3}},
  mTechArmor:{name:'Rigged Armor',ic:'hunker',desc:'+1 armor and +1 HP.',mod:{armor:1,hp:1}},
  mTechOverclock:{name:'Overclocked Blaster',ic:'shoot',desc:'+10 aim and +1 damage.',mod:{aim:10,dmg:1}},
@@ -52,7 +52,7 @@ Object.assign(PERKS,{
  hDemoSapper:{name:'Sapper',ic:'grenade',desc:'+2 grenades.',mod:{nades:2}},
  hDemoBig:{name:'Big Gun',ic:'shoot',desc:'+2 damage and +1 range.',mod:{dmg:2,range:1}},
  hBulTaunt:{name:'Draw Fire',ic:'guard',desc:'+2 HP and +20 will.',mod:{hp:2,will:20}},
- hBulFort:{name:'Fortress',ic:'hunker',desc:'+2 armor and +2 HP.',mod:{armor:2,hp:2}}});
+ hBulFort:{name:'Fortress',ic:'hunker',desc:'+1 armor and +2 HP.',mod:{armor:1,hp:2}}});
 
 // trunk: ranks 1–2. specs: two per class; sig = rank-3 skill that comes with the spec; 4–7 = pick 1 of 2.
 const TREES={
@@ -100,7 +100,7 @@ const SPEC_TRAITS={
  vanguard:{n:'Close Assault',desc:'+15 aim and +1 damage against enemies within 4 tiles.'},
  sniper:{n:'Patience',desc:'+10 aim and +1 damage against enemies 7+ tiles away.'},
  infiltrator:{n:'Opening Strike',desc:'Your first hit each mission gets +20 aim and +2 damage.'},
- surgeon:{n:'Triage',desc:'Every heal you give restores 2 more HP.'},
+ surgeon:{n:'Triage',desc:'Every heal you give restores 2 more HP; +1 medkit.',mod:{kits:1}},
  tech:{n:'Field Repairs',desc:'At the start of each turn, you and adjacent allies regain 1 HP.'},
  demolitionist:{n:'Blast Radius',desc:'Grenades, Ion Grenades and Rockets deal +1 damage.'},
  bulwark:{n:'Iron Wall',desc:'+1 armor; enemies get −10 aim against allies next to you.',mod:{armor:1}}};
@@ -108,3 +108,6 @@ const SPEC_TRAITS={
 const STAT_IC={hp:'st_hp',armor:'st_armor',aim:'st_aim',crit:'st_crit',dmg:'st_dmg',mob:'st_mob',maxF:'st_focus',will:'st_will',range:'st_range',kits:'medic',nades:'grenade',deflect:'guard',guardDef:'guard'};
 for(const T of Object.values(TREES))for(const k of [...T.trunk[1],...T.trunk[2],...Object.values(T.specs).flatMap(s=>[4,5,6,7].flatMap(r=>s[r]))]){
  const p=PERKS[k];if(p&&p.mod)p.ic=STAT_IC[Object.keys(p.mod).sort((a,b)=>Math.abs(p.mod[b]*(b==='aim'||b==='will'||b==='crit'||b==='deflect'||b==='guardDef'?.2:1))-Math.abs(p.mod[a]*(a==='aim'||a==='will'||a==='crit'||a==='deflect'||a==='guardDef'?.2:1)))[0]]||p.ic}
+
+// Unit Power weights (power.js unitPower). One point ≈ one 'unit' of battle value. Tune here.
+const POWER_W={hp:2,aim:.5,dmg:3,armor:5,crit:.2,focus:1.5,mob:1,deflect:.2,range:1.5,rangeCap:12,kit:3,nade:3,skill:2,active:4,spec:4};  // active: each learned active ability (a button), since stat picks show up in stats but abilities don't

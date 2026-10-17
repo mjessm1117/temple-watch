@@ -166,3 +166,10 @@ H (`wip/battle-variety-2`) merged into main; owners for wave 4 are in `docs/CHAT
 - K → J: take over `css/holo.css`; pick a distinct `--warn`; keep H's `#bvComm` under the banner.
 - K → G: 3D overlays for `S.bv.bar.zones`, `S.bv.bombs`, chasm tile `V`.
 - K → P/owner of data-life.js: Council vote credit costs swing an era by ~200 Cr; consider a flat or Favor-based cost.
+- F(trees) round 2 (2026-10-17): R7 balance band 146–158 Power across all 32 builds (meter now counts range/kits/grenades/abilities, plus small perk nerfs/buffs); new full-screen skill tree (`ui-tree.js`, Roster → Skill tree). CHANGELOG: "Skill tree screen: see every pick and what it unlocks, pick by clicking. Specializations rebalanced so troops and Jedi top out at similar strength."
+
+## UI pass — Chat J, 2026-10-17
+Desktop (≥880px) only; phone rules in style.css untouched. New `public/css/ui.css` (loaded last; delete it to get the old layout) and `public/js/temple-map.js` (after temple-ui.js).
+- **Battle HUD:** `.side` becomes a transparent grid over the board: roster top-left, tips/objectives/contacts/log top-right, bottom bar = `#card` | `#acts` (ability tiles) + `#hint` | `#odds` + End turn. No markup changes in render.js. 3D camera buttons moved to top centre.
+- **Temple:** left rail = floor plan (`ROOMS` in temple-map.js: id, name, wing, tab, icon). A room opens its tab plus its `wingRow(k)` card; War Room shows `galaxyHTML()` unchanged. All tab panels still render (hidden) so tests find their buttons. Tabs no room claims get a footer button automatically. `wingsTab` now = `wingRow` per wing. `TAB` still works: code that sets `TAB` moves the player to that tab's room.
+- **Requests:** J → I: galaxy lives in `.rwar` inside `.troom` (≈1000px wide at 1366). J → anyone adding a Temple tab: add a room to `ROOMS` (or it lands in the footer).
