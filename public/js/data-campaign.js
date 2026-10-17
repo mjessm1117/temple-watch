@@ -26,7 +26,7 @@ const WINGS={
  armory:{n:'Armory',cost:[0,200,300],up:[0,15,15],eff:['Not built','Military blasters (T2, 1 mod), medium armor, utility gear','Elite blasters (T3, 2 mods), heavy armor'],staff:'Troop gear costs 20% less',desc:'Better blasters, armor, mods and utility gear.'},
  comms:{n:'Comms Hub',cost:[0,150],up:[0,10],eff:['Not built','See crisis rewards before you choose'],staff:'+1 Intel per month',desc:'Intelligence: see rewards in advance and gather Intel.'},
  archives:{n:'Archives',cost:[0,250,300],up:[0,10,10],eff:['Not built','Research one project at a time','Research 50% faster'],staff:'+25% research speed',desc:'Research: new gear, saber forms, abilities and wing upgrades.'},
- gardens:{n:'Meditation Gardens',cost:[0,150,250],up:[0,5,10],eff:['Not built','Units assigned to Meditate shed stress fast','Meditation can also heal a trauma'],staff:'All units shed 5 more stress per mission',desc:'Removes stress, and at level 2 treats traumas.'},
+ gardens:{n:'Meditation Gardens',cost:[0,150,250],up:[0,5,10],eff:['Not built','Meditating units shed stress fast; Jedi shed 1 Darkness a month','Meditation can also heal a trauma; Jedi shed 2 Darkness a month'],staff:'All units shed 5 more stress per mission; Order Darkness −1 a month',desc:'Removes stress and Darkness, and at level 2 treats traumas.'},
  barracks:{n:'Barracks',cost:[0,0,200,300],req:[0,0,0,'logistics'],up:[0,5,5,5],eff:['Not built','Roster cap 10','Roster cap 14','Roster cap 18'],cap:[0,10,14,18],staff:'+1 Recruit per month',desc:'Houses the roster. Higher levels raise the roster cap.'}};
 const CAPTIVE=2;          // missions until an ignored captive escapes home on their own
 const WOUND={light:3,serious:10,grave:40,graveL2:20};
