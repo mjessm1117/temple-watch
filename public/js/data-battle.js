@@ -7,14 +7,14 @@
 // range: ranged weapons lose this much reach (min 3) · vision: no sight or shots past this many tiles (Sense units +3)
 // droids/ionStun: war droids added, % each droid shorts out per turn · cracks: tiles cracked per turn · guest: an extra fighter.
 const TWISTS={
- sandstorm:{n:'Sandstorm',ic:'smoke',themes:['plains','ruins','dock','jungle'],w:3,range:-3,hud:'Ranges −3',
-  desc:'Grit fills the air. Every ranged weapon reaches 3 tiles less (minimum 3), yours and theirs. Snipers suffer most. Close the distance.'},
- blizzard:{n:'Blizzard',ic:'smoke',themes:['snow'],w:4,range:-3,hud:'Ranges −3',
-  desc:'A whiteout. Every ranged weapon reaches 3 tiles less (minimum 3), yours and theirs. Close the distance.'},
+ sandstorm:{n:'Sandstorm',ic:'smoke',themes:['plains','ruins','dock','jungle'],w:3,range:-2,hud:'Ranges −2',
+  desc:'Grit fills the air. Every ranged weapon reaches 2 tiles less (minimum 3), yours and theirs. Snipers suffer most. Close the distance.'},
+ blizzard:{n:'Blizzard',ic:'smoke',themes:['snow'],w:4,range:-2,hud:'Ranges −2',
+  desc:'A whiteout. Every ranged weapon reaches 2 tiles less (minimum 3), yours and theirs. Close the distance.'},
  blackout:{n:'Blackout',ic:'conceal',themes:['city','dock','temple','caves','ruins'],w:3,vision:4,hud:'Sight 4',
   desc:'The lights are out. Nobody sees or shoots past 4 tiles (Sense: 7). Overwatch and long rifles lose their edge; ambushes are easy.'},
- ionstorm:{n:'Ion storm',ic:'ion',themes:['plains','snow','dock','ruins','jungle','city'],w:2,droids:2,ionStun:35,hud:'Droids short out',
-  desc:'Ion clouds roll in. Two war droids join the enemy, and every droid has a 35% chance to short out (stunned) each turn. Personal shields fail.'},
+ ionstorm:{n:'Ion storm',ic:'ion',themes:['plains','snow','dock','ruins','jungle','city'],w:2,droids:2,ionStun:25,hud:'Droids short out',
+  desc:'Ion clouds roll in. Two of their troopers are war droids instead, and every droid has a 25% chance to short out (stunned) each turn. Personal shields fail.'},
  collapse:{n:'Unstable ground',ic:'tremor',themes:['city','dock','caves','ruins','temple'],w:3,cracks:2,hud:'Cracks fall next turn',
   desc:'The floor is failing. Each turn 2 tiles near your squad crack; next turn they fall away: 3 damage to anyone standing there, and the tile becomes a chasm.'},
  ally:{n:'Unexpected ally',ic:'soldier',themes:null,w:3,guest:1,hud:'+1 guest fighter',

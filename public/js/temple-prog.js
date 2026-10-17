@@ -4,13 +4,13 @@
 
 // --- Tree stat picks (ranks 4–7). `mod` adds to battle stats (see addMod in temple.js). will/aimVsHorror are plain fields read by the engine (Chat X).
 Object.assign(PERKS,{
- gIron:{name:'Iron Body',ic:'guard',desc:'+2 HP.',mod:{hp:2}},
+ gIron:{name:'Iron Body',ic:'guard',desc:'+1 HP and +10 will.',mod:{hp:1,will:10}},
  gDuelist:{name:'Duelist',ic:'strike',desc:'+5 aim and +10% crit chance.',mod:{aim:5,crit:10}},
  gBulwark:{name:'Bulwark',ic:'hunker',desc:'+1 armor and +10 deflect while on Guard.',mod:{armor:1,guardDef:10}},
  gVanguard:{name:'Vanguard',ic:'leap',desc:'+1 move and +1 damage.',mod:{mob:1,dmg:1}},
  gWarden:{name:'Warden',ic:'guard',desc:'+15 deflect.',mod:{deflect:15}},
- gUnbreakable:{name:'Unbreakable',ic:'hunker',desc:'+3 HP and +1 armor.',mod:{hp:3,armor:1}},
- gMasterBlade:{name:'Master Blade',ic:'strike',desc:'+2 damage and +10% crit chance.',mod:{dmg:2,crit:10}},
+ gUnbreakable:{name:'Unbreakable',ic:'hunker',desc:'+2 HP and +1 armor.',mod:{hp:2,armor:1}},
+ gMasterBlade:{name:'Master Blade',ic:'strike',desc:'+1 damage and +15% crit chance.',mod:{dmg:1,crit:15}},
  cResolve:{name:'Resolve',ic:'guard',desc:'+2 HP and +10 will.',mod:{hp:2,will:10}},
  cWellspring:{name:'Wellspring',ic:'meditate',desc:'+1 max Focus and +5 deflect.',mod:{maxF:1,deflect:5}},
  cSeer:{name:'Battle Seer',ic:'mark',desc:'+10 aim and +1 move.',mod:{aim:10,mob:1}},
@@ -29,7 +29,7 @@ Object.assign(PERKS,{
  soMarksman:{name:'Marksman',ic:'mark',desc:'+10 aim and +2 range.',mod:{aim:10,range:2}},
  soSteel:{name:'Nerves of Steel',ic:'guard',desc:'+1 armor and +15 will.',mod:{armor:1,will:15}},
  soIronWill:{name:'Iron Will',ic:'guard',desc:'+2 HP and +20 will.',mod:{hp:2,will:20}},
- soCommander:{name:'Commander',ic:'guard',desc:'+10 aim, +2 HP and +1 move.',mod:{aim:10,hp:2,mob:1}},
+ soCommander:{name:'Commander',ic:'guard',desc:'+10 aim, +3 HP, +1 armor and +1 move.',mod:{aim:10,hp:3,armor:1,mob:1}},
  soLegend:{name:'Living Legend',ic:'shoot',desc:'+2 damage and +10% crit chance.',mod:{dmg:2,crit:10}},
  scEagle:{name:'Eagle Eye',ic:'mark',desc:'+2 range and +5 aim.',mod:{range:2,aim:5}},
  scSniper:{name:'Sniper',ic:'mark',desc:'+10 aim.',mod:{aim:10}},
@@ -48,7 +48,7 @@ Object.assign(PERKS,{
  hBulwark:{name:'Walking Bulwark',ic:'hunker',desc:'+1 armor and +10 will.',mod:{armor:1,will:10}},
  hGunner:{name:'Steady Gunner',ic:'shoot',desc:'+10 aim.',mod:{aim:10}},
  hHeavyWeapons:{name:'Heavy Weapons',ic:'shoot',desc:'+1 damage and +1 range.',mod:{dmg:1,range:1}},
- hTitan:{name:'Titan',ic:'hunker',desc:'+3 HP and +1 armor.',mod:{hp:3,armor:1}},
+ hTitan:{name:'Titan',ic:'hunker',desc:'+3 HP.',mod:{hp:3}},
  hWarlord:{name:'Warlord',ic:'grenade',desc:'+2 damage and +1 grenade.',mod:{dmg:2,nades:1}}});
 for(const p of Object.values(PERKS)){p.desc=p.desc||p.tip;p.tip=p.tip||p.desc}
 

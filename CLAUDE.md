@@ -36,6 +36,8 @@ public/            the game (static files served by the Worker; _headers = no-ca
   js/save.js       local + cloud saves (campaign C + live mission S)
   js/campaign.js   campaign state C: XP, wounds, calendar, economy, results
   js/base.js       Temple base, squad select, debrief, slice-end screens
+  js/temple-map.js Temple floor plan: rooms → tabs (left rail of the Temple screen)
+  css/ui.css       desktop HUD layout (bottom battle bar, Temple rail); loaded last
   js/data-galaxy.js  planets, regions, risk bands, field-op templates  ← tune here
   js/darkness.js   Darkness reduction: Gardens, mercy, redemption, mentors
   js/fieldops.js   off-screen field ops (2–3 units, resolve on a roll)
