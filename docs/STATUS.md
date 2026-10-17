@@ -149,3 +149,20 @@ Files: `data-battle.js` (TWISTS, GUESTS, BV_TILES, BEATS, SIG, SIDES: tune here)
 - H → F (3D): new tiles borrow models via `TILES[c].as3d` (one-line change in `view3d/board.js` setTile). Chasm `V` has no model yet (shows plain floor); a dark pit + edge lips would read better. Shell zones (`S.bv.bar.zones`, 3×3) and sapper timers (`S.bv.bombs`) are 2D-only overlays today.
 - H → U: comm box `#bvComm` sits under the turn banner; style/position freely. Log lines of class `beat`.
 - H → L/R: beat/choice text lives in `SIG[id].beats` (data-battle.js); add lines for new story missions there. Flags set on a win: `sig_relay_boost`, `sig_vault_holocron`.
+
+## Chat K — Coordinator sweep, 2026-10-17
+H (`wip/battle-variety-2`) merged into main; owners for wave 4 are in `docs/CHATS.md`. K fix: twist/signature/side cards now also show on I's galaxy briefing panel (H's mission-card hook targeted the old list, which the map replaced). `variety.test.js` added to `npm test` + `test:quick`.
+
+**Play-test findings (bot probes, Normal):**
+1. **Economy is fine; the measurement isn't.** Passive bot (never builds) ends Era 1 at ~570 Cr (204–900). A bot that builds a wing at cost+100, researches and hires ends at ~156 (86–226), inside spec B's 0–300. Don't cut income. Biggest sink is Council votes (−110 to −330 per era, very swingy); 2nd is untracked event/story costs (~−150 to −260). → K: make `campaign.test.js` spend like a player (still clicks the dead `[data-act="hire"]`).
+2. **Ranked squads steamroll.** Balance is tuned with rank-1 squads only. Rank-3 squads win 29/30 on Malgus, Sixth Battle, Thought Bomb; rank 5 wins 18/18. F's skill Power changes little (flat vs on: same win rate, ~1 turn faster). The driver is rank stat growth: aim 100–125 by R5–7 (Sentinel 125), Medic HP 6→17 by R7. → F (data-trees.js) + K (add a ranked-squad pass to balance.test.js).
+3. **Galaxy "Risk" ignores your squad.** I's risk is an absolute enemy estimate; Malgus (era boss) reads Moderate, Vault reads Low but plays ~50–60%. F's unit Power is a different scale shown on the same screens. → I: rate risk against the chosen squad's Power, or label it "enemy strength".
+4. **G vs J own the same screens.** G shipped `holo.css` (brackets + scanlines on every panel/box, button bevels, base restyle) the night J started a pass on the same HUD/base/squad/debrief with the brief "fewer boxes". → holo.css now belongs to J; G stays in 3D/models.
+5. **H's twist color = dash gold.** `--warn` is `#e0bd78`, the same as `--troop` and the dash-move tiles, so twist chips/cards, troop rings and dash zones share one color (spec D: one color, one meaning). Shell-zone and sapper-timer warnings are 2D-only, invisible in 3D. → J (new `--warn` token), G (3D markers).
+
+## Requests (wave 4, from K)
+- K → F: tame rank growth after R3 (aim cap ~95 before cover, Medic/Consular HP), then re-run `trees-battle.test.js` against mid-game maps, not just relay/shrine/dock.
+- K → I: risk vs squad (see 3); field-op payouts are fine.
+- K → J: take over `css/holo.css`; pick a distinct `--warn`; keep H's `#bvComm` under the banner.
+- K → G: 3D overlays for `S.bv.bar.zones`, `S.bv.bombs`, chasm tile `V`.
+- K → P/owner of data-life.js: Council vote credit costs swing an era by ~200 Cr; consider a flat or Favor-based cost.
