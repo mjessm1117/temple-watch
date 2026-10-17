@@ -5,11 +5,14 @@ const GAL={sel:null,reg:null};
 const planetOf=where=>{const p=String(where||'').split('·').pop().trim();return PLANETS[p]?p:null};
 // Enemy-power estimate for a mission: every starting foe and every wave, weighted by HP, armor and aim; horrors count extra.
 function foeList(M){const L=[...(M.foes||[]).map(f=>f[0]),...Object.values(M.waves||{}).flat(),...[M.boss,M.bossKey].filter(k=>k&&!(M.foes||[]).some(f=>f[0]===k))];return L.filter(k=>FOES[k])}
-function riskOf(M,id){const d=DIFF[(C&&C.diff)||'normal'],t=(typeof TUNE!=='undefined'&&(TUNE[id+':0']||TUNE[id]))||{},L=foeList(M);
- let p=0;for(const k of L){const F=FOES[k];p+=(F.hp+(t.hp||0)+d.enemyHp+2*(F.armor||0))*((F.aim+(t.aim||0)+d.enemyAim)/65)*(F.horror?1.4:1)*(k===M.boss||k===M.bossKey?1.5:1)}
- p+=((t.extra||0)+d.extra*Object.keys(M.waves||{}).length)*4;
- const cm=typeof campaignMods==='function'?campaignMods():{};p*=1+((cm.enemyAim||0)+(cm.enemyHp||0)*8)/100;
- const b=RISK.filter(r=>p>=r[0]).pop();return{p:Math.round(p),n:b[1],lv:b[2]}}
+function enemyPower(M,id){const d=DIFF[(C&&C.diff)||'normal'],t=(typeof TUNE!=='undefined'&&(TUNE[id+':0']||TUNE[id]))||{},L=foeList(M);
+ let p=0;for(const k of L){const F=FOES[k];p+=(F.hp+(t.hp||0)+d.enemyHp+2*(F.armor||0))*((F.aim+(t.aim||0)+d.enemyAim)/65)*(F.horror?1.4:1)*(k===M.boss||k===M.bossKey||F.boss?RISK_W.boss:1)}
+ p+=((t.extra||0)+d.extra*Object.keys(M.waves||{}).length)*4;if(RISK_W.clock.includes(M.type))p+=RISK_W.threat;   // Threat-clock missions call reinforcements
+ const cm=typeof campaignMods==='function'?campaignMods():{};return p*(1+((cm.enemyAim||0)+(cm.enemyHp||0)*8)/100)}
+// Risk = enemy strength vs the squad you'd send (defaultSquad: best fit units, front-B rules included). No fit units → enemy strength alone.
+function riskOf(M,id,o){const p=enemyPower(M,id),sq=C&&typeof unitPower==='function'?defaultSquad(o||{}).map(unit).filter(Boolean):[],sp=sq.reduce((s,r)=>s+unitPower(r),0);
+ const T=sp?100*p/sp:p/RISK_W.solo,b=RISK.filter(r=>T>=r[0]).pop()
+ return{p:Math.round(p),sp,T:+T.toFixed(1),n:b[1],lv:b[2],vs:sq.length}}
 function foeCounts(M){const c={};for(const k of foeList(M)){const n=FOES[k].n;c[n]=(c[n]||0)+1}return Object.entries(c).map(([n,k])=>`${k>1?k+'× ':''}${n}`).join(', ')}
 // Everything the map shows: mission options (index i) and field ops.
 function galaxyItems(){ensureField();const it=[];
@@ -48,13 +51,13 @@ function regionPanel(id,it){const R=REGIONS.find(r=>r[0]===id),here=it.filter(x=
  ${here.length?`<div class="gchips col">${here.map(x=>`<button type="button" class="gchip" data-pin="${x.key}" style="--pc:${PIN[x.cat].c}"><i></i>${x.n}<small>${x.planet}</small></button>`).join('')}</div>`:'<p class="muted">Nothing needs the Order here right now.</p>'}
  <button type="button" data-reg="none">Back to the briefing</button>`}
 function panelFor(x){if(!x)return '<p class="muted">The galaxy is quiet.</p>';if(x.f)return fieldPanel(x.f);if(x.s)return sithPanel(x.s,x.planet);
- const {o,M,i}=x,P=PLANETS[x.planet]||{},seeRw=C.wings.comms||o.story,rk=riskOf(M,o.mission),sib=C.options.filter(y=>y.adv).length>1;
+ const {o,M,i}=x,P=PLANETS[x.planet]||{},seeRw=C.wings.comms||o.story,rk=riskOf(M,o.mission,o),sib=C.options.filter(y=>y.adv).length>1;
  const reward=seeRw?(fmtRes(M.reward)||'none')+(M.bonus?` · bonus ${fmtRes(M.bonus)} (${M.bonusTxt})`:''):'Unknown · build the Comms Hub to see';
  const goal=M.type==='defend'?`Hold for ${M.turns} turns`:M.type==='rescue'?'Free the prisoner and reach evac':M.type==='investigate'?'Scan the terminals and extract':M.type==='sabotage'?'Plant the charges and extract':M.type==='escort'?'Get the VIP to evac':'Take down the target';
  return `<div class="eyebrow">${o.story?'Story mission':o.kind||'Mission'} · ${M.where}${P.reg?` · ${REG_N[P.reg]}`:''}</div><h3 class="gtitle">${x.n}</h3>
  ${M.quote&&o.story?`<blockquote class="mq">${M.quote}</blockquote>`:''}<p>${o.text||M.brief}</p>${o.text&&M.brief&&o.text!==M.brief?`<p class="muted">${M.brief}</p>`:''}
  <div class="gfacts"><span>Goal</span><b>${goal}${M.par?` · par ${M.par} turns`:''}</b>
- <span>Risk</span><b class="risk r${rk.lv}" title="Enemy strength estimate ${rk.p}">${'▮'.repeat(rk.lv)}${'▯'.repeat(4-rk.lv)} ${rk.n}</b>
+ <span>Risk</span><b class="risk r${rk.lv}" title="Enemy strength ${rk.p} vs squad Power ${rk.sp}">${'▮'.repeat(rk.lv)}${'▯'.repeat(4-rk.lv)} ${rk.n}${rk.vs?` <small class="muted">vs your best ${rk.vs} (Power ${rk.sp})</small>`:' <small class="muted">enemy strength</small>'}</b>
  <span>Expected</span><b>${foeCounts(M)||'Unknown'}${M.stealth?' · you start hidden':''}${o.fewer?` · front B: ${o.fewer} fewer rank-and-file`:''}</b>
  <span>Reward</span><b>${o.quest?'mission pay · ':''}${reward}</b>${o.questTxt?`<span>${o.redeem?'Redemption':'Quest'}</span><b class="up">${o.questTxt}</b>`:''}
  <span>Deadline</span><b>${expiryTxt(x)}</b>${P.reg?`<span>Region</span><b class="${unrestOf(P.reg)>=UNREST.hostile?'bad':''}">Unrest ${unrestOf(P.reg)} · ${UNREST_WORD[unrestOf(P.reg)]}${unrestOf(P.reg)>=UNREST.hostile?` · enemies +${UNREST.aimAt3} aim`:''}${o.adv&&sib?' · ignoring adds +1':''}</b>`:''}${o.adv&&sib?`<span>If ignored</span><b class="bad">${o.ignore&&o.ignore.lose?'they are lost':fmtRes(o.ignore)||'nothing'}</b>`:''}
@@ -97,6 +100,6 @@ function pinSVG(x){const P=PIN[x.cat],on=x.key===GAL.sel,big=x.o&&x.o.story,op=!
  ${urgent?`<circle class="urg" cx="${x.x+r*.75}" cy="${hy-r*.75}" r="3"><title>Expires if you pick another</title></circle>`:''}
  ${!op||on?`<text class="gpl2" x="${lx}" y="${hy+3.5}" text-anchor="${left?'end':'start'}">${lab}</text>`:''}<title>${x.n} · ${x.planet}</title></g>`}
 const pinLabel=n=>{n=String(n).replace(/ · .*/,'');return n.length>20?n.slice(0,19)+'…':n};
-function chipMeta(x){if(x.o){const rk=riskOf(x.M,x.o.mission);return `${x.planet} · ${x.o.story?'Story':x.o.kind||'Mission'} · ${rk.n} risk`}
+function chipMeta(x){if(x.o){const rk=riskOf(x.M,x.o.mission,x.o);return `${x.planet} · ${x.o.story?'Story':x.o.kind||'Mission'} · ${rk.n} risk`}
  if(x.f)return `${x.planet} · Field op · ${x.f.st==='team'?`team back in ${x.f.left}d`:`${FIELD_OPS[x.f.k].days}d away`}`;
  return `${x.planet} · Sith op · ${x.s.st==='team'?'team out':'hits at month end'}`}

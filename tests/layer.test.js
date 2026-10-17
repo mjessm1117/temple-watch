@@ -52,5 +52,8 @@ check(E("!C.twin&&C.step===s0+1&&C.month*30+C.day===d0+DAYS"),'after front B: on
 d.querySelector('#toBase').click();
 E("C.step=ts[1];C.options=optionsFor(C.step).filter(o=>o.adv&&!o.hostages);for(const r of C.roster){r.wound=0;r.assign=null}launchMission(0,defaultSquad(C.options[0]));missionOver(true,'t')");
 check(E("twinB()"),'second twin step opens');E("var s1=C.step;autoFront(0)");check(E("!C.twin&&C.step===s1+1"),'auto-resolve front B finishes the step');
+// Risk is rated against the squad you'd send
+E("var rk0=riskOf(MISSIONS.relay,'relay').T;for(const r of C.roster)r.rank=Math.min(7,r.rank+3);var rk1=riskOf(MISSIONS.relay,'relay').T");
+check(E('rk1<rk0'),'stronger squad lowers mission risk');check(E("riskOf(MISSIONS.dock,'dock').T>riskOf(MISSIONS.relay,'relay').T"),'era boss rates riskier than the opening relay');
 check(errs.length===0,'no page errors '+(errs[0]||''));
 console.log(JSON.stringify({err:errs.length}));process.exit(fail?1:0);

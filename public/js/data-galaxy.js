@@ -33,7 +33,9 @@ const PIN={story:{c:'var(--holo)',ic:'relay'},crisis:{c:'var(--troop)',ic:'strik
  redeem:{c:'var(--dark)',ic:'darkness'},field:{c:'#a7c7cc',ic:'scan'},sith:{c:'var(--sith)',ic:'e_trooper'}};
 const TYPE_IC={defend:'guard',rescue:'captured',investigate:'scan',assault:'strike',sabotage:'charge',escort:'evac'};
 // Risk bands from the enemy-power estimate in galaxy.js (riskOf). Normal: most Era 1 maps read Moderate; the hardest Ruusan maps Severe.
-const RISK=[[0,'Low',1],[35,'Moderate',2],[50,'High',3],[65,'Severe',4]];
+// Risk bands on T = 100 × enemy strength ÷ squad Power (unitPower, power.js). Start squad (Power ~360) on the opening relay ≈ 11 = Moderate. [Tuned round 2]
+const RISK=[[0,'Low',1],[9,'Moderate',2],[13.5,'High',3],[18,'Severe',4]];
+const RISK_W={boss:3.5,threat:12,clock:['rescue','investigate','sabotage','escort'],solo:3.6};   // boss ×3.5; Threat-clock maps +12 (reinforcements); solo = divisor with no squad
 
 // ── Field ops: 2–3 units leave for X days, resolve on a roll, never die (spec B §7 never lose). ──
 // want = classes that fit the job ('jedi' = any Jedi). stars = difficulty 1–3. days = time away (1 mission = DAYS = 15 days).
