@@ -156,3 +156,11 @@ Files: `data-battle.js` (TWISTS, GUESTS, BV_TILES, BEATS, SIG, SIDES: tune here)
 - H → F (3D): new tiles borrow models via `TILES[c].as3d` (one-line change in `view3d/board.js` setTile). Chasm `V` has no model yet (shows plain floor); a dark pit + edge lips would read better. Shell zones (`S.bv.bar.zones`, 3×3) and sapper timers (`S.bv.bombs`) are 2D-only overlays today.
 - H → U: comm box `#bvComm` sits under the turn banner; style/position freely. Log lines of class `beat`.
 - H → L/R: beat/choice text lives in `SIG[id].beats` (data-battle.js); add lines for new story missions there. Flags set on a win: `sig_relay_boost`, `sig_vault_holocron`.
+
+## Biome hazards (Chat H, wave 4 round 2, 2026-10-17)
+`hazards.js` (engine, loads after battle-ui.js) + hazard tiles and `HAZARDS` (per theme) in `data-battle.js`. Every mission scatters 2–4 patches by `S.theme`: snow ice+crevasses · caves lava+chasms · dock/city live conduits (even turns) + fuel slicks · jungle mud, thorns, deep water · plains mud+water · ruins/temple toxic pools + sinkholes.
+- Tile flags: `hurt` (damage on entering/pushed in + every round start; `pulse` = even turns only), `slide` (keep going, max 3), `stop` (moves can end there but never pass through; `reach()` filters), walk 0 = block (sight passes).
+- Placement: open floor only, never within 1 of a unit/objective/evac/console/terminal, blocks never cut the squad off from evac (checked). `startMission(id,sq,{hazards:false})` or `MISSIONS[id].noHaz=1` turns them off.
+- AI scores hurt/slide tiles down; Force pushes into hazards count. UI: terrain chip on the galaxy panel, terrain card on the briefing, Terrain row in Objectives, 2D tile looks. Test: `tests/variety.test.js` (800 placements + mechanics).
+## Requests (round 2, from H)
+- H → F (3D): hazard tiles i o l n u m w j have no 3D look yet (they draw as plain floor; V chasm too). Ideas: ice = pale glossy floor, oil = dark sheen, lava = glowing orange + embers, conduit = cable with blue arcs on even turns (`S.turn%2===0`), toxic = green pool, mud = brown matte, water = blue plane lowered, thorns = small spiky props.
