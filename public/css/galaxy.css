@@ -1,0 +1,36 @@
+/* Galaxy map + briefing panel (Chat I). Uses the color tokens in style.css. */
+.gwrap{display:grid;gap:12px}
+@media(min-width:880px){.gwrap{grid-template-columns:minmax(0,1fr) 360px;align-items:start}}
+.gleft{display:grid;gap:8px;min-width:0}
+.gmap{width:100%;height:auto;display:block;background:radial-gradient(ellipse at 50% 50%,#12232a 0%,var(--panel) 70%);border:1px solid var(--line);border-radius:8px}
+.greg{fill:color-mix(in srgb,var(--holo) 4%,transparent);stroke:var(--grid);stroke-width:1;cursor:pointer;transition:fill .15s}
+.greg:hover{fill:color-mix(in srgb,var(--holo) 9%,transparent)}
+.greg.on{fill:color-mix(in srgb,var(--holo) 16%,transparent);stroke:var(--holo)}
+.greg.unk{fill:color-mix(in srgb,var(--dim) 6%,transparent)}
+.glab{font:500 8px var(--mono);fill:var(--dim);text-anchor:middle;letter-spacing:.12em;text-transform:uppercase;pointer-events:none;opacity:.75}
+.gpl{fill:var(--dim);pointer-events:none}.gpn{font:500 8px var(--body);fill:var(--dim);pointer-events:none}
+.gpin{cursor:pointer;outline:none}
+.gpin line{stroke:var(--pc);stroke-width:1.5;opacity:.7}
+.gpin circle{fill:var(--pc);stroke:var(--bg);stroke-width:1.5}
+.gpin use{fill:none;stroke:#0a1113;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.gpin:hover circle,.gpin:focus-visible circle{stroke:var(--fg)}
+.gpin.on circle{stroke:var(--fg);stroke-width:2.5;filter:drop-shadow(0 0 6px var(--pc))}
+.gpin.away circle{fill:var(--raise);stroke:var(--pc);stroke-dasharray:3 2}.gpin.away use{stroke:var(--pc)}
+.glegend{display:flex;flex-wrap:wrap;gap:4px 14px;font:500 11px var(--mono);color:var(--dim)}
+.glegend i,.gchip i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--pc);margin-right:5px;vertical-align:-1px}
+.gchips{display:flex;flex-wrap:wrap;gap:6px}.gchips.col{display:grid}
+.gchip{display:inline-flex;align-items:center;gap:2px;font:500 12px var(--body);min-height:34px;text-align:left}
+.gchip small{color:var(--dim);margin-left:6px;font-size:11px}
+.gchip.on{border-color:var(--pc);background:color-mix(in srgb,var(--pc) 12%,var(--raise))}
+.gpanel{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--raise);display:grid;gap:8px;align-content:start}
+.gpanel p{margin:0;font-size:13px}
+.gtitle{font:600 18px var(--disp)!important;letter-spacing:.02em!important;text-transform:none!important;color:var(--fg)!important;margin:0!important}
+.gfacts{display:grid;grid-template-columns:max-content 1fr;gap:4px 10px;font-size:12px}
+.gfacts span{color:var(--dim);font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.06em;padding-top:1px}
+.gfacts b{font-weight:500}
+.risk.r1{color:var(--good)}.risk.r2{color:var(--holo)}.risk.r3{color:var(--warn)}.risk.r4{color:var(--sith)}
+.godds{font-size:13px}.godds b{font:600 20px var(--disp);color:var(--holo);margin-right:4px}
+.glog{border-top:1px solid var(--line);padding-top:8px;display:grid;gap:3px}.glog p{font-size:12px!important}
+.dkline{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}.dkline .dkt{color:var(--dark)}
+.gpanel .picks{display:flex;flex-wrap:wrap;gap:6px}
+@media(prefers-reduced-motion:reduce){.greg{transition:none}}

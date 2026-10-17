@@ -1,4 +1,5 @@
 # Changelog
+- 2026-10-16: Chat I: galaxy map replaces the mission list (regions, pins, briefing with risk/deadline/enemies); field ops (send 2–3 units off-screen); four ways to shed Darkness (Gardens, mercy, redemption missions, mentors).
 - 2026-10-13: Wave 3 planned (see docs/CHATS.md); npm run test:quick for fast iteration.
 - 2026-10-12: Wave 2 merged: 3D battles, Temple management, sabotage/escort/listening-post crises in the campaign, objective HUD for every mission type (boss HP for Malgus), new tiles in 3D, retirees shown, pinch-zoom on phones.
 - 2026-10-12: Wave 2 planned: 3D battle, Temple management, maps/missions, story (see docs/CHATS.md).

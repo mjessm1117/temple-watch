@@ -36,11 +36,15 @@ public/            the game (static files served by the Worker; _headers = no-ca
   js/save.js       local + cloud saves (campaign C + live mission S)
   js/campaign.js   campaign state C: XP, wounds, calendar, economy, results
   js/base.js       Temple base, squad select, debrief, slice-end screens
+  js/data-galaxy.js  planets, regions, risk bands, field-op templates  ← tune here
+  js/darkness.js   Darkness reduction: Gardens, mercy, redemption, mentors
+  js/fieldops.js   off-screen field ops (2–3 units, resolve on a roll)
+  js/galaxy.js     galaxy map + briefing panel (replaces the mission list)
   js/screens.js    opening vision + difficulty; boots the game (load last)
 worker.js               Worker entry: /api/save → backend, else static files from public/
 functions/api/save.js   backend: GET/PUT /api/save (KV binding SAVES)
 wrangler.toml           Worker config: assets dir, KV binding
-tests/                  bot.js (test bot), balance.test.js (bot games per mission), campaign.test.js (full slice), sync.test.mjs (cross-device save)
+tests/                  bot.js (test bot), layer.test.js (Darkness/field ops/map), balance.test.js (bot games per mission), campaign.test.js (full slice), sync.test.mjs (cross-device save)
 assets/temple-watch.ico  desktop icon used by the launcher on Jess's laptop
 tools/inline.js         builds dist/temple-watch.html (single file, for tests/offline)
 docs/                   design, specs, chat briefs, changelog

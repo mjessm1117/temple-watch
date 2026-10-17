@@ -57,11 +57,11 @@ function baseScreen(){SCR=baseScreen;S=null;ensureTemple();const m=$('#modal');m
  m.innerHTML=`<div class="box wide base">${resRow()}
  <div><div class="eyebrow">${eraLabel()} · ${DIFF[C.diff].n}</div><h2>Jedi Temple, Coruscant</h2></div>
  ${C.news.length?`<div class="news">${C.news.map(n=>`<p>${n}</p>`).join('')}</div>`:''}
- <section><h3>Galaxy · choose the next mission</h3><div class="opts">${C.options.map(optionHTML).join('')}</div></section>
+ ${typeof galaxyHTML==='function'?galaxyHTML():`<section><h3>Galaxy · choose the next mission</h3><div class="opts">${C.options.map(optionHTML).join('')}</div></section>`}
  <nav class="tabs" role="tablist">${window.codexOpen?'<button type="button" id="hubCx" title="Codex (C)">Codex</button>':''}${window.settingsOpen?'<button type="button" id="hubSet">Settings</button>':''}${TABS.map(([k,n])=>`<button type="button" role="tab" class="${TAB===k?'on':''}" aria-selected="${TAB===k}" data-tab="${k}">${n}${k==='roster'&&pend?` (${pend})`:''}</button>`).join('')}</nav>
  ${TABS.map(([k,,f])=>`<section class="tpanel" ${TAB===k?'':'hidden'}>${f()}</section>`).join('')}</div>`;
  m.onclick=hubClick;m.onchange=ev=>{const s=ev.target.closest('[data-assign]');if(s){assign(s.dataset.assign,s.value);baseScreen()}const p=ev.target.closest('[data-pair]');if(p){setPair(p.dataset.pair,p.value);baseScreen()}}}
-function hubClick(ev){if(ev.target.closest('#hubCx'))return codexOpen();if(ev.target.closest('#hubSet'))return settingsOpen();const t=ev.target.closest('[data-tab]');if(t){TAB=t.dataset.tab;return baseScreen()}
+function hubClick(ev){if(typeof galaxyClick==='function'&&galaxyClick(ev))return;if(ev.target.closest('#hubCx'))return codexOpen();if(ev.target.closest('#hubSet'))return settingsOpen();const t=ev.target.closest('[data-tab]');if(t){TAB=t.dataset.tab;return baseScreen()}
  const b=ev.target.closest('[data-act]');if(!b||b.disabled)return;const [a,x,y]=b.dataset.act.split(':');
  if(a==='squad')return squadScreen(+x);
  if(progClick(a,x,y));else if(a==='build')buildWing(x);else if(a==='pick')pickAbility(x,y);else if(a==='alt')setAlt(x,y);else if(a==='borrow')borrowSkill(x,y);else if(a==='grief')griefChoice(x,y==='1');

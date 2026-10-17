@@ -32,8 +32,8 @@ const PLANETS={
 const PIN={story:{c:'var(--holo)',ic:'relay'},crisis:{c:'var(--troop)',ic:'strike'},rescue:{c:'var(--sith)',ic:'captured'},quest:{c:'var(--good)',ic:'kyber'},
  redeem:{c:'var(--dark)',ic:'darkness'},field:{c:'#a7c7cc',ic:'scan'}};
 const TYPE_IC={defend:'guard',rescue:'captured',investigate:'scan',assault:'strike',sabotage:'charge',escort:'evac'};
-// Risk bands from the enemy-power estimate in galaxy.js (riskOf). Tuned so the opening relay reads Moderate on Normal.
-const RISK=[[0,'Low',1],[46,'Moderate',2],[64,'High',3],[86,'Severe',4]];
+// Risk bands from the enemy-power estimate in galaxy.js (riskOf). Normal: most Era 1 maps read Moderate; the hardest Ruusan maps Severe.
+const RISK=[[0,'Low',1],[35,'Moderate',2],[50,'High',3],[65,'Severe',4]];
 
 // ── Field ops: 2–3 units leave for X days, resolve on a roll, never die (spec B §7 never lose). ──
 // want = classes that fit the job ('jedi' = any Jedi). stars = difficulty 1–3. days = time away (1 mission = DAYS = 15 days).
