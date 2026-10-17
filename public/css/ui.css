@@ -1,0 +1,184 @@
+/* UI pass (Chat J). Loaded last. Desktop (≥880px): XCOM-style battle bar + Temple floor plan. Phone keeps style.css rules.
+   Remove this file to get the previous layout back. */
+:root{--glass:#08131699;--glassB:#0a1517d9;--hair:color-mix(in srgb,var(--holo) 18%,transparent);--ease:cubic-bezier(.2,.7,.2,1)}
+
+/* ---------- Shared: type + buttons + modals ---------- */
+.eyebrow{letter-spacing:.14em}
+.box h2{font-size:26px;letter-spacing:.05em}
+.muted{line-height:1.45}
+button{transition:border-color .12s,box-shadow .12s,background .12s,color .12s,transform .12s var(--ease)}
+button:active:not(:disabled){transform:translateY(1px)}
+.modal .box{animation:boxIn .22s var(--ease)}
+@keyframes boxIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+
+/* Opening + generic choices: big rows with a lit edge on hover */
+.choice{border-left:3px solid var(--line);padding:12px 14px}
+.choice:hover:not(:disabled){border-left-color:var(--holo);background:color-mix(in srgb,var(--holo) 8%,var(--raise))}
+.choice b{font-size:15px}
+
+/* Squad select: cards with class colour edge; picked = lit */
+.squad{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.sq{min-height:56px;padding:8px 10px;border-left:3px solid var(--uc,var(--line))}
+.sq:not(.on){opacity:.72}.sq:not(.on):hover{opacity:1}
+.sq.on{background:color-mix(in srgb,var(--uc,var(--holo)) 12%,var(--raise));border-color:color-mix(in srgb,var(--uc,var(--holo)) 60%,transparent)}
+.sq .mini{width:36px;height:36px}
+
+/* Debrief: summary rows breathe; totals stand out */
+.sum{gap:0}.sum>div{padding-block:7px;align-items:center}
+.sum>div:hover{background:color-mix(in srgb,var(--holo) 4%,transparent)}
+.sum>div:last-child{border-bottom:0}
+.box h2.lose{text-shadow:0 0 18px color-mix(in srgb,var(--sith) 45%,transparent)}
+
+/* Settings / codex / keys */
+.ui-card{border-color:var(--edge,var(--line));box-shadow:0 20px 60px #000b;animation:boxIn .2s var(--ease)}
+.setrow{padding-block:12px}.setrow b{font:600 14px var(--disp);letter-spacing:.03em}
+.seg button{min-width:56px}
+.cxe{transition:border-color .12s}.cxe:hover{border-color:var(--edge,var(--holo))}
+
+/* ---------- Battle HUD, desktop: board fills the window; orders in a bar along the bottom ---------- */
+@media(min-width:880px){
+ body:not(:has(.modal:not([hidden]) .base)){padding:0}
+ #app{max-width:none;height:100vh;gap:0;grid-template-rows:auto auto minmax(0,1fr)}
+ .top{padding:8px 18px;background:linear-gradient(#05090bf5,#05090bcc);border-bottom:1px solid var(--hair)}
+ .brand{font-size:17px}
+ .top .stats>span{border:0;background:none;padding:0 10px;border-left:1px solid var(--line);border-radius:0}
+ .top .stats>span:first-child{border-left:0}
+ .top .endrow button{background:none;border-color:transparent;color:var(--dim);box-shadow:none}
+ .top .endrow button:hover:not(:disabled){color:var(--fg);border-color:var(--line);box-shadow:none}
+ .banner{border-radius:0;border-inline:0;padding:4px;font-size:11px;letter-spacing:.32em;box-shadow:none}
+ .layout{display:block;position:relative;height:100%;min-height:0}
+ .layout .bwrap{max-width:none;height:100%;margin:0}
+ .v3d .v3{height:100%;border:0;border-radius:0}
+ body:not(.v3d) .layout .bwrap{width:min(100%,calc((100vh - 270px) / 1.2));height:auto;margin:10px auto 0}
+
+ /* The orders layer: transparent grid over the board; only its panels catch the mouse */
+ .layout .side{position:absolute;inset:0;max-height:none;overflow:visible;z-index:5;pointer-events:none;
+  display:grid;grid-template-columns:300px minmax(0,1fr) 300px;grid-template-rows:auto auto auto auto minmax(0,1fr) auto;gap:8px 16px;padding:12px 16px 14px;
+  background:linear-gradient(to top,#05090bf7 0,#05090bd9 130px,#05090b00 240px)}
+ .side>*{pointer-events:auto;min-width:0}
+ .side .panel,.side .tipcard{background:var(--glassB);backdrop-filter:blur(8px);border:1px solid var(--hair);border-radius:4px;box-shadow:0 8px 24px #0007;padding:10px 12px}
+ .side .panel::after{opacity:.45}
+
+ /* Left column: squad list */
+ .side>.panel:has(#roster){grid-column:1;grid-row:1/5;justify-self:start;align-self:start;background:none;border:0;box-shadow:none;backdrop-filter:none;padding:0}
+ .side>.panel:has(#roster)::after{display:none}
+ .roster{flex-direction:column;gap:4px;align-items:stretch}
+ .roster button{min-width:150px;justify-content:flex-start;gap:6px;background:var(--glassB);backdrop-filter:blur(6px);border:1px solid var(--hair);border-left:3px solid var(--uc);border-radius:3px;font-size:12.5px;padding:5px 10px}
+ .roster button:hover:not(:disabled){transform:translateX(3px)}
+ .roster button.on{background:color-mix(in srgb,var(--uc) 22%,#0a1517e6);border-color:var(--uc);color:#fff;box-shadow:0 0 14px color-mix(in srgb,var(--uc) 35%,transparent)}
+ .roster button.done{opacity:.45}
+
+ /* Right column: tips, objectives, contacts, log */
+ .side>#tips{grid-column:3;grid-row:1}
+ .side>#objP{grid-column:3;grid-row:2}
+ .side>#podP{grid-column:3;grid-row:3}
+ .side>.panel:has(#log){grid-column:3;grid-row:4;gap:6px}
+ .side>#objP,.side>#podP,.side>.panel:has(#log){padding:8px 12px}
+ .log{max-height:96px;font-size:12px}
+ .logf button{min-height:24px;padding:1px 7px;font-size:10.5px}
+ .side>#tips{display:grid;gap:6px}
+ .tipcard{border-color:var(--holo);box-shadow:0 0 0 1px var(--glow,transparent),0 8px 24px #0008}
+ .tipcard .endrow button{min-height:30px;font-size:12px}
+
+ /* Bottom bar: unit card | abilities | odds + end turn */
+ .side>#card{grid-column:1;grid-row:6;align-self:end;background:none;border:0;box-shadow:none;backdrop-filter:none;padding:0 16px 0 0;border-right:1px solid var(--hair);border-radius:0;gap:6px}
+ .side>#card::after{display:none}
+ .side>.panel:has(#acts){grid-column:2/4;grid-row:6;align-self:end;background:none;border:0;box-shadow:none;backdrop-filter:none;padding:0;
+  display:grid;grid-template-columns:minmax(0,1fr) 300px;grid-template-areas:"hint odds" "acts end";gap:8px 16px;align-items:end;pointer-events:none}
+ .side>.panel:has(#acts)::after{display:none}
+ .side>.panel:has(#acts)>*{pointer-events:auto}
+ #acts{grid-area:acts;display:flex;flex-wrap:wrap;gap:5px;justify-content:center;align-content:end}
+ #hint{grid-area:hint;text-align:center;font-size:12.5px;min-height:0;text-shadow:0 1px 3px #000;max-width:620px;justify-self:center}
+ #odds{grid-area:odds;align-self:end}
+ #odds:empty{display:none}
+ .side .endrow{grid-area:end;flex-wrap:wrap}
+ .keyline{display:none}
+ .uname{font-size:21px;color:var(--uc,var(--holo));text-shadow:0 0 12px color-mix(in srgb,var(--uc,var(--holo)) 35%,transparent)}
+ .usub{font-size:10.5px;letter-spacing:.16em}
+ .who .mini{width:42px;height:42px}
+
+ /* Ability tiles */
+ .act{width:80px;min-height:76px;padding:8px 4px 6px;gap:4px;align-content:start;background:#0b171bdd;border:1px solid #79d3e22e;border-radius:4px;backdrop-filter:blur(4px)}
+ .act .ic{width:24px;height:24px;color:var(--holo)}
+ .act span{font-size:11.5px;line-height:1.15}
+ .act small{font-size:9.5px;margin-top:2px}
+ .act:hover:not(:disabled){transform:translateY(-3px);border-color:var(--holo);background:#0f2329ee;box-shadow:0 6px 18px #000a,0 0 14px color-mix(in srgb,var(--holo) 30%,transparent)}
+ .act.on{border-color:var(--holo);background:color-mix(in srgb,var(--holo) 22%,#0b171b);box-shadow:inset 0 -2px 0 var(--holo),0 0 18px color-mix(in srgb,var(--holo) 35%,transparent)}
+ .act:disabled{opacity:.32}
+ .act:disabled .ic{color:var(--dim)}
+
+ /* Odds: floating readout above End turn */
+ .odds{background:var(--glassB);backdrop-filter:blur(8px);border-color:var(--holo);border-radius:4px;padding:10px 12px;box-shadow:0 8px 24px #0008;animation:boxIn .16s var(--ease)}
+ .odds .tot{font-size:26px;text-shadow:0 0 12px var(--glow,transparent)}
+
+ #endBtn{min-height:50px;font-size:14px;letter-spacing:.18em;text-transform:uppercase}
+ #undoBtn{flex:0 0 100%;min-height:30px;font-size:12px;margin:0}
+
+ /* 3D camera controls: top centre, out of the way of the squad list and the bar */
+ .v3c{left:50%;bottom:auto;top:10px;transform:translateX(-50%);flex-wrap:nowrap}
+ .v3c span{display:none}
+}
+
+/* ---------- Temple screen: floor plan rail + the open room ---------- */
+.modal:has(.base){background:radial-gradient(1100px 600px at 70% 0%,#0e1f25f0,#05090bf7 70%);place-items:start stretch;padding:0}
+.box.base{max-width:none;min-height:100vh;border:0;border-radius:0;box-shadow:none;background:transparent;padding:14px 20px 28px;gap:12px 20px;animation:none;
+ display:grid;grid-template-columns:minmax(0,1fr);align-content:start}
+.box.base::after{display:none}
+.base .resbar{grid-column:1/-1}
+.troom{display:grid;gap:12px;align-content:start;min-width:0}
+.thead{border-left:3px solid var(--holo);padding-left:12px;display:grid;gap:2px}
+.thead h2{font-size:28px}
+.thead .muted{font-size:13px}
+.rwing .wing{background:var(--raise);border:1px solid var(--edge,var(--line));border-radius:6px;padding:10px 12px}
+.tmap{display:grid;gap:8px;align-content:start}
+.tplan{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:6px;
+ grid-template-areas:"cn cn" "ar co" "wr wr" "tr am" "ga fo" "me ba" "ha un"}
+/* the spine corridor behind the rooms */
+.tplan::before{content:'';position:absolute;left:50%;top:8px;bottom:8px;width:2px;transform:translateX(-50%);background:linear-gradient(var(--hair),var(--holo) 40%,var(--hair));opacity:.5;z-index:0}
+.room{position:relative;z-index:1;display:grid;grid-template-columns:18px 1fr auto;grid-template-rows:auto auto;gap:1px 8px;align-items:center;text-align:left;
+ padding:8px 10px;min-height:52px;font-family:var(--body);background:linear-gradient(180deg,#0f1d22,#0b1619);border:1px solid var(--line);border-radius:4px}
+.room .ic{width:18px;height:18px;grid-row:1/3;color:var(--holo);opacity:.85}
+.room b{font:600 12.5px var(--disp);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.room small{grid-column:2/4;font:500 10.5px var(--mono);color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.room .lv{display:flex;gap:2px}.room .lv i{width:6px;height:6px;border-radius:1px;background:var(--line)}.room .lv i.on{background:var(--holo);box-shadow:0 0 4px var(--holo)}
+.room em{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:var(--holo);color:#05090b;font:600 11px var(--mono);font-style:normal;display:grid;place-items:center;padding:0 4px;box-shadow:0 0 10px var(--holo)}
+.room:hover:not(:disabled){border-color:color-mix(in srgb,var(--holo) 60%,var(--line));background:linear-gradient(180deg,#12262c,#0c1a1e)}
+.room.on{border-color:var(--holo);background:linear-gradient(180deg,color-mix(in srgb,var(--holo) 20%,#0f1d22),#0c1a1e);box-shadow:0 0 0 1px var(--holo) inset,0 0 18px color-mix(in srgb,var(--holo) 25%,transparent)}
+.room.on b{color:var(--holo)}
+.room.off{background:repeating-linear-gradient(135deg,#0b1517 0 6px,#0d191c 6px 12px);border-style:dashed}
+.room.off .ic,.room.off b{opacity:.55}
+.room[data-room="war"]{min-height:66px;border-color:color-mix(in srgb,var(--holo) 45%,var(--line))}
+.room[data-room="war"] b{font-size:15px;letter-spacing:.1em;text-transform:uppercase}
+.room[data-room="council"] b{letter-spacing:.08em}
+.tfoot{display:flex;flex-wrap:wrap;gap:4px}
+.tfoot button{flex:1;min-height:32px;font-size:12px;padding:4px 8px;background:none}
+.tfoot button.on{color:var(--holo);border-color:var(--holo)}
+@media(min-width:880px){
+ .box.base{grid-template-columns:300px minmax(0,1fr);grid-template-rows:auto auto 1fr}
+ .tmap{grid-column:1;grid-row:2/4;position:sticky;top:14px}
+ .base .calstrip{grid-column:2;grid-row:2;margin:0}
+ .troom{grid-column:2;grid-row:3}
+ .tpanel,.rwar{animation:roomIn .22s var(--ease)}
+}
+@keyframes roomIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+@media(max-width:879px){.tplan{grid-template-columns:repeat(2,1fr)}.room small{display:none}.room{min-height:44px}}
+
+/* ---------- Reduced motion ---------- */
+@media(prefers-reduced-motion:reduce){
+ .modal .box,.ui-card,.odds,.tpanel,.rwar{animation:none}
+ button,.act,.roster button{transition:none}
+ .act:hover:not(:disabled),.roster button:hover:not(:disabled),button:active:not(:disabled){transform:none}}
+
+/* Squad select: wider, three across, check mark on picked */
+.box.sqbox{max-width:780px}
+.sqbox .squad{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.sq.on::after{content:'✓';position:absolute;top:6px;right:8px;font:600 12px var(--mono);color:var(--uc,var(--holo))}
+.sq{position:relative}
+.sqbox #deploy{min-height:46px;letter-spacing:.14em;text-transform:uppercase}
+/* Debrief: result accent along the top */
+.box:has(>.sum){border-top:2px solid var(--holo)}
+.box:has(>h2.lose){border-top-color:var(--sith)}
+.sum>div>span:last-child{font:500 12px var(--mono)}
+/* Settings: label left, control right, one line */
+.ui-card{width:min(580px,100%)}
+.setrow{flex-wrap:nowrap}.setrow small{max-width:250px}

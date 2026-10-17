@@ -35,10 +35,11 @@ function armoryTab(){const L=C.roster.filter(r=>r.status==='active');if(!L.some(
  return `<div class="tw"><div class="ulist">${list}</div><div class="gear"><div><b>${r.n}</b> <small class="muted">${r.cls} · Rank ${r.rank}${picks?' · '+picks:''}</small></div><div class="stl">${statLine(r)}</div>${h}
  <p class="muted">${isJedi(r)?'Sabers need the Kyber Forge and Kyber crystals.':'Military gear and heavy armor need the Armory.'} Stats shown are what this unit takes into battle.</p></div></div>`}
 
-function wingsTab(){return Object.entries(WINGS).map(([k,w])=>{const l=C.wings[k],nc=w.cost[l+1],bld=C.build===k,s=C.staff[k]&&unit(C.staff[k]);
+function wingRow(k){const w=WINGS[k];{const l=C.wings[k],nc=w.cost[l+1],bld=C.build===k,s=C.staff[k]&&unit(C.staff[k]);
  return `<div class="wing ${l?'':'off'}" data-tip="wing:${k}"><div><b>${w.n}</b> <small>${l?'Level '+l:'Not built'}</small><p>${bld?'Under construction · ready after the next mission':w.eff[l]}${l&&w.eff[l+1]?` · <span class="muted">Next: ${w.eff[l+1]}</span>`:!l?` · <span class="muted">${w.eff[1]}</span>`:''}</p>
  ${l?`<p class="muted">Staff: ${s?`<b>${s.n}</b> · ${w.staff}`:`open slot (${w.staff}). Assign someone in the Roster.`}</p>`:''}</div>
- ${nc!=null&&!bld?`<button type="button" data-act="build:${k}" ${C.build||C.res.credits<nc||!researched(w.req&&w.req[l+1])?'disabled':''}>${l?'Upgrade':'Build'} ${nc} Cr${w.req&&!researched(w.req[l+1])?` · research ${RESEARCH[w.req[l+1]].n}`:''}</button>`:''}</div>`}).join('')+'<p class="muted">One build at a time. Upkeep is paid monthly.</p>'}
+ ${nc!=null&&!bld?`<button type="button" data-act="build:${k}" ${C.build||C.res.credits<nc||!researched(w.req&&w.req[l+1])?'disabled':''}>${l?'Upgrade':'Build'} ${nc} Cr${w.req&&!researched(w.req[l+1])?` · research ${RESEARCH[w.req[l+1]].n}`:''}</button>`:''}</div>`}}
+function wingsTab(){return Object.keys(WINGS).map(wingRow).join('')+'<p class="muted">One build at a time. Upkeep is paid monthly.</p>'}
 
 function recruitTab(){const full=rosterCount()>=rosterCap();
  return `<p class="muted">Roster ${rosterCount()}/${rosterCap()} (Barracks). New candidates every month. Troopers cost ${HIRE_COST} Cr + 1 Recruit; Padawans come from the Temple, free.${full?' <span class="bad">Roster full: upgrade the Barracks.</span>':''}</p>
@@ -55,18 +56,20 @@ const TABS=[['roster','Roster',rosterTab],['armory','Armory',armoryTab],['wings'
 function baseScreen(){SCR=baseScreen;S=null;ensureTemple();const m=$('#modal');m.hidden=false;
  if(C.step>=PLAN.length&&!C.options.length)return endScreen();
  const pend=C.roster.filter(r=>r.status==='active'&&pendingRank(r)).length;
+ const R=curRoom(),war=R.id==='war';
  m.innerHTML=`<div class="box wide base">${resRow()}
- <div><div class="eyebrow">${eraLabel()} · ${DIFF[C.diff].n}</div><h2>Jedi Temple, Coruscant</h2></div>
+ <aside class="tmap" aria-label="Temple rooms">${templeMapHTML(pend)}</aside>
+ <div class="troom"><div class="thead"><div class="eyebrow">Jedi Temple · ${eraLabel()} · ${DIFF[C.diff].n}</div><h2>${R.n}</h2><p class="muted">${R.d}</p></div>
  ${C.news.length?`<div class="news">${C.news.map(n=>`<p>${n}</p>`).join('')}</div>`:''}
- ${typeof galaxyHTML==='function'?galaxyHTML():`<section><h3>Galaxy · choose the next mission</h3><div class="opts">${C.options.map(optionHTML).join('')}</div></section>`}
- <nav class="tabs" role="tablist">${window.codexOpen?'<button type="button" id="hubCx" title="Codex (C)">Codex</button>':''}${window.settingsOpen?'<button type="button" id="hubSet">Settings</button>':''}${TABS.map(([k,n])=>`<button type="button" role="tab" class="${TAB===k?'on':''}" aria-selected="${TAB===k}" data-tab="${k}">${n}${k==='roster'&&pend?` (${pend})`:''}</button>`).join('')}</nav>
- ${TABS.map(([k,,f])=>`<section class="tpanel" ${TAB===k?'':'hidden'}>${f()}</section>`).join('')}</div>`;
+ <section class="rwar" ${war?'':'hidden'}>${typeof galaxyHTML==='function'?galaxyHTML():`<section><h3>Galaxy · choose the next mission</h3><div class="opts">${C.options.map(optionHTML).join('')}</div></section>`}</section>
+ ${R.wing?`<div class="rwing">${wingRow(R.wing)}</div>`:''}
+ ${TABS.map(([k,,f])=>`<section class="tpanel" ${TAB===k&&!war?'':'hidden'}>${f()}</section>`).join('')}</div></div>`;
  m.onclick=hubClick;m.onchange=ev=>{const s=ev.target.closest('[data-assign]');if(s){assign(s.dataset.assign,s.value);baseScreen()}const p=ev.target.closest('[data-pair]');if(p){setPair(p.dataset.pair,p.value);baseScreen()}}}
-function hubClick(ev){if(typeof galaxyClick==='function'&&galaxyClick(ev))return;if(ev.target.closest('#hubCx'))return codexOpen();if(ev.target.closest('#hubSet'))return settingsOpen();const t=ev.target.closest('[data-tab]');if(t){TAB=t.dataset.tab;return baseScreen()}
+function hubClick(ev){if(typeof galaxyClick==='function'&&galaxyClick(ev))return;if(ev.target.closest('#hubCx'))return codexOpen();if(ev.target.closest('#hubSet'))return settingsOpen();const rm=ev.target.closest('[data-room]');if(rm){setRoom(rm.dataset.room);return baseScreen()}const t=ev.target.closest('[data-tab]');if(t){TAB=t.dataset.tab;return baseScreen()}
  const b=ev.target.closest('[data-act]');if(!b||b.disabled)return;const [a,x,y]=b.dataset.act.split(':');
  if(a==='squad')return squadScreen(+x);if(a==='tree')return treeScreen(x);
  if(progClick(a,x,y));else if(a==='build')buildWing(x);else if(a==='pick')pickAbility(x,y);else if(a==='alt')setAlt(x,y);else if(a==='borrow')borrowSkill(x,y);else if(a==='grief')griefChoice(x,y==='1');
- else if(a==='arm'){ARM=x;TAB='armory'}else if(a==='wpn')buyWeapon(x);else if(a==='armor')buyArmor(x,y);else if(a==='mod')buyMod(x,y);else if(a==='dropmod')dropMod(x,y);
+ else if(a==='arm'){ARM=x;TAB='armory';ROOM='armory'}else if(a==='wpn')buyWeapon(x);else if(a==='armor')buyArmor(x,y);else if(a==='mod')buyMod(x,y);else if(a==='dropmod')dropMod(x,y);
  else if(a==='saber')craftSaber(x);else if(a==='trait')setTrait(x,y);else if(a==='col')setColor(x,y);
  else if(a==='hire'){candEdit(+x);const i=+x,c=$('#modal').querySelector(`input[name="rc${i}"]:checked`);hireCand(i,$('#rn'+i).value,c&&c.value)}
  baseScreen()}

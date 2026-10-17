@@ -1,4 +1,5 @@
 # Changelog
+- 2026-10-17: Chat J (UI): battle orders move to an XCOM-style bar along the bottom (unit card, ability tiles, odds, End turn) with the squad list left and objectives/log right, so the board fills the window. The Temple is now a floor plan: click a room (War Room, Barracks, Archives, Forge…) to open it, with its wing card on top. Wider squad select with check marks, cleaner debrief and settings, hover lifts and fades (off with reduced motion).
 - 2026-10-16: Chat I: galaxy map replaces the mission list (regions, pins, briefing with risk/deadline/enemies); field ops (send 2–3 units off-screen); four ways to shed Darkness (Gardens, mercy, redemption missions, mentors).
 - 2026-10-13: Wave 3 planned (see docs/CHATS.md); npm run test:quick for fast iteration.
 - 2026-10-12: Wave 2 merged: 3D battles, Temple management, sabotage/escort/listening-post crises in the campaign, objective HUD for every mission type (boss HP for Malgus), new tiles in 3D, retirees shown, pinch-zoom on phones.
