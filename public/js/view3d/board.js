@@ -16,9 +16,9 @@ export class Board{
    evac:new THREE.MeshBasicMaterial({color:0x7fd99a,transparent:true,opacity:.28,depthWrite:false})};
   this.box=new THREE.BoxGeometry(1,1,1);this.cyl=new THREE.CylinderGeometry(.5,.5,1,10);
   const hm=(c,o)=>new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false});
-  this.hm={reach:hm(0x79d3e2,.3),dash:hm(0xe0bd78,.3),hover:hm(0x79d3e2,.55),hoverDash:hm(0xe0bd78,.55),tgt:hm(0xef6a5d,.85),ally:hm(0x7fd99a,.85),spot:hm(0x79d3e2,.7),pick:hm(0xffffff,.95),
+  this.hm={reach:hm(0x2f9dff,.5),dash:hm(0xffb21e,.5),hover:hm(0x7fc8ff,.85),hoverDash:hm(0xffd166,.85),reachEdge:hm(0x9fe3ff,.95),dashEdge:hm(0xffe08a,.95),tgt:hm(0xef6a5d,.85),ally:hm(0x7fd99a,.85),spot:hm(0x79d3e2,.7),pick:hm(0xffffff,.95),
    area:hm(0x79d3e2,.2),iarea:hm(0xef6a5d,.22),path:hm(0x79d3e2,.95),smoke:hm(0x8aa2a5,.22),vis:new THREE.MeshBasicMaterial({map:this.hatch(),transparent:true,opacity:.85,depthWrite:false})};
-  this.plane=new THREE.PlaneGeometry(.92,.92).rotateX(-Math.PI/2);this.ring=new THREE.RingGeometry(.34,.44,24).rotateX(-Math.PI/2);
+  this.plane=new THREE.PlaneGeometry(.92,.92).rotateX(-Math.PI/2);this.ring=new THREE.RingGeometry(.34,.44,24).rotateX(-Math.PI/2);this.frame=new THREE.RingGeometry(.55,.64,4,1,Math.PI/4).rotateX(-Math.PI/2);
   this.dot=new THREE.CircleGeometry(.06,10).rotateX(-Math.PI/2);this.hl=new THREE.Group();scene.add(this.hl);this.pool={};
   this.shieldTex=[this.shieldTexture(false),this.shieldTexture(true)];this.lines=new THREE.Group();scene.add(this.lines);this.anim=[]}
  pos(x,y,h=0){const r=this.grid&&this.grid[y];return new this.T.Vector3(x+.5-this.cols/2,h+(r?elevOf(r[x])*EH:0),y+.5-this.rows/2)}
@@ -91,7 +91,7 @@ export class Board{
   g.strokeStyle=`rgba(${c0},.75)`;g.lineWidth=5;for(let i=-64;i<128;i+=16){g.beginPath();g.moveTo(i,0);g.lineTo(i+64,64);g.stroke()}
   g.lineWidth=3;g.strokeRect(1.5,1.5,61,61);const t=new this.T.CanvasTexture(c);t.colorSpace=this.T.SRGBColorSpace;return t}
  palette(cb){const h=this.hm;h.tgt.color.setHex(cb?0xff9e2c:0xef6a5d);h.iarea.color.setHex(cb?0xff9e2c:0xef6a5d);h.ally.color.setHex(cb?0x5fb0ff:0x7fd99a);
-  h.dash.color.setHex(cb?0xf5e663:0xe0bd78);h.hoverDash.color.setHex(cb?0xf5e663:0xe0bd78);this.cbHatch=cb;h.vis.map.dispose();h.vis.map=this.hatch();h.vis.needsUpdate=true}
+  h.dash.color.setHex(cb?0xf5e663:0xffb21e);h.hoverDash.color.setHex(cb?0xf5e663:0xffd166);h.dashEdge.color.setHex(cb?0xfff3a0:0xffe08a);this.cbHatch=cb;h.vis.map.dispose();h.vis.map=this.hatch();h.vis.needsUpdate=true}
  shieldTexture(full){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');g.beginPath();
   g.moveTo(32,6);g.lineTo(54,14);g.lineTo(54,32);g.bezierCurveTo(54,46,44,54,32,59);g.bezierCurveTo(20,54,10,46,10,32);g.lineTo(10,14);g.closePath();
   g.lineWidth=6;g.strokeStyle='#79d3e2';g.fillStyle='#79d3e2';if(full)g.fill();g.stroke();
@@ -102,7 +102,8 @@ export class Board{
  highlight(h){for(const p of Object.values(this.pool)){p.i=0;for(const o of p.list)o.visible=false}
   for(const c of [...this.lines.children]){this.lines.remove(c);c.geometry.dispose();c.material.dispose()}const hm=this.hm,lift=(x,y,dy=.012)=>this.pos(x,y,dy);
   for(const t of h.vision||[])this.take('vis',this.plane,hm.vis).position.copy(lift(t.x,t.y,.008));
-  for(const t of h.reach)this.take(t.dash?'dash':'reach',this.plane,t.dash?hm.dash:hm.reach).position.copy(lift(t.x,t.y));
+  for(const t of h.reach){this.take(t.dash?'dash':'reach',this.plane,t.dash?hm.dash:hm.reach).position.copy(lift(t.x,t.y));
+   this.take(t.dash?'dashE':'reachE',this.frame,t.dash?hm.dashEdge:hm.reachEdge).position.copy(lift(t.x,t.y,.013))}
   if(h.hover)this.take(h.hover.dash?'hovD':'hov',this.plane,h.hover.dash?hm.hoverDash:hm.hover).position.copy(lift(h.hover.x,h.hover.y,.014));
   for(const t of h.targets){const o=this.take('t_'+t.kind,t.kind==='spot'?this.plane:this.ring,hm[t.kind]);o.position.copy(lift(t.x,t.y,.02))}
   for(const p of h.path){const o=this.take('dot',this.dot,hm.path);o.position.copy(p).setY(p.y+.03)}
