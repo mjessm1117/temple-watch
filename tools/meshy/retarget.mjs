@@ -91,5 +91,9 @@ for(const n of gt.r.listNodes())if(n.getName().startsWith(M))n.setName(n.getName
 // pack: base color only, 1024px webp, quantized + meshopt
 const {prune,dedup,textureCompress,quantize,meshopt,resample}=await import('@gltf-transform/functions');const sharp=(await import('sharp')).default;
 for(const m of D.getRoot().listMaterials()){for(const k of ['setNormalTexture','setMetallicRoughnessTexture','setOcclusionTexture','setEmissiveTexture'])m[k](null);m.setMetallicFactor(0).setRoughnessFactor(.85)}
+// Characters Meshy couldn't remesh (<300K faces) get simplified here to ~12K tris; skin weights survive (simplify only drops vertices).
+{let t=0;for(const me of D.getRoot().listMeshes())for(const p of me.listPrimitives())t+=(p.getIndices()?.getCount()||0)/3;
+ if(t>20000){const {simplify,weld}=await import('@gltf-transform/functions');const {MeshoptSimplifier}=await import('meshoptimizer');await MeshoptSimplifier.ready;
+  await D.transform(weld(),simplify({simplifier:MeshoptSimplifier,ratio:12000/t,error:.01}));console.log('simplified',Math.round(t),'tris')}}
 await D.transform(prune({keepLeaves:true}),dedup(),resample(),textureCompress({encoder:sharp,targetFormat:'webp',resize:[1024,1024],quality:82}),quantize(),meshopt({encoder:(await import('meshoptimizer')).MeshoptEncoder,level:'medium'}));
 await io.write(outP,D);console.log('wrote',outP,D.getRoot().listAnimations().length,'clips');

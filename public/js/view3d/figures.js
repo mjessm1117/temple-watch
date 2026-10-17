@@ -9,7 +9,7 @@ let T=null;const cache={};
 const FILE={human:new URL('../../models/human.glb',import.meta.url).href,beast:new URL('../../models/beast.glb',import.meta.url).href};
 // Meshy unit models (public/models/units/<kind>.glb, see CREDITS.md): textured, Mixamo-rigged, our clips baked in,
 // bones renamed to the names below, weapons hang off a 'grip_r' node. A kind listed here that fails to load falls back to the mannequin.
-export const UNITS=new Set(['jedi']);
+export const UNITS=new Set(['jedi','trooper','scout','medic','heavy','sith','sithHeavy','mando','agent']);
 const urlOf=n=>n.startsWith('u_')?new URL(`../../models/units/${n.slice(2)}.glb`,import.meta.url).href:FILE[n];
 // Right hand rest matrix of human.glb: weapon parts are authored in that model's space and re-expressed relative to the hand.
 const HSRC=[0,1,0,0,-1,0,0,0,0,0,1,0,-.7389,1.4408,-.0654,1];let HI=null;
