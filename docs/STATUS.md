@@ -179,3 +179,23 @@ Desktop (≥880px) only; phone rules in style.css untouched. New `public/css/ui.
 - **Two fronts** (`twin.js`): last 2 crisis steps per era, unlocked by Barracks L2 or Era 2, needs 8 fit units. Front A: 6 units, no time passes. Front B: 4 units / 0–2 Jedi / squad A excluded / 1 fewer grunt; or auto-resolve (25 + 6×Σrank, max 70%) or stand down. Then one `advance()`, and untaken crises are ignored. Field teams can't leave between fronts. Small engine touches: `squadRule()` (campaign.js, base.js), `o.fewer` (turns.js).
 - Known gap: front A's squad gets the benched-stress relief at the shared time step.
 - ✅ K → I (risk vs squad): Risk is now T = 100 × enemy strength ÷ Power of the squad you'd send (`defaultSquad`, front-B rules included). Enemy strength counts bosses ×3.5 and +12 for Threat-clock maps. Start squad: relay Moderate, Malgus High; rank-6 squad: relay Low. Panel shows "vs your best N (Power X)". Bands in `RISK`/`RISK_W` (data-galaxy.js).
+
+## Battle variety (Chat H, wave 4, 2026-10-17)
+Files: `data-battle.js` (TWISTS, GUESTS, BV_TILES, BEATS, SIG, SIDES: tune here), `battle.js` (engine, wraps startMission/startPlayerTurn/endTurn/checkEnd/threatStep/damage/blast/los/mkFoe/eAct/lootAt/exec/applyResults/launchMission), `battle-ui.js` (briefing cards, mission-card chips, HUD rows, comm box, debrief report). Test: `tests/variety.test.js`.
+- **Twists** roll on the crisis option (`o.twist`), filtered by mission theme; shown on the card, briefing, top strip and Objectives. `startMission(id,sq,{twist:'none'|id})` forces one.
+- **Beats**: max 3 generic per mission + every signature beat. Choices queue in `S.bv.q`; End turn waits for an answer (`bvPick(0|1)`; the bot answers at random). History in `S.bv.hist`.
+- **Signatures**: relay uplink pad · envoy runs for a speeder · vault holocron carry · Ilum sapper charges · Adraas shield pylons · Malgus lift locks (max 2) · Muster braziers → allies · Ravine wounded Jedi · Caves spreading rot · Sixth Battle jailer's key · Seventh Battle artillery spotter · Thought Bomb ritual stones.
+- **Side objectives** (crises only, `o.side`): paid on a win via `applyResults` (`out.bvRes`).
+- Weak-bot Normal, signature only, 30 games vs pre-change build: Adraas 80→retuned (base 60), Malgus 65 (70), Kaan 57 (47), Ilum 73 (73). Bot variance ±15 at this size.
+## Requests (wave 4, from H)
+- H → F (3D): new tiles borrow models via `TILES[c].as3d` (one-line change in `view3d/board.js` setTile). Chasm `V` has no model yet (shows plain floor); a dark pit + edge lips would read better. Shell zones (`S.bv.bar.zones`, 3×3) and sapper timers (`S.bv.bombs`) are 2D-only overlays today.
+- H → U: comm box `#bvComm` sits under the turn banner; style/position freely. Log lines of class `beat`.
+- H → L/R: beat/choice text lives in `SIG[id].beats` (data-battle.js); add lines for new story missions there. Flags set on a win: `sig_relay_boost`, `sig_vault_holocron`.
+
+## Biome hazards (Chat H, wave 4 round 2, 2026-10-17)
+`hazards.js` (engine, loads after battle-ui.js) + hazard tiles and `HAZARDS` (per theme) in `data-battle.js`. Every mission scatters 2–4 patches by `S.theme`: snow ice+crevasses · caves lava+chasms · dock/city live conduits (even turns) + fuel slicks · jungle mud, thorns, deep water · plains mud+water · ruins/temple toxic pools + sinkholes.
+- Tile flags: `hurt` (damage on entering/pushed in + every round start; `pulse` = even turns only), `slide` (keep going, max 3), `stop` (moves can end there but never pass through; `reach()` filters), walk 0 = block (sight passes).
+- Placement: open floor only, never within 1 of a unit/objective/evac/console/terminal, blocks never cut the squad off from evac (checked). `startMission(id,sq,{hazards:false})` or `MISSIONS[id].noHaz=1` turns them off.
+- AI scores hurt/slide tiles down; Force pushes into hazards count. UI: terrain chip on the galaxy panel, terrain card on the briefing, Terrain row in Objectives, 2D tile looks. Test: `tests/variety.test.js` (800 placements + mechanics).
+## Requests (round 2, from H)
+- H → F (3D): hazard tiles i o l n u m w j have no 3D look yet (they draw as plain floor; V chasm too). Ideas: ice = pale glossy floor, oil = dark sheen, lava = glowing orange + embers, conduit = cable with blue arcs on even turns (`S.turn%2===0`), toxic = green pool, mud = brown matte, water = blue plane lowered, thorns = small spiky props.

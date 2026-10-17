@@ -7,14 +7,14 @@
 // range: ranged weapons lose this much reach (min 3) · vision: no sight or shots past this many tiles (Sense units +3)
 // droids/ionStun: war droids added, % each droid shorts out per turn · cracks: tiles cracked per turn · guest: an extra fighter.
 const TWISTS={
- sandstorm:{n:'Sandstorm',ic:'smoke',themes:['plains','ruins','dock','jungle'],w:3,range:-3,hud:'Ranges −3',
-  desc:'Grit fills the air. Every ranged weapon reaches 3 tiles less (minimum 3), yours and theirs. Snipers suffer most. Close the distance.'},
- blizzard:{n:'Blizzard',ic:'smoke',themes:['snow'],w:4,range:-3,hud:'Ranges −3',
-  desc:'A whiteout. Every ranged weapon reaches 3 tiles less (minimum 3), yours and theirs. Close the distance.'},
+ sandstorm:{n:'Sandstorm',ic:'smoke',themes:['plains','ruins','dock','jungle'],w:3,range:-2,hud:'Ranges −2',
+  desc:'Grit fills the air. Every ranged weapon reaches 2 tiles less (minimum 3), yours and theirs. Snipers suffer most. Close the distance.'},
+ blizzard:{n:'Blizzard',ic:'smoke',themes:['snow'],w:4,range:-2,hud:'Ranges −2',
+  desc:'A whiteout. Every ranged weapon reaches 2 tiles less (minimum 3), yours and theirs. Close the distance.'},
  blackout:{n:'Blackout',ic:'conceal',themes:['city','dock','temple','caves','ruins'],w:3,vision:4,hud:'Sight 4',
   desc:'The lights are out. Nobody sees or shoots past 4 tiles (Sense: 7). Overwatch and long rifles lose their edge; ambushes are easy.'},
- ionstorm:{n:'Ion storm',ic:'ion',themes:['plains','snow','dock','ruins','jungle','city'],w:2,droids:2,ionStun:35,hud:'Droids short out',
-  desc:'Ion clouds roll in. Two war droids join the enemy, and every droid has a 35% chance to short out (stunned) each turn. Personal shields fail.'},
+ ionstorm:{n:'Ion storm',ic:'ion',themes:['plains','snow','dock','ruins','jungle','city'],w:2,droids:2,ionStun:25,hud:'Droids short out',
+  desc:'Ion clouds roll in. Two of their troopers are war droids instead, and every droid has a 25% chance to short out (stunned) each turn. Personal shields fail.'},
  collapse:{n:'Unstable ground',ic:'tremor',themes:['city','dock','caves','ruins','temple'],w:3,cracks:2,hud:'Cracks fall next turn',
   desc:'The floor is failing. Each turn 2 tiles near your squad crack; next turn they fall away: 3 damage to anyone standing there, and the tile becomes a chasm.'},
  ally:{n:'Unexpected ally',ic:'soldier',themes:null,w:3,guest:1,hud:'+1 guest fighter',
@@ -179,3 +179,26 @@ const SIDES={
  quiet:{n:'Quiet hands',desc:'Win without using a Force power (anything that costs Focus).',res:{favor:3}},
  pristine:{n:'Not a scratch',desc:'Win with the objective above 90%.',res:{credits:30},types:['defend']},
  vipSafe:{n:'Not a hair harmed',desc:'The VIP or prisoner takes no damage.',res:{favor:3},types:['rescue','escort']}};
+
+// ---- 5. Biome hazards (hazards.js): every mission scatters hazard patches by theme. Tiles: hurt (damage on entering and at the
+// start of each round), slide (keep sliding the way you moved, up to 3 tiles), stop (entering ends your move), block (no walking,
+// sight passes). pulse: only live on even turns. Pushing someone into a hazard counts as entering it.
+Object.assign(BV_TILES,{
+ i:{n:'Ice',desc:'Slick ice. Step onto it and you keep sliding the same way (up to 3 tiles) until something stops you.',cover:0,h:0,walk:1,slide:1,as:'ice'},
+ o:{n:'Oil slick',desc:'Slick fuel. Step onto it and you keep sliding the same way (up to 3 tiles) until something stops you.',cover:0,h:0,walk:1,slide:1,as:'oil'},
+ l:{n:'Lava',desc:'Molten rock: 3 damage when you step in or are pushed in, and again at the start of each round you stand in it.',cover:0,h:0,walk:1,hurt:3,as:'lava'},
+ n:{n:'Live conduit',desc:'Exposed power line. On even turns it is live: 2 damage to anyone stepping on or standing there.',cover:0,h:0,walk:1,hurt:2,pulse:1,as:'cond'},
+ u:{n:'Toxic pool',desc:'Corrosive runoff: 1 damage when you step in, and again at the start of each round you stand in it.',cover:0,h:0,walk:1,hurt:1,as:'tox'},
+ m:{n:'Mud',desc:'Deep mud. Stepping in ends your move for this action.',cover:0,h:0,walk:1,stop:1,as:'mud'},
+ w:{n:'Deep water',desc:'Too deep to wade. Nothing walks through it; sight and shots pass over.',cover:0,h:0,walk:0,as:'wat'},
+ j:{n:'Thorn brake',desc:'Razor thorns: 1 damage when you push through, and you stop there.',cover:0,h:0,walk:1,hurt:1,stop:1,as:'thorn'}});
+// Per theme: which hazards appear and how many patches (2–3 tiles each). Twist "Unstable ground" already covers falling floors.
+const HAZARDS={
+ snow:{tiles:['i','i','V'],patches:4,n:'Ice and crevasses'},
+ caves:{tiles:['l','l','V'],patches:3,n:'Lava and chasms'},
+ dock:{tiles:['n','o','o'],patches:3,n:'Live conduits and fuel slicks'},
+ city:{tiles:['n','o'],patches:3,n:'Live conduits and fuel slicks'},
+ jungle:{tiles:['m','j','w'],patches:4,n:'Mud, thorns and deep water'},
+ plains:{tiles:['m','w'],patches:3,n:'Mud and deep water'},
+ ruins:{tiles:['u','u','V'],patches:3,n:'Toxic pools and sinkholes'},
+ temple:{tiles:['u','V'],patches:2,n:'Toxic runoff and broken floors'}};

@@ -36,6 +36,7 @@ const _bvDeb=debrief;debrief=function(win,msg,out){_bvDeb(win,msg,out);try{const
  const T=TWISTS[b.tw],sg=sigStat(),sd=sideStat(),H=(b.hist||[]).slice(-8);
  btn.insertAdjacentHTML('beforebegin',`<div class="bvrecap"><b>Battle report</b>${T?`<p>${icon(T.ic)} Twist: ${T.n}</p>`:''}${sg?`<p>${icon('mark')} ${sg.n}: ${sg.v}</p>`:''}${sd?`<p>${icon('scan')} ${sd.n}: ${win&&sideOk()?'done ✓':'missed'}</p>`:''}
   ${out&&out.bvRes?`<p class="up">Extra rewards: ${fmtRes(out.bvRes)}</p>`:''}${H.length?`<details><summary>Comms log (${H.length})</summary>${H.map(t=>`<p class="muted">${t}</p>`).join('')}</details>`:''}</div>`)}catch(e){}};
-// Galaxy briefing panel (Chat I's map replaced the mission list): show the same twist/signature/side cards there.
-if(typeof panelFor==='function'){const _bvPanel=panelFor;panelFor=function(x){const h=_bvPanel(x);try{if(!x||!x.o||x.f||x.s)return h;const o=x.o;
- return h.replace(/<button type="button" class="primary" data-act="squad:/,twCard(TWISTS[twistFor(o)],SIG[o.mission],SIDES[sideFor(o)])+'<button type="button" class="primary" data-act="squad:')}catch(e){return h}}}
+// Galaxy map briefing panel (galaxy.js, replaced the mission cards): same chips above "Choose squad".
+if(typeof panelFor==='function'){const _bvPanel=panelFor;panelFor=function(x){const h=_bvPanel(x);try{if(!x||!x.o)return h;const o=x.o,T=TWISTS[twistFor(o)],D=SIDES[sideFor(o)],G=SIG[o.mission];
+ const tags=`<div class="meta twmeta">${T?`<span class="twchip" title="${T.desc}">${icon(T.ic)} ${T.n}</span>`:''}${G?`<span class="twchip sig" title="${G.desc}">${icon('mark')} ${G.n}</span>`:''}${D?`<span class="twchip side" title="${D.desc}">${icon('scan')} ${D.n}: ${fmtRes(D.res)}</span>`:''}</div>`;
+ return h.replace(/<button type="button" class="primary" data-act="squad:/,tags+'<button type="button" class="primary" data-act="squad:')}catch(e){return h}}}
