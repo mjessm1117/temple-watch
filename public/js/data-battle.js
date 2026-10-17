@@ -179,3 +179,26 @@ const SIDES={
  quiet:{n:'Quiet hands',desc:'Win without using a Force power (anything that costs Focus).',res:{favor:3}},
  pristine:{n:'Not a scratch',desc:'Win with the objective above 90%.',res:{credits:30},types:['defend']},
  vipSafe:{n:'Not a hair harmed',desc:'The VIP or prisoner takes no damage.',res:{favor:3},types:['rescue','escort']}};
+
+// ---- 5. Biome hazards (hazards.js): every mission scatters hazard patches by theme. Tiles: hurt (damage on entering and at the
+// start of each round), slide (keep sliding the way you moved, up to 3 tiles), stop (entering ends your move), block (no walking,
+// sight passes). pulse: only live on even turns. Pushing someone into a hazard counts as entering it.
+Object.assign(BV_TILES,{
+ i:{n:'Ice',desc:'Slick ice. Step onto it and you keep sliding the same way (up to 3 tiles) until something stops you.',cover:0,h:0,walk:1,slide:1,as:'ice'},
+ o:{n:'Oil slick',desc:'Slick fuel. Step onto it and you keep sliding the same way (up to 3 tiles) until something stops you.',cover:0,h:0,walk:1,slide:1,as:'oil'},
+ l:{n:'Lava',desc:'Molten rock: 3 damage when you step in or are pushed in, and again at the start of each round you stand in it.',cover:0,h:0,walk:1,hurt:3,as:'lava'},
+ n:{n:'Live conduit',desc:'Exposed power line. On even turns it is live: 2 damage to anyone stepping on or standing there.',cover:0,h:0,walk:1,hurt:2,pulse:1,as:'cond'},
+ u:{n:'Toxic pool',desc:'Corrosive runoff: 1 damage when you step in, and again at the start of each round you stand in it.',cover:0,h:0,walk:1,hurt:1,as:'tox'},
+ m:{n:'Mud',desc:'Deep mud. Stepping in ends your move for this action.',cover:0,h:0,walk:1,stop:1,as:'mud'},
+ w:{n:'Deep water',desc:'Too deep to wade. Nothing walks through it; sight and shots pass over.',cover:0,h:0,walk:0,as:'wat'},
+ j:{n:'Thorn brake',desc:'Razor thorns: 1 damage when you push through, and you stop there.',cover:0,h:0,walk:1,hurt:1,stop:1,as:'thorn'}});
+// Per theme: which hazards appear and how many patches (2–3 tiles each). Twist "Unstable ground" already covers falling floors.
+const HAZARDS={
+ snow:{tiles:['i','i','V'],patches:4,n:'Ice and crevasses'},
+ caves:{tiles:['l','l','V'],patches:3,n:'Lava and chasms'},
+ dock:{tiles:['n','o','o'],patches:3,n:'Live conduits and fuel slicks'},
+ city:{tiles:['n','o'],patches:3,n:'Live conduits and fuel slicks'},
+ jungle:{tiles:['m','j','w'],patches:4,n:'Mud, thorns and deep water'},
+ plains:{tiles:['m','w'],patches:3,n:'Mud and deep water'},
+ ruins:{tiles:['u','u','V'],patches:3,n:'Toxic pools and sinkholes'},
+ temple:{tiles:['u','V'],patches:2,n:'Toxic runoff and broken floors'}};
