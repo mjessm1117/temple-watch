@@ -10,7 +10,7 @@ const story=(d,g)=>{for(let k=0;k<16;k++){const q=s=>d.querySelector(s),ch=[...d
 let fail=0;const check=(ok,m)=>{if(!ok){console.log('FAIL '+m);fail++}};
 async function playEra(w,d,g){const ms=[];for(let m=0;m<60&&(story(d,g),w.eval('C.options.length'));m++){
   for(const p of d.querySelectorAll('[data-act^="pick:"]'))if(p.isConnected)p.click();
-  d.querySelector(`[data-act="squad:${g%2&&w.eval('C.options.length')>1?1:0}"]`).click();d.querySelector('#deploy').click();
+  const oi=g%2&&w.eval('C.options.length')>1?1:0;d.querySelector(`button[data-pin="o${oi}"]`).click();d.querySelector(`[data-act="squad:${oi}"]`).click();d.querySelector('#deploy').click();
   if(!w.eval('S&&!S.over')){check(false,'mission did not start');break}const id=w.eval('S.id');
   for(let i=0;i<40&&!w.eval('S.over');i++){w.eval('AI()');await w.eval('endTurn()')}
   check(w.eval('S.over'),'mission ended');ms.push(id+(w.eval('S.win')?'+':'-'));d.querySelector('#toBase').click()}return ms}

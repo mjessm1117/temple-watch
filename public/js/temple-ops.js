@@ -50,7 +50,7 @@ function progAdvance(){ensureProg();const R=C.research;
   if(C.staff.gardens)addStress(r,-STRESS.gardensStaff);
   if(r.assign==='calm'&&C.wings.gardens>=2&&r.scars.some(k=>SCARS[k].kind==='trauma')&&rnd(SCAR.treat)){const k=r.scars.find(k=>SCARS[k].kind==='trauma');r.scars=r.scars.filter(x=>x!==k);C.news.push(`${r.n} made peace with it: ${SCARS[k].n} is gone.`)}
   if(r.assign==='rest'&&C.wings.medical>=3&&r.scars.some(k=>SCARS[k].kind==='wound')&&rnd(SCAR.treat)){const k=r.scars.find(k=>SCARS[k].kind==='wound');r.scars=r.scars.filter(x=>x!==k);C.news.push(`Bacta treatment: ${r.n}'s ${SCARS[k].n} is healed.`)}
-  if(r.assign==='calm'&&!r.stress&&!(C.wings.gardens>=2&&r.scars.some(k=>SCARS[k].kind==='trauma'))){r.assign=null;C.news.push(`${r.n} is at peace and back on call.`)}
+  if(r.assign==='calm'&&!r.stress&&!(isJedi(r)&&r.dark>0)&&!(C.wings.gardens>=2&&r.scars.some(k=>SCARS[k].kind==='trauma'))){r.assign=null;C.news.push(`${r.n} is at peace and back on call.`)}
   if(r.assign&&r.assign.startsWith('op:'))r.assign=null}
  for(const o of C.ops.list.filter(o=>o.st==='team')){const T=o.team.map(unit).filter(Boolean),ch=Math.min(OPS.max,OPS.teamBase+OPS.perRank*T.reduce((s,r)=>s+r.rank,0));
   if(rnd(ch)){o.st='done';for(const r of T){r.xp+=OPS.xp;if(promote(r))C.news.push(`${r.n} reached Rank ${r.rank}. Choose a new skill in the Roster.`)}C.news.push(`Sith op stopped: ${SITH_OPS[o.k].n}. The team earns +${OPS.xp} XP each.`)}

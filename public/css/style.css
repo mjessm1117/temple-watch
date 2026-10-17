@@ -262,7 +262,7 @@ html.rm *,html.rm *::before,html.rm *::after{animation:none!important;transition
 .trow.lock{opacity:.5}.topt{border:1px solid var(--line);border-radius:6px;padding:4px 6px;display:grid;grid-template-columns:auto 1fr;gap:0 6px;align-items:center}
 .topt small{grid-column:2;color:var(--dim)}
 .specs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.spec{border:1px solid var(--line);border-radius:8px;padding:6px}.spec.on{border-color:var(--holo)}.spec.off{opacity:.55}
-.spec>b{display:flex;gap:6px;align-items:center}.spec>b svg{width:16px;height:16px}.spec .trow{grid-template-columns:44px 1fr 1fr}.xtrain{margin-top:8px}.picks button.on{border-color:var(--holo)}
+.spec>b{display:flex;gap:6px;align-items:center}.spec>b svg{width:16px;height:16px}.spec .trow{grid-template-columns:44px 1fr 1fr}.xtrain{margin-top:8px}.pw{font:700 9px var(--mono);color:var(--holo);border:1px solid var(--holo);border-radius:3px;padding:0 2px;margin-left:3px}.strait{display:block;margin-top:4px;font-size:11px}.strait b{color:var(--holo)}.pwr{font:600 11px var(--mono);color:var(--holo)}.pwr svg{width:12px;height:12px;vertical-align:-2px}.picks button.on{border-color:var(--holo)}
 @media (max-width:700px){.specs{grid-template-columns:1fr}}.topt.on{border-color:var(--holo);box-shadow:0 0 0 1px var(--holo) inset}.topt svg{width:16px;height:16px}
 
 /* ---- Wave 3 follow-up (Chat U): stealth, heights, area odds, HUD panels, calendar, tips, colorblind ---- */

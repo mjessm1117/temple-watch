@@ -131,6 +131,12 @@ Codex now matches P/X/R ids: 0 gaps across AB, PERKS (under `ability`), FOES (in
 ## Skill trees (Chat F · Skill Trees, 2026-10-16)
 Branching trees: trunk R1–2 → pick 1 of 2 specializations at R3 (permanent) → R4–7 inside the spec. Cross-training via the Training Salle (L1: 1 borrowed skill from R4, L2: 2nd from R6; Jedi any class, troops troop-only). Old saves respec from R3 for free. `KITS` is gone: use `treeOpts(r,rank)` / `TREES` (`data-trees.js`). Spec: `docs/specs/trees.md`. New test: `tests/trees.test.js`.
 - F(trees) → E: CHANGELOG: "Skill trees branch: pick a specialization at rank 3 (16 new specs), choose within it to rank 7, and cross-train a second class at the Training Salle. Units past rank 2 get a free respec."
+## Chat I — Campaign layer, 2026-10-16
+- **Darkness reduction** (`darkness.js`): Jedi meditating in the Gardens shed 1/2 Darkness a month (by level; they stay assigned while Darkness > 0); staffed Gardens −1 Order Darkness/month. Mercy in battle: capture = 1, heal/stabilize/revive an ally = 1, sparing a surrendered foe = 2; every 2 = −1 Darkness, max −2 per mission. Redemption mission at Darkness ≥6 (one per Jedi per era; win −4 and stress −20, lose +1). Mentors: a Padawan's Master or a Counsel mentor (Knight/Master rank ≥4) at Darkness ≤2 pulls −1/month; at ≥7 pulls +1. Roster shows next month's change.
+- **Galaxy map** (`galaxy.js`, `data-galaxy.js`, `css/galaxy.css`): replaces the hub list. Regions clickable; pins per option + field op; briefing panel: goal, risk (enemy-power estimate → Low/Moderate/High/Severe), expected enemies, reward, deadline, ignore penalty. Chips under the map mirror the pins (keyboard + tests).
+- **Field ops** (`fieldops.js`): 1–2 a month, expire in 30 days; 2–3 units leave for 15–30 days; odds = 45 + 5×ranks + 10×right class (max 2) + 8 for a third − 12×(stars−1), clamp 10–92. Fail = stress +15 each, one wounded; never death. Sith ops (2-unit teams) unchanged.
+- **Second squad:** design only, `docs/specs/second-squad.md`.
+- Tests: new `tests/layer.test.js`; campaign bot clicks a pin before the squad screen and sends field ops in odd runs.
 
 ## Battle variety (Chat H, wave 4, 2026-10-17)
 Files: `data-battle.js` (TWISTS, GUESTS, BV_TILES, BEATS, SIG, SIDES: tune here), `battle.js` (engine, wraps startMission/startPlayerTurn/endTurn/checkEnd/threatStep/damage/blast/los/mkFoe/eAct/lootAt/exec/applyResults/launchMission), `battle-ui.js` (briefing cards, mission-card chips, HUD rows, comm box, debrief report). Test: `tests/variety.test.js`.

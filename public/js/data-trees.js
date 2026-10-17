@@ -57,31 +57,54 @@ Object.assign(PERKS,{
 // trunk: ranks 1–2. specs: two per class; sig = rank-3 skill that comes with the spec; 4–7 = pick 1 of 2.
 const TREES={
  Guardian:{trunk:{1:['saberThrow','defLine'],2:['leap','reflectM']},specs:{
-  protector:{n:'Protector',ic:'guard',desc:'Shields the squad and holds the line.',sig:'barrier',4:['gIron','gBulwark'],5:['collapse','gWarden'],6:['forceWave','gAegis'],7:['gUnbreakable','gLastStand']},
-  weaponMaster:{n:'Weapon Master',ic:'strike',desc:'Lives in melee and cuts through crowds.',sig:'sweep',4:['gDuelist','gVanguard'],5:['mightyBlow','flurry'],6:['precisionStrike','gWMFocus'],7:['gMasterBlade','gWMStorm']}}},
+  protector:{n:'Protector',ic:'sp_protector',desc:'Shields the squad and holds the line.',sig:'barrier',4:['gIron','gBulwark'],5:['collapse','gWarden'],6:['forceWave','gAegis'],7:['gUnbreakable','gLastStand']},
+  weaponMaster:{n:'Weapon Master',ic:'sp_weaponMaster',desc:'Lives in melee and cuts through crowds.',sig:'sweep',4:['gDuelist','gVanguard'],5:['mightyBlow','flurry'],6:['precisionStrike','gWMFocus'],7:['gMasterBlade','gWMStorm']}}},
  Consular:{trunk:{1:['stun','forceHeal'],2:['barrier','battleMed']},specs:{
-  sage:{n:'Sage',ic:'medic',desc:'Healer. Keeps everyone standing.',sig:'forceRevive',4:['massHeal','cResolve'],5:['cWellspring','cSageLight'],6:['cSeer','cSageEmpathy'],7:['cMaster','cSageAvatar']},
-  shadow:{n:'Shadow',ic:'conceal',desc:'Controls minds and strikes unseen.',sig:'mindTrick',4:['pull','shadowStep'],5:['forceWave','cShWhisper'],6:['stasisField','cShVeil'],7:['cShMaster','disarm']}}},
+  sage:{n:'Sage',ic:'sp_sage',desc:'Healer. Keeps everyone standing.',sig:'forceRevive',4:['massHeal','cResolve'],5:['cWellspring','cSageLight'],6:['cSeer','cSageEmpathy'],7:['cMaster','cSageAvatar']},
+  shadow:{n:'Shadow',ic:'sp_shadow',desc:'Controls minds and strikes unseen.',sig:'mindTrick',4:['pull','shadowStep'],5:['forceWave','cShWhisper'],6:['stasisField','cShVeil'],7:['cShMaster','disarm']}}},
  Sentinel:{trunk:{1:['flurry','sense'],2:['shadowStep','sExecutioner']},specs:{
-  watchman:{n:'Watchman',ic:'mark',desc:'Hunter and investigator. Finishes the wounded.',sig:'executioner',4:['disarm','sHunter'],5:['sGhost','sWatchSense'],6:['precisionStrike','spotter'],7:['sUntouchable','sWatchJudge']},
-  bladeDancer:{n:'Blade Dancer',ic:'flurry',desc:'Fast, mobile, always moving.',sig:'saberThrow',4:['sEdge','sDancer'],5:['sweep','sDanceFlow'],6:['leap','sDanceWhirl'],7:['sBlademaster','sDanceStorm']}}},
+  watchman:{n:'Watchman',ic:'sp_watchman',desc:'Hunter and investigator. Finishes the wounded.',sig:'executioner',4:['disarm','sHunter'],5:['sGhost','sWatchSense'],6:['precisionStrike','spotter'],7:['sUntouchable','sWatchJudge']},
+  bladeDancer:{n:'Blade Dancer',ic:'sp_bladeDancer',desc:'Fast, mobile, always moving.',sig:'saberThrow',4:['sEdge','sDancer'],5:['sweep','sDanceFlow'],6:['leap','sDanceWhirl'],7:['sBlademaster','sDanceStorm']}}},
  Wayseeker:{trunk:{1:['pathfinder','wildBond'],2:['tremor','barrier']},specs:{
-  beastwarden:{n:'Beastwarden',ic:'calm',desc:'Tames creatures and horrors.',sig:'beastCalm',4:['wStalker','forceHeal'],5:['wBond','wBeastHide'],6:['wSeer','wBeastPack'],7:['wPrimal','wBeastKing']},
-  earthshaper:{n:'Earthshaper',ic:'tremor',desc:'Bends the ground and drags enemies around.',sig:'pull',4:['saberThrow','wEarthRoot'],5:['forceWave','wEarthStone'],6:['collapse','wEarthReach'],7:['stasisField','wEarthWorld']}}},
+  beastwarden:{n:'Beastwarden',ic:'sp_beastwarden',desc:'Tames creatures and horrors.',sig:'beastCalm',4:['wStalker','forceHeal'],5:['wBond','wBeastHide'],6:['wSeer','wBeastPack'],7:['wPrimal','wBeastKing']},
+  earthshaper:{n:'Earthshaper',ic:'sp_earthshaper',desc:'Bends the ground and drags enemies around.',sig:'pull',4:['saberThrow','wEarthRoot'],5:['forceWave','wEarthStone'],6:['collapse','wEarthReach'],7:['stasisField','wEarthWorld']}}},
  Soldier:{trunk:{1:['suppress','hunker'],2:['rapidFire','flakVest']},specs:{
-  sergeant:{n:'Sergeant',ic:'guard',desc:'Leader. Rallies and steadies the squad.',sig:'rally',4:['holdLine','soSteel'],5:['mark','soSgtDrill'],6:['smoke','soTough'],7:['soCommander','soSgtHero']},
-  vanguard:{n:'Vanguard',ic:'dash',desc:'Assault trooper. Closes in and hits hard.',sig:'chainShot',4:['veteran','soVanCharge'],5:['soMarksman','soVanPlate'],6:['runGun','soVanShred'],7:['soLegend','soVanStorm']}}},
+  sergeant:{n:'Sergeant',ic:'sp_sergeant',desc:'Leader. Rallies and steadies the squad.',sig:'rally',4:['holdLine','soSteel'],5:['mark','soSgtDrill'],6:['smoke','soTough'],7:['soCommander','soSgtHero']},
+  vanguard:{n:'Vanguard',ic:'sp_vanguard',desc:'Assault trooper. Closes in and hits hard.',sig:'chainShot',4:['veteran','soVanCharge'],5:['soMarksman','soVanPlate'],6:['runGun','soVanShred'],7:['soLegend','soVanStorm']}}},
  Scout:{trunk:{1:['mark','scEagle'],2:['deadeye','longshot']},specs:{
-  sniper:{n:'Sniper',ic:'mark',desc:'Long range. One shot, one kill.',sig:'spotter',4:['killshot','scSniper'],5:['scAssassin','scSnStill'],6:['scDeadly','chainShot'],7:['scLegend','scSnOneShot']},
-  infiltrator:{n:'Infiltrator',ic:'conceal',desc:'Moves unseen and strikes first.',sig:'runGun',4:['fieldcraft','ghost'],5:['scSurvivor','scInfShadow'],6:['smoke','scInfKnife'],7:['scInfPhantom','scInfStrike']}}},
+  sniper:{n:'Sniper',ic:'sp_sniper',desc:'Long range. One shot, one kill.',sig:'spotter',4:['killshot','scSniper'],5:['scAssassin','scSnStill'],6:['scDeadly','chainShot'],7:['scLegend','scSnOneShot']},
+  infiltrator:{n:'Infiltrator',ic:'sp_infiltrator',desc:'Moves unseen and strikes first.',sig:'runGun',4:['fieldcraft','ghost'],5:['scSurvivor','scInfShadow'],6:['smoke','scInfKnife'],7:['scInfPhantom','scInfStrike']}}},
  Medic:{trunk:{1:['smoke','mDrilled'],2:['reviveStim','fieldKit']},specs:{
-  surgeon:{n:'Field Surgeon',ic:'medic',desc:'Saves lives. More kits, steadier hands.',sig:'medBeacon',4:['traumaBag','mSurgeon'],5:['mStoic','mFieldSurgeon'],6:['rally','mSurgCalm'],7:['mAngel','mSurgMiracle']},
-  tech:{n:'Combat Tech',ic:'drone',desc:'Drones, armor and a sharper blaster.',sig:'shieldDrone',4:['combatMedic','mTechArmor'],5:['mMarksman','mark'],6:['suppress','mTechOverclock'],7:['mVeteran','mTechDrones']}}},
+  surgeon:{n:'Field Surgeon',ic:'sp_surgeon',desc:'Saves lives. More kits, steadier hands.',sig:'medBeacon',4:['traumaBag','mSurgeon'],5:['mStoic','mFieldSurgeon'],6:['rally','mSurgCalm'],7:['mAngel','mSurgMiracle']},
+  tech:{n:'Combat Tech',ic:'sp_tech',desc:'Drones, armor and a sharper blaster.',sig:'shieldDrone',4:['combatMedic','mTechArmor'],5:['mMarksman','mark'],6:['suppress','mTechOverclock'],7:['mVeteran','mTechDrones']}}},
  Heavy:{trunk:{1:['suppress','shredder'],2:['bandolier','flakVest']},specs:{
-  demolitionist:{n:'Demolitionist',ic:'grenade',desc:'Explosives expert. Rockets and more grenades.',sig:'rocket',4:['ionNade','hDemoExtra'],5:['hHeavyWeapons','hDemoBlast'],6:['hGunner','hDemoSapper'],7:['hWarlord','hDemoBig']},
-  bulwark:{n:'Bulwark',ic:'hunker',desc:'Walking cover. Soaks fire and holds ground.',sig:'holdLine',4:['juggernaut','hBrute'],5:['hBulwark','hunker'],6:['chainShot','hBulTaunt'],7:['hTitan','hBulFort']}}}};
+  demolitionist:{n:'Demolitionist',ic:'sp_demolitionist',desc:'Explosives expert. Rockets and more grenades.',sig:'rocket',4:['ionNade','hDemoExtra'],5:['hHeavyWeapons','hDemoBlast'],6:['hGunner','hDemoSapper'],7:['hWarlord','hDemoBig']},
+  bulwark:{n:'Bulwark',ic:'sp_bulwark',desc:'Walking cover. Soaks fire and holds ground.',sig:'holdLine',4:['juggernaut','hBrute'],5:['hBulwark','hunker'],6:['chainShot','hBulTaunt'],7:['hTitan','hBulFort']}}}};
 
 // Cross-training (multiclass). Free, gated by the Training Salle: L1 = 1 borrowed skill from rank 4, L2 = a 2nd from rank 6.
 // Jedi may cross-train in any class; troops only in other troop classes (no Force). Borrowable = the second class's trunk (ranks 1–2).
 // NOGUN: troop skills that need a blaster or kits, so a Jedi can't borrow them.
 const XTRAIN={minRank:[4,6],noGun:['suppress','rapidFire','deadeye','longshot','scEagle','bandolier','reviveStim','fieldKit']};
+
+// Spec traits: a passive every member of the spec gets from rank 3. Engine: power.js. mod = flat stat change via addMod.
+const SPEC_TRAITS={
+ protector:{n:'Shield Wall',desc:'Allies next to you take 1 less damage from enemy hits (min 1).'},
+ weaponMaster:{n:'Momentum',desc:'Each kill this mission adds +1 damage to your attacks (max +3).'},
+ sage:{n:'Life Bond',desc:'Your heals restore 1 more HP and give you back 1 Focus.'},
+ shadow:{n:'Mind’s Edge',desc:'Force powers deal +1 damage, +2 against stunned enemies.'},
+ watchman:{n:'Judgment',desc:'+10 aim against elites and bosses; each kill restores 1 Focus.'},
+ bladeDancer:{n:'Flow',desc:'Each kill this mission gives +1 move (max +2).'},
+ beastwarden:{n:'Beast Lore',desc:'+15 aim and +2 damage against creatures and horrors.'},
+ earthshaper:{n:'Bedrock',desc:'Your Force powers ignore armor.'},
+ sergeant:{n:'Steady Line',desc:'You and allies within 3 tiles get +5 aim.'},
+ vanguard:{n:'Close Assault',desc:'+15 aim and +1 damage against enemies within 4 tiles.'},
+ sniper:{n:'Patience',desc:'+10 aim and +1 damage against enemies 7+ tiles away.'},
+ infiltrator:{n:'Opening Strike',desc:'Your first hit each mission gets +20 aim and +2 damage.'},
+ surgeon:{n:'Triage',desc:'Every heal you give restores 2 more HP.'},
+ tech:{n:'Field Repairs',desc:'At the start of each turn, you and adjacent allies regain 1 HP.'},
+ demolitionist:{n:'Blast Radius',desc:'Grenades, Ion Grenades and Rockets deal +1 damage.'},
+ bulwark:{n:'Iron Wall',desc:'+1 armor; enemies get −10 aim against allies next to you.',mod:{armor:1}}};
+// Tree perks get an icon for their main stat, so every pick reads at a glance (icons.js st_*).
+const STAT_IC={hp:'st_hp',armor:'st_armor',aim:'st_aim',crit:'st_crit',dmg:'st_dmg',mob:'st_mob',maxF:'st_focus',will:'st_will',range:'st_range',kits:'medic',nades:'grenade',deflect:'guard',guardDef:'guard'};
+for(const T of Object.values(TREES))for(const k of [...T.trunk[1],...T.trunk[2],...Object.values(T.specs).flatMap(s=>[4,5,6,7].flatMap(r=>s[r]))]){
+ const p=PERKS[k];if(p&&p.mod)p.ic=STAT_IC[Object.keys(p.mod).sort((a,b)=>Math.abs(p.mod[b]*(b==='aim'||b==='will'||b==='crit'||b==='deflect'||b==='guardDef'?.2:1))-Math.abs(p.mod[a]*(a==='aim'||a==='will'||a==='crit'||a==='deflect'||a==='guardDef'?.2:1)))[0]]||p.ic}

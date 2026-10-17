@@ -7,13 +7,23 @@ import {clone as skClone} from '../../vendor/SkeletonUtils.js';
 
 let T=null;const cache={};
 const FILE={human:new URL('../../models/human.glb',import.meta.url).href,beast:new URL('../../models/beast.glb',import.meta.url).href};
+// Meshy unit models (public/models/units/<kind>.glb, see CREDITS.md): textured, Mixamo-rigged, our clips baked in,
+// bones renamed to the names below, weapons hang off a 'grip_r' node. A kind listed here that fails to load falls back to the mannequin.
+export const UNITS=new Set(['jedi']);
+const urlOf=n=>n.startsWith('u_')?new URL(`../../models/units/${n.slice(2)}.glb`,import.meta.url).href:FILE[n];
+// Right hand rest matrix of human.glb: weapon parts are authored in that model's space and re-expressed relative to the hand.
+const HSRC=[0,1,0,0,-1,0,0,0,0,0,1,0,-.7389,1.4408,-.0654,1];let HI=null;
+const WEAP=new Set(['saber','rifle','longrifle','cannon','pistol']);
 // Our names → clip names in each file (human.glb clips were renamed at build time).
 const CLIPS={beast:{idle:'Idle',walk:'Walk',run:'Run',swing:'Punch',swing2:'Weapon',claw:'Punch',hit:'HitReact',knock:'HitReact',death:'Death',death2:'Death',toLay:'Death',
  getUp:'Jump_Land',jumpStart:'Jump',jumpLoop:'Jump_Idle',jumpLand:'Jump_Land',cast:'Weapon',lifted:'Duck',cheer:'Yes'}};
-export const fileOf=kind=>kind==='beast'||kind==='spawn'?'beast':kind==='nexus'||kind==='nexusCore'?null:'human';
+const legacyOf=kind=>kind==='beast'||kind==='spawn'?'beast':kind==='nexus'||kind==='nexusCore'?null:'human';
+export const fileOf=kind=>UNITS.has(kind)?'u_'+kind:legacyOf(kind);
 export function loadModel(name){if(!name)return Promise.resolve(null);if(cache[name])return cache[name].p;const c=cache[name]={ok:null};
  const L=new GLTFLoader();L.setMeshoptDecoder(MeshoptDecoder);
- c.p=L.loadAsync(FILE[name]).then(g=>{c.ok={scene:g.scene,clips:g.animations};return c.ok}).catch(e=>{console.warn('3D model failed, using block figures:',name,e);c.ok=false;return null});
+ c.p=L.loadAsync(urlOf(name)).then(g=>{const meshy=name.startsWith('u_'),h=meshy?new T.Box3().setFromObject(g.scene).getSize(new T.Vector3()).y:0;c.ok={scene:g.scene,clips:g.animations,meshy,h};return c.ok})
+  .catch(e=>{if(name.startsWith('u_')){console.warn('Meshy model failed, using mannequin:',name,e);const k=name.slice(2);UNITS.delete(k);return loadModel(legacyOf(k)).then(m=>{c.ok=m||false;return m})}
+   console.warn('3D model failed, using block figures:',name,e);c.ok=false;return null});
  return c.p}
 export const modelOf=name=>name&&cache[name]&&cache[name].ok||null;
 export function initFigures(THREE){T=THREE}
@@ -44,7 +54,8 @@ const LOOK={
 const mat=(c,o={})=>new T.MeshStandardMaterial({color:c,roughness:.6,metalness:.25,flatShading:true,...o});
 const glow=c=>new T.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:1.8,roughness:.4});
 // A part placed in model space (T-pose, meters, facing +z), then re-parented to a bone keeping its world transform.
-function part(fig,bone,geo,m,s,p,r){const o=new T.Mesh(geo,m);o.scale.set(...s);o.position.set(...p);if(r)o.rotation.set(...r);o.castShadow=false; // the skinned body casts; small gear doesn't (saves shadow draws)
+function part(fig,bone,geo,m,s,p,r){const o=new T.Mesh(geo,m);o.scale.set(...s);o.position.set(...p);if(r)o.rotation.set(...r);o.castShadow=false;
+ if(fig.userData.grip&&bone==='hand_r'){HI=HI||new T.Matrix4().fromArray(HSRC).invert();o.updateMatrix();o.matrix.premultiply(HI);o.matrix.decompose(o.position,o.quaternion,o.scale);fig.userData.grip.add(o);return o} // the skinned body casts; small gear doesn't (saves shadow draws)
 
  fig.add(o);o.updateMatrixWorld(true);const b=fig.getObjectByName(bone);if(b)b.attach(o);return o}
 
@@ -61,11 +72,12 @@ export function makeFigure(kind,color){const file=fileOf(kind),M=modelOf(file);i
   else for(const s of [-1,1])part(obj,'Head',g.cone,horn,[.12,.6,.12],[s*.6,3.45,.2],[.3,0,s*-.5]);
   for(const m of [eye,horn])m.userData.e0=m.emissive.clone();
   return finish(obj,M,kind,mats,[],kind==='spawn'?.36:.42)}
- const L=LOOK[kind]||LOOK.trooper,tint=new T.Color(),[mm,mj]=[mat(L.main),mat(L.joint,{metalness:.35})];mats.push(mm,mj);
- obj.traverse(o=>{if(o.isMesh){o.castShadow=true;o.material=/Joint/.test(o.material.name)?mj:mm}});
+ const meshy=M.meshy,beastK=kind==='beast'||kind==='spawn',L=LOOK[kind]||LOOK.trooper,[mm,mj]=[mat(L.main),mat(L.joint,{metalness:.35})];
+ if(meshy){obj.userData.grip=obj.getObjectByName('grip_r');obj.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;o.material=o.material.clone();mats.push(o.material)}})}
+ else{mats.push(mm,mj);obj.traverse(o=>{if(o.isMesh){o.castShadow=true;o.material=/Joint/.test(o.material.name)?mj:mm}})}
  const ma=mat(L.accent||L.joint),mw=mat(0x24282c,{metalness:.7,roughness:.35}),mv=L.visor?glow(L.visor):mat(0x14202a,{metalness:.6});mats.push(ma,mw,mv);
  const glows=[],bulk=L.bulk||1;
- for(const k of L.gear)switch(k){
+ for(const k of meshy?(beastK?[]:L.gear.filter(k=>WEAP.has(k))):L.gear)switch(k){
   case 'robe':part(obj,'pelvis',g.skirt,mm,[.2,.62,.17],[0,.66,.0]).castShadow=true;break;
   case 'cape':part(obj,'spine_03',g.box,ma,[.4,.9,.02],[0,1.0,-.13],[.08,0,0]);break;
   case 'kama':part(obj,'pelvis',g.box,ma,[.34,.3,.03],[0,.78,-.12],[.1,0,0]);break;
@@ -97,7 +109,7 @@ export function makeFigure(kind,color){const file=fileOf(kind),M=modelOf(file);i
   case 'cannon':gun(obj,g,mw,ma,.58,.13,.2);break;
   case 'pistol':gun(obj,g,mw,ma,.26,.05,0);break}
  for(const m of mats)m.userData.e0=m.emissive.clone();
- return finish(obj,M,kind,mats,glows,1.15/1.83*bulk*(kind==='malgus'?1.08:1))}
+ return finish(obj,M,kind,mats,glows,(meshy?(beastK?1.55:1.15)/(M.h||1.7):1.15/1.83*bulk)*(kind==='malgus'?1.08:1))}
 
 function gun(obj,g,mw,ma,len,th,stock){const hx=-.76,hy=1.36;part(obj,'hand_r',g.box,mw,[len,th*1.3,th],[hx-len/2+.12,hy,0]);
  part(obj,'hand_r',g.box,mw,[.05,.1,th*.9],[hx+.02,hy-.07,0]);if(stock)part(obj,'hand_r',g.box,ma,[stock,th*1.1,th*.8],[hx+.12+stock/2,hy-.02,0]);}

@@ -9,7 +9,7 @@ function stateTag(r){return r.status==='retired'?'<span class="dim">Retired</spa
 function rosterTab(){const act=C.roster.filter(r=>r.status!=='dead');
  return act.map(r=>{const next=r.rank<RANKS.length?RANKS[r.rank].xp:null,p=pendingRank(r),bs=bondsOf(r).filter(b=>b.lvl);
   return `<div class="rrow"><span class="mini" style="--uc:${r.col||'var(--troop)'}">${icon(r.cls.toLowerCase())}</span><div class="rmain"><b data-tip="class:${r.cls}">${r.n}</b>
-  <small>${r.title?r.title+' · ':''}${r.cls} · Rank ${r.rank} · ${r.xp}${next?'/'+next:''} XP${isJedi(r)?` · Darkness ${r.dark}`:''}${r.trait?` · ${TRAITS[r.trait].n}`:''} · age ${r.age}${r.fear?` · <span class="bad">afraid (${r.fear})</span>`:''}</small>
+  <small><span class="pwr">${icon('st_power')}${unitPower(r)}</span> · ${r.title?r.title+' · ':''}${r.cls}${specOf(r)?' ('+specOf(r).n+')':''} · Rank ${r.rank} · ${r.xp}${next?'/'+next:''} XP${isJedi(r)?` · Darkness ${r.dark}`:''}${r.trait?` · ${TRAITS[r.trait].n}`:''} · age ${r.age}${r.fear?` · <span class="bad">afraid (${r.fear})</span>`:''}</small>
   ${bs.length?`<small class="bd">Bonds: ${bs.map(b=>`${b.n} ${'★'.repeat(b.lvl)}`).join(', ')}</small>`:''}
   ${p?`<div class="picks">Rank ${p}: ${p===3?'choose a specialization (permanent)':'choose one'} ${treeOpts(r,p).map(k=>{const a=pickCard(r,p,k);return `<button type="button" data-act="pick:${r.id}:${k}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}${a.name}</button>`}).join('')}<small>${treeOpts(r,p).map(k=>{const a=pickCard(r,p,k);return `${a.name}: ${a.desc}`}).join(' · ')}</small></div>`:''}
   ${rosterProg(r)}
@@ -19,7 +19,7 @@ function rosterTab(){const act=C.roster.filter(r=>r.status!=='dead');
  +`<p class="muted">Assigned units train, recover or staff a wing between missions, but can't deploy.${C.legends.length?` Fallen: ${C.legends.map(l=>l.n).join(', ')}.`:''}</p>`}
 
 function armoryTab(){const L=C.roster.filter(r=>r.status==='active');if(!L.some(r=>r.id===ARM))ARM=L[0]&&L[0].id;const r=unit(ARM);
- const list=L.map(x=>`<button type="button" class="${x.id===ARM?'on':''}" data-act="arm:${x.id}"><span class="mini" style="--uc:${x.col||'var(--troop)'}">${icon(x.cls.toLowerCase())}</span><span>${x.n}<small>${x.cls} · R${x.rank}</small></span></button>`).join('');
+ const list=L.map(x=>`<button type="button" class="${x.id===ARM?'on':''}" data-act="arm:${x.id}"><span class="mini" style="--uc:${x.col||'var(--troop)'}">${icon(x.cls.toLowerCase())}</span><span>${x.n}<small>${x.cls} · R${x.rank} · P${unitPower(x)}</small></span></button>`).join('');
  if(!r)return '<p class="muted">No one at the Temple.</p>';const g=r.gear;let h='';
  if(isJedi(r)){const nx=SABERS[g.saber+1];
   h+=`<div class="grow"><b>Saber</b><span>${SABERS[g.saber].n} (T${g.saber+1})</span>${nx?`<button type="button" data-act="saber:${r.id}" ${!hasWing(nx.need)||C.res.credits<nx.cost||C.res.kyber<kyberOf(nx.kyber)?'disabled':''}>Craft ${nx.n} · ${cost(nx.cost,kyberOf(nx.kyber))}${needTxt(nx.need)}</button>`:''}</div>`;
@@ -57,11 +57,11 @@ function baseScreen(){SCR=baseScreen;S=null;ensureTemple();const m=$('#modal');m
  m.innerHTML=`<div class="box wide base">${resRow()}
  <div><div class="eyebrow">${eraLabel()} · ${DIFF[C.diff].n}</div><h2>Jedi Temple, Coruscant</h2></div>
  ${C.news.length?`<div class="news">${C.news.map(n=>`<p>${n}</p>`).join('')}</div>`:''}
- <section><h3>Galaxy · choose the next mission</h3><div class="opts">${C.options.map(optionHTML).join('')}</div></section>
+ ${typeof galaxyHTML==='function'?galaxyHTML():`<section><h3>Galaxy · choose the next mission</h3><div class="opts">${C.options.map(optionHTML).join('')}</div></section>`}
  <nav class="tabs" role="tablist">${window.codexOpen?'<button type="button" id="hubCx" title="Codex (C)">Codex</button>':''}${window.settingsOpen?'<button type="button" id="hubSet">Settings</button>':''}${TABS.map(([k,n])=>`<button type="button" role="tab" class="${TAB===k?'on':''}" aria-selected="${TAB===k}" data-tab="${k}">${n}${k==='roster'&&pend?` (${pend})`:''}</button>`).join('')}</nav>
  ${TABS.map(([k,,f])=>`<section class="tpanel" ${TAB===k?'':'hidden'}>${f()}</section>`).join('')}</div>`;
  m.onclick=hubClick;m.onchange=ev=>{const s=ev.target.closest('[data-assign]');if(s){assign(s.dataset.assign,s.value);baseScreen()}const p=ev.target.closest('[data-pair]');if(p){setPair(p.dataset.pair,p.value);baseScreen()}}}
-function hubClick(ev){if(ev.target.closest('#hubCx'))return codexOpen();if(ev.target.closest('#hubSet'))return settingsOpen();const t=ev.target.closest('[data-tab]');if(t){TAB=t.dataset.tab;return baseScreen()}
+function hubClick(ev){if(typeof galaxyClick==='function'&&galaxyClick(ev))return;if(ev.target.closest('#hubCx'))return codexOpen();if(ev.target.closest('#hubSet'))return settingsOpen();const t=ev.target.closest('[data-tab]');if(t){TAB=t.dataset.tab;return baseScreen()}
  const b=ev.target.closest('[data-act]');if(!b||b.disabled)return;const [a,x,y]=b.dataset.act.split(':');
  if(a==='squad')return squadScreen(+x);
  if(progClick(a,x,y));else if(a==='build')buildWing(x);else if(a==='pick')pickAbility(x,y);else if(a==='alt')setAlt(x,y);else if(a==='borrow')borrowSkill(x,y);else if(a==='grief')griefChoice(x,y==='1');
@@ -71,17 +71,17 @@ function hubClick(ev){if(ev.target.closest('#hubCx'))return codexOpen();if(ev.ta
  baseScreen()}
 
 // Full skill tree for one unit (Armory): trunk ranks 1–2, then both specializations side by side, then cross-training.
-const optHTML=(k,on)=>{const a=pickInfo(k);return `<span class="topt ${on?'on':''}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}<b>${a.name}</b><small>${a.desc||a.tip||''}</small></span>`};
-const rowHTML=(r,rk,opts,P)=>`<div class="trow ${rk>r.rank?'lock':''}"><span>R${rk}${RANKS[rk-1]?` <small>${RANKS[rk-1].xp} XP</small>`:''}</span>${opts.map(k=>optHTML(k,P[rk-1]===k)).join('')}</div>`;
+const optHTML=(k,on,r)=>{const a=pickInfo(k);return `<span class="topt ${on?'on':''}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}<b>${a.name}${on&&r&&AB[k]?pwTag(skillPower(r,k)):''}</b><small>${a.desc||a.tip||''}</small></span>`};
+const rowHTML=(r,rk,opts,P)=>`<div class="trow ${rk>r.rank?'lock':''}"><span>R${rk}${RANKS[rk-1]?` <small>${RANKS[rk-1].xp} XP</small>`:''}</span>${opts.map(k=>optHTML(k,P[rk-1]===k,r)).join('')}</div>`;
 function treeHTML(r){const T=TREES[r.cls];if(!T)return '';const P=r.picks.length?r.picks:picksOf(r);
- return `<div><b class="eyebrow">Skill tree · ${r.cls}</b>${CLASS[r.cls].desc?` <small class="muted">${CLASS[r.cls].desc}</small>`:''}<div class="tree">${[1,2].map(rk=>rowHTML(r,rk,T.trunk[rk],P)).join('')}</div>
- <div class="specs">${Object.entries(T.specs).map(([id,s])=>`<div class="spec ${r.spec===id?'on':r.spec?'off':''}"><b>${icon(s.ic||'guard')} ${s.n}</b><small class="muted">${s.desc} Rank 3, permanent.</small>
+ return `<div><b class="eyebrow">Skill tree · ${r.cls}${specOf(r)?' · '+specOf(r).n:''}</b> <span class="pwr">${icon('st_power')} Power ${unitPower(r)}</span> <small class="muted">Skill power: I at learning, +1 every 2 ranks (max III), signature +1. Each level: +1 damage/heal, +5% hit.</small><br>${CLASS[r.cls].desc?` <small class="muted">${CLASS[r.cls].desc}</small>`:''}<div class="tree">${[1,2].map(rk=>rowHTML(r,rk,T.trunk[rk],P)).join('')}</div>
+ <div class="specs">${Object.entries(T.specs).map(([id,s])=>`<div class="spec ${r.spec===id?'on':r.spec?'off':''}"><b>${icon(s.ic||'guard')} ${s.n}</b><small class="muted">${s.desc} Rank 3, permanent.</small>${SPEC_TRAITS[id]?`<small class="strait"><b>${SPEC_TRAITS[id].n}:</b> ${SPEC_TRAITS[id].desc}</small>`:''}
   <div class="tree">${rowHTML(r,3,[s.sig],r.spec===id?P:[])}${[4,5,6,7].map(rk=>rowHTML(r,rk,s[rk],r.spec===id?P:[])).join('')}</div></div>`).join('')}</div>${xtrainHTML(r)}</div>`}
 function xtrainHTML(r){const lv=C.wings.training||0,n=xtrainSlots(r),B=r.borrow||[];let h;
  if(!lv)h='<small class="muted">Build the Training Salle to cross-train: borrow skills from a second class.</small>';
  else if(r.rank<XTRAIN.minRank[0])h=`<small class="muted">Cross-training opens at rank ${XTRAIN.minRank[0]}.</small>`;
  else{h=`<small class="muted">Borrowed ${B.length}/${n}${lv<2?' · Training Salle L2 adds a 2nd at rank 6':r.rank<XTRAIN.minRank[1]?' · 2nd slot at rank 6':''}. ${isJedi(r)?'Jedi can learn any class.':'Troops can learn other troop classes, never the Force.'}</small>`;
-  if(B.length)h+=`<div class="tree"><div class="trow"><span>${r.alt}</span>${B.map(k=>optHTML(k,1)).join('')}</div></div>`;
+  if(B.length)h+=`<div class="tree"><div class="trow"><span>${r.alt}</span>${B.map(k=>optHTML(k,1,r)).join('')}</div></div>`;
   if(!B.length)h+=`<div class="picks">Second class: ${xtrainClasses(r).map(c=>`<button type="button" class="${r.alt===c?'on':''}" data-act="alt:${r.id}:${c}" data-tip="class:${c}">${icon(c.toLowerCase())}${c}</button>`).join('')}</div>`;
   if(r.alt&&B.length<n)h+=`<div class="picks">Borrow from ${r.alt}: ${xtrainPool(r).map(k=>{const a=pickInfo(k);return `<button type="button" data-act="borrow:${r.id}:${k}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}${a.name}</button>`}).join('')}</div>`}
  return `<div class="xtrain"><b class="eyebrow">Cross-training</b> ${h}</div>`}

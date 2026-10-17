@@ -69,7 +69,7 @@ function sceneScreen(){SCR=sceneScreen;const s=C.story,id=s.q[0],m=$('#modal');m
   ${(loreSee(['zym','gnost','darach','coruscant']),'')}<p class="muted">The Vision meter shows how surely it is coming true. It starts <b>${SHADOW.word(s.shadow)}</b>. Win the fights that matter to dim it.</p>
   <button type="button" class="primary" id="scOk">Continue</button></div>`;m.onclick=null;$('#scOk').onclick=()=>done();return}
  const e=EVENTS.find(e=>e.id===id);if(!e){s.q.shift();return baseScreen()}loreSee(EVENT_LORE[e.id]);
- const cant=c=>Object.entries(c.effects).some(([k,v])=>RES_NAMES[k]&&k!=='orderDark'&&v<0&&(C.res[k]||0)+v<0);
+ const cant=c=>Object.entries(c.effects).some(([k,v])=>RES_NAMES[k]&&k!=='orderDark'&&k!=='favor'&&v<0&&(C.res[k]||0)+v<0);
  m.innerHTML=`<div class="box"><div class="eyebrow">Council matter · Month ${C.month}</div><h2>A choice</h2><p>${e.text}</p>
   ${e.choices.map((c,i)=>`<button type="button" class="choice" data-ch="${i}" ${cant(c)?'disabled':''}><b>${c.label}</b><span>${choiceText(c.effects)}</span></button>`).join('')}</div>`;
  m.onclick=ev=>{const b=ev.target.closest('[data-ch]');if(!b||b.disabled)return;const c=e.choices[+b.dataset.ch];s.seen.push(e.id);done([c.label,...applyFx(c.effects)])}}
