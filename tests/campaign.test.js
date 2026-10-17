@@ -14,7 +14,7 @@ let fail=0;const check=(ok,msg)=>{if(!ok){console.log('FAIL '+msg);fail++}};cons
    const b=d.querySelector('[data-act="hire"]');if(g%2&&b&&!b.disabled)b.click();
    for(const p of d.querySelectorAll('[data-act^="pick:"]'))if(p.isConnected)p.click();
    // Galaxy map: odd runs send a field op team when one is open, then every run picks a pin and opens its squad screen.
-   const fp=d.querySelector('g[data-pin^="ff"]');if(g%2&&fp&&w.eval("C.field.list.some(o=>o.st==='open')")&&w.eval('C.roster.filter(fit).length')>=8){fp.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
+   const fp=d.querySelector('g[data-pin^="ff"]');if(g%2&&fp&&w.eval("C.field.list.some(o=>o.st==='open')")&&w.eval('C.roster.filter(fit).length')>=6){fp.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
     for(const b of [...d.querySelectorAll('[data-act^="fop:"]')].slice(-2))b.click();const s2=d.querySelector('[data-act^="fsend:"]');if(s2&&!s2.disabled){s2.click();sum.field++}}
    const oi=g%2&&w.eval('C.options.length')>1?1:0;d.querySelector(`button[data-pin="o${oi}"]`).click();
    d.querySelector(`[data-act="squad:${oi}"]`).click();d.querySelector('#deploy').click();
