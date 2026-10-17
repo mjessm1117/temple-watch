@@ -18,7 +18,7 @@ function templeMods(u,r){if(!r.gear)return u;const g=r.gear;
  else{for(let t=1;t<=g.w;t++)addMod(u,WEAPONS[t].mod);addMod(u,ARMOR[g.armor].mod);for(const m of g.mods)addMod(u,MODS[m].mod)}
  if(r.trait)addMod(u,TRAITS[r.trait].mod);addMod(u,r.bonus);if(r.fear>0)u.aim-=10;
  u.mob=Math.max(2,u.mob);u.bonds=bondsOf(r).filter(b=>b.lvl).map(b=>({rid:b.rid,lvl:b.lvl}));
- u.bondAim=u.bonds.length?BOND.aim:0;u.bondReact=u.bonds.some(b=>b.lvl>=2)?1:0;progMods(u,r);u.mob=Math.max(2,u.mob);return u}
+ u.bondAim=u.bonds.length?BOND.aim:0;u.bondReact=u.bonds.some(b=>b.lvl>=2)?1:0;progMods(u,r);treeMods(u,r);u.mob=Math.max(2,u.mob);return u}
 
 // --- promotions: one pick per rank (1–7); a unit can owe picks for several ranks. An unpicked rank 1 fights with its first option. ---
 // Trees (data-trees.js): trunk ranks 1–2, rank 3 = pick a spec (its signature skill), ranks 4–7 inside the spec. Borrowed skills ride along.
@@ -33,7 +33,8 @@ function fixTree(r){const T=TREES[r.cls];if(!T)return;r.picks=r.picks.slice(0,7)
  r.borrow=(r.borrow||[]).filter(k=>xtrainPool(r,1).includes(k)).slice(0,xtrainSlots(r))}
 // A pick button's label: rank 3 shows the spec name with its signature skill.
 function pickCard(r,p,k){const a=pickInfo(k);if(p!==3)return{name:a.name,ic:a.ic,desc:a.desc||a.tip||''};
- const s=Object.values(TREES[r.cls].specs).find(s=>s.sig===k);return{name:`${s.n} · ${a.name}`,ic:s.ic,desc:`${s.desc} Comes with ${a.name}: ${a.desc||a.tip||''}`}}
+ const s=Object.values(TREES[r.cls].specs).find(s=>s.sig===k);const T=SPEC_TRAITS[Object.keys(TREES[r.cls].specs).find(n=>TREES[r.cls].specs[n]===s)];
+ return{name:`${s.n} · ${a.name}`,ic:s.ic,desc:`${s.desc} Comes with ${a.name} (Power II): ${a.desc||a.tip||''}${T?` Trait, ${T.n}: ${T.desc}`:''}`}}
 // --- cross-training (multiclass): free, gated by the Training Salle. XTRAIN in data-trees.js.
 const xtrainSlots=r=>XTRAIN.minRank.filter((m,i)=>(C.wings.training||0)>i&&r.rank>=m).length;
 const xtrainClasses=r=>Object.keys(TREES).filter(c=>c!==r.cls&&(CLASS[c].lockEra||0)<=(C.era||1)&&(isJedi(r)||!CLASS[c].jedi));

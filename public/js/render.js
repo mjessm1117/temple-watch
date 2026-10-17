@@ -34,7 +34,7 @@ function actsHTML(){const u=S.sel;if(!canAct(u)||S.peek)return '';
   if(ab.f&&u.focus<ab.f)why=`Needs ${ab.f} Focus`;else if(ab.avail)why=ab.avail(u);
   if(!why&&!ab.instant&&!targetsFor(u,k).length){if(ab.ctx)return '';why='No targets'}
   const cost=[ab.f?ab.f+' Focus':'',ab.ap===1?'1 action':'ends turn'].filter(Boolean).join(' · ');
-  n++;return `<button type="button" data-a="${k}" data-tip="ability:${k}" data-cost="${ab.instant&&!ab.ap?'0':ab.ap===1?'1':'end'}" data-f="${ab.f||0}" class="act ${S.mode===k?'on':''}" ${why?'disabled':''}>${n<10?`<kbd>${n}</kbd>`:''}${icon(ab.ic)}<span>${ab.name}<small>${why||cost}</small></span></button>`}).join('')}
+  n++;return `<button type="button" data-a="${k}" data-tip="ability:${k}" data-cost="${ab.instant&&!ab.ap?'0':ab.ap===1?'1':'end'}" data-f="${ab.f||0}" class="act ${S.mode===k?'on':''}" ${why?'disabled':''}>${n<10?`<kbd>${n}</kbd>`:''}${icon(ab.ic)}<span>${ab.name}${window.pwTag&&u.pw?pwTag(u.pw[k]||0):''}<small>${why||cost}</small></span></button>`}).join('')}
 // Names what the target hides behind, for the odds panel ("Half cover · crate").
 const COVER_N={'#':'wall',O:'objective',d:'door',D:'locked door',c:'crate',r:'rubble',x:'barrel',k:'console',q:'terminal',Q:'terminal'};
 function coverName(t,a){if(t.barrier)return 'Force Barrier';let best=null,bv=0;const dx=Math.sign(a.x-t.x),dy=Math.sign(a.y-t.y);
