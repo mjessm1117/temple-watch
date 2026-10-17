@@ -10,7 +10,7 @@ function rosterTab(){const act=C.roster.filter(r=>r.status!=='dead');
  return act.map(r=>{const next=r.rank<RANKS.length?RANKS[r.rank].xp:null,p=pendingRank(r),bs=bondsOf(r).filter(b=>b.lvl);
   return `<div class="rrow"><span class="mini" style="--uc:${r.col||'var(--troop)'}">${icon(r.cls.toLowerCase())}</span><div class="rmain"><b data-tip="class:${r.cls}">${r.n}</b>
   <small><span class="pwr">${icon('st_power')}${unitPower(r)}</span> · ${r.title?r.title+' · ':''}${r.cls}${specOf(r)?' ('+specOf(r).n+')':''} · Rank ${r.rank} · ${r.xp}${next?'/'+next:''} XP${isJedi(r)?` · Darkness ${r.dark}`:''}${r.trait?` · ${TRAITS[r.trait].n}`:''} · age ${r.age}${r.fear?` · <span class="bad">afraid (${r.fear})</span>`:''}</small>
-  ${bs.length?`<small class="bd">Bonds: ${bs.map(b=>`${b.n} ${'★'.repeat(b.lvl)}`).join(', ')}</small>`:''}
+  ${bs.length?`<small class="bd">Bonds: ${bs.map(b=>`${b.n} ♦${b.lvl}`).join(', ')}</small>`:''}
   ${p?`<div class="picks">Rank ${p}: ${p===3?'choose a specialization (permanent)':'choose one'} ${treeOpts(r,p).map(k=>{const a=pickCard(r,p,k);return `<button type="button" data-act="pick:${r.id}:${k}" data-tip="${AB[k]?'ability':'gear'}:${k}">${icon(a.ic||'guard')}${a.name}</button>`}).join('')}<small>${treeOpts(r,p).map(k=>{const a=pickCard(r,p,k);return `${a.name}: ${a.desc}`}).join(' · ')}</small></div>`:''}
   ${TREES[r.cls]?`<button type="button" class="tbtn" data-act="tree:${r.id}">${icon('st_power')} Skill tree${p?' · pick waiting':''}</button>`:''}
   ${rosterProg(r)}

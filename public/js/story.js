@@ -95,7 +95,7 @@ function yearsScreen(){SCR=yearsScreen;const s=C.story,m=$('#modal');m.hidden=fa
  if(!s.yrs){s.yrs=yearsJump();saveGame()}const y=s.yrs,built=Object.keys(C.wings).filter(k=>C.wings[k]>0);
  const roleBtns=x=>{const r=C.roster.find(r=>r.id===x.id);return `<div class="rrow"><div class="rmain"><b>${r.n}</b><small>${r.cls} · Rank ${r.rank} · age ${r.age}</small>
   ${x.role?`<p class="ready">${x.role}</p>`:`<div class="picks">${built.map(k=>`<button type="button" data-role="${x.id}:staff:${k}">Staff ${WINGS[k].n}</button>`).join('')}
-  <button type="button" data-role="${x.id}:teach">${YEARS.roles.teach}</button><button type="button" data-role="${x.id}:relic">${YEARS.roles.relic}</button></div>`}</div></div>`};
+  <button type="button" data-role="${x.id}:teach">${YEARS.roles.teach}</button><button type="button" data-role="${x.id}:relic">${YEARS.roles.relic}</button>${typeof legRoleBtns==='function'?legRoleBtns(r):''}</div>`}</div></div>`};
  const P=PLAN[C.step],A=ACTS[P.act]||ACTS[2];
  m.innerHTML=`<div class="box wide"><div class="eyebrow">Act ${P.act||2} · ${bbyTxt(s.bby)}</div><h2>${A.t}</h2>
  <p>${A.text}</p>
@@ -103,7 +103,8 @@ function yearsScreen(){SCR=yearsScreen;const s=C.story,m=$('#modal');m.hidden=fa
  ${y.ret.length?`<h3>Retirees · choose what each one does</h3>${y.ret.map(roleBtns).join('')}`:''}
  <button type="button" class="primary" id="yrOk" ${y.ret.some(x=>!x.role)?'disabled':''}>Back to the Temple</button></div>`;
  m.onclick=ev=>{const b=ev.target.closest('[data-role]');if(!b)return;const [id,role,wing]=b.dataset.role.split(':'),x=y.ret.find(x=>x.id===id),r=C.roster.find(r=>r.id===id);
-  if(role==='staff'){const old=C.staff[wing]&&unit(C.staff[wing]);if(old&&old.status==='active')old.assign=null;C.staff[wing]=r.id;r.assign='staff:'+wing;x.role=`Staffs the ${WINGS[wing].n}`}
+  if(b.disabled)return;if(role==='council'||role==='general')x.role=retireTo(r,role,wing)||'Retired';
+  else if(role==='staff'){const old=C.staff[wing]&&unit(C.staff[wing]);if(old&&old.status==='active')old.assign=null;C.staff[wing]=r.id;r.assign='staff:'+wing;x.role=`Staffs the ${WINGS[wing].n}`}
   else if(role==='teach'){s.teach[r.cls]=r.n;x.role=`Teaches the next ${r.cls} recruit`}
   else{x.role='Leaves a relic to the Archive';r.relic=1}
   r.role=x.role;if(r.rank>=2)archive(r,`Retired at ${r.age}. ${x.role}.`);saveGame();yearsScreen()};

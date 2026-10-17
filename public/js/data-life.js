@@ -67,7 +67,7 @@ const LOOKS={jedi:['Hooded robe','Open robe','Battle tunic','Armored robe','Trav
 const BIO_MAX=140;
 
 // Master–Padawan pairing: a Knight or Master (rank ≥ PAIR.rank) takes one Padawan. Starts a bond; the Padawan earns extra XP when both deploy.
-const PAIR={rank:3,xp:8,bond:1};
+const PAIR={rank:3,xp:8,bond:2};   // bond = starting bond level (1–8 scale)
 const PRESET_MAX=6;
 
 // Black-market gear (unlocked by MARKET_ITEMS.unlock). Added to the Armory tables.

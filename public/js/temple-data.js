@@ -48,7 +48,10 @@ const AGES={Padawan:[14,19],Knight:[22,40],troop:[20,35]};
 const JEDI_NAMES=['Vela Sorn','Arin Taal','Quin Vasro','Myra Kell','Teo Lanris','Shae Orrin','Bastil Rhe','Nim Calder'];
 
 // Bonds (spec C §7): +1 level per revive, or per 3 missions survived together. Level effects reach battle via battleUnit().
-const BOND={missions:3,aim:5,max:3,fear:2};   // fear = missions of −10 aim after a level-3 partner dies
+// Bonds 1–8 (Chat Q, Zero Company-style): pairs earn points; need[l] = points from level l to l+1. Combat tiers by level:
+// aimAt = +aim near partner · reactAt = free answer shot once/mission · griefAt = partner's death causes fear. maxAim at level 8 (Unbreakable).
+const BOND={max:8,need:[8,10,12,14,16,18,20,22],aim:5,maxAim:10,aimAt:2,reactAt:4,griefAt:6,fear:2,   // fear = missions of −10 aim after a close partner dies
+ together:6,win:3,saved:15,field:5,den:2};   // points: deployed together and both live · +win · one saved the other · field op success · same Temple assignment per mission
 
 // Personal quests (spec C §7): offered once a unit reaches rank 2; shown in the crisis list; the unit must deploy.
 const QUESTS={

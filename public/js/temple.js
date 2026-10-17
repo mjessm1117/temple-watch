@@ -6,7 +6,7 @@ function ensureTemple(){if(!C)return;const w=C.wings;for(const k of Object.keys(
  C.bonds=C.bonds||{};C.quests=C.quests||{};C.staff=C.staff||{};if(!C.cands)C.cands=genCands();
  for(const r of C.roster){r.gear=r.gear||{w:0,armor:'none',mods:[],saber:0,trait:null};r.bonus=r.bonus||{};r.picks=r.picks||[];
   if(r.age==null)r.age=ageFor(r);if(!C.treeV&&TREES[r.cls])r.picks=[TREES[r.cls].trunk[1][0],...r.picks];fixTree(r);if(r.trait===undefined)r.trait=null;if(r.fear==null)r.fear=0;r.pick=pendingRank(r)}
- C.treeV=2;ensureProg();ensureLife()}
+ C.treeV=2;ensureProg();ensureLife();if(typeof ensureLegacy==='function')ensureLegacy()}
 const ri2=([a,b])=>a+Math.floor(Math.random()*(b-a+1));
 const ageFor=r=>ri2(isJedi(r)?AGES[r.title==='Knight'?'Knight':'Padawan']:AGES.troop);
 function addMod(u,m){for(const [k,v] of Object.entries(m||{})){
@@ -17,8 +17,8 @@ function templeMods(u,r){if(!r.gear)return u;const g=r.gear;
  if(isJedi(r)){for(let t=1;t<=g.saber;t++)addMod(u,SABERS[t].mod);if(g.trait)addMod(u,SABER_TRAITS[g.trait].mod)}
  else{for(let t=1;t<=g.w;t++)addMod(u,WEAPONS[t].mod);addMod(u,ARMOR[g.armor].mod);for(const m of g.mods)addMod(u,MODS[m].mod)}
  if(r.trait)addMod(u,TRAITS[r.trait].mod);addMod(u,r.bonus);if(r.fear>0)u.aim-=10;
- u.mob=Math.max(2,u.mob);u.bonds=bondsOf(r).filter(b=>b.lvl).map(b=>({rid:b.rid,lvl:b.lvl}));
- u.bondAim=u.bonds.length?BOND.aim:0;u.bondReact=u.bonds.some(b=>b.lvl>=2)?1:0;progMods(u,r);treeMods(u,r);u.mob=Math.max(2,u.mob);return u}
+ u.mob=Math.max(2,u.mob);const bs=bondsOf(r);u.bonds=bs.map(b=>({rid:b.rid,lvl:bondTier(b.lvl)})).filter(b=>b.lvl);   // rules.js reads tiers 1–3
+ u.bondAim=u.bonds.length?(bs.some(b=>b.lvl>=BOND.max)?BOND.maxAim:BOND.aim):0;u.bondReact=u.bonds.some(b=>b.lvl>=2)?1:0;if(typeof legacyMods==='function')legacyMods(u,r);progMods(u,r);treeMods(u,r);u.mob=Math.max(2,u.mob);return u}
 
 // --- promotions: one pick per rank (1–7); a unit can owe picks for several ranks. An unpicked rank 1 fights with its first option. ---
 // Trees (data-trees.js): trunk ranks 1–2, rank 3 = pick a spec (its signature skill), ranks 4–7 inside the spec. Borrowed skills ride along.
@@ -97,7 +97,9 @@ function addRecruit(c,name,col){const n=(name||'').replace(/[<>&"]/g,'').trim().
 const bkey=(a,b)=>a<b?a+'|'+b:b+'|'+a;
 function bondsOf(r){const o=[];for(const [k,v] of Object.entries(C.bonds||{})){const [a,b]=k.split('|');if(a!==r.id&&b!==r.id)continue;
  const p=unit(a===r.id?b:a);if(p&&p.status!=='dead')o.push({rid:p.id,n:p.n,lvl:v.lvl,n3:v.n})}return o.sort((x,y)=>y.lvl-x.lvl)}
-function bondUp(a,b,why,out){if(!a||!b||a===b)return;const k=bkey(a,b),v=C.bonds[k]=C.bonds[k]||{lvl:0,n:0};if(v.lvl>=BOND.max)return;v.lvl++;v.n=0;
+const bondTier=l=>l>=BOND.griefAt?3:l>=BOND.reactAt?2:l>=BOND.aimAt?1:0;
+// One level up (Trials, pairing). Points: bondPts in legacy.js. keep = keep leftover points.
+function bondUp(a,b,why,out,keep){if(!a||!b||a===b)return;const k=bkey(a,b),v=C.bonds[k]=C.bonds[k]||{lvl:0,n:0};if(v.lvl>=BOND.max)return;v.lvl++;if(!keep)v.n=0;if(typeof bondOffer==='function')bondOffer(v);
  if(out)out.bonds.push(`${unit(a).n} & ${unit(b).n}: bond level ${v.lvl} (${why})`)}
 
 // --- personal quests: one per unit, offered at rank 2+, shown with the month's crises ---
@@ -115,11 +117,10 @@ function questReward(o,out){const r=unit(o.quest),Q=C.quests[o.quest];if(!r||!Q)
 
 // After every mission (called from applyResults). `dep` = deployed roster entries with their battle units.
 function templeAfterMission(dep,win,o,out){out.bonds=[];
- for(const {r,u} of dep){if(r.fear>0&&!u.vip)r.fear--;if(u.savedBy&&u.savedBy!==r.id)bondUp(r.id,u.savedBy,'saved in battle',out)}
+ for(const {r,u} of dep){if(r.fear>0&&!u.vip)r.fear--;if(u.savedBy&&u.savedBy!==r.id)bondPts(r.id,u.savedBy,BOND.saved,'saved in battle',out)}
  const live=dep.filter(d=>!d.u.vip&&d.r.status==='active');
- for(let i=0;i<live.length;i++)for(let j=i+1;j<live.length;j++){const k=bkey(live[i].r.id,live[j].r.id),v=C.bonds[k]=C.bonds[k]||{lvl:0,n:0};
-  if(v.lvl<BOND.max&&++v.n>=BOND.missions)bondUp(live[i].r.id,live[j].r.id,BOND.missions+' missions together',out)}
- for(const {r} of dep.filter(d=>d.r.status==='dead'))for(const b of bondsOf(r).filter(b=>b.lvl>=3)){const p=unit(b.rid);p.fear=BOND.fear;
+ for(let i=0;i<live.length;i++)for(let j=i+1;j<live.length;j++)bondPts(live[i].r.id,live[j].r.id,BOND.together+(win?BOND.win:0),'fought together',out);
+ for(const {r} of dep.filter(d=>d.r.status==='dead'))for(const b of bondsOf(r).filter(b=>b.lvl>=BOND.griefAt)){const p=unit(b.rid);p.fear=BOND.fear;
   out.bonds.push(`${p.n} lost ${r.n}. Fear: −10 aim for ${BOND.fear} missions.`);if(isJedi(p))p.grief=r.n}
  if(win&&o.quest&&!o.redeem)questReward(o,out);progAfterMission(dep,win,out);lifeAfterMission(dep,win,o,out)}
 // Jedi choice after a bonded partner dies (spec C §7): grieve (keep the fear) or use the anger (Darkness +2, no fear).

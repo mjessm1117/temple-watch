@@ -1,0 +1,10 @@
+/* Squad & Legacy (Chat Q): story, bonds, retirement, Council support. Uses the color tokens from style.css. */
+.lore,.bonds{margin:8px 0;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--raise)}
+.lore p{margin:4px 0}
+.bondrow{display:grid;gap:4px;padding:6px 0;border-top:1px solid var(--line)}
+.bondrow:first-of-type{border-top:0}
+.bbar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:3px}
+.bbar i{display:block;height:100%;background:var(--holo)}
+details.ret{margin-top:8px}
+details.ret summary{cursor:pointer;color:var(--dim)}
+.legsup{margin:10px 0;padding:8px 10px;border:1px dashed var(--holo);border-radius:6px}
