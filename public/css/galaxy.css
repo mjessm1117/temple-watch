@@ -34,6 +34,23 @@
 .dkline{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}.dkline .dkt{color:var(--dark)}
 .gpanel .picks{display:flex;flex-wrap:wrap;gap:6px}
 @media(prefers-reduced-motion:reduce){.greg{transition:none}}
-.greg.u2{fill:color-mix(in srgb,var(--warn) 7%,transparent)}.greg.u3{fill:color-mix(in srgb,var(--sith) 9%,transparent)}
-.greg.u4,.greg.u5{fill:color-mix(in srgb,var(--sith) 16%,transparent);stroke:color-mix(in srgb,var(--sith) 45%,var(--grid))}
+.greg.u2{stroke:color-mix(in srgb,var(--warn) 55%,var(--grid));stroke-width:1.5}.greg.u3{stroke:color-mix(in srgb,var(--sith) 60%,var(--grid));stroke-width:2;stroke-dasharray:6 3}
+.greg.u4,.greg.u5{stroke:var(--sith);stroke-width:2.5;stroke-dasharray:6 3;fill:color-mix(in srgb,var(--sith) 4%,transparent)}
 .greg.on{fill:color-mix(in srgb,var(--holo) 16%,transparent);stroke:var(--holo)}
+/* Round 2: easier-to-read pins. Head size = importance; urgent dot = expires if you pick another; haloed labels. */
+.gpin .head{fill:var(--pc);stroke:var(--bg);stroke-width:1.5}
+.gpin .ring{fill:none;stroke:var(--pc);stroke-width:1.2;opacity:.6}
+.gpin .gpd{fill:var(--pc);stroke:none}
+.gpin .urg{fill:var(--sith);stroke:var(--bg);stroke-width:1.2}
+.gpin.op{opacity:.85}.gpin.op .head{stroke-width:1}
+.gpin.on .head{stroke:var(--fg);stroke-width:2.5;filter:drop-shadow(0 0 6px var(--pc))}
+.gpin:hover .head,.gpin:focus-visible .head{stroke:var(--fg)}
+.gpin.away .head{fill:var(--raise);stroke:var(--pc);stroke-dasharray:3 2}
+.gpl2{font:600 9.5px var(--disp);fill:var(--fg);paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round;pointer-events:none;letter-spacing:.02em}
+.gpin.on .gpl2{fill:var(--pc)}
+.gpn{font-size:7.5px;opacity:.8}
+.gchip span{display:grid;line-height:1.2}.gchip span small{margin:0;font-size:10.5px}
+.gchip.op{opacity:.85}
+.twin{border:1px solid var(--troop);border-left-width:3px;border-radius:6px;padding:8px 10px;font-size:13px;margin-bottom:8px;background:color-mix(in srgb,var(--troop) 8%,var(--raise));display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.twin b{color:var(--troop);font-family:var(--disp)}.twin.b{border-color:var(--holo)}.twin.b b{color:var(--holo)}
+.twin.off{border-color:var(--line);background:var(--raise);color:var(--dim)}.twin button{min-height:30px;padding:4px 10px}

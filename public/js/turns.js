@@ -26,7 +26,7 @@ function startMission(id,squad,o={}){const B=MISSIONS[id],n=1+(B.alts||[]).lengt
  // Safety net (never lose): a squad under 4 faces one fewer trooper per missing unit, so a depleted roster can't death-spiral.
  // Safety net + per-map tuning: the mission's rank-and-file type (most common foe) is cut or added.
  const tu=S.tune,F=M.foes||[],grunt=F.map(f=>f[0]).sort((a,b)=>F.filter(f=>f[0]===b).length-F.filter(f=>f[0]===a).length).find(t=>!FOES[t].boss)||'trooper';
- let cut=Math.max(0,4-squad.length)+(tu.fewer||0);const foes=F.filter(f=>!(f[0]===grunt&&cut>0&&cut--));
+ let cut=Math.max(0,4-squad.length)+(tu.fewer||0)+(o.fewer||0);const foes=F.filter(f=>!(f[0]===grunt&&cut>0&&cut--));
  for(const [t,x,y,pod] of foes){const e=mkFoe(t,x,y);if(M.stealth)e.pod=pod??('g'+e.uid);S.units.push(e)}
  for(let i=0;i<(cm.extraEnemies||0)+(tu.extra||0);i++){const sq=players(),p=tilesWhere((c,x,y)=>y<5&&PASS(c)&&c!=='E'&&!unitAt(x,y)).sort((a,b)=>Math.min(...sq.map(q=>dist(q,b)))-Math.min(...sq.map(q=>dist(q,a))))[i%3];
   if(p){const e=mkFoe(i%3===2&&FOES.heavy&&!M.era?'heavy':grunt,p.x,p.y);if(M.stealth)e.pod='x'+(i>>1);S.units.push(e)}}

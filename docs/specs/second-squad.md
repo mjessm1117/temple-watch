@@ -1,4 +1,6 @@
-# Second playable squad (design, not built) — Chat I, 2026-10-16
+# Second playable squad — Chat I, designed 2026-10-16, **built 2026-10-17** (`public/js/twin.js`, numbers in `TWIN`, data-galaxy.js)
+
+Built as designed with one change: unlock is **Barracks L2** (there is no Hangar wing yet) or Era 2+. Front B's mission has 1 fewer rank-and-file foe (4 units vs a map tuned for 6). Rescue-with-captives crises can't be auto-resolved.
 
 Goal: late game, the Order fights on two fronts at once. You command two full squads; each one is a real battle you play.
 

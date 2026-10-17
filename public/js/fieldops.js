@@ -17,8 +17,8 @@ function fieldOdds(k,team,planet){const D=FIELD_OPS[k],T=team.map(unit).filter(B
  const rk=T.reduce((s,r)=>s+r.rank,0),fits=Math.min(FIELD.matchMax,T.filter(r=>fieldWant(r,D)).length),why=[[`Base`,FIELD.base],[`Ranks (${rk})`,FIELD.perRank*rk]];
  if(fits)why.push([`Right skills ×${fits}`,FIELD.match*fits]);if(T.length>=3)why.push(['Third member',FIELD.three]);const reg=planet&&PLANETS[planet]&&PLANETS[planet].reg;if(reg&&typeof unrestOf==='function'&&unrestOf(reg)>=UNREST.hostile)why.push([`Unrest in ${REG_N[reg]}`,UNREST.fieldAt3]);if(D.stars>1)why.push([`Difficulty ${'★'.repeat(D.stars)}`,-FIELD.star*(D.stars-1)]);
  const raw=why.reduce((s,w)=>s+w[1],0);return{ch:Math.max(FIELD.min,Math.min(FIELD.max,raw)),why}}
-function fieldRes(D){const o={};for(const [k,v] of Object.entries(D.res))o[k]=k==='credits'?Math.round(v*DIFF[C.diff].income):v;return o}
-function sendField(id){const o=fieldOp(id),T=FTEAM.map(unit).filter(r=>r&&fit(r));if(!o||o.st!=='open'||T.length<FIELD.team[0]||T.length>FIELD.team[1])return false;
+function fieldRes(D){const o={};for(const [k,v] of Object.entries(D.res))o[k]=k==='credits'?Math.round(v*FIELD.cr*DIFF[C.diff].income):v;return o}
+function sendField(id){if(typeof twinB==='function'&&twinB())return false;const o=fieldOp(id),T=FTEAM.map(unit).filter(r=>r&&fit(r));if(!o||o.st!=='open'||T.length<FIELD.team[0]||T.length>FIELD.team[1])return false;
  const D=FIELD_OPS[o.k];o.st='team';o.team=T.map(r=>r.id);o.ch=fieldOdds(o.k,o.team,o.planet).ch;o.left=D.days;o.fresh=1;
  for(const r of T)r.assign='field:'+o.id;FTEAM=[];C.news.push(`${T.map(r=>r.n).join(', ')} left for ${o.planet}: ${D.n} (${o.ch}%). Back in ${D.days} days.`);saveGame();return true}
 function resolveField(o){const D=FIELD_OPS[o.k],T=o.team.map(unit).filter(r=>r&&r.status==='active'),roll=Math.random()*100,win=roll<o.ch,lines=[];

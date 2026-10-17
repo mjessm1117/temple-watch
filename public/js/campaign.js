@@ -77,5 +77,7 @@ function addTroop(){const used=new Set(C.roster.map(r=>r.n)),n=RECRUIT_NAMES.fin
  C.roster.push({id:'u'+C.nid++,n,cls:pickOne(['Soldier','Scout','Medic','Heavy']),rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0})}
 function pickAbility(id,k){const r=C.roster.find(r=>r.id===id),p=r&&pendingRank(r);if(!p||!treeOpts(r,p).includes(k))return;r.picks.push(k);if(p===3)r.spec=Object.keys(TREES[r.cls].specs).find(n=>TREES[r.cls].specs[n].sig===k);r.pick=pendingRank(r);saveGame()}
 function launchMission(i,ids){ensureTemple();const o=C.options[i],sq=ids.map(id=>battleUnit(C.roster.find(r=>r.id===id)));chooseOption(i);
- startMission(o.mission,sq,{diff:C.diff,hostage:hostageFor(o),crisis:o.crisis||null})}
-function defaultSquad(o){const q=o&&o.quest,ok=C.roster.filter(r=>fit(r)&&r.id!==(o&&o.hostage)).sort((a,b)=>(b.id===q)-(a.id===q)),J=ok.filter(isJedi).slice(0,3),T=ok.filter(r=>!isJedi(r));return[...J,...T].slice(0,6).map(r=>r.id)}
+ startMission(o.mission,sq,{diff:C.diff,hostage:hostageFor(o),crisis:o.crisis||null,fewer:o.fewer||0})}
+// Squad size rules. twin.js overrides this for the second front (4 units, 0–2 Jedi, squad A's units excluded).
+function squadRule(){return{max:6,jmin:1,jmax:3,used:[]}}
+function defaultSquad(o){const R=squadRule(),q=o&&o.quest,ok=C.roster.filter(r=>fit(r)&&!R.used.includes(r.id)&&r.id!==(o&&o.hostage)).sort((a,b)=>(b.id===q)-(a.id===q)),J=ok.filter(isJedi).slice(0,R.jmax),T=ok.filter(r=>!isJedi(r));return[...J,...T].slice(0,R.max).map(r=>r.id)}

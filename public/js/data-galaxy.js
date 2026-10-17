@@ -38,17 +38,18 @@ const RISK=[[0,'Low',1],[35,'Moderate',2],[50,'High',3],[65,'Severe',4]];
 // ── Field ops: 2–3 units leave for X days, resolve on a roll, never die (spec B §7 never lose). ──
 // want = classes that fit the job ('jedi' = any Jedi). stars = difficulty 1–3. days = time away (1 mission = DAYS = 15 days).
 const FIELD_OPS={
- convoy:{n:'Relief convoy',want:['Medic','Consular'],days:15,stars:1,res:{favor:5},desc:'Escort bacta and grain to a world the war forgot.'},
+ convoy:{n:'Relief convoy',want:['Medic','Consular'],days:15,stars:1,res:{favor:3},desc:'Escort bacta and grain to a world the war forgot.'},
  smugglers:{n:'Smuggler route',want:['Scout','Sentinel'],days:15,stars:1,res:{intel:2},desc:'Trace the spice route the Empire uses to move its agents.'},
- pirates:{n:'Pirate cell',want:['Soldier','Heavy','Guardian'],days:15,stars:2,res:{credits:90},desc:'Break a pirate crew preying on Republic freighters. Their hold pays.'},
+ pirates:{n:'Pirate cell',want:['Soldier','Heavy','Guardian'],days:15,stars:2,res:{credits:80},desc:'Break a pirate crew preying on Republic freighters. Their hold pays.'},
  pilgrimage:{n:'Kyber pilgrimage',want:['jedi'],days:30,stars:2,res:{kyber:1},desc:'A cave sings in the Force. A Jedi must go and listen.'},
- militia:{n:'Train a militia',want:['Soldier','Guardian'],days:30,stars:1,res:{favor:6,recruits:1},desc:'Drill farmers into a militia. One of them may follow you home.'},
+ militia:{n:'Train a militia',want:['Soldier','Guardian'],days:30,stars:1,res:{favor:3,recruits:1},desc:'Drill farmers into a militia. One of them may follow you home.'},
  shadow:{n:'Shadow an agent',want:['Scout','Sentinel'],days:15,stars:3,res:{intel:3},desc:'An Imperial agent is meeting a senator\'s aide. Watch, record, stay unseen.'},
- broker:{n:'Talk to a broker',want:['Consular'],days:15,stars:2,res:{credits:110},desc:'A Hutt broker owes the Republic. Collect, politely.'},
+ broker:{n:'Talk to a broker',want:['Consular'],days:15,stars:2,res:{credits:90},desc:'A Hutt broker owes the Republic. Collect, politely.'},
  ruins:{n:'Survey the ruins',want:['jedi','Scout'],days:30,stars:2,res:{intel:2,kyber:1},desc:'Old Jedi ruins, half buried. Something in them still hums.'},
- pilots:{n:'Downed pilots',want:['Medic','Scout'],days:15,stars:2,res:{favor:4,intel:1},desc:'A Republic flight went down behind the lines. Find them first.'},
- mines:{n:'Clear the lanes',want:['Heavy','Soldier'],days:15,stars:2,res:{credits:60,favor:3},desc:'Sith mines choke a trade lane. Clear them, convoy by convoy.'}};
-const FIELD={base:45,perRank:5,match:10,matchMax:2,three:8,star:12,min:10,max:92,   // odds = base + 5×Σrank + 10×fits (max 2) + 8 if 3 go − 12×(stars−1)
+ pilots:{n:'Downed pilots',want:['Medic','Scout'],days:15,stars:2,res:{favor:2,intel:1},desc:'A Republic flight went down behind the lines. Find them first.'},
+ mines:{n:'Clear the lanes',want:['Heavy','Soldier'],days:15,stars:2,res:{credits:60,favor:2},desc:'Sith mines choke a trade lane. Clear them, convoy by convoy.'}};
+const FIELD={cr:.5,   // field-op credits × this × difficulty income. Favor rewards kept small: each point raises the monthly stipend for the rest of the era [Tuned round 2: Era 1 ends ~400 Cr]
+ base:45,perRank:5,match:10,matchMax:2,three:8,star:12,min:10,max:92,   // odds = base + 5×Σrank + 10×fits (max 2) + 8 if 3 go − 12×(stars−1)
  xp:15,expire:30,perMonth:[1,2],team:[2,3],failStress:15,failWound:10,badRoll:12,badWound:20,log:6};   // badRoll: the top 12% of rolls is a bad fail (one serious wound)
 // Field op planets per era (no Coruscant: ops leave the Temple).
 const FIELD_PLANETS={1:['Balmorra','Ord Mantell','Dantooine','Taris','Nar Shaddaa','Ossus','Alderaan','Hydian Way'],
@@ -58,3 +59,8 @@ const UNREST={max:5,ignore:1,lose:1,win:-1,opHit:1,lapse:1,fieldWin:-1,
  hostile:3,aimAt3:5,fieldAt3:-10,   // at Unrest ≥3: enemies there +5 aim; field ops there −10 odds
  favorAt:4,favor:-1};               // each region at Unrest ≥4 costs 1 Senate Favor a month
 const UNREST_WORD=['Calm','Uneasy','Restless','Hostile','Burning','Fallen'];
+// ── Two fronts (docs/specs/second-squad.md). The last `perEra` crisis steps with 2+ crises can be fought by two squads. ──
+const TWIN={perEra:2,unlock:{barracks:2,era:2},minFit:8,minB:2,   // unlock: Barracks L2 or Era 2+; needs 8 fit units at the start, 2 left for front B
+ bMax:4,bJedi:2,fewer:1,                                     // front B: 4 units, 0–2 Jedi, and its mission has 1 fewer rank-and-file foe
+ autoBase:25,autoPerRank:6,autoMax:70,autoXp:10,              // auto-resolve odds = 25 + 6×Σrank of the 4 best free units, max 70
+ loseFavor:-3,loseStress:15,loseWound:10};                    // [Default] spec values

@@ -42,6 +42,7 @@ public/            the game (static files served by the Worker; _headers = no-ca
   js/darkness.js   Darkness reduction: Gardens, mercy, redemption, mentors
   js/fieldops.js   off-screen field ops (2–3 units, resolve on a roll)
   js/galaxy.js     galaxy map + briefing panel (replaces the mission list)
+  js/twin.js       two fronts: a second squad on late crisis steps
   js/screens.js    opening vision + difficulty; boots the game (load last)
 worker.js               Worker entry: /api/save → backend, else static files from public/
 functions/api/save.js   backend: GET/PUT /api/save (KV binding SAVES)

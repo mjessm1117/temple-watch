@@ -17,8 +17,9 @@ function galaxyItems(){ensureField();const it=[];
   it.push({key:'o'+i,i,o,M,cat,planet:planetOf(M.where)||'Mid Rim',n:o.n||M.n,ic:o.redeem?'darkness':TYPE_IC[M.type]||'strike'})});
  for(const o of (C.ops&&C.ops.list)||[])if(o.st==='open'||o.st==='team')it.push({key:'s'+o.id,s:o,cat:'sith',planet:opPlanet(o),n:SITH_OPS[o.k].n,ic:o.st==='team'?'dash':'e_trooper'});
  for(const f of C.field.list)it.push({key:'f'+f.id,f,cat:'field',planet:PLANETS[f.planet]?f.planet:'Mid Rim',n:FIELD_OPS[f.k].n,ic:f.st==='team'?'dash':'scan'});
- const at={};for(const x of it){const P=PLANETS[x.planet],k=at[x.planet]=(at[x.planet]||0)+1;   // spread pins that share a planet
-  const a=(k-1)*2.1,r=k>1?16+(k>6?10:0):0;x.x=Math.round(P.x+r*Math.cos(a));x.y=Math.round(P.y+r*Math.sin(a))}
+ const at={},seen={};for(const x of it)at[x.planet]=(at[x.planet]||0)+1;   // pins sharing a planet fan out in an arc above it
+ for(const x of it){const P=PLANETS[x.planet],n=at[x.planet],k=seen[x.planet]=(seen[x.planet]||0)+1;
+  const a=n>1?Math.PI*(1.15+.7*(k-1)/(n-1)):0,r=n>1?(n>4?30:22):0;x.x=Math.round(P.x+r*Math.cos(a));x.y=Math.round(P.y+r*Math.sin(a)+(n>1?8:0))}
  return it}
 // How long an option stays open, in plain words.
 function expiryTxt(x){const o=x.o;if(x.s)return x.s.st==='team'?'Team away · resolves after the next mission':'Hits at month end';if(x.f)return x.f.st==='team'?`Team away · back in ${x.f.left} days`:`Expires in ${x.f.exp} days`;
@@ -26,22 +27,21 @@ function expiryTxt(x){const o=x.o;if(x.s)return x.s.st==='team'?'Team away · re
  if(!o.adv)return o.quest||o.redeem?'Stays open while the unit is free':'Stays open this step';
  return C.options.filter(y=>y.adv).length>1?'Expires when you launch another mission':'Last chance';}
 function galaxyHTML(){const it=galaxyItems();if(!it.some(x=>x.key===GAL.sel))GAL.sel=(it.find(x=>x.o&&x.o.story)||it[0]||{}).key||null;
- const cx=GAL_C.x,cy=GAL_C.y,rings=REGIONS.filter(r=>r[2]).reverse();
+ const at={};for(const x of it)at[x.planet]=1;const cx=GAL_C.x,cy=GAL_C.y,rings=REGIONS.filter(r=>r[2]).reverse();
  const svg=`<svg class="gmap" viewBox="0 0 600 380" role="img" aria-label="Galaxy map">
  <defs><radialGradient id="gcore"><stop offset="0" stop-color="#e8f6ff" stop-opacity=".55"/><stop offset="1" stop-color="#79d3e2" stop-opacity="0"/></radialGradient></defs>
  <path class="greg unk ${GAL.reg==='unknown'?'on':''}" data-reg="unknown" d="M0 0H70Q30 190 70 380H0Z"><title>${REG_N.unknown}</title></path>
  ${rings.map(([id,n,rx])=>`<ellipse class="greg u${unrestOf(id)} ${GAL.reg===id?'on':''}" data-reg="${id}" cx="${cx}" cy="${cy}" rx="${rx}" ry="${Math.round(rx*GAL_C.ry)}"><title>${n} · Unrest ${unrestOf(id)} (${UNREST_WORD[unrestOf(id)]})</title></ellipse>`).join('')}
  <ellipse cx="${cx}" cy="${cy}" rx="46" ry="28" fill="url(#gcore)" pointer-events="none"/>
  ${rings.map(([id,n,rx])=>`<text class="glab" x="${cx}" y="${cy-Math.round(rx*GAL_C.ry)+11}">${n}</text>`).join('')}<text class="glab" x="36" y="370">Unknown</text>
- ${Object.entries(PLANETS).filter(([n])=>!/Rim|Way/.test(n)).map(([n,p])=>`<circle class="gpl" cx="${p.x}" cy="${p.y}" r="2.2"/><text class="gpn" x="${p.x+5}" y="${p.y-4}">${n}</text>`).join('')}
- ${it.map(x=>{const P=PIN[x.cat],on=x.key===GAL.sel;return `<g class="gpin ${on?'on':''} ${x.f&&x.f.st==='team'?'away':''}" data-pin="${x.key}" tabindex="0" role="button" aria-label="${x.n}" style="--pc:${P.c}">
-  <line x1="${x.x}" y1="${x.y}" x2="${x.x}" y2="${x.y-14}"/><circle cx="${x.x}" cy="${x.y-22}" r="${on?11:9}"/><use href="#i-${x.ic}" x="${x.x-6}" y="${x.y-28}" width="12" height="12"/><title>${x.n} · ${x.planet}</title></g>`}).join('')}
+ ${Object.entries(PLANETS).filter(([n])=>!/Rim|Way/.test(n)).map(([n,p])=>`<circle class="gpl" cx="${p.x}" cy="${p.y}" r="2.2"/>${at[n]?'':`<text class="gpn" x="${p.x+5}" y="${p.y-4}">${n}</text>`}`).join('')}
+ ${it.filter(x=>!x.o).map(pinSVG).join('')}${it.filter(x=>x.o).map(pinSVG).join('')}
  </svg>`;
- const chips=it.map(x=>`<button type="button" class="gchip ${x.key===GAL.sel?'on':''}" data-pin="${x.key}" style="--pc:${PIN[x.cat].c}"><i></i>${x.n}<small>${x.planet}</small></button>`).join('');
+ const chips=it.map(x=>`<button type="button" class="gchip ${x.key===GAL.sel?'on':''} ${x.o?'':'op'}" data-pin="${x.key}" style="--pc:${PIN[x.cat].c}"><i></i><span>${x.n}<small>${chipMeta(x)}</small></span></button>`).join('');
  const legend=[['story','Story'],['crisis','Crisis'],['rescue','Rescue'],['quest','Personal'],['redeem','Redemption'],['field','Field op'],['sith','Sith op']].filter(([k])=>it.some(x=>x.cat===k))
   .map(([k,n])=>`<span style="--pc:${PIN[k].c}"><i></i>${n}</span>`).join('');
  return `<section class="galaxy"><h3>Galaxy · choose the next mission <small>${it.filter(x=>x.o).length} missions · ${it.filter(x=>x.f&&x.f.st==='open').length} field ops</small></h3>
- <div class="gwrap"><div class="gleft">${svg}<div class="glegend">${legend}<span class="muted">Click a pin or a region.</span></div><div class="gchips">${chips}</div></div>
+ ${typeof twinBanner==='function'?twinBanner():''}<div class="gwrap"><div class="gleft">${svg}<div class="glegend">${legend}<span><i style="background:var(--sith);width:6px;height:6px"></i>expires if you pick another</span><span class="muted">Click a pin or a region.</span></div><div class="gchips">${chips}</div></div>
  <aside class="gpanel">${GAL.reg?regionPanel(GAL.reg,it):panelFor(it.find(x=>x.key===GAL.sel))}${fieldLogHTML()}</aside></div></section>`}
 function regionPanel(id,it){const R=REGIONS.find(r=>r[0]===id),here=it.filter(x=>(PLANETS[x.planet]||{}).reg===id);
  const u=unrestOf(id);return `<div class="eyebrow">Region</div><h3 class="gtitle">${R[1]}</h3><p>${R[3]}</p><div class="gfacts"><span>Unrest</span><b class="${u>=UNREST.hostile?'bad':''}">${'▮'.repeat(u)}${'▯'.repeat(UNREST.max-u)} ${u} · ${UNREST_WORD[u]}</b><span>Effects</span><b>${u>=UNREST.favorAt?`Senate Favor ${UNREST.favor}/month · `:''}${u>=UNREST.hostile?`enemies +${UNREST.aimAt3} aim, field ops ${UNREST.fieldAt3}% here`:'none yet'}</b><span>Raised by</span><b>ignored crises, lost missions, Sith op hits, lapsed field ops</b><span>Lowered by</span><b>winning missions and field ops here</b></div>
@@ -59,9 +59,9 @@ function panelFor(x){if(!x)return '<p class="muted">The galaxy is quiet.</p>';if
  <span>Reward</span><b>${o.quest?'mission pay · ':''}${reward}</b>${o.questTxt?`<span>${o.redeem?'Redemption':'Quest'}</span><b class="up">${o.questTxt}</b>`:''}
  <span>Deadline</span><b>${expiryTxt(x)}</b>${P.reg?`<span>Region</span><b class="${unrestOf(P.reg)>=UNREST.hostile?'bad':''}">Unrest ${unrestOf(P.reg)} · ${UNREST_WORD[unrestOf(P.reg)]}${unrestOf(P.reg)>=UNREST.hostile?` · enemies +${UNREST.aimAt3} aim`:''}${o.adv&&sib?' · ignoring adds +1':''}</b>`:''}${o.adv&&sib?`<span>If ignored</span><b class="bad">${o.ignore&&o.ignore.lose?'they are lost':fmtRes(o.ignore)||'nothing'}</b>`:''}
  ${o.src?`<span>Asked by</span><b>${o.src}</b>`:''}${o.quest?`<span>Must deploy</span><b>${unit(o.quest).n}</b>`:''}</div>
- <button type="button" class="primary" data-act="squad:${i}">Choose squad</button>`}
+ <button type="button" class="primary" data-act="squad:${i}">Choose squad${typeof twinB==='function'&&twinB()?` · front B (${TWIN.bMax})`:''}</button>${typeof twinButtons==='function'?twinButtons(i,o):''}`}
 // Returns true when it handled the click (then the hub re-renders).
-function galaxyClick(ev){const p=ev.target.closest('[data-pin]'),r=ev.target.closest('[data-reg]'),b=ev.target.closest('[data-act^="fop:"],[data-act^="fsend:"]');
+function galaxyClick(ev){if(typeof twinClick==='function'&&twinClick(ev))return true;const p=ev.target.closest('[data-pin]'),r=ev.target.closest('[data-reg]'),b=ev.target.closest('[data-act^="fop:"],[data-act^="fsend:"]');
  if(b&&!b.disabled){const [a,x]=b.dataset.act.split(':');fieldClick(a,x);baseScreen();return true}
  if(p){GAL.sel=p.dataset.pin;GAL.reg=null;FTEAM=[];baseScreen();return true}
  if(r){GAL.reg=r.dataset.reg==='none'||GAL.reg===r.dataset.reg?null:r.dataset.reg;baseScreen();return true}return false}
@@ -87,3 +87,16 @@ function sithPanel(o,planet){const D=SITH_OPS[o.k],P=PLANETS[planet]||{},T=(o.te
  <div class="gfacts"><span>Deadline</span><b>Hits at month end${P.reg?` · Unrest +${UNREST.opHit} in ${REG_N[P.reg]}`:''}</b><span>Counter</span><b>${opCost(o)} Intel now, or a 2-unit team (resolves after the next mission)</b></div>
  ${o.st==='team'?`<p class="muted">Team: ${T.map(r=>r.n).join(' & ')}.</p>`:`<div class="picks">${fitU.map(r=>`<button type="button" class="${OPTEAM.includes(r.id)?'on':''}" data-act="opt:${r.id}">${r.n} R${r.rank}</button>`).join('')}</div>
  <div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" data-act="opi:${o.id}" ${C.res.intel<opCost(o)?'disabled':''}>Spend ${opCost(o)} Intel</button><button type="button" class="primary" data-act="opteam:${o.id}" ${OPTEAM.length!==2?'disabled':''}>Send team · ${ch}%</button></div>`}`}
+
+// One pin: a stalk, a head sized by importance (story > crisis > ops), the type icon, an urgency dot, and a haloed label.
+function pinSVG(x){const P=PIN[x.cat],on=x.key===GAL.sel,big=x.o&&x.o.story,op=!x.o,r=(big?12:op?7.5:10)+(on?2:0),hy=x.y-(op?16:22),
+ urgent=(x.o&&x.o.adv&&C.options.filter(y=>y.adv).length>1)||(x.s&&x.s.st==='open'),lab=pinLabel(x.n),left=x.x>470,lx=left?x.x-r-4:x.x+r+4;
+ return `<g class="gpin ${on?'on':''} ${op?'op':''} ${big?'big':''} ${x.f&&x.f.st==='team'||x.s&&x.s.st==='team'?'away':''}" data-pin="${x.key}" tabindex="0" role="button" aria-label="${x.n}, ${x.planet}" style="--pc:${P.c}">
+ <line x1="${x.x}" y1="${x.y}" x2="${x.x}" y2="${hy+r}"/><circle class="gpd" cx="${x.x}" cy="${x.y}" r="1.8"/>${big?`<circle class="ring" cx="${x.x}" cy="${hy}" r="${r+3.5}"/>`:''}
+ ${x.s?`<rect class="head" x="${x.x-r*.8}" y="${hy-r*.8}" width="${r*1.6}" height="${r*1.6}" transform="rotate(45 ${x.x} ${hy})"/>`:`<circle class="head" cx="${x.x}" cy="${hy}" r="${r}"/>`}<use href="#i-${x.ic}" x="${x.x-r*.62}" y="${hy-r*.62}" width="${r*1.24}" height="${r*1.24}"/>
+ ${urgent?`<circle class="urg" cx="${x.x+r*.75}" cy="${hy-r*.75}" r="3"><title>Expires if you pick another</title></circle>`:''}
+ ${!op||on?`<text class="gpl2" x="${lx}" y="${hy+3.5}" text-anchor="${left?'end':'start'}">${lab}</text>`:''}<title>${x.n} · ${x.planet}</title></g>`}
+const pinLabel=n=>{n=String(n).replace(/ · .*/,'');return n.length>20?n.slice(0,19)+'…':n};
+function chipMeta(x){if(x.o){const rk=riskOf(x.M,x.o.mission);return `${x.planet} · ${x.o.story?'Story':x.o.kind||'Mission'} · ${rk.n} risk`}
+ if(x.f)return `${x.planet} · Field op · ${x.f.st==='team'?`team back in ${x.f.left}d`:`${FIELD_OPS[x.f.k].days}d away`}`;
+ return `${x.planet} · Sith op · ${x.s.st==='team'?'team out':'hits at month end'}`}

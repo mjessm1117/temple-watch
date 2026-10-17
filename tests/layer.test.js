@@ -40,5 +40,17 @@ E("C.unrest.r.mid=4;C.news=[];templeMonth()");check(E("C.news.some(n=>/Unrest in
 E("C.unrest.r.mid=3;C.options=optionsFor(C.step);var rix=C.options.findIndex(o=>regionOf(MISSIONS[o.mission].where)==='mid');if(rix>=0)launchMission(rix,defaultSquad(C.options[rix]))");
 check(E("rix<0||S.unrestAim===5"),'hostile region: enemies +5 aim');
 E("S=null;C.ops.list.push({id:'opz',k:'snipers',st:'open'});baseScreen()");check(!!d.querySelector('g[data-pin="sopz"]'),'Sith op shows as a pin');
+// Two fronts: front A plays without time passing, front B gets 4 slots and excludes A's squad, then time passes once.
+E("S=null;C.twin=null;C.wings.barracks=2;var ts=twinSteps();C.step=ts[0];C.options=optionsFor(C.step).filter(o=>o.adv);for(let i=0;i<6;i++)addTroop();for(const r of C.roster){r.wound=0;r.assign=null;r.status='active'}");
+check(E('twinOpen()'),'twin step opens with Barracks 2 and 8+ fit units');
+E("var d0=C.month*30+C.day,s0=C.step,ida=defaultSquad(C.options[0]);launchMission(0,ida);missionOver(true,'test')");
+check(E("twinB()&&C.step===s0&&C.month*30+C.day===d0"),'after front A: front B open, no time passed');
+check(E("squadRule().max")===4&&E("defaultSquad(C.options[0]).every(id=>!ida.includes(id))"),'front B: 4 slots, front A squad excluded');
+d.querySelector('#toBase').click();story();check(!!d.querySelector('.twin.b')&&!!d.querySelector('[data-act="standdown"]'),'galaxy shows the front B banner');
+E("launchMission(0,defaultSquad(C.options[0]));missionOver(false,'test')");
+check(E("!C.twin&&C.step===s0+1&&C.month*30+C.day===d0+DAYS"),'after front B: one step, time passed once');
+d.querySelector('#toBase').click();
+E("C.step=ts[1];C.options=optionsFor(C.step).filter(o=>o.adv&&!o.hostages);for(const r of C.roster){r.wound=0;r.assign=null}launchMission(0,defaultSquad(C.options[0]));missionOver(true,'t')");
+check(E("twinB()"),'second twin step opens');E("var s1=C.step;autoFront(0)");check(E("!C.twin&&C.step===s1+1"),'auto-resolve front B finishes the step');
 check(errs.length===0,'no page errors '+(errs[0]||''));
 console.log(JSON.stringify({err:errs.length}));process.exit(fail?1:0);
