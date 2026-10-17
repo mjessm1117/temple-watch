@@ -36,7 +36,7 @@ function bvSetup(){const T=TWISTS[S.bv.tw]||{},G=SIG[S.bv.sig]||{},b=S.bv;
  if(G.runner){const e=enemies().find(e=>e.type===G.runner.type);const p=bvPlace('G',G.runner.to);if(e&&p)b.run={uid:e.uid,to:p,mob:G.runner.mob,on:0}}
  if(G.relic){const p=bvPlace('H',G.relic.at);if(p)b.relic={x:p.x,y:p.y,by:null}}
  if(G.bombs)b.bombs=[];
- if(G.pylons){b.pyl={};for(const a of G.pylons.at){const p=bvPlace('P',a);if(p)b.pyl[p.x+','+p.y]=PYLON_HP}}
+ if(G.pylons){b.pyl={};for(const a of G.pylons.at){const p=bvPlace('P',a);if(p)b.pyl[p.x+','+p.y]=G.pylons.hp||PYLON_HP}if(G.pylons.par&&S.M.par)S.M.par+=G.pylons.par}
  if(G.switches){b.sw={n:0,need:0};for(const a of G.switches.at)if(bvPlace('L',a))b.sw.need++}
  if(G.wounded){b.wd=[];const L=Object.entries(GUESTS).filter(([k,g])=>g.era===2&&CLASS[g.cls]&&CLASS[g.cls].jedi);
   for(const a of G.wounded.at){const p=tile(a[0],a[1])==='.'&&!unitAt(a[0],a[1])?{x:a[0],y:a[1]}:floorNear(a,3)[0];if(!p)continue;

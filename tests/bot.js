@@ -54,7 +54,7 @@ function sigGoal(u){const b=S.bv;if(!b||u.vip)return undefined;const sq=players(
  for(const m of (b.bombs||[]).slice().sort((a,c)=>a.t-c.t))if(first(m))return cheb(u,m)>1?m:undefined;
  for(const t of tilesWhere(c=>c==='L'))if(first(t))return cheb(u,t)>1?t:undefined;
  for(const id of b.wd||[]){const w=byId(id);if(w&&w.status==='down'&&w.wounded&&first(w))return cheb(u,w)>1?{x:w.x,y:w.y}:undefined}
- if(b.pad){if(tile(u.x,u.y)==='U')return here;const P=tilesWhere(c=>c==='U');for(const p of P)if(!unitAt(p.x,p.y)&&first(p)&&!sq.some(q=>q!==u&&tile(q.x,q.y)==='U'))return p}
- if(b.pyl&&u.jedi){const P=Object.keys(b.pyl).map(k=>{const [x,y]=k.split(',').map(Number);return{x,y}});const p=near(P);
+ if(b.pad&&(SIG[S.id].pads.need||S.turn>=(S.M.par||0)-1)){if(tile(u.x,u.y)==='U')return here;const P=tilesWhere(c=>c==='U');for(const p of P)if(!unitAt(p.x,p.y)&&first(p)&&!sq.some(q=>q!==u&&tile(q.x,q.y)==='U'))return p}
+ if(b.pyl&&u.jedi&&(SIG[S.id].pylons.shieldBoss||b.sp)){const P=Object.keys(b.pyl).map(k=>{const [x,y]=k.split(',').map(Number);return{x,y}});const p=near(P);
   if(p&&sq.filter(q=>q.jedi).sort((a,c)=>dist(a,p)-dist(c,p))[0]===u)return cheb(u,p)>1?p:undefined}
  return undefined}

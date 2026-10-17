@@ -105,15 +105,15 @@ const SIG={
    {on:'turn',n:3,who:'Master Gnost-Dural',txt:'The vault wards are waking. I can guide you through them, or you can break them.',choice:{
     a:{label:'Follow his lead',txt:'Gnost-Dural talks you through the wards, one breath at a time: every Jedi +2 Focus.',do:{focus:2}},
     b:{label:'Break the wards',txt:'The wards shatter: two enemies reel, stunned. Something in the dark answers (Darkness +1).',do:{foeStun:2,dark:1}}}}]},
- ilum:{n:'Sapper charges',desc:'Imperial sappers plant charges (T) near the cave mouth on turns 3, 5 and 7. Defuse each (adjacent, 1 action) within 2 turns or it blows: 3 damage around it, 5 to the cave mouth.',
-  bombs:{plant:{3:2,5:2,7:1},timer:2,near:[4,10],r:4,objDmg:5},
+ ilum:{n:'Sapper charges',desc:'Imperial sappers plant charges (T) near the cave mouth on turns 3 and 6. Defuse each (adjacent, 1 action) within 2 turns or it blows: 3 damage around it, 3 to the cave mouth.',
+  bombs:{plant:{3:2,6:1},timer:2,near:[4,10],r:4,objDmg:3},
   beats:[{on:'turn',n:1,who:'Sgt. Jace Malcom',txt:'The Imps brought sappers. If they get charges on the cave mouth, defuse them fast.'},
    {on:'bomb',who:'Sgt. Jace Malcom',txt:'Charges down by the cave mouth! Two turns on the timers. Move!'},
    {on:'turn',n:6,who:'Sgt. Jace Malcom',txt:'I can bring the outer roof down on their approach. Costs us the outer cave, but it\'ll slow them.',choice:{
     a:{label:'Bring it down',txt:'The outer cave roars shut (cave mouth −3). Two attackers are buried in the fall: stunned.',do:{obj:-3,foeStun:2}},
     b:{label:'Hold the line',txt:'Malcom grins. "Thought you\'d say that." +10 aim this turn.',do:{aim:10}}}}]},
- adraasHunt:{n:'Shield pylons',desc:'Two pylons (P) shield Lord Adraas: nothing hurts him while one stands. Shoot, blast or wreck them (6 HP each).',
-  pylons:{at:[[1,1],[8,1]],shieldBoss:1,doneEv:'pylonsDown'},
+ adraasHunt:{n:'Shield pylons',desc:'Two pylons (P) shield Lord Adraas: nothing hurts him while one stands. Shoot, blast or wreck them (4 HP each). Threat starts a turn later.',
+  pylons:{at:[[1,3],[8,3]],hp:4,shieldBoss:1,par:1,doneEv:'pylonsDown'},
   beats:[{on:'turn',n:1,who:'Satele Shan',txt:'Adraas is hiding behind generator pylons. Bring them down or nothing will touch him.'},
    {on:'pylonsDown',who:'Satele Shan',txt:'His shield is down. Now!',do:{aim:10}},
    {on:'bossHalf',who:'Lord Adraas',txt:'You fight well for Republic dogs. Walk away and I let you live.',choice:{
