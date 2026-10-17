@@ -156,3 +156,20 @@ Same rules as wave 2: `git pull` before you start and before every push · edit 
 2. Roster from spec A §3: Brotherhood Trooper, Sith Marauder, Sith Lord, Mercenary Sniper, Sith Spawn + nexus. Put the data in `data-era2.js` (append to `FOES`); engine needs go to X as Requests.
 3. Era jump rules from spec B §1.4: Legends, wing decay, resource carry-over, and the time-skip scene. Add Council cameos (Hoth, Farfalla). Use `theme` values (plains/caves).
 4. Era 2 ends in a stub screen: "To be continued: High Republic".
+
+---
+
+# Wave 4 (2026-10-16/17): file owners
+
+Same rules: `git pull` first, edit only files you own, cross-file needs go under "Requests" in `docs/STATUS.md`, `npm test` green before push. **Chat K is the Coordinator from here** (E's job: merge, test, tune, report).
+
+| Chat | Status | Owns (edit only these) |
+| --- | --- | --- |
+| F Skill trees + Power | shipped | `data-trees.js`, `power.js`, `docs/specs/trees.md`, `tests/trees*.test.js` |
+| G Graphics (Meshy) | shipped | `view3d/*`, `public/models/*`, `public/vendor/*`, `tools/meshy/*`. **Hands `css/holo.css` to J.** |
+| H Battle variety | merged by K 2026-10-17 | `data-battle.js`, `battle.js`, `battle-ui.js`, `tests/variety.test.js` |
+| I Campaign layer | shipped | `darkness.js`, `fieldops.js`, `galaxy.js`, `data-galaxy.js`, `css/galaxy.css`, `tests/layer.test.js`, `docs/specs/second-squad.md` |
+| J UI polish | designing | `css/style.css`, `css/holo.css`, `render.js`, `input.js`, `ui-*.js`, `index.html`; screen markup in `base.js`/`temple-ui.js` (look only, no logic). Galaxy map look: ask I. |
+| K Coordinator | active | `tests/bot.js` + other tests, `package.json`, `tools/inline.js`, `docs/STATUS.md`, `docs/CHATS.md`, `docs/CHANGELOG.md`; merge fixes anywhere |
+
+Economy numbers (`STIPEND`, `MISSION_CR`, wing costs, Council vote costs) stay with the campaign data owner (`data-campaign.js`, `data-life.js`); field-op and side-objective payouts stay with I (`data-galaxy.js`) and H (`data-battle.js`). One retune pass at a time: K measures, owners change numbers.
