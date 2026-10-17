@@ -355,3 +355,15 @@ html.cb .cell.vis{background:repeating-linear-gradient(135deg,color-mix(in srgb,
 .twchip.sig{color:var(--holo);border-color:color-mix(in srgb,var(--holo) 50%,transparent)}.twchip.side{color:var(--good);border-color:color-mix(in srgb,var(--good) 50%,transparent)}
 .twmeta{gap:6px;flex-wrap:wrap}.twcard.side{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:color-mix(in srgb,var(--good) 6%,var(--raise))}.twcard.side b,.orow.side span{color:var(--good)}
 .bvrecap{margin:10px 0;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--raise)}.bvrecap p{margin:3px 0}.bvrecap .ic{width:14px;height:14px;vertical-align:-2px}
+/* Biome hazards (hazards.js) */
+.cell.ice{background:linear-gradient(135deg,#1d3a46,#2b5868 60%,#1d3a46)}
+.cell.oil{background:radial-gradient(circle at 40% 45%,#2a2238,#151820 70%)}
+.cell.lava{background:radial-gradient(circle at 50% 50%,#ff8a3d,#b5321e 55%,#3a120b);box-shadow:inset 0 0 10px #ff5a1f}
+.cell.cond{background:repeating-linear-gradient(90deg,var(--panel) 0 8px,color-mix(in srgb,var(--holo) 35%,var(--panel)) 8px 10px)}
+.cell.cond.live{box-shadow:inset 0 0 12px var(--holo)}
+.cell.tox{background:radial-gradient(circle,#6f9a2c,#2b3b12 70%)}
+.cell.mud{background:radial-gradient(circle at 60% 40%,#5a4630,#2f2418 70%)}
+.cell.wat{background:linear-gradient(180deg,#123247,#0b2131)}
+.cell.thorn{background:repeating-linear-gradient(45deg,#1b2a18 0 4px,#3d5a2a 4px 6px)}
+.twchip.haz,.orow.haz span{color:#d9a25f}.twchip.haz{border-color:color-mix(in srgb,#d9a25f 50%,transparent)}
+.twcard.haz{border-color:color-mix(in srgb,#d9a25f 45%,var(--line));background:color-mix(in srgb,#d9a25f 6%,var(--raise))}.twcard.haz b{color:#d9a25f}

@@ -12,7 +12,7 @@ function goalFor(u){u.stay=0;if(window.sigGoal){const g=sigGoal(u);if(g!==undefi
   if(u.abil.includes('console')&&!players().some(p=>p.abil.includes('hack')&&p.status==='ok')){const k=tilesWhere(c=>c==='k')[0];return cheb(u,k)>1?k:null}}
  return null}
 function moveToward(u,g,near=0){const R=reach(u);let best=null,bd=dist(u,g)-.5;
- for(const k of Object.keys(R.d)){const [x,y]=k.split(',').map(Number),d=dist({x,y},g)-(inCover({x,y})?.4:0);if(R.d[k]>0&&d<bd){bd=d;best={x,y}}}
+ for(const k of Object.keys(R.d)){const [x,y]=k.split(',').map(Number),t=TILES[tile(x,y)]||{},d=dist({x,y},g)-(inCover({x,y})?.4:0)+(t.hurt?2:0)+(t.slide?.6:0);if(R.d[k]>0&&d<bd){bd=d;best={x,y}}}
  if(!best)return false;moveAlong(u,pathTo(u,best.x,best.y,R.prev));u.ap--;after();return true}
 function act(u){const go=c=>{exec(u,c[0],c[1]);return true};
  for(const k of ['hack','console','scan','plant','door','defuse','light','rouse','wreck'])if(pick(u,k))return go(pick(u,k));

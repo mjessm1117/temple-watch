@@ -52,3 +52,13 @@ startPlayerTurn=function(){if(hzSet()&&!S.over)for(const u of S.units.filter(u=>
 // AI: stay out of hurting tiles and off slick ones.
 const _hzScore=tileScore;
 tileScore=function(e,pos){let s=_hzScore(e,pos);if(hzSet()){const t=HZ(tile(pos.x,pos.y));if(t.hurt)s-=12*t.hurt;if(t.slide)s-=6}return s};
+// UI: briefing terrain card, Objectives row, live conduits glow on the 2D board.
+const hzOf=id=>{const B=MISSIONS[id]||{},th=B.theme||THEME_OF[id]||'plains';return B.noHaz?null:HAZARDS[th]};
+const hzLine=Z=>[...new Set(Z.tiles)].map(c=>`<b>${HZ(c).n}</b>: ${HZ(c).desc}`).join(' ');
+const _hzSquad=squadScreen;squadScreen=function(i,keep){_hzSquad(i,keep);try{const o=C.options[i],Z=hzOf(o.mission),box=document.querySelector('#modal .box');if(!Z||!box||box.querySelector('.twcard.haz'))return;
+ const a=box.querySelector('.twcard')||[...box.querySelectorAll(':scope > p')].find(p=>!p.classList.contains('muted'));if(a)a.insertAdjacentHTML(a.classList.contains('twcard')?'beforebegin':'afterend',`<div class="twcard haz"><b>${icon('elev')} Terrain: ${Z.n}</b><span>${hzLine(Z)}</span></div>`)}catch(e){}};
+const _hzHud=hudRender;hudRender=function(){_hzHud();const Z=hzSet();if(!Z)return;const o=document.getElementById('objs');
+ if(o)o.insertAdjacentHTML('afterbegin',`<div class="orow haz" title="${hzLine(Z).replace(/<[^>]+>/g,'').replace(/"/g,'&quot;')}"><span>${icon('elev')} Terrain</span><b>${Z.n}</b></div>`);
+ if(S.turn%2===0)for(const p of tilesWhere(c=>c==='n')){const c=document.querySelector(`#board .cell[data-x="${p.x}"][data-y="${p.y}"]`);if(c)c.classList.add('live')}};
+if(typeof panelFor==='function'){const _hzPanel=panelFor;panelFor=function(x){const h=_hzPanel(x);try{const Z=x&&x.o&&hzOf(x.o.mission);if(!Z)return h;
+ return h.replace('<div class="meta twmeta">',`<div class="meta twmeta"><span class="twchip haz" title="${hzLine(Z).replace(/<[^>]+>/g,'').replace(/"/g,'&quot;')}">${icon('elev')} ${Z.n}</span>`)}catch(e){return h}}}
