@@ -379,3 +379,5 @@ html.cb .cell.vis{background:repeating-linear-gradient(135deg,color-mix(in srgb,
 .twchip.sig{color:var(--holo);border-color:color-mix(in srgb,var(--holo) 50%,transparent)}.twchip.side{color:var(--good);border-color:color-mix(in srgb,var(--good) 50%,transparent)}
 .twmeta{gap:6px;flex-wrap:wrap}.twcard.side{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:color-mix(in srgb,var(--good) 6%,var(--raise))}.twcard.side b,.orow.side span{color:var(--good)}
 .bvrecap{margin:10px 0;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--raise)}.bvrecap p{margin:3px 0}.bvrecap .ic{width:14px;height:14px;vertical-align:-2px}
+/* Comm box floats under the banner so it never adds a row to the #app grid (ui.css bottom-bar layout). */
+.bvcomm{position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:40;width:min(760px,calc(100vw - 32px));margin:0;box-shadow:0 8px 24px #0009}
