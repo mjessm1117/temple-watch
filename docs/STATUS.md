@@ -137,6 +137,13 @@ Branching trees: trunk R1–2 → pick 1 of 2 specializations at R3 (permanent) 
 - **Field ops** (`fieldops.js`): 1–2 a month, expire in 30 days; 2–3 units leave for 15–30 days; odds = 45 + 5×ranks + 10×right class (max 2) + 8 for a third − 12×(stars−1), clamp 10–92. Fail = stress +15 each, one wounded; never death. Sith ops (2-unit teams) unchanged.
 - **Second squad:** design only, `docs/specs/second-squad.md`.
 - Tests: new `tests/layer.test.js`; campaign bot clicks a pin before the squad screen and sends field ops in odd runs.
+- F(trees) round 2 (2026-10-17): R7 balance band 146–158 Power across all 32 builds (meter now counts range/kits/grenades/abilities, plus small perk nerfs/buffs); new full-screen skill tree (`ui-tree.js`, Roster → Skill tree). CHANGELOG: "Skill tree screen: see every pick and what it unlocks, pick by clicking. Specializations rebalanced so troops and Jedi top out at similar strength."
+
+## UI pass — Chat J, 2026-10-17
+Desktop (≥880px) only; phone rules in style.css untouched. New `public/css/ui.css` (loaded last; delete it to get the old layout) and `public/js/temple-map.js` (after temple-ui.js).
+- **Battle HUD:** `.side` becomes a transparent grid over the board: roster top-left, tips/objectives/contacts/log top-right, bottom bar = `#card` | `#acts` (ability tiles) + `#hint` | `#odds` + End turn. No markup changes in render.js. 3D camera buttons moved to top centre.
+- **Temple:** left rail = floor plan (`ROOMS` in temple-map.js: id, name, wing, tab, icon). A room opens its tab plus its `wingRow(k)` card; War Room shows `galaxyHTML()` unchanged. All tab panels still render (hidden) so tests find their buttons. Tabs no room claims get a footer button automatically. `wingsTab` now = `wingRow` per wing. `TAB` still works: code that sets `TAB` moves the player to that tab's room.
+- **Requests:** J → I: galaxy lives in `.rwar` inside `.troom` (≈1000px wide at 1366). J → anyone adding a Temple tab: add a room to `ROOMS` (or it lands in the footer).
 
 ## Battle variety (Chat H, wave 4, 2026-10-17)
 Files: `data-battle.js` (TWISTS, GUESTS, BV_TILES, BEATS, SIG, SIDES: tune here), `battle.js` (engine, wraps startMission/startPlayerTurn/endTurn/checkEnd/threatStep/damage/blast/los/mkFoe/eAct/lootAt/exec/applyResults/launchMission), `battle-ui.js` (briefing cards, mission-card chips, HUD rows, comm box, debrief report). Test: `tests/variety.test.js`.
