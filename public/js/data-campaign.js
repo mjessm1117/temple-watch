@@ -34,7 +34,7 @@ const DAYS=15;            // days that pass per mission
 const MISSION_CR=0.6;      // mission credit rewards × this (data.js rewards stay as written) [Tuned wave 3]
 const STIPEND=[60,1.5];   // monthly Senate stipend = (a + b×Favor) × difficulty income. Spec B said 100+2×Favor; cut so credits stay tight [Tuned wave 3]
 const TROOP_PAY=7,HIRE_COST=30,TRAIN_XP=12;   // TRAIN_XP = XP per mission period benched in the Training Salle [Default]
-const START_RES={credits:300,intel:0,kyber:1,favor:50,recruits:2};
+const START_RES={credits:500,intel:0,kyber:1,favor:50,recruits:2};
 const START_ROSTER=[
  {n:'Kira Venn',cls:'Guardian',title:'Knight',rank:2,xp:30,picks:['saberThrow','leap'],col:'#62b3ff'},
  {n:'Tor Saalen',cls:'Consular',title:'Padawan',col:'#72e0a4'},

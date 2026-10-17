@@ -3,9 +3,11 @@ let C=null;
 const isJedi=r=>!!CLASS[r.cls].jedi;
 function newCampaign(diff){
  C={v:2,treeV:1,diff,month:1,day:1,step:0,res:{...START_RES},orderDark:0,wings:{medical:1,training:0,forge:0,armory:0,comms:0,archives:0,gardens:0,barracks:1},build:null,
-  roster:START_ROSTER.map((r,i)=>({id:'u'+(i+1),rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0,...r})),nid:START_ROSTER.length+1,
+  roster:START_ROSTER.map((r,i)=>({id:'u'+(i+1),rank:START_RANK,xp:RANKS[START_RANK-1].xp,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0,gear:startGear(r.cls),...r})),nid:START_ROSTER.length+1,
   options:[],news:[],flags:{},legends:[]};
  ensureTemple();C.options=optionsFor(0);S=null;saveGame();baseScreen()}
+// The first squad arrives trained (rank 2) and kitted: Jedi with an attuned saber and battle robes, troops with military blasters and light armor.
+const START_RANK=2,startGear=cls=>CLASS[cls]&&CLASS[cls].jedi?{w:0,armor:'robes',mods:[],saber:1,trait:null}:{w:1,armor:'light',mods:[],saber:0,trait:null};
 function abilFor(r){const P=picksOf(r).filter(k=>AB[k]),B=BASE_KIT[r.cls]||[];
  if(isJedi(r))return['strike',...B,...P,...(r.rank>=2?['choke']:[]),'push','guard','meditate','subdue','stabilize','door','console','scan'];
  return['shoot',...B,...P,'overwatch','subdue','stabilize','door']}
