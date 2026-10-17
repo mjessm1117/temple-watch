@@ -16,7 +16,7 @@ let fail=0;const check=(ok,msg)=>{if(!ok){console.log('FAIL '+msg);fail++}};cons
    // Galaxy map: odd runs send a field op team when one is open, then every run picks a pin and opens its squad screen.
    const fp=d.querySelector('g[data-pin^="ff"]');if(g%2&&fp&&w.eval("C.field.list.some(o=>o.st==='open')")&&w.eval('C.roster.filter(fit).length')>=6){fp.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
     for(const b of [...d.querySelectorAll('[data-act^="fop:"]')].slice(-2))b.click();const s2=d.querySelector('[data-act^="fsend:"]');if(s2&&!s2.disabled){s2.click();sum.field++}}
-   const oi=g%2&&w.eval('C.options.length')>1?1:0;d.querySelector(`button[data-pin="o${oi}"]`).click();
+   const oi=g%2&&w.eval('C.options.length')>1?1:0;const pb=d.querySelector(`button[data-pin="o${oi}"]`);if(!pb)console.log("NOPIN",oi,w.eval("JSON.stringify(C.options.map(o=>o.mission))"),d.querySelector("#modal").innerHTML.slice(0,400));pb.click();
    d.querySelector(`[data-act="squad:${oi}"]`).click();d.querySelector('#deploy').click();
    if(!w.eval("S&&!S.over")){console.log("not started", w.eval("JSON.stringify({step:C.step,fit:C.roster.filter(fit).length,pick:pickSquad})"));fail++;break}sum.maxSave=Math.max(sum.maxSave,w.eval('JSON.stringify(saveData()).length'));
    for(let i=0;i<40&&!w.eval('S.over');i++){w.eval('AI()');await w.eval('endTurn()')}
