@@ -29,5 +29,5 @@ function syncDialog(){const m=$('#modal');const wasOpen=!m.hidden;m.hidden=false
   if(ok===undefined){$('#syncMsg').textContent='Could not reach the save server. Sync works only on the Cloudflare site.';return}
   const pulled=await pullRemote();if(!pulled&&(C||S))saveGame();close()}}
 function continueGame(d){C=d.C;
- if(d.S){S={...d.S,M:MISSIONS[d.S.id],d:DIFF[d.S.diff],fx:[],peek:null,pick:null,phase:'player',mode:'move',tg:[]};S.sel=S.units[d.S.sel]||null;$('#modal').hidden=true;SCR=null;log('Save loaded.');render()}
+ if(d.S){S={...d.S,M:(B=>d.S.mapIx&&B.alts&&B.alts[d.S.mapIx-1]?{...B,...B.alts[d.S.mapIx-1]}:B)(MISSIONS[d.S.id]),d:DIFF[d.S.diff],fx:[],peek:null,pick:null,phase:'player',mode:'move',tg:[]};S.sel=S.units[d.S.sel]||null;$('#modal').hidden=true;SCR=null;log('Save loaded.');render()}
  else{S=null;baseScreen()}}

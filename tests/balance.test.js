@@ -6,7 +6,7 @@ const N=+process.env.GAMES||6,diff=process.env.DIFF||'normal';let fail=0;
 const w0=new JSDOM(html,{runScripts:'dangerously'}).window,maps=w0.eval(`(()=>{const out=[],bad=[];
  for(const [id,B] of Object.entries(MISSIONS))[B,...(B.alts||[])].forEach((v,i)=>{const M={...B,...v},g=M.map,at=(x,y)=>g[y]&&g[y][x],ok=p=>!!p&&PASS(at(p[0],p[1]));
   out.push([id,i]);const tag=id+'#'+i,need=['rescue','investigate','sabotage','escort'].includes(M.type);
-  if(g.length!==H||g.some(r=>r.length!==W))bad.push(tag+' size');for(const r of g)for(const c of r)if(!TILES[c])bad.push(tag+' tile '+c);
+  if(g.length<8||g.some(r=>r.length!==g[0].length))bad.push(tag+' size');for(const r of g)for(const c of r)if(!TILES[c])bad.push(tag+' tile '+c);
   if(M.start.length<6||!M.start.every(ok))bad.push(tag+' start');if(!(M.foes||[]).every(f=>ok([f[1],f[2]])))bad.push(tag+' foe');
   if(M.hostage&&!ok(M.hostage))bad.push(tag+' hostage');if(need&&!g.join('').includes('E'))bad.push(tag+' no evac');
   if(M.type==='sabotage'&&(g.join('').match(/C/g)||[]).length<M.need)bad.push(tag+' charges');

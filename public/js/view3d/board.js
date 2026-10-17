@@ -109,6 +109,10 @@ export class Board{
  highlight(h){for(const p of Object.values(this.pool)){p.i=0;for(const o of p.list)o.visible=false}
   for(const c of [...this.lines.children]){this.lines.remove(c);c.geometry.dispose();c.material.dispose()}const hm=this.hm,lift=(x,y,dy=.012)=>this.pos(x,y,dy);
   for(const t of h.vision||[])this.take('vis',this.plane,hm.vis).position.copy(lift(t.x,t.y,.008));
+  // Map marks (Chat M, wave 5): objective zone (green), exit (red), incoming group (red), overwatch zones (amber / enemy red).
+  if(!this.mkm)this.mkm={zone:[0x7fd99a,.30],exit:[0xef6a5d,.55],in:[0xef6a5d,.38],ow:[0xffb21e,.16],owe:[0xef6a5d,.12]};
+  for(const m of h.marks||[]){const c=this.mkm[m.k];if(!c)continue;if(!(c.mat))c.mat=new this.T.MeshBasicMaterial({color:c[0],transparent:true,opacity:c[1],depthWrite:false});
+   this.take('mk_'+m.k,this.plane,c.mat).position.copy(lift(m.x,m.y,.006))}
   for(const t of h.reach){this.take(t.dash?'dash':'reach',this.plane,t.dash?hm.dash:hm.reach).position.copy(lift(t.x,t.y));
    this.take(t.dash?'dashE':'reachE',this.frame,t.dash?hm.dashEdge:hm.reachEdge).position.copy(lift(t.x,t.y,.013))}
   if(h.hover)this.take(h.hover.dash?'hovD':'hov',this.plane,h.hover.dash?hm.hoverDash:hm.hover).position.copy(lift(h.hover.x,h.hover.y,.014));

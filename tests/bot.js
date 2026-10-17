@@ -2,7 +2,7 @@
 window.AI=function(){while(S.bv&&S.bv.q&&S.bv.q.length&&!S.over)bvPick(Math.random()<.5?0:1);if(S.conc&&stealthTurn())return;for(let n=0;n<24;n++){const u=players().find(canAct);if(!u||S.over)break;S.sel=u;act(u)}};
 function pick(u,k){if(!u.abil.includes(k))return null;const ab=AB[k];if(ab.passive||(ab.f&&u.focus<ab.f)||(ab.avail&&ab.avail(u)))return null;
  if(ab.instant)return[k,null];const t=targetsFor(u,k).sort((a,b)=>(b.chance||0)-(a.chance||0))[0];return t?[k,t]:null}
-function goalFor(u){u.stay=0;if(window.sigGoal){const g=sigGoal(u);if(g!==undefined){if(g&&g.x===u.x&&g.y===u.y){u.stay=1;return null}if(g)return g}}
+function goalFor(u){u.stay=0;if(window.mapGoal){const g=mapGoal(u);if(g!==undefined){if(g&&g.x===u.x&&g.y===u.y){u.stay=1;return null}if(g)return g}}if(window.sigGoal){const g=sigGoal(u);if(g!==undefined){if(g&&g.x===u.x&&g.y===u.y){u.stay=1;return null}if(g)return g}}
  if(u.vip)return S.grid.flatMap((r,y)=>r.map((c,x)=>c==='E'?{x,y}:null)).filter(Boolean).sort((a,b)=>dist(u,a)-dist(u,b))[0];
  if(S.type==='investigate'){if(S.clues>=2)return goalFor({...u,vip:1});const q=tilesWhere(c=>c==='q').sort((a,b)=>dist(u,a)-dist(u,b))[0];
   if(q&&u.abil.includes('scan')&&!players().some(p=>p!==u&&p.abil.includes('scan')&&dist(p,q)<dist(u,q)))return cheb(u,q)>1?q:null}

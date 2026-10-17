@@ -5,8 +5,12 @@ function line(x0,y0,x1,y1){const pts=[],n=Math.max(Math.abs(x1-x0),Math.abs(y1-y
 // Heights (wave 3): eyes sit 1.2 above the tile's elev. Walls (h 2) and raised ground (elev) block a line that passes below their top.
 // Ground to ground behaves as before; a shooter on a high ledge sees over walls at mid range.
 const elevAt=(x,y)=>(TILES[tile(x,y)]||{}).elev||0,uEl=u=>elevAt(u.x,u.y);
-function los(a,b){const P=line(a.x,a.y,b.x,b.y),n=P.length-1,ea=elevAt(a.x,a.y)+1.2,eb=elevAt(b.x,b.y)+1.2;
- for(let i=1;i<n;i++){const p=P[i];if(cheb(p,a)<=1||cheb(p,b)<=1)continue;const c=tile(p.x,p.y),top=FULL(c)?(TILES[c].h||2)+elevAt(p.x,p.y):elevAt(p.x,p.y);
+// Angles (Chat M, wave 5): a wall right in front of the shooter now blocks the shot. Only a unit in full cover can lean out
+// (peek) from a free side tile, so you shoot around corners and wall ends, not through the middle of a wall.
+function los(a,b){if(los0(a,b,0))return true;if(!N4.some(([dx,dy])=>FULL(tile(a.x+dx,a.y+dy))))return false;
+ for(const [dx,dy] of N4){const x=a.x+dx,y=a.y+dy;if(inb(x,y)&&PASS(tile(x,y))&&!(x===b.x&&y===b.y)&&los0({x,y},b,1))return true}return false}
+function los0(a,b,peek){const P=line(a.x,a.y,b.x,b.y),n=P.length-1,ea=elevAt(a.x,a.y)+1.2,eb=elevAt(b.x,b.y)+1.2;
+ for(let i=1;i<n;i++){const p=P[i];if(cheb(p,b)<=1||!peek&&cheb(p,a)<=1&&!FULL(tile(p.x,p.y)))continue;const c=tile(p.x,p.y),top=FULL(c)?(TILES[c].h||2)+elevAt(p.x,p.y):elevAt(p.x,p.y);
   if(top&&top>=ea+(eb-ea)*i/n)return false}return true}
 function coverVal(t,from){if(t.barrier)return 40;let b=0;const dx=Math.sign(from.x-t.x),dy=Math.sign(from.y-t.y);
  const te=uEl(t),fe=elevAt(from.x,from.y);

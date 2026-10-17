@@ -1,5 +1,6 @@
 /* Combat data: difficulty knobs, enemies, missions (maps, waves, rewards). Tune numbers here. Spec: docs/specs/combat.md */
-const W=10,H=12;
+// Board size (Chat M, wave 5): maps can be any size. 10×12 until state.js swaps these for getters that follow S.grid.
+Object.defineProperty(window,'W',{value:10,configurable:true,writable:true});Object.defineProperty(window,'H',{value:12,configurable:true,writable:true});
 // Map legend: # wall · O objective (relay/shrine) · d door · D locked door  = full cover, blocks movement
 //             c crate · x barrel · k console · q clue terminal · Q scanned clue = half cover, blocks movement
 //             r rubble (half cover, walkable) · . floor · _ open door · E evac zone

@@ -123,10 +123,11 @@ function play(type,d){const {units,fx3,labels,board,rig}=V;
  }return 0}
 // Status call-outs (Chat X): each gets a color and a small effect on the unit it pops over.
 const TXT={AMBUSH:['#e0bd78',1],REVEALED:['#ef6a5d',1],SPOTTED:['#ef6a5d',0],'!':['#ef6a5d',1],PANIC:['#c9a7ff',1],ANGER:['#ff6a4a',0],FROZEN:['#9fe7ff',0],
- HIDDEN:['#a8bcc0',0],QUAKE:['#e0b880',1],ION:['#6fd0ff',0],SHIELD:['#7fd99a',0],DEFLECT:['#9fe7ff',0]};
+ HIDDEN:['#a8bcc0',0],QUAKE:['#e0b880',1],ION:['#6fd0ff',0],SHIELD:['#7fd99a',0],DEFLECT:['#9fe7ff',0],OVERWATCH:['#ffb21e',1],INBOUND:['#ef6a5d',1],CONTACT:['#ef6a5d',1],RUNNER:['#ef6a5d',1],OBJECTIVE:['#7fd99a',1]};
 function textFx(d){const {labels,fx3,units,rig}=V,t=TXT[d.txt],p=P(d,.8),u=S.units.find(o=>o.x===d.x&&o.y===d.y&&alive(o)),v=u&&units.map.get(u.uid);
  labels.float(P(d,1.55),d.txt,d.cls||'',!!(t&&t[1]),t&&t[0]);if(!t)return 0;
  switch(d.txt){
+  case 'OVERWATCH':fx3.ring(p,0xffb21e,.3,2.2,.6,.1);break;
   case 'AMBUSH':fx3.ring(p,0xe0bd78,.3,2.6,.7,.1);fx3.motes(p,0xe0bd78,20);break;
   case 'REVEALED':case 'SPOTTED':fx3.ring(p,0xef6a5d,.2,1.4,.5,.1);break;
   case '!':if(v)v.hitAnim&&v.hitAnim();break;
@@ -169,7 +170,7 @@ function ui(){if(!V||!S)return;if(cb()!==lastCb){lastCb=cb();board0().palette(la
   if(it.to)h.lines.push({a,b:P(it.to,.9),color:0xef6a5d,dash:1});if(it.area){h.lines.push({a,b:P(it.area,.2),color:0xef6a5d,dash:1});h.iarea=it.area}}
  // Stealth (Chat X): red = tiles an enemy would spot you on; the hidden squad is drawn ghosted.
  if(S.conc&&typeof visionTiles==='function'){const k=enemies().map(e=>e.x+','+e.y+e.status).join(';');if(visK!==k||visS!==S){visK=k;visS=S;visT=visionTiles()}h.vision=visT}
- board.highlight(h);units.marks(sel,S.peek);for(const v of units.map.values())v.ghost&&v.ghost(v.u.side==='p'&&v.u.status==='ok'&&!!(S.conc||v.u.conc))
+ if(window.mapMarks)h.marks=mapMarks();board.highlight(h);units.marks(sel,S.peek);for(const v of units.map.values())v.ghost&&v.ghost(v.u.side==='p'&&v.u.status==='ok'&&!!(S.conc||v.u.conc))
  // % tags: same rule as the 2D board (best enemy shot in white).
  const shoot=S.info&&canAct(sel)&&S.mode==='move'&&sel.abil.includes('shoot')?targetsFor(sel,'shoot').filter(g=>g.t):[];
  const list=[...S.tg.filter(g=>!g.area&&!g.spot&&g.chance!=null),...shoot.filter(s=>!S.tg.some(g=>g.x===s.x&&g.y===s.y))].filter(g=>!g.t||!g.t.hid);

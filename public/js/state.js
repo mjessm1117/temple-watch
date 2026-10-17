@@ -1,5 +1,7 @@
 /* Mission state S, lookups, log. Campaign state C lives in campaign.js. */
 let S,fid=0;
+// W/H follow the live mission's grid (maps can be any size); defined here so the getter sees S.
+Object.defineProperty(window,'W',{get:()=>S&&S.grid?S.grid[0].length:10,configurable:true});Object.defineProperty(window,'H',{get:()=>S&&S.grid?S.grid.length:12,configurable:true});
 
 const tile=(x,y)=>inb(x,y)?S.grid[y][x]:'#';
 const alive=u=>u.status!=='dead'&&u.status!=='captured';
