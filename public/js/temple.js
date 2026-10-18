@@ -1,6 +1,6 @@
 /* Temple logic: gear and crafting, wing assignments, recruiting, bonds, personal quests, promotions.
    UI lives in temple-ui.js. Hooks into campaign.js: battleUnit → templeMods, applyResults → templeAfterMission, advance → templeAdvance. */
-const RANK_TITLE=['','Recruit','Private','Corporal','Sergeant','Lieutenant','Captain','Commander'];
+const RANK_TITLE=['','Recruit','Private','Corporal','Sergeant','Lieutenant','Captain','Commander','Veteran Commander','Elite Commander','Legend'];
 // Older saves: add the fields this file needs.
 function ensureTemple(){if(!C)return;const w=C.wings;for(const k of Object.keys(WINGS))if(w[k]==null)w[k]=k==='barracks'?1:0;
  C.bonds=C.bonds||{};C.quests=C.quests||{};C.staff=C.staff||{};if(!C.cands)C.cands=genCands();
@@ -22,7 +22,7 @@ function templeMods(u,r){if(!r.gear)return u;const g=r.gear;
 
 // --- promotions: one pick per rank (1–7); a unit can owe picks for several ranks. An unpicked rank 1 fights with its first option. ---
 // Trees (data-trees.js): trunk ranks 1–2, rank 3 = pick a spec (its signature skill), ranks 4–7 inside the spec. Borrowed skills ride along.
-const picksOf=r=>[...(r.picks.length||!TREES[r.cls]?r.picks:[TREES[r.cls].trunk[1][0]]),...(r.borrow||[])];
+const picksOf=r=>[...(r.picks.length||!TREES[r.cls]?r.picks:[TREES[r.cls].trunk[1][0]]),...(r.borrow||[]),...(r.extra||[])];   // extra = bought with skill points (skills.js)
 const specOf=r=>{const T=TREES[r.cls];return T&&r.spec?T.specs[r.spec]:null};
 function treeOpts(r,k){const T=TREES[r.cls];if(!T)return[];if(k<=2)return T.trunk[k]||[];if(k===3)return Object.values(T.specs).map(s=>s.sig);const s=specOf(r);return s&&s[k]||[]}
 function pendingRank(r){const k=r.picks.length+1;return k<=r.rank&&treeOpts(r,k).length?k:0}
@@ -30,7 +30,7 @@ function pendingRank(r){const k=r.picks.length+1;return k<=r.rank&&treeOpts(r,k)
 function fixTree(r){const T=TREES[r.cls];if(!T)return;r.picks=r.picks.slice(0,7);r.spec=null;
  for(let i=0;i<r.picks.length;i++){const k=i+1,o=treeOpts(r,k);if(k<=2){if(!o.includes(r.picks[i]))r.picks[i]=o[0];continue}
   if(!o.includes(r.picks[i])){r.picks.length=i;break}if(k===3)r.spec=Object.keys(T.specs).find(n=>T.specs[n].sig===r.picks[i])}
- r.borrow=(r.borrow||[]).filter(k=>xtrainPool(r,1).includes(k)).slice(0,xtrainSlots(r))}
+ r.borrow=(r.borrow||[]).filter(k=>xtrainPool(r,1).includes(k)).slice(0,xtrainSlots(r));if(typeof fixExtra==='function')fixExtra(r)}
 // A pick button's label: rank 3 shows the spec name with its signature skill.
 function pickCard(r,p,k){const a=pickInfo(k);if(p!==3)return{name:a.name,ic:a.ic,desc:a.desc||a.tip||''};
  const s=Object.values(TREES[r.cls].specs).find(s=>s.sig===k);const T=SPEC_TRAITS[Object.keys(TREES[r.cls].specs).find(n=>TREES[r.cls].specs[n]===s)];
@@ -99,7 +99,7 @@ function bondsOf(r){const o=[];for(const [k,v] of Object.entries(C.bonds||{})){c
  const p=unit(a===r.id?b:a);if(p&&p.status!=='dead')o.push({rid:p.id,n:p.n,lvl:v.lvl,n3:v.n})}return o.sort((x,y)=>y.lvl-x.lvl)}
 const bondTier=l=>l>=BOND.griefAt?3:l>=BOND.reactAt?2:l>=BOND.aimAt?1:0;
 // One level up (Trials, pairing). Points: bondPts in legacy.js. keep = keep leftover points.
-function bondUp(a,b,why,out,keep){if(!a||!b||a===b)return;const k=bkey(a,b),v=C.bonds[k]=C.bonds[k]||{lvl:0,n:0};if(v.lvl>=BOND.max)return;v.lvl++;if(!keep)v.n=0;if(typeof bondOffer==='function')bondOffer(v);
+function bondUp(a,b,why,out,keep){if(!a||!b||a===b)return;const k=bkey(a,b),v=C.bonds[k]=C.bonds[k]||{lvl:0,n:0};if(v.lvl>=BOND.max)return;v.lvl++;if(!keep)v.n=0;if(typeof bondOffer==='function')bondOffer(v,a,b);
  if(out)out.bonds.push(`${unit(a).n} & ${unit(b).n}: bond level ${v.lvl} (${why})`)}
 
 // --- personal quests: one per unit, offered at rank 2+, shown with the month's crises ---

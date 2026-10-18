@@ -5,9 +5,9 @@ const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'h
 let fail=0;const check=(ok,m)=>{if(!ok){fail++;console.log('FAIL',m)}};
 setTimeout(()=>{try{
  const bad=w.eval(`(()=>{const o=[];for(const [c,T] of Object.entries(TREES)){if(!CLASS[c])o.push('class '+c);const all=[];
-  for(const k of [1,2]){if(T.trunk[k].length!==2)o.push(c+' trunk '+k);all.push(...T.trunk[k])}
+  for(const k of [1,2]){if(T.trunk[k].length!==3)o.push(c+' trunk '+k);all.push(...T.trunk[k])}
   const S=Object.values(T.specs);if(S.length!==2)o.push(c+' spec count');if(S[0].sig===S[1].sig)o.push(c+' same sig');
-  for(const s of S){if(!s.n||!s.desc)o.push(c+' spec text');const ids=[s.sig];for(const k of [4,5,6,7]){if(!s[k]||s[k].length!==2||s[k][0]===s[k][1])o.push(c+' '+s.n+' r'+k);ids.push(...s[k])}
+  for(const s of S){if(!s.n||!s.desc)o.push(c+' spec text');const ids=[s.sig];for(const k of [4,5,6,7]){if(!s[k]||s[k].length!==3||new Set(s[k]).size!==3)o.push(c+' '+s.n+' r'+k);ids.push(...s[k])}
    for(const k of ids)if(all.includes(k)||ids.indexOf(k)!==ids.lastIndexOf(k))o.push(c+' '+s.n+' dup '+k)}
   for(const s of S)for(const k of [s.sig,...[4,5,6,7].flatMap(r=>s[r]),...all]){const a=PERKS[k]||AB[k];if(!a)o.push('missing '+k);else if(!(a.desc||a.tip))o.push('no desc '+k)}}
   return o})()`);
@@ -34,7 +34,7 @@ setTimeout(()=>{try{
   click('.tn.open');out.wait=r.picks.length;out.conf=!!m.querySelector('[data-act^="tconf"]');click('[data-act^="tconf"]');out.spec=r.spec;
   out.closed=m.querySelectorAll('.tt-spec.off').length;out.chips=m.querySelectorAll('.chip').length;out.taken=m.querySelectorAll('.tn.taken').length;
   click('[data-act="tclose"]');return out})()`);
- check(ts.open===2&&ts.r1===1&&ts.r2===2&&ts.wait===2&&ts.conf&&ts.spec&&ts.closed===1&&ts.taken===3&&ts.chips>10,'tree screen flow: '+JSON.stringify(ts));
+ check(ts.open===3&&ts.r1===1&&ts.r2===2&&ts.wait===2&&ts.conf&&ts.spec&&ts.closed===1&&ts.taken===3&&ts.chips>10,'tree screen flow: '+JSON.stringify(ts));
  // Balance band: every rank-7 build's Power within ±8% of the median.
  const band=w.eval(`(()=>{C.era=3;const v=[];for(const [cls,T] of Object.entries(TREES))for(const [sid,s] of Object.entries(T.specs))for(const o of [0,1]){
   const r={id:'bb'+cls+sid+o,n:'x',cls,rank:7,xp:800,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0};C.roster.push(r);ensureTemple();

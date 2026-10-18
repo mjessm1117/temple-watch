@@ -8,3 +8,11 @@
 details.ret{margin-top:8px}
 details.ret summary{cursor:pointer;color:var(--dim)}
 .legsup{margin:10px 0;padding:8px 10px;border:1px dashed var(--holo);border-radius:6px}
+/* Skill tree: 3 options per rank, skill points, bonds panel (Chat Q) */
+.tt-row,.tt-trunk .tt-row{grid-template-columns:48px repeat(3,1fr)}
+.tn.buy{border-color:var(--dark);border-style:dashed;cursor:pointer;opacity:1}.tn.buy b{text-decoration:none}.tn.buy:hover{background:var(--raise)}
+.tk.buy{background:var(--dark)}
+.chip.fx{border-color:color-mix(in srgb,var(--holo) 50%,transparent)}.chip.chain{border-color:var(--warn);color:var(--warn)}
+.tt-sp{margin:6px 0;padding:6px 10px;border:1px solid var(--dark);border-radius:6px}
+.tt-bonds{margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:8px}
+@media (max-width:760px){.tt-row,.tt-trunk .tt-row{grid-template-columns:40px 1fr}}

@@ -23,7 +23,8 @@ function bondPts(a,b,pts,why,out){if(!a||!b||a===b||!pts||!unit(a)||!unit(b))ret
 // A level-up owes one drill pick; the offer (3 random drills) waits in the Roster until picked. Level 8 gives Unbreakable instead.
 function rollDrills(v){const pool=Object.keys(DRILLS).filter(d=>DRILLS[d].min<=v.lvl&&(DRILLS[d].pts||!v.dr.includes(d))),o=[];
  while(pool.length&&o.length<3)o.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);return o}
-function bondOffer(v){v.dr=v.dr||[];if(v.lvl>=BOND.max)return;v.owed=(v.owed||0)+1;if(!v.offer)v.offer=rollDrills(v)}
+function bondOffer(v,a,b){v.dr=v.dr||[];if(typeof SKILL!=='undefined'&&SKILL.bond.includes(v.lvl))for(const id of [a,b]){const r=id&&unit(id);if(r){r.sp=(r.sp||0)+1;C.news&&C.news.push(`${r.n}: bond ${v.lvl} with ${unit(id===a?b:a).n} → +1 skill point.`)}}
+ if(v.lvl>=BOND.max)return;v.owed=(v.owed||0)+1;if(!v.offer)v.offer=rollDrills(v)}
 function pickDrill(k,d){const v=C.bonds[k];if(!v||!v.offer||!v.offer.includes(d))return;const D=DRILLS[d],[a,b]=k.split('|');
  v.owed=Math.max(0,(v.owed||1)-1);v.offer=null;if(D.mod)v.dr.push(d);
  if(D.pts&&v.lvl<BOND.max)bondPts(a,b,Math.ceil(bondNeed(v.lvl)*D.pts),'worked it out');
