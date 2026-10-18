@@ -1,10 +1,10 @@
 /* Campaign data: classes, ranks, ability trees, wings, economy, the mission plan. Spec: docs/specs/campaign.md §5, combat.md §2 */
 // Rank-1 stats per class. Rank gains above 1 come from RANK_GAIN (cumulative). Sentinel/Wayseeker paths: spec A §2.2.
 const CLASS={
- Guardian:{jedi:1,hp:6,aim:75,mob:5,dmg:[4,6],range:1.5,deflect:35,dodge:10,guardDef:70,maxF:4,init:14,will:70,desc:'Front-line Jedi. Tough, protects allies, best at holding ground.'},
- Consular:{jedi:1,hp:5,aim:75,mob:5,dmg:[3,4],range:1.5,deflect:25,dodge:10,guardDef:50,maxF:4,init:12,will:75,desc:'Force support. Heals, shields and controls the fight.'},
- Sentinel:{jedi:1,hp:5,aim:75,mob:6,dmg:[4,5],range:1.5,deflect:30,dodge:15,guardDef:60,maxF:4,crit:10,init:15,will:70,desc:'Skirmisher Jedi. Fast, precise, finishes wounded enemies.'},
- Wayseeker:{jedi:1,hp:5,aim:72,mob:6,dmg:[3,5],range:1.5,deflect:30,dodge:15,guardDef:55,maxF:5,init:13,will:75,lockEra:3,desc:'Wandering Jedi who reshape the battlefield. Unlocks in the High Republic era.'},
+ Guardian:{jedi:1,hp:6,aim:75,mob:5,dmg:[4,6],range:1.5,deflect:35,dodge:5,guardDef:70,maxF:4,init:14,will:70,desc:'Front-line Jedi. Tough, protects allies, best at holding ground.'},
+ Consular:{jedi:1,hp:5,aim:75,mob:5,dmg:[3,4],range:1.5,deflect:25,dodge:5,guardDef:50,maxF:4,init:12,will:75,desc:'Force support. Heals, shields and controls the fight.'},
+ Sentinel:{jedi:1,hp:5,aim:75,mob:6,dmg:[4,5],range:1.5,deflect:30,dodge:10,guardDef:60,maxF:4,crit:10,init:15,will:70,desc:'Skirmisher Jedi. Fast, precise, finishes wounded enemies.'},
+ Wayseeker:{jedi:1,hp:5,aim:72,mob:6,dmg:[3,5],range:1.5,deflect:30,dodge:10,guardDef:55,maxF:5,init:13,will:75,lockEra:3,desc:'Wandering Jedi who reshape the battlefield. Unlocks in the High Republic era.'},
  Soldier:{hp:8,armor:1,aim:70,mob:5,dmg:[3,6],range:8,init:10,will:55,desc:'Republic trooper. Reliable rifle, suppression and overwatch.'},
  Scout:{hp:6,aim:80,mob:6,dmg:[4,7],range:11,crit:15,init:15,will:50,desc:'Long-range marksman. Marks targets and lands critical hits.'},
  Medic:{hp:7,aim:65,mob:5,dmg:[2,4],range:6,kits:2,init:9,will:55,desc:'Field medic and tech. Revives the fallen and hacks consoles.'},

@@ -162,4 +162,4 @@ Object.assign(ICONS,{defender:'M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6zM12 7v10M9 
  for(const k of ['defender','shieldbearer'])if(!sp.querySelector('#i-'+k))sp.insertAdjacentHTML('beforeend',`<symbol id="i-${k}" viewBox="0 0 24 24"><path d="${ICONS[k]}"/></symbol>`)})();
 
 // ── Melee (power.js): a melee hit on a melee fighter may be answered. Force user vs Force user = blade lock (always answered). ──
-const MELEE={counter:30,lock:100,counterDmg:'low'};   // counter % for non-Force melee defenders; counter hits for the defender's low damage roll
+const MELEE={counter:20,lock:60,counterDmg:'low'};   // counter % for non-Force melee defenders; counter hits for the defender's low damage roll
