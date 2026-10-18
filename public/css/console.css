@@ -1,0 +1,103 @@
+/* Command console look (Chat N, wave 5). Loaded last. Same spec D color roles plus one new role:
+   --alert = warning / needs attention (battle twists, terrain hazards, waiting orders). Gold stays troops + dash moves.
+   Status lights: good = nominal · holo = active · alert = needs attention · sith = hostile · off = offline.
+   Remove this file (and js/console.js) to get the previous look back. */
+:root{--alert:#ff9a4a;--alertS:repeating-linear-gradient(135deg,color-mix(in srgb,var(--alert) 16%,transparent) 0 6px,transparent 6px 12px)}
+
+/* ---------- Status lights ---------- */
+.led{display:inline-block;width:8px;height:8px;border-radius:50%;flex:none;background:var(--good);box-shadow:0 0 6px var(--good);font-style:normal}
+.led.holo{background:var(--holo);box-shadow:0 0 6px var(--holo)}
+.led.alert{background:var(--alert);box-shadow:0 0 7px var(--alert);animation:ledBlink 2.4s ease-in-out infinite}
+.led.sith{background:var(--sith);box-shadow:0 0 7px var(--sith);animation:ledBlink 1.6s ease-in-out infinite}
+.led.dark{background:var(--dark);box-shadow:0 0 6px var(--dark)}
+.led.off{background:#2c4148;box-shadow:none}
+@keyframes ledBlink{50%{opacity:.35}}
+
+/* ---------- Warnings: twists + terrain get --alert with hazard stripes (shape, not colour alone) ---------- */
+.twchip:not(.sig):not(.side){color:var(--alert);border-color:color-mix(in srgb,var(--alert) 60%,transparent);background:var(--alertS)}
+.twcard:not(.sig):not(.side){border-color:color-mix(in srgb,var(--alert) 55%,var(--line));background:var(--alertS),color-mix(in srgb,var(--alert) 6%,var(--raise))}
+.twcard:not(.sig):not(.side) b{color:var(--alert)}
+.orow.tw span,.orow.haz span{color:var(--alert)}
+.bvcomm.ask{border-left-color:var(--alert);box-shadow:0 0 0 1px color-mix(in srgb,var(--alert) 40%,transparent)}
+
+/* ---------- Temple: console header ---------- */
+.cbrand{display:flex;align-items:center;gap:8px;font:600 13px var(--disp);letter-spacing:.2em;text-transform:uppercase;color:var(--holo);text-shadow:0 0 12px var(--glow,transparent);padding-right:6px}
+.resbar>span{display:inline-flex;align-items:center;gap:6px}
+.resbar>span[title]::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--holo);box-shadow:0 0 5px var(--holo)}
+.resbar>span[title="Senate Favor"]::before{background:var(--good);box-shadow:0 0 5px var(--good)}
+.resbar>span.dk::before{background:var(--dark);box-shadow:0 0 5px var(--dark)}
+.resbar>span.vis::before{background:var(--holo)}
+.cmeter{display:inline-block;width:46px;height:5px;border-radius:3px;background:var(--grid);overflow:hidden;font-style:normal}
+.cmeter>i{display:block;height:100%;background:var(--c);box-shadow:0 0 6px var(--c)}
+.resbar .cal::after{content:'';width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 6px var(--good);animation:ledBlink 2s steps(2,start) infinite}
+
+/* Desktop grid: header · alert bar · (rail | calendar · room) */
+@media(min-width:880px){
+ .box.base{grid-template-rows:auto auto auto 1fr}
+ .box.base>.resbar{grid-row:1}.box.base>.calerts{grid-row:2}
+ .box.base>.tmap{grid-row:3/5}.box.base>.calstrip{grid-row:3}.box.base>.troom{grid-row:4}}
+/* Alert bar */
+.calerts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
+.ca{display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:12.5px;border:1px solid var(--line);border-radius:3px;background:linear-gradient(180deg,#0f1c21,#0b1518);box-shadow:inset 3px 0 0 var(--good)}
+.ca.alert{border-color:color-mix(in srgb,var(--alert) 55%,var(--line));box-shadow:inset 3px 0 0 var(--alert);background:var(--alertS),#0c171a}
+.ca.sith{border-color:color-mix(in srgb,var(--sith) 50%,var(--line));box-shadow:inset 3px 0 0 var(--sith)}
+.ca.holo{box-shadow:inset 3px 0 0 var(--holo)}
+.ctag{font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:1px 6px;margin-right:6px;border:1px solid currentColor;border-radius:2px}
+.ctag.al{color:var(--alert)}.ctag.si{color:var(--sith)}.ctag.ho{color:var(--holo)}.ctag.gd{color:var(--good)}
+
+/* Room status lights */
+.room .led.rl{position:absolute;right:8px;bottom:9px;width:7px;height:7px}
+.room small{padding-right:12px}
+.room.off .led.rl{opacity:1}
+.room.st-good:not(.on) .ic{color:var(--good)}.room.st-alert .ic{color:var(--alert)}.room.st-sith .ic{color:var(--sith)}
+.room.st-alert:not(.on){box-shadow:inset 3px 0 0 var(--alert)}.room.st-sith:not(.on){box-shadow:inset 3px 0 0 var(--sith)}
+
+/* Galaxy feed under the floor plan */
+.cfeed{border:1px solid var(--line);border-radius:4px;background:var(--scan,none),linear-gradient(180deg,#0e1b20,#0a1417);padding:8px 10px;display:grid;gap:0;max-height:260px;overflow:auto}
+.cfeed h3{margin:0 0 4px;font:600 10.5px var(--mono);letter-spacing:.16em;text-transform:uppercase}
+.cfeed>div{display:grid;grid-template-columns:52px 1fr;gap:8px;padding:5px 0;border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent);font-size:12px;line-height:1.35}
+.cfeed time{font:500 10.5px var(--mono);color:var(--dim);padding-top:1px}
+.cfeed .si{color:color-mix(in srgb,var(--sith) 70%,var(--fg))}.cfeed .dk{color:color-mix(in srgb,var(--dark) 70%,var(--fg))}.cfeed .gd{color:color-mix(in srgb,var(--good) 60%,var(--fg))}
+
+/* HoloNet ticker: fixed along the bottom */
+.cticker{position:fixed;left:0;right:0;bottom:0;height:28px;z-index:20;overflow:hidden;background:#05090bf2;border-top:1px solid var(--hair,var(--line));font:500 11.5px var(--mono);color:var(--dim);display:flex;align-items:center}
+.ctrack{display:flex;gap:40px;padding-left:24px;white-space:nowrap;animation:tick 60s linear infinite}
+.ctrack b{color:var(--holo);font-weight:600;margin-right:6px;letter-spacing:.08em}
+@keyframes tick{to{transform:translateX(-50%)}}
+.box.base{padding-bottom:44px}
+
+/* Radar sweep across the galaxy map (no pointer events) */
+.gleft{position:relative;overflow:hidden}
+.gleft::after{content:'';position:absolute;left:50%;top:42%;width:160%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;pointer-events:none;
+ background:conic-gradient(from 0deg,color-mix(in srgb,var(--holo) 14%,transparent),transparent 38deg);animation:sweep 9s linear infinite;mix-blend-mode:screen}
+@keyframes sweep{to{rotate:1turn}}
+
+/* ---------- Battle HUD: same console language ---------- */
+.top .stats>span{display:inline-flex;align-items:center;gap:6px}
+.top .stats>span::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--holo);box-shadow:0 0 5px var(--holo);flex:none}
+.top .stats>span:has(#sObj)::before{background:var(--good);box-shadow:0 0 5px var(--good)}
+.top .stats>#sWaveW::before{background:var(--sith);box-shadow:0 0 5px var(--sith)}
+.top .stats>#sThrW::before{background:var(--alert);box-shadow:0 0 5px var(--alert)}
+.top .stats>span.dk::before{background:var(--dark);box-shadow:0 0 5px var(--dark)}
+.top .stats>.twchip::before{background:var(--alert);box-shadow:0 0 5px var(--alert);animation:ledBlink 2.4s ease-in-out infinite}
+.top .stats>.twchip.sig::before,.top .stats>.twchip.side::before{background:var(--holo);animation:none}
+.top .stats>.conc::before{background:var(--good)}
+@media(min-width:880px){
+ .top{box-shadow:0 1px 0 #000,0 6px 18px #0008}
+ .side>#objP{box-shadow:inset 3px 0 0 var(--holo),0 8px 24px #0007}
+ .side>#podP{box-shadow:inset 3px 0 0 var(--sith),0 8px 24px #0007}
+ .side>.panel:has(#log){box-shadow:inset 3px 0 0 var(--line),0 8px 24px #0007}
+ .roster button{position:relative;padding-right:22px}
+ .roster button::after{content:'';position:absolute;right:9px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:var(--good);box-shadow:0 0 5px var(--good)}
+ .roster button.done::after{background:#2c4148;box-shadow:none}
+ .roster button.on::after{background:var(--holo);box-shadow:0 0 6px var(--holo)}
+ #endBtn{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--holo) 25%,transparent),0 0 18px color-mix(in srgb,var(--holo) 14%,transparent)}
+}
+
+/* ---------- Reduced motion: lights hold steady, ticker and sweep stop ---------- */
+@media(prefers-reduced-motion:reduce){
+ .led.alert,.led.sith,.resbar .cal::after,.top .stats>.twchip::before{animation:none}
+ .ctrack{animation:none}
+ .gleft::after{display:none}}
+html.rm .led,html.rm .ctrack,html.rm .resbar .cal::after,html.rm .top .stats>span::before{animation:none!important}
+html.rm .gleft::after{display:none}

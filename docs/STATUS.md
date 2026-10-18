@@ -199,3 +199,11 @@ Files: `data-battle.js` (TWISTS, GUESTS, BV_TILES, BEATS, SIG, SIDES: tune here)
 - AI scores hurt/slide tiles down; Force pushes into hazards count. UI: terrain chip on the galaxy panel, terrain card on the briefing, Terrain row in Objectives, 2D tile looks. Test: `tests/variety.test.js` (800 placements + mechanics).
 ## Requests (round 2, from H)
 - H → F (3D): hazard tiles i o l n u m w j have no 3D look yet (they draw as plain floor; V chasm too). Ideas: ice = pale glossy floor, oil = dark sheen, lava = glowing orange + embers, conduit = cable with blue arcs on even turns (`S.turn%2===0`), toxic = green pool, mud = brown matte, water = blue plane lowered, thorns = small spiky props.
+
+## Command console (Chat N, wave 5, 2026-10-17)
+Jess picked direction A "Bridge" + subtle motion. Look only: `css/console.css` (loaded last) + `js/console.js` (after hazards.js; wraps `baseScreen`, reads state, writes nothing). Delete both to get the old look.
+- **New color role `--alert` #ff9a4a** = warning / needs attention: battle twists, terrain hazards, waiting orders, low credits. Always with hazard stripes or a blinking light (not color alone). Gold stays troops + dash moves.
+- **Status lights:** good = nominal · holo = active · alert = needs attention · sith = hostile · off = offline. On header readouts, Temple rooms (icon tinted too), battle top strip and roster.
+- **Temple:** console header with meters (Favor, Darkness, Vision), alert bar (twists, Sith ops, rank-ups, wounded, builds, low credits), galaxy feed under the floor plan (this session's `C.news`, newest first, not saved), HoloNet ticker along the bottom, radar sweep on the galaxy map.
+- **Reduced motion** (OS or Settings → `html.rm`): lights steady, ticker and sweep stop.
+- Requests: N → I: radar sweep is `.gleft::after` in console.css; move it to galaxy.css if you prefer. N → anyone writing `C.news`: start Sith news with "Sith"/"Imperial" and Darkness news with "Dark" so the feed tints them.
