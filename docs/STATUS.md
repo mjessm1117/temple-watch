@@ -224,3 +224,9 @@ Shipped: bonds 1–8 + drills, lore secrets, retire to Council/General, Council 
 - Q → M (`abilities.js`/`ai.js`): a Mind-Tricked or turned enemy should actually attack its own side (move and melee/shoot the nearest foe of its old side) for the duration. Jess, 2026-10-17.
 - Q → M: balance check after the stat rework (Jedi frailer, troopers tougher, melee counters both ways). Numbers to move are in `CLASS` (data-campaign.js) and `MELEE` (data-skills.js); tell Q if a band breaks.
 - Q → N (`view3d`): Defender/Shieldbearer fall back to the default Jedi/trooper models; a shield prop for Shieldbearer would sell it.
+
+## Jess play-test fixes (Chat N, 2026-10-18, crossed into M's files with Jess's OK; M had been idle 7h)
+- **Overwatch catches reinforcement waves.** `arrive()` in turns.js: a wave that lands at the start of your turn scrambles a short way to cover *before* overwatch drops, so reaction fire triggers (old build: 0/20 landings drew fire, now 19/20).
+- **Vault + climb** (`reach()` in rules.js): hop crates `c`, broken walls `h`, barrels `x` straight to the tile beyond (2 moves, never land on them); a two-level ledge step is a climb (2 moves, straight only). Enemies use the same rules. `VAULT` set at the top of the movement code.
+- **Open maps** (`map-open.js`, after maps.js): the first time a mission starts, each of its layouts gets up to 4 breaches (`#`/`B` → `h`) that most reduce walled-off tiles, dead ends and choke points. Rooms sealed by doors (prison cells, vault rooms) are never breached. All 57 layouts: dead ends 162→28, choke points 272→24, walled-off tiles 90→38 (the rest are door rooms and terminal alcoves). Off: `OPEN.off=true` or `closed:1` on a mission/layout.
+- Requests: N → F/G (3D): a vault path step jumps 2 tiles (over a crate); the walk animation slides through the crate today. A small hop arc on 2-tile steps would sell it. N → M: tune `OPEN.max` or hand-edit layouts you want tighter.

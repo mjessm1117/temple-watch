@@ -5,6 +5,10 @@ function mk(base,side,extra={}){const u={...base,...extra,side,status:'ok',ap:2,
  u.max=u.hp;u.focus=u.maxF?(u.wildBond?u.maxF:2):0;u.dmg=[...u.dmg];if(side==='p'&&!u.vip)u.will=willOf(u);return u}
 function mkFoe(t,x,y){const f=FOES[t],d=S.d;S.eCount[t]=(S.eCount[t]||0)+1;
  const cm=S.cm||{},tu=S.tune||{};return mk({...f,hp:Math.max(1,f.hp+(f.horror?0:d.enemyHp+(cm.enemyHp||0)+(tu.hp||0))),aim:f.aim+d.enemyAim+(cm.enemyAim||0)+(tu.aim||0)},'e',{type:t,n:f.envoy||f.boss||f.bane?f.n:`${f.n} ${S.eCount[t]}`,x,y})}
+// A landing wave scrambles a short way to cover before your overwatch drops, so overwatch can fire on it (XCOM reinforcements).
+function arrive(list){for(const e of list){if(S.over||e.side!=='e'||e.hid||e.status!=='ok')continue;
+ const R=reach({...e,mob:Math.ceil(e.mob/2)+1});let best=null,bs=-1e9;for(const k of Object.keys(R.d)){const [x,y]=k.split(',').map(Number),sc=scamperScore(e,{x,y});if(sc>bs){bs=sc;best={x,y}}}
+ if(best&&(best.x!==e.x||best.y!==e.y))moveAlong(e,pathTo(e,best.x,best.y,R.prev))}}
 function spawn(list){list=[...list];for(let i=0;i<S.d.extra;i++)list.push('trooper');
  const spots=tilesWhere((c,x,y)=>y<2&&PASS(c)&&c!=='E'&&!unitAt(x,y)).sort(()=>Math.random()-.5);
  const got=[];list.forEach((t,i)=>{const p=spots[i];if(p){const e=mkFoe(t,p.x,p.y);S.units.push(e);got.push(e);horrorSeen(e)}});formPods(got);
@@ -48,7 +52,7 @@ function after(){S.mode='move';S.tg=[];S.pick=null;checkEnd();if(!canAct(S.sel))
 
 function startPlayerTurn(){const M=S.M;
  S.phase='player';
- if(M.waves&&S.turn>1&&M.waves[S.turn])spawn(M.waves[S.turn]);
+ if(M.waves&&S.turn>1&&M.waves[S.turn]){const had=new Set(S.units);spawn(M.waves[S.turn]);arrive(S.units.filter(e=>!had.has(e)))}
  if(M.par&&S.turn>M.par){S.threat++;threatStep();if(S.over)return}
  if(S.beacon&&S.turn>=S.beacon.turn){S.beacon=null;log('The beacon\'s call is answered.','bad');dropship(M.reinforce||['trooper','trooper'],0)}
  landDrops();expireLoot();

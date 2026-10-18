@@ -57,13 +57,18 @@ function odds(a,t,{melee=false,mod=0,noCover=false}={}){const L=[['Aim',a.aim]];
  const raw=L.reduce((s,l)=>s+l[1],0);return{lines:L,total:Math.max(5,Math.min(95,Math.round(raw)))}}
 const hitChance=(a,t,o)=>odds(a,t,o).total;
 
-// Moves: 8 directions; a step may climb or drop one level of elev, never two (use the ramps).
+// Movement. Steps cost 1. Vault (2): hop a crate, broken wall or barrel to the tile beyond, straight only, never landing on it.
+// Climb (2): a two-level step up or down a ledge, straight only. Nobody gets stuck behind low cover.
+const VAULT=new Set(['c','h','x']);
 function reach(u){const d={},prev={},q=[[u.x,u.y]],mob=u.rooted?0:u.mob;d[u.x+','+u.y]=0;
+ const go=(nx,ny,x,y,nc)=>{const k=nx+','+ny;if(nc>mob||(d[k]!=null&&d[k]<=nc))return;d[k]=nc;prev[k]=x+','+y;q.push([nx,ny])};
  while(q.length){const [x,y]=q.shift(),cd=d[x+','+y];if(cd>=mob)continue;
-  for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){if(!dx&&!dy)continue;const nx=x+dx,ny=y+dy,k=nx+','+ny;
-   if(!inb(nx,ny)||!PASS(tile(nx,ny))||unitAt(nx,ny)||d[k]!=null)continue;
-   if(dx&&dy&&(!PASS(tile(x+dx,y))||!PASS(tile(x,y+dy))))continue;if(Math.abs(elevAt(nx,ny)-elevAt(x,y))>1)continue;
-   d[k]=cd+1;prev[k]=x+','+y;q.push([nx,ny])}}
+  for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){if(!dx&&!dy)continue;const nx=x+dx,ny=y+dy;
+   if(!inb(nx,ny))continue;const c=tile(nx,ny);
+   if(VAULT.has(c)&&!(dx&&dy)){const lx=nx+dx,ly=ny+dy;if(inb(lx,ly)&&PASS(tile(lx,ly))&&!unitAt(lx,ly)&&!unitAt(nx,ny)&&Math.abs(elevAt(lx,ly)-elevAt(x,y))<=1)go(lx,ly,x,y,cd+2);continue}
+   if(!PASS(c)||unitAt(nx,ny))continue;
+   if(dx&&dy&&(!PASS(tile(x+dx,y))||!PASS(tile(x,y+dy))))continue;const de=Math.abs(elevAt(nx,ny)-elevAt(x,y));if(de>2||(de===2&&dx&&dy))continue;
+   go(nx,ny,x,y,cd+(de===2?2:1))}}
  return{d,prev}}
 function pathTo(u,x,y,prev){const p=[];let k=x+','+y;const s=u.x+','+u.y;while(k&&k!==s){const [a,b]=k.split(',').map(Number);p.unshift({x:a,y:b});k=prev[k]}return p}
 function moveAlong(u,path){for(const s of path){u.x=s.x;u.y=s.y;if(u.side==='p'){reveal();lootAt(u);if(watchCheck(u))break}reactions(u);if(u.status!=='ok')break}}
