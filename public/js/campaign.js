@@ -1,6 +1,7 @@
 /* Campaign state C: calendar, resources, wings, roster, XP/ranks, wounds, crises. Spec: docs/specs/campaign.md */
 let C=null;
 const isJedi=r=>!!CLASS[r.cls].jedi;
+const troopClasses=()=>Object.keys(CLASS).filter(k=>!CLASS[k].jedi&&(CLASS[k].lockEra||0)<=((C&&C.era)||1));
 function newCampaign(diff){
  C={v:2,treeV:1,diff,month:1,day:1,step:0,res:{...START_RES},orderDark:0,wings:{medical:1,training:0,forge:0,armory:0,comms:0,archives:0,gardens:0,barracks:1},build:null,
   roster:START_ROSTER.map((r,i)=>({id:'u'+(i+1),rank:START_RANK,xp:RANKS[START_RANK-1].xp,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0,gear:startGear(r.cls),...r})),nid:START_ROSTER.length+1,
@@ -76,7 +77,7 @@ function monthTick(){const f=C.res.favor,st=Math.round((STIPEND[0]+STIPEND[1]*f)
  C.res.credits+=st-up-pay;if(C.res.credits<0){C.res.credits=0;gain('favor',-5);C.news.push('The Temple ran out of credits. The Senate covered the debt: Senate Favor −5.')}C.res.recruits+=rec;C.news.push(`Month ${C.month}: Senate stipend +${st}, upkeep −${up}, troop pay −${pay}, recruits +${rec}. New recruit candidates are in.`);templeMonth()}
 function buildWing(k){const l=C.wings[k],cost=WINGS[k].cost[l+1];if(C.build||cost==null||C.res.credits<cost||!researched(WINGS[k].req&&WINGS[k].req[l+1]))return;C.res.credits-=cost;C.build=k;saveGame()}
 function addTroop(){const used=new Set(C.roster.map(r=>r.n)),n=RECRUIT_NAMES.find(x=>!used.has(x))||'Recruit '+C.nid;
- C.roster.push({id:'u'+C.nid++,n,cls:pickOne(['Soldier','Scout','Medic','Heavy']),rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0})}
+ C.roster.push({id:'u'+C.nid++,n,cls:pickOne(troopClasses()),rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0})}
 function pickAbility(id,k){const r=C.roster.find(r=>r.id===id),p=r&&pendingRank(r);if(!p||!treeOpts(r,p).includes(k))return;r.picks.push(k);if(p===3)r.spec=Object.keys(TREES[r.cls].specs).find(n=>TREES[r.cls].specs[n].sig===k);r.pick=pendingRank(r);saveGame()}
 function launchMission(i,ids){ensureTemple();const o=C.options[i],sq=ids.map(id=>battleUnit(C.roster.find(r=>r.id===id)));chooseOption(i);
  startMission(o.mission,sq,{diff:C.diff,hostage:hostageFor(o),crisis:o.crisis||null,fewer:o.fewer||0})}

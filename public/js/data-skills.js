@@ -132,3 +132,34 @@ const BOND_TECH={
  backToBack:{n:'Back to Back',desc:'Enemies get −15 aim against you while your partner is next to you.'},
  angel:{n:'Guardian Angel',desc:'Once per mission, with your partner within 4 tiles, a killing blow leaves you at 1 HP.'},
  rhythm:{n:'Battle Rhythm',desc:'When your partner kills, you heal 1, gain 1 Focus, and your next kill this turn refunds an action.'}};
+
+// ── Tank classes (wave 5, Jess): trees + their own perks. shelter = enemies −N aim against allies next to you. ──
+Object.assign(PERKS,{
+ tkGuardPost:{name:'Guard Post',ic:'guard',desc:'Enemies get −10 aim against allies next to you.',fx:{shelter:10}},
+ tkFortress:{name:'Fortress',ic:'hunker',desc:'+1 armor and +2 HP.',mod:{armor:1,hp:2}},
+ tkColossus:{name:'Colossus',ic:'guard',desc:'Survive one killing blow at 1 HP; regain 2 HP each turn; allies next to you take 1 less damage.',fx:{lastStand:1,regen:2,ward:1}},
+ tkParry:{name:'Parry',ic:'strike',desc:'+15 deflect. Enemies that hit you in melee take 1 damage.',mod:{deflect:15},fx:{riposte:1}},
+ tkRedirect:{name:'Redirect',ic:'guard',desc:'+10 deflect. Enemies get −10 aim against you.',mod:{deflect:10},fx:{dodge:10}},
+ tkWall:{name:'Wall of Light',ic:'guard',desc:'+20 deflect.',mod:{deflect:20}},
+ tkSoresu:{name:'Soresu Master',ic:'guard',desc:'+20 deflect, enemies −15 aim against you, melee attackers take 2.',mod:{deflect:20},fx:{dodge:15,riposte:2}},
+ tkShieldWall:{name:'Shield Wall',ic:'guard',desc:'Enemies get −15 aim against allies next to you.',fx:{shelter:15}},
+ tkBastion:{name:'Living Bastion',ic:'hunker',desc:'+2 armor. Allies next to you take 1 less damage.',mod:{armor:2},fx:{ward:1}}});
+TREES.Defender={trunk:{1:['defLine','saberThrow','gChallenge'],2:['leap','gStalwart','tkGuardPost']},specs:{
+ bastion:{n:'Bastion',ic:'sp_protector',desc:'Unmovable. Soaks fire and shelters allies.',sig:'barrier',4:['gIron','gpBastion','tkFortress'],5:['collapse','gAegis','gpBeacon'],6:['forceWave','gpUndying','tkShieldWall'],7:['gUnbreakable','gpLiving','tkColossus']},
+ soresu:{n:'Soresu',ic:'sp_weaponMaster',desc:'Perfect defense. Deflects, dodges, counters.',sig:'reflectM',4:['tkParry','gBulwark','chFade'],5:['gwCounter','sbBlur','tkRedirect'],6:['precisionStrike','tkWall','gLastStand'],7:['tkSoresu','sUntouchable','gwRampage']}}};
+TREES.Shieldbearer={trunk:{1:['hunker','suppress','hCoverMe'],2:['flakVest','mHardy','tkGuardPost']},specs:{
+ phalanx:{n:'Phalanx',ic:'sp_bulwark',desc:'Shield line. Everyone behind you lives.',sig:'holdLine',4:['juggernaut','hbWall','tkShieldWall'],5:['hBulwark','hbIron','rally'],6:['smoke','hTitan','tkFortress'],7:['hbAnchor','soSgtHero','tkBastion']},
+ breacher:{n:'Breacher',ic:'sp_vanguard',desc:'Shield-first assault. Kicks the door and keeps going.',sig:'chainShot',4:['soVanPlate','svBrawl','soBreach'],5:['svFury','veteran','hBrute'],6:['runGun','soVanCharge','svRush'],7:['soLegend','svRampage','hWarlord']}}};
+Object.assign(SPEC_TRAITS,{
+ bastion:{n:'Immovable',desc:'+1 armor and +10 will.',mod:{armor:1,will:10}},
+ soresu:{n:'Form III',desc:'+15 deflect; enemies get −10 aim against you.',mod:{deflect:15},fx:{dodge:10}},
+ phalanx:{n:'Shield Line',desc:'+1 armor; allies next to you take 1 less damage.',mod:{armor:1},fx:{ward:1}},
+ breacher:{n:'Breach and Clear',desc:'+15 aim and +1 damage within 4 tiles.',fx:{closeAim:15,closeDmg:1}}});
+FX_N.shelter='Shelter allies';
+// Class icons (icons.js injected its symbols already, so add these to the same sprite). Shapes: shield+saber, riot shield.
+Object.assign(ICONS,{defender:'M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6zM12 7v10M9 12h6',shieldbearer:'M5 3h14v10c0 4-3 7-7 8-4-1-7-4-7-8zM9 8h6M9 12h6'});
+(function(){const sp=document.querySelector('svg symbol')&&document.querySelector('svg symbol').parentNode;if(!sp)return;
+ for(const k of ['defender','shieldbearer'])if(!sp.querySelector('#i-'+k))sp.insertAdjacentHTML('beforeend',`<symbol id="i-${k}" viewBox="0 0 24 24"><path d="${ICONS[k]}"/></symbol>`)})();
+
+// ── Melee (power.js): a melee hit on a melee fighter may be answered. Force user vs Force user = blade lock (always answered). ──
+const MELEE={counter:30,lock:100,counterDmg:'low'};   // counter % for non-Force melee defenders; counter hits for the defender's low damage roll

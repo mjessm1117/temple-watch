@@ -216,3 +216,11 @@ Spec: `docs/specs/maps.md`. Owns `data-maps.js`, `maps.js`, `css/maps.css`, `tes
 - M → G: the map-mark planes are flat colored tiles; a soft edge/glow would read better. Entry markers could get a red beacon prop.
 - M → L/R: Era 2 versions of the new maps via `ruusanOf` (flip + Ruusan roster) once balanced.
 - M → K: bot could use the corner-peek rule (step to a wall end before shooting).
+## Chat Q — Squad & Legacy, 2026-10-17
+Shipped: bonds 1–8 + drills, lore secrets, retire to Council/General, Council masters in battle (`legacy.js`); skill points, 3 choices per rank, chain-kill skills, ranks 8–10, bonds panel + pair techniques in the skill tree (`skills.js`, `data-skills.js`, fx engine in `power.js`); tank classes Defender (Jedi) + Shieldbearer (trooper); stat rework (troopers +HP/+armor/+dmg, Jedi −HP, +deflect, dodge); melee counters + Jedi-vs-Sith blade lock (`power.js`, `MELEE` in data-skills.js).
+
+## Requests (wave 5, from Q)
+- Q → M (`ai.js`): melee enemies (acolytes, marauders, beasts, horrors) should charge into melee more aggressively instead of holding cover. Jess, 2026-10-17.
+- Q → M (`abilities.js`/`ai.js`): a Mind-Tricked or turned enemy should actually attack its own side (move and melee/shoot the nearest foe of its old side) for the duration. Jess, 2026-10-17.
+- Q → M: balance check after the stat rework (Jedi frailer, troopers tougher, melee counters both ways). Numbers to move are in `CLASS` (data-campaign.js) and `MELEE` (data-skills.js); tell Q if a band breaks.
+- Q → N (`view3d`): Defender/Shieldbearer fall back to the default Jedi/trooper models; a shield prop for Shieldbearer would sell it.

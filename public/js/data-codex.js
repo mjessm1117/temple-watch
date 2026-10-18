@@ -262,6 +262,8 @@ const CODEX={
   Scout:{lore:'The scout goes ahead and returns with what the squad needs to know. Quiet, quick, and rarely thanked.'}, // [N]
   Medic:{lore:'The medic runs toward the wounded when everyone else runs away. A kit, a steady voice, and a lot of nerve.'}, // [N]
   Heavy:{lore:'The heavy carries what the others cannot. A big weapon, a big pack, and a stubbornness to match.'}, // [N]
+  Defender:{lore:'Soresu masters who never strike first. They stand in the fire so others can walk out of it.'}, // [L M] Soresu is the defensive lightsaber form; the class is ours [N]
+  Shieldbearer:{lore:'Troopers in heavy plate behind a riot shield. Slow, loud, and the last thing a raider wants to charge.'}, // [N]
   VIP:{lore:'Someone whose survival matters more than their own preferences. They did not choose the role, and many of them handle it with grace.'} // [N]
  },
  planet:{

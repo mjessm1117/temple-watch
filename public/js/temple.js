@@ -81,7 +81,7 @@ const assignName=r=>!r.assign?'':r.assign==='train'?'Training':r.assign==='rest'
 const rosterCap=()=>WINGS.barracks.cap[C.wings.barracks]||10;
 const rosterCount=()=>C.roster.filter(r=>r.status==='active'||r.status==='captured').length;
 function genCands(){const out=[],keys=Object.keys(TRAITS);
- for(let i=0;i<3;i++){const jedi=i===0&&(C.month%2===1),cls=jedi?pickOne(Object.keys(CLASS).filter(k=>CLASS[k].jedi&&(CLASS[k].lockEra||0)<=(C.era||1))):pickOne(['Soldier','Scout','Medic','Heavy']);
+ for(let i=0;i<3;i++){const jedi=i===0&&(C.month%2===1),cls=jedi?pickOne(Object.keys(CLASS).filter(k=>CLASS[k].jedi&&(CLASS[k].lockEra||0)<=(C.era||1))):pickOne(troopClasses());
   out.push({cls,jedi:jedi?1:0,trait:pickOne(keys),origin:pickOne(ORIGINS[jedi?'jedi':'troop']),species:pickOne(SPECIES),age:ri2(jedi?AGES.Padawan:AGES.troop)})}
  return out}
 const candCost=c=>c.jedi?{credits:0,recruits:0}:{credits:HIRE_COST,recruits:1};

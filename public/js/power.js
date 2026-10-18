@@ -13,7 +13,8 @@ function skillPower(r,k){const L=learnedAt(r)[k];if(!L)return 0;const s=specOf(r
 function treeMods(u,r){u.pw={};for(const k of Object.keys(learnedAt(r)))u.pw[k]=skillPower(r,k);u.specT=r.spec||null;
  const T=r.spec&&SPEC_TRAITS[r.spec];if(T&&T.mod)addMod(u,T.mod);
  // Skill effects (data-skills.js): sum every learned perk's fx; aimVs merges into the engine's per-tag aim table.
- u.fx={};for(const k of Object.keys(learnedAt(r))){const P=PERKS[k];if(!P)continue;for(const [f,v] of Object.entries(P.fx||{}))u.fx[f]=(u.fx[f]||0)+v;
+ u.fx={};for(const [f,v] of Object.entries((T&&T.fx)||{}))u.fx[f]=(u.fx[f]||0)+v;
+ for(const k of Object.keys(learnedAt(r))){const P=PERKS[k];if(!P)continue;for(const [f,v] of Object.entries(P.fx||{}))u.fx[f]=(u.fx[f]||0)+v;
   if(P.aimVs){u.aimVs={...(u.aimVs||{})};for(const [g,v] of Object.entries(P.aimVs))u.aimVs[g]=(u.aimVs[g]||0)+v}}return u}
 // Weights (POWER_W, data-trees.js): range, medkits and grenades count, so troops aren't undersold next to Jedi Focus/deflect.
 function unitPower(r){const u=battleUnit(r),W=POWER_W,d=(u.dmg[0]+u.dmg[1])/2,pw=Object.values(u.pw||{}).reduce((s,v)=>s+v,0);
@@ -89,7 +90,8 @@ odds=(o=>function(a,t,op){const r=o(a,t,op);if(!a||!t)return r;const L=r.lines,a
   if(eliteT(t))add('Big target',fxv(a,'eliteAim'));if(fxv(a,'adjAim')&&S.units.some(p=>p!==a&&p.side==='p'&&p.status==='ok'&&cheb(p,a)<=1))add('Pack',fxv(a,'adjAim'));
   const au=S.units.filter(p=>p.side==='p'&&p.status==='ok'&&fxv(p,'auraAim')&&cheb(p,a)<=3).reduce((m,p)=>Math.max(m,fxv(p,'auraAim')),0);add('Inspired',au);
   if(pairsT(a,'crossfire').some(p=>cheb(p,t)<=4))add('Crossfire',15)}
- if(a.side==='e'&&t.side==='p'){add('Dodge',-fxv(t,'dodge'));if(pairsT(t,'backToBack').some(p=>cheb(p,t)<=1))add('Back to back',-15)}
+ if(a.side==='e'&&t.side==='p'){add('Dodge',-(fxv(t,'dodge')+(t.dodge||0)));
+  add('Sheltered',-S.units.filter(p=>p!==t&&p.side==='p'&&p.status==='ok'&&fxv(p,'shelter')&&cheb(p,t)<=1).reduce((m,p)=>Math.max(m,fxv(p,'shelter')),0));if(pairsT(t,'backToBack').some(p=>cheb(p,t)<=1))add('Back to back',-15)}
  return{lines:L,total:Math.max(5,Math.min(95,Math.round(L.reduce((s,l)=>s+l[1],0))))}})(odds);
 damage=(o=>function(t,d,src,...x){
  if(src&&src.side==='p'&&t.side==='e'&&d>0){const dd=dist(src,t);
@@ -104,7 +106,12 @@ damage=(o=>function(t,d,src,...x){
  const was=alive(t)&&t.status!=='dead'&&t.status!=='down';o(t,d,src,...x);
  // Riposte: a melee hit on someone with Counter costs the attacker.
  if(t.side==='p'&&src&&src.side==='e'&&alive(src)&&src.status!=='dead'&&cheb(src,t)<=1&&fxv(t,'riposte')&&t.status==='ok'){fx(t,'COUNTER');o(src,fxv(t,'riposte'),t)}
- if(was&&src&&src.side==='p'&&t.side==='e'&&(t.status==='dead'||t.status==='down'||!alive(t)))fxKill(src,t)})(damage);
+ if(was&&src&&src.side==='p'&&t.side==='e'&&(t.status==='dead'||t.status==='down'||!alive(t)))fxKill(src,t)
+ // Melee answer (MELEE, data-skills.js): both sides. A Force user hit in melee by a Force user always strikes back (blade lock);
+ // other melee fighters strike back MELEE.counter% of the time. Never during Force powers, never chains (S.inCtr).
+ if(!S.inCtr&&!S.forceAct&&src&&src.side!==t.side&&src.range<2&&t.range<2&&cheb(src,t)<=1&&t.status==='ok'&&alive(t)&&alive(src)&&src.status!=='dead'){
+  const force=u=>u.side==='p'?!!u.jedi:tagsOf(u).includes('force'),lock=force(src)&&force(t);
+  if(rnd(lock?MELEE.lock:MELEE.counter)){S.inCtr=1;try{fx(t,lock?'BLADE LOCK':'COUNTER','defl');log(`${t.n} ${lock?'locks blades with':'strikes back at'} ${src.n}.`);o(src,Math.max(1,t.dmg[0]),t)}finally{S.inCtr=0}}}})(damage);
 function fxKill(u,t){const melee=cheb(u,t)<=1,far=dist(u,t)>=SKILL.chainR;
  if(fxv(u,'killFocus')&&u.maxF)u.focus=Math.min(u.maxF,(u.focus||0)+fxv(u,'killFocus'));
  if(fxv(u,'killHeal')&&u.hp<u.max){const n=Math.min(fxv(u,'killHeal'),u.max-u.hp);u.hp+=n;fx(u,'+'+n,'heal')}
