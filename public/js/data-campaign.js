@@ -5,10 +5,10 @@ const CLASS={
  Consular:{jedi:1,hp:5,aim:75,mob:5,dmg:[3,4],range:1.5,deflect:25,dodge:10,guardDef:50,maxF:4,init:12,will:75,desc:'Force support. Heals, shields and controls the fight.'},
  Sentinel:{jedi:1,hp:5,aim:75,mob:6,dmg:[4,5],range:1.5,deflect:30,dodge:15,guardDef:60,maxF:4,crit:10,init:15,will:70,desc:'Skirmisher Jedi. Fast, precise, finishes wounded enemies.'},
  Wayseeker:{jedi:1,hp:5,aim:72,mob:6,dmg:[3,5],range:1.5,deflect:30,dodge:15,guardDef:55,maxF:5,init:13,will:75,lockEra:3,desc:'Wandering Jedi who reshape the battlefield. Unlocks in the High Republic era.'},
- Soldier:{hp:9,armor:1,aim:70,mob:5,dmg:[4,6],range:8,init:10,will:55,desc:'Republic trooper. Reliable rifle, suppression and overwatch.'},
- Scout:{hp:7,armor:1,aim:80,mob:6,dmg:[5,7],range:11,crit:15,init:15,will:50,desc:'Long-range marksman. Marks targets and lands critical hits.'},
- Medic:{hp:8,armor:1,aim:65,mob:5,dmg:[3,4],range:6,kits:2,init:9,will:55,desc:'Field medic and tech. Revives the fallen and hacks consoles.'},
- Heavy:{hp:10,armor:2,aim:60,mob:4,dmg:[4,6],range:7,nades:2,init:7,will:60,desc:'Heavy weapons. Grenades, rockets and armor-shredding fire.'},
+ Soldier:{hp:8,armor:1,aim:70,mob:5,dmg:[3,6],range:8,init:10,will:55,desc:'Republic trooper. Reliable rifle, suppression and overwatch.'},
+ Scout:{hp:6,aim:80,mob:6,dmg:[4,7],range:11,crit:15,init:15,will:50,desc:'Long-range marksman. Marks targets and lands critical hits.'},
+ Medic:{hp:7,aim:65,mob:5,dmg:[2,4],range:6,kits:2,init:9,will:55,desc:'Field medic and tech. Revives the fallen and hacks consoles.'},
+ Heavy:{hp:9,armor:2,aim:60,mob:4,dmg:[3,6],range:7,nades:2,init:7,will:60,desc:'Heavy weapons. Grenades, rockets and armor-shredding fire.'},
  // Tanks (Chat Q, wave 5; names invented [N]). Defender = Soresu-style Jedi who soaks hits; Shieldbearer = trooper in heavy plate with a riot shield.
  Defender:{jedi:1,hp:8,armor:1,aim:70,mob:4,dmg:[3,5],range:1.5,deflect:35,guardDef:85,maxF:4,init:10,will:80,desc:'Tank Jedi. Soresu defense: soaks hits, counters, shelters allies.'},
  Shieldbearer:{hp:12,armor:3,aim:65,mob:4,dmg:[3,5],range:6,init:8,will:70,desc:'Tank trooper. Heavy plate and a riot shield: holds the line, covers allies.'}};
