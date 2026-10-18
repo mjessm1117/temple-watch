@@ -140,8 +140,8 @@ Object.assign(PERKS,{
  tkColossus:{name:'Colossus',ic:'guard',desc:'Survive one killing blow at 1 HP; regain 2 HP each turn; allies next to you take 1 less damage.',fx:{lastStand:1,regen:2,ward:1}},
  tkParry:{name:'Parry',ic:'strike',desc:'+15 deflect. Enemies that hit you in melee take 1 damage.',mod:{deflect:15},fx:{riposte:1}},
  tkRedirect:{name:'Redirect',ic:'guard',desc:'+10 deflect. Enemies get −10 aim against you.',mod:{deflect:10},fx:{dodge:10}},
- tkWall:{name:'Wall of Light',ic:'guard',desc:'+20 deflect.',mod:{deflect:20}},
- tkSoresu:{name:'Soresu Master',ic:'guard',desc:'+20 deflect, enemies −15 aim against you, melee attackers take 2.',mod:{deflect:20},fx:{dodge:15,riposte:2}},
+ tkWall:{name:'Wall of Light',ic:'guard',desc:'+15 deflect.',mod:{deflect:15}},
+ tkSoresu:{name:'Soresu Master',ic:'guard',desc:'+20 deflect, enemies −10 aim against you, melee attackers take 2.',mod:{deflect:20},fx:{dodge:10,riposte:2}},
  tkShieldWall:{name:'Shield Wall',ic:'guard',desc:'Enemies get −15 aim against allies next to you.',fx:{shelter:15}},
  tkBastion:{name:'Living Bastion',ic:'hunker',desc:'+2 armor. Allies next to you take 1 less damage.',mod:{armor:2},fx:{ward:1}}});
 TREES.Defender={trunk:{1:['defLine','saberThrow','gChallenge'],2:['leap','gStalwart','tkGuardPost']},specs:{
@@ -152,8 +152,8 @@ TREES.Shieldbearer={trunk:{1:['hunker','suppress','hCoverMe'],2:['flakVest','mHa
  breacher:{n:'Breacher',ic:'sp_vanguard',desc:'Shield-first assault. Kicks the door and keeps going.',sig:'chainShot',4:['soVanPlate','svBrawl','soBreach'],5:['svFury','veteran','hBrute'],6:['runGun','soVanCharge','svRush'],7:['soLegend','svRampage','hWarlord']}}};
 Object.assign(SPEC_TRAITS,{
  bastion:{n:'Immovable',desc:'+1 armor and +10 will.',mod:{armor:1,will:10}},
- soresu:{n:'Form III',desc:'+15 deflect; enemies get −10 aim against you.',mod:{deflect:15},fx:{dodge:10}},
- phalanx:{n:'Shield Line',desc:'+1 armor; allies next to you take 1 less damage.',mod:{armor:1},fx:{ward:1}},
+ soresu:{n:'Form III',desc:'+15 deflect; enemies get −5 aim against you.',mod:{deflect:15},fx:{dodge:5}},
+ phalanx:{n:'Shield Line',desc:'Allies next to you take 1 less damage; +10 will.',mod:{will:10},fx:{ward:1}},
  breacher:{n:'Breach and Clear',desc:'+15 aim and +1 damage within 4 tiles.',fx:{closeAim:15,closeDmg:1}}});
 FX_N.shelter='Shelter allies';
 // Class icons (icons.js injected its symbols already, so add these to the same sprite). Shapes: shield+saber, riot shield.

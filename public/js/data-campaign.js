@@ -8,10 +8,10 @@ const CLASS={
  Soldier:{hp:8,armor:1,aim:70,mob:5,dmg:[3,6],range:8,init:10,will:55,desc:'Republic trooper. Reliable rifle, suppression and overwatch.'},
  Scout:{hp:6,aim:80,mob:6,dmg:[4,7],range:11,crit:15,init:15,will:50,desc:'Long-range marksman. Marks targets and lands critical hits.'},
  Medic:{hp:7,aim:65,mob:5,dmg:[2,4],range:6,kits:2,init:9,will:55,desc:'Field medic and tech. Revives the fallen and hacks consoles.'},
- Heavy:{hp:9,armor:2,aim:60,mob:4,dmg:[3,6],range:7,nades:2,init:7,will:60,desc:'Heavy weapons. Grenades, rockets and armor-shredding fire.'},
+ Heavy:{hp:8,armor:2,aim:60,mob:4,dmg:[3,6],range:7,nades:2,init:7,will:60,desc:'Heavy weapons. Grenades, rockets and armor-shredding fire.'},
  // Tanks (Chat Q, wave 5; names invented [N]). Defender = Soresu-style Jedi who soaks hits; Shieldbearer = trooper in heavy plate with a riot shield.
  Defender:{jedi:1,hp:8,armor:1,aim:70,mob:4,dmg:[3,5],range:1.5,deflect:35,guardDef:85,maxF:4,init:10,will:80,desc:'Tank Jedi. Soresu defense: soaks hits, counters, shelters allies.'},
- Shieldbearer:{hp:12,armor:3,aim:65,mob:4,dmg:[3,5],range:6,init:8,will:70,desc:'Tank trooper. Heavy plate and a riot shield: holds the line, covers allies.'}};
+ Shieldbearer:{hp:11,armor:3,aim:65,mob:4,dmg:[3,5],range:6,init:8,will:70,desc:'Tank trooper. Heavy plate and a riot shield: holds the line, covers allies.'}};
 // Stat rework (Jess, wave 5): troopers wear real armor and hit harder; Jedi are frailer but deflect and dodge (dodge = enemy aim −N, power.js).
 // Always-known abilities per class (besides the Jedi/troop basics in campaign.js abilFor).
 const BASE_KIT={Medic:['heal','scan','hack'],Heavy:['grenade'],Shieldbearer:['hunker']};
