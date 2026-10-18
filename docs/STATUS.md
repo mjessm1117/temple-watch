@@ -207,3 +207,12 @@ Jess picked direction A "Bridge" + subtle motion. Look only: `css/console.css` (
 - **Temple:** console header with meters (Favor, Darkness, Vision), alert bar (twists, Sith ops, rank-ups, wounded, builds, low credits), galaxy feed under the floor plan (this session's `C.news`, newest first, not saved), HoloNet ticker along the bottom, radar sweep on the galaxy map.
 - **Reduced motion** (OS or Settings → `html.rm`): lights steady, ticker and sweep stop.
 - Requests: N → I: radar sweep is `.gleft::after` in console.css; move it to galaxy.css if you prefer. N → anyone writing `C.news`: start Sith news with "Sith"/"Imperial" and Darkness news with "Dark" so the feed tints them.
+## Maps & Tactics — Chat M, wave 5, 2026-10-17
+Spec: `docs/specs/maps.md`. Owns `data-maps.js`, `maps.js`, `css/maps.css`, `tests/maps.test.js`.
+- 10 new maps as extra `alts` of shrine/rescue/archive/sabotage/escort (old maps untouched). New mission type `op` (reach/hold/chase/extract). Entries on several edges for waves + reinforcements.
+- Engine touches outside my files (small, flagged here): `state.js` W/H getters (data.js keeps a 10×12 fallback), `rules.js` `los` (wall in front blocks; corner peek), `save.js` reload keeps the alt layout (was base mission), `view3d/board.js` + `main.js` (map marks layer, OVERWATCH/INBOUND call-outs), `index.html` (2 scripts + maps.css), `tests/bot.js` (`mapGoal` hook), `tests/balance.test.js` (map size check = rectangular).
+- Sight rule changed for every map. Old-map win rates before/after are in the push notes below; re-check with `GAMES=20`.
+## Requests (from M)
+- M → G: the map-mark planes are flat colored tiles; a soft edge/glow would read better. Entry markers could get a red beacon prop.
+- M → L/R: Era 2 versions of the new maps via `ruusanOf` (flip + Ruusan roster) once balanced.
+- M → K: bot could use the corner-peek rule (step to a wall end before shooting).

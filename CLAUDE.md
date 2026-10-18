@@ -43,6 +43,8 @@ public/            the game (static files served by the Worker; _headers = no-ca
   js/fieldops.js   off-screen field ops (2–3 units, resolve on a roll)
   js/galaxy.js     galaxy map + briefing panel (replaces the mission list)
   js/twin.js       two fronts: a second squad on late crisis steps
+  js/data-maps.js  new maps (bigger, entries, operations) added as random layouts  ← tune here
+  js/maps.js       any board size, entry points, operation steps (reach/hold/chase/extract), overwatch zones
   js/screens.js    opening vision + difficulty; boots the game (load last)
 worker.js               Worker entry: /api/save → backend, else static files from public/
 functions/api/save.js   backend: GET/PUT /api/save (KV binding SAVES)
