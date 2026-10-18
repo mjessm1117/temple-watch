@@ -19,7 +19,8 @@ function treeMods(u,r){u.pw={};for(const k of Object.keys(learnedAt(r)))u.pw[k]=
 // Weights (POWER_W, data-trees.js): range, medkits and grenades count, so troops aren't undersold next to Jedi Focus/deflect.
 function unitPower(r){const u=battleUnit(r),W=POWER_W,d=(u.dmg[0]+u.dmg[1])/2,pw=Object.values(u.pw||{}).reduce((s,v)=>s+v,0);
  return Math.round(u.hp*W.hp+(u.aim-50)*W.aim+d*W.dmg+(u.armor||0)*W.armor+(u.crit||0)*W.crit+(u.maxF||0)*W.focus+(u.mob||0)*W.mob+(u.deflect||0)*W.deflect
-  +Math.min(u.range||0,W.rangeCap)*W.range+(u.kits||0)*W.kit+(u.nades||0)*W.nade+pw*W.skill+Object.keys(u.pw||{}).filter(k=>AB[k]&&!AB[k].passive).length*W.active+(r.spec?W.spec:0))}
+  +Math.min(u.range||0,W.rangeCap)*W.range+(u.kits||0)*W.kit+(u.nades||0)*W.nade+pw*W.skill+Object.keys(u.pw||{}).filter(k=>AB[k]&&!AB[k].passive).length*W.active+(r.spec?W.spec:0)
+  +((u.dodge||0)+((u.fx&&u.fx.dodge)||0))*W.dodge+Object.keys(u.fx||{}).filter(k=>k!=='dodge').length*W.fx)}
 const pwTag=n=>n>1?` <b class="pw" title="Power ${ROMAN[n]}">${ROMAN[n]}</b>`:'';
 
 // --- engine hooks -------------------------------------------------------------------------------

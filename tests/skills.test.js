@@ -37,5 +37,12 @@ E("AB.__k={name:'t',run:(u,g)=>damage(g.t,99,u)};U.ap=1;exec(U,'__k',{t:F,chance
 check(E("F.status")==='dead'&&E("U.ap")===1&&E("U.chainUsed")===1,'kill with chain: ending action refunded');
 // last stand
 E("U.fx.lastStand=1;U.lsUsed=0;U.hp=3;U.armor=0;damage(U,9,F)");check(E("U.hp")===1&&E("U.status")==='ok','last stand keeps a unit at 1 HP');
+// Tank classes + stat rework + melee
+check(E("['Defender','Shieldbearer'].every(c=>CLASS[c]&&TREES[c]&&ICONS[c.toLowerCase()]&&SPEC_TRAITS[Object.keys(TREES[c].specs)[0]])"),'tank classes have stats, trees, icons, traits');
+check(E("troopClasses().includes('Shieldbearer')&&CLASS.Shieldbearer.armor>=3&&CLASS.Soldier.armor>=1&&CLASS.Guardian.dodge>0"),'troopers armored, Jedi dodge, Shieldbearer recruitable');
+E("addRecruit({cls:'Defender',jedi:1,trait:null,origin:'Temple-raised',species:'Human',age:20},'Tank',null);var D=C.roster[C.roster.length-1];ensureTemple()");
+check(E("battleUnit(D).hp")>=8&&E("abilFor(D).includes('strike')"),'Defender recruit builds a battle unit');
+E("var J=S.units.find(u=>u.side==='p'&&u.jedi&&u.status==='ok')||U;var Sx=S.units.find(u=>u.side==='e'&&u.status==='ok');if(Sx){Sx.tags=['force'];Sx.range=1.5;Sx.x=J.x+1;Sx.y=J.y;J.range=1.5;J.hp=J.max=20;Sx.hp=Sx.max=20;var h0=Sx.hp;MELEE.lock=100;J.jedi=1;damage(J,2,Sx)}");
+check(E("!Sx||Sx.hp<h0"),'blade lock: Jedi hit in melee by a Force user strikes back');
 check(!errs.length,'no page errors'+(errs.length?': '+errs.join(' | '):''));
 console.log(JSON.stringify({fail,err:errs.length}));process.exit(fail||errs.length?1:0);

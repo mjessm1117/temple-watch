@@ -110,4 +110,4 @@ for(const T of Object.values(TREES))for(const k of [...T.trunk[1],...T.trunk[2],
  const p=PERKS[k];if(p&&p.mod)p.ic=STAT_IC[Object.keys(p.mod).sort((a,b)=>Math.abs(p.mod[b]*(b==='aim'||b==='will'||b==='crit'||b==='deflect'||b==='guardDef'?.2:1))-Math.abs(p.mod[a]*(a==='aim'||a==='will'||a==='crit'||a==='deflect'||a==='guardDef'?.2:1)))[0]]||p.ic}
 
 // Unit Power weights (power.js unitPower). One point ≈ one 'unit' of battle value. Tune here.
-const POWER_W={hp:2,aim:.5,dmg:3,armor:5,crit:.2,focus:1.5,mob:1,deflect:.2,range:1.5,rangeCap:12,kit:3,nade:3,skill:2,active:4,spec:4};  // active: each learned active ability (a button), since stat picks show up in stats but abilities don't
+const POWER_W={dodge:.6,fx:2,hp:2,aim:.5,dmg:3,armor:5,crit:.2,focus:1.5,mob:1,deflect:.2,range:1.5,rangeCap:12,kit:3,nade:3,skill:2,active:4,spec:4};  // active: each learned active ability (a button), since stat picks show up in stats but abilities don't
