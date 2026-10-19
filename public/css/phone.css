@@ -1,0 +1,61 @@
+/* Phone pass (Chat N, 2026-10-18). Loaded last. ≤600px only; desktop untouched. Look only.
+   Battle: compact header rows that scroll sideways, comm box in the flow (never over the board), smaller ability tiles.
+   Temple: one-line readouts, compact 3-across rooms with the War Room first, short feed, no ticker. */
+@media(max-width:600px){
+ /* ---------- Battle ---------- */
+ .top{gap:4px 8px;padding-bottom:2px}
+ .brand{font-size:15px;letter-spacing:.08em}.brand small{font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .top .stats{gap:4px;font-size:11px}
+ .top .stats>span{padding:2px 7px;flex:none}
+ .top .endrow{gap:4px}
+ .top .endrow button{min-height:32px;padding:3px 9px;font-size:11.5px;letter-spacing:.02em}
+ .banner{padding:3px 8px;font-size:10.5px;letter-spacing:.2em}
+ .brand small{display:none}
+ /* 2D board: shrink so the whole board fits between the header and the orders sheet */
+ body:not(.v3d) .layout .bwrap{max-width:max(280px,calc((66vh - 170px) * var(--board-ar,.833)))}
+ /* comm box: in the flow under the banner, short and quiet */
+ .bvcomm{position:static;transform:none;width:auto;margin:0;padding:6px 8px 6px 10px;gap:6px;font-size:12.5px;box-shadow:none}
+ .bvcomm .cm{flex:1 1 0;min-width:0}.bvcomm .cm b{font-size:10.5px}
+ .bvcomm .cm p{margin:1px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+ .bvcomm .x{min-height:30px;min-width:30px;padding:0 6px}
+ .bvcomm .ch button{min-height:36px}
+ /* bottom sheet: roster chips + 4-across tiles */
+ .roster{gap:5px}.roster button{min-height:38px;padding:4px 9px;font-size:12px}
+ #acts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+ .act{width:auto;min-height:54px;padding:6px 2px 4px;gap:2px}
+ .act .ic{width:20px;height:20px}
+ .act span{font-size:11px;line-height:1.1}
+ .act small{font-size:9px;line-height:1.1}
+ #hint{font-size:12px;line-height:1.35}
+ .tipcard{padding:7px 9px}.tipcard p{font-size:12px;margin:0}.tipcard .endrow button{min-height:36px}
+ #endBtn{min-height:44px}
+
+ /* ---------- Temple ---------- */
+ .box.base{padding:8px 10px 16px;gap:8px}
+ .resbar,.calerts,.calstrip{display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:5px;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+ .resbar::-webkit-scrollbar,.calerts::-webkit-scrollbar,.calstrip::-webkit-scrollbar{display:none}
+ .resbar>*,.calerts>*,.calstrip>*{flex:none}
+ .resbar{font-size:11.5px}
+ .resbar>span,.resbar>button{padding:3px 8px;min-height:30px}
+ .resbar .cal{margin-left:0}
+ .cbrand{font-size:11px;letter-spacing:.14em}
+ .cmeter{width:30px}
+ .ca{font-size:11.5px;padding:4px 8px;white-space:nowrap}
+ .calstrip>div{max-width:62vw;font-size:11px;padding:5px 8px}
+ /* rooms: 3 across, War Room on top full width */
+ .tplan{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:none;gap:5px}
+ .tplan::before{display:none}
+ .room{grid-area:auto!important;min-height:44px;padding:6px 7px;grid-template-columns:16px 1fr;gap:1px 6px}
+ .room .ic{width:16px;height:16px;grid-row:1}
+ .room b{font-size:11.5px;letter-spacing:.01em}
+ .room .lv{display:none}
+ .room small{display:none}
+ .room em{top:-5px;right:-5px}
+ .room .led.rl{right:6px;bottom:6px;width:6px;height:6px}
+ .room[data-room="war"]{order:-1;grid-area:auto/1/auto/-1!important;min-height:48px}
+ .room[data-room="war"] b{font-size:13px}
+ .tfoot button{min-height:36px}
+ .cfeed{display:none} /* the room's own news block shows the same lines on phone */
+ .thead h2{font-size:22px}.thead .muted{font-size:12px}
+ .cticker{display:none}
+}
