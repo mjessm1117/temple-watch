@@ -13,6 +13,12 @@
 
 
 ## Bucket claims (feedback 2026-10-18)
+- **Wave 6 file owners (2026-10-20).** Edit only your files; need a change elsewhere → add a line under that owner here. Anyone may add their own `<script>` line to `index.html` (pull first). `git pull` before every push.
+  - **E Coordinator · Battle feel:** `view3d/*`, `render.js`, `input.js`, `ui-hud.js`, `css/ui.css`, `identity.js`, `data-identity.js`, `tests/identity.test.js`, `docs/CHANGELOG.md`.
+  - **M2 Maps:** `data-maps.js`, `maps.js`, `map-open.js`, `data.js` (layouts only), `hazards.js`, new `tests/mapcheck.test.js`.
+  - **T2 Temple building:** `temple-map.js`, `temple-ui.js`, `temple-data.js`, new `temple-build*.js` / `data-wings.js`, new `css/temple.css`.
+  - **S2 Strike teams:** `twin.js`, `fieldops.js`, `galaxy.js`, `data-galaxy.js`, `base.js` (squad select), new `teams.js` / `data-teams.js`, new `tests/teams.test.js`.
+  - Shared, ask first: `rules.js`, `abilities.js`, `ai.js`, `turns.js`, `campaign.js`, `data-campaign.js`, `temple.js` → request to E.
 - **1 Squad identity** — Coordinator E, 2026-10-19. Armor pips (1 per hit), nicknames (deeds suggest, pick at promotion), voice bubbles + debrief quote, Padawan battle bonus, 3D gear silhouette. Touches rules.js, campaign.js, temple*.js, base.js, render.js, view3d/figures+units.
   - Shipped: `data-identity.js` (VOICES, DEEDS, NICK_CLASS, PAD) + `identity.js` (wraps bark/select/applyResults/promoHTML/identHTML/setIdent/setPair/ensureTemple/battleUnit). Armor pips in `damage()` (rules.js); `armorPips()` in render.js, also drawn by view3d/main.js. 3D kit dressing: `dress()` in view3d/figures.js reads `u.kit` {armor,w,mods,look}. Test: `tests/identity.test.js`.
   - Balance note: armor is much weaker now (Shieldbearer 3 armor = 3 softened hits, not −3 forever). Watch tank survival; numbers in `CLASS` / `ARMOR`.
