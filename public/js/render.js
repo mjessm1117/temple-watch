@@ -9,19 +9,21 @@ function badge(u){return u.status==='down'?'down':u.status==='stunned'?'stunned'
  u.panic?'panic':u.disarmed?'disarmed':u.rooted?'rooted':u.guard?'guard':u.ow?'overwatch':u.hunker?'hunker':u.barrier?'barrier':u.supp?'suppressed':u.marked?'marked':u.conc?'concealed':u.shield?'shield':u.data?'scan':null}
 const BADGE_IC={suppressed:'suppress',marked:'mark',disarmed:'disarm',concealed:'conceal',rooted:'disarm',shield:'barrier'};
 const badgeIc=b=>{const k=BADGE_IC[b]||b;return ICONS[k]?k:'mark'};
+// Armor pips under the HP bar: lit = left, hollow = broken (armorMax set on first hit).
+function armorPips(u){const m=Math.max(u.armorMax||0,u.armor||0);return m?`<i class="ar" data-tip="stat:armor">${Array.from({length:m},(_,i)=>`<b class="${i<(u.armor||0)?'on':''}"></b>`).join('')}</i>`:''}
 function token(u){if(u.hid)return '';
  const c=['tok',u.side==='e'?'en':'',u===S.sel&&!S.peek?'sel':'',u===S.peek?'peek':'',u.status,u.guard?'guard':'',u.side==='p'&&u.status==='ok'&&!u.bound&&!u.ap&&S.phase==='player'?'spent':''].join(' ');
  const b=badge(u),col=u.side==='e'?'var(--sith)':u.vip?'var(--good)':u.col||'var(--troop)';
  const hp=`<i class="hp">${Array.from({length:u.max},(_,i)=>`<b class="${i<u.hp?'on':''}"></b>`).join('')}</i>`;
  const tp=u.side==='e'&&u.type?` data-tip="enemy:${u.type}"`:'';
- return `<div class="${c}" style="--uc:${col}"${tp}>${icon(unitIcon(u))}${hp}${b?`<span class="bdg" data-tip="status:${b}">${icon(badgeIc(b))}${u.status==='down'&&!u.stable?`<small>${u.bleed}</small>`:''}</span>`:''}${S.info?`<em>${u.hp}</em>`:''}</div>`}
+ return `<div class="${c}" style="--uc:${col}"${tp}>${icon(unitIcon(u))}${hp}${armorPips(u)}${b?`<span class="bdg" data-tip="status:${b}">${icon(badgeIc(b))}${u.status==='down'&&!u.stable?`<small>${u.bleed}</small>`:''}</span>`:''}${S.info?`<em>${u.hp}</em>`:''}</div>`}
 const pips=(n,on,cls='')=>`<span class="pips ${cls}">${Array.from({length:n},(_,i)=>`<i class="${i<on?'on':''}"></i>`).join('')}</span>`;
 function cardHTML(){const u=S.peek||S.sel;
  if(!u)return `<p class="muted">${S.phase==='enemy'?'Enemy turn…':'Select a unit.'}</p>`;
  const st={down:u.stable?'Down · stabilized':`Down · ${u.bleed} turn${u.bleed>1?'s':''} to bleed out`,stunned:'Stunned',surrender:'Surrendered'}[u.status];
- const T=(t,k)=>t?(k?`<span data-tip="${k}">${t}</span>`:t):'',tags=[T(st,'status:'+u.status),T(u.bound?'Locked in the cell':''),T(u.guard?'Guard':'','status:guard'),T(u.ow?'Overwatch':'','status:overwatch'),T(u.hunker?'Hunkered':'','status:hunker'),T(u.barrier?'Barrier':'','status:barrier'),T(u.data?'Carrying data':'','status:scan'),T(u.panic?'Panicked':'','status:panic'),T(u.disarmed?'Disarmed':'','status:disarmed'),T(u.conc?'Concealed':'','status:concealed'),T(u.armor?`Armor ${u.armor}`:'','stat:damage'),T(u.horror?'Hurts only Jedi':'',u.type?'enemy:'+u.type:'')].filter(Boolean);
- const sub=u.side==='e'?'Hostile':u.vip?'Prisoner':`${u.title||'Rank '+(u.rank||1)} · ${u.cls}`;
- let h=`<div class="who"><span class="mini" style="--uc:${u.side==='e'?'var(--sith)':u.col||'var(--troop)'}">${icon(unitIcon(u))}</span><div><div class="uname" style="${u.col?'color:'+u.col:''}">${u.n}</div><div class="usub">${sub}${tags.length?' · '+tags.join(' · '):''}</div></div></div>`;
+ const T=(t,k)=>t?(k?`<span data-tip="${k}">${t}</span>`:t):'',tags=[T(st,'status:'+u.status),T(u.bound?'Locked in the cell':''),T(u.guard?'Guard':'','status:guard'),T(u.ow?'Overwatch':'','status:overwatch'),T(u.hunker?'Hunkered':'','status:hunker'),T(u.barrier?'Barrier':'','status:barrier'),T(u.data?'Carrying data':'','status:scan'),T(u.panic?'Panicked':'','status:panic'),T(u.disarmed?'Disarmed':'','status:disarmed'),T(u.conc?'Concealed':'','status:concealed'),T(u.armor||u.armorMax?`Armor ${u.armor||0}/${Math.max(u.armorMax||0,u.armor||0)}`:'','stat:armor'),T(u.horror?'Hurts only Jedi':'',u.type?'enemy:'+u.type:'')].filter(Boolean);
+ const sub=u.side==='e'?'Hostile':u.vip?'Prisoner':`${u.title||'Rank '+(u.rank||1)} · ${u.cls}${u.masterN?` · <span data-tip="stat:padawan">Padawan of ${u.masterN}</span>`:''}`;
+ let h=`<div class="who"><span class="mini" style="--uc:${u.side==='e'?'var(--sith)':u.col||'var(--troop)'}">${icon(unitIcon(u))}</span><div><div class="uname" style="${u.col?'color:'+u.col:''}">${u.n}${u.nick?` <small class="nick">${u.nick}</small>`:''}</div><div class="usub">${sub}${tags.length?' · '+tags.join(' · '):''}</div></div></div>`;
  h+=`<div class="row" style="--uc:${u.side==='e'?'var(--sith)':u.col||'var(--troop)'}"><span data-tip="stat:hp">HP</span>${pips(u.max,u.hp)}${S.info?`<b class="num">${u.hp}/${u.max}</b>`:''}</div>`;
  if(u.side==='p'&&!u.vip)h+=`<div class="row apr" style="--uc:var(--fg)"><span data-tip="stat:actions">Actions</span><span class="pips">${[0,1].map(i=>`<i class="${i<u.ap?'on':''}${i===u.ap-1?' s1':''}${i===u.ap-2?' s2':''}"></i>`).join('')}</span></div>`;
  if(u.jedi)h+=`<div class="row fr"><span data-tip="stat:focus">Focus</span><span class="pips f">${Array.from({length:u.maxF},(_,i)=>`<i class="${i<u.focus?'on':''}" data-k="${u.focus-i}"></i>`).join('')}</span></div><div class="row"><span data-tip="status:darkness">Darkness</span><span class="bar"><b style="width:${u.dark*10}%"></b></span><span>${u.dark}/10</span></div>`;
@@ -44,7 +46,7 @@ function coverName(t,a){if(t.barrier)return 'Force Barrier';let best=null,bv=0;c
 function oddsHTML(){const u=S.sel,g=S.pick;if(!g||!canAct(u))return '';const ab=AB[S.mode];let head,lines=[],total=g.chance;
  if(g.t&&g.t.side==='e'&&(S.mode==='shoot'||ab.melee)){const o=odds(u,g.t,ab.melee?{melee:true,mod:S.mode==='sweep'?-10:u.leapAim||0}:{});lines=o.lines;total=o.total}
  if(g.barrel)head='Barrel · 3×3 blast, 3 damage';else if(g.area)head=ab.name+' · 3×3 area';else if(g.spot)head='Leap here';else if(g.t)head=g.t.n;else head=ab.name;
- const dm=ab.dm&&g.t&&g.t.side==='e'?ab.dm(u):null,kill=dm&&Math.max(1,dm[1]+(u.jedi&&u.dark>=5?1:0)-(g.t.armor||0))>=g.t.hp;
+ const dm=ab.dm&&g.t&&g.t.side==='e'?ab.dm(u):null,kill=dm&&Math.max(1,dm[1]+(u.jedi&&u.dark>=5?1:0)-(g.t.armor?1:0))>=g.t.hp;
  const AH=g.area?areaHits(u,S.mode,g):[];
  return `<div class="odds"><div class="oh"><b>${head}</b>${total!=null?`<span class="tot">${total}%</span>`:''}</div>
  ${lines.map(([k,v])=>`<div class="ol" data-tip="mod:${k}"><span>${/cover$/.test(k)&&g.t?k+' · '+coverName(g.t,u):k}</span><span>${k==='Aim'?v:(v>0?'+':'')+v}</span></div>`).join('')}
@@ -108,6 +110,7 @@ function render(){if(!S)return;
   const sp=g&&!g.area&&!g.spot&&g.chance!=null?g:shoot.find(t=>t.x===x&&t.y===y);
   if(sp&&(!sp.t||!sp.t.hid))h+=`<span class="pct${sp.ally?' al':sp.chance===best&&sp.t&&sp.t.side==='e'?' best':''}">${sp.chance}%</span>`;
   for(const f of S.fx)if(f.x===x&&f.y===y)h+=`<span class="fx ${f.cls}">${f.txt}</span>`;
+  for(const b of S.say||[])if(b.u.x===x&&b.u.y===y&&!b.u.hid)h+=`<span class="say2">${b.txt}</span>`;
   h+='</div>'}
  $('#board').innerHTML=h;drawOver();
  $('#roster').innerHTML=S.units.filter(u=>u.side==='p').map((u,i)=>`<button type="button" data-u="${i}" class="${u===S.sel&&!S.peek?'on':''} ${!canAct(u)?'done':''}" style="--uc:${u.vip?'var(--good)':u.col||'var(--troop)'}">${icon(unitIcon(u))}${shortName(u)}${u.status==='down'?' ✚':u.status==='dead'?' †':''}</button>`).join('');

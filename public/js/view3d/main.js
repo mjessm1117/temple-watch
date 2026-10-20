@@ -182,7 +182,7 @@ function ui(){if(!V||!S)return;if(cb()!==lastCb){lastCb=cb();board0().palette(la
  labels.setTags(list.map(g=>({p:g.t?vpos(g.t,(units.get(g.t).headY||1.2)+.55):P(g,1),html:g.chance+'%'+(g.kill?' ☠':''),cls:g.ally?'al':g.chance===best&&g.t&&g.t.side==='e'?'best':''})))}
 function unitLabels(){const L=[];for(const u of S.units){const v=V.units.map.get(u.uid);if(!v||v.gone||v.state==='dead'||u.hid||!alive(u)&&u.status!=='dead')continue;
   const hp=Math.max(0,Math.min(u.max,hpShow.has(u.uid)?hpShow.get(u.uid):u.hp)),b=v.state==='down'?'down':badge(u);
-  const html=`<i class="hp" style="--uc:${unitColor(u)}">${Array.from({length:u.max},(_,i)=>`<b class="${i<hp?'on':''}"></b>`).join('')}</i>${b?`<span class="bdg">${icon(b)}${u.status==='down'&&!u.stable?`<small>${u.bleed}</small>`:''}</span>`:''}${S.info?`<em>${hp}</em>`:''}`;
+  const html=`<i class="hp" style="--uc:${unitColor(u)}">${Array.from({length:u.max},(_,i)=>`<b class="${i<hp?'on':''}"></b>`).join('')}</i>${typeof armorPips==='function'?armorPips(u):''}${b?`<span class="bdg">${icon(b)}${u.status==='down'&&!u.stable?`<small>${u.bleed}</small>`:''}</span>`:''}${S.info?`<em>${hp}</em>`:''}`;
   L.push({key:u.uid,html,pos:()=>{const p=V.units.anchor(u);return p&&p.setY(p.y+.22)}})}
  V.labels.setUnits(L)}
 

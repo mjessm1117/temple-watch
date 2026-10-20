@@ -9,7 +9,7 @@ import {kindOf} from './units.js';
 const cache=new Map(),pending=new Set(),SIZE=128;let R=null,scene,cam,busy=false;
 const asUnit=r=>r.side?r:{n:r.n,cls:r.cls,col:r.col,side:'p',jedi:typeof isJedi==='function'?isJedi(r):!!(window.CLASS&&CLASS[r.cls]&&CLASS[r.cls].jedi)};
 const colorOf=u=>u.vip?'#7fd99a':u.col||'#e0bd78';
-const keyOf=u=>kindOf(u)+'|'+colorOf(u);
+const kitOf=u=>u.kit||(u.gear&&{armor:u.gear.armor,w:u.gear.w,mods:u.gear.mods,look:u.look}),keyOf=u=>{const k=kitOf(u);return kindOf(u)+'|'+colorOf(u)+(k?'|'+[k.armor,k.look].join('/'):'')};
 
 function setup(){initFigures(THREE);const c=document.createElement('canvas');c.width=c.height=SIZE;
  R=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:true,preserveDrawingBuffer:true});R.setPixelRatio(1);R.setSize(SIZE,SIZE,false);
@@ -26,7 +26,7 @@ const queue=[];
 function pump(){if(busy||!queue.length)return;busy=true;const job=queue.shift(),file=fileOf(kindOf(job.u));
  loadModel(file).then(m=>{try{if(m)cache.set(job.k,shoot(job.u))}catch(e){console.warn('portrait failed',e)}
   pending.delete(job.k);busy=false;if(job.onReady)job.onReady();(window.requestIdleCallback||setTimeout)(pump)})}
-function shoot(u){if(!R)setup();const F=makeFigure(kindOf(u),colorOf(u));if(!F)return null;const o=F.obj;
+function shoot(u){if(!R)setup();const F=makeFigure(kindOf(u),colorOf(u),kitOf(u));if(!F)return null;const o=F.obj;
  o.rotation.y=-.42;scene.add(o);const a=F.acts.idle||Object.values(F.acts)[0];if(a){a.play();F.mixer.update(.6)}o.updateMatrixWorld(true);
  const head=new THREE.Vector3();(o.getObjectByName('Head')||o).getWorldPosition(head);
  scene.userData.rim.color.set(colorOf(u));

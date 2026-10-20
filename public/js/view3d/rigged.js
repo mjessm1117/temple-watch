@@ -8,7 +8,7 @@ const GUN={trooper:1,scout:1,medic:1,heavy:1,sith:1,sithHeavy:1,mando:1,agent:1,
 
 export class RV extends UV{
  static can(u){return !!modelOf(fileOf(kindOf(u)))}
- build(){const T=this.T,F=makeFigure(this.kind,this.U.color(this.u));this.F=F;this.body.add(F.obj);this.mats.push(...F.mats);this.glows=F.glows.length?F.glows:null;
+ build(){const T=this.T,F=makeFigure(this.kind,this.U.color(this.u),this.u.kit);this.F=F;this.body.add(F.obj);this.mats.push(...F.mats);this.glows=F.glows.length?F.glows:null;
   this.headY=this.kind==='beast'?1.45:1.2;this.idleArm=0;this.cur=null;this.curName='';this.one=null;this.moving=0;this.coverT=0;this.cover=false;this.swingN=0;
   F.mixer.addEventListener('finished',e=>{if(this.one&&e.action===this.one.a&&!this.one.hold)this.one=null});
   this.pose={armR:0,legs:0,lift:0,lunge:0,flail:0};this.init()}

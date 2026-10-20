@@ -53,6 +53,7 @@ function odds(a,t,{melee=false,mod=0,noCover=false}={}){const L=[['Aim',a.aim]];
  if(bmedNear(a))L.push(['Battle Meditation',a.side==='p'?10:-10]);
  if(a.side==='p'&&t.marked)L.push(['Marked',15]);
  const bd=bondNear(a);if(bd)L.push(['Bond',bd]);
+ const mn=typeof masterNear==='function'?masterNear(a):0;if(mn)L.push(['Master near',mn]);
  if(mod)L.push([mod>0?'Ability bonus':'Ability penalty',mod]);
  const raw=L.reduce((s,l)=>s+l[1],0);return{lines:L,total:Math.max(5,Math.min(95,Math.round(raw)))}}
 const hitChance=(a,t,o)=>odds(a,t,o).total;
@@ -93,7 +94,8 @@ function addDark(u,n){const b=u.dark;u.dark=Math.max(0,Math.min(10,u.dark+n));
  if(u.dark>=10)log(`${u.n} stands at the edge of falling.`,'dark')}
 function damage(t,d,src){
  if(src&&src.horror&&!t.jedi){fx(t,'IMMUNE');log(`${src.n} ignores ${t.n}. It hunts only the Force.`);return}
- if(t.armor)d=Math.max(1,d-t.armor);
+ // Armor pips (Jess 2026-10-19): each attack that lands is cut by 1 and strips 1 pip. Hazards ignore armor.
+ if(t.armor>0&&src){t.armorMax=Math.max(t.armorMax||0,t.armor);d=Math.max(1,d-1);t.armor--;fx(t,t.armor?'ARMOR −1':'ARMOR BROKEN','defl');if(!t.armor)log(`${t.n}'s armor breaks.`)}
  // Thought Shield (Sith Lords): Force powers do half damage.
  if(S.forceAct&&t.sithLord&&src&&src.side==='p'){d=Math.ceil(d/2);fx(t,'SHIELDED','defl');log(`${t.n}'s Thought Shield blunts the Force.`)}
  if(t.shield>0){const a=Math.min(t.shield,d);t.shield-=a;d-=a;fx(t,'SHIELD','defl');log(`${t.n}'s shield soaks ${a}.`);if(!d)return}

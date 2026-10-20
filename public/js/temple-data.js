@@ -3,7 +3,7 @@
 
 // Stat-only rank picks for troops (spec A has one ability per troop rank; the second option is ours [Default]). `mod` adds to battle stats.
 const PERKS={
- flakVest:{name:'Flak Vest',ic:'hunker',tip:'+1 armor: every hit on this unit does 1 less (min 1).',mod:{armor:1}},
+ flakVest:{name:'Flak Vest',ic:'hunker',tip:'+1 armor pip: softens one more hit by 1.',mod:{armor:1}},
  veteran:{name:'Veteran',ic:'guard',tip:'+10 aim and +1 HP.',mod:{aim:10,hp:1}},
  longshot:{name:'Long Shot',ic:'mark',tip:'+2 range and +10% crit chance.',mod:{range:2,crit:10}},
  killshot:{name:'Killshot',ic:'shoot',tip:'+1 damage on every shot.',mod:{dmg:1}},

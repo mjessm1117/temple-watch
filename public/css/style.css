@@ -393,3 +393,9 @@ html.cb .cell.vis{background:repeating-linear-gradient(135deg,color-mix(in srgb,
 .cell.thorn{background:repeating-linear-gradient(45deg,#1b2a18 0 4px,#3d5a2a 4px 6px)}
 .twchip.haz,.orow.haz span{color:#d9a25f}.twchip.haz{border-color:color-mix(in srgb,#d9a25f 50%,transparent)}
 .twcard.haz{border-color:color-mix(in srgb,#d9a25f 45%,var(--line));background:color-mix(in srgb,#d9a25f 6%,var(--raise))}.twcard.haz b{color:#d9a25f}
+
+/* Armor pips (bucket 1) */
+.ar{display:flex;gap:3px;justify-content:center;margin-top:2px;pointer-events:none}.ar b{width:5px;height:5px;transform:rotate(45deg);border:1px solid #b9cbd3;background:transparent}.ar b.on{background:#b9cbd3}
+.tok .ar{position:absolute;left:0;right:0;bottom:-9px}
+.say2{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-4px);z-index:6;width:max-content;max-width:180px;font:500 11px var(--body,'IBM Plex Sans',sans-serif);color:var(--fg);background:#0d181be6;border:1px solid #79d3e266;border-radius:8px;padding:3px 7px;text-align:center;pointer-events:none;white-space:normal;box-shadow:0 3px 10px #0008}
+.uname .nick{font:500 12px var(--body,sans-serif);color:var(--dim)}.nickrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}.nickrow button small{color:var(--dim);margin-left:4px}

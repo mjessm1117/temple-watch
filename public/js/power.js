@@ -51,7 +51,7 @@ damage=function(t,d,src,...x){
  if(src&&src.side==='p'&&t.side==='e'&&d>0){d+=S.pw||0;const tg=tagsOf(t),dd=dist(src,t);
   if(SPT(src,'weaponMaster'))d+=src.mom||0;
   if(SPT(src,'shadow')&&S.forceAct)d+=t.status==='stunned'?2:1;
-  if(SPT(src,'earthshaper')&&S.forceAct)d+=t.armor||0;
+  if(SPT(src,'earthshaper')&&S.forceAct)d+=t.armor?1:0;
   if(SPT(src,'beastwarden')&&(tg.includes('creature')||tg.includes('horror')))d+=2;
   if(SPT(src,'vanguard')&&dd<=4)d+=1;
   if(SPT(src,'sniper')&&dd>=7)d+=1;
@@ -101,9 +101,9 @@ damage=(o=>function(t,d,src,...x){
   d+=src.fxMom||0;if(['grenade','rocket','ionNade'].includes(S.curK))d+=fxv(src,'nadeDmg')}
  if(t.side==='p'&&src&&src.side==='e'&&d>1){const w=Math.min(2,S.units.filter(p=>p!==t&&p.side==='p'&&p.status==='ok'&&fxv(p,'ward')&&cheb(p,t)<=1).length);if(w){d=Math.max(1,d-w);fx(t,'WARD','defl')}}
  // Last stand: own skill, or a Guardian Angel partner within 4.
- if(t.side==='p'&&t.status==='ok'&&d>0){const eff=t.armor?Math.max(1,d-t.armor):d;
+ if(t.side==='p'&&t.status==='ok'&&d>0){const eff=t.armor?Math.max(1,d-1):d;
   if(eff>=t.hp&&t.hp>1){const ls=fxv(t,'lastStand')&&!t.lsUsed,ga=!ls&&!t.gaUsed&&pairsT(t,'angel').some(p=>cheb(p,t)<=4);
-   if(ls||ga){if(ls)t.lsUsed=1;else t.gaUsed=1;d=t.hp-1+(t.armor||0);fx(t,ls?'LAST STAND':'GUARDIAN ANGEL','defl');log(`${t.n} refuses to fall.`,'good')}}}
+   if(ls||ga){if(ls)t.lsUsed=1;else t.gaUsed=1;d=t.hp-1+(t.armor?1:0);fx(t,ls?'LAST STAND':'GUARDIAN ANGEL','defl');log(`${t.n} refuses to fall.`,'good')}}}
  const was=alive(t)&&t.status!=='dead'&&t.status!=='down';o(t,d,src,...x);
  // Riposte: a melee hit on someone with Counter costs the attacker.
  if(t.side==='p'&&src&&src.side==='e'&&alive(src)&&src.status!=='dead'&&cheb(src,t)<=1&&fxv(t,'riposte')&&t.status==='ok'){fx(t,'COUNTER');o(src,fxv(t,'riposte'),t)}

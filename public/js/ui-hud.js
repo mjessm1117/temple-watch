@@ -7,7 +7,7 @@ function eraLabel(){const e=typeof C!=='undefined'&&C&&C.era||1,E=uiGv('ERA'+e)|
 const hurtsAllies=ab=>ab.friendly!=null?!!ab.friendly:/allies too|everyone|friend/i.test((ab.desc||'')+' '+(ab.tip||''));
 function areaHits(u,k,g){const ab=AB[k];if(!ab||!u||!g)return [];if(ab.ally&&!ab.dm)return [];const ff=hurtsAllies(ab),dm=ab.dm?ab.dm(u):null;
  return S.units.filter(t=>alive(t)&&!t.hid&&t.status!=='captured'&&cheb(t,g)<=1&&(t.side==='e'||ff)).map(t=>{
-  const ally=t.side==='p',ch=ab.areaChance?ab.areaChance(u,t):100,d=dm&&[Math.max(1,dm[0]-(t.armor||0)),Math.max(1,dm[1]-(t.armor||0))];
+  const ally=t.side==='p',ch=ab.areaChance?ab.areaChance(u,t):100,d=dm&&[Math.max(1,dm[0]-(t.armor?1:0)),Math.max(1,dm[1]-(t.armor?1:0))];
   return {t,ally,chance:Math.round(ch),dm:d,kill:d&&t.status==='ok'?(d[0]>=t.hp?'kills':d[1]>=t.hp?'may kill':''):''}}).sort((a,b)=>a.ally-b.ally)}
 // --- Objectives panel ---
 const OBJ_TXT={defend:M=>`Hold the ${M.objName||'objective'} until the end of turn ${M.turns}.`,rescue:()=>'Free the prisoner and get them to an evac zone.',

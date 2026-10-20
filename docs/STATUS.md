@@ -14,6 +14,8 @@
 
 ## Bucket claims (feedback 2026-10-18)
 - **1 Squad identity** — Coordinator E, 2026-10-19. Armor pips (1 per hit), nicknames (deeds suggest, pick at promotion), voice bubbles + debrief quote, Padawan battle bonus, 3D gear silhouette. Touches rules.js, campaign.js, temple*.js, base.js, render.js, view3d/figures+units.
+  - Shipped: `data-identity.js` (VOICES, DEEDS, NICK_CLASS, PAD) + `identity.js` (wraps bark/select/applyResults/promoHTML/identHTML/setIdent/setPair/ensureTemple/battleUnit). Armor pips in `damage()` (rules.js); `armorPips()` in render.js, also drawn by view3d/main.js. 3D kit dressing: `dress()` in view3d/figures.js reads `u.kit` {armor,w,mods,look}. Test: `tests/identity.test.js`.
+  - Balance note: armor is much weaker now (Shieldbearer 3 armor = 3 softened hits, not −3 forever). Watch tank survival; numbers in `CLASS` / `ARMOR`.
 
 **v0.1 (2026-10-11, superseded).** One Old Republic mission: defend a relay for 8 turns against 3 Sith waves. 2 Jedi + 4 troops. Cover, hit %, overwatch, Guard, Focus, Push/Throw/Collapse/Choke/Stun, Darkness, surrender/subdue, bleed-out/revive, briefing choice, debrief. Local saves + cloud sync by code.
 

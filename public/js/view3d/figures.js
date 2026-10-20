@@ -64,7 +64,7 @@ let G=null;const geos=()=>G||(G={box:new T.BoxGeometry(1,1,1),cyl:new T.Cylinder
  core:new T.CylinderGeometry(1,1,1,8)});
 
 // Builds one figure. Returns {obj, mixer, acts, glows, mats, scale}. color = saber/unit color (hex string or number).
-export function makeFigure(kind,color){const file=fileOf(kind),M=modelOf(file);if(!M)return null;
+export function makeFigure(kind,color,kit){const file=fileOf(kind),M=modelOf(file);if(!M)return null;
  const obj=skClone(M.scene),mats=[],g=geos();obj.updateMatrixWorld(true);
  if(file==='beast'){obj.traverse(o=>{if(o.isMesh){o.material=new T.MeshStandardMaterial({color:kind==='spawn'?0x8a8494:0x6e5644,roughness:.85,metalness:.05,flatShading:true});o.material.flatShading=true;o.castShadow=true;mats.push(o.material)}});
   const eye=glow(kind==='spawn'?0xb26bff:0xff3b2e);mats.push(eye);for(const s of [-1,1])part(obj,'Head',g.sph,eye,[.09,.06,.05],[s*.36,2.95,.62]);
@@ -108,9 +108,34 @@ export function makeFigure(kind,color){const file=fileOf(kind),M=modelOf(file);i
   case 'longrifle':gun(obj,g,mw,ma,.85,.06,.06);part(obj,'hand_r',g.cyl,mw,[.025,.16,.025],[-.88,1.39,0],[0,0,Math.PI/2]);break;
   case 'cannon':gun(obj,g,mw,ma,.58,.13,.2);break;
   case 'pistol':gun(obj,g,mw,ma,.26,.05,0);break}
+ if(kit&&!beastK)dress(obj,g,kit,color,mats,mw,isJ(kind));
  for(const m of mats)m.userData.e0=m.emissive.clone();
- return finish(obj,M,kind,mats,glows,(meshy?(beastK?1.55:1.15)/(M.h||1.7):1.15/1.83*bulk)*(kind==='malgus'?1.08:1))}
+ const F=finish(obj,M,kind,mats,glows,(meshy?(beastK?1.55:1.15)/(M.h||1.7):1.15/1.83*bulk)*(kind==='malgus'?1.08:1));
+ if(kit&&KIT_BULK[kit.armor])for(const ax of ['x','z'])F.obj.scale[ax]*=KIT_BULK[kit.armor];return F}
 
+// Per-unit gear (bucket 1, 2026-10-19): armor tier, helmet style (identity editor "look"), weapon tier + mods change the figure.
+// Parts sit relative to bone positions, scaled by head height, so they fit the mannequin and every Meshy model.
+const KIT_BULK={heavy:1.07,beskar:1.08,medium:1.03};const isJ=k=>k==='jedi';
+function dress(obj,g,kit,color,mats,mw,jedi){const bp=n=>{const b=obj.getObjectByName(n);return b?b.getWorldPosition(new T.Vector3()):null},hd=bp('Head');if(!hd)return;
+ const k=hd.y/1.569,uc=mat(new T.Color(color||0xe0bd78).getHex(),{metalness:.25}),steel=mat(kit.armor==='beskar'?0xb9c2c9:0x8a949c,{metalness:.7,roughness:.35});mats.push(uc,steel);
+ const at=(bone,geo,m,s,o,r)=>{const b=bp(bone);if(!b)return;return part(obj,bone,geo,m,s.map(v=>v*k),[b.x+o[0]*k,b.y+o[1]*k,b.z+o[2]*k],r)};
+ const ua=bp('upperarm_r'),pad=(m,sz)=>{if(!ua)return;for(const [bn,s] of [['upperarm_r',-1],['upperarm_l',1]])at(bn,g.sph,m,[.1*sz,.06*sz,.1*sz],[s*.02,.06,0])};
+ // Armor: medium = unit-colored pads; heavy/beskar = big steel pads + chest plate + collar.
+ if(kit.armor==='medium'||kit.armor==='armoredRobes')pad(uc,1);
+ if(kit.armor==='heavy'||kit.armor==='beskar'){pad(steel,1.35);at('spine_03',g.box,steel,[.36,.22,.07],[0,.02,.15]);at('spine_03',g.box,uc,[.36,.04,.075],[0,.1,.155]);at('neck_01',g.cyl,steel,[.11,.05,.11],[0,-.01,0])}
+ // Look: helmet style for troopers, robe style for Jedi.
+ switch(kit.look){
+  case 'Full helmet':at('Head',g.box,uc,[.035,.06,.2],[0,.27,0]);break;
+  case 'Field cap':at('Head',g.cyl,uc,[.15,.06,.16],[0,.25,0]);at('Head',g.box,uc,[.2,.014,.12],[0,.22,.11]);break;
+  case 'Visor':at('Head',g.box,glow(0x79d3e2),[.19,.035,.05],[0,.12,.13]);break;
+  case 'Hood':case 'Hooded robe':at('Head',g.hood,mat(jedi?0x6b5a45:0x4a4f45),[.18,.22,.19],[0,.1,-.02]);break;
+  case 'Traveler’s cloak':at('spine_03',g.box,mat(0x5a4a3a),[.42,.85,.02],[0,-.25,-.16],[.08,0,0]);break;
+  case 'Battle tunic':at('pelvis',g.cyl,uc,[.17,.05,.13],[0,.08,0]);break}
+ // Weapon tier + mods (guns only): scope on tier 2+ or Scope mod, barrel extension on Long barrel, unit-color stripe on elite guns.
+ if(!jedi){const mods=kit.mods||[];
+  if(kit.w>=2||mods.includes('scope'))part(obj,'hand_r',g.cyl,mw,[.032,.2,.032],[-.9,1.44,0],[0,0,Math.PI/2]);
+  if(mods.includes('barrel'))part(obj,'hand_r',g.cyl,mw,[.024,.18,.024],[-1.33,1.36,0],[0,0,Math.PI/2]);
+  if(kit.w>=2)part(obj,'hand_r',g.box,uc,[.06,.1,.076],[-.84,1.36,0])}}
 function gun(obj,g,mw,ma,len,th,stock){const hx=-.76,hy=1.36;part(obj,'hand_r',g.box,mw,[len,th*1.3,th],[hx-len/2+.12,hy,0]);
  part(obj,'hand_r',g.box,mw,[.05,.1,th*.9],[hx+.02,hy-.07,0]);if(stock)part(obj,'hand_r',g.box,ma,[stock,th*1.1,th*.8],[hx+.12+stock/2,hy-.02,0]);}
 function finish(obj,M,kind,mats,glows,scale){obj.scale.setScalar(scale);const mixer=new T.AnimationMixer(obj),acts={},map=CLIPS[fileOf(kind)];
