@@ -1,0 +1,85 @@
+/* Temple cutaway (Chat T2): spires, ground floor, sublevel bays, adjacency links, room log. Loaded after ui.css. */
+.tmap{--build:#d9a05b;--rock:#0b1215;--rock2:#101a1e}
+@media(min-width:880px){.box.base{grid-template-columns:340px minmax(0,1fr)}}
+
+.tcut{position:relative;display:grid;gap:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;
+ background:linear-gradient(180deg,#0d2129 0,#0a1519 150px,var(--rock) 151px)}
+.tspires{display:block;width:100%;height:46px;margin-bottom:-2px}
+.tspires .zig{fill:#12262d;stroke:color-mix(in srgb,var(--holo) 45%,var(--line));stroke-width:1}
+.tspires .spire{fill:#12262d;stroke:color-mix(in srgb,var(--holo) 60%,var(--line));stroke-width:1.2;vector-effect:non-scaling-stroke}
+
+/* the ziggurat body above ground */
+.tzig{display:grid;gap:6px;padding:6px 10px 10px;background:linear-gradient(180deg,#12262d,#0e1d22);
+ border-left:1px solid color-mix(in srgb,var(--holo) 30%,var(--line));border-right:1px solid color-mix(in srgb,var(--holo) 30%,var(--line))}
+.tzig .crown{margin:0 34px}
+.tgr{display:grid;grid-template-columns:1.6fr 1fr;gap:6px}
+.tcut .room{min-height:46px;padding:6px 8px}
+.tcut .room.wr b{font-size:14px;letter-spacing:.1em;text-transform:uppercase}
+.tcut .room.wr{border-color:color-mix(in srgb,var(--holo) 45%,var(--line))}
+
+/* the ground line */
+.tsurf{display:flex;justify-content:space-between;padding:3px 10px;font:600 9.5px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--dim);
+ border-top:2px solid color-mix(in srgb,var(--holo) 35%,var(--line));background:linear-gradient(180deg,#16242a,var(--rock))}
+
+/* sublevels: 3 bays × 3 floors, with 10px rock walls between (where links show) */
+.tsub{display:grid;grid-template-columns:1fr 10px 1fr 10px 1fr;grid-template-rows:auto 10px auto 10px auto;padding:10px;
+ background:radial-gradient(circle at 20% 30%,#ffffff05 0 2px,transparent 3px) 0 0/23px 19px,radial-gradient(circle at 70% 60%,#00000040 0 3px,transparent 4px) 0 0/31px 27px,
+ repeating-linear-gradient(170deg,var(--rock) 0 14px,var(--rock2) 14px 15px)}
+.tsub .room,.tsub .slot{min-width:0;min-height:62px;grid-template-columns:16px 1fr;grid-template-rows:auto auto auto;padding:6px 6px;gap:1px 5px}
+.tsub .room .ic{width:16px;height:16px;grid-row:1/2}
+.tsub .room b{font-size:11.5px}
+.tsub .room .lv{grid-column:1/3;grid-row:2}
+.tsub .room small{grid-column:1/3;grid-row:3;font-size:9.5px}
+.tsub .room{box-shadow:inset 0 -3px 0 #0006}
+.stf{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 6px var(--good)}
+
+/* empty bay: cut rock, dashed */
+.slot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;padding:4px;border:1px dashed color-mix(in srgb,var(--holo) 25%,var(--line));border-radius:4px;
+ background:#070d0f;color:var(--dim);font-family:var(--body)}
+.slot b{font:600 18px var(--disp);color:color-mix(in srgb,var(--holo) 55%,var(--dim));line-height:1}
+.slot small{font:500 9.5px var(--mono);letter-spacing:.06em}
+.slot:hover,.slot.on{border-color:var(--holo);color:var(--fg);background:#0c1a1e}
+.slot.tgt{border-style:solid;border-color:var(--build);background:color-mix(in srgb,var(--build) 10%,#070d0f);animation:tgtPulse 1.4s ease-in-out infinite}
+.slot.tgt b{font-size:11px;color:var(--build)}
+.slot.tgt small{text-align:center;white-space:normal;line-height:1.2}
+@keyframes tgtPulse{50%{box-shadow:0 0 12px color-mix(in srgb,var(--build) 45%,transparent)}}
+
+/* construction: scaffold stripes; upgrade: a stripe along the floor */
+.room.bld{border:1px dashed var(--build);background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--build) 18%,#0b1517) 0 5px,#0b1517 5px 12px);animation:scaf 3s linear infinite;background-size:34px 34px}
+.room.bld .ic,.room.bld b{color:var(--build)}
+.room.bld small{color:var(--build)}
+.room.upg::after{content:'';position:absolute;left:4px;right:4px;bottom:3px;height:3px;border-radius:2px;
+ background:repeating-linear-gradient(90deg,var(--build) 0 6px,transparent 6px 10px);background-size:20px 3px;animation:scafx 1s linear infinite}
+@keyframes scaf{to{background-position:34px 0}}
+@keyframes scafx{to{background-position:20px 0}}
+
+/* adjacency links sit in the rock wall between two rooms */
+.lnk{align-self:center;justify-self:center;border-radius:3px;background:var(--holo);box-shadow:0 0 8px var(--holo);pointer-events:auto;z-index:2}
+.lnk.h{width:10px;height:22px}.lnk.v{width:22px;height:10px}
+.lnk.x2{background:var(--good);box-shadow:0 0 10px var(--good)}
+.lnk.prev{background:var(--build);box-shadow:0 0 8px var(--build);opacity:.75}
+
+.deep{margin:0 10px 10px}
+.tcut .room.deep{border-color:#2a2a3a;background:linear-gradient(180deg,#0e0f17,#090a10)}
+.tmove{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0;font-size:12px;color:var(--build)}
+.tmove .ic{width:14px;height:14px}
+.tmove button{min-height:28px;padding:2px 10px;font-size:12px}
+
+/* room panel extras */
+.wside{display:grid;gap:6px;margin-top:10px}
+.wloc{display:flex;align-items:center;gap:8px;font-size:13px}.wloc .ic{width:16px;height:16px;color:var(--holo)}
+.wloc button{margin-left:auto}
+.wside h3{margin:6px 0 0;font-size:11px}
+.adj{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.adj li{padding:6px 10px;border:1px solid var(--line);border-left:3px solid var(--line);border-radius:4px;font-size:13px;opacity:.75}
+.adj li.on{border-left-color:var(--holo);opacity:1}
+.adj li small{display:inline}
+.wlog{list-style:none;margin:0;padding:0;display:grid;gap:3px;max-height:260px;overflow:auto}
+.wlog li{display:grid;grid-template-columns:120px 1fr;gap:8px;font-size:12.5px;padding:3px 0;border-bottom:1px solid #ffffff08}
+.wlog li span{font:500 10.5px var(--mono);color:var(--dim);padding-top:2px}
+.wlog li.up{color:var(--holo)}.wlog li.good{color:var(--good)}.wlog li.dead,.wlog li.bad{color:var(--sith)}
+.wlog li.yr{color:var(--dim);font-style:italic}
+.rslot .wing{display:flex;gap:10px;justify-content:space-between;align-items:center;background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-top:6px}
+
+@media(max-width:879px){.tsub .room small,.slot small{display:none}.tsub .room,.tsub .slot{min-height:48px}}
+@media(prefers-reduced-motion:reduce){.room.bld,.room.upg::after,.slot.tgt{animation:none}}

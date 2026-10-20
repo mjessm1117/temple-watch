@@ -21,6 +21,7 @@ const roomOf=id=>ROOMS.find(r=>r.id===id)||ROOMS[3];
 const roomForTab=t=>({roster:'barracks',armory:'armory',wings:'works',research:'archives',ops:'comms',council:'council',market:'under',recruit:'hangar'})[t];
 function setRoom(id){const r=roomOf(id);ROOM=r.id;if(r.tab)TAB=ROOM_TAB=r.tab;else ROOM_TAB=TAB}
 function curRoom(){if(TAB!==ROOM_TAB){ROOM_TAB=TAB;const r=roomForTab(TAB);ROOM=r||'tab:'+TAB}
+ if(ROOM.startsWith('slot:')&&typeof slotById==='function'&&slotById(ROOM.slice(5))){const sl=slotById(ROOM.slice(5));return {id:ROOM,n:sl.n,d:'Empty sublevel bay. Build a wing here.',slot:sl.id}}
  if(ROOM.startsWith('tab:')){const t=TABS.find(x=>x[0]===TAB);return {id:ROOM,n:t?t[1]:'Temple',d:'',tab:TAB}}return roomOf(ROOM)}
 
 // One short status line per room. Every lookup is guarded: other chats own most of this state.
@@ -41,10 +42,8 @@ function roomLine(r){try{const cnt=a=>C.roster.filter(x=>x.status==='active'&&x.
   case 'hangar':return 'New faces monthly';
   case 'under':return 'Open after dark'}}catch(e){}return ''}
 
+// The rail: a cutaway of the Temple (spires, ground floor, sublevel bays). Drawn by temple-build.js.
 function templeMapHTML(pend){const cur=curRoom().id;
- const lv=r=>{if(!r.wing)return '';const l=C.wings[r.wing],mx=WINGS[r.wing].cost.length-1;return `<span class="lv" aria-label="Level ${l} of ${mx}">${Array.from({length:mx},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</span>`};
- const tile=r=>{const off=r.wing&&!C.wings[r.wing],badge=r.id==='barracks'&&pend?`<em title="${pend} unit${pend>1?'s':''} can rank up">${pend}</em>`:'';
-  return `<button type="button" title="${r.n}" class="room ${r.id===cur?'on':''} ${off?'off':''}" data-room="${r.id}" style="grid-area:${r.g}" aria-pressed="${r.id===cur}">${icon(r.ic)}<b>${r.s||r.n}</b>${lv(r)}<small>${roomLine(r)}</small>${badge}</button>`};
  const claimed=new Set(ROOMS.map(r=>r.tab)),extra=TABS.filter(([k])=>!claimed.has(k));
- return `<div class="tplan">${ROOMS.filter(r=>r.g).map(tile).join('')}</div>
+ return `${cutawayHTML(pend,cur)}
  <div class="tfoot"><button type="button" data-room="works" class="${cur==='works'?'on':''}">All wings</button>${extra.map(([k,n])=>`<button type="button" data-tab="${k}" class="${TAB===k&&cur.startsWith('tab:')?'on':''}">${n}</button>`).join('')}${window.codexOpen?'<button type="button" id="hubCx" title="Codex (C)">Codex</button>':''}${window.settingsOpen?'<button type="button" id="hubSet">Settings</button>':''}</div>`}
