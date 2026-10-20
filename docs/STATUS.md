@@ -12,6 +12,9 @@
 **Next (v0.2b):** Years pass (aging, Trials, retirement), saber/gear crafting, Docking Ring Nine boss vs Darth Malgus, era end. Also: smart bot and difficulty tuning to spec A §8 bands.
 
 
+## Bucket claims (feedback 2026-10-18)
+- **1 Squad identity** — Coordinator E, 2026-10-19. Armor pips (1 per hit), nicknames (deeds suggest, pick at promotion), voice bubbles + debrief quote, Padawan battle bonus, 3D gear silhouette. Touches rules.js, campaign.js, temple*.js, base.js, render.js, view3d/figures+units.
+
 **v0.1 (2026-10-11, superseded).** One Old Republic mission: defend a relay for 8 turns against 3 Sith waves. 2 Jedi + 4 troops. Cover, hit %, overwatch, Guard, Focus, Push/Throw/Collapse/Choke/Stun, Darkness, surrender/subdue, bleed-out/revive, briefing choice, debrief. Local saves + cloud sync by code.
 
 Tests: 40 bot games, 0 errors; a passive bot wins ~30–35%. The sync test passes.
