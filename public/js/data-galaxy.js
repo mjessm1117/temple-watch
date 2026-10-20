@@ -49,10 +49,16 @@ const FIELD_OPS={
  broker:{n:'Talk to a broker',want:['Consular'],days:15,stars:2,res:{credits:90},desc:'A Hutt broker owes the Republic. Collect, politely.'},
  ruins:{n:'Survey the ruins',want:['jedi','Scout'],days:30,stars:2,res:{intel:2,kyber:1},desc:'Old Jedi ruins, half buried. Something in them still hums.'},
  pilots:{n:'Downed pilots',want:['Medic','Scout'],days:15,stars:2,res:{favor:2,intel:1},desc:'A Republic flight went down behind the lines. Find them first.'},
- mines:{n:'Clear the lanes',want:['Heavy','Soldier'],days:15,stars:2,res:{credits:60,favor:2},desc:'Sith mines choke a trade lane. Clear them, convoy by convoy.'}};
+ mines:{n:'Clear the lanes',want:['Heavy','Soldier'],days:15,stars:2,res:{credits:60,favor:2},desc:'Sith mines choke a trade lane. Clear them, convoy by convoy.'},
+ // Covert actions (WotC-style, Jess 2026-10-20: units + credits). Pay a fee up front, bigger rewards, a failure can get one member captured.
+ vault:{n:'Covert: paymaster vault',covert:1,fee:60,want:['Scout','Sentinel'],days:30,stars:2,res:{credits:300},desc:'A Sith paymaster banks on a neutral world. Pay the slicers, lift the vault.'},
+ mole:{n:'Covert: plant a mole',covert:1,fee:50,want:['Consular','Scout'],days:30,stars:2,res:{intel:5},desc:'Buy a clerk inside Imperial Intelligence. Someone has to make the deal in person.'},
+ kyberrun:{n:'Covert: kyber run',covert:1,fee:80,want:['jedi','Scout'],days:30,stars:3,res:{kyber:2,intel:1},desc:'A Hutt hoard holds Ilum-grade crystals. Bribe the guards, walk them out.'},
+ yard:{n:'Covert: cripple a shipyard',covert:1,fee:70,want:['Heavy','Medic'],days:30,stars:3,res:{favor:6,intel:2},desc:'Sabotage a Sith yard so it looks like an accident. The Senate will notice the quiet.'}};
 const FIELD={cr:.5,   // field-op credits × this × difficulty income. Favor rewards kept small: each point raises the monthly stipend for the rest of the era [Tuned round 2: Era 1 ends ~400 Cr]
  base:45,perRank:5,match:10,matchMax:2,three:8,star:12,min:10,max:92,   // odds = base + 5×Σrank + 10×fits (max 2) + 8 if 3 go − 12×(stars−1)
- xp:15,expire:30,perMonth:[1,2],team:[2,3],failStress:15,failWound:10,badRoll:12,badWound:20,log:6};   // badRoll: the top 12% of rolls is a bad fail (one serious wound)
+ xp:15,expire:30,perMonth:[1,2],team:[2,3],failStress:15,failWound:10,badRoll:12,badWound:20,log:6,
+ covert:{perMonth:1,from:2,capture:25}};   // covert: 1 new each month from month 2; a failed covert action: 25% one member captured   // badRoll: the top 12% of rolls is a bad fail (one serious wound)
 // Field op planets per era (no Coruscant: ops leave the Temple).
 const FIELD_PLANETS={1:['Balmorra','Ord Mantell','Dantooine','Taris','Nar Shaddaa','Ossus','Alderaan','Hydian Way'],
  2:['Ruusan','Ord Mantell','Dantooine','Nar Shaddaa','Ossus','Hydian Way','Balmorra']};
