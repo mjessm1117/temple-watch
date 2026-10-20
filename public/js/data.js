@@ -176,4 +176,6 @@ const TUNE={
  "depot:0":{aim:5},
  "shrine:0":{aim:3},
  "r_nexus:0":{aim:10},
- "shrine:1":{aim:0}};
+ "shrine:1":{aim:0},
+ // Wave 6 maps (Chat M2): new biome layouts.
+ "shrine:5":{aim:-10},"fort:5":{aim:-10},"rescue:3":{aim:10,hp:1,extra:1},"taris:3":{aim:10,hp:1,extra:1},"archive:5":{aim:10,hp:1,extra:1}};
