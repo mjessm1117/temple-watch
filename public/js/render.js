@@ -48,10 +48,13 @@ function oddsHTML(){const u=S.sel,g=S.pick;if(!g||!canAct(u))return '';const ab=
  if(g.barrel)head='Barrel · 3×3 blast, 3 damage';else if(g.area)head=ab.name+' · 3×3 area';else if(g.spot)head='Leap here';else if(g.t)head=g.t.n;else head=ab.name;
  const dm=ab.dm&&g.t&&g.t.side==='e'?ab.dm(u):null,kill=dm&&Math.max(1,dm[1]+(u.jedi&&u.dark>=5?1:0)-(g.t.armor?1:0))>=g.t.hp;
  const AH=g.area?areaHits(u,S.mode,g):[];
- return `<div class="odds"><div class="oh"><b>${head}</b>${total!=null?`<span class="tot">${total}%</span>`:''}</div>
+ const TG=S.tg.filter(x=>!x.area||x.t),ti=TG.findIndex(x=>x.x===g.x&&x.y===g.y),cyc=TG.length>1?`<span class="cyc"><button type="button" data-cyc="-1" title="Previous target (←)">◀</button><small>${ti+1}/${TG.length}</small><button type="button" data-cyc="1" title="Next target (→)">▶</button></span>`:'';
+ const shot=g.t&&g.t.side==='e'&&(S.mode==='shoot'||ab.melee),fl=shot&&!ab.melee&&flanked(g.t,u),cr=shot?(fl?50:u.crit||0):0;
+ return `<div class="odds"><div class="oh">${cyc}<b>${head}</b>${total!=null?`<span class="tot">${total}%</span>`:''}</div>
  ${lines.map(([k,v])=>`<div class="ol" data-tip="mod:${k}"><span>${/cover$/.test(k)&&g.t?k+' · '+coverName(g.t,u):k}</span><span>${k==='Aim'?v:(v>0?'+':'')+v}</span></div>`).join('')}
  ${g.area?(AH.length?AH.map(h=>`<div class="ol${h.ally?' warn':''}"><span>${h.t.n}${h.ally?' · ally!':''}</span><span>${h.chance}%${h.dm?` · ${h.dm[0]===h.dm[1]?h.dm[0]:h.dm[0]+'–'+h.dm[1]} dmg`:''}${h.kill?' · '+h.kill:''}</span></div>`).join(''):'<div class="ol"><span class="muted">No one in the blast.</span></div>'):''}
  ${dm?`<div class="ol dm"><span>Damage</span><span>${dm[0]}–${dm[1]}${kill?' · kills on hit':''}</span></div>`:''}
+ ${shot?`<div class="ol" data-tip="stat:crit"><span>Crit${fl?' · flanked':''}</span><span>${cr}% · +2 dmg</span></div>`:''}
  <button type="button" id="confirm" class="primary">Confirm ${ab.name}</button></div>`}
 function hintText(){if(S.over)return '';if(S.phase==='enemy')return 'The enemy is moving…';const u=S.sel;
  if(S.peek)return 'Enemy details and its likely plan. Tap one of your units to give orders.';

@@ -182,3 +182,8 @@ button:active:not(:disabled){transform:translateY(1px)}
 /* Settings: label left, control right, one line */
 .ui-card{width:min(580px,100%)}
 .setrow{flex-wrap:nowrap}.setrow small{max-width:250px}
+
+/* Aim view (wave 6): odds panel becomes a wider aim bar while the shoulder cam is on */
+.odds .oh .cyc{display:inline-flex;align-items:center;gap:4px;margin-right:8px}.odds .cyc button{min-width:28px;padding:2px 6px}.odds .cyc small{color:var(--dim)}
+@media (min-width:900px){body.aiming.v3d #odds{position:fixed;left:50%;bottom:150px;transform:translateX(-50%);width:min(560px,90vw);z-index:20;pointer-events:auto}
+ body.aiming.v3d .odds .tot{font-size:34px}body.aiming.v3d .odds{display:grid;grid-template-columns:1fr 1fr;gap:2px 18px}body.aiming.v3d .odds .oh,body.aiming.v3d .odds #confirm{grid-column:1/-1}}

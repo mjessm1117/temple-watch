@@ -39,7 +39,7 @@ function init(){const wrap=document.querySelector('.bwrap'),host=document.create
  const rim=new THREE.DirectionalLight(0x79d3e2,.8);rim.position.set(-6,5,-8);scene.add(rim);const scenery=new Scenery(THREE,scene),lights={hemi,key,rim};
  initFigures(THREE);const rig=new CamRig(THREE),board=new Board(THREE,scene),units=new Units(THREE,scene,board,unitColor);units.Rig=RV;const fx3=new Effects(THREE,scene,rig),labels=new Labels(host);
  const ctl=document.createElement('div');ctl.className='v3c';
- ctl.innerHTML=`<button type="button" data-c="l" title="Rotate left (Q)">⟲</button><button type="button" data-c="r" title="Rotate right (E)">⟳</button><button type="button" data-c="i" title="Zoom in (wheel)">+</button><button type="button" data-c="o" title="Zoom out (wheel)">−</button><button type="button" data-c="f" title="Reset view">⌂</button><button type="button" data-c="c" title="Cinematic cameras on/off" class="cineb"></button><span>Drag or WASD to pan · wheel zoom · Q/E rotate</span>`;
+ ctl.innerHTML=`<button type="button" data-c="l" title="Rotate left (Q) · drag the mouse to orbit">⟲</button><button type="button" data-c="r" title="Rotate right (E)">⟳</button><button type="button" data-c="i" title="Zoom in (wheel)">+</button><button type="button" data-c="o" title="Zoom out (wheel)">−</button><button type="button" data-c="f" title="Reset view">⌂</button><button type="button" data-c="c" title="Cinematic cameras on/off" class="cineb"></button><span>Drag or WASD to pan · wheel zoom · Q/E rotate</span>`;
  ctl.addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(!c)return;({l:()=>rig.rotate(-1),r:()=>rig.rotate(1),i:()=>rig.zoom(1/1.2),o:()=>rig.zoom(1.2),f:()=>fit(),c:()=>View3D.cinematics=!V.cine.enabled})[c.dataset.c]()});
  host.appendChild(ctl);
  const ray=new THREE.Raycaster(),ndc=new THREE.Vector2(),ground=new THREE.Plane(new THREE.Vector3(0,1,0),0),hit=new THREE.Vector3();
@@ -158,7 +158,12 @@ function abilityFx(d){const {units,fx3,rig}=V,u=units.get(d.u),k=d.k,g=d.g,tp=g&
 
 let visK='',visS=null,visT=[],lastCb=false;const board0=()=>V.board;
 // UI layer: reach tiles, cover shields, targets, path, aim/intent lines, % tags. Rebuilt on every render and hover.
-function ui(){if(!V||!S)return;if(cb()!==lastCb){lastCb=cb();board0().palette(lastCb);lastS=null;return View3D.sync()}const {board,units,labels}=V,sel=S.sel,can=canAct(sel)&&!S.peek&&S.phase==='player';
+let camSel=null;
+function camUi(){const {rig}=V,sel=S.sel,pl=S.phase==='player';
+ if(pl&&sel&&sel!==camSel&&sel.side==='p'&&V.units.get(sel))rig.focus(P(sel));camSel=sel;
+ const g=S.pick,aim=pl&&sel&&g&&g.t&&!g.area&&!g.spot&&g.t!==sel&&V.units.get(sel)&&V.units.get(g.t);
+ rig.aim(aim?vpos(sel,0):null,aim?vpos(g.t,.9):null);document.body.classList.toggle('aiming',!!aim)}
+function ui(){if(!V||!S)return;try{camUi()}catch(e){console.warn(e)}if(cb()!==lastCb){lastCb=cb();board0().palette(lastCb);lastS=null;return View3D.sync()}const {board,units,labels}=V,sel=S.sel,can=canAct(sel)&&!S.peek&&S.phase==='player';
  const h={reach:[],hover:null,targets:[],path:[],area:null,iarea:null,smoke:S.smoke||[],shields:[],lines:[]};
  // Blue = 1 action, gold = dash (both actions), from Chat U's moveZones().
  if(can&&S.mode==='move'){const Z=typeof moveZones==='function'?moveZones(sel):{...reach(sel),mob:1e9},R=Z.d;for(const k in R){if(!(R[k]>0))continue;const [x,y]=k.split(',').map(Number),hot=!!HOV&&HOV.x===x&&HOV.y===y,dash=R[k]>Z.mob;h.reach.push({x,y,dash});if(hot)h.hover={x,y,dash};

@@ -33,7 +33,7 @@ function chooseAbility(k){const u=S.sel;if(!canAct(u)||!AB[k])return;
  if(AB[k].instant)return exec(u,k,null);
  S.pick=null;S.hpath=null;if(S.mode===k){S.mode='move';S.tg=[]}else{S.mode=k;S.tg=targetsFor(u,k)}render()}
 $('#acts').addEventListener('click',ev=>{const b=ev.target.closest('button[data-a]');if(!b||b.disabled)return;chooseAbility(b.dataset.a)});
-$('#odds').addEventListener('click',ev=>{if(ev.target.closest('#confirm')&&S.pick&&canAct(S.sel))exec(S.sel,S.mode,S.pick)});
+$('#odds').addEventListener('click',ev=>{const c=ev.target.closest('[data-cyc]');if(c){ev.stopPropagation();return cycleTarget(+c.dataset.cyc)}if(ev.target.closest('#confirm')&&S.pick&&canAct(S.sel))exec(S.sel,S.mode,S.pick)});
 $('#roster').addEventListener('click',ev=>{const b=ev.target.closest('button[data-u]');if(b)select(S.units.filter(u=>u.side==='p')[+b.dataset.u])});
 // Ending with units that can still act: first press names them and lights them in the roster; second press ends.
 let endT=0;$('#endBtn').addEventListener('click',()=>{const e=$('#endBtn'),A=players().filter(canAct);
