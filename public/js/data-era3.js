@@ -146,7 +146,8 @@ Object.assign(MISSIONS,{
   goal:'Hold the outpost for 8 turns. Path-Runners drop in behind you.',win:'The outpost stays lit.',lose:'The outpost goes dark.',reward:{credits:80},bonus:{credits:30},bonusTxt:'Outpost above 75%'})});
 // Extra guards so the reused layouts aren't walkovers.
 MISSIONS.h_prisoners.foes.push(['nihil_storm',6,6],['nihil_raider',9,8]);
-MISSIONS.h_hetzal.foes.push(['nihil_storm',5,0],['nihil_raider',2,1]);
+MISSIONS.h_hetzal.foes.push(['nihil_raider',5,0]);
+MISSIONS.h_roots.foes.push(['nihil_storm',8,8]);
 MISSIONS.h_scouts.foes.push(['nihil_raider',8,0],['nihil_storm',5,4]);
 
 // Per-map balance (E3 owns these rows). Same format as data.js TUNE. Target: weak test bot wins ~55–70% on Normal.
