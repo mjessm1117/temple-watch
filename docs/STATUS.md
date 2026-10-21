@@ -14,6 +14,11 @@
 
 ## Bucket claims (feedback 2026-10-18)
 - **Focus session (E, 2026-10-21, Jess: all in one chat):** E took over temple files for this session. New: `css/xcom.css`, `js/hud-xcom.js`, `data-modules.js` + `temple-modules.js` (C.mods: cd/next/dug/digging/feat; hooks `slotDeco`/`roomDeco` in temple-build.js), graze (`GRAZE` in rules.js), flank preview + enemy follow cam (view3d/main.js), move-range border (view3d/board.js). Test: `tests/modules.test.js`.
+- **Saga (story-first layer)** — Chat Saga, 2026-10-21. Owns `data-saga.js`, `saga.js`, `css/saga.css`, `tests/saga.test.js` (wired into both npm scripts), `docs/specs/saga.md`. Added 2 script tags before `screens.js` and 1 css link. Era 1 only (`C.era===1`).
+  - Shipped: squad arcs (Kira, Tor, Rhal, Ilsa, Bren, Grak + Satele/Jace/Varra), Temple "Your people" strip (1 talk per visit; arc climaxes forced, max 2/visit), approach picker on the squad screen, squad beats on turn 2–3 via the comm box, aftermath + grief scenes, trust (±5 aim at ±2), 3 personal missions, finale allies at Docking Ring Nine, cast epilogues.
+  - Wraps (originals kept): `baseScreen`, `squadScreen`, `launchMission`, `startMission`, `bvFire`, `bvPick`, `applyResults`, `optionsFor`, `battleUnit`; `EPILOGUE.unshift`. Save adds `C.saga` (~2 KB).
+  - Balance: default approach "As briefed" changes nothing, so bot numbers hold. Squad beats add one comm decision per mission (bot answers at random).
+  - Saga → E (CHANGELOG): "Story-first Era 1: your squad has arcs. Talk to them at the Temple, choose an approach before each mission, answer them mid-fight, decide the aftermath. Their stories decide who stands with you against Malgus."
 - **Wave 6 file owners (2026-10-20).** Edit only your files; need a change elsewhere → add a line under that owner here. Anyone may add their own `<script>` line to `index.html` (pull first). `git pull` before every push.
   - **E Coordinator · Battle feel:** `view3d/*`, `render.js`, `input.js`, `ui-hud.js`, `css/ui.css`, `identity.js`, `data-identity.js`, `tests/identity.test.js`, `docs/CHANGELOG.md`.
   - **M2 Maps:** `data-maps.js`, `maps.js`, `map-open.js`, `data.js` (layouts only), `hazards.js`, new `tests/mapcheck.test.js`.

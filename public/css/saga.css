@@ -1,0 +1,28 @@
+/* Saga layer (saga.js): "Your people" strip on the Temple screen, talk scenes, approach picker, finale allies. */
+.saga-strip{margin-top:10px;border:1px solid var(--line);border-left:3px solid var(--holo);background:var(--raise);padding:8px 10px;border-radius:6px}
+.saga-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.saga-h b{font:600 13px var(--disp);letter-spacing:.08em;text-transform:uppercase;color:var(--holo)}
+.saga-h span{color:var(--dim);font-size:13px}
+.saga-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.saga-chip{display:grid;gap:1px;text-align:left;min-width:120px;padding:6px 10px;border:1px solid var(--line);border-left:3px solid var(--uc,var(--troop));background:var(--panel);border-radius:5px;font-family:var(--body);cursor:default}
+.saga-chip b{font:600 13px var(--disp);color:var(--fg)}
+.saga-chip small{font-size:12px;color:var(--dim)}
+.saga-chip small.hi{color:var(--good)}.saga-chip small.lo{color:var(--sith)}
+.saga-chip em{font-style:normal;font-size:12px;color:var(--holo)}
+.saga-chip.talk{border-color:var(--holo);box-shadow:0 0 0 1px rgba(121,211,226,.25),0 0 12px rgba(121,211,226,.18)}
+.saga-chip.talk:not([disabled]){cursor:pointer}
+.saga-chip.talk:not([disabled]):hover{background:var(--raise)}
+.saga-scene{max-width:620px}
+.saga-who{display:flex;align-items:center;gap:10px;margin:4px 0 2px}
+.saga-who .mini{width:36px;height:36px}
+.saga-who b{font:600 15px var(--disp)}
+.saga-who small{color:var(--dim)}
+.saga-say{border-left:3px solid var(--holo);padding:6px 12px;font-style:italic;color:var(--fg)}
+.saga-ap h3,.saga-fin h3{margin:12px 0 6px}
+.saga-aps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px}
+.saga-aps .choice.on{border-color:var(--holo);border-left-color:var(--holo);background:rgba(121,211,226,.08)}
+.saga-aps .choice i{font-style:normal;color:var(--troop)}
+.saga-fin{border:1px solid var(--line);border-left:3px solid var(--good);padding:6px 10px;border-radius:5px;margin-top:8px}
+.saga-fin p{margin:4px 0;font-size:13px}
+.saga-fin b{color:var(--good)}
+@media (max-width:600px){.saga-chip{min-width:0;flex:1 1 45%}}
