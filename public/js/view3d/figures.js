@@ -131,6 +131,9 @@ function dress(obj,g,kit,color,mats,mw,jedi){const bp=n=>{const b=obj.getObjectB
   case 'Hood':case 'Hooded robe':at('Head',g.hood,mat(jedi?0x6b5a45:0x4a4f45),[.18,.22,.19],[0,.1,-.02]);break;
   case 'Traveler’s cloak':at('spine_03',g.box,mat(0x5a4a3a),[.42,.85,.02],[0,-.25,-.16],[.08,0,0]);break;
   case 'Battle tunic':at('pelvis',g.cyl,uc,[.17,.05,.13],[0,.08,0]);break}
+ // Class props: Shieldbearer carries a riot shield on the left forearm; Defender wears heavy pauldrons and a cape.
+ if(kit.cls==='Shieldbearer'){const la=bp('lowerarm_l')?'lowerarm_l':'hand_l';at(la,g.box,steel,[.05,.5,.34],[.06,-.05,.05]);at(la,g.box,uc,[.055,.06,.3],[.06,.12,.05]);at(la,g.box,glow(0x79d3e2),[.056,.025,.18],[.06,-.22,.05])}
+ if(kit.cls==='Defender'){pad(steel,1.5);at('spine_03',g.box,uc,[.4,.8,.02],[0,-.32,-.15],[.08,0,0])}
  // Weapon tier + mods (guns only): scope on tier 2+ or Scope mod, barrel extension on Long barrel, unit-color stripe on elite guns.
  if(!jedi){const mods=kit.mods||[];
   if(kit.w>=2||mods.includes('scope'))part(obj,'hand_r',g.cyl,mw,[.032,.2,.032],[-.9,1.44,0],[0,0,Math.PI/2]);

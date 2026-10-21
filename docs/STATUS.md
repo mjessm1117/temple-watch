@@ -13,6 +13,7 @@
 
 
 ## Bucket claims (feedback 2026-10-18)
+- **Focus session (E, 2026-10-21, Jess: all in one chat):** E took over temple files for this session. New: `css/xcom.css`, `js/hud-xcom.js`, `data-modules.js` + `temple-modules.js` (C.mods: cd/next/dug/digging/feat; hooks `slotDeco`/`roomDeco` in temple-build.js), graze (`GRAZE` in rules.js), flank preview + enemy follow cam (view3d/main.js), move-range border (view3d/board.js). Test: `tests/modules.test.js`.
 - **Wave 6 file owners (2026-10-20).** Edit only your files; need a change elsewhere → add a line under that owner here. Anyone may add their own `<script>` line to `index.html` (pull first). `git pull` before every push.
   - **E Coordinator · Battle feel:** `view3d/*`, `render.js`, `input.js`, `ui-hud.js`, `css/ui.css`, `identity.js`, `data-identity.js`, `tests/identity.test.js`, `docs/CHANGELOG.md`.
   - **M2 Maps:** `data-maps.js`, `maps.js`, `map-open.js`, `data.js` (layouts only), `hazards.js`, new `tests/mapcheck.test.js`.

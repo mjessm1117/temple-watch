@@ -21,13 +21,14 @@ function eAttacks(e,pos){const a={...e,x:pos.x,y:pos.y},out=[];
  if(e.nades>0&&!e.disarmed){const g=bestBlast(e,pos);if(g&&g.score>=70)out.push(g)}
  out.sort((x,y)=>y.score-x.score);return out[0]||null}
 function tileScore(e,pos){let s=Math.random()*3+elevAt(pos.x,pos.y)*3;const P=players().filter(p=>p.status==='ok'&&!p.vip);
- if(!e.horror)for(const p of P)if(dist(p,pos)<=10&&los(p,pos))s-=(40-coverVal(pos,p))/2;
+ const melee=e.range<2,fear=melee?.2:.5; // melee enemies charge (Jess 10-17): they barely care about cover
+ if(!e.horror)for(const p of P)if(dist(p,pos)<=10&&los(p,pos))s-=(40-coverVal(pos,p))*fear;
  const a=eAttacks(e,pos);if(a)s+=a.score*.6;
  // Flanking: a spot that sees a squad member with no cover toward it.
  if(e.range>=2)for(const p of P)if(inCover(p)&&dist(pos,p)<=e.range&&los(pos,p)&&coverVal(p,pos)===0)s+=12;
  // Pods stay within 3 of a living leader.
  const L=e.lead&&byId(e.lead);if(L&&alive(L)&&L.status==='ok')s-=Math.max(0,dist(pos,L)-3)*3;
- if(e.range<2){const j=P.filter(p=>p.jedi),T=(e.force||e.horror)&&j.length?j:P;if(T.length)s-=Math.min(...T.map(p=>dist(p,pos)))*4}
+ if(melee){const j=P.filter(p=>p.jedi),T=(e.force||e.horror)&&j.length?j:P;if(T.length){const m=Math.min(...T.map(p=>dist(p,pos)));s-=m*7;if(T.some(p=>cheb(p,pos)===1))s+=30}}
  else if(S.type==='defend')s-=dist(pos,nearestConsole(pos))*2.5;
  else if(P.length)s-=Math.max(0,Math.min(...P.map(p=>dist(p,pos)))-e.range*.7)*2;
  return s}
@@ -57,7 +58,13 @@ async function eAct0(e){
  if(isElite(e)&&e.hp*3<=e.max&&!e.fellBack&&!S.conc&&!asleep(e))return fallBack(e);
  if(S.conc||asleep(e))return idleAct(e);
  if(e.tricked){e.tricked=0;S.peek=e;const melee=e.range<2,o=enemies().filter(o=>o!==e&&o.status==='ok'&&!o.hid&&(melee?cheb(e,o)===1:dist(e,o)<=e.range&&los(e,o)));
-  if(o.length){const t=o.sort((x,y)=>x.hp-y.hp)[0];log(`${e.n}, mind clouded, turns on ${t.n}.`,'good');resolve(e,t,hitChance(e,t,{melee}),e.dmg,{melee,label:'confused attack'});render();await sleep(500)}
+  let tg=o;if(!tg.length){ // close in on the nearest former ally first, then strike (Jess 10-17)
+   const foes=enemies().filter(x=>x!==e&&x.status==='ok'&&!x.hid);if(foes.length){const R=reach(e);let best=null,bs=-1e9;
+    for(const k of Object.keys(R.d)){const [x,y]=k.split(',').map(Number),p={x,y},n=foes.map(f=>dist(p,f)).sort((a,b)=>a-b)[0],can=foes.some(f=>melee?cheb(p,f)===1:dist(p,f)<=e.range&&los(p,f));
+     const sc=(can?100:0)-n;if(sc>bs){bs=sc;best=p}}
+    if(best&&(best.x!==e.x||best.y!==e.y)){log(`${e.n}, mind clouded, rounds on its own side.`,'good');moveAlong(e,pathTo(e,best.x,best.y,R.prev));render();await sleep(380)}
+    if(e.status==='ok')tg=foes.filter(f=>melee?cheb(e,f)===1:dist(e,f)<=e.range&&los(e,f))}}
+  if(tg.length&&e.status==='ok'){const t=tg.sort((x,y)=>x.hp-y.hp)[0];log(`${e.n}, mind clouded, turns on ${t.n}.`,'good');resolve(e,t,hitChance(e,t,{melee}),e.dmg,{melee,label:'confused attack'});render();await sleep(500)}
   else log(`${e.n} stands confused.`);return}
  // Hidden agents wait until someone comes within 6 or they get a 70%+ shot.
  if(e.hid&&!players().some(p=>p.status==='ok'&&!p.vip&&dist(p,e)<=6)){const a=eAttacks(e,e);if(!a||a.kind!=='shot'||a.chance<70)return}

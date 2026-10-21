@@ -15,8 +15,11 @@ export class CamRig{
  // Over-the-shoulder: behind the shooter, offset to their right, looking past them at the target.
  aim(from,to){if(!from||!to){this.aimOn=false;return}const d=to.clone().sub(from).setY(0);if(d.lengthSq()<.01)d.set(0,0,-1);d.normalize();
   const r=new this.T.Vector3(-d.z,0,d.x),far=Math.min(1,from.distanceTo(to)/10);
-  this.aimP.copy(from).addScaledVector(d,-2.1-far).addScaledVector(r,.85).setY(from.y+1.15+far*.6);this.aimL.copy(to).setY(to.y+.1);this.aimOn=true}
+  this.aimP.copy(from).addScaledVector(d,-2.6-far).addScaledVector(r,1.1).setY(from.y+2.5+far*1.4);this.aimL.copy(to).setY(to.y-.3).lerp(from,.15);this.aimOn=true}
  zoom(f){this.distGoal=Math.min(30,Math.max(5,this.distGoal*f))}
+ // World units under one screen pixel at the target (so a dragged finger keeps the same patch of ground under it).
+ perPx(h){return 2*this.dist*Math.tan(this.cam.fov*Math.PI/360)/Math.max(200,h)}
+ panW(right,fwd){this.pan(right/(this.dist*.05),fwd/(this.dist*.05))}
  pan(right,fwd){const s=Math.sin(this.yawGoal),c=Math.cos(this.yawGoal),k=this.dist*.05;
   this.goal.x+=(c*right-s*fwd)*k;this.goal.z+=(-s*right-c*fwd)*k;
   this.clamp()}
@@ -36,14 +39,16 @@ export class CamRig{
   dom.addEventListener('contextmenu',e=>e.preventDefault());
   dom.addEventListener('wheel',e=>{e.preventDefault();this.zoom(e.deltaY>0?1.12:1/1.12)},{passive:false});
   // Two-finger pinch zooms on phones/tablets; one finger pans, tap selects.
-  const pts=new Map();let pinch=0;const gap=()=>{const[a,b]=[...pts.values()];return Math.hypot(a.x-b.x,a.y-b.y)||1};
-  dom.addEventListener('pointerdown',e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2){pinch=gap();down=null;dragged=true;return}
+  const pts=new Map();let pinch=0,ang=0,mid=null;const gap=()=>{const[a,b]=[...pts.values()];return Math.hypot(a.x-b.x,a.y-b.y)||1},
+   angle=()=>{const[a,b]=[...pts.values()];return Math.atan2(b.y-a.y,b.x-a.x)},center=()=>{const[a,b]=[...pts.values()];return{x:(a.x+b.x)/2,y:(a.y+b.y)/2}};
+  dom.addEventListener('pointerdown',e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2){pinch=gap();ang=angle();mid=center();down=null;dragged=true;return}
    down={x:e.clientX,y:e.clientY,b:e.button,orbit:e.pointerType==='mouse'&&e.button===0&&!e.shiftKey};dragged=false;dom.setPointerCapture(e.pointerId)});
-  const lift=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=0};dom.addEventListener('pointercancel',lift);
+  const lift=e=>{pts.delete(e.pointerId);if(pts.size<2){pinch=0;mid=null}};dom.addEventListener('pointercancel',lift);
   dom.addEventListener('pointermove',e=>{if(pts.has(e.pointerId))pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
-   if(pinch&&pts.size===2){const g=gap();this.zoom(pinch/g);pinch=g;return}
+   if(pinch&&pts.size===2){const g=gap(),a=angle(),m=center();this.zoom(pinch/g);pinch=g;let da=a-ang;if(da>Math.PI)da-=2*Math.PI;if(da<-Math.PI)da+=2*Math.PI;this.yawGoal+=da;ang=a;
+    const k=this.perPx(dom.clientHeight);this.panW(-(m.x-mid.x)*k,(m.y-mid.y)*k);mid=m;return}
    if(down){const dx=e.clientX-down.x,dy=e.clientY-down.y;if(!dragged&&Math.hypot(dx,dy)>7)dragged=true;
-    if(dragged){if(down.orbit)this.orbit(-dx*.008,dy*.004);else{const s=.9/Math.max(300,dom.clientWidth)*30;this.pan(-dx*s,dy*s)}down.x=e.clientX;down.y=e.clientY;return}}
+    if(dragged){if(down.orbit)this.orbit(-dx*.008,dy*.004);else{const k=this.perPx(dom.clientHeight);this.panW(-dx*k,dy*k/Math.sin(this.pitch))}down.x=e.clientX;down.y=e.clientY;return}}
    const t=pick(e);onTile(t?t.x:-1,t?t.y:-1,'hover')});
   dom.addEventListener('pointerup',e=>{lift(e);const was=down;down=null;if(!was||dragged||was.b!==0)return;const t=pick(e);if(t)onTile(t.x,t.y,'click')});
   dom.addEventListener('pointerleave',()=>onTile(-1,-1,'hover'));

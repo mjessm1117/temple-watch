@@ -2,7 +2,7 @@
    Wing levels, costs and effects stay in data-campaign.js (WINGS). Logic: temple-build.js. */
 
 // The sublevels under the Temple: 3 floors × 3 bays. id = 's'+floor+bay. Adjacent = same floor next bay, or same bay next floor.
-const SLOT_ROWS=3,SLOT_COLS=3,BAYS=['West','Center','East'];
+const SLOT_ROWS=5,SLOT_COLS=3,BAYS=['West','Center','East'];
 const SLOTS=[];for(let f=1;f<=SLOT_ROWS;f++)for(let b=0;b<SLOT_COLS;b++)SLOTS.push({id:'s'+f+b,f,b,n:`Sublevel ${f} · ${BAYS[b]}`,sn:`SL${f} ${BAYS[b][0]}`});
 
 // Where each wing goes when the game places it for you (old saves, Build with no slot picked) and the slot is free.

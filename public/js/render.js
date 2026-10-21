@@ -54,7 +54,7 @@ function oddsHTML(){const u=S.sel,g=S.pick;if(!g||!canAct(u))return '';const ab=
  ${lines.map(([k,v])=>`<div class="ol" data-tip="mod:${k}"><span>${/cover$/.test(k)&&g.t?k+' · '+coverName(g.t,u):k}</span><span>${k==='Aim'?v:(v>0?'+':'')+v}</span></div>`).join('')}
  ${g.area?(AH.length?AH.map(h=>`<div class="ol${h.ally?' warn':''}"><span>${h.t.n}${h.ally?' · ally!':''}</span><span>${h.chance}%${h.dm?` · ${h.dm[0]===h.dm[1]?h.dm[0]:h.dm[0]+'–'+h.dm[1]} dmg`:''}${h.kill?' · '+h.kill:''}</span></div>`).join(''):'<div class="ol"><span class="muted">No one in the blast.</span></div>'):''}
  ${dm?`<div class="ol dm"><span>Damage</span><span>${dm[0]}–${dm[1]}${kill?' · kills on hit':''}</span></div>`:''}
- ${shot?`<div class="ol" data-tip="stat:crit"><span>Crit${fl?' · flanked':''}</span><span>${cr}% · +2 dmg</span></div>`:''}
+ ${shot?`<div class="ol" data-tip="stat:crit"><span>Crit${fl?' · flanked':''}</span><span>${cr}% · +2 dmg</span></div>${!ab.melee&&total!=null&&total<95?`<div class="ol" data-tip="stat:graze"><span>Graze</span><span>${Math.min(GRAZE,95-total+5)}% · half dmg</span></div>`:''}`:''}
  <button type="button" id="confirm" class="primary">Confirm ${ab.name}</button></div>`}
 function hintText(){if(S.over)return '';if(S.phase==='enemy')return 'The enemy is moving…';const u=S.sel;
  if(S.peek)return 'Enemy details and its likely plan. Tap one of your units to give orders.';

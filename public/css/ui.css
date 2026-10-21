@@ -36,7 +36,7 @@ button:active:not(:disabled){transform:translateY(1px)}
 .cxe{transition:border-color .12s}.cxe:hover{border-color:var(--edge,var(--holo))}
 
 /* ---------- Battle HUD, desktop: board fills the window; orders in a bar along the bottom ---------- */
-@media(min-width:880px){
+@media(min-width:880px),(orientation:landscape) and (min-width:560px) and (max-height:600px){
  body:not(:has(.modal:not([hidden]) .base)){padding:0}
  #app{max-width:none;height:100vh;gap:0;grid-template-rows:auto auto minmax(0,1fr)}
  .top{padding:8px 18px;background:linear-gradient(#05090bf5,#05090bcc);border-bottom:1px solid var(--hair)}
@@ -153,7 +153,7 @@ button:active:not(:disabled){transform:translateY(1px)}
 .tfoot{display:flex;flex-wrap:wrap;gap:4px}
 .tfoot button{flex:1;min-height:32px;font-size:12px;padding:4px 8px;background:none}
 .tfoot button.on{color:var(--holo);border-color:var(--holo)}
-@media(min-width:880px){
+@media(min-width:880px),(orientation:landscape) and (min-width:560px) and (max-height:600px){
  .box.base{grid-template-columns:300px minmax(0,1fr);grid-template-rows:auto auto 1fr}
  .tmap{grid-column:1;grid-row:2/4;position:sticky;top:14px}
  .base .calstrip{grid-column:2;grid-row:2;margin:0}
@@ -185,5 +185,5 @@ button:active:not(:disabled){transform:translateY(1px)}
 
 /* Aim view (wave 6): odds panel becomes a wider aim bar while the shoulder cam is on */
 .odds .oh .cyc{display:inline-flex;align-items:center;gap:4px;margin-right:8px}.odds .cyc button{min-width:28px;padding:2px 6px}.odds .cyc small{color:var(--dim)}
-@media (min-width:900px){body.aiming.v3d #odds{position:fixed;left:50%;bottom:150px;transform:translateX(-50%);width:min(560px,90vw);z-index:20;pointer-events:auto}
+@media (min-width:900px) and (min-height:601px){body.aiming.v3d #odds{position:fixed;left:50%;bottom:98px;transform:translateX(-50%);width:min(480px,60vw);z-index:20;pointer-events:auto}
  body.aiming.v3d .odds .tot{font-size:34px}body.aiming.v3d .odds{display:grid;grid-template-columns:1fr 1fr;gap:2px 18px}body.aiming.v3d .odds .oh,body.aiming.v3d .odds #confirm{grid-column:1/-1}}

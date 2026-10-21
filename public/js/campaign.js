@@ -49,7 +49,7 @@ function applyResults(win){const M=S.M,o=C.options[C.chosen]||{},out={res:{},row
   if(bonus){for(const [k,v] of Object.entries(M.bonus||{}))gain(k,v,out.res);out.bonus=M.bonusTxt}
   if(S.envoyTaken){C.flags.e1_strike_known=1;out.flag='The envoy talks: the peace talks are a feint. The Empire plans a strike on Coruscant.'}}
  else gain('favor',-3,out.res);
- gain('intel',S.intel,out.res);gain('orderDark',4*S.orderDark,out.res);
+ gain('intel',S.intel,out.res);gain('credits',S.lootCred||0,out.res);gain('orderDark',4*S.orderDark,out.res);
  for(const u of S.units.filter(u=>u.side==='p'&&u.rid)){const r=C.roster.find(r=>r.id===u.rid);if(!r)continue;let xp=0,fate;
   if(u.vip){if(win&&u.status!=='dead'){r.status='active';r.capT=0;r.wound=Math.ceil(WOUND.serious/healMult());fate='Rescued · recovering'}
    else if(u.status==='dead'){r.status='dead';fate='Died in the rescue'}else fate='Still captive'}

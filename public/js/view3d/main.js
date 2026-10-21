@@ -52,7 +52,7 @@ function init(){const wrap=document.querySelector('.bwrap'),host=document.create
  const resize=()=>{const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);rig.cam.aspect=w/h;rig.cam.updateProjectionMatrix();fx3.setScale(renderer.getPixelRatio()*h/2.2)};
  new ResizeObserver(resize).observe(host);
  const fit=()=>{if(!board.rows)return;rig.fit(board.cols,board.rows,rig.cam.aspect);const c=[[-1,-1],[1,-1],[-1,1],[1,1]].map(([a,b])=>new THREE.Vector3(a*board.cols/2,0,b*board.rows/2));
-  for(let d=6;d<=32;d+=.5){rig.dist=d;rig.update(0);rig.cam.updateMatrixWorld();if(c.every(p=>{const v=p.clone().project(rig.cam);return Math.abs(v.x)<.97&&Math.abs(v.y)<.94}))break}rig.distGoal=rig.dist};
+  for(let d=6;d<=32;d+=.5){rig.dist=d;rig.update(0);rig.cam.updateMatrixWorld();if(c.every(p=>{const v=p.clone().project(rig.cam);return Math.abs(v.x)<.97&&Math.abs(v.y)<.94}))break}rig.distGoal=rig.dist=Math.max(8,rig.dist*.8)}; // XCOM framing: a bit closer than the whole board
  V={renderer,scene,rig,board,units,fx3,labels,host,resize,fit,scenery,lights,cine:new Cine(THREE,rig,host,labels.el)};cineBtn();resize();
  const setReduce=()=>{units.reduce=fx3.reduce=V.cine.reduce=reduceMQ.matches};setReduce();reduceMQ.addEventListener('change',setReduce);
  let last=performance.now(),slowN=0;const loop=now=>{requestAnimationFrame(loop);const raw=(now-last)/1000,real=Math.min(.05,raw);last=now;if(!on||document.hidden||!S)return;frame(real,now/1000);
@@ -94,7 +94,10 @@ function reveals(){const fresh=S.units.filter(u=>u.side==='e'&&!u.hid&&alive(u)&
  if(!V.cine.ready('reveal',4))return;const c=fresh.reduce((a,u)=>a.add(P(u)),new THREE.Vector3()).multiplyScalar(1/fresh.length);
  const n={};for(const u of fresh){const k=u.n.replace(/ \d+$/,'');n[k]=(n[k]||0)+1}const horror=fresh.some(u=>u.horror||u.boss);
  V.cine.reveal(c,`<div style="font:600 18px 'Chakra Petch',sans-serif;letter-spacing:.14em;color:${horror?'#ef6a5d':'#e0bd78'}">${horror?'THREAT SIGHTED':'CONTACT'}</div><div style="font:500 13px 'IBM Plex Sans',sans-serif;color:#dbe7e4">${Object.entries(n).map(([k,v])=>v>1?k+' ×'+v:k).join(' · ')}</div>`)}
+// Enemy turn: the camera follows whoever acts (XCOM), only if they're near the screen edge.
+const offEdge=p=>{const s=proj(p),c=V.renderer.domElement;return !s||s.x<c.clientWidth*.2||s.x>c.clientWidth*.8||s.y<c.clientHeight*.15||s.y>c.clientHeight*.72};
 function play(type,d){const {units,fx3,labels,board,rig}=V;
+ if(S.phase==='enemy'&&(type==='move'||type==='shot')){const a=d.u||d.a,to=type==='move'&&d.path.length?d.path.at(-1):a;if(a&&a.side==='e'&&!a.hid&&offEdge(P(to)))rig.focus(P(a).lerp(P(to),.6))}
  switch(type){
   case 'move':{if(d.u.hid||!d.path.length)return 0;const v=units.get(d.u);if(v.state!=='ok')return 0;return v.walk([P(d.from),...d.path.map(p=>P(p))],d.path.at(-1))+40}
   case 'shot':{const a=units.get(d.a),tv=units.get(d.t),pa=P(d.from,.9),pt=tv.root.position.clone().setY(.8);a.faceTo(pt);
@@ -158,16 +161,19 @@ function abilityFx(d){const {units,fx3,rig}=V,u=units.get(d.u),k=d.k,g=d.g,tp=g&
 
 let visK='',visS=null,visT=[],lastCb=false;const board0=()=>V.board;
 // UI layer: reach tiles, cover shields, targets, path, aim/intent lines, % tags. Rebuilt on every render and hover.
-let camSel=null;
+let camSel=null,camT=null;
 function camUi(){const {rig}=V,sel=S.sel,pl=S.phase==='player';
- if(pl&&sel&&sel!==camSel&&sel.side==='p'&&V.units.get(sel))rig.focus(P(sel));camSel=sel;
+ const edge=p=>{const s=proj(p),c=V.renderer.domElement;return !s||s.x<c.clientWidth*.22||s.x>c.clientWidth*.78||s.y<c.clientHeight*.18||s.y>c.clientHeight*.7};
+ if(pl&&sel&&sel!==camSel&&sel.side==='p'&&V.units.get(sel)&&edge(P(sel)))rig.focus(P(sel));camSel=sel;
  const g=S.pick,aim=pl&&sel&&g&&g.t&&!g.area&&!g.spot&&g.t!==sel&&V.units.get(sel)&&V.units.get(g.t);
- rig.aim(aim?vpos(sel,0):null,aim?vpos(g.t,.9):null);document.body.classList.toggle('aiming',!!aim)}
+ const touch=matchMedia('(pointer:coarse)').matches;
+ if(touch){rig.aim(null);if(aim&&g.t!==camT&&(edge(P(sel))||edge(P(g.t))))rig.focus(P(sel).lerp(P(g.t),.5))}else rig.aim(aim?vpos(sel,0):null,aim?vpos(g.t,.9):null);camT=aim?g.t:null;document.body.classList.toggle('aiming',!!aim)}
+const coarse=matchMedia('(pointer:coarse)').matches;
 function ui(){if(!V||!S)return;try{camUi()}catch(e){console.warn(e)}if(cb()!==lastCb){lastCb=cb();board0().palette(lastCb);lastS=null;return View3D.sync()}const {board,units,labels}=V,sel=S.sel,can=canAct(sel)&&!S.peek&&S.phase==='player';
  const h={reach:[],hover:null,targets:[],path:[],area:null,iarea:null,smoke:S.smoke||[],shields:[],lines:[]};
  // Blue = 1 action, gold = dash (both actions), from Chat U's moveZones().
  if(can&&S.mode==='move'){const Z=typeof moveZones==='function'?moveZones(sel):{...reach(sel),mob:1e9},R=Z.d;for(const k in R){if(!(R[k]>0))continue;const [x,y]=k.split(',').map(Number),hot=!!HOV&&HOV.x===x&&HOV.y===y,dash=R[k]>Z.mob;h.reach.push({x,y,dash});if(hot)h.hover={x,y,dash};
-   for(const [dx,dy] of N4){if(!inb(x+dx,y+dy))continue;const c=tile(x+dx,y+dy);if(FULL(c)||HALF(c))h.shields.push({x,y,dx,dy,full:FULL(c),hot})}}}
+   for(const [dx,dy] of N4){if(!inb(x+dx,y+dy))continue;const c=tile(x+dx,y+dy);if((FULL(c)||HALF(c))&&(hot||coarse))h.shields.push({x,y,dx,dy,full:FULL(c),hot})}}}
  for(const g of S.tg){const pk=S.pick&&S.pick.x===g.x&&S.pick.y===g.y;h.targets.push({x:g.x,y:g.y,kind:pk?'pick':g.area||g.spot?'spot':g.ally?'ally':'tgt'})}
  if(S.hpath&&S.hpath.length&&sel){const pts=[sel,...S.hpath].map(p=>P(p));for(let i=0;i<pts.length-1;i++)for(let f=0;f<1;f+=.25)h.path.push(pts[i].clone().lerp(pts[i+1],f));h.path.push(pts.at(-1))}
  if(S.pick&&sel){if(S.pick.area)h.area=S.pick;else if(!S.pick.spot)h.lines.push({a:vpos(sel,.9),b:P(S.pick,.9),color:0x79d3e2,dash:1})}
@@ -175,7 +181,7 @@ function ui(){if(!V||!S)return;try{camUi()}catch(e){console.warn(e)}if(cb()!==la
   if(it.to)h.lines.push({a,b:P(it.to,.9),color:0xef6a5d,dash:1});if(it.area){h.lines.push({a,b:P(it.area,.2),color:0xef6a5d,dash:1});h.iarea=it.area}}
  // Stealth (Chat X): red = tiles an enemy would spot you on; the hidden squad is drawn ghosted.
  if(S.conc&&typeof visionTiles==='function'){const k=enemies().map(e=>e.x+','+e.y+e.status).join(';');if(visK!==k||visS!==S){visK=k;visS=S;visT=visionTiles()}h.vision=visT}
- if(window.mapMarks)h.marks=mapMarks();board.highlight(h);units.marks(sel,S.peek);for(const v of units.map.values())v.ghost&&v.ghost(v.u.side==='p'&&v.u.status==='ok'&&!!(S.conc||v.u.conc))
+ if(window.mapMarks)h.marks=mapMarks();h.marks=[...(h.marks||[]),...(S.loot||[]).map(l=>({k:'loot',x:l.x,y:l.y})),...(S.drops||[]).map(d=>({k:'in',x:d.x,y:d.y}))]; // loot crates + dropship flaresboard.highlight(h);units.marks(sel,S.peek);for(const v of units.map.values())v.ghost&&v.ghost(v.u.side==='p'&&v.u.status==='ok'&&!!(S.conc||v.u.conc))
  // % tags: same rule as the 2D board (best enemy shot in white).
  const shoot=S.info&&canAct(sel)&&S.mode==='move'&&sel.abil.includes('shoot')?targetsFor(sel,'shoot').filter(g=>g.t):[];
  const list=[...S.tg.filter(g=>!g.area&&!g.spot&&g.chance!=null),...shoot.filter(s=>!S.tg.some(g=>g.x===s.x&&g.y===s.y))].filter(g=>!g.t||!g.t.hid);
@@ -184,7 +190,10 @@ function ui(){if(!V||!S)return;try{camUi()}catch(e){console.warn(e)}if(cb()!==la
  // Area abilities (Chat U's areaHits): chips over every unit the hovered area would hit.
  if(S.mode!=='move'&&HOV&&typeof areaHits==='function'){const g=S.tg.find(g=>g.area&&g.x===HOV.x&&g.y===HOV.y);
   if(g)for(const a of areaHits(sel,S.mode,g)){if(!a.t||a.t.hid)continue;list.push({t:a.t,chance:a.chance,ally:a.ally,x:a.t.x,y:a.t.y,kill:a.kill})}}
- labels.setTags(list.map(g=>({p:g.t?vpos(g.t,(units.get(g.t).headY||1.2)+.55):P(g,1),html:g.chance+'%'+(g.kill?' ☠':''),cls:g.ally?'al':g.chance===best&&g.t&&g.t.side==='e'?'best':''})))}
+ // XCOM flank preview: hovering a move tile tags every visible enemy you'd flank from there.
+ if(S.mode==='move'&&HOV&&can&&typeof flanked==='function'){const spot={...sel,x:HOV.x,y:HOV.y};for(const e of enemies())if(!e.hid&&e.status==='ok'&&!list.some(g=>g.t===e)){
+   let ok=false;try{ok=flanked(e,spot)&&dist(spot,e)<=sel.range&&los(spot,e)}catch(_){}if(ok)list.push({t:e,flank:1,chance:0})}}
+ labels.setTags(list.map(g=>({p:g.t?vpos(g.t,(units.get(g.t).headY||1.2)+.55):P(g,1),html:g.flank?'FLANK':g.chance+'%'+(g.kill?' ☠':''),cls:g.flank?'flank':g.ally?'al':g.chance===best&&g.t&&g.t.side==='e'?'best':''})))}
 function unitLabels(){const L=[];for(const u of S.units){const v=V.units.map.get(u.uid);if(!v||v.gone||v.state==='dead'||u.hid||!alive(u)&&u.status!=='dead')continue;
   const hp=Math.max(0,Math.min(u.max,hpShow.has(u.uid)?hpShow.get(u.uid):u.hp)),b=v.state==='down'?'down':badge(u);
   const html=`<i class="hp" style="--uc:${unitColor(u)}">${Array.from({length:u.max},(_,i)=>`<b class="${i<hp?'on':''}"></b>`).join('')}</i>${typeof armorPips==='function'?armorPips(u):''}${b?`<span class="bdg">${icon(b)}${u.status==='down'&&!u.stable?`<small>${u.bleed}</small>`:''}</span>`:''}${S.info?`<em>${hp}</em>`:''}`;

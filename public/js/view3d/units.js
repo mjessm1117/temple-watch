@@ -82,7 +82,7 @@ export class UV{
  add(d,fn,done){this.tw.push({t:0,d:Math.max(.001,d),fn,done})}
  faceTo(p){const r=this.root.position;if(Math.hypot(p.x-r.x,p.z-r.z)>.01)this.face=Math.atan2(p.x-r.x,p.z-r.z)}
  walk(pts,tile){const per=this.U.reduce?.06:.17,segs=pts.length-1;if(segs<1){this.setTile(tile);return 0}
-  this.add(per*segs,k=>{const f=Math.min(segs-.0001,k*segs),i=Math.floor(f),a=pts[i],b=pts[i+1];this.root.position.lerpVectors(a,b,f-i);this.faceTo(b);this.pose.legs=Math.sin(k*segs*Math.PI*2)},
+  this.add(per*segs,k=>{const f=Math.min(segs-.0001,k*segs),i=Math.floor(f),a=pts[i],b=pts[i+1];this.root.position.lerpVectors(a,b,f-i);if(a.distanceTo(b)>1.5)this.root.position.y+=Math.sin((f-i)*Math.PI)*.6;this.faceTo(b);this.pose.legs=Math.sin(k*segs*Math.PI*2)},
    ()=>{this.pose.legs=0;this.setTile(tile)});return per*segs*1000}
  setTile(t){this.vx=t.x;this.vy=t.y;this.root.position.copy(this.U.board.pos(t.x,t.y))}
  aim(at,d=.55){this.faceTo(at);if(this.kind==='beast')return;this.add(d,k=>{this.pose.armR=k<.7?-1.5*sm(Math.min(1,k*4)):-1.5*(1-sm((k-.7)/.3))-.001},()=>{this.pose.armR=0})}

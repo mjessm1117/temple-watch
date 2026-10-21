@@ -114,10 +114,14 @@ function damage(t,d,src){
  if(t.side==='p'&&t.status==='ok'&&!t.vip&&d>=Math.max(3,t.max/2))panicCheck(t,20,'a brutal hit');
  if(t.side==='p'&&t.rid)bondAnswer(t,src)}
 // Roll an attack. Aim assist (Story/Normal): each miss in a row adds hidden aim to that unit's next roll.
+const GRAZE=10; // graze band, in % points above the hit chance
 function resolve(a,t,chance,dr,{melee=false,ignoreDeflect=false,label='shot'}={}){a.fired=1;
  let ch=chance;if(a.side==='p'&&a.miss&&S.d.assist)ch=Math.min(95,ch+a.miss*S.d.assist);
  if(a.hid){a.hid=0;log(`${a.n} was hiding in plain sight!`,'bad')}if(a.side==='p'&&a.conc&&!S.conc){a.conc=0;log(`${a.n} strikes from the shadows.`)}
- if(!rnd(ch)){if(a.side==='p')a.miss=(a.miss||0)+1;log(`${a.n}'s ${label} misses ${t.n}.`);fx(t,'MISS','miss');return false}
+ // Graze (XCOM 2): a ranged roll that misses by less than GRAZE still clips the target for half damage (no crit).
+ const roll=Math.random()*100;
+ if(roll>=ch){if(!melee&&roll<ch+GRAZE&&t.status==='ok'){const g=Math.max(1,Math.ceil(ri(dr[0],dr[1])/2));log(`${a.n}'s ${label} grazes ${t.n} for ${g}.`,t.side==='p'?'bad':'');fx(t,'GRAZE','miss');damage(t,g,a);return true}
+  if(a.side==='p')a.miss=(a.miss||0)+1;log(`${a.n}'s ${label} misses ${t.n}.`);fx(t,'MISS','miss');return false}
  if(a.side==='p')a.miss=0;
  if(!melee&&!ignoreDeflect&&t.deflect&&t.status==='ok'){const def=t.guard?t.guardDef:t.deflect;
   if(rnd(def)){log(`${t.n} deflects the bolt!`,t.side==='p'?'good':'');fx(t,'DEFLECT','defl');

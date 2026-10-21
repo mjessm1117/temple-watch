@@ -22,7 +22,7 @@ export class RV extends UV{
   if(u.ow&&GUN[this.kind])return 'aim';if(this.cover&&GUN[this.kind])return 'crouch';
   return this.kind==='jedi'||this.kind==='acolyte'||this.kind==='malgus'?'saberIdle':GUN[this.kind]?'gunIdle':'idle'}
  walk(pts,tile){const per=this.U.reduce?.06:.2,segs=pts.length-1;if(segs<1){this.setTile(tile);return 0}this.moving=1;this.one=null;
-  this.add(per*segs,k=>{const f=Math.min(segs-.0001,k*segs),i=Math.floor(f),a=pts[i],b=pts[i+1];this.root.position.lerpVectors(a,b,f-i);this.faceTo(b)},
+  this.add(per*segs,k=>{const f=Math.min(segs-.0001,k*segs),i=Math.floor(f),a=pts[i],b=pts[i+1];this.root.position.lerpVectors(a,b,f-i);if(a.distanceTo(b)>1.5)this.root.position.y+=Math.sin((f-i)*Math.PI)*.6;this.faceTo(b)},
    ()=>{this.moving=0;this.setTile(tile)});return per*segs*1000}
  shoot(at){this.faceTo(at);if(this.kind==='beast')return this.swing(at);this.act(GUN[this.kind]?'shoot':'cast',{once:1,speed:1.3})}
  aim(at,d=.55){if(at)this.faceTo(at);if(this.kind==='beast')return;this.act(GUN[this.kind]?'aim':'cast',{once:1,hold:1,speed:1.2});this.add(d,()=>{},()=>this.release())}

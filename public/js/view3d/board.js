@@ -19,10 +19,10 @@ export class Board{
    evac:new THREE.MeshBasicMaterial({color:0x7fd99a,transparent:true,opacity:.28,depthWrite:false})};
   this.box=new THREE.BoxGeometry(1,1,1);this.cyl=new THREE.CylinderGeometry(.5,.5,1,10);
   const hm=(c,o)=>new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false});
-  this.hm={reach:hm(0x2f9dff,.5),dash:hm(0xffb21e,.5),hover:hm(0x7fc8ff,.85),hoverDash:hm(0xffd166,.85),reachEdge:hm(0x9fe3ff,.95),dashEdge:hm(0xffe08a,.95),tgt:hm(0xef6a5d,.85),ally:hm(0x7fd99a,.85),spot:hm(0x79d3e2,.7),pick:hm(0xffffff,.95),
+  this.hm={reach:hm(0x2f9dff,.13),dash:hm(0xffb21e,.1),hover:hm(0x7fc8ff,.85),hoverDash:hm(0xffd166,.85),reachEdge:hm(0x9fe3ff,.95),dashEdge:hm(0xffe08a,.95),tgt:hm(0xef6a5d,.85),ally:hm(0x7fd99a,.85),spot:hm(0x79d3e2,.7),pick:hm(0xffffff,.95),
    area:hm(0x79d3e2,.2),iarea:hm(0xef6a5d,.22),path:hm(0x79d3e2,.95),smoke:hm(0x8aa2a5,.22),vis:new THREE.MeshBasicMaterial({map:this.hatch(),transparent:true,opacity:.85,depthWrite:false})};
   this.plane=new THREE.PlaneGeometry(.92,.92).rotateX(-Math.PI/2);this.ring=new THREE.RingGeometry(.34,.44,24).rotateX(-Math.PI/2);this.frame=new THREE.RingGeometry(.55,.64,4,1,Math.PI/4).rotateX(-Math.PI/2);
-  this.dot=new THREE.CircleGeometry(.06,10).rotateX(-Math.PI/2);this.hl=new THREE.Group();scene.add(this.hl);this.pool={};
+  this.dot=new THREE.CircleGeometry(.06,10).rotateX(-Math.PI/2);this.edge=new THREE.BoxGeometry(1.02,.03,.07);this.hl=new THREE.Group();scene.add(this.hl);this.pool={};
   this.shieldTex=[this.shieldTexture(false),this.shieldTexture(true)];this.lines=new THREE.Group();scene.add(this.lines);this.anim=[]}
  pos(x,y,h=0){const r=this.grid&&this.grid[y];return new this.T.Vector3(x+.5-this.cols/2,h+(r?elevOf(r[x])*EH:0),y+.5-this.rows/2)}
  elev(x,y){const r=this.grid&&this.grid[y];return r&&r[x]!=null?elevOf(r[x]):0}
@@ -110,11 +110,15 @@ export class Board{
   for(const c of [...this.lines.children]){this.lines.remove(c);c.geometry.dispose();c.material.dispose()}const hm=this.hm,lift=(x,y,dy=.012)=>this.pos(x,y,dy);
   for(const t of h.vision||[])this.take('vis',this.plane,hm.vis).position.copy(lift(t.x,t.y,.008));
   // Map marks (Chat M, wave 5): objective zone (green), exit (red), incoming group (red), overwatch zones (amber / enemy red).
-  if(!this.mkm)this.mkm={zone:[0x7fd99a,.30],exit:[0xef6a5d,.55],in:[0xef6a5d,.38],ow:[0xffb21e,.16],owe:[0xef6a5d,.12]};
+  if(!this.mkm)this.mkm={loot:[0xe0bd78,.6],zone:[0x7fd99a,.30],exit:[0xef6a5d,.55],in:[0xef6a5d,.38],ow:[0xffb21e,.16],owe:[0xef6a5d,.12]};
   for(const m of h.marks||[]){const c=this.mkm[m.k];if(!c)continue;if(!(c.mat))c.mat=new this.T.MeshBasicMaterial({color:c[0],transparent:true,opacity:c[1],depthWrite:false});
    this.take('mk_'+m.k,this.plane,c.mat).position.copy(lift(m.x,m.y,.006))}
+  // XCOM move range: faint fill + a glowing border. Blue = 1-action edge, gold = dash (outer) edge.
+  const R=new Set(h.reach.map(t=>t.x+','+t.y)),B1=new Set(h.reach.filter(t=>!t.dash).map(t=>t.x+','+t.y));
   for(const t of h.reach){this.take(t.dash?'dash':'reach',this.plane,t.dash?hm.dash:hm.reach).position.copy(lift(t.x,t.y));
-   this.take(t.dash?'dashE':'reachE',this.frame,t.dash?hm.dashEdge:hm.reachEdge).position.copy(lift(t.x,t.y,.013))}
+   for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const k=(t.x+dx)+','+(t.y+dy),outer=!R.has(k),inner=!t.dash&&!B1.has(k);if(!outer&&!inner)continue;
+    const gold=outer&&t.dash,o=this.take(gold?'dashL':'reachL',this.edge,gold?hm.dashEdge:hm.reachEdge),p=lift(t.x,t.y,.03);
+    p.x+=dx*.5;p.z+=dy*.5;o.position.copy(p);o.rotation.y=dx?Math.PI/2:0}}
   if(h.hover)this.take(h.hover.dash?'hovD':'hov',this.plane,h.hover.dash?hm.hoverDash:hm.hover).position.copy(lift(h.hover.x,h.hover.y,.014));
   for(const t of h.targets){const o=this.take('t_'+t.kind,t.kind==='spot'?this.plane:this.ring,hm[t.kind]);o.position.copy(lift(t.x,t.y,.02))}
   for(const p of h.path){const o=this.take('dot',this.dot,hm.path);o.position.copy(p).setY(p.y+.03)}

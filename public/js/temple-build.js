@@ -6,7 +6,7 @@
 const slotOf=k=>C.slots&&Object.keys(C.slots).find(s=>C.slots[s]===k);
 const slotById=id=>SLOTS.find(s=>s.id===id);
 const nearSlots=id=>{const s=slotById(id);return SLOTS.filter(o=>Math.abs(o.f-s.f)+Math.abs(o.b-s.b)===1).map(o=>o.id)};
-const freeSlots=()=>SLOTS.map(s=>s.id).filter(id=>!C.slots[id]);
+const freeSlots=()=>SLOTS.map(s=>s.id).filter(id=>!C.slots[id]&&(typeof slotOpen!=='function'||slotOpen(id)));
 const wingUp=k=>(C.wings[k]||0)>0;
 const pairsOf=k=>ADJ.filter(p=>p.a===k||p.b===k);
 const partner=(p,k)=>p.a===k?p.b:p.a;
@@ -82,12 +82,14 @@ function linkHTML(p,s1,s2,prev){const A=slotById(s1),B=slotById(s2),h=A.f===B.f,
  return `<i class="lnk ${h?'h':'v'} ${prev?'prev':''} ${!prev&&pairMult(p)>1?'x2':''}" style="grid-row:${row};grid-column:${col}" title="${p.n}: ${pairTip(p)}"></i>`}
 function cutawayHTML(pend,cur){try{wingSync()}catch(e){ensureSlots()}const mv=MOVE&&movable(MOVE)?MOVE:null;if(!mv)MOVE=null;
  const room=(id,cls,extra)=>{const r=roomOf(id);return `<button type="button" class="room ${cls||''} ${r.id===cur?'on':''}" data-room="${r.id}" title="${r.n}" aria-pressed="${r.id===cur}">${icon(r.ic)}<b>${r.s||r.n}</b><small>${roomLine(r)}</small>${extra||''}</button>`};
- const cells=SLOTS.map(s=>{const k=C.slots[s.id],pos=`grid-row:${s.f*2-1};grid-column:${s.b*2+1}`;
-  if(!k){const pv=mv?linksAt(mv,s.id):[],sel=cur==='slot:'+s.id;
+ const cells=SLOTS.filter(s=>typeof slotOpen!=='function'||slotOpen(s.id)).map(s=>{const k=C.slots[s.id],pos=`grid-row:${s.f*2-1};grid-column:${s.b*2+1}`;
+  if(!k){const pv=mv?linksAt(mv,s.id):[],sel=cur==='slot:'+s.id,D=typeof slotDeco==='function'?slotDeco(s.id):{cls:'',html:''};
+   if(D.cls&&!mv)return `<button type="button" class="slot ${D.cls} ${sel?'on':''}" style="${pos}" data-slot="${s.id}" title="${s.n}">${D.html}</button>`;
    return `<button type="button" class="slot ${mv?'tgt':''} ${sel?'on':''}" style="${pos}" data-slot="${s.id}" title="${s.n}: ${mv?'move the dig here':'empty · build a wing here'}">${mv?`<b>Move here</b><small>${pv.length?pv.map(p=>p.n).join(', '):'no links'}</small>`:`<b>+</b><small>${s.sn}</small>`}</button>`}
   const r=roomOf(k),l=C.wings[k],mx=WINGS[k].cost.length-1,bld=C.build===k,badge=k==='barracks'&&pend?`<em title="${pend} unit${pend>1?'s':''} can rank up">${pend}</em>`:'',st=C.staff&&C.staff[k]&&unit(C.staff[k]);
-  return `<button type="button" class="room wingrm ${!l?'bld':bld?'upg':''} ${k===cur?'on':''}" style="${pos}" data-room="${k}" title="${WINGS[k].n} · ${s.n}" aria-pressed="${k===cur}">${icon(r.ic)}<b>${WING_SHORT[k]||r.n}</b>
-   <span class="lv" aria-label="Level ${l} of ${mx}">${Array.from({length:mx},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</span><small>${!l?'Building…':bld?'Upgrading…':st?st.n.split(' ')[0]:roomLine(r)}</small>${st?'<span class="stf" title="Staffed"></span>':''}${badge}</button>`}).join('');
+  const RD=typeof roomDeco==='function'?roomDeco(k):{cls:'',html:''};
+  return `<button type="button" class="room wingrm ${!l?'bld':bld?'upg':''} ${RD.cls} ${k===cur?'on':''}" style="${pos}" data-room="${k}" title="${WINGS[k].n} · ${s.n}" aria-pressed="${k===cur}">${icon(r.ic)}<b>${WING_SHORT[k]||r.n}</b>
+   <span class="lv" aria-label="Level ${l} of ${mx}">${Array.from({length:mx},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</span><small>${!l?'Building…':bld?'Upgrading…':st?st.n.split(' ')[0]:roomLine(r)}</small>${st?'<span class="stf" title="Staffed"></span>':''}${badge}${RD.html}</button>`}).join('');
  const links=[];for(const p of ADJ)if(pairOn(p)){const a=slotOf(p.a),b=slotOf(p.b);links.push(linkHTML(p,a,b))}
  if(mv)for(const s of freeSlots())for(const p of linksAt(mv,s))links.push(linkHTML(p,s,slotOf(partner(p,mv)),1));
  return `<div class="tcut">

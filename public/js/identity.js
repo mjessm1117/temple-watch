@@ -82,6 +82,6 @@ const _ensureI=ensureTemple;ensureTemple=function(){const r=_ensureI.apply(this,
 
 // --- battle unit: nickname, voice, Master link ---
 const _buI=battleUnit;battleUnit=function(r){const u=_buI(r),R=C&&r&&r.id&&C.roster.find(x=>x.id===r.id);
- if(R){u.nick=nickText(R);const g=R.gear||{};u.kit={armor:g.armor,w:g.w,mods:g.mods||[],look:R.look};const m=C.pairs&&C.pairs[R.id];if(m&&R.title==='Padawan'){u.master=m;const M=unit(m);u.masterN=M&&M.n}}return u};
+ if(R){u.nick=nickText(R);const g=R.gear||{};u.kit={armor:g.armor,w:g.w,mods:g.mods||[],look:R.look,cls:R.cls,species:R.species};const m=C.pairs&&C.pairs[R.id];if(m&&R.title==='Padawan'){u.master=m;const M=unit(m);u.masterN=M&&M.n}}return u};
 // rules.js asks this for the Padawan aim bonus (shown in the odds panel as "Master near").
 function masterNear(a){return a.master&&a.side==='p'&&players().some(p=>p.rid===a.master&&p.status==='ok'&&dist(a,p)<=PAD.r)?PAD.aim:0}
