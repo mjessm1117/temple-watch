@@ -152,7 +152,7 @@ MISSIONS.h_scouts.foes.push(['nihil_raider',8,0],['nihil_storm',5,4]);
 
 // Per-map balance (E3 owns these rows). Same format as data.js TUNE. Target: weak test bot wins ~55–70% on Normal.
 Object.assign(TUNE,{"h_hetzal:0":{aim:25,hp:3,extra:2},"h_grove:0":{aim:15,hp:2,extra:1},"h_valo:0":{aim:15,hp:1,extra:1},"h_tempest:0":{aim:15,hp:2,extra:1},
- "h_husks:0":{aim:15,hp:2,extra:1},"h_beacon:0":{aim:8,hp:1},"h_roots:0":{aim:25,hp:3,extra:1},"h_salvage:0":{aim:12,hp:1,extra:1},"h_scouts:0":{aim:15,hp:2,extra:1},
+ "h_husks:0":{aim:15,hp:2,extra:1},"h_beacon:0":{aim:8,hp:1},"h_roots:0":{aim:20,hp:3,extra:1},"h_salvage:0":{aim:12,hp:1,extra:1},"h_scouts:0":{aim:15,hp:2,extra:1},
  "h_cache:0":{aim:20,hp:3,extra:1},"h_prisoners:0":{aim:20,hp:2,extra:1},"h_buoy:0":{aim:28,hp:2,extra:1},"h_outpost:0":{aim:12,hp:1,extra:1}});
 
 Object.assign(CRISES,{
