@@ -15,9 +15,13 @@ const w0=new JSDOM(html,{runScripts:'dangerously'}).window,maps=w0.eval(`(()=>{c
   if(need){const seen=new Set([M.start[0]+'']),q=[M.start[0]];let hit=0;while(q.length){const [x,y]=q.shift();if(at(x,y)==='E'){hit=1;break}
    for(const [dx,dy] of N4){const nx=x+dx,ny=y+dy,c=at(nx,ny);if(c&&(PASS(c)||'dD'.includes(c))&&!seen.has(nx+','+ny)){seen.add(nx+','+ny);q.push([nx,ny])}}}if(!hit)bad.push(tag+' evac unreachable')}});
  return{out,bad}})()`);w0.close();
-if(maps.bad.length){console.log('FAIL maps:',maps.bad.join(', '));process.exit(1)}
-console.log(`maps ok: ${maps.out.length}`);
-(async()=>{for(const [id,mi] of maps.out){const res={mission:id,map:mi,win:0,lose:0,err:0,dead:0,turns:0};
+// Memory: jsdom games leak, so the parent runs each mission in its own child process (ONLY=<id>). FIRST=1 plays only map 0 of each mission (test:quick).
+const ONLY=process.env.ONLY,FIRST=process.env.FIRST==='1';
+if(!ONLY){if(maps.bad.length){console.log('FAIL maps:',maps.bad.join(', '));process.exit(1)}
+ console.log(`maps ok: ${maps.out.length}`);const {spawnSync}=require('child_process');
+ for(const id of [...new Set(maps.out.map(m=>m[0]))]){const r=spawnSync(process.execPath,[__filename],{stdio:'inherit',env:{...process.env,ONLY:id}});if(r.status!==0){fail++;console.log(`FAIL balance child ${id} exit ${r.status}${r.signal?' '+r.signal:''}`)}}
+ process.exit(fail?1:0)}
+(async()=>{for(const [id,mi] of maps.out.filter(m=>m[0]===ONLY&&(!FIRST||m[1]===0))){const res={mission:id,map:mi,win:0,lose:0,err:0,dead:0,turns:0};
  for(let g=0;g<N;g++){const w=new JSDOM(html,{runScripts:'dangerously'}).window;const errs=[];w.addEventListener('error',e=>errs.push(e.message));
   try{w.eval(bot);w.eval(`startMission('${id}',START_ROSTER.map((r,i)=>battleUnit({id:'u'+i,rank:1,xp:0,dark:0,picks:[],...r})),{diff:'${diff}',map:${mi}})`);
    for(let i=0;i<40&&!w.eval('S.over');i++){w.eval('AI()');await w.eval('endTurn()')}
