@@ -5,13 +5,13 @@ Every open request, bug and "not done" note from STATUS/CHANGELOG/FEEDBACK, one 
 Already closed this week (don't redo): armor pips, Padawans (bond 2 start), voices, nicknames, 3D camera + aim view, XCOM HUD, phone landscape, Temple ziggurat/spires/undercroft/wing actions, hack rewards, graze, flank preview, melee charge, Mind Trick turns foes, shield prop, vault hop arc, loot/flare markers, loot credits banked, new Sith schemes, Era 3.
 
 ## E2 · Coordinator (integration, tests, Temple, HUD)
-- [ ] Campaign test flake: rescue chain can loop past 24 missions (~1–2 in 8 runs). Find the cause, fix it.
-- [ ] campaign.test.js should spend like a player (it still clicks the dead `[data-act="hire"]`); bot buys gear/wings so the economy is really measured.
-- [ ] Temple roster cards: show Tired (`isTired(r)`) and team name (`teamOf(r.id)?.n`) badges.
-- [ ] Fold adjacency (`adjSum`) into campaign.js/temple.js instead of additive hooks (low priority; only if it simplifies).
-- [ ] Front A squad gets benched-stress relief at the shared time step (Chat I known gap).
-- [ ] Forge: confirm it has a real effect (old note "no effect until crafting"); fix if not.
-- [ ] Clean stale notes at the top of STATUS.md ("Next (v0.2b)" etc.); keep STATUS short.
+- [x] Campaign test flake: rescue chain can loop past 24 missions (~1–2 in 8 runs). Cause: a lost personal quest (adv:0) stayed on offer, so the bot could re-pick it forever on one step (losses fed rescues). Fix: one try per quest per step. `935de8d`
+- [x] campaign.test.js should spend like a player: bot now queues wings, crafts sabers, upgrades blasters, hires (keeps 100 Cr spare). 2 runs: ~1,000 Cr spent, 243 Cr left at era end (spec B band 0–300; old bot hoarded ~1,130). `a5f36c1`
+- [x] Temple roster cards: show Tired (`isTired(r)`) and team name (`teamOf(r.id)?.n`) badges. `a5f36c1`
+- [x] Fold adjacency (`adjSum`): checked, wouldn't simplify (6 call sites, all in temple-build.js with their own news lines). Left as is.
+- [x] Front A squad gets benched-stress relief at the shared time step: fixed with `r.fought`/`C.tick` (anyone who fought since the last time step counts as deployed). `a5f36c1`
+- [x] Forge: confirmed real. Gates T2/T3 saber crafting (+1 dmg each tier, test-checked), Attune Sabers action, staff Kyber discount, adjacency. `a5f36c1` (test)
+- [x] Clean stale notes at the top of STATUS.md: v0.2a/v0.2b/"Next" block replaced with a pointer to CHANGELOG + OPEN-ITEMS.
 - [ ] Optional cleanup: rename the floating-text `fx(p,txt,cls)` path to `floatText` (F→E).
 - [ ] Merge, run full `npm test`, push; close this file.
 
