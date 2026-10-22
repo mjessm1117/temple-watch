@@ -12,6 +12,16 @@
 **Next (v0.2b):** Years pass (aging, Trials, retirement), saber/gear crafting, Docking Ring Nine boss vs Darth Malgus, era end. Also: smart bot and difficulty tuning to spec A §8 bands.
 
 
+## Wave 7 (2026-10-22): close every open item — checklist in `docs/OPEN-ITEMS.md`
+File owners (edit only yours; need a change elsewhere → add a request line here under that owner). Anyone may add their own `<script>` line to `index.html` (pull first). `git pull` before every push. **Full `npm test` green before every push.**
+- **E2 Coordinator:** `tests/*` (except bot.js), `docs/*`, `campaign.js`, `temple*.js`, `data-modules.js`, `data-wings.js`, `identity.js`, `hud-xcom.js`, `render.js`, `input.js`, `ui-hud.js`, `css/ui.css`, `css/xcom.css`, `css/temple.css`, `base.js`, `saga.js` (placement only).
+- **B2 Balance:** numbers in `data.js`, `data-campaign.js`, `data-battle.js`, `data-teams.js`, `teams.js`, `MELEE` in `data-skills.js`, `GRAZE` in `rules.js` (one line), `OPEN` toggle in `map-open.js`.
+- **M3 Maps:** `data-maps.js`, `maps.js`, `map-open.js` (except the OPEN toggle), `hazards.js`, `tests/mapcheck.test.js`, new `data-maps-era2.js`.
+- **V2 Visuals:** `public/js/view3d/*`, `public/models/*`, `public/vendor/*`, `fx.js`, `css/style.css` (3D/board parts), `tools/meshy*`.
+- **K2 Kits & AI:** `abilities.js`, `ai.js`, `rules.js` (except GRAZE), `data-trees.js`, `data-skills.js` (abilities), `skills.js`, `power.js`, `hack.js`, `temple-prog.js` (PROG_AB), `tests/bot.js`.
+- **A2 App & onboarding:** `manifest.webmanifest`, new `public/sw.js`, `worker.js` (headers only), `screens.js`, new `tutorial.js` / `data-tutorial.js`.
+- **E3 Era 3:** its own files (`story-era3.js`, `data-era3.js`, `tests/era3.test.js`).
+
 ## Bucket claims (feedback 2026-10-18)
 - **Focus session (E, 2026-10-21, Jess: all in one chat):** E took over temple files for this session. New: `css/xcom.css`, `js/hud-xcom.js`, `data-modules.js` + `temple-modules.js` (C.mods: cd/next/dug/digging/feat; hooks `slotDeco`/`roomDeco` in temple-build.js), graze (`GRAZE` in rules.js), flank preview + enemy follow cam (view3d/main.js), move-range border (view3d/board.js). Test: `tests/modules.test.js`.
 - **Saga (story-first layer)** — Chat Saga, 2026-10-21. Owns `data-saga.js`, `saga.js`, `css/saga.css`, `tests/saga.test.js` (wired into both npm scripts), `docs/specs/saga.md`. Added 2 script tags before `screens.js` and 1 css link. Era 1 only (`C.era===1`).
