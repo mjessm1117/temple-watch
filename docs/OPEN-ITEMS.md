@@ -17,7 +17,7 @@ Already closed this week (don't redo): armor pips, Padawans (bond 2 start), voic
 
 ## B2 · Balance
 - [ ] Balance recheck after the stat rework + this week's changes: armor pips (tanks much weaker), melee charge, graze, hack, wing-action buffs, spires. Measure with the bot; numbers in `CLASS`, `ARMOR`, `MELEE`, `GRAZE`, `MOD_ACTS`, `SPIRES`.
-- [ ] Strike-team auto-resolve odds (first-pass 62–70%): measure and tune `TAUTO`/`FATIGUE`.
+- [x] Strike-team auto-resolve odds (first-pass 62–70%): measure and tune `TAUTO`/`FATIGUE`. (7214620: start team 62% kept; rank+2 was 90 cap everywhere, now ~84; cap 85; Story +8 / Hard −8 / Legend −15. FATIGUE unchanged.)
 - [ ] Malgus win rate (old: Normal ~27%, Story ~67% weak bot) and Ossus Vault (~50–60%, Threat-limited): re-measure, tune to spec A bands.
 - [ ] With M3: once layouts are validated, re-run full balance and turn off `map-open.js` auto-breaches (`OPEN.off=true`) if bands hold.
 
