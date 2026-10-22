@@ -5,7 +5,9 @@ const TEAMS={base:2,max:4,barracks:[2,3],   // 2 teams; Barracks level 2 and lev
  names:['Aurek','Besh','Cresh','Dorn'],log:6};
 // Auto-resolve odds = base + 5×Σrank + leader + bonds − tired − short-handed + risk, clamped 10–90.
 // Calibration [Estimate]: start team (Jedi R2 + 2 troopers R2) ≈ 62–70%; full R3 team with bonds ≈ 85–90 (cap). Severe maps ≈ 50.
-const TAUTO={base:35,perRank:5,lead:8,bond:3,bondMax:9,tired:5,short:6,min:10,max:90,
+// B2 wave 7: perRank 5→3 (Risk already counts unit power, so ranks were counted twice: R+2 teams sat at the 90 cap everywhere),
+// base 35→47 keeps a start team at ~62, max 90→85 (auto never beats a skilled player on Normal, spec A ~85%), diff = Story/Hard/Legend offset.
+const TAUTO={base:47,perRank:3,lead:8,bond:3,bondMax:9,tired:5,short:6,min:10,max:85,diff:{story:8,normal:0,hard:-8,legend:-15},
  scale:1.5,                                 // team Power × 1.5 before the risk check (a 4-unit team vs maps built for 6)
  risk:[0,6,0,-5,-18],                       // by risk level 1–4: Low, Moderate, High, Severe
  xp:12,winWound:25,                         // win: +12 XP each; each member 25% chance of a light wound

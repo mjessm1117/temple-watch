@@ -27,7 +27,7 @@ function teamOdds(t,o){const M=MISSIONS[o.mission],T=teamAvail(t),A=TAUTO;if(!M|
  let bp=0;for(let i=0;i<T.length;i++)for(let j=i+1;j<T.length;j++){const v=C.bonds&&C.bonds[bkey(T[i].id,T[j].id)];if(v&&v.lvl)bp+=A.bond}
  if(bp)why.push(['Bonds',Math.min(A.bondMax,bp)]);const tired=T.filter(isTired).length;if(tired)why.push([`Tired ×${tired}`,-A.tired*tired]);
  if(T.length<TEAMS.size)why.push([`Short-handed ${T.length}/${TEAMS.size}`,-A.short*(TEAMS.size-T.length)]);
- const lv=teamRisk(T,M,o.mission);if(A.risk[lv])why.push([`${RISK[lv-1][1]} risk`,A.risk[lv]]);
+ const dv=(A.diff||{})[C.diff]||0;if(dv)why.push([DIFF[C.diff].n,dv]);const lv=teamRisk(T,M,o.mission);if(A.risk[lv])why.push([`${RISK[lv-1][1]} risk`,A.risk[lv]]);
  return{ch:Math.max(A.min,Math.min(A.max,why.reduce((s,w)=>s+w[1],0))),why,T,lv}}
 const teamFor=o=>{const id=o&&o.crisis&&C.tAs&&C.tAs.step===C.step&&C.tAs.map[o.crisis];return id&&C.teams.find(t=>t.id===id)};
 // Auto-resolve one crisis with a team. Called instead of ignoring it.
