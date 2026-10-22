@@ -12,6 +12,8 @@ import {Cine} from './cine.js';
 import {forceFx} from './forcefx.js';
 import {startPortraits} from './portraits.js';
 import {startDiorama} from './diorama.js';
+import {startGalaxy} from './galaxy3d.js';
+import {startArmory} from './armory3d.js';
 import {RV} from './rigged.js';
 import {initFigures,loadModel,fileOf} from './figures.js';
 import {loadProps} from './props.js';
@@ -228,4 +230,4 @@ window.View3D={get dbg(){return V},get queue(){return {n:Q.length,busy,types:Q.s
  skipCinematic(){if(V)V.cine.skip()},sync(){if(!on||!V||!S)return;if(S!==lastS)rebuild();ui()},
  // Resolves once every queued animation has played (logic may await this between enemy actions; 2D/tests resolve at once).
  idle(){return on&&V&&S&&(Q.length||busy>0)&&!document.hidden?new Promise(r=>{waiters.push(r);setTimeout(r,4000)}):Promise.resolve()},hover(){if(on&&V&&S)ui()},get on(){return on}};
-if(glOK){try{startPortraits();startDiorama()}catch(e){console.warn(e)}btn.hidden=false;btn.addEventListener('click',()=>setOn(!on));setOn(store.get()!=='2d')}
+if(glOK){try{startPortraits();startDiorama();startGalaxy();startArmory()}catch(e){console.warn(e)}btn.hidden=false;btn.addEventListener('click',()=>setOn(!on));setOn(store.get()!=='2d')}
