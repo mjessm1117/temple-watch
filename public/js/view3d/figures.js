@@ -9,7 +9,7 @@ let T=null;const cache={};
 const FILE={human:new URL('../../models/human.glb',import.meta.url).href,beast:new URL('../../models/beast.glb',import.meta.url).href};
 // Meshy unit models (public/models/units/<kind>.glb, see CREDITS.md): textured, Mixamo-rigged, our clips baked in,
 // bones renamed to the names below, weapons hang off a 'grip_r' node. A kind listed here that fails to load falls back to the mannequin.
-export const UNITS=new Set(['jedi','trooper','scout','medic','heavy','sith','sithHeavy','mando','agent','malgus','bhTrooper','sniper','marauder','sithLord','kaan','bane','envoy','civ','beast','spawn']);
+export const UNITS=new Set(['defender','shieldbearer','acolyte','nihilRaider','nihilStorm','marchionRo','lournaDee','drengir','nameless','jedi','trooper','scout','medic','heavy','sith','sithHeavy','mando','agent','malgus','bhTrooper','sniper','marauder','sithLord','kaan','bane','envoy','civ','beast','spawn']);
 const urlOf=n=>n.startsWith('u_')?new URL(`../../models/units/${n.slice(2)}.glb`,import.meta.url).href:FILE[n];
 // Right hand rest matrix of human.glb: weapon parts are authored in that model's space and re-expressed relative to the hand.
 const HSRC=[0,1,0,0,-1,0,0,0,0,0,1,0,-.7389,1.4408,-.0654,1];let HI=null;
@@ -115,11 +115,12 @@ export function makeFigure(kind,color,kit){const file=fileOf(kind),M=modelOf(fil
   case 'pistol':gun(obj,g,mw,ma,.26,.05,0);break}
  if(kit&&!beastK)dress(obj,g,kit,color,mats,mw,isJ(kind));
  for(const m of mats)m.userData.e0=m.emissive.clone();
- const F=finish(obj,M,kind,mats,glows,(meshy?(beastK?1.55:1.15)/(M.h||1.7):1.15/1.83*bulk)*(kind==='malgus'?1.08:1));
+ const F=finish(obj,M,kind,mats,glows,(meshy?(beastK?1.55:1.15)/(M.h||1.7):1.15/1.83*bulk)*(BIG[kind]||1));
  if(kit&&KIT_BULK[kit.armor])for(const ax of ['x','z'])F.obj.scale[ax]*=KIT_BULK[kit.armor];return F}
 
 // Per-unit gear (bucket 1, 2026-10-19): armor tier, helmet style (identity editor "look"), weapon tier + mods change the figure.
 // Parts sit relative to bone positions, scaled by head height, so they fit the mannequin and every Meshy model.
+const BIG={malgus:1.08,nihilStorm:1.12,drengir:1.12,nameless:1.15};
 const KIT_BULK={heavy:1.07,beskar:1.08,medium:1.03};const isJ=k=>k==='jedi'||k==='defender';
 function dress(obj,g,kit,color,mats,mw,jedi){const bp=n=>{const b=obj.getObjectByName(n);return b?b.getWorldPosition(new T.Vector3()):null},hd=bp('Head');if(!hd)return;
  const k=hd.y/1.569,uc=mat(new T.Color(color||0xe0bd78).getHex(),{metalness:.25}),steel=mat(kit.armor==='beskar'?0xb9c2c9:0x8a949c,{metalness:.7,roughness:.35});mats.push(uc,steel);
