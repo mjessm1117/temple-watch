@@ -12,7 +12,7 @@ Already closed this week (don't redo): armor pips, Padawans (bond 2 start), voic
 - [x] Front A squad gets benched-stress relief at the shared time step: fixed with `r.fought`/`C.tick` (anyone who fought since the last time step counts as deployed). `a5f36c1`
 - [x] Forge: confirmed real. Gates T2/T3 saber crafting (+1 dmg each tier, test-checked), Attune Sabers action, staff Kyber discount, adjacency. `a5f36c1` (test)
 - [x] Clean stale notes at the top of STATUS.md: v0.2a/v0.2b/"Next" block replaced with a pointer to CHANGELOG + OPEN-ITEMS.
-- [ ] Optional cleanup: rename the floating-text `fx(p,txt,cls)` path to `floatText` (F→E).
+- [x] ~~Optional cleanup: rename `fx(p,txt,cls)` → `floatText`~~ **Deferred by Jess (2026-10-22) to after wave 7** (~120 call sites in 14 files other chats are editing).
 - [ ] Merge, run full `npm test`, push; close this file.
 
 ## B2 · Balance
