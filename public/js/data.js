@@ -5,11 +5,12 @@ Object.defineProperty(window,'W',{value:10,configurable:true,writable:true});Obj
 //             c crate · x barrel · k console · q clue terminal · Q scanned clue = half cover, blocks movement
 //             r rubble (half cover, walkable) · . floor · _ open door · E evac zone
 //             ^ raised ground (elev 1, walkable) · M high ledge (elev 2; reach it from ^, a 2-level step is a cliff)
+// B2 wave 7: every enemyAim +5 (bot won ~75% on Normal after graze/hack/melee charge/wing buffs; band 55–70).
 const DIFF={
- story: {n:'Story', enemyHp:-1,enemyAim:-10,extra:0,bleed:6,assist:10,bonusKit:1,income:1.3},
- normal:{n:'Normal',enemyHp:0, enemyAim:0,  extra:0,bleed:4,assist:10,bonusKit:0,income:1},
- hard:  {n:'Hard',  enemyHp:0, enemyAim:5,  extra:1,bleed:3,assist:0, bonusKit:0,income:.85},
- legend:{n:'Legend',enemyHp:1, enemyAim:10, extra:1,bleed:2,assist:0, bonusKit:0,income:.7}};
+ story: {n:'Story', enemyHp:-1,enemyAim:-5,extra:0,bleed:6,assist:10,bonusKit:1,income:1.3},
+ normal:{n:'Normal',enemyHp:0, enemyAim:5,  extra:0,bleed:4,assist:10,bonusKit:0,income:1},
+ hard:  {n:'Hard',  enemyHp:0, enemyAim:10, extra:1,bleed:3,assist:0, bonusKit:0,income:.85},
+ legend:{n:'Legend',enemyHp:1, enemyAim:15, extra:1,bleed:2,assist:0, bonusKit:0,income:.7}};
 const FOES={
  trooper:{desc:'Standard rifleman: 4 HP, range 8. Seeks cover and flanks.',n:'Sith Trooper',ic:'e_trooper',hp:4,aim:65,mob:5,dmg:[2,4],range:8,init:8},
  heavy:{desc:'6 HP, 1 armor, one grenade. Its hits strip cover and armor.',n:'Sith Heavy',ic:'e_heavy',hp:6,aim:60,mob:4,dmg:[3,4],range:7,armor:1,nades:1,shredder:1,init:6},
