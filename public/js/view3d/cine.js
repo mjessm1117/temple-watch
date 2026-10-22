@@ -1,4 +1,4 @@
-// Cinematic camera beats: mission-start flyover, kill cam, Force-power cam, enemy-reveal pan.
+// Cinematic camera beats: mission-start flyover + squad dolly, kill cam, boss/last-kill orbit, Force-power cam, action cam (grenades, leaps), enemy-reveal pan.
 // Each beat borrows the camera from the rig for ~1–4 s and hands it back with a blend. Click, Esc, Space or Enter skips.
 // Off switch: View3D.cinematics = false (stored in localStorage 'tw_cine'); reduced motion also turns them off.
 const KEY='tw_cine',sm=k=>k*k*(3-2*k);
@@ -23,10 +23,10 @@ export class Cine{
  ready(kind,cd){const now=performance.now()/1000;if(!this.on||this.cur||(this.cool[kind]||0)>now)return false;this.cool[kind]=now+cd;return true}
  // shot(k) → {p, l}: camera position + look-at for progress k (0–1). d = seconds.
  play(kind,d,shot,o={}){if(!this.on)return 0;const c=this.rig.cam;this.from.p.copy(c.position);this.from.l.copy(this.rig.target);
-  this.cur={kind,t:0,d,shot,ease:o.ease??.35};this.labelsEl.style.transition='opacity .25s';this.labelsEl.style.opacity=o.labels?'.85':'0';this.hint.style.opacity='.7';
+  this.cur={kind,t:0,d,shot,ease:o.ease??.35,next:o.next};this.labelsEl.style.transition='opacity .25s';this.labelsEl.style.opacity=o.labels?'.85':'0';this.hint.style.opacity='.7';
   if(o.title){this.card.innerHTML=o.title;this.card.style.opacity='1'}else this.card.style.opacity='0';return d*1000}
- skip(){if(!this.cur)return;this.cur=null;this.justSkipped=1;this.end()}
- end(){this.cur=null;this.back=.45;this.labelsEl.style.opacity='';this.hint.style.opacity='0';this.card.style.opacity='0'}
+ skip(){if(!this.cur)return;this.cur.next=null;this.cur=null;this.justSkipped=1;this.end()}
+ end(){const nx=this.cur&&this.cur.next;this.cur=null;if(nx&&this.on){this.from.p.copy(this.rig.cam.position);if(nx())return}this.back=.45;this.labelsEl.style.opacity='';this.hint.style.opacity='0';this.card.style.opacity='0'}
  // Called after rig.update each frame. Returns true while it owns the camera.
  update(dt){const c=this.rig.cam,T=this.T;
   if(this.cur){const s=this.cur;s.t+=dt;const k=Math.min(1,s.t/s.d),v=s.shot(k,dt),e=s.ease?Math.min(1,sm(Math.min(1,s.t/s.ease))):1;
@@ -46,6 +46,18 @@ export class Cine{
  // Slow arc around the caster toward the target.
  forcecam(a,b,d=1.25){const T=this.T,mid=a.clone().lerp(b,.4),dir=b.clone().sub(a).setY(0).normalize(),side=new T.Vector3(-dir.z,0,dir.x);
   return this.play('force',d,k=>({p:a.clone().addScaledVector(dir,-2.4).addScaledVector(side,2-k*1.1).setY(a.y+2-k*.35),l:mid.clone().setY(.8)}),{ease:.3})}
+ // Mission intro, second beat: from beside the squad, looking past them toward the enemy side, slow dolly in (pts = their positions), then hand back. Chained after flyover.
+ squad(pts,d=1.8){const T=this.T;if(!pts.length)return 0;const c=pts.reduce((a,p)=>a.add(p),new T.Vector3()).multiplyScalar(1/pts.length);
+  const fwd=c.clone().negate().setY(0);if(fwd.lengthSq()<.01)fwd.set(0,0,-1);fwd.normalize();const side=new T.Vector3(-fwd.z,0,fwd.x);
+  const w=Math.max(2.2,...pts.map(p=>p.distanceTo(c)))+1.4;
+  return this.play('squad',d,k=>({p:c.clone().addScaledVector(fwd,-1.2).addScaledVector(side,w-k*.9).setY(1.5+k*.2),l:c.clone().addScaledVector(fwd,1.6+k*.8).setY(.7)}),{ease:.5})}
+ // Grenades, rockets, leaps, sweeps: a wide low side view framing thrower and impact, slow push-in.
+ actioncam(a,b,d=1.1){const T=this.T,mid=a.clone().lerp(b,.5),dir=b.clone().sub(a).setY(0);if(dir.lengthSq()<.01)dir.set(0,0,-1);dir.normalize();
+  const side=new T.Vector3(-dir.z,0,dir.x),w=Math.max(3.2,a.distanceTo(b)*.9);
+  return this.play('action',d,k=>({p:mid.clone().addScaledVector(side,w-k*.6).setY(1.6+w*.18),l:mid.clone().lerp(b,.25+k*.25).setY(.6)}),{ease:.25})}
+ // Boss or last enemy down: slow orbit around the fallen, low and close.
+ finale(p,title,d=2.4){const T=this.T,a0=Math.atan2(this.rig.cam.position.x-p.x,this.rig.cam.position.z-p.z);
+  return this.play('finale',d,k=>{const a=a0+k*1.1;return{p:new T.Vector3(p.x+Math.sin(a)*3,p.y+1.3+k*.5,p.z+Math.cos(a)*3),l:p.clone().setY(p.y+.4)}},{ease:.35,title})}
  // Swing over to newly spotted enemies, hold, then hand back.
  reveal(p,title,d=1.6){const T=this.T,dir=p.clone().sub(this.rig.target).setY(0);if(dir.lengthSq()<.01)dir.set(0,0,-1);dir.normalize();
   return this.play('reveal',d,k=>({p:p.clone().addScaledVector(dir,3.6).setY(3.4),l:p.clone().setY(.6)}),{ease:.45,title,labels:1})}

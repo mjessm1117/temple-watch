@@ -131,6 +131,7 @@ function dress(obj,g,kit,color,mats,mw,jedi){const bp=n=>{const b=obj.getObjectB
   case 'Hood':case 'Hooded robe':at('Head',g.hood,mat(jedi?0x6b5a45:0x4a4f45),[.18,.22,.19],[0,.1,-.02]);break;
   case 'Traveler’s cloak':at('spine_03',g.box,mat(0x5a4a3a),[.42,.85,.02],[0,-.25,-.16],[.08,0,0]);break;
   case 'Battle tunic':at('pelvis',g.cyl,uc,[.17,.05,.13],[0,.08,0]);break}
+ species(at,g,kit,color,mats,jedi);
  // Class props: Shieldbearer carries a riot shield on the left forearm; Defender wears heavy pauldrons and a cape.
  if(kit.cls==='Shieldbearer'){const la=bp('lowerarm_l')?'lowerarm_l':'hand_l';at(la,g.box,steel,[.05,.5,.34],[.06,-.05,.05]);at(la,g.box,uc,[.055,.06,.3],[.06,.12,.05]);at(la,g.box,glow(0x79d3e2),[.056,.025,.18],[.06,-.22,.05])}
  if(kit.cls==='Defender'){pad(steel,1.5);at('spine_03',g.box,uc,[.4,.8,.02],[0,-.32,-.15],[.08,0,0])}
@@ -139,6 +140,19 @@ function dress(obj,g,kit,color,mats,mw,jedi){const bp=n=>{const b=obj.getObjectB
   if(kit.w>=2||mods.includes('scope'))part(obj,'hand_r',g.cyl,mw,[.032,.2,.032],[-.9,1.44,0],[0,0,Math.PI/2]);
   if(mods.includes('barrel'))part(obj,'hand_r',g.cyl,mw,[.024,.18,.024],[-1.33,1.36,0],[0,0,Math.PI/2]);
   if(kit.w>=2)part(obj,'hand_r',g.box,uc,[.06,.1,.076],[-.84,1.36,0])}}
+// Species (recruit editor, V2): cheap head parts on any body. Skin tones vary per unit (seeded by the unit color).
+const SKIN={'Twi\'lek':[0x4f86c6,0x5aa35a,0xb8443c,0x8a5ab8,0xd9a066],Togruta:[0xc8552e,0xb04a2a,0xd06a3a],Zabrak:[0xd8b08a,0xa86a3a,0xc2483a],Mirialan:[0x8fae6a,0xc9b06a],Rodian:[0x4f8a4a,0x6a9a3a],'Kel Dor':[0xc87a4a,0xa85a3a]};
+function species(at,g,kit,color,mats,jedi){const sp=kit.species,P=SKIN[sp];if(!P)return;const h=Math.abs(new T.Color(color||0xe0bd78).getHex()*2654435761|0),skin=mat(P[h%P.length]);mats.push(skin);
+ const dark=mat(0x0d0f12,{metalness:.4,roughness:.25}),bone=mat(0xe8e2d6);mats.push(dark,bone);
+ // Troopers wear sealed helmets: only what sticks out of one (lekku, montrals, a Kel Dor breather).
+ switch(sp){
+  case 'Twi\'lek':for(const s of [-1,1])at('Head',g.sph,skin,[.055,.3,.06],[s*.08,-.14,s<0?.05:-.06],[s<0?-.15:.3,0,s*.15]);break;
+  case 'Togruta':for(const s of [-1,1]){at('Head',g.sph,bone,[.05,.15,.05],[s*.09,.26,-.02],[-.15,0,-s*.45]);at('Head',g.sph,skin,[.045,.2,.05],[s*.08,-.1,.06],[-.2,0,s*.12])}
+   at('Head',g.sph,skin,[.05,.24,.055],[0,-.12,-.1],[.35,0,0]);break;
+  case 'Zabrak':if(jedi){for(const [x,z] of [[0,.08],[-.06,.05],[.06,.05],[-.035,.0],[.035,.0]])at('Head',g.cone,bone,[.028,.15,.028],[x,.31,z]);for(const s of [-1,1])at('Head',g.box,mat(0x1a1416),[.012,.08,.006],[s*.04,.03,.142])}break;
+  case 'Kel Dor':if(jedi)at('Head',g.box,dark,[.17,.05,.05],[0,.06,.13]);at('Head',g.box,mat(0x6a7276,{metalness:.6}),[.09,.07,.06],[0,-.02,.14]);break;
+  case 'Rodian':if(jedi){for(const s of [-1,1])at('Head',g.sph,dark,[.04,.05,.03],[s*.045,.06,.125]);at('Head',g.sph,skin,[.03,.025,.035],[0,0,.14])}break;
+  case 'Mirialan':if(jedi)for(const s of [-1,1])at('Head',g.box,mat(0x1a2a3a),[.025,.025,.006],[s*.045,.02,.14],[0,0,Math.PI/4]);break}}
 function gun(obj,g,mw,ma,len,th,stock){const hx=-.76,hy=1.36;part(obj,'hand_r',g.box,mw,[len,th*1.3,th],[hx-len/2+.12,hy,0]);
  part(obj,'hand_r',g.box,mw,[.05,.1,th*.9],[hx+.02,hy-.07,0]);if(stock)part(obj,'hand_r',g.box,ma,[stock,th*1.1,th*.8],[hx+.12+stock/2,hy-.02,0]);}
 function finish(obj,M,kind,mats,glows,scale){obj.scale.setScalar(scale);const mixer=new T.AnimationMixer(obj),acts={},map=CLIPS[fileOf(kind)];

@@ -7,9 +7,9 @@ import {initFigures,loadModel,makeFigure,fileOf} from './figures.js';
 import {kindOf} from './units.js';
 
 const cache=new Map(),pending=new Set(),SIZE=128;let R=null,scene,cam,busy=false;
-const asUnit=r=>r.side?r:{n:r.n,cls:r.cls,col:r.col,side:'p',jedi:typeof isJedi==='function'?isJedi(r):!!(window.CLASS&&CLASS[r.cls]&&CLASS[r.cls].jedi)};
+const asUnit=r=>r.side?r:{n:r.n,cls:r.cls,col:r.col,gear:r.gear,look:r.look,species:r.species,side:'p',jedi:typeof isJedi==='function'?isJedi(r):!!(window.CLASS&&CLASS[r.cls]&&CLASS[r.cls].jedi)};
 const colorOf=u=>u.vip?'#7fd99a':u.col||'#e0bd78';
-const kitOf=u=>u.kit||(u.gear&&{armor:u.gear.armor,w:u.gear.w,mods:u.gear.mods,look:u.look}),keyOf=u=>{const k=kitOf(u);return kindOf(u)+'|'+colorOf(u)+(k?'|'+[k.armor,k.look].join('/'):'')};
+const kitOf=u=>u.kit||((u.gear||u.species||u.look)&&{armor:(u.gear||{}).armor,w:(u.gear||{}).w,mods:(u.gear||{}).mods,look:u.look,species:u.species,cls:u.cls}),keyOf=u=>{const k=kitOf(u);return kindOf(u)+'|'+colorOf(u)+(k?'|'+[k.armor,k.look,k.species].join('/'):'')};
 
 function setup(){initFigures(THREE);const c=document.createElement('canvas');c.width=c.height=SIZE;
  R=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:true,preserveDrawingBuffer:true});R.setPixelRatio(1);R.setSize(SIZE,SIZE,false);

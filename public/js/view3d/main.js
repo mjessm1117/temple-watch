@@ -74,7 +74,9 @@ const proj=p=>{const v=p.clone().project(V.rig.cam);if(v.z>1)return null;const c
 function rebuild(){lastS=S;Q.length=0;busy=0;hpShow.clear();V.units.clear();V.labels.clear();const th=themeOf({...S.M,theme:S.theme||S.M.theme});V.board.setTheme(THEMES[th]);V.board.build(S.grid);V.fx3.clearKept();
  V.scenery.apply(th,V.board.cols,V.board.rows,V.lights,V.renderer);
  seen.clear();for(const u of S.units)if(u.side==='e'&&!u.hid&&alive(u))seen.add(u.uid);
- if(S.turn===1&&S.phase==='player'&&!flown.has(S)&&S.units.every(u=>u.hp===u.max)){flown.add(S);V.cine.flyover(V.board.cols,V.board.rows,`<div style="font:600 26px 'Chakra Petch',sans-serif;letter-spacing:.12em;color:#dbe7e4">${(S.M.n||'').toUpperCase()}</div><div style="font:500 13px 'IBM Plex Sans',sans-serif;color:#8aa2a5;margin-top:4px">${S.M.where||''}</div>`)}V.fit();V.units.reconcile(S.units);ui();models()}
+ if(S.turn===1&&S.phase==='player'&&!flown.has(S)&&S.units.every(u=>u.hp===u.max)){flown.add(S);V.cine.flyover(V.board.cols,V.board.rows,`<div style="font:600 26px 'Chakra Petch',sans-serif;letter-spacing:.12em;color:#dbe7e4">${(S.M.n||'').toUpperCase()}</div><div style="font:500 13px 'IBM Plex Sans',sans-serif;color:#8aa2a5;margin-top:4px">${S.M.where||''}</div>`);
+  // Second intro beat: dolly along the squad once the sweep ends (skipped with it).
+  if(V.cine.cur)V.cine.cur.next=()=>{const sq=S.units.filter(u=>u.side==='p'&&alive(u)&&V.units.map.has(u.uid));return V.cine.squad(sq.map(u=>V.units.get(u).root.position.clone()))>0}}V.fit();V.units.reconcile(S.units);ui();models()}
 // Lazy-load only the model files this mission's units need; swap figures in once loaded (block figures show meanwhile).
 function models(){const want=new Set(S.units.map(u=>fileOf(kindOf(u))));
  const later=[...Object.values(S.M&&S.M.waves||{}).flat(),...(S.M&&S.M.reinforce||[])];
@@ -106,7 +108,9 @@ function play(type,d){const {units,fx3,labels,board,rig}=V;
    if(d.label==='lightning'){a.cast(pt,1);return fx3.lightning(pa.setY(1),pt,.55)+60}
    if(d.label==='thrown saber'){a.throwAt(pt);}if(d.label==='thrown saber')return fx3.saber(pa,pt,unitColor(d.a))+40;
    const lethal=d.hit&&Q.some((e,i)=>e.type==='kill'&&e.d.t===d.t&&!Q.slice(0,i).some(o=>o.type==='shot'));
-   if(lethal&&d.a.side==='p'&&(enemies().length<=1||Math.random()<.5)&&V.cine.ready('kill',7))V.cine.killcam(a.root.position.clone(),tv.root.position.clone(),d.melee?1.2:1.5);
+   const last=d.t.side==='e'&&(d.t.boss||enemies().filter(e=>alive(e)).length<=1);
+   if(lethal&&d.a.side==='p'&&(last||Math.random()<.5)&&V.cine.ready('kill',7)){V.cine.killcam(a.root.position.clone(),tv.root.position.clone(),d.melee?1.2:1.5);
+    if(last&&V.cine.cur){const t=d.t;V.cine.cur.next=()=>V.cine.finale(tv.root.position.clone(),t.boss?finTitle(t):'')>0}}
    if(d.melee){a.swing(pt);return 210}
    a.shoot(pt);const nx=Q.findIndex(o=>o.type==='shot'),upto=nx<0?Q:Q.slice(0,nx),deflect=!d.hit&&upto.some(e=>e.type==='text'&&e.d.txt==='DEFLECT');
    // Guard can send the bolt back: the reflected hit is the next 'hit' whose source is the defender.
@@ -115,7 +119,8 @@ function play(type,d){const {units,fx3,labels,board,rig}=V;
    return back?ms*2.2:ms}
   case 'hit':{const v=units.get(d.t),at=d.src?vpos(d.src):null;v.flash();if(at)v.knock(at,d.d>=4?.34:.24);fx3.sparks(vpos(d.t,.8),d.src&&d.src.side==='e'?0xff8a6a:0x9fe7ff,16);
    hpShow.set(d.t.uid,d.hp);return 130}
-  case 'kill':{const v=units.get(d.t),p=vpos(d.t,.8);v.fall('dead',d.src?vpos(d.src):null);fx3.burst(p);labels.float(p.clone().setY(1.7),'KILL','kill',true);
+  case 'kill':{const v=units.get(d.t),p=vpos(d.t,.8);
+   if(d.t.side==='e'&&(d.t.boss||!enemies().some(e=>e!==d.t&&alive(e)))&&V.cine.ready('finale',2))V.cine.finale(v.root.position.clone(),d.t.boss?finTitle(d.t):'');v.fall('dead',d.src?vpos(d.src):null);fx3.burst(p);labels.float(p.clone().setY(1.7),'KILL','kill',true);
    if(!units.reduce)slowT=.25;hpShow.set(d.t.uid,0);return 700}
   case 'down':{const v=units.get(d.t);v.fall('down',d.src?vpos(d.src):null);fx3.puff(vpos(d.t,.4),6);hpShow.set(d.t.uid,0);return 520}
   case 'explode':{const d2=fx3.explosion(P(d,.2));setTimeout(()=>{if(V&&S){const lost=board.sync(S.grid);for(const l of lost)fx3.debris(P(l,.3),8)}},120);return d2}
@@ -146,12 +151,15 @@ function textFx(d){const {labels,fx3,units,rig}=V,t=TXT[d.txt],p=P(d,.8),u=S.uni
 const BOLT={bhTrooper:0xff8a2a,sniper:0x8aff5a,mando:0x8aff5a};
 const boltColor=u=>u.side==='p'?0x4fb4ff:BOLT[kindOf(u)]||(cb()?0xff9e2c:0xff3b2e);
 const FORCE=new Set(['push','collapse','choke','stun','mindTrick','saberThrow','tremor','pull','battleMed','leap','beastCalm','forceWave','stasisField','massHeal','forceRevive','disarm']),HEAL=new Set(['heal','forceHeal','stabilize','forceRevive','reviveStim']),SHIELD=new Set(['guard','barrier','hunker','defLine','smoke']);
+const finTitle=t=>`<div style="font:600 20px 'Chakra Petch',sans-serif;letter-spacing:.14em;color:#e0bd78">${(t.n||'').toUpperCase()} FALLS</div>`;
+const ACTION=new Set(['grenade','ionNade','rocket','sweep','mightyBlow','chainShot','flurry']);
 function abilityFx(d){const {units,fx3,rig}=V,u=units.get(d.u),k=d.k,g=d.g,tp=g&&(g.t?vpos(g.t,.8):P(g,.8));
  if(tp)u.faceTo(tp);
  if(tp&&FORCE.has(k)&&d.u.side==='p'&&Math.random()<.6&&V.cine.ready('force',9))V.cine.forcecam(u.root.position.clone(),tp);
  if(k==='leap'&&g){const ms=u.leap(P(d.from),P(g),g);setTimeout(()=>{if(!V)return;fx3.ring(P(g),0x9fe7ff,.2,1.3,.4,.06);fx3.puff(P(g,.2),8,0x6a7a80)},ms*.9);return ms}
  const ff=forceFx({k,u,tv:g&&g.t?units.get(g.t):null,from:P(d.from),tp,fx3,T:THREE,rig,reduce:units.reduce,color:new THREE.Color(unitColor(d.u)).getHex(),P});
  if(ff!=null)return ff;
+ if(tp&&d.u.side==='p'&&ACTION.has(k)&&Math.random()<.6&&V.cine.ready('action',8))V.cine.actioncam(u.root.position.clone(),tp);
  if(k==='grenade'&&g){u.throwAt(tp);return fx3.arc(P(d.from,1),P(g,.15),.5)}
  if(HEAL.has(k)&&tp){if(g&&g.t!==d.u)u.use(tp);else u.cast(null,.5);fx3.motes(tp,0x7fd99a);return 300}
  if(SHIELD.has(k)){fx3.ring(tp||vpos(d.u),k==='barrier'?0x7fd99a:0x79d3e2,.3,.9,.5,.4);return 250}
@@ -181,7 +189,10 @@ function ui(){if(!V||!S)return;try{camUi()}catch(e){console.warn(e)}if(cb()!==la
   if(it.to)h.lines.push({a,b:P(it.to,.9),color:0xef6a5d,dash:1});if(it.area){h.lines.push({a,b:P(it.area,.2),color:0xef6a5d,dash:1});h.iarea=it.area}}
  // Stealth (Chat X): red = tiles an enemy would spot you on; the hidden squad is drawn ghosted.
  if(S.conc&&typeof visionTiles==='function'){const k=enemies().map(e=>e.x+','+e.y+e.status).join(';');if(visK!==k||visS!==S){visK=k;visS=S;visT=visionTiles()}h.vision=visT}
- if(window.mapMarks)h.marks=mapMarks();h.marks=[...(h.marks||[]),...(S.loot||[]).map(l=>({k:'loot',x:l.x,y:l.y})),...(S.drops||[]).map(d=>({k:'in',x:d.x,y:d.y}))]; /* loot crates + dropship flares */board.highlight(h);units.marks(sel,S.peek);for(const v of units.map.values())v.ghost&&v.ghost(v.u.side==='p'&&v.u.status==='ok'&&!!(S.conc||v.u.conc))
+ if(window.mapMarks)h.marks=mapMarks();h.marks=[...(h.marks||[]),...(S.loot||[]).map(l=>({k:'loot',x:l.x,y:l.y})),...(S.drops||[]).map(d=>({k:'in',x:d.x,y:d.y}))]; /* loot crates + dropship flares */
+ // V2: shell zones (3×3, land next turn) as pulsing red marks; a beacon over each incoming group's center.
+ const bv=S.bv;for(const z of (bv&&bv.bar&&bv.bar.zones)||[])for(let y=z.y-1;y<=z.y+1;y++)for(let x=z.x-1;x<=z.x+1;x++)if(inb(x,y))h.marks.push({k:'shell',x,y});
+ h.beacons=S.over?[]:[...(S.drops||[]),...(S.inbound?[S.inbound]:[])].filter(d=>d&&inb(d.x,d.y));board.highlight(h);units.marks(sel,S.peek);for(const v of units.map.values())v.ghost&&v.ghost(v.u.side==='p'&&v.u.status==='ok'&&!!(S.conc||v.u.conc))
  // % tags: same rule as the 2D board (best enemy shot in white).
  const shoot=S.info&&canAct(sel)&&S.mode==='move'&&sel.abil.includes('shoot')?targetsFor(sel,'shoot').filter(g=>g.t):[];
  const list=[...S.tg.filter(g=>!g.area&&!g.spot&&g.chance!=null),...shoot.filter(s=>!S.tg.some(g=>g.x===s.x&&g.y===s.y))].filter(g=>!g.t||!g.t.hid);
@@ -193,7 +204,14 @@ function ui(){if(!V||!S)return;try{camUi()}catch(e){console.warn(e)}if(cb()!==la
  // XCOM flank preview: hovering a move tile tags every visible enemy you'd flank from there.
  if(S.mode==='move'&&HOV&&can&&typeof flanked==='function'){const spot={...sel,x:HOV.x,y:HOV.y};for(const e of enemies())if(!e.hid&&e.status==='ok'&&!list.some(g=>g.t===e)){
    let ok=false;try{ok=flanked(e,spot)&&dist(spot,e)<=sel.range&&los(spot,e)}catch(_){}if(ok)list.push({t:e,flank:1,chance:0})}}
- labels.setTags(list.map(g=>({p:g.t?vpos(g.t,(units.get(g.t).headY||1.2)+.55):P(g,1),html:g.flank?'FLANK':g.chance+'%'+(g.kill?' ☠':''),cls:g.flank?'flank':g.ally?'al':g.chance===best&&g.t&&g.t.side==='e'?'best':''})))}
+ labels.setTags([...warnTags(),...list.map(g=>({p:g.t?vpos(g.t,(units.get(g.t).headY||1.2)+.55):P(g,1),html:g.flank?'FLANK':g.chance+'%'+(g.kill?' ☠':''),cls:g.flank?'flank':g.ally?'al':g.chance===best&&g.t&&g.t.side==='e'?'best':''}))])}
+// Countdown labels the 2D board shows: sapper charge timers, pylon HP, "SHELLS" over each artillery zone, inbound turn.
+function warnTags(){const b=S.bv,out=[];if(S.over)return out;
+ for(const m of (b&&b.bombs)||[])out.push({p:P(m,1.25),html:`⏱ ${m.t}`,cls:'warn'+(m.t<=1?' hot':'')});
+ for(const [k,hp] of Object.entries((b&&b.pyl)||{})){const [x,y]=k.split(',').map(Number);out.push({p:P({x,y},1.9),html:`⚡ ${hp}`,cls:'warn hp'})}
+ for(const z of (b&&b.bar&&b.bar.zones)||[])out.push({p:P(z,.9),html:'SHELLS NEXT TURN',cls:'warn hot'});
+ for(const d of [...(S.drops||[]),...(S.inbound?[S.inbound]:[])])if(d&&inb(d.x,d.y)){const n=d.turn!=null?d.turn-S.turn:null;out.push({p:P(d,1.75),html:n!=null&&n>0?`INBOUND · ${n}T`:'INBOUND',cls:'warn'})}
+ return out}
 function unitLabels(){const L=[];for(const u of S.units){const v=V.units.map.get(u.uid);if(!v||v.gone||v.state==='dead'||u.hid||!alive(u)&&u.status!=='dead')continue;
   const hp=Math.max(0,Math.min(u.max,hpShow.has(u.uid)?hpShow.get(u.uid):u.hp)),b=v.state==='down'?'down':badge(u);
   const html=`<i class="hp" style="--uc:${unitColor(u)}">${Array.from({length:u.max},(_,i)=>`<b class="${i<hp?'on':''}"></b>`).join('')}</i>${typeof armorPips==='function'?armorPips(u):''}${b?`<span class="bdg">${icon(b)}${u.status==='down'&&!u.stable?`<small>${u.bleed}</small>`:''}</span>`:''}${S.info?`<em>${hp}</em>`:''}`;

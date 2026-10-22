@@ -399,3 +399,9 @@ html.cb .cell.vis{background:repeating-linear-gradient(135deg,color-mix(in srgb,
 .tok .ar{position:absolute;left:0;right:0;bottom:-9px}
 .say2{position:absolute;bottom:100%;left:50%;transform:translate(-50%,-4px);z-index:6;width:max-content;max-width:180px;font:500 11px var(--body,'IBM Plex Sans',sans-serif);color:var(--fg);background:#0d181be6;border:1px solid #79d3e266;border-radius:8px;padding:3px 7px;text-align:center;pointer-events:none;white-space:normal;box-shadow:0 3px 10px #0008}
 .uname .nick{font:500 12px var(--body,sans-serif);color:var(--dim)}.nickrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}.nickrow button small{color:var(--dim);margin-left:4px}
+/* V2: 3D countdown labels (charge timers, pylon HP, shell zones, inbound) */
+.v3t.warn .in{background:#1a0d0b;color:#ff8a7a;border:1px solid #ef6a5d;box-shadow:0 0 10px #ef6a5d88;font-weight:700;letter-spacing:.06em}
+.v3t.warn.hot .in{background:#ef6a5d;color:#0a1113;animation:v3warn 1s ease-in-out infinite}
+.v3t.warn.hp .in{border-color:#6fd0ff;color:#9fe7ff;box-shadow:0 0 10px #6fd0ff66}
+@keyframes v3warn{50%{box-shadow:0 0 18px #ef6a5d}}
+@media (prefers-reduced-motion:reduce){.v3t.warn.hot .in{animation:none}}

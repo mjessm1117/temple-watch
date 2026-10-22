@@ -85,6 +85,7 @@ export class Board{
   return g}
  isNS(x,y){const w=c=>'#OdD_'.includes(c);const g=this.grid;return w((g[y-1]||[])[x]||'#')&&w((g[y+1]||[])[x]||'#')}
  update(dt,t){for(const a of this.anim){if(a.spin)a.o.rotation.y+=dt*a.spin;if(a.pulse){const s=.75+.15*Math.sin(t*3);a.o.scale.set(s,1,s)}}
+  if(this.mkm){const w=.5+.5*Math.sin(t*4);for(const c of Object.values(this.mkm))if(c[2]&&c.mat)c.mat.opacity=c[1]*(.55+.45*w);if(this.bcn){this.bcn.lm.opacity=Math.sin(t*6)>0?1:.25;this.bcn.bm.opacity=.1+.08*w}}
   for(const o of this.lines.children)if(o.userData.flow){o.userData.flow.t=(o.userData.flow.t+dt*1.6)%1;const f=o.userData.flow;o.position.lerpVectors(f.a,f.b,f.t)}}
  floorTexture(){const s=48,c=document.createElement('canvas');c.width=this.cols*s;c.height=this.rows*s;const g=c.getContext('2d'),P=this.pal&&this.pal.floor||['#0e1a1e','#0f1c20','rgba(121,211,226,.22)','#14242a'];
   g.fillStyle='#0c171a';g.fillRect(0,0,c.width,c.height);let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
@@ -93,6 +94,9 @@ export class Board{
   g.strokeStyle=P[2];g.lineWidth=1.5;for(let x=0;x<=this.cols;x++){g.beginPath();g.moveTo(x*s,0);g.lineTo(x*s,c.height);g.stroke()}
   for(let y=0;y<=this.rows;y++){g.beginPath();g.moveTo(0,y*s);g.lineTo(c.width,y*s);g.stroke()}
   const t=new this.T.CanvasTexture(c);t.colorSpace=this.T.SRGBColorSpace;t.anisotropy=4;return t}
+ // Feathered square: bright rim fading to a soft center, so mark planes glow instead of reading as flat tiles.
+ softTexture(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');for(let i=0;i<32;i++){const a=i<4?.95-i*.12:Math.max(.22,.55-i*.012);g.fillStyle=`rgba(255,255,255,${a})`;g.fillRect(i,i,64-2*i,64-2*i)}
+  const t=new this.T.CanvasTexture(c);t.colorSpace=this.T.SRGBColorSpace;return t}
  // Enemy sight while concealed: red diagonal hatching with a border, readable on every theme.
  hatch(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const c0=this.cbHatch?'255,158,44':'255,59,46';g.fillStyle=`rgba(${c0},.18)`;g.fillRect(0,0,64,64);
   g.strokeStyle=`rgba(${c0},.75)`;g.lineWidth=5;for(let i=-64;i<128;i+=16){g.beginPath();g.moveTo(i,0);g.lineTo(i+64,64);g.stroke()}
@@ -110,9 +114,15 @@ export class Board{
   for(const c of [...this.lines.children]){this.lines.remove(c);c.geometry.dispose();c.material.dispose()}const hm=this.hm,lift=(x,y,dy=.012)=>this.pos(x,y,dy);
   for(const t of h.vision||[])this.take('vis',this.plane,hm.vis).position.copy(lift(t.x,t.y,.008));
   // Map marks (Chat M, wave 5): objective zone (green), exit (red), incoming group (red), overwatch zones (amber / enemy red).
-  if(!this.mkm)this.mkm={loot:[0xe0bd78,.6],zone:[0x7fd99a,.30],exit:[0xef6a5d,.55],in:[0xef6a5d,.38],ow:[0xffb21e,.16],owe:[0xef6a5d,.12]};
-  for(const m of h.marks||[]){const c=this.mkm[m.k];if(!c)continue;if(!(c.mat))c.mat=new this.T.MeshBasicMaterial({color:c[0],transparent:true,opacity:c[1],depthWrite:false});
+  // Soft glow (V2): a feathered texture, additive; danger marks pulse. shell = artillery lands next turn (Chat H barrage).
+  if(!this.mkm){this.glowTex=this.softTexture();this.mkm={loot:[0xe0bd78,.75],zone:[0x7fd99a,.55],exit:[0xef6a5d,.85,1],in:[0xef6a5d,.6,1],ow:[0xffb21e,.3],owe:[0xef6a5d,.25],shell:[0xff2a1e,.95,1]}}
+  for(const m of h.marks||[]){const c=this.mkm[m.k];if(!c)continue;if(!(c.mat))c.mat=new this.T.MeshBasicMaterial({color:c[0],map:this.glowTex,transparent:true,opacity:c[1],depthWrite:false});
    this.take('mk_'+m.k,this.plane,c.mat).position.copy(lift(m.x,m.y,.006))}
+  // Entry beacons: a red mast + blinking light + light beam over every incoming group (dropship flare / Threat wave).
+  if(!this.bcn){const T=this.T,b=(c,o)=>new T.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false});
+   this.bcn={mast:new T.CylinderGeometry(.035,.05,1.1,6).translate(0,.55,0),lamp:new T.SphereGeometry(.09,10,8),beam:new T.CylinderGeometry(.16,.3,2.6,12,1,true).translate(0,1.3,0),
+    mm:new T.MeshStandardMaterial({color:0x3a4a50,metalness:.5,roughness:.6}),lm:b(0xff4a3a,1),bm:b(0xff3b2e,.16)};this.bcn.bm.blending=T.AdditiveBlending;this.bcn.bm.side=T.DoubleSide}
+  for(const p of h.beacons||[]){const q=lift(p.x,p.y,0),B=this.bcn;this.take('bcM',B.mast,B.mm).position.copy(q);this.take('bcL',B.lamp,B.lm).position.copy(q).setY(q.y+1.15);this.take('bcB',B.beam,B.bm).position.copy(q)}
   // XCOM move range: faint fill + a glowing border. Blue = 1-action edge, gold = dash (outer) edge.
   const R=new Set(h.reach.map(t=>t.x+','+t.y)),B1=new Set(h.reach.filter(t=>!t.dash).map(t=>t.x+','+t.y));
   for(const t of h.reach){this.take(t.dash?'dash':'reach',this.plane,t.dash?hm.dash:hm.reach).position.copy(lift(t.x,t.y));
