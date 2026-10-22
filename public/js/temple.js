@@ -15,7 +15,8 @@ function addMod(u,m){for(const [k,v] of Object.entries(m||{})){
 function templeMods(u,r){if(!r.gear)return u;const g=r.gear;
  for(const k of picksOf(r))if(PERKS[k])addMod(u,PERKS[k].mod);
  if(isJedi(r)){for(let t=1;t<=g.saber;t++)addMod(u,SABERS[t].mod);if(g.trait)addMod(u,SABER_TRAITS[g.trait].mod)}
- else{for(let t=1;t<=g.w;t++)addMod(u,WEAPONS[t].mod);addMod(u,ARMOR[g.armor].mod);for(const m of g.mods)addMod(u,MODS[m].mod)}
+ else{for(let t=1;t<=g.w;t++)addMod(u,WEAPONS[t].mod);addMod(u,ARMOR[g.armor].mod)}
+ if(isJedi(r))addMod(u,ARMOR[g.armor].mod);arsenalMods(u,r);   // modules on weapon / armor / saber, evolution (arsenal.js)
  if(r.trait)addMod(u,TRAITS[r.trait].mod);addMod(u,r.bonus);if(r.fear>0)u.aim-=10;
  u.mob=Math.max(2,u.mob);const bs=bondsOf(r);u.bonds=bs.map(b=>({rid:b.rid,lvl:bondTier(b.lvl)})).filter(b=>b.lvl);   // rules.js reads tiers 1–3
  u.bondAim=u.bonds.length?(bs.some(b=>b.lvl>=BOND.max)?BOND.maxAim:BOND.aim):0;u.bondReact=u.bonds.some(b=>b.lvl>=2)?1:0;if(typeof legacyMods==='function')legacyMods(u,r);progMods(u,r);treeMods(u,r);u.mob=Math.max(2,u.mob);return u}
@@ -52,7 +53,7 @@ function statDiff(a,b){const L=[['hp','HP'],['aim','Aim'],['mob','Move'],['range
  for(const k of b.abil.filter(k=>!a.abil.includes(k)))o.push('new: '+(AB[k]?AB[k].name:k));return o.join(' · ')}
 
 // --- costs ---
-const priceOf=c=>Math.round(c*(C.staff.armory?.8:1));
+const priceOf=c=>Math.round(c*(C.staff.armory?.8:1)*(researched('supply')?.85:1));
 const kyberOf=k=>Math.max(1,k-(C.staff.forge?1:0)-(researched('kyberLore')?1:0));
 const hasWing=n=>!n||C.wings[n[0]]>=n[1];
 const unit=id=>C.roster.find(r=>r.id===id);

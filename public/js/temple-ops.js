@@ -67,7 +67,7 @@ function counterOp(id){const o=C.ops.list.find(o=>o.id===id);if(!o||o.st!=='open
 let OPTEAM=[];
 function sendTeam(id){const o=C.ops.list.find(o=>o.id===id),T=OPTEAM.map(unit).filter(r=>r&&fit(r));if(!o||o.st!=='open'||T.length!==2)return;
  o.st='team';o.team=T.map(r=>r.id);for(const r of T)r.assign='op:'+o.id;OPTEAM=[];saveGame()}
-function startResearch(k){const P=RESEARCH[k],R=C.research;if(!P||!C.wings.archives||R.cur||R.done.includes(k)||!(P.need||[]).every(researched))return;
+function startResearch(k){const P=RESEARCH[k],R=C.research;if(!P||!C.wings.archives||R.cur||R.done.includes(k)||(P.era||1)>(C.era||1)||!(P.need||[]).every(researched))return;
  const c=P.cost;if(C.res.credits<(c.credits||0)||C.res.intel<(c.intel||0))return;C.res.credits-=c.credits||0;C.res.intel-=c.intel||0;R.cur=k;R.prog=0;saveGame()}
 function setUtil(id,k){const r=unit(id),it=UTIL[k];if(!r||!it||r.gear.util===k||!okGear(it))return;if(!pay(priceOf(it.cost)))return;r.gear.util=k;saveGame()}
 function setForm(id,k){const r=unit(id),f=FORMS[k];if(r&&f&&isJedi(r)&&researched(f.res)){r.gear.form=k;saveGame()}}
@@ -75,7 +75,8 @@ function raiseMaster(id){const r=unit(id);if(r&&isJedi(r)&&r.title==='Knight'&&r
 
 // --- screens ---
 const costTxt=c=>[c.credits&&c.credits+' Cr',c.intel&&c.intel+' Intel'].filter(Boolean).join(' + ')||'free';
-function researchTab(){const R=C.research;if(!C.wings.archives)return '<p class="muted">Build the Archives (Wings tab) to start research.</p>';
+function researchTab(){return arsenalResearch()}
+function researchTabOld(){const R=C.research;if(!C.wings.archives)return '<p class="muted">Build the Archives (Wings tab) to start research.</p>';
  const sp=(C.wings.archives>=2?1.5:1)*(C.staff.archives?1.25:1),cur=R.cur&&RESEARCH[R.cur];
  return `<p>${cur?`Researching <b>${cur.n}</b>: ${Math.floor(R.prog)}/${cur.days} days (+${Math.round(DAYS*sp)} per mission).`:'<span class="warn">No project running.</span> Pick one below.'} Done: ${R.done.length}/${Object.keys(RESEARCH).length}.</p>
  <div class="seats">${Object.entries(RESEARCH).map(([k,P])=>{const done=R.done.includes(k),need=(P.need||[]).filter(n=>!researched(n)),c=P.cost,no=R.cur||need.length||C.res.credits<(c.credits||0)||C.res.intel<(c.intel||0);

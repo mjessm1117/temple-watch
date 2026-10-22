@@ -24,7 +24,7 @@ const MOD_INFO={'Aim':'The shooter\'s base aim.','Half cover':'Target behind hal
  'Executioner':'+25 against targets at half HP or less.','Boosted':'An ally\'s buff raises this unit\'s aim.','Target shielded':'A buff on the target makes it harder to hit.',
  'Sith Lord nearby':'A Sith Lord within 4 tiles drives nearby Sith to shoot straighter.','Vs':'Trained against this kind of foe.','Beast lore':'Knows how beasts fight.','Fear of horrors':'A scar: this unit fears horrors.','Flank':'Target has no cover against this angle.','Ambush':'First shot from concealment.','Will':'Shaken nerves.'};
 function loreOf(kind,id){const C=uiGv('CODEX');return C&&C[kind]&&C[kind][id]&&C[kind][id].lore||''}
-function gearItem(id){for(const n of ['GEAR','ARMOR','MODS','UTIL','UTILITY','STANCES','FORMS','CRYSTAL_FX','SABER_TRAITS','TRAITS','PERKS','SCARS']){const t=uiGv(n);if(t&&!Array.isArray(t)&&t[id]&&typeof t[id]==='object')return t[id]}
+function gearItem(id){for(const n of ['GEAR','ARMOR','MODS','AMODS','SMODS','UTIL','UTILITY','STANCES','FORMS','CRYSTAL_FX','SABER_TRAITS','TRAITS','PERKS','SCARS']){const t=uiGv(n);if(t&&!Array.isArray(t)&&t[id]&&typeof t[id]==='object')return t[id]}
  for(const n of ['WEAPONS','SABERS']){const t=uiGv(n);if(Array.isArray(t)){const i=t.find((w,ix)=>w.id===id||String(ix)===String(id)||w.n===id);if(i)return i}}return null}
 function foeAuto(f){return [`HP ${f.hp} · Aim ${f.aim} · Move ${f.mob} · Damage ${f.dmg[0]}–${f.dmg[1]} · Range ${f.range<2?'melee':f.range}`,f.armor?`Armor ${f.armor}.`:'',f.horror||f.forceOnly?'Hurts only Force users; troops are immune.':'',f.hid?'Starts hidden.':''].filter(Boolean).join(' ')}
 function describe(kind,id){let name=id,desc='',ic=null,t;
@@ -53,7 +53,7 @@ function codexScan(){if(!S)return;codexSee('mission',S.id);
 function codexIds(kind){const src={ability:'AB',enemy:'FOES',class:'CLASS',tile:'TILES',wing:'WINGS',research:'RESEARCH',mission:'MISSIONS'}[kind];
  let ids=src&&uiGv(src)?Object.keys(uiGv(src)):[];
  if(kind==='status')ids=Object.keys({...STATUS_INFO,...(uiGv('STATUS')||{})});
- if(kind==='gear')for(const n of ['GEAR','ARMOR','MODS','UTIL','UTILITY','STANCES','FORMS']){const t=uiGv(n);if(t&&!Array.isArray(t))ids.push(...Object.keys(t).filter(k=>k!=='none'))}
+ if(kind==='gear')for(const n of ['GEAR','ARMOR','MODS','AMODS','SMODS','UTIL','UTILITY','STANCES','FORMS']){const t=uiGv(n);if(t&&!Array.isArray(t))ids.push(...Object.keys(t).filter(k=>k!=='none'))}
  if(kind==='tile')ids=ids.filter(c=>c!=='.');
  const C=uiGv('CODEX');if(C&&C[kind])for(const k of Object.keys(C[kind]))if(!ids.includes(k))ids.push(k);
  return [...new Set(ids)]}

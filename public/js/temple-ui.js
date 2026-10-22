@@ -26,10 +26,9 @@ function armoryTab(){const L=C.roster.filter(r=>r.status==='active');if(!L.some(
   h+=`<div class="grow"><b>Saber</b><span>${SABERS[g.saber].n} (T${g.saber+1})</span>${nx?`<button type="button" data-act="saber:${r.id}" ${!hasWing(nx.need)||C.res.credits<nx.cost||C.res.kyber<kyberOf(nx.kyber)?'disabled':''}>Craft ${nx.n} · ${cost(nx.cost,kyberOf(nx.kyber))}${needTxt(nx.need)}</button>`:''}</div>`;
   if(SABERS[g.saber].trait)h+=`<div class="grow"><b>Trait</b>${Object.entries(SABER_TRAITS).map(([k,t])=>`<button type="button" class="${g.trait===k?'on':''}" data-act="trait:${r.id}:${k}" title="${t.tip}">${t.n} · ${t.tip}</button>`).join('')}</div>`;
   h+=`<div class="grow"><b>Crystal</b>${Object.entries(CRYSTALS).map(([k,c])=>`<button type="button" class="sw ${r.col===c?'on':''}" style="--c:${c}" data-act="col:${r.id}:${c}" title="${k}" aria-label="${k} crystal"></button>`).join('')}</div>`}
- else{const nx=WEAPONS[g.w+1],slots=WEAPONS[g.w].slots;
+ else{const nx=WEAPONS[g.w+1];
   h+=`<div class="grow"><b>Weapon</b><span>${WEAPONS[g.w].n} (T${g.w+1})</span>${nx?`<button type="button" data-act="wpn:${r.id}" ${!hasWing(nx.need)||C.res.credits<priceOf(nx.cost)?'disabled':''}>Upgrade to ${nx.n} · ${cost(priceOf(nx.cost))}${needTxt(nx.need)}</button>`:''}</div>`;
-  h+=`<div class="grow"><b>Mods ${g.mods.length}/${slots}</b>${slots?Object.entries(MODS).filter(([,m])=>researched(m.res)).map(([k,m])=>g.mods.includes(k)?`<button type="button" class="on" data-act="dropmod:${r.id}:${k}" title="Remove (no refund)">${m.n} · ${m.tip} ✕</button>`
-   :`<button type="button" data-act="mod:${r.id}:${k}" ${g.mods.length>=slots||C.res.credits<priceOf(m.cost)?'disabled':''}>${m.n} · ${m.tip} · ${cost(priceOf(m.cost))}</button>`).join(''):'<span class="muted">Upgrade the weapon to fit mods.</span>'}</div>`;
+  h+=modRows(r,'w');
   h+=`<div class="grow"><b>Color</b>${TROOP_COLS.map(c=>`<button type="button" class="sw ${(r.col||TROOP_COLS[0])===c?'on':''}" style="--c:${c}" data-act="col:${r.id}:${c}" aria-label="Token color ${c}"></button>`).join('')}</div>`}
  h+=armoryProg(r)+presetHTML(r)+identHTML(r)+treeHTML(r)+recordHTML(r);const picks=r.picks.map(k=>pickInfo(k).name).join(', ');
  return `<div class="tw"><div class="ulist">${list}</div><div class="gear"><div><b>${r.n}</b> <small class="muted">${r.cls} · Rank ${r.rank}${picks?' · '+picks:''}</small></div><div class="stl">${statLine(r)}</div>${h}

@@ -187,3 +187,10 @@ button:active:not(:disabled){transform:translateY(1px)}
 .odds .oh .cyc{display:inline-flex;align-items:center;gap:4px;margin-right:8px}.odds .cyc button{min-width:28px;padding:2px 6px}.odds .cyc small{color:var(--dim)}
 @media (min-width:900px) and (min-height:601px){body.aiming.v3d #odds{position:fixed;left:50%;bottom:98px;transform:translateX(-50%);width:min(480px,60vw);z-index:20;pointer-events:auto}
  body.aiming.v3d .odds .tot{font-size:34px}body.aiming.v3d .odds{display:grid;grid-template-columns:1fr 1fr;gap:2px 18px}body.aiming.v3d .odds .oh,body.aiming.v3d .odds #confirm{grid-column:1/-1}}
+/* Research tree (arsenal.js): 5 branches side by side, one card per project. */
+.rtree{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:6px}
+.rbr{display:grid;gap:6px;align-content:start}
+.rnode{border:1px solid var(--line);border-radius:8px;padding:7px;font-size:12px;display:grid;gap:3px;background:var(--panel)}
+.rnode.done{border-color:var(--good);opacity:.75}.rnode.cur{border-color:var(--holo);box-shadow:0 0 8px rgba(121,211,226,.35)}
+.rnode.lock{border-style:dashed;color:var(--dim)}
+@media (max-width:860px){.rtree{grid-template-columns:repeat(2,minmax(0,1fr))}}
