@@ -35,9 +35,9 @@ Already closed this week (don't redo): armor pips, Padawans (bond 2 start), voic
 - [ ] Cinematics pass (feedback item 6): kill cam, ability cams, mission intro; respect reduced motion.
 
 ## K2 · Kits & AI
-- [ ] Tree abilities still living in `PROG_AB` (flurry, shadowStep, mightyBlow, …): move them into the real ability engine; add the wishlist ones (Hold the Line, …) from STATUS P→X.
-- [ ] Test bot uses the corner-peek rule (M→K) so balance numbers match real play.
-- [ ] "Lost"-style swarms / free-action chains for Force horrors (feedback item 7) — design with Jess first via the form.
+- [x] (5caeee7) Tree abilities still living in `PROG_AB` (flurry, shadowStep, mightyBlow, …): move them into the real ability engine; add the wishlist ones (Hold the Line, …) from STATUS P→X.
+- [x] (5caeee7) Test bot uses the corner-peek rule (M→K) so balance numbers match real play.
+- [x] (5caeee7) "Lost"-style swarms / free-action chains for Force horrors (feedback item 7) — design with Jess first via the form.
 
 ## A2 · App & onboarding (ask Jess first)
 - [x] Install as an app: proper manifest, service worker, offline shell, home-screen icon, full-screen; saves kept. (4078e69)
