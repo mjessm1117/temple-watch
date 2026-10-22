@@ -109,7 +109,7 @@ FOES.adraas={n:'Lord Adraas',ic:'e_acolyte',hp:11,aim:75,mob:5,dmg:[4,5],range:1
 Object.assign(MISSIONS,{
  // Act II story: Gnost-Dural's arc. Ossus is a ruined Jedi archive world (Legends, High); this expedition is [N].
  vault:{n:"Gnost-Dural's Vault",where:'Archive ruins · Ossus',type:'investigate',story:1,par:6,theme:'ruins',
-  map:["..q.#..#q.",".h..#..#..","..c....c..","B.#.hh.#.B","...r..r...",".c..q...c.","..B....B..",".r..cc..r.","...h..h...",".c......c.","..c.r..c..","EE......EE"],
+  map:["..q.h..#q.",".h.._.._..","..c....c..","h.#.hh.#.h","...r..r...",".c..q...c.","..B....B..",".r..cc..r.","...h..h...",".c......c.","..c.r..c..","EE......EE"],
   stealth:1,foes:[['trooper',1,2,1],['trooper',8,2,2],['agent',5,1],['heavy',5,4,2],['acolyte',3,1,1]],patrol:{2:[[8,2],[8,4],[6,4],[6,2]]},reinforce:['trooper','trooper'],
   start:[[2,11],[3,11],[4,11],[5,11],[6,11],[7,11]],
   brief:'You start concealed: pods patrol the ruins. Master Gnost-Dural found a sealed vault in the Ossus ruins: records from the last time the Sith struck at the Jedi. Imperial agents found it too. Scan the terminals (Jedi or Medic, adjacent), then reach evac.',

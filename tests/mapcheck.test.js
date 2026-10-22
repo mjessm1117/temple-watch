@@ -2,15 +2,22 @@
 //  1. reach  — every walkable tile can be reached from the squad start (doors count as open).
 //  2. routes — every objective and every enemy entry has 2+ separate routes: no single 2×2 patch of ground (a choke) cuts it off.
 //  3. cover  — every walkable tile has a cover spot (a tile next to cover or higher ground) within 3 tiles.
+//  4. sight  — no dead ground: no patch of SIGHT.blob+ open tiles (no cover beside them) that can't see any objective, enemy entry, north spawn edge or enemy start
+//              within SIGHT.range (real line-of-sight rule from rules.js, doors open). Blind tiles are listed either way (a hiding spot in cover is fine);
+//              more than SIGHT.maxBlind of the map blind also fails.
+//  5. open   — map-open.js would add no breach (openGrid finds nothing to improve), so OPEN.off can be flipped without changing any map.
+//              WAIVE lists layouts still waiting on their owner's fix (see docs/STATUS.md requests); they print 'waived' instead of failing.
 // Prints one line per layout. MAPCHECK=warn prints the report but never fails (for exploring).
 const {JSDOM}=require('jsdom');const fs=require('fs'),path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'..','dist','temple-watch.html'),'utf8');
 const w=new JSDOM(html,{runScripts:'dangerously'}).window;
-const D=JSON.parse(w.eval(`JSON.stringify({T:TILES,V:[...VAULT],L:Object.entries(MISSIONS).flatMap(([id,B])=>[B,...(B.alts||[])].map((v,i)=>({id,i,M:{...B,...v,alts:0}})))})`));w.close();
+const D=JSON.parse(w.eval(`JSON.stringify({T:TILES,V:[...VAULT],L:Object.entries(MISSIONS).flatMap(([id,B])=>[B,...(B.alts||[])].map((v,i)=>({id,i,M:{...B,...v,alts:0},open:v.map&&!v.closed&&!B.closed?openGrid(v.map.map(r=>r.split(''))):0})))})`));w.close();
 const T=D.T,V=new Set(D.V),DOOR=new Set(['d','D','_']);
 const PLUG=+process.env.PLUG||2;
+const WAIVE={'h_husks#0':'E3: h at (1,3) and (8,6) in data-era3.js'};
+const SIGHT={range:+process.env.SRANGE||8,blob:+process.env.BLOB||4,maxBlind:.25};
 
-function check({id,i,M}){const g=M.map,H=g.length,W=g[0].length,at=(x,y)=>x>=0&&y>=0&&x<W&&y<H?g[y][x]:null,K=(x,y)=>x+','+y;
+function check({id,i,M,open}){const g=M.map,H=g.length,W=g[0].length,at=(x,y)=>x>=0&&y>=0&&x<W&&y<H?g[y][x]:null,K=(x,y)=>x+','+y;
  const walk=(x,y,doors=1)=>{const c=at(x,y);return !!c&&(!!(T[c]||{}).walk||doors&&DOOR.has(c))},el=(x,y)=>(T[at(x,y)]||{}).elev||0;
  // Neighbours by the real movement rule (rules.js reach): 8 ways, no corner cutting, vault low cover straight, max 2-level step (straight only).
  const nb=(x,y,doors=1)=>{const r=[];for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){if(!dx&&!dy)continue;const nx=x+dx,ny=y+dy,c=at(nx,ny);if(c==null)continue;
@@ -49,10 +56,30 @@ function check({id,i,M}){const g=M.map,H=g.length,W=g[0].length,at=(x,y)=>x>=0&&
  const spots=cells.filter(([x,y])=>!DOOR.has(at(x,y))&&cov(x,y));
  const bare=cells.filter(([x,y])=>!spots.some(([a,b])=>Math.max(Math.abs(a-x),Math.abs(b-y))<=3));
  const dead=cells.filter(([x,y])=>nb(x,y).length===1).length;
- return {tag:`${id}#${i}`,n:M.n,size:W+'x'+H,lost,chokes,bare,dead,goals:goals.length}}
+ // 4. sight: port of rules.js line/los0/los (full cover blocks unless beside either end; raised ground blocks below its top; peek from full cover).
+ const FULL=(x,y)=>{const c=at(x,y);return c==null||(!DOOR.has(c)&&(T[c]||{}).cover===2)},hgt=(x,y)=>{const c=at(x,y);return c==null?9:FULL(x,y)?((T[c]||{}).h||2)+el(x,y):el(x,y)};
+ const line=(x0,y0,x1,y1)=>{const P=[],n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0))*2||1;for(let j=0;j<=n;j++){const t=j/n,p=[Math.round(x0+(x1-x0)*t),Math.round(y0+(y1-y0)*t)],l=P[P.length-1];if(!l||l[0]!==p[0]||l[1]!==p[1])P.push(p)}return P};
+ const ch=(a,b)=>Math.max(Math.abs(a[0]-b[0]),Math.abs(a[1]-b[1]));
+ const los0=(a,b,peek)=>{const P=line(a[0],a[1],b[0],b[1]),n=P.length-1,ea=el(...a)+1.2,eb=el(...b)+1.2;
+  for(let j=1;j<n;j++){const p=P[j];if(ch(p,b)<=1||!peek&&ch(p,a)<=1&&!FULL(...p))continue;const top=hgt(...p);if(top&&top>=ea+(eb-ea)*j/n)return false}return true};
+ const N4=[[1,0],[-1,0],[0,1],[0,-1]];
+ const los=(a,b)=>{if(los0(a,b,0))return true;if(!N4.some(([p,q])=>FULL(a[0]+p,a[1]+q)))return false;
+  return N4.some(([p,q])=>{const s=[a[0]+p,a[1]+q];return walk(...s)&&!(s[0]===b[0]&&s[1]===b[1])&&los0(s,b,1)})};
+ const seeK=new Set();// Waves without entries arrive on the two north rows (turns.js spawn); reinforcements too.
+ const edge=(M.waves||M.reinforce)&&!M.entries?cells.filter(([x,y])=>y<2):[];
+ const foeAt=[...(M.foes||[]),...(M.phases||[]).filter(p=>p.foe).map(p=>p.foe)].filter(f=>f&&typeof f[1]==='number').map(f=>[f[1],f[2]]);
+ const useful=[...goals.flatMap(G=>G.tiles),...edge,...(M.entries||[]).map(e=>[e[0],e[1]]),...foeAt].filter(([x,y])=>{const k=K(x,y);return seeK.has(k)?0:seeK.add(k)});
+ const blind=cells.filter(c=>!useful.some(t=>ch(c,t)<=SIGHT.range&&(ch(c,t)===0||los(c,t))));
+ // Dead ground = blind, open (no cover beside it) and not a squad start tile. Group touching tiles; a group of SIGHT.blob+ fails.
+ const dg=new Set(blind.filter(([x,y])=>!cov(x,y)&&!srcK.has(K(x,y))).map(([x,y])=>K(x,y))),blobs=[];
+ for(const k of dg){if(blobs.some(b=>b.has(k)))continue;const b=new Set([k]),q=[k];while(q.length){const [x,y]=q.pop().split(',').map(Number);
+  for(let a=-1;a<=1;a++)for(let c=-1;c<=1;c++){const n=K(x+a,y+c);if(dg.has(n)&&!b.has(n)){b.add(n);q.push(n)}}}blobs.push(b)}
+ const deadG=blobs.filter(b=>b.size>=SIGHT.blob).map(b=>[...b][0]+' ('+b.size+')');
+ if(process.env.SHOW&&deadG.length){const bk=new Set(blind.map(([x,y])=>K(x,y))),gk=new Set(useful.map(([x,y])=>K(x,y)));console.log(`-- ${id}#${i} ${M.n}`);g.forEach((r,y)=>console.log('   '+[...r].map((c,x)=>dg.has(K(x,y))?'@':bk.has(K(x,y))?'*':gk.has(K(x,y))&&c==='.'?'o':c).join('')+'  '+y))}
+ return {tag:`${id}#${i}`,n:M.n,size:W+'x'+H,lost,chokes,bare,dead,goals:goals.length,blind:blind.length,deadG,cells:cells.length,open}}
 
 let fail=0;const rows=D.L.map(check);
-for(const r of rows){const ok=!r.lost.length&&!r.chokes.length&&!r.bare.length;if(!ok)fail++;
- console.log(`${ok?'ok  ':'FAIL'} ${r.tag.padEnd(14)} ${r.size.padEnd(6)} goals ${r.goals} · unreachable ${r.lost.length}${r.lost.length?" ["+r.lost.slice(0,6).map(p=>p.join(",")).join(" ")+"]":""} · chokes ${r.chokes.length}${r.chokes.length?' ['+r.chokes.join('; ')+']':''} · bare ${r.bare.length}${r.bare.length?' ['+r.bare.slice(0,6).map(p=>p.join(',')).join(' ')+(r.bare.length>6?' …':'')+']':''} · dead ends ${r.dead}`)}
+for(const r of rows){const ok=!r.lost.length&&!r.chokes.length&&!r.bare.length&&!r.deadG.length&&r.blind<=r.cells*SIGHT.maxBlind&&(!r.open||!!WAIVE[r.tag]);if(!ok)fail++;
+ console.log(`${ok?'ok  ':'FAIL'} ${r.tag.padEnd(14)} ${r.size.padEnd(6)} goals ${r.goals} · unreachable ${r.lost.length}${r.lost.length?" ["+r.lost.slice(0,6).map(p=>p.join(",")).join(" ")+"]":""} · chokes ${r.chokes.length}${r.chokes.length?' ['+r.chokes.join('; ')+']':''} · bare ${r.bare.length}${r.bare.length?' ['+r.bare.slice(0,6).map(p=>p.join(',')).join(' ')+(r.bare.length>6?' …':'')+']':''} · dead ends ${r.dead} · blind ${r.blind}/${r.cells}${r.deadG.length?' · DEAD GROUND ['+r.deadG.join('; ')+']':''}${r.open?' · breaches '+r.open+(WAIVE[r.tag]?' (waived: '+WAIVE[r.tag]+')':''):''}`)}
 console.log(`mapcheck: ${rows.length-fail}/${rows.length} layouts pass`);
 process.exit(fail&&process.env.MAPCHECK!=='warn'?1:0);

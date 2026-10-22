@@ -80,11 +80,11 @@ MISSIONS.rescue.alts=[{where:'Cliffside cell block · Ord Mantell',
  start:[[3,11],[5,11],[6,11],[7,11],[2,10],[7,10]]}];
 Object.assign(MISSIONS,{
  archive:{n:'The Listening Post',where:'Imperial listening post · Balmorra',type:'investigate',par:6,theme:'ruins',stealth:1,patrol:{2:[[8,3],[8,7],[3,7],[3,3]]},
-  map:["..q#......","...#.c..#q",".c.B....B.","....x..^^.",".h..##..h.","....q.....",".c.B..B.c.","^^......^^",".x..cc..c.","..........",".c..h..c..","EE......EE"],
+  map:["..q#......","...#.c..#q",".c.B....h.","....x..^^.",".h..##..h.","....q.....",".c.B..B.c.","^^......^^",".x..cc..c.","..........",".c..h..c..","EE......EE"],
   foes:[['trooper',1,1,1],['trooper',6,1,2],['heavy',5,3,3],['agent',7,6],['trooper',8,3,2]],reinforce:['trooper','trooper'],
   start:[[3,11],[4,11],[5,11],[6,11],[2,10],[8,10]],
   alts:[{where:'Data vault · Nar Shaddaa',
-   map:["...c..c...",".q..##..q.","##d#..#d##","^^......^^",".B.x..b.B.","...h..h...",".c..q...c.","...B..B...",".h.^..^.h.","..c.cc.c..","..........","EE......EE"],
+   map:["...c..c...",".q..##..q.","##d#..#d##","^^......^^",".B.x..b.B.","...h..h...",".c..q...c.","...h..B...",".h.^..^.h.","..c.cc.c..","..........","EE......EE"],
    theme:'city',foes:[['trooper',2,0,1],['trooper',7,0,1],['heavy',5,3,2],['agent',9,5]],patrol:{1:[[2,3],[7,3]]},start:[[3,11],[4,11],[5,11],[6,11],[2,10],[7,10]]}],
   brief:'An Imperial post is reading Republic fleet traffic. Copy its data terminals (Jedi or Medic, adjacent), then get anyone to an evac zone. Blast walls crack under explosions.',
   goal:'Scan 2 of 3 terminals, then reach an evac zone. Threat rises after turn 6: terminals get wiped. Shoot alarm beacons before they call help.',

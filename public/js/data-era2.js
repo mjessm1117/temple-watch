@@ -73,7 +73,7 @@ Object.assign(MISSIONS,{
   reward:{credits:70,recruits:1},bonus:{favor:4},bonusTxt:'Done by turn 6'},
  // ── Act II (~1,003 BBY) ──
  r_caves:{n:"Kaan's Caves",where:'Cave network · Ruusan',type:'investigate',story:1,era:2,theme:'caves',par:6,
-  map:["###....q##","#..#..#..#","#.q....c.#","##..##..##","#...q....#","#.x.#..c.#","##..#.r.##","#.c....c.#","#..h..h..#","##.....###","#.c.rr.c.#","EE......EE"],
+  map:["###....q##","#.....h..#","#.q....c.#","#h..##..##","#...q....#","#.x.#..c.#","##..#.r.##","#.c....c.#","#..h..h..#","##.....###","#.c.rr.c.#","EE......EE"],
   foes:[['bh_trooper',1,2],['bh_trooper',8,2],['bh_marauder',5,4],['bh_sniper',5,0],['sith_spawn',3,6]],reinforce:['bh_trooper','bh_trooper'],
   start:[[3,11],[4,11],[5,11],[6,11],[3,10],[6,10]],
   brief:'A prisoner says the Brotherhood is gathering in the caves. Copy the ritual tablets (Jedi or Medic, adjacent), then get anyone to an evac zone. Something in the dark only hunts Jedi.',

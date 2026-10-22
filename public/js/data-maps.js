@@ -136,10 +136,10 @@ const NEW_MAPS={
    win:'The codes are ours and the squad is off the ridge.',lose:'The post wipes its codes before the copy finishes.'},
   {style:'op',type:'op',n:'Rooftop Chase',where:'Upper city rooftops · Coruscant',theme:'city',par:8,stealth:0,patrol:{},big:1,
    map:["....######....######",
-        "....#....#....#....#",
-        ".c..#...._..c._....#",
+        "....#..c.#....#....#",
+        ".c..h...._..c._....#",
         "....#....#....#..c.#",
-        "....##_###....##_###",
+        "....##_h##....##_###",
         "..h.................",
         "......c.....^^^.....",
         "#_##########^^^####_",
@@ -147,7 +147,7 @@ const NEW_MAPS={
         "..c...#..c........c.",
         "......_.............",
         "......#.....##...h..",
-        "#_#####.....##......",
+        "h_#####.....##......",
         "...........c.....EEE"],
    foes:[['trooper',2,2],['trooper',16,3],['heavy',10,9],['agent',17,9]],
    start:[[2,13],[4,13],[6,13],[8,13],[8,12],[9,13]],
@@ -184,7 +184,7 @@ const NEW_MAPS={
  sabotage:[
   {style:'route',n:'Balmorra Fuel Farm',where:'Fuel farm · Balmorra',par:9,stealth:0,patrol:{},big:1,
    map:["##...c...C....c...##",
-        "#.........#.......C#",
+        "#.........h.......C#",
         "..c..x...###..x.....",
         "....^^^^^^^^^^^^....",
         "....^^^^^^^^^^^^....",
@@ -242,7 +242,7 @@ const NEW_MAPS={
         "#.....^^^...",
         "#..c..^^^.c.",
         "#.....^^^...",
-        "##.h..^.....",
+        "#h.h..^.....",
         "#..........."],
    hostage:[3,16],
    foes:[['trooper',6,3],['trooper',1,7],['heavy',10,10],['agent',7,2],['trooper',3,10],['trooper',9,6],['heavy',4,5],['trooper',8,8]],
@@ -341,11 +341,6 @@ NEW_MAPS.escort.push(
    entries:[[12,7,'side shaft'],[1,0,'upper vent']],
    brief:'A defector must cross the old mine to the lift. The west gallery is long and exposed; the middle shafts are tight, with cover at every turn.',
    goal:'Get the VIP to the evac lift in the far corner. Watch the ledges.'});
-
-// Layout fixes for maps defined in other chats' files (mapcheck.test.js): one row swapped, nothing else.
-// vault: terminal pockets had one way in → side doorways + broken walls you can vault. r_caves: sealed alcove opened.
-const ROW_FIX={vault:{1:'.h.._.._..',3:'h.#.hh.#.h'},r_caves:{1:'#.....#..#'}};
-for(const [id,R] of Object.entries(ROW_FIX)){const B=MISSIONS[id];if(!B)continue;B.map=B.map.map((r,y)=>R[y]&&R[y].length===r.length?R[y]:r)}
 
 // Register: every new map becomes one more random layout of its mission.
 for(const [id,L] of Object.entries(NEW_MAPS))for(const m of L){const B=MISSIONS[id];if(!B)continue;(B.alts=B.alts||[]).push(m)}
