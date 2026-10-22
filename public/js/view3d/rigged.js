@@ -4,7 +4,7 @@
 import {UV,kindOf} from './units.js';
 import {makeFigure,modelOf,fileOf} from './figures.js';
 const sm=k=>k*k*(3-2*k);
-const GUN={trooper:1,scout:1,medic:1,heavy:1,sith:1,sithHeavy:1,mando:1,agent:1,envoy:1};
+const GUN={trooper:1,scout:1,medic:1,heavy:1,sith:1,sithHeavy:1,mando:1,agent:1,envoy:1,shieldbearer:1,nihilRaider:1,nihilStorm:1,marchionRo:1,lournaDee:1};
 
 export class RV extends UV{
  static can(u){return !!modelOf(fileOf(kindOf(u)))}
@@ -20,7 +20,7 @@ export class RV extends UV{
  release(){if(this.one&&this.one.hold&&this.state==='ok')this.one=null}
  baseName(){const u=this.u;if(this.pose.lift>.05)return 'lifted';if(this.moving)return 'run';if(this.kind==='beast')return 'idle';
   if(u.ow&&GUN[this.kind])return 'aim';if(this.cover&&GUN[this.kind])return 'crouch';
-  return this.kind==='jedi'||this.kind==='acolyte'||this.kind==='malgus'?'saberIdle':GUN[this.kind]?'gunIdle':'idle'}
+  return this.kind==='jedi'||this.kind==='defender'||this.kind==='acolyte'||this.kind==='malgus'?'saberIdle':GUN[this.kind]?'gunIdle':'idle'}
  walk(pts,tile){const per=this.U.reduce?.06:.2,segs=pts.length-1;if(segs<1){this.setTile(tile);return 0}this.moving=1;this.one=null;
   this.add(per*segs,k=>{const f=Math.min(segs-.0001,k*segs),i=Math.floor(f),a=pts[i],b=pts[i+1];this.root.position.lerpVectors(a,b,f-i);if(a.distanceTo(b)>1.5)this.root.position.y+=Math.sin((f-i)*Math.PI)*.6;this.faceTo(b)},
    ()=>{this.moving=0;this.setTile(tile)});return per*segs*1000}

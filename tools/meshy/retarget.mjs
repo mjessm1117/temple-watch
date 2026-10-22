@@ -19,6 +19,9 @@ for(const [s,u,m] of [['l','l','Left'],['r','r','Right']]){Object.assign(MAP,{[`
 // Fingers stay in the model's own rest pose (retargeted UAL fingers read as claws on Meshy hands).
 const FINGERS={};for(const [s,m] of [['l','Left'],['r','Right']])for(const f of ['thumb','index','middle','ring','pinky'])for(const i of [1,2,3])FINGERS[`${f}_0${i}_${s}`]=`${m}Hand${f[0].toUpperCase()+f.slice(1)}${i}`;
 
+// Newer Meshy rigs (2026) drop the "mixamorig:" prefix and rename a few bones: normalize them to the Mixamo names.
+{const ALT={Spine01:'Spine1',Spine02:'Spine2',neck:'Neck'},want=new Set([...Object.values(MAP),...Object.values(FINGERS)]);
+ for(const n of D.getRoot().listNodes()){const b=ALT[n.getName()]||n.getName();if(!b.startsWith(M)&&want.has(b))n.setName(M+b)}}
 function graph(doc){const r=doc.getRoot(),par=new Map(),by={};for(const n of r.listNodes()){by[n.getName()]=n;for(const c of n.listChildren())par.set(c,n)}return {r,par,by}}
 const gs=graph(S),gt=graph(D);
 const loc=(t,r,s)=>new T.Matrix4().compose(new T.Vector3(...t),new T.Quaternion(...r),new T.Vector3(...s));

@@ -19,7 +19,7 @@ const ENEMY={e_trooper:'sith',e_heavy:'sithHeavy',e_agent:'agent',e_acolyte:'aco
 const byName=n=>/sith lord|marauder|kaan|bane|dark acolyte|nightsister/i.test(n||'')?'acolyte':/sniper|bounty|agent/i.test(n||'')?'agent':/mandalorian/i.test(n||'')?'mando':null;
 export const kindOf=u=>u.vip?'civ':u.jedi?'jedi':u.side==='e'?(BYTYPE[u.type]||(u.nexus?'nexus':null)||(u.horror?'beast':null)||byName(u.n)||ENEMY[u.ic]||'sith'):({Scout:'scout',Medic:'medic',Heavy:'heavy'}[u.cls]||'trooper');
 // Block-figure stand-ins for kinds that only exist as rigged models.
-const BLOCK={malgus:'acolyte',mando:'trooper',bhTrooper:'sith',sniper:'agent',marauder:'acolyte',sithLord:'acolyte',kaan:'acolyte',bane:'acolyte'};
+const BLOCK={defender:'jedi',shieldbearer:'trooper',nihilRaider:'agent',nihilStorm:'sithHeavy',marchionRo:'sithHeavy',lournaDee:'agent',malgus:'acolyte',mando:'trooper',bhTrooper:'sith',sniper:'agent',marauder:'acolyte',sithLord:'acolyte',kaan:'acolyte',bane:'acolyte'};
 export const isNexus=k=>k==='nexus'||k==='nexusCore';
 let WHITE;const lerp=(a,b,k)=>a+(b-a)*k,sm=k=>k*k*(3-2*k);
 

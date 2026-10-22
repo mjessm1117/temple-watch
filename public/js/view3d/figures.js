@@ -47,6 +47,11 @@ const LOOK={
  marauder:{main:0x3a1c1c,joint:0x120808,accent:0x6a1414,saber:0xff3b2e,gear:['tabard','belt','pads','saber']},
  sithLord:{main:0x1e1a22,joint:0x0b0a0d,accent:0x4a1020,saber:0xff3b2e,gear:['robe','hood','cape','belt','saber']},
  kaan:{main:0x2a2018,joint:0x100c08,accent:0xb8862a,saber:0xff3b2e,bulk:1.05,gear:['robe','cowl','cape','belt','saber']},
+ // Wave 7 Meshy kinds: Defender/Shieldbearer classes, Era 3 (High Republic) foes. Meshy models only take the weapon from gear.
+ defender:{main:0x6b4a36,joint:0x3a2a1e,gear:['saber']},shieldbearer:{main:0xe6e8ea,joint:0x5b6168,accent:0xa8322b,gear:['rifle']},
+ nihilRaider:{main:0x8a5a3a,joint:0x2a3a3a,accent:0x3a8a8a,gear:['rifle']},nihilStorm:{main:0x2a4a4a,joint:0x1a1a1a,accent:0xb07a3a,bulk:1.1,gear:['cannon']},
+ marchionRo:{main:0x1a1a1e,joint:0x0b0b0d,accent:0x8a8f96,gear:['pistol']},lournaDee:{main:0x1a1a1e,joint:0x0b0b0d,accent:0xc49a3a,gear:['pistol']},
+ drengir:{main:0x2a4a24,joint:0x1a2a14,gear:[]},nameless:{main:0xd8d0c0,joint:0x3a2a4a,gear:[]},
  bane:{main:0x24201c,joint:0x0d0b0a,accent:0x3a2a1a,saber:0xff2a1a,visor:0xff3b2e,bulk:1.18,gear:['mask','pads','chest','robe','saber']},
  envoy:{main:0x8a8f96,joint:0x4a4f56,gear:['robe','belt','pistol']},
  civ:{main:0x9a8a66,joint:0x5a4f3a,gear:['robe','belt']}};
@@ -115,7 +120,7 @@ export function makeFigure(kind,color,kit){const file=fileOf(kind),M=modelOf(fil
 
 // Per-unit gear (bucket 1, 2026-10-19): armor tier, helmet style (identity editor "look"), weapon tier + mods change the figure.
 // Parts sit relative to bone positions, scaled by head height, so they fit the mannequin and every Meshy model.
-const KIT_BULK={heavy:1.07,beskar:1.08,medium:1.03};const isJ=k=>k==='jedi';
+const KIT_BULK={heavy:1.07,beskar:1.08,medium:1.03};const isJ=k=>k==='jedi'||k==='defender';
 function dress(obj,g,kit,color,mats,mw,jedi){const bp=n=>{const b=obj.getObjectByName(n);return b?b.getWorldPosition(new T.Vector3()):null},hd=bp('Head');if(!hd)return;
  const k=hd.y/1.569,uc=mat(new T.Color(color||0xe0bd78).getHex(),{metalness:.25}),steel=mat(kit.armor==='beskar'?0xb9c2c9:0x8a949c,{metalness:.7,roughness:.35});mats.push(uc,steel);
  const at=(bone,geo,m,s,o,r)=>{const b=bp(bone);if(!b)return;return part(obj,bone,geo,m,s.map(v=>v*k),[b.x+o[0]*k,b.y+o[1]*k,b.z+o[2]*k],r)};
