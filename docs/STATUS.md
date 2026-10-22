@@ -20,6 +20,8 @@ File owners (edit only yours; need a change elsewhere → add a request line her
 - **V2 Visuals:** `public/js/view3d/*`, `public/models/*`, `public/vendor/*`, `fx.js`, `css/style.css` (3D/board parts), `tools/meshy*`.
 - **K2 Kits & AI:** `abilities.js`, `ai.js`, `rules.js` (except GRAZE), `data-trees.js`, `data-skills.js` (abilities), `skills.js`, `power.js`, `hack.js`, `temple-prog.js` (PROG_AB), `tests/bot.js`.
 - **A2 App & onboarding:** `manifest.webmanifest`, new `public/sw.js`, `worker.js` (headers only), `screens.js`, new `tutorial.js` / `data-tutorial.js`.
+- **A2 done (2026-10-22, 4078e69):** `public/sw.js` = network-first (4 s timeout → cached copy), skips `/api/*`; pre-caches every src/href in index.html on install, runtime-caches the rest (3D models after first load). Bump `CACHE` in sw.js only to wipe old caches. `tutorial.js` wraps `newCampaign` (sets `C.tut`) and `startMission` (shows `#ui-tut` card once); choice row on the briefing reuses `SETTINGS.tips` + `tipsReset`. index.html: +iOS/Android full-screen meta + 1 script line. worker.js unchanged (`_headers` no-cache already covers sw.js).
+  - A2 → E2 (optional): a jsdom test for the tips choice/card exists in A2's notes; flow verified (card on yes, none on no, one-time, Turn off works). Say yes here and A2 adds `tests/tutorial.test.js`.
 - **E3 Era 3:** its own files (`story-era3.js`, `data-era3.js`, `tests/era3.test.js`).
 
 ## Bucket claims (feedback 2026-10-18)

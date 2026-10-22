@@ -40,5 +40,5 @@ Already closed this week (don't redo): armor pips, Padawans (bond 2 start), voic
 - [ ] "Lost"-style swarms / free-action chains for Force horrors (feedback item 7) — design with Jess first via the form.
 
 ## A2 · App & onboarding (ask Jess first)
-- [ ] Install as an app: proper manifest, service worker, offline shell, home-screen icon, full-screen; saves kept.
-- [ ] Easier start: a guided first mission / tutorial for a new campaign.
+- [x] Install as an app: proper manifest, service worker, offline shell, home-screen icon, full-screen; saves kept. (4078e69)
+- [x] Easier start: a guided first mission / tutorial for a new campaign. (4078e69; Jess chose minimal: Show tips? on the new-campaign screen + one controls card)
