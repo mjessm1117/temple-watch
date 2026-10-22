@@ -106,9 +106,10 @@ function bondUp(a,b,why,out,keep){if(!a||!b||a===b)return;const k=bkey(a,b),v=C.
 // --- personal quests: one per unit, offered at rank 2+, shown with the month's crises ---
 function questFor(r){const pool=Object.entries(QUESTS).filter(([,q])=>q.who==='any'||(q.who==='dark'?isJedi(r)&&r.dark>=5:q.who==='jedi'?isJedi(r):!isJedi(r))
  &&(!q.needLegend||C.legends.some(l=>CLASS[l.cls]&&CLASS[l.cls].jedi)));return pool.length?pickOne(pool)[0]:null}
+// A failed quest can be retried on a later step, not the same one (Q.tried).
 function questOptions(){const o=[];
  for(const r of C.roster){if(r.status!=='active'||r.rank<2)continue;if(!C.quests[r.id]){const q=questFor(r);if(q)C.quests[r.id]={q,st:'offer'}}
-  const Q=C.quests[r.id];if(!Q||Q.st!=='offer'||o.length>=2)continue;const q=QUESTS[Q.q];
+  const Q=C.quests[r.id];if(!Q||Q.st!=='offer'||Q.tried===C.step||o.length>=2)continue;const q=QUESTS[Q.q];
   o.push({n:`${q.n} · ${r.n}`,kind:'Personal quest',src:'Personal quest',mission:q.mission,quest:r.id,text:q.text.replace(/\{n\}/g,r.n),ignore:{},adv:0,questTxt:q.txt.replace(/\{n\}/g,r.n)})}
  return o}
 function questReward(o,out){const r=unit(o.quest),Q=C.quests[o.quest];if(!r||!Q)return;const q=QUESTS[Q.q];Q.st='done';
@@ -123,6 +124,7 @@ function templeAfterMission(dep,win,o,out){out.bonds=[];
  for(let i=0;i<live.length;i++)for(let j=i+1;j<live.length;j++)bondPts(live[i].r.id,live[j].r.id,BOND.together+(win?BOND.win:0),'fought together',out);
  for(const {r} of dep.filter(d=>d.r.status==='dead'))for(const b of bondsOf(r).filter(b=>b.lvl>=BOND.griefAt)){const p=unit(b.rid);p.fear=BOND.fear;
   out.bonds.push(`${p.n} lost ${r.n}. Fear: −10 aim for ${BOND.fear} missions.`);if(isJedi(p))p.grief=r.n}
+ if(o.quest&&!o.redeem&&C.quests[o.quest])C.quests[o.quest].tried=C.step;
  if(win&&o.quest&&!o.redeem)questReward(o,out);progAfterMission(dep,win,out);lifeAfterMission(dep,win,o,out)}
 // Jedi choice after a bonded partner dies (spec C §7): grieve (keep the fear) or use the anger (Darkness +2, no fear).
 function griefChoice(id,dark){const r=unit(id);if(!r||!r.grief)return;if(dark){r.dark=Math.min(10,r.dark+2);r.fear=0}r.grief=null;saveGame()}

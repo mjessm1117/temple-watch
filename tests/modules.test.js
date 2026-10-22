@@ -35,5 +35,8 @@ check(rt.includes(E('C.teams[0].n'))&&rt.includes('>Tired<'),'roster card shows 
 E('J.fat=0;C.teams[0].lead=null');
 E("var _S=S;S=null;var A2=C.roster.filter(r=>r.status==='active')[0],B2=C.roster.filter(r=>r.status==='active')[1];A2.stress=B2.stress=50;A2.assign=B2.assign=null;C.staff.gardens=null;A2.fought=C.tick||0;progAdvance();S=_S");
 check(E('A2.stress')===50&&E('B2.stress')===50-E('STRESS.bench'),'two fronts: front A squad gets no bench relief at the shared step');
+E("var QR=C.roster.find(r=>r.status==='active');QR.rank=2;C.quests[QR.id]={q:Object.keys(QUESTS)[0],st:'offer'}");
+check(E('questOptions().some(o=>o.quest===QR.id)'),'personal quest offered');E('C.quests[QR.id].tried=C.step');
+check(!E('questOptions().some(o=>o.quest===QR.id)'),'a failed quest is not re-offered on the same step (no endless loop)');
 check(!errs.length,'no page errors'+(errs.length?': '+errs.join(' | '):''));
 console.log(JSON.stringify({fail,err:errs.length}));process.exit(fail||errs.length?1:0)})();
