@@ -60,11 +60,11 @@ function baseScreen(){SCR=baseScreen;S=null;ensureTemple();const m=$('#modal');m
  m.innerHTML=`<div class="box wide base">${resRow()}
  <aside class="tmap" aria-label="Temple rooms">${templeMapHTML(pend)}</aside>
  <div class="troom"><div class="thead"><div class="eyebrow">Jedi Temple · ${eraLabel()} · ${DIFF[C.diff].n}</div><h2>${R.n}</h2><p class="muted">${R.d}</p></div>
- ${C.news.length?`<div class="news">${C.news.map(n=>`<p>${n}</p>`).join('')}</div>`:''}
  <section class="rwar" ${war?'':'hidden'}>${typeof galaxyHTML==='function'?galaxyHTML():`<section><h3>Galaxy · choose the next mission</h3><div class="opts">${C.options.map(optionHTML).join('')}</div></section>`}</section>
  ${R.wing?`<div class="rwing">${wingRow(R.wing)}${typeof wingSideHTML==='function'?wingSideHTML(R.wing):''}</div>`:''}
  ${R.slot?`<div class="rwing rslot">${slotPanelHTML(R.slot)}</div>`:''}
- ${TABS.map(([k,,f])=>`<section class="tpanel" ${TAB===k&&!war&&!R.slot?'':'hidden'}>${f()}</section>`).join('')}</div></div>`;
+ ${TABS.map(([k,,f])=>`<section class="tpanel" ${TAB===k&&!war&&!R.slot?'':'hidden'}>${f()}</section>`).join('')}
+ ${C.news.length?`<div class="news">${C.news.map(n=>`<p>${n}</p>`).join('')}</div>`:''}</div></div>`; // Jess 10-21: the selected room comes first; news and people below
  m.onclick=hubClick;m.onchange=ev=>{const s=ev.target.closest('[data-assign]');if(s){assign(s.dataset.assign,s.value);baseScreen()}const p=ev.target.closest('[data-pair]');if(p){setPair(p.dataset.pair,p.value);baseScreen()}}}
 function hubClick(ev){if(typeof galaxyClick==='function'&&galaxyClick(ev))return;if(typeof buildClick==='function'&&buildClick(ev))return baseScreen();if(ev.target.closest('#hubCx'))return codexOpen();if(ev.target.closest('#hubSet'))return settingsOpen();const rm=ev.target.closest('[data-room]');if(rm){setRoom(rm.dataset.room);return baseScreen()}const t=ev.target.closest('[data-tab]');if(t){TAB=t.dataset.tab;return baseScreen()}
  const b=ev.target.closest('[data-act]');if(!b||b.disabled)return;const [a,x,y]=b.dataset.act.split(':');

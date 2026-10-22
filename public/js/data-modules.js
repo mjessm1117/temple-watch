@@ -12,27 +12,30 @@ const MOD_ACTS={
  gardens:{n:'Retreat',ic:'calm',cd:3,cost:{},now:'calm',desc:'Every unit −20 stress; the darkest Jedi sheds 1 Darkness.'},
  barracks:{n:'Muster Call',ic:'guard',cd:3,cost:{credits:20},now:'recruit',desc:'+1 Recruit now.'}};
 
-// Excavation: sublevel 1 is open from the start. Deeper bays are rock until dug. One dig at a time; a dig takes one mission.
-const DIG_COST={1:0,2:40,3:80,4:140,5:220};
-// Deeper floors open later in the campaign (whichever comes first). Until then they are hidden.
-const DEEP_OPEN={4:{month:5,era:2},5:{month:10,era:2}};
-// Bay features: rolled once per bay (seeded by campaign), revealed when the bay is dug. Bonus applies only with a matching wing on top. [N] flavour
+// Growth (Jess 2026-10-21: up and out). Terraces open as the Order grows (whichever comes first); the annexes widen the base later.
+const TIER_OPEN={m:{wings:3,month:3},t:{wings:5,month:6},a:{month:5,era:2}};
+const TIER_WHY={m:'Opens after 3 wings or month 3',t:'Opens after 5 wings or month 6',a:'Opens in month 5 or Era 2'};
+
+// Spires: the four towers around the Council spire. Big late builds, one at a time. Names: Legends Jedi Temple towers [Medium confidence].
+// eff keys: research (days per mission), stress (removed per mission), xp (per deployed unit per mission), will (in battle), month {res:n}.
+const SPIRES={
+ sp0:{n:'Tower of First Knowledge',ic:'scan',eff:{research:4,month:{intel:1}},tip:'Research +4 days per mission, +1 Intel a month.'},
+ sp1:{n:'Tower of Reassurance',ic:'calm',eff:{stress:8,will:5},tip:'Every unit sheds 8 stress per mission; squads get +5 will in battle.'},
+ sp2:{n:'Tower of Reconciliation',ic:'relay',eff:{month:{favor:3}},tip:'+3 Senate Favor a month: the Order mediates for the Republic.'},
+ sp3:{n:'Tower of Guidance',ic:'mark',eff:{xp:5},tip:'Every unit you deploy gains 5 more XP per mission.'}};
+const SPIRE_COST={credits:350,kyber:2},SPIRE_TIME=2,SPIRE_OPEN={month:4,era:2};
+
+// Undercroft: 3 vaults under the base hall, dug once each (one mission) for a rare find. A find pays while its wing stands anywhere (no wing listed = always). [N] flavour
+const UNDER_DIG={u0:60,u1:100,u2:140};
 const BAY_FEAT={
- kyber:{n:'Kyber vein',ic:'kyber',wings:['forge'],tip:'Kyber Forge here: +1 Kyber a month.',month:{kyber:1}},
- vault:{n:'Sealed Jedi vault',ic:'scan',wings:['archives'],tip:'Archives here: research +3 days per mission. Digging it out: +2 Intel.',research:3,found:{intel:2}},
- spring:{n:'Hot spring',ic:'stabilize',wings:['medical','gardens'],tip:'Medical or Gardens here: wounded heal 2 more days and everyone sheds 3 stress per mission.',heal:2,stress:3},
- hall:{n:'Old sparring hall',ic:'strike',wings:['training'],tip:'Training here: units who sit out a mission gain 4 XP.',bench:4},
- cache:{n:'Forgotten arms cache',ic:'hunker',wings:['armory'],tip:'Armory here: +10 Credits per won mission. Digging it out: +30 Credits.',winCr:10,found:{credits:30}},
- antenna:{n:'Deep relay mast',ic:'relay',wings:['comms'],tip:'Comms here: +1 Intel a month.',month:{intel:1}},
- rubble:{n:'Collapsed tunnel',ic:'collapse',wings:[],tip:'Nothing special. Salvage paid for part of the dig: +20 Credits.',found:{credits:20}}};
-// Rare finds, deep floors only.
-Object.assign(BAY_FEAT,{
- kyber2:{n:'Great Kyber cave',ic:'kyber',wings:['forge'],tip:'Kyber Forge here: +2 Kyber a month.',month:{kyber:2}},
- holocron:{n:'Holocron chamber',ic:'scan',wings:['archives'],tip:'Archives here: research +6 days per mission. Digging it out: +4 Intel.',research:6,found:{intel:4}},
- crypt:{n:'Jedi crypt',ic:'calm',wings:['gardens'],tip:'Gardens here: Order Darkness −1 a month. The old masters rest easy.',month:{orderDark:-1}},
- barracks2:{n:'Old Temple Guard barracks',ic:'guard',wings:['barracks'],tip:'Barracks here: +1 Recruit a month.',month:{recruits:1}}});
-const DEEP_FEAT_POOL=['kyber2','holocron','crypt','barracks2','spring','rubble'];
-const BAY_FEAT_POOL=['kyber','vault','spring','hall','cache','antenna','rubble','rubble'];
+ kyber2:{n:'Great Kyber cave',ic:'kyber',wings:['forge'],tip:'With the Kyber Forge built: +2 Kyber a month.',month:{kyber:2}},
+ holocron:{n:'Holocron chamber',ic:'scan',wings:['archives'],tip:'With the Archives built: research +6 days per mission. Found: +4 Intel.',research:6,found:{intel:4}},
+ crypt:{n:'Jedi crypt',ic:'calm',wings:[],tip:'Order Darkness −1 a month. The old masters rest easy.',month:{orderDark:-1}},
+ spring:{n:'Hot spring',ic:'stabilize',wings:[],tip:'Wounded heal 2 more days and everyone sheds 3 stress per mission.',heal:2,stress:3},
+ guard:{n:'Old Temple Guard barracks',ic:'guard',wings:['barracks'],tip:'With the Barracks built: +1 Recruit a month.',month:{recruits:1}},
+ cache:{n:'Forgotten arms cache',ic:'hunker',wings:['armory'],tip:'With the Armory built: +10 Credits per won mission. Found: +40 Credits.',winCr:10,found:{credits:40}},
+ hall:{n:'Old sparring hall',ic:'strike',wings:['training'],tip:'With the Training Salle built: units who sit out a mission gain 4 XP.',bench:4}};
+const UNDER_POOL=['holocron','crypt','spring','guard','cache','hall'];   // + one Great Kyber cave guaranteed
 
 // New Sith schemes (merged into SITH_OPS; counter with Intel or a team as usual). Custom effects run in temple-modules.js opHits wrap. [N]
 Object.assign(SITH_OPS,{

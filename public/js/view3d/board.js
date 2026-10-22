@@ -19,10 +19,10 @@ export class Board{
    evac:new THREE.MeshBasicMaterial({color:0x7fd99a,transparent:true,opacity:.28,depthWrite:false})};
   this.box=new THREE.BoxGeometry(1,1,1);this.cyl=new THREE.CylinderGeometry(.5,.5,1,10);
   const hm=(c,o)=>new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false});
-  this.hm={reach:hm(0x2f9dff,.13),dash:hm(0xffb21e,.1),hover:hm(0x7fc8ff,.85),hoverDash:hm(0xffd166,.85),reachEdge:hm(0x9fe3ff,.95),dashEdge:hm(0xffe08a,.95),tgt:hm(0xef6a5d,.85),ally:hm(0x7fd99a,.85),spot:hm(0x79d3e2,.7),pick:hm(0xffffff,.95),
+  this.hm={reach:hm(0x2f9dff,.32),dash:hm(0xffb21e,.24),hover:hm(0x7fc8ff,.85),hoverDash:hm(0xffd166,.85),reachEdge:hm(0x9fe3ff,.95),dashEdge:hm(0xffe08a,.95),tgt:hm(0xef6a5d,.85),ally:hm(0x7fd99a,.85),spot:hm(0x79d3e2,.7),pick:hm(0xffffff,.95),
    area:hm(0x79d3e2,.2),iarea:hm(0xef6a5d,.22),path:hm(0x79d3e2,.95),smoke:hm(0x8aa2a5,.22),vis:new THREE.MeshBasicMaterial({map:this.hatch(),transparent:true,opacity:.85,depthWrite:false})};
   this.plane=new THREE.PlaneGeometry(.92,.92).rotateX(-Math.PI/2);this.ring=new THREE.RingGeometry(.34,.44,24).rotateX(-Math.PI/2);this.frame=new THREE.RingGeometry(.55,.64,4,1,Math.PI/4).rotateX(-Math.PI/2);
-  this.dot=new THREE.CircleGeometry(.06,10).rotateX(-Math.PI/2);this.edge=new THREE.BoxGeometry(1.02,.03,.07);this.hl=new THREE.Group();scene.add(this.hl);this.pool={};
+  this.dot=new THREE.CircleGeometry(.06,10).rotateX(-Math.PI/2);this.edge=new THREE.BoxGeometry(1.02,.05,.11);this.hl=new THREE.Group();scene.add(this.hl);this.pool={};
   this.shieldTex=[this.shieldTexture(false),this.shieldTexture(true)];this.lines=new THREE.Group();scene.add(this.lines);this.anim=[]}
  pos(x,y,h=0){const r=this.grid&&this.grid[y];return new this.T.Vector3(x+.5-this.cols/2,h+(r?elevOf(r[x])*EH:0),y+.5-this.rows/2)}
  elev(x,y){const r=this.grid&&this.grid[y];return r&&r[x]!=null?elevOf(r[x]):0}

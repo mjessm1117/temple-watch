@@ -181,7 +181,7 @@ function ui(){if(!V||!S)return;try{camUi()}catch(e){console.warn(e)}if(cb()!==la
   if(it.to)h.lines.push({a,b:P(it.to,.9),color:0xef6a5d,dash:1});if(it.area){h.lines.push({a,b:P(it.area,.2),color:0xef6a5d,dash:1});h.iarea=it.area}}
  // Stealth (Chat X): red = tiles an enemy would spot you on; the hidden squad is drawn ghosted.
  if(S.conc&&typeof visionTiles==='function'){const k=enemies().map(e=>e.x+','+e.y+e.status).join(';');if(visK!==k||visS!==S){visK=k;visS=S;visT=visionTiles()}h.vision=visT}
- if(window.mapMarks)h.marks=mapMarks();h.marks=[...(h.marks||[]),...(S.loot||[]).map(l=>({k:'loot',x:l.x,y:l.y})),...(S.drops||[]).map(d=>({k:'in',x:d.x,y:d.y}))]; // loot crates + dropship flaresboard.highlight(h);units.marks(sel,S.peek);for(const v of units.map.values())v.ghost&&v.ghost(v.u.side==='p'&&v.u.status==='ok'&&!!(S.conc||v.u.conc))
+ if(window.mapMarks)h.marks=mapMarks();h.marks=[...(h.marks||[]),...(S.loot||[]).map(l=>({k:'loot',x:l.x,y:l.y})),...(S.drops||[]).map(d=>({k:'in',x:d.x,y:d.y}))]; /* loot crates + dropship flares */board.highlight(h);units.marks(sel,S.peek);for(const v of units.map.values())v.ghost&&v.ghost(v.u.side==='p'&&v.u.status==='ok'&&!!(S.conc||v.u.conc))
  // % tags: same rule as the 2D board (best enemy shot in white).
  const shoot=S.info&&canAct(sel)&&S.mode==='move'&&sel.abil.includes('shoot')?targetsFor(sel,'shoot').filter(g=>g.t):[];
  const list=[...S.tg.filter(g=>!g.area&&!g.spot&&g.chance!=null),...shoot.filter(s=>!S.tg.some(g=>g.x===s.x&&g.y===s.y))].filter(g=>!g.t||!g.t.hid);

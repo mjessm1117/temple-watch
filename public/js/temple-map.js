@@ -21,7 +21,7 @@ const roomOf=id=>ROOMS.find(r=>r.id===id)||ROOMS[3];
 const roomForTab=t=>({roster:'barracks',armory:'armory',wings:'works',research:'archives',ops:'comms',council:'council',market:'under',recruit:'hangar'})[t];
 function setRoom(id){const r=roomOf(id);ROOM=r.id;if(r.tab)TAB=ROOM_TAB=r.tab;else ROOM_TAB=TAB}
 function curRoom(){if(TAB!==ROOM_TAB){ROOM_TAB=TAB;const r=roomForTab(TAB);ROOM=r||'tab:'+TAB}
- if(ROOM.startsWith('slot:')&&typeof slotById==='function'&&slotById(ROOM.slice(5))){const sl=slotById(ROOM.slice(5));return {id:ROOM,n:sl.n,d:'Empty sublevel bay. Build a wing here.',slot:sl.id}}
+ if(ROOM.startsWith('slot:')&&typeof slotById==='function'&&slotById(ROOM.slice(5))){const sl=slotById(ROOM.slice(5));return {id:ROOM,n:sl.n,d:sl.tier==='sp'?'One of the four towers around the Council spire.':sl.tier==='u'?'A sealed vault under the base hall.':'An open terrace bay. Build a wing here.',slot:sl.id}}
  if(ROOM.startsWith('tab:')){const t=TABS.find(x=>x[0]===TAB);return {id:ROOM,n:t?t[1]:'Temple',d:'',tab:TAB}}return roomOf(ROOM)}
 
 // One short status line per room. Every lookup is guarded: other chats own most of this state.

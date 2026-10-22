@@ -5,8 +5,9 @@
 // ── State ── C.slots {slotId:wing} · C.wlog {wing:[{d,t,c}]} · C.wsnap (last-seen state, for the log diff)
 const slotOf=k=>C.slots&&Object.keys(C.slots).find(s=>C.slots[s]===k);
 const slotById=id=>SLOTS.find(s=>s.id===id);
-const nearSlots=id=>{const s=slotById(id);return SLOTS.filter(o=>Math.abs(o.f-s.f)+Math.abs(o.b-s.b)===1).map(o=>o.id)};
-const freeSlots=()=>SLOTS.map(s=>s.id).filter(id=>!C.slots[id]&&(typeof slotOpen!=='function'||slotOpen(id)));
+// Bays share a wall: same row and one bay apart, or rows next to each other and half a bay apart (the ziggurat steps in).
+const nearSlots=id=>{const s=slotById(id);if(!s||!s.wing)return [];return SLOTS.filter(o=>o.wing&&o!==s&&(o.row===s.row?Math.abs(o.x-s.x)===1:Math.abs(o.row-s.row)===1&&Math.abs(o.x-s.x)===.5)).map(o=>o.id)};
+const freeSlots=()=>SLOTS.filter(s=>s.wing).map(s=>s.id).filter(id=>!C.slots[id]&&(typeof slotOpen!=='function'||slotOpen(id)));
 const wingUp=k=>(C.wings[k]||0)>0;
 const pairsOf=k=>ADJ.filter(p=>p.a===k||p.b===k);
 const partner=(p,k)=>p.a===k?p.b:p.a;
@@ -72,7 +73,7 @@ function wingSync(){if(!C)return;ensureSlots();const P=C.wsnap,ctx=WB_CTX?` (${W
 const movable=k=>k&&C.build===k&&!wingUp(k);
 function placeWing(k,id){ensureSlots();if(C.slots[id]||!WINGS[k])return false;const cur=slotOf(k);
  if(cur&&!movable(k))return false;if(cur)delete C.slots[cur];C.slots[id]=k;
- if(cur)wlog(k,`Builders moved the dig to ${slotById(id).n}.`);return true}
+ if(cur)wlog(k,`Builders moved the work to ${slotById(id).n}.`);return true}
 function buildAt(k,id){if(slotOf(k)||C.slots[id])return;C.slots[id]=k;buildWing(k);if(C.build!==k)delete C.slots[id]}
 
 // ── Cutaway (the left rail) ──
@@ -80,33 +81,44 @@ let MOVE=null;   // wing being moved (scaffold only)
 function linkHTML(p,s1,s2,prev){const A=slotById(s1),B=slotById(s2),h=A.f===B.f,f=Math.min(A.f,B.f),b=Math.min(A.b,B.b);
  const row=h?f*2-1:f*2,col=h?b*2+2:b*2+1;
  return `<i class="lnk ${h?'h':'v'} ${prev?'prev':''} ${!prev&&pairMult(p)>1?'x2':''}" style="grid-row:${row};grid-column:${col}" title="${p.n}: ${pairTip(p)}"></i>`}
+// Ziggurat cutaway (2026-10-21, Jess: the Temple grows up and out). Spires on top, terraces that widen toward the base, annexes on the sides,
+// War Room + Hangar at the gates, the undercroft vaults below. 12 half-bay columns; a bay spans 2 and starts at col (x+1)*2+1.
+const COL=s=>`grid-column:${(s.x+1)*2+1}/span 2`;
 function cutawayHTML(pend,cur){try{wingSync()}catch(e){ensureSlots()}const mv=MOVE&&movable(MOVE)?MOVE:null;if(!mv)MOVE=null;
  const room=(id,cls,extra)=>{const r=roomOf(id);return `<button type="button" class="room ${cls||''} ${r.id===cur?'on':''}" data-room="${r.id}" title="${r.n}" aria-pressed="${r.id===cur}">${icon(r.ic)}<b>${r.s||r.n}</b><small>${roomLine(r)}</small>${extra||''}</button>`};
- const cells=SLOTS.filter(s=>typeof slotOpen!=='function'||slotOpen(s.id)).map(s=>{const k=C.slots[s.id],pos=`grid-row:${s.f*2-1};grid-column:${s.b*2+1}`;
-  if(!k){const pv=mv?linksAt(mv,s.id):[],sel=cur==='slot:'+s.id,D=typeof slotDeco==='function'?slotDeco(s.id):{cls:'',html:''};
-   if(D.cls&&!mv)return `<button type="button" class="slot ${D.cls} ${sel?'on':''}" style="${pos}" data-slot="${s.id}" title="${s.n}">${D.html}</button>`;
-   return `<button type="button" class="slot ${mv?'tgt':''} ${sel?'on':''}" style="${pos}" data-slot="${s.id}" title="${s.n}: ${mv?'move the dig here':'empty · build a wing here'}">${mv?`<b>Move here</b><small>${pv.length?pv.map(p=>p.n).join(', '):'no links'}</small>`:`<b>+</b><small>${s.sn}</small>`}</button>`}
+ const D0={cls:'',html:''},deco=id=>typeof slotDeco==='function'?slotDeco(id):D0;
+ const bay=s=>{const k=C.slots[s.id],pos=`grid-row:${s.row+1};${COL(s)}`,sel=cur==='slot:'+s.id;
+  if(!k){const D=deco(s.id),open=typeof slotOpen!=='function'||slotOpen(s.id);
+   if(mv&&open){const pv=linksAt(mv,s.id);return `<button type="button" class="slot tgt" style="${pos}" data-slot="${s.id}" title="${s.n}: move the build here"><b>Move here</b><small>${pv.length?pv.map(p=>p.n).join(', '):'no links'}</small></button>`}
+   if(D.cls)return `<button type="button" class="slot ${D.cls} ${sel?'on':''}" style="${pos}" data-slot="${s.id}" title="${s.n}">${D.html}</button>`;
+   return `<button type="button" class="slot ${sel?'on':''}" style="${pos}" data-slot="${s.id}" title="${s.n}: empty · build a wing here"><b>+</b><small>${s.sn}</small></button>`}
   const r=roomOf(k),l=C.wings[k],mx=WINGS[k].cost.length-1,bld=C.build===k,badge=k==='barracks'&&pend?`<em title="${pend} unit${pend>1?'s':''} can rank up">${pend}</em>`:'',st=C.staff&&C.staff[k]&&unit(C.staff[k]);
-  const RD=typeof roomDeco==='function'?roomDeco(k):{cls:'',html:''};
-  return `<button type="button" class="room wingrm ${!l?'bld':bld?'upg':''} ${RD.cls} ${k===cur?'on':''}" style="${pos}" data-room="${k}" title="${WINGS[k].n} · ${s.n}" aria-pressed="${k===cur}">${icon(r.ic)}<b>${WING_SHORT[k]||r.n}</b>
-   <span class="lv" aria-label="Level ${l} of ${mx}">${Array.from({length:mx},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</span><small>${!l?'Building…':bld?'Upgrading…':st?st.n.split(' ')[0]:roomLine(r)}</small>${st?'<span class="stf" title="Staffed"></span>':''}${badge}${RD.html}</button>`}).join('');
- const links=[];for(const p of ADJ)if(pairOn(p)){const a=slotOf(p.a),b=slotOf(p.b);links.push(linkHTML(p,a,b))}
- if(mv)for(const s of freeSlots())for(const p of linksAt(mv,s))links.push(linkHTML(p,s,slotOf(partner(p,mv)),1));
- return `<div class="tcut">
- <svg class="tspires" viewBox="0 0 300 64" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64 L28 40 L272 40 L300 64Z" class="zig"/>
-  <path d="M40 40 V14 L44 6 L48 14 V40 M252 40 V14 L256 6 L260 14 V40 M100 40 V20 L104 12 L108 20 V40 M192 40 V20 L196 12 L200 20 V40 M144 40 V8 L150 0 L156 8 V40" class="spire"/></svg>
- <div class="tzig">${room('council','crown')}<div class="tgr">${room('war','wr')}${room('hangar','hg')}</div></div>
- <div class="tsurf"><span>Surface</span><span>Sublevels</span></div>
- <div class="tsub">${cells}${links.join('')}</div>
+  const RD=typeof roomDeco==='function'?roomDeco(k):D0,lk=ADJ.filter(p=>(p.a===k||p.b===k)&&pairOn(p));
+  return `<button type="button" class="room wingrm ${!l?'bld':bld?'upg':''} ${RD.cls} ${lk.length?'linked':''} ${k===cur?'on':''}" style="${pos}" data-room="${k}" title="${WINGS[k].n} · ${s.n}${lk.length?' · links: '+lk.map(p=>p.n).join(', '):''}" aria-pressed="${k===cur}">${icon(r.ic)}<b>${WING_SHORT[k]||r.n}</b>
+   <span class="lv" aria-label="Level ${l} of ${mx}">${Array.from({length:mx},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</span><small>${!l?'Building…':bld?'Upgrading…':st?st.n.split(' ')[0]:roomLine(r)}</small>${st?'<span class="stf" title="Staffed"></span>':''}${badge}${lk.length?`<span class="lkn" title="${lk.map(p=>p.n).join(', ')}">⛓${lk.length}</span>`:''}${RD.html}</button>`};
+ const M=typeof ensureMods==='function'?ensureMods():null;
+ const spire=s=>{const P=typeof SPIRES!=='undefined'&&SPIRES[s.id];if(!P)return '';const done=M&&M.spire[s.id],b=M&&M.spireB&&M.spireB.id===s.id,sel=cur==='slot:'+s.id;
+  return `<button type="button" class="spr ${done?'up':b?'bld':''} ${sel?'on':''}" data-slot="${s.id}" title="${P.n}: ${P.tip}">${icon(P.ic)}<small>${done?P.n.replace('Tower of ',''):b?'Rising…':'Tower'}</small></button>`};
+ const SP=SLOTS.filter(s=>s.tier==='sp');
+ const terr=[[0,'5/9'],[1,'4/10'],[2,'3/11']].map(([r,c])=>`<i class="terr" style="grid-row:${r+1};grid-column:${c}"></i>`).join('')+
+  (SLOTS.some(s=>s.tier==='a'&&(slotOpen(s.id)))?`<i class="terr an" style="grid-row:3;grid-column:1/3"></i><i class="terr an" style="grid-row:3;grid-column:11/13"></i>`:'');
+ const zig=SLOTS.filter(s=>s.wing&&(s.tier!=='a'||slotOpen(s.id))).map(bay).join('');
+ const under=SLOTS.filter(s=>s.tier==='u').map(s=>{const D=deco(s.id),sel=cur==='slot:'+s.id;return `<button type="button" class="slot vault ${D.cls} ${sel?'on':''}" style="grid-row:1;${COL(s)}" data-slot="${s.id}" title="${s.n}">${D.html}</button>`}).join('');
+ return `<div class="tcut tz">
+ <div class="tz-sp">${spire(SP[0])}${spire(SP[1])}${room('council','crown')}${spire(SP[2])}${spire(SP[3])}</div>
+ <div class="tz-zig">${terr}${zig}</div>
+ <div class="tz-gate">${room('war','wr')}${room('hangar','hg')}</div>
+ <div class="tz-lbl">Undercroft</div>
+ <div class="tz-zig tz-under">${under}</div>
  ${room('under','deep')}</div>
- ${mv?`<p class="tmove">${icon('relay')} Moving the ${WINGS[mv].n} dig. Pick a lit slot. <button type="button" data-act="nomove">Cancel</button></p>`:''}`}
+ ${mv?`<p class="tmove">${icon('relay')} Moving the ${WINGS[mv].n} build. Pick a lit bay. <button type="button" data-act="nomove">Cancel</button></p>`:''}`}
 
 // ── Room panel extras: location, links, room log ──
 function wingSideHTML(k){ensureSlots();const s=slotOf(k),L=pairsOf(k),log=(C.wlog&&C.wlog[k])||[];
  const lk=L.map(p=>{const o=partner(p,k),on=pairOn(p),touch=s&&slotOf(o)&&nearSlots(s).includes(slotOf(o)),x=on&&pairMult(p)>1;
   return `<li class="${on?'on':''}"><b>${p.n}</b> <small>with ${WINGS[o].n}</small> · ${pairTip(p)}${x?' <span class="up">×2 staffed</span>':''}
    <small class="muted">${on?(x?'':' Staff either wing to double it.'):touch?' Shares a wall: works once both are built.':` Needs the ${WINGS[o].n} next door.`}</small></li>`}).join('');
- const mv=movable(k)?`<button type="button" data-act="move:${k}" ${freeSlots().length?'':'disabled'}>Move the dig</button>`:'';
+ const mv=movable(k)?`<button type="button" data-act="move:${k}" ${freeSlots().length?'':'disabled'}>Move the build</button>`:'';
  return `<div class="wside"><div class="wloc">${icon('collapse')} <b>${s?slotById(s).n:'Not placed yet'}</b> ${mv}</div>
  <h3 class="eyebrow">Adjacency</h3><ul class="adj">${lk}</ul>
  <h3 class="eyebrow">Room log</h3>${log.length?`<ol class="wlog">${log.map(e=>`<li class="${e.c}"><span>${e.d}</span>${e.t}</li>`).join('')}</ol>`:'<p class="muted">Nothing has happened here yet.</p>'}</div>`}
@@ -129,7 +141,7 @@ function buildClick(ev){const sl=ev.target.closest('[data-slot]');
 const _bwT2=buildWing;
 buildWing=function(k,...rest){ensureSlots();const had=slotOf(k),lv=C.wings[k],s=had||bestSlot(k);if(!s)return;
  _bwT2(k,...rest);if(C.build!==k)return;if(!had)C.slots[s]=k;
- wlog(k,lv?`Work begins on level ${lv+1}.`:`Ground broken in ${slotById(slotOf(k)).n}.`,'up')};
+ wlog(k,lv?`Work begins on level ${lv+1}.`:`Scaffolds go up on the ${slotById(slotOf(k)).n.toLowerCase()}.`,'up')};
 const _taT2=templeAdvance;templeAdvance=function(){_taT2();try{adjAdvance();wingSync()}catch(e){console.error(e)}};
 const _tmT2=templeMonth;templeMonth=function(){_tmT2();try{adjMonth()}catch(e){console.error(e)}};
 const _arT2=applyResults;

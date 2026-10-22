@@ -7,12 +7,13 @@ const E=s=>w.eval(s);
 (async()=>{
 d.querySelector('[data-d="normal"]').click();for(let k=0;k<12;k++){const q=s=>d.querySelector(s),ch=[...d.querySelectorAll('[data-ch]')].filter(b=>!b.disabled);if(q('#scOk'))q('#scOk').click();else if(ch.length)ch[0].click();else break}
 E('ensureMods();baseScreen()');
-check(d.querySelectorAll('.slot.rock').length>=4,'deep bays start as rock');
-check(E("SLOTS.some(s=>s.f>1&&C.mods.feat[s.id]==='kyber')"),'a Kyber vein is hidden somewhere deep');
-E("C.res.credits=999;var bay=SLOTS.find(s=>s.f===2&&!C.mods.dug[s.id]).id");
-check(!E("buildAt('forge',bay),slotOf('forge')"),'cannot build on rock');
-E("bayDig(bay)");check(E('C.mods.digging')===E('bay'),'dig starts');E('templeAdvance()');check(E('!!C.mods.dug[bay]&&!C.mods.digging'),'dig finishes after a mission');
-E("C.mods.feat[bay]='kyber';C.slots[bay]='forge';C.wings.forge=1;var k0=C.res.kyber;templeMonth()");check(E('C.res.kyber')>E('k0'),'Forge on a Kyber vein pays Kyber monthly');
+check(d.querySelectorAll('.spr').length===4&&d.querySelectorAll('.slot.vault').length===3,'ziggurat: 4 spires and 3 undercroft vaults');
+check(E("Object.values(C.mods.feat).includes('kyber2')"),'a Great Kyber cave is hidden in the undercroft');
+check(!E("slotOpen('t0')")&&E("slotOpen('b0')"),'upper terrace locked at the start, base hall open');
+E("C.res.credits=999;C.res.kyber=9");check(!E("buildAt('forge','u0'),slotOf('forge')"),'no wings in the undercroft');
+E("bayDig('u0')");check(E('C.mods.digging')==='u0','dig starts');E('templeAdvance()');check(E('!!C.mods.dug.u0&&!C.mods.digging'),'dig finishes after a mission');
+E("C.mods.feat.u0='kyber2';C.wings.forge=1;var k0=C.res.kyber;templeMonth()");check(E('C.res.kyber')>=E('k0')+2,'Great Kyber cave pays while the Forge stands');
+E("C.month=4;spireBuild('sp3');templeAdvance();templeAdvance()");check(E("!!C.mods.spire.sp3"),'a spire rises in 2 missions');
 // actions
 E("C.roster[0].wound=9;C.roster[0].status='active';modUse('medical')");check(E('C.roster[0].wound')===0&&E('C.mods.cd.medical')===3,'Bacta Rush heals and goes on cooldown');
 check(!E("modReady('medical')"),'not ready until missions pass');E('templeAdvance();templeAdvance();templeAdvance()');check(E("modReady('medical')"),'ready again after 3 missions');

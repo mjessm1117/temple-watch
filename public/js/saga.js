@@ -82,7 +82,7 @@ baseScreen=function(){if(!sagaOn())return _sgBase();if(typeof storyInit==='funct
  if(g.visit!==key){g.visit=key;let n=0;for(const T of TALKS)if(n<SAGA_FORCE&&T.force&&talkReady(T)&&!g.q.some(e=>e.id===T.id)){g.q.push({k:'talk',id:T.id});n++}saveGame()}
  while(g.q.length){const sc=sagaBuild(g.q[0]);if(sc&&(sc.kind!=='talk'||castOn(sc.who)))return sagaScene(sc,1);g.q.shift()}
  _sgBase();sagaStrip()};
-function sagaStrip(){const box=document.querySelector('#modal .base .thead');if(!box||document.querySelector('.saga-strip'))return;const g=C.saga,key=C.step+'|'+sagaDone(),busy=g.talked===key;
+function sagaStrip(){const box=document.querySelector('#modal .base .troom'); /* bottom of the room panel (Jess 10-21) */if(!box||document.querySelector('.saga-strip'))return;const g=C.saga,key=C.step+'|'+sagaDone(),busy=g.talked===key;
  const who=Object.keys(g.id).filter(castOn);if(!who.length)return;
  const ready=k=>TALKS.find(T=>T.who===k&&!T.force&&talkReady(T));
  box.insertAdjacentHTML('beforeend',`<div class="saga-strip"><div class="saga-h"><b>Your people</b><span>${busy?'No more time to talk before the next mission.':who.some(ready)?'Time for one conversation before the next mission.':'Nobody needs you right now.'}</span></div>
