@@ -10,8 +10,10 @@ function briefing(noPull){SCR=briefing;const m=$('#modal');m.hidden=false;
  <button class="choice" type="button" data-d="story"><b>Story</b><span>Weaker enemies, 6 turns to bleed out, an extra medkit, more Senate money.</span></button>
  <button class="choice" type="button" data-d="normal"><b>Normal</b><span>The intended fight. 4 turns to bleed out. Misses in a row get a hidden aim boost.</span></button>
  <button class="choice" type="button" data-d="hard"><b>Hard</b><span>Sharper enemies, an extra trooper per wave, 3 turns to bleed out, no aim help.</span></button>
- <button class="choice" type="button" data-d="legend"><b>Legend</b><span>Tougher, sharper enemies and 2 turns to bleed out. Expect losses.</span></button></div>`;
+ <button class="choice" type="button" data-d="legend"><b>Legend</b><span>Tougher, sharper enemies and 2 turns to bleed out. Expect losses.</span></button>${tutRow()}</div>`;
  m.onclick=null;m.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>newCampaign(b.dataset.d));
- const c=m.querySelector('#cont');if(c)c.onclick=()=>continueGame(loadSave())}
+ tutWire(m);const c=m.querySelector('#cont');if(c)c.onclick=()=>continueGame(loadSave())}
 
+// Installable app (A2): sw.js serves the newest build when online, the last copy when offline. Saves stay in localStorage.
+if('serviceWorker' in navigator&&location.protocol==='https:')addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 briefing();
