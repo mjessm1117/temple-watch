@@ -28,11 +28,11 @@ Already closed this week (don't redo): armor pips, Padawans (bond 2 start), voic
 - [x] Drop the `ROW_FIX` patches by moving fixes into the owning map data. ✓ 255b533
 
 ## V2 · Visuals (3D)
-- [x] Shell-zone and sapper-timer warnings are 2D-only: show them on the 3D board (zones + countdown labels). — 330c9f5
-- [x] Map marks: soft glow on mark planes; red beacon prop at enemy entry points (M→G). — 330c9f5
-- [x] Recruit looks on models: use `u.kit.look` and `u.kit.species` (skin tone / head shape / lekku / horns where cheap) on 3D figures and portraits. — 330c9f5
-- [x] Meshy coverage: Defender and Shieldbearer still use default models; check every class and enemy kind has a model; generate missing ones with the Meshy account (Jess pays for it). — 82f8aaa
-- [x] Cinematics pass (feedback item 6): kill cam, ability cams, mission intro; respect reduced motion. — 330c9f5
+- [x] Shell-zone and sapper-timer warnings are 2D-only: show them on the 3D board (zones + countdown labels). — 412374a
+- [x] Map marks: soft glow on mark planes; red beacon prop at enemy entry points (M→G). — 412374a
+- [x] Recruit looks on models: use `u.kit.look` and `u.kit.species` (skin tone / head shape / lekku / horns where cheap) on 3D figures and portraits. — 412374a
+- [x] Meshy coverage: Defender and Shieldbearer still use default models; check every class and enemy kind has a model; generate missing ones with the Meshy account (Jess pays for it). — c915399
+- [x] Cinematics pass (feedback item 6): kill cam, ability cams, mission intro; respect reduced motion. — 412374a
 
 ## K2 · Kits & AI
 - [x] (5caeee7) Tree abilities still living in `PROG_AB` (flurry, shadowStep, mightyBlow, …): move them into the real ability engine; add the wishlist ones (Hold the Line, …) from STATUS P→X.
