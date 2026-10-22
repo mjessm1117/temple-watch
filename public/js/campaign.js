@@ -62,6 +62,7 @@ function applyResults(win){const M=S.M,o=C.options[C.chosen]||{},out={res:{},row
   const before=r.rank;if(r.status==='active'&&promote(r))out.promo.push(r.id);dep.push({r,u});
   out.rows.push({n:r.n,xp,fate,rank:r.rank>before?r.rank:0,dark:isJedi(r)?r.dark:null})}
  if(o.hostages){C.rescueStep=C.step;if(win)for(const id of o.hostages){const r=C.roster.find(r=>r.id===id);if(r&&r.status==='captured'){r.status='active';r.capT=0;r.wound=Math.ceil(WOUND.serious/healMult());out.rows.push({n:r.n,xp:0,fate:'Freed from the cells · recovering',rank:0,dark:null})}}}
+ C.tick=C.tick||0;for(const {r} of dep)r.fought=C.tick;   // who fought since the last time step (both fronts count)
  templeAfterMission(dep,win,o,out);advance(o);return out}
 // Time passes: builds finish, wounds heal, the month turns over (stipend, upkeep, pay, recruits).
 function advance(o){C.news=[];C.day+=DAYS;while(C.day>30){C.day-=30;C.month++;monthTick()}

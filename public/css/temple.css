@@ -145,3 +145,4 @@
 .slot.found{border:1px solid #6b5a45;background:#16130f;color:#a8977f;display:grid;justify-items:center;gap:1px}.slot.found .ic,.slot.found svg{width:16px;height:16px}
 .slot.found b{font-size:10px;color:#cdb894;text-align:center;line-height:1.1}.slot.found.on{border-color:#e0bd78;box-shadow:0 0 12px #e0bd7844}.slot.found.on b{color:#e0bd78}
 @media(prefers-reduced-motion:reduce){.spr.bld{animation:none}}
+.rtag{font-size:11px;padding:1px 6px;border:1px solid color-mix(in srgb,var(--troop) 55%,var(--line));border-radius:9px;color:var(--troop);white-space:nowrap}.rtag.bad{border-color:color-mix(in srgb,var(--sith) 55%,var(--line));color:var(--sith)}

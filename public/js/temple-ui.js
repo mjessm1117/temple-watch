@@ -4,6 +4,9 @@ let TAB='roster',ARM=null;
 const cost=(cr,ky)=>`${cr} Cr${ky?` + ${ky} Ky`:''}`;
 const needTxt=n=>n&&!hasWing(n)?` · needs ${WINGS[n[0]].n} ${n[1]}`:'';
 function statLine(r){const u=battleUnit(r);return `HP ${u.hp} · Aim ${u.aim} · Dmg ${u.dmg.join('–')} · Range ${u.range<2?'melee':u.range} · Move ${u.mob}${u.armor?` · Armor ${u.armor}`:''}${u.crit?` · Crit ${u.crit}%`:''}${u.maxF?` · Focus ${u.maxF} · Deflect ${u.deflect}`:''}${u.kits!=null?` · Medkits ${u.kits}`:''}${u.nades!=null?` · Grenades ${u.nades}`:''}${u.bondAim?` · Bond +${u.bondAim} aim`:''}`}
+// Strike-team badges (teams.js): which team the unit is on, and Tired after back-to-back fights.
+function teamTags(r){const t=typeof teamOf==='function'&&teamOf(r.id),tired=typeof isTired==='function'&&isTired(r);
+ return (t?`<span class="rtag" title="Strike team">${t.n}</span>`:'')+(tired?'<span class="rtag bad" title="Fought 2 steps in a row: −10 aim until one step off">Tired</span>':'')}
 function stateTag(r){return r.status==='retired'?'<span class="dim">Retired</span>':r.status==='captured'?'<span class="bad">Captured</span>':r.assign?`<span class="warn">${assignName(r)}${r.wound?` · ${r.wound}d`:''}</span>`:r.wound?`<span class="warn">Wounded · ${r.wound} days</span>`:'<span class="ready">Ready</span>'}
 
 function rosterTab(){const act=C.roster.filter(r=>r.status!=='dead');
@@ -16,7 +19,7 @@ function rosterTab(){const act=C.roster.filter(r=>r.status!=='dead');
   ${rosterProg(r)}
   ${r.grief?`<div class="picks">${r.n} lost ${r.grief}. <button type="button" data-act="grief:${r.id}:0">Grieve (keep fear)</button><button type="button" data-act="grief:${r.id}:1">Use the anger (Darkness +2, no fear)</button></div>`:''}
   ${r.status==='active'?`<select data-assign="${r.id}" aria-label="Assignment for ${r.n}">${assignOpts(r).map(([v,t])=>`<option value="${v}" ${(r.assign||'')===v?'selected':''}>${t}</option>`).join('')}</select>`:''}</div>
-  <div style="display:grid;gap:4px;justify-items:end">${stateTag(r)}<button type="button" data-act="arm:${r.id}">Gear</button></div></div>`}).join('')
+  <div style="display:grid;gap:4px;justify-items:end">${stateTag(r)}${teamTags(r)}<button type="button" data-act="arm:${r.id}">Gear</button></div></div>`}).join('')
  +`<p class="muted">Assigned units train, recover or staff a wing between missions, but can't deploy.${C.legends.length?` Fallen: ${C.legends.map(l=>l.n).join(', ')}.`:''}</p>`}
 
 function armoryTab(){const L=C.roster.filter(r=>r.status==='active');if(!L.some(r=>r.id===ARM))ARM=L[0]&&L[0].id;const r=unit(ARM);

@@ -26,5 +26,14 @@ check(E("modNext()")==='','buffs clear after one battle');
 E("var A=S.units.find(u=>u.side==='p'&&!u.jedi),T={n:'Dummy',side:'e',x:0,y:0,hp:20,max:20,status:'ok'};S.units.push(T);var _r=Math.random;Math.random=()=>0.55");
 E("resolve(A,T,50,[6,6],{})");check(E('T.hp')===17,'graze: roll 55 vs 50% does half of 6');
 E("Math.random=()=>0.9;T.hp=20;resolve(A,T,50,[6,6],{});Math.random=_r");check(E('T.hp')===20,'clean miss outside the band');
+// Wave 7 (E2): Kyber Forge has a real effect (gates saber tiers that add damage); roster cards show team + Tired.
+E("var J=C.roster.find(r=>isJedi(r)&&r.status==='active');J.gear.saber=0;C.wings.forge=0;C.res.credits=999;C.res.kyber=9");
+var dm0=E('battleUnit(J).dmg[1]');E('craftSaber(J.id)');check(E('J.gear.saber')===0,'no Forge: saber craft blocked');
+E('C.wings.forge=1;craftSaber(J.id)');check(E('J.gear.saber')===1&&E('battleUnit(J).dmg[1]')===dm0+1,'Forge L1: Attuned saber crafts and adds +1 damage');
+E("ensureTeams();C.teams[0].lead=J.id;J.fat=FATIGUE.at");var rt=E('rosterTab()');
+check(rt.includes(E('C.teams[0].n'))&&rt.includes('>Tired<'),'roster card shows team name and Tired badge');
+E('J.fat=0;C.teams[0].lead=null');
+E("var _S=S;S=null;var A2=C.roster.filter(r=>r.status==='active')[0],B2=C.roster.filter(r=>r.status==='active')[1];A2.stress=B2.stress=50;A2.assign=B2.assign=null;C.staff.gardens=null;A2.fought=C.tick||0;progAdvance();S=_S");
+check(E('A2.stress')===50&&E('B2.stress')===50-E('STRESS.bench'),'two fronts: front A squad gets no bench relief at the shared step');
 check(!errs.length,'no page errors'+(errs.length?': '+errs.join(' | '):''));
 console.log(JSON.stringify({fail,err:errs.length}));process.exit(fail||errs.length?1:0)})();

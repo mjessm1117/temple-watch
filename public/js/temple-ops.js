@@ -45,6 +45,8 @@ function progAdvance(){ensureProg();const R=C.research;
  if(R.cur&&C.wings.archives){R.prog+=DAYS*(C.wings.archives>=2?1.5:1)*(C.staff.archives?1.25:1);const P=RESEARCH[R.cur];
   if(R.prog>=P.days){R.done.push(R.cur);C.news.push(`Research complete: ${P.n}. ${P.desc}`);if(R.cur==='kyberLore')C.res.kyber++;if(P.dark)gain('orderDark',P.dark);R.cur=null;R.prog=0}}
  const deployed=new Set((S&&S.units||[]).filter(u=>u.side==='p'&&u.rid).map(u=>u.rid));
+ for(const r of C.roster)if(r.fought!=null&&r.fought===(C.tick||0))deployed.add(r.id);   // front A fought this step too
+ C.tick=(C.tick||0)+1;
  for(const r of C.roster.filter(r=>r.status==='active')){
   if(!deployed.has(r.id)){let d=STRESS.bench+(r.assign==='rest'?STRESS.rest:0)+(r.assign==='calm'?STRESS.calm:0);addStress(r,-d)}
   if(C.staff.gardens)addStress(r,-STRESS.gardensStaff);
