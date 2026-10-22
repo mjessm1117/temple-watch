@@ -21,13 +21,33 @@ function act(u){const go=c=>{exec(u,c[0],c[1]);return true};
  const g=goalFor(u);if(g&&moveToward(u,g))return true;
  if(S.type==='sabotage'&&!u.vip&&tile(u.x,u.y)==='E'&&tilesWhere(c=>c==='X').length>=S.M.need){const s=pick(u,'shoot');return go(s&&s[1].t&&s[1].chance>=45?s:[u.jedi?'guard':'overwatch',null])}
  if(u.vip){u.ap=0;return after()}
+ c=kitSupport(u);if(c)return go(c);
  if(u.jedi){c=pick(u,'subdue')||pick(u,'saberThrow')||pick(u,'strike');if(c&&c[0]==='strike'&&c[1].spot.path.length>3)c=pick(u,'push')||c}
  if(!c&&S.beacon){const b=targetsFor(u,'shoot').find(g=>g.beacon);if(b)c=['shoot',b]}
  if(!c){const s=pick(u,'shoot');if(s&&s[1].beacon)s[1]=targetsFor(u,'shoot').filter(g=>g.t).sort((a,b)=>b.chance-a.chance)[0];if(s&&s[1]&&(s[1].pylon?1:s[1].barrel?enemies().some(e=>cheb(e,s[1])<=1)&&!players().some(p=>cheb(p,s[1])<=1):s[1].t.status==='ok'&&s[1].chance>=45))c=s}
  if(!c&&u.nades){const gs=targetsFor(u,'grenade').map(g=>({g,n:enemies().filter(e=>e.status==='ok'&&!e.hid&&cheb(e,g)<=1).length,m:players().filter(p=>cheb(p,g)<=1).length})).filter(o=>o.n>=2&&!o.m);if(gs.length)c=['grenade',gs[0].g]}
- if(c)return go(c);
+ if(!c&&!u.vip&&peekMove(u))return true;
+ if(c)return go(kitUp(u,c));
  if(S.type!=='defend'&&u.ap===2&&!u.stay){const e=enemies().filter(e=>!e.hid&&e.status==='ok').sort((a,b)=>dist(u,a)-dist(u,b))[0];if(e&&dist(u,e)>(u.range<2?1.5:u.range*.6)&&moveToward(u,e))return true}
  return go([u.jedi?'guard':u.abil.includes('hunker')&&u.hp*2<=u.max?'hunker':'overwatch',null])}
+
+// Corner peek (M→K): with no 45%+ shot, step to the tile with the best shot — often a wall end beside full cover, where los() lets a unit lean out.
+function peekMove(u){if(u.range<2||!u.abil.includes('shoot')||u.ap<2||u.stay)return false;const R=reach(u),now=bestShot(u,u);let best=null,bs=-1e9;
+ for(const k of Object.keys(R.d)){if(!R.d[k])continue;const [x,y]=k.split(',').map(Number),p={x,y};if((TILES[tile(x,y)]||{}).hurt)continue;const h=bestShot(u,p);
+  if(h<45||h<now+10)continue;const s=h+(inCover(p)?12:0)-R.d[k];if(s>bs){bs=s;best=p}}
+ if(!best)return false;moveAlong(u,pathTo(u,best.x,best.y,R.prev));u.ap--;after();return true}
+// Use the kit like a player: heal/area/support picks first, then swap a plain strike or shot for a better tree version on the same target.
+const foesNear=(u,r)=>enemies().filter(e=>e.status==='ok'&&!e.hid&&dist(u,e)<=r).length,hurt=(u,r)=>players().filter(p=>!p.vip&&alive(p)&&dist(u,p)<=r&&(p.status==='down'&&!p.stable||p.hp*2<=p.max)).length;
+function kitSupport(u){const P=k=>pick(u,k);
+ if(hurt(u,4)>=2){const c=P('massHeal')||(hurt(u,3)>=2&&P('medBeacon'));if(c)return c}
+ for(const k of ['forceHeal','reviveStim']){const c=P(k);if(c&&c[1].t&&(c[1].t.status==='down'&&!c[1].t.stable||c[1].t.hp*2<=c[1].t.max))return c}
+ if(foesNear(u,3.2)>=2){const c=P('stasisField')||(foesNear(u,2.9)>=2&&P('forceWave'));if(c)return c}
+ for(const k of ['battleMed','mark']){const c=P(k);if(c&&(k!=='battleMed'||foesNear(u,6)>=2)&&u.ap===2)return c}
+ return null}
+function kitUp(u,c){const [k,g]=c,t=g&&g.t;if(!t||!t.side||t.side!=='e')return c;const same=k2=>{const o=pick(u,k2);return o&&o[1].t===t?o:null};
+ if(k==='strike'&&cheb(u,t)===1)return same('precisionStrike')||same('mightyBlow')||same('flurry')||c;
+ if(k==='shoot'){const d=same('deadeye');if(d&&d[1].chance>=60&&t.hp>u.dmg[1])return d;return (g.chance>=60&&same('chainShot'))||c}
+ return c}
 
 // Concealed (stealth missions): creep only through tiles outside enemy sight (red tiles), toward the objective or an ambush spot.
 // Once someone has a 55%+ shot (or from turn 3), everyone else sets overwatch/guard and the best shot springs the ambush.
