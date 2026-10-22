@@ -22,10 +22,10 @@ Already closed this week (don't redo): armor pips, Padawans (bond 2 start), voic
 - [ ] With M3: once layouts are validated, re-run full balance and turn off `map-open.js` auto-breaches (`OPEN.off=true`) if bands hold.
 
 ## M3 · Maps
-- [ ] Add a sightline / blind-spot metric to `tests/mapcheck.test.js` (no long stretch of open ground with no cover and no line of sight to an objective; flag tiles that can't see or be seen from anywhere useful).
-- [ ] Era 2 (Ruusan) versions of the wave-6 maps via `ruusanOf` (Frozen Watchpost, Smuggler Grotto, Overgrown Relay, Deepway Tunnels, etc.).
-- [ ] Hand-fix any layouts that still need `map-open.js` breaches, so B2 can turn it off.
-- [ ] Drop the `ROW_FIX` patches by moving fixes into the owning map data.
+- [x] Add a sightline / blind-spot metric to `tests/mapcheck.test.js` (no long stretch of open ground with no cover and no line of sight to an objective; flag tiles that can't see or be seen from anywhere useful). ✓ 255b533
+- [x] Era 2 (Ruusan) versions of the wave-6 maps via `ruusanOf` (Frozen Watchpost, Smuggler Grotto, Overgrown Relay, Deepway Tunnels, etc.). ✓ 255b533
+- [x] Hand-fix any layouts that still need `map-open.js` breaches, so B2 can turn it off. ✓ 255b533 (h_husks waits on E3, see STATUS)
+- [x] Drop the `ROW_FIX` patches by moving fixes into the owning map data. ✓ 255b533
 
 ## V2 · Visuals (3D)
 - [ ] Shell-zone and sapper-timer warnings are 2D-only: show them on the 3D board (zones + countdown labels).
