@@ -1,5 +1,6 @@
 import {mergeGeometries} from '../../vendor/BufferGeometryUtils.js';
-import {addProp} from './props.js';
+import {addProp,WALL_OF} from './props.js';
+import {RoundedBoxGeometry} from '../../vendor/RoundedBoxGeometry.js';
 // Map geometry from S.grid + floor highlights. Half cover is waist-high (crates, consoles, barrels), full cover is tall (walls, pillars, doors).
 // Rebuilds only tiles whose character changed; anything that lost cover reports back so effects can throw debris.
 const HALF_H=.55,FULL_H=1.55;
@@ -11,13 +12,15 @@ export const EH=.45,elevOf=c=>(TILES[c]||{}).elev||0;
 export const tileH=c=>{const h=(TILES[c]||{}).h||0;return h>=2?FULL_H:h>=1?HALF_H:h>0?.2:0};
 export class Board{
  constructor(THREE,scene){this.T=THREE;this.scene=scene;this.root=new THREE.Group();scene.add(this.root);this.tiles=new Map();this.grid=null;
-  const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.8,metalness:.15,flatShading:true,...o});
-  this.m={wall:M(0x2b3e46),wallTop:M(0x35505a),trim:M(0x79d3e2,{emissive:0x79d3e2,emissiveIntensity:.5}),crate:M(0x7a6544),band:M(0x3b3123),
+  const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.8,metalness:.15,...o});
+  const tex=this.wallTexture();this.m={cliff:M(0x3a4a50,{map:tex,roughness:.95,metalness:.05}),wall:M(0x2b3e46,{map:tex,roughness:.85}),wallTop:M(0x35505a,{map:tex}),trim:M(0x79d3e2,{emissive:0x79d3e2,emissiveIntensity:.5}),crate:M(0x7a6544),band:M(0x3b3123),
    barrel:M(0xa8342a,{emissive:0x3a0804}),stripe:M(0xe0bd78,{emissive:0x3a2a08}),metal:M(0x4a5d64,{metalness:.5}),dark:M(0x17242a),
    screen:M(0x79d3e2,{emissive:0x79d3e2,emissiveIntensity:1.1}),clue:M(0xe0bd78,{emissive:0xe0bd78,emissiveIntensity:.9}),
    done:M(0x7fd99a,{emissive:0x7fd99a,emissiveIntensity:.9}),lock:M(0xef6a5d,{emissive:0xef6a5d,emissiveIntensity:1}),rubble:M(0x3a4a50),
    evac:new THREE.MeshBasicMaterial({color:0x7fd99a,transparent:true,opacity:.28,depthWrite:false})};
-  this.box=new THREE.BoxGeometry(1,1,1);this.cyl=new THREE.CylinderGeometry(.5,.5,1,10);
+  this.box=new THREE.BoxGeometry(1,1,1);this.cyl=new THREE.CylinderGeometry(.5,.5,1,18);
+  // Soft-edged blocks: walls and raised tiles catch a highlight on their edges instead of reading as raw boxes.
+  this.rb={};this.rbox=(w,h,d,r=.05)=>{const k=[w,h,d,r]+'';return this.rb[k]||(this.rb[k]=new RoundedBoxGeometry(w,h,d,2,r))};
   const hm=(c,o)=>new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false});
   this.hm={reach:hm(0x2f9dff,.32),dash:hm(0xffb21e,.24),hover:hm(0x7fc8ff,.85),hoverDash:hm(0xffd166,.85),reachEdge:hm(0x9fe3ff,.95),dashEdge:hm(0xffe08a,.95),tgt:hm(0xef6a5d,.85),ally:hm(0x7fd99a,.85),spot:hm(0x79d3e2,.7),pick:hm(0xffffff,.95),
    area:hm(0x79d3e2,.2),iarea:hm(0xef6a5d,.22),path:hm(0x79d3e2,.95),smoke:hm(0x8aa2a5,.22),vis:new THREE.MeshBasicMaterial({map:this.hatch(),transparent:true,opacity:.85,depthWrite:false})};
@@ -27,10 +30,10 @@ export class Board{
  pos(x,y,h=0){const r=this.grid&&this.grid[y];return new this.T.Vector3(x+.5-this.cols/2,h+(r?elevOf(r[x])*EH:0),y+.5-this.rows/2)}
  elev(x,y){const r=this.grid&&this.grid[y];return r&&r[x]!=null?elevOf(r[x]):0}
  // Theme palette (themes.js): recolors shared materials; the floor texture is redrawn on the next build.
- setTheme(th){this.pal=th;const m=this.m;for(const [k,v] of [['wall',th.wall],['wallTop',th.wallTop],['crate',th.crate],['band',th.band],['metal',th.metal],['rubble',th.rubble]])m[k].color.setHex(v);
+ setTheme(th){this.pal=th;const m=this.m;for(const [k,v] of [['cliff',th.rubble],['wall',th.wall],['wallTop',th.wallTop],['crate',th.crate],['band',th.band],['metal',th.metal],['rubble',th.rubble]])m[k].color.setHex(v);
   m.trim.color.setHex(th.trim);m.trim.emissive.setHex(th.trim);m.dark.color.setHex(th.ground)}
  build(grid){this.clear();this.rows=grid.length;this.cols=grid[0].length;this.grid=grid.map(r=>[...r]);this.tops=[];
-  const T=this.T,base=new T.Mesh(new T.BoxGeometry(this.cols+.6,.4,this.rows+.6),this.m.dark);base.position.y=-.2;base.receiveShadow=true;this.root.add(base);
+  const T=this.T,base=new T.Mesh(new RoundedBoxGeometry(this.cols+.6,.4,this.rows+.6,3,.18),this.m.dark);base.position.y=-.2;base.receiveShadow=true;this.root.add(base);
   this.floorMat=new T.MeshStandardMaterial({map:this.floorTexture(),roughness:.9,metalness:.1});const floor=new T.Mesh(new T.PlaneGeometry(this.cols,this.rows).rotateX(-Math.PI/2),this.floorMat);
   floor.position.y=.001;floor.receiveShadow=true;this.root.add(floor);
   const rim=new T.Mesh(new T.BoxGeometry(this.cols+.7,.05,this.rows+.7),this.m.trim);rim.position.y=-.03;this.root.add(rim);
@@ -53,10 +56,11 @@ export class Board{
  make(c,x,y){const T=this.T,g=new T.Group(),m=this.m,add=(geo,mat,sx,sy,sz,px=0,py=0,pz=0,ry=0)=>{const o=new T.Mesh(geo,mat);o.scale.set(sx,sy,sz);o.position.set(px,py,pz);o.rotation.y=ry;g.add(o);return o};
   const seed=(x*73+y*37)%7;
   switch(c){
-   case '#':add(this.box,m.wall,1,FULL_H,1,0,FULL_H/2);add(this.box,m.wallTop,1.02,.08,1.02,0,FULL_H);for(const [sx,sz,px,pz] of [[1.02,.03,0,.5],[1.02,.03,0,-.5],[.03,1.02,.5,0],[.03,1.02,-.5,0]])add(this.box,m.trim,sx,.03,sz,px,FULL_H+.05,pz).userData.noShadow=1;break;
+   case '#':if(this.kit&&addProp(g,WALL_OF(this.kit),1,FULL_H,(this.isNS(x,y)?Math.PI/2:0)+(seed%2)*Math.PI,1))break; // slab follows the wall lineadd(this.rbox(1,FULL_H,1),m.wall,1,1,1,0,FULL_H/2);add(this.rbox(1.02,.1,1.02,.035),m.wallTop,1,1,1,0,FULL_H);for(const [sx,sz,px,pz] of [[1.02,.03,0,.5],[1.02,.03,0,-.5],[.03,1.02,.5,0],[.03,1.02,-.5,0]])add(this.box,m.trim,sx,.03,sz,px,FULL_H+.05,pz).userData.noShadow=1;break;
    case 'O':{if(!addProp(g,'O',.9,FULL_H+.3)){add(this.cyl,m.metal,.8,.5,.8,0,.25);add(this.cyl,m.wall,.22,FULL_H,.22,0,FULL_H/2+.2)}const r=add(new T.TorusGeometry(.32,.03,6,24),m.screen,1,1,1,0,1.25);r.rotation.x=Math.PI/2;
     r.userData.noShadow=1;this.anim.push({g,o:r,spin:1.5});add(new T.OctahedronGeometry(.12),m.screen,1,1,1,0,FULL_H+.35).userData.noShadow=1;break}
-   case 'd':case 'D':case '_':{add(this.box,m.wall,.16,FULL_H,1,-.42,FULL_H/2);add(this.box,m.wall,.16,FULL_H,1,.42,FULL_H/2);add(this.box,m.wallTop,1,.2,1,0,FULL_H-.1);
+   case 'd':case 'D':case '_':{if(c!=='_'&&this.kit&&addProp(g,'door_'+this.kit,1,FULL_H,0,1)){if(c==='D')add(this.box,m.lock,.5,.06,.2,0,FULL_H+.12).userData.noShadow=1;if(this.isNS(x,y))g.rotation.y=Math.PI/2;break}
+    add(this.box,m.wall,.16,FULL_H,1,-.42,FULL_H/2);add(this.box,m.wall,.16,FULL_H,1,.42,FULL_H/2);add(this.box,m.wallTop,1,.2,1,0,FULL_H-.1);
     if(c!=='_'){add(this.box,m.metal,.68,FULL_H-.2,.14,0,(FULL_H-.2)/2);add(this.box,c==='D'?m.lock:m.screen,.5,.05,.16,0,.95).userData.noShadow=1}
     if(this.isNS(x,y))g.rotation.y=Math.PI/2;break}
    case 'c':if(addProp(g,'c',.8,HALF_H,seed*Math.PI/2))break;add(this.box,m.crate,.78,HALF_H,.78,0,HALF_H/2,0,seed*.08);add(this.box,m.band,.8,.07,.8,0,HALF_H*.7,0,seed*.08);add(this.box,m.band,.8,.07,.8,0,HALF_H*.25,0,seed*.08);break;
@@ -75,25 +79,43 @@ export class Board{
  platform(g,x,y,e,c){const T=this.T,h=e*EH,m=this.m,G=this.grid,cap=new T.PlaneGeometry(1,1).rotateX(-Math.PI/2),uv=cap.attributes.uv;
   for(let i=0;i<uv.count;i++)uv.setXY(i,(x+uv.getX(i))/this.cols,1-(y+1-uv.getY(i))/this.rows);
   const top=new T.Mesh(cap,this.floorMat);top.position.y=.004;top.userData={x,y};top.receiveShadow=true;g.add(top);this.tops.push(top);
-  const blk=new T.Mesh(this.box,m.wall);blk.scale.set(1,h,1);blk.position.y=-h/2;g.add(blk);
+  const drop=(dx,dy)=>{const n=(G[y+dy]||[])[x+dx];return Math.max(0,e-(n==null?0:elevOf(n)))*EH};
+  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]])if(drop(dx,dy)>0)g.add(new T.Mesh(this.skirt(x,y,dx,dy,drop(dx,dy),drop(-dy,dx)>0,drop(dy,-dx)>0),m.cliff));
   for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const n=(G[y+dy]||[])[x+dx];if(n==null)continue;const ne=elevOf(n);if(ne>=e)continue;
    const lip=new T.Mesh(this.box,m.trim);lip.scale.set(dx?.04:1,.04,dy?.04:1);lip.position.set(dx*.5,.02,dy*.5);lip.userData.noShadow=1;g.add(lip);
    // One-level drop to walkable ground: a ramp if the tile is marked ramp, otherwise two steps. Two levels = cliff (lip only).
    if(e-ne===1&&(TILES[n]||{}).walk){const d=EH;if((TILES[c]||{}).ramp){const len=.46,r=new T.Mesh(this.box,m.wallTop);r.scale.set(dx?Math.hypot(len,d):.7,.05,dy?Math.hypot(len,d):.7);
      const ang=Math.atan2(d,len);r.position.set(dx*(.5+len/2),-d/2,dy*(.5+len/2));if(dx)r.rotation.z=dx*ang;else r.rotation.x=-dy*ang;r.castShadow=false;g.add(r)}
-    else for(let i=1;i<=2;i++){const st=new T.Mesh(this.box,m.wallTop),dep=.16*i;st.scale.set(dx?dep:.6,d*(3-i)/3,dy?dep:.6);st.position.set(dx*(.5+dep/2),-d+d*(3-i)/6,dy*(.5+dep/2));g.add(st)}}}
+    else for(let i=1;i<=2;i++){const dep=.16*i,sh=d*(3-i)/3,st=new T.Mesh(this.rbox(dx?dep:.6,sh,dy?dep:.6,Math.min(.04,sh/3)),m.wallTop);st.position.set(dx*(.5+dep/2),-d+d*(3-i)/6,dy*(.5+dep/2));g.add(st)}}}
+  return g}
+ // Sloped, uneven rock face for one dropping side of a raised tile. Top edge stays on the tile edge (lips line up);
+ // the foot flares out by F. Ends flare too when the side next to them also drops, so corners close without gaps.
+ // Edge rows/columns get no noise, so neighbouring faces meet exactly.
+ skirt(x,y,dx,dy,D,endP,endN){const T=this.T,NU=6,NV=3,F=Math.min(.3,.12+D*.25),tx=-dy,tz=dx,P=[],U=[],I=[];
+  const hash=(a,b,c)=>{const v=Math.sin(a*12.99+b*78.23+c*37.71)*43758.55;return v-Math.floor(v)-.5};
+  for(let j=0;j<=NV;j++)for(let i=0;i<=NU;i++){const f=j/NV,s=i/NU-.5,end=s>0?endP:endN,sx=s*(1+2*f*F*(end?1:0)),o=f*F;
+   const edge=i===0||i===NU||j===0,w=edge?0:hash(x*2+dx+s*tx*3,y*2+dy+s*tz*3,j)*.14,out=.5+o+w;
+   P.push(dx*out+tx*sx,-f*D+(edge||j===NV?0:hash(x+s,y-s,j+7)*.05),dy*out+tz*sx);U.push(i/NU,f*D)}
+  for(let j=0;j<NV;j++)for(let i=0;i<NU;i++){const a=j*(NU+1)+i,b=a+1,c=a+NU+1,d=c+1;I.push(a,c,b,b,c,d)}
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(P,3));g.setAttribute('uv',new T.Float32BufferAttribute(U,2));g.setIndex(I);
+  g.computeVertexNormals();const nz=g.attributes.normal;let dot=0;for(let k=0;k<nz.count;k++)dot+=nz.getX(k)*dx+nz.getZ(k)*dy;if(dot<0){g.setIndex(I.map((v,k)=>I[k-k%3+[0,2,1][k%3]]));g.computeVertexNormals()}
   return g}
  isNS(x,y){const w=c=>'#OdD_'.includes(c);const g=this.grid;return w((g[y-1]||[])[x]||'#')&&w((g[y+1]||[])[x]||'#')}
  update(dt,t){for(const a of this.anim){if(a.spin)a.o.rotation.y+=dt*a.spin;if(a.pulse){const s=.75+.15*Math.sin(t*3);a.o.scale.set(s,1,s)}}
   if(this.mkm){const w=.5+.5*Math.sin(t*4);for(const c of Object.values(this.mkm))if(c[2]&&c.mat)c.mat.opacity=c[1]*(.55+.45*w);if(this.bcn){this.bcn.lm.opacity=Math.sin(t*6)>0?1:.25;this.bcn.bm.opacity=.1+.08*w}}
   for(const o of this.lines.children)if(o.userData.flow){o.userData.flow.t=(o.userData.flow.t+dt*1.6)%1;const f=o.userData.flow;o.position.lerpVectors(f.a,f.b,f.t)}}
- floorTexture(){const s=48,c=document.createElement('canvas');c.width=this.cols*s;c.height=this.rows*s;const g=c.getContext('2d'),P=this.pal&&this.pal.floor||['#0e1a1e','#0f1c20','rgba(121,211,226,.22)','#14242a'];
+ floorTexture(){const s=64,c=document.createElement('canvas');c.width=this.cols*s;c.height=this.rows*s;const g=c.getContext('2d'),P=this.pal&&this.pal.floor||['#0e1a1e','#0f1c20','rgba(121,211,226,.22)','#14242a'];
   g.fillStyle='#0c171a';g.fillRect(0,0,c.width,c.height);let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
   for(let y=0;y<this.rows;y++)for(let x=0;x<this.cols;x++){g.fillStyle=(x+y)%2?P[1]:P[0];g.fillRect(x*s+1,y*s+1,s-2,s-2);
    g.fillStyle=P[3];for(let i=0;i<7;i++){const w=2+rnd()*6;g.globalAlpha=.25+rnd()*.35;g.fillRect(x*s+rnd()*(s-w),y*s+rnd()*(s-w),w,w*(.4+rnd()))}g.globalAlpha=1}
   g.strokeStyle=P[2];g.lineWidth=1.5;for(let x=0;x<=this.cols;x++){g.beginPath();g.moveTo(x*s,0);g.lineTo(x*s,c.height);g.stroke()}
   for(let y=0;y<=this.rows;y++){g.beginPath();g.moveTo(0,y*s);g.lineTo(c.width,y*s);g.stroke()}
-  const t=new this.T.CanvasTexture(c);t.colorSpace=this.T.SRGBColorSpace;t.anisotropy=4;return t}
+  const t=new this.T.CanvasTexture(c);t.colorSpace=this.T.SRGBColorSpace;t.anisotropy=8;return t}
+ // Grey stone/panel detail for walls; the theme color tints it. Seeded, so every load looks the same.
+ wallTexture(){const s=128,c=document.createElement('canvas');c.width=c.height=s;const g=c.getContext('2d');let sd=11;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+  g.fillStyle='#d8d8d8';g.fillRect(0,0,s,s);for(let i=0;i<260;i++){const w=2+rnd()*10;g.fillStyle=`rgba(${rnd()<.5?'0,0,0':'255,255,255'},${.04+rnd()*.08})`;g.fillRect(rnd()*s,rnd()*s,w,w*(.3+rnd()))}
+  g.strokeStyle='rgba(0,0,0,.28)';g.lineWidth=2;g.strokeRect(1,1,s-2,s-2);g.beginPath();g.moveTo(0,s*.5);g.lineTo(s,s*.5);g.moveTo(s*.5,0);g.lineTo(s*.5,s*.5);g.moveTo(s*.25,s*.5);g.lineTo(s*.25,s);g.moveTo(s*.75,s*.5);g.lineTo(s*.75,s);g.stroke();
+  const t=new this.T.CanvasTexture(c);t.colorSpace=this.T.SRGBColorSpace;t.anisotropy=8;return t}
  // Feathered square: bright rim fading to a soft center, so mark planes glow instead of reading as flat tiles.
  softTexture(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');for(let i=0;i<32;i++){const a=i<4?.95-i*.12:Math.max(.22,.55-i*.012);g.fillStyle=`rgba(255,255,255,${a})`;g.fillRect(i,i,64-2*i,64-2*i)}
   const t=new this.T.CanvasTexture(c);t.colorSpace=this.T.SRGBColorSpace;return t}

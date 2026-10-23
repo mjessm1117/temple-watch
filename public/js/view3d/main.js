@@ -16,7 +16,7 @@ import {startGalaxy} from './galaxy3d.js';
 import {startArmory} from './armory3d.js';
 import {RV} from './rigged.js';
 import {initFigures,loadModel,fileOf} from './figures.js';
-import {loadProps} from './props.js';
+import {loadProps,WALL_OF} from './props.js';
 import {kindOf} from './units.js';
 
 const btn=document.getElementById('viewBtn'),modal=document.getElementById('modal'),KEY='tw_view';
@@ -60,7 +60,8 @@ function init(){const wrap=document.querySelector('.bwrap'),host=document.create
  let last=performance.now(),slowN=0;const loop=now=>{requestAnimationFrame(loop);const raw=(now-last)/1000,real=Math.min(.05,raw);last=now;if(!on||document.hidden||!S)return;frame(real,now/1000);
   // Adaptive quality: if frames run slow for ~2 s, drop resolution a step (to 1×), then soften shadows.
   if(raw>1/42&&raw<.5)slowN++;else slowN=Math.max(0,slowN-2);if(slowN>120){slowN=0;const pr=renderer.getPixelRatio();
-   if(pr>1){renderer.setPixelRatio(Math.max(1,pr-.25));resize()}else if(renderer.shadowMap.type!==THREE.BasicShadowMap){renderer.shadowMap.type=THREE.BasicShadowMap;key.shadow.mapSize.set(1024,1024);key.shadow.map?.dispose();key.shadow.map=null}}};requestAnimationFrame(loop)}
+   // Shadows soften first; resolution (which brings back jagged edges) only drops if that isn't enough.
+   if(renderer.shadowMap.type!==THREE.BasicShadowMap){renderer.shadowMap.type=THREE.BasicShadowMap;key.shadow.mapSize.set(1024,1024);key.shadow.map?.dispose();key.shadow.map=null}else if(pr>1){renderer.setPixelRatio(Math.max(1,pr-.25));resize()}}};requestAnimationFrame(loop)}
 
 const P=(o,y=0)=>V.board.pos(o.x,o.y,y);
 const vpos=(u,y=.8)=>{const v=V.units.get(u),p=v.root.position;return p.clone().setY(Math.max(0,V.board.elev(v.vx,v.vy)*EH)+y)};
@@ -73,7 +74,11 @@ function frame(real,t){const {rig,board,units,fx3,labels,renderer,scene}=V;if(S!
  if(S.smoke&&S.smoke.length&&Math.random()<real*3)for(const s of S.smoke)fx3.puff(P(s,.3),1,0x8aa2a5);
  labels.update(real,proj);if(modal.hidden)renderer.render(scene,rig.cam)}
 const proj=p=>{const v=p.clone().project(V.rig.cam);if(v.z>1)return null;const c=V.renderer.domElement;return{x:(v.x+1)/2*c.clientWidth,y:(1-v.y)/2*c.clientHeight}};
-function rebuild(){lastS=S;Q.length=0;busy=0;hpShow.clear();V.units.clear();V.labels.clear();const th=themeOf({...S.M,theme:S.theme||S.M.theme});V.board.setTheme(THEMES[th]);V.board.build(S.grid);V.fx3.clearKept();
+// Shadow box sized to the map so big boards keep crisp shadows to the edge (was a fixed 18×18).
+function fitShadow(){const k=V.lights.key,c=k.shadow.camera,h=Math.max(V.board.cols,V.board.rows)/2+1.5,big=h>10&&!matchMedia('(pointer:coarse)').matches;
+ Object.assign(c,{left:-h,right:h,top:h,bottom:-h,far:Math.max(30,h*3)});c.updateProjectionMatrix();const ms=big?4096:2048;
+ if(k.shadow.mapSize.x<ms&&V.renderer.shadowMap.type!==THREE.BasicShadowMap){k.shadow.mapSize.set(ms,ms);k.shadow.map?.dispose();k.shadow.map=null}}
+function rebuild(){lastS=S;Q.length=0;busy=0;hpShow.clear();V.units.clear();V.labels.clear();const th=themeOf({...S.M,theme:S.theme||S.M.theme});V.board.kit=th;V.board.setTheme(THEMES[th]);V.board.build(S.grid);fitShadow();V.fx3.clearKept();
  V.scenery.apply(th,V.board.cols,V.board.rows,V.lights,V.renderer);
  seen.clear();for(const u of S.units)if(u.side==='e'&&!u.hid&&alive(u))seen.add(u.uid);
  if(S.turn===1&&S.phase==='player'&&!flown.has(S)&&S.units.every(u=>u.hp===u.max)){flown.add(S);V.cine.flyover(V.board.cols,V.board.rows,`<div style="font:600 26px 'Chakra Petch',sans-serif;letter-spacing:.12em;color:#dbe7e4">${(S.M.n||'').toUpperCase()}</div><div style="font:500 13px 'IBM Plex Sans',sans-serif;color:#8aa2a5;margin-top:4px">${S.M.where||''}</div>`);
@@ -84,7 +89,7 @@ function models(){const want=new Set(S.units.map(u=>fileOf(kindOf(u))));
  const later=[...Object.values(S.M&&S.M.waves||{}).flat(),...(S.M&&S.M.reinforce||[])];
  for(const t of later)if(typeof t==='string'&&FOES[t])want.add(fileOf(kindOf({...FOES[t],side:'e',type:t})));
  want.delete(null);for(const f of want)loadModel(f).then(m=>{if(m&&V&&S){V.units.upgrade();ui()}})
- loadProps(THREE,new Set(S.grid.map(r=>[...r]).flat()),['pillar','statue','brazier','container','gantry']).then(n=>{if(n&&V&&S){V.board.build(S.grid);V.scenery.apply(V.scenery.name,V.board.cols,V.board.rows,V.lights,V.renderer)}})}
+ loadProps(THREE,new Set(S.grid.map(r=>[...r]).flat()),['pillar','statue','brazier','container','gantry',WALL_OF(V.board.kit),'door_'+V.board.kit]).then(n=>{if(n&&V&&S){V.board.build(S.grid);V.scenery.apply(V.scenery.name,V.board.cols,V.board.rows,V.lights,V.renderer)}})}
 
 // Event queue: each beat waits for the previous one. A backlog (fast enemy turns) plays faster.
 function pump(ms){const sp=(Q.length>6?3:Q.length>2?1.8:1)*(V.units.reduce?2:1);busy-=ms*sp;
