@@ -12,10 +12,21 @@ function areaHits(u,k,g){const ab=AB[k];if(!ab||!u||!g)return [];if(ab.ally&&!ab
 // --- Objectives panel ---
 const OBJ_TXT={defend:M=>`Hold the ${M.objName||'objective'} until the end of turn ${M.turns}.`,rescue:()=>'Free the prisoner and get them to an evac zone.',
  escort:()=>'Get the VIP to an evac zone alive.',sabotage:M=>`Arm ${M.need} charges, then get everyone to evac.`,
- investigate:()=>'Scan data terminals: 2 clues to win, 3 for the bonus. Then extract at evac.',assault:()=>'Take down the target.'};
+ investigate:()=>'Copy data from the terminals (computer screens): 2 clues to win, 3 for the bonus. Then get everyone to the evac circles.',assault:()=>'Take down the target.'};
+// "Do this next" line: the one concrete step and the button to press, from live mission state.
+function objNext(){const M=S.M,h=typeof hostage==='function'?hostage():null,P=players().filter(alive);
+ if(S.type==='investigate'){if(S.clues<2){const q=tilesWhere(c=>c==='q').length;return q?`Walk any unit onto a tile touching a data terminal (diagonals count). A <b>Scan clue</b> button appears: press it, then click the terminal. ${2-S.clues} more to go.`:'No terminals left.'}
+  return `Data secured${S.clues<3?' (one more terminal = bonus)':''}. Move everyone onto the evac circles.`}
+ if(S.type==='rescue'&&h){if(h.bound)return 'Open the cell: stand next to a console and press <b>Use console</b>, or use <b>Hack</b> within 4 tiles.';return `Walk ${h.n} to an evac circle. Keep them out of enemy fire.`}
+ if(S.type==='escort'&&h)return `Walk ${h.n} to an evac circle. Your squad clears the way.`;
+ if(S.type==='sabotage'){const a=armed();return a<M.need?`Stand next to a charge site and press <b>Plant charge</b>. ${M.need-a} more to arm.`:'Charges armed. Move everyone onto the evac circles.'}
+ if(S.type==='defend')return `Keep enemies off the ${M.objName||'objective'}. Survive to the end of turn ${M.turns}.`;
+ if(S.type==='assault')return 'Focus fire on the target. Everyone else is a distraction.';
+ return ''}
 function objHTML(){const M=S.M,o=objStat(),rows=[];
  rows.push(`<p class="obj1">${(OBJ_TXT[S.type]||(()=>M.brief||''))(M)}</p>`);
  rows.push(`<div class="orow"><span>${o.label}</span><b>${o.val}</b></div>`);
+ {const n=objNext();if(n)rows.push(`<p class="onext"><b>Next:</b> ${n}</p>`)}
  if(S.type==='defend')rows.push(`<div class="orow"><span>Turn</span><b>${S.turn} / ${M.turns}</b></div>`);
  const nw=M.waves&&Object.keys(M.waves).map(Number).find(t=>t>S.turn);if(M.waves)rows.push(`<div class="orow"><span>Next wave</span><b>${nw?'turn '+nw:'none left'}</b></div>`);
  if(M.par)rows.push(`<div class="orow${S.threat>=4?' hot':''}"><span data-tip="stat:threat">Threat</span><b>${S.threat?`${S.threat} / 6 · fails at 6`:`rises after turn ${M.par}`}</b></div>`);

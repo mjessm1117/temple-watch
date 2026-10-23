@@ -38,5 +38,10 @@ check(E('A2.stress')===50&&E('B2.stress')===50-E('STRESS.bench'),'two fronts: fr
 E("var QR=C.roster.find(r=>r.status==='active');QR.rank=2;C.quests[QR.id]={q:Object.keys(QUESTS)[0],st:'offer'}");
 check(E('questOptions().some(o=>o.quest===QR.id)'),'personal quest offered');E('C.quests[QR.id].tried=C.step');
 check(!E('questOptions().some(o=>o.quest===QR.id)'),'a failed quest is not re-offered on the same step (no endless loop)');
+// Clear objectives (E2, 2026-10-23): a "Next:" step in the panel; objective buttons stay visible with how-to.
+E("startMission('envoy',C.roster.filter(fit).slice(0,4).map(battleUnit))");
+check(E('objHTML()').includes('Next:')&&E('objHTML()').includes('Scan clue'),'investigate: panel says what to do next');
+E("S.phase='player';S.sel=players().find(u=>!adjTiles(u,'q').length&&u.abil.includes('scan'))||players()[0];if(!S.sel.abil.includes('scan'))S.sel.abil.push('scan');S.sel.ap=2");
+check(E('actsHTML()').includes('Stand next to a data terminal'),'Scan clue button shows greyed with a hint when not next to a terminal');
 check(!errs.length,'no page errors'+(errs.length?': '+errs.join(' | '):''));
 console.log(JSON.stringify({fail,err:errs.length}));process.exit(fail||errs.length?1:0)})();

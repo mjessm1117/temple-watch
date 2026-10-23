@@ -53,3 +53,4 @@
 
 /* hack choice */
 .odds.hackp{display:grid;gap:6px}.odds.hackp button{display:grid;text-align:left;gap:2px;padding:8px 10px}.odds.hackp button small{font-size:11px;color:var(--dim)}
+.objs .onext{margin:4px 0 2px;padding:5px 7px;border-left:2px solid var(--holo);background:color-mix(in srgb,var(--holo) 10%,transparent);font-size:12px;line-height:1.35;color:var(--fg)}.objs .onext b{color:var(--holo)}

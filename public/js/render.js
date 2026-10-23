@@ -31,10 +31,13 @@ function cardHTML(){const u=S.peek||S.sel;
  if(S.info||u.side==='e')h+=`<div class="grid2"><span data-tip="stat:aim">Aim <b>${u.aim}</b></span><span data-tip="stat:move">Move <b>${u.mob}</b></span><span data-tip="stat:damage">Damage <b>${u.dmg[0]}–${u.dmg[1]}</b></span><span data-tip="stat:range">Range <b>${u.range<2?'melee':u.range}</b></span>${u.deflect?`<span data-tip="stat:deflect">Deflect <b>${u.deflect}%</b></span>`:''}${u.crit?`<span data-tip="stat:crit">Crit <b>${u.crit}%</b></span>`:''}${u.kits!=null?`<span data-tip="stat:medkits">Medkits <b>${u.kits}</b></span>`:''}${u.nades!=null?`<span data-tip="stat:grenades">Grenades <b>${u.nades}</b></span>`:''}${u.will!=null?`<span data-tip="stat:will">Will <b>${u.will}</b></span>`:''}${u.stress?`<span data-tip="stat:stress">Stress <b>${u.stress}</b></span>`:''}</div>`;
  if(u.side==='e'&&u.type&&FOES[u.type]&&FOES[u.type].desc)h+=`<p class="udesc">${FOES[u.type].desc}</p>`;
  return h}
+// Mission-objective buttons stay visible (greyed, with how-to) instead of vanishing until you stand in the right spot.
+const CTX_HINT={scan:()=>S.type==='investigate'&&tilesWhere(c=>c==='q').length?'Stand next to a data terminal':'',
+ plant:()=>S.type==='sabotage'&&tilesWhere(c=>c==='C').length?'Stand next to a charge site':''};
 function actsHTML(){const u=S.sel;if(!canAct(u)||S.peek)return '';
  let n=0;return u.abil.map(k=>{const ab=AB[k];if(!ab||ab.passive)return '';let why=null;
   if(ab.f&&u.focus<ab.f)why=`Needs ${ab.f} Focus`;else if(ab.avail)why=ab.avail(u);
-  if(!why&&!ab.instant&&!targetsFor(u,k).length){if(ab.ctx)return '';why='No targets'}
+  if(!why&&!ab.instant&&!targetsFor(u,k).length){if(ab.ctx&&!CTX_HINT[k]?.(u))return '';why=ab.ctx?CTX_HINT[k](u):'No targets'}
   const cost=[ab.f?ab.f+' Focus':'',ab.ap===1?'1 action':'ends turn'].filter(Boolean).join(' · ');
   n++;return `<button type="button" data-a="${k}" data-tip="ability:${k}" data-cost="${ab.instant&&!ab.ap?'0':ab.ap===1?'1':'end'}" data-f="${ab.f||0}" class="act ${S.mode===k?'on':''}" ${why?'disabled':''}>${n<10?`<kbd>${n}</kbd>`:''}${icon(ab.ic)}<span>${ab.name}${window.pwTag&&u.pw?pwTag(u.pw[k]||0):''}<small>${why||cost}</small></span></button>`}).join('')}
 // Names what the target hides behind, for the odds panel ("Half cover · crate").
