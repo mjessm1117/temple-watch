@@ -28,7 +28,7 @@ export class UV{
   this.vx=u.x;this.vy=u.y;this.state=u.status==='down'?'down':'ok';this.lie=this.state==='down'?1:0;this.lieAxis=new this.T.Vector3(1,0,0);this.face=u.side==='e'?0:Math.PI;
   this.root=new this.T.Group();this.body=new this.T.Group();this.root.add(this.body);this.p={};this.build();this.base();
   this.root.position.copy(U.board.pos(u.x,u.y));this.sc=this.kind==='beast'?1.3:1.18;this.root.scale.setScalar(this.sc);this.headY*=this.sc;U.scene.add(this.root);this.pose={armR:0,legs:0,lift:0,lunge:0,flail:0}}
- mat(c,o={}){const m=new this.T.MeshStandardMaterial({color:c,roughness:.65,metalness:.2,flatShading:true,...o});m.userData.e0=m.emissive.clone();this.mats.push(m);return m}
+ mat(c,o={}){const m=new this.T.MeshStandardMaterial({color:c,roughness:.65,metalness:.2,...o});m.userData.e0=m.emissive.clone();this.mats.push(m);return m}
  part(parent,geo,m,sx,sy,sz,x=0,y=0,z=0){const o=new this.T.Mesh(geo,m);o.scale.set(sx,sy,sz);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o}
  pivot(parent,x,y,z=0){const g=new this.T.Group();g.position.set(x,y,z);parent.add(g);return g}
  build(){if(this.kind==='beast'||this.kind==='spawn')return this.buildBeast();if(isNexus(this.kind))return this.buildNexus();const K=KIND[BLOCK[this.kind]||this.kind]||KIND.sith,G=this.U.geo,b=this.body,bulk=K.bulk||1;

@@ -56,7 +56,7 @@ const LOOK={
  envoy:{main:0x8a8f96,joint:0x4a4f56,gear:['robe','belt','pistol']},
  civ:{main:0x9a8a66,joint:0x5a4f3a,gear:['robe','belt']}};
 
-const mat=(c,o={})=>new T.MeshStandardMaterial({color:c,roughness:.6,metalness:.25,flatShading:true,...o});
+const mat=(c,o={})=>new T.MeshStandardMaterial({color:c,roughness:.6,metalness:.25,...o});
 const glow=c=>new T.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:1.8,roughness:.4});
 // A part placed in model space (T-pose, meters, facing +z), then re-parented to a bone keeping its world transform.
 function part(fig,bone,geo,m,s,p,r){const o=new T.Mesh(geo,m);o.scale.set(...s);o.position.set(...p);if(r)o.rotation.set(...r);o.castShadow=false;
@@ -71,7 +71,7 @@ let G=null;const geos=()=>G||(G={box:new T.BoxGeometry(1,1,1),cyl:new T.Cylinder
 // Builds one figure. Returns {obj, mixer, acts, glows, mats, scale}. color = saber/unit color (hex string or number).
 export function makeFigure(kind,color,kit){const file=fileOf(kind),M=modelOf(file);if(!M)return null;
  const obj=skClone(M.scene),mats=[],g=geos();obj.updateMatrixWorld(true);
- if(file==='beast'){obj.traverse(o=>{if(o.isMesh){o.material=new T.MeshStandardMaterial({color:kind==='spawn'?0x8a8494:0x6e5644,roughness:.85,metalness:.05,flatShading:true});o.material.flatShading=true;o.castShadow=true;mats.push(o.material)}});
+ if(file==='beast'){obj.traverse(o=>{if(o.isMesh){o.material=new T.MeshStandardMaterial({color:kind==='spawn'?0x8a8494:0x6e5644,roughness:.85,metalness:.05});o.castShadow=true;mats.push(o.material)}});
   const eye=glow(kind==='spawn'?0xb26bff:0xff3b2e);mats.push(eye);for(const s of [-1,1])part(obj,'Head',g.sph,eye,[.09,.06,.05],[s*.36,2.95,.62]);
   const horn=mat(kind==='spawn'?0x3a2a4a:0xd8cbb0);mats.push(horn);if(kind==='spawn')for(let i=0;i<5;i++)part(obj,'Torso',g.cone,horn,[.1,.5,.1],[(i-2)*.22,2.5-Math.abs(i-2)*.1,-.45],[-.6,0,(i-2)*-.2]);
   else for(const s of [-1,1])part(obj,'Head',g.cone,horn,[.12,.6,.12],[s*.6,3.45,.2],[.3,0,s*-.5]);
