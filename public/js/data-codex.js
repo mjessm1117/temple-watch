@@ -138,6 +138,7 @@ const CODEX={
   heavy:{lore:'A walking wall in Imperial plate, with a gun that wants to be heard. It is slow to turn and quick to punish those who stand still.'}, // [N]
   agent:{lore:'Imperial Intelligence does not announce itself. A cold hide, a long rifle, and a patience the Temple’s own scouts would respect.'}, // [L H] Imperial Intelligence; [N] sniper role
   acolyte:{lore:'A student of the Sith, hungry to be noticed by someone with more power. Lightning crackles in the fingers, and mercy has not yet been taught.'}, // [L H] Sith acolytes; [N] characterization
+  husk:{lore:'What is left when a great horror feeds. A Dark Husk has no mind of its own, only hunger, and it moves when its maker kills.'}, // [N]
   terentatek:{lore:'A beast bred, it is said, to hunt those who touch the Force. The Jedi who survive an encounter rarely describe it, but the nightmares do.'}, // [L H] Terentatek hunts Force users
   envoy:{lore:'A Republic envoy with the right smile and the wrong friends. Whispers say that someone close to the talks is selling the schedule.'}, // [N]
   malgus:{lore:'A Sith Lord who believes the Republic is a lie and means to prove it with fire. He fights like a man with nothing left to lose.'}, // [L H] Darth Malgus; [N] phrasing
