@@ -16,7 +16,7 @@ import {startGalaxy} from './galaxy3d.js';
 import {startArmory} from './armory3d.js';
 import {RV} from './rigged.js';
 import {initFigures,loadModel,fileOf} from './figures.js';
-import {loadProps} from './props.js';
+import {loadProps,WALL_OF} from './props.js';
 import {kindOf} from './units.js';
 
 const btn=document.getElementById('viewBtn'),modal=document.getElementById('modal'),KEY='tw_view';
@@ -89,7 +89,7 @@ function models(){const want=new Set(S.units.map(u=>fileOf(kindOf(u))));
  const later=[...Object.values(S.M&&S.M.waves||{}).flat(),...(S.M&&S.M.reinforce||[])];
  for(const t of later)if(typeof t==='string'&&FOES[t])want.add(fileOf(kindOf({...FOES[t],side:'e',type:t})));
  want.delete(null);for(const f of want)loadModel(f).then(m=>{if(m&&V&&S){V.units.upgrade();ui()}})
- loadProps(THREE,new Set(S.grid.map(r=>[...r]).flat()),['pillar','statue','brazier','container','gantry','wall_'+V.board.kit,'door_'+V.board.kit]).then(n=>{if(n&&V&&S){V.board.build(S.grid);V.scenery.apply(V.scenery.name,V.board.cols,V.board.rows,V.lights,V.renderer)}})}
+ loadProps(THREE,new Set(S.grid.map(r=>[...r]).flat()),['pillar','statue','brazier','container','gantry',WALL_OF(V.board.kit),'door_'+V.board.kit]).then(n=>{if(n&&V&&S){V.board.build(S.grid);V.scenery.apply(V.scenery.name,V.board.cols,V.board.rows,V.lights,V.renderer)}})}
 
 // Event queue: each beat waits for the previous one. A backlog (fast enemy turns) plays faster.
 function pump(ms){const sp=(Q.length>6?3:Q.length>2?1.8:1)*(V.units.reduce?2:1);busy-=ms*sp;

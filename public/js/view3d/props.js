@@ -2,6 +2,8 @@
 // primitive crates/barrels/consoles for them on the next build. A prop that isn't listed or fails to load keeps the primitive.
 import {GLTFLoader} from '../../vendor/GLTFLoader.js';
 import {MeshoptDecoder} from '../../vendor/meshopt_decoder.module.js';
+// Themes that borrow another theme's wall (their own Meshy walls kept coming out with openings).
+export const WALL_OF=t=>'wall_'+({temple:'ruins',dock:'city'}[t]||t);
 export const PROPS=new Set(['crate','barrel','console','terminal','relay','rubble','pillar','statue','brazier','container','gantry',
  ...['dock','city','jungle','snow','temple','ruins','plains','caves'].flatMap(t=>['wall_'+t,'door_'+t])]); // wall/door kit per theme (board.js)
 // tile char → prop file

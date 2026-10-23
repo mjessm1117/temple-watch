@@ -1,5 +1,5 @@
 import {mergeGeometries} from '../../vendor/BufferGeometryUtils.js';
-import {addProp} from './props.js';
+import {addProp,WALL_OF} from './props.js';
 import {RoundedBoxGeometry} from '../../vendor/RoundedBoxGeometry.js';
 // Map geometry from S.grid + floor highlights. Half cover is waist-high (crates, consoles, barrels), full cover is tall (walls, pillars, doors).
 // Rebuilds only tiles whose character changed; anything that lost cover reports back so effects can throw debris.
@@ -56,7 +56,7 @@ export class Board{
  make(c,x,y){const T=this.T,g=new T.Group(),m=this.m,add=(geo,mat,sx,sy,sz,px=0,py=0,pz=0,ry=0)=>{const o=new T.Mesh(geo,mat);o.scale.set(sx,sy,sz);o.position.set(px,py,pz);o.rotation.y=ry;g.add(o);return o};
   const seed=(x*73+y*37)%7;
   switch(c){
-   case '#':if(this.kit&&addProp(g,'wall_'+this.kit,1,FULL_H,(this.isNS(x,y)?Math.PI/2:0)+(seed%2)*Math.PI,1))break; // slab follows the wall lineadd(this.rbox(1,FULL_H,1),m.wall,1,1,1,0,FULL_H/2);add(this.rbox(1.02,.1,1.02,.035),m.wallTop,1,1,1,0,FULL_H);for(const [sx,sz,px,pz] of [[1.02,.03,0,.5],[1.02,.03,0,-.5],[.03,1.02,.5,0],[.03,1.02,-.5,0]])add(this.box,m.trim,sx,.03,sz,px,FULL_H+.05,pz).userData.noShadow=1;break;
+   case '#':if(this.kit&&addProp(g,WALL_OF(this.kit),1,FULL_H,(this.isNS(x,y)?Math.PI/2:0)+(seed%2)*Math.PI,1))break; // slab follows the wall lineadd(this.rbox(1,FULL_H,1),m.wall,1,1,1,0,FULL_H/2);add(this.rbox(1.02,.1,1.02,.035),m.wallTop,1,1,1,0,FULL_H);for(const [sx,sz,px,pz] of [[1.02,.03,0,.5],[1.02,.03,0,-.5],[.03,1.02,.5,0],[.03,1.02,-.5,0]])add(this.box,m.trim,sx,.03,sz,px,FULL_H+.05,pz).userData.noShadow=1;break;
    case 'O':{if(!addProp(g,'O',.9,FULL_H+.3)){add(this.cyl,m.metal,.8,.5,.8,0,.25);add(this.cyl,m.wall,.22,FULL_H,.22,0,FULL_H/2+.2)}const r=add(new T.TorusGeometry(.32,.03,6,24),m.screen,1,1,1,0,1.25);r.rotation.x=Math.PI/2;
     r.userData.noShadow=1;this.anim.push({g,o:r,spin:1.5});add(new T.OctahedronGeometry(.12),m.screen,1,1,1,0,FULL_H+.35).userData.noShadow=1;break}
    case 'd':case 'D':case '_':{if(c!=='_'&&this.kit&&addProp(g,'door_'+this.kit,1,FULL_H,0,1)){if(c==='D')add(this.box,m.lock,.5,.06,.2,0,FULL_H+.12).userData.noShadow=1;if(this.isNS(x,y))g.rotation.y=Math.PI/2;break}
