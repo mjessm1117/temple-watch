@@ -11,7 +11,7 @@ function newCampaign(diff){
 const START_RANK=2,startGear=cls=>CLASS[cls]&&CLASS[cls].jedi?{w:0,armor:'robes',mods:[],saber:1,trait:null}:{w:1,armor:'light',mods:[],saber:0,trait:null};
 function abilFor(r){const P=picksOf(r).filter(k=>AB[k]),B=BASE_KIT[r.cls]||[];
  if(isJedi(r))return['strike',...B,...P,...(r.rank>=2?['choke']:[]),'push','guard','meditate','subdue','stabilize','door','console','scan'];
- return['shoot',...B,...P,'overwatch','subdue','stabilize','door']}
+ return['shoot',...B,...P,'overwatch','subdue','stabilize','door',...(B.includes('scan')?[]:['scan'])]}   // anyone can copy a terminal (was Jedi + Medic only)
 // Roster entry → battle stats: class base + RANK_GAIN for every rank reached (data-campaign.js), then gear/perks/stress (templeMods).
 function battleUnit(r){const b=CLASS[r.cls],u={...b,n:r.n,cls:r.cls,col:r.col,rid:r.id,rank:r.rank,title:r.title,dark:r.dark||0,dmg:[...b.dmg]};delete u.desc;
  for(let k=2;k<=r.rank;k++){const G=RANK_GAIN[k]||{};u.hp+=G.hp||0;u.aim+=G.aim||0;u.will+=G.will||0;
@@ -85,3 +85,5 @@ function launchMission(i,ids){ensureTemple();const o=C.options[i],sq=ids.map(id=
 // Squad size rules. twin.js overrides this for the second front (4 units, 0–2 Jedi, squad A's units excluded).
 function squadRule(){return{max:6,jmin:1,jmax:3,used:[]}}
 function defaultSquad(o){const R=squadRule(),q=o&&o.quest,ok=C.roster.filter(r=>fit(r)&&!R.used.includes(r.id)&&r.id!==(o&&o.hostage)).sort((a,b)=>(b.id===q)-(a.id===q)),J=ok.filter(isJedi).slice(0,R.jmax),T=ok.filter(r=>!isJedi(r));return[...J,...T].slice(0,R.max).map(r=>r.id)}
+// Saves made mid-mission before every unit could scan: add Scan clue on resume (2026-10-23).
+if(typeof continueGame==='function'){const _cgScan=continueGame;continueGame=function(d){const r=_cgScan.apply(this,arguments);if(S&&S.units)for(const u of S.units)if(u.side==='p'&&u.rid&&!u.vip&&u.abil&&!u.abil.includes('scan'))u.abil.push('scan');return r}}

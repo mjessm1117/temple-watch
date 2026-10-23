@@ -43,5 +43,8 @@ E("startMission('envoy',C.roster.filter(fit).slice(0,4).map(battleUnit))");
 check(E('objHTML()').includes('Next:')&&E('objHTML()').includes('Scan clue'),'investigate: panel says what to do next');
 E("S.phase='player';S.sel=players().find(u=>!adjTiles(u,'q').length&&u.abil.includes('scan'))||players()[0];if(!S.sel.abil.includes('scan'))S.sel.abil.push('scan');S.sel.ap=2");
 check(E('actsHTML()').includes('Stand next to a data terminal'),'Scan clue button shows greyed with a hint when not next to a terminal');
+check(E("C.roster.filter(r=>r.status==='active').every(r=>abilFor(r).includes('scan'))"),'every unit can Scan clue (not just Jedi and Medics)');
+E("startMission('envoy',C.roster.filter(fit).slice(0,4).map(battleUnit));for(const u of players())u.abil=u.abil.filter(k=>k!=='scan');var _sv=JSON.parse(JSON.stringify(saveData()));continueGame(_sv)");
+check(E("players().filter(u=>u.rid).every(u=>u.abil.includes('scan'))"),'resumed old mid-mission save: everyone gets Scan clue');
 check(!errs.length,'no page errors'+(errs.length?': '+errs.join(' | '):''));
 console.log(JSON.stringify({fail,err:errs.length}));process.exit(fail||errs.length?1:0)})();
