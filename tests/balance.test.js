@@ -19,7 +19,9 @@ const w0=new JSDOM(html,{runScripts:'dangerously'}).window,maps=w0.eval(`(()=>{c
 const ONLY=process.env.ONLY,FIRST=process.env.FIRST==='1';
 if(!ONLY){if(maps.bad.length){console.log('FAIL maps:',maps.bad.join(', '));process.exit(1)}
  console.log(`maps ok: ${maps.out.length}`);const {spawnSync}=require('child_process');
- for(const id of [...new Set(maps.out.map(m=>m[0]))]){const r=spawnSync(process.execPath,[__filename],{stdio:'inherit',env:{...process.env,ONLY:id}});if(r.status!==0){fail++;console.log(`FAIL balance child ${id} exit ${r.status}${r.signal?' '+r.signal:''}`)}}
+ // SHARD=i/n plays every n-th mission (run shards in parallel to fit under time caps); unset = all.
+ const [si,sn]=(process.env.SHARD||'0/1').split('/').map(Number);
+ for(const id of [...new Set(maps.out.map(m=>m[0]))].filter((_,i)=>i%sn===si)){const r=spawnSync(process.execPath,[__filename],{stdio:'inherit',env:{...process.env,ONLY:id}});if(r.status!==0){fail++;console.log(`FAIL balance child ${id} exit ${r.status}${r.signal?' '+r.signal:''}`)}}
  process.exit(fail?1:0)}
 (async()=>{for(const [id,mi] of maps.out.filter(m=>m[0]===ONLY&&(!FIRST||m[1]===0))){const res={mission:id,map:mi,win:0,lose:0,err:0,dead:0,turns:0};
  for(let g=0;g<N;g++){const w=new JSDOM(html,{runScripts:'dangerously'}).window;const errs=[];w.addEventListener('error',e=>errs.push(e.message));
