@@ -37,7 +37,7 @@ const rng=a=>()=>{a=a+0x6d2b79f5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t
 export class Scenery{
  constructor(T,scene){this.T=T;this.scene=scene;this.root=new T.Group();scene.add(this.root);this.parts=null;this.anim=[];
   const mc={};const M=(c,o={})=>{const k=c+JSON.stringify(o);return mc[k]||(mc[k]=new T.MeshStandardMaterial({color:c,roughness:.85,metalness:.1,...o}))};this.M=M;
-  this.g={box:new T.BoxGeometry(1,1,1),cyl:new T.CylinderGeometry(.5,.5,1,16),cone:new T.ConeGeometry(.5,1,12),ico:new T.IcosahedronGeometry(.5,0),oct:new T.OctahedronGeometry(.5,0)}}
+  this.g={box:new T.BoxGeometry(1,1,1),cyl:new T.CylinderGeometry(.5,.5,1,16),cone:new T.ConeGeometry(.5,1,12),ico:new T.IcosahedronGeometry(.5,1),oct:new T.OctahedronGeometry(.5,0)}}
  apply(name,cols,rows,L,renderer){const T=this.T,th=THEMES[name]||THEMES.dock;this.name=name;this.th=th;this.root.clear();this.anim=[];
   const sc=this.scene;sc.fog=new T.Fog(th.fog[0],th.fog[1],th.fog[2]);sc.background=new T.Color(th.sky[0]);
   L.hemi.color.setHex(th.hemi[0]);L.hemi.groundColor.setHex(th.hemi[1]);L.hemi.intensity=th.hemi[2];L.key.color.setHex(th.key[0]);L.key.intensity=th.key[1];

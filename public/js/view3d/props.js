@@ -20,6 +20,7 @@ export function loadProps(THREE,chars,extra=[]){T=THREE;const names=new Set([...
    const b=new T.Box3().setFromObject(root);cache[n].ok={root,size:b.getSize(new T.Vector3()),min:b.min.clone(),c:b.getCenter(new T.Vector3())};return 1})
    .catch(e=>{console.warn('prop failed, keeping primitive:',n,e);PROPS.delete(n);return 0})})()}).p)).then(r=>r.some(Boolean))}
 // Adds the prop for tile char (or prop name) c to group g, fitted to footprint w (tiles) and height h. Returns false if not loaded.
-export function addProp(g,c,w,h,yaw){const P=cache[PROP_OF[c]||c],M=P&&P.ok;if(!M)return false;const o=M.root.clone();
- const k=Math.min(w/Math.max(M.size.x,M.size.z),h/M.size.y);o.scale.setScalar(k);o.rotation.y=yaw||0;
- const off=new T.Vector3(-M.c.x,-M.min.y,-M.c.z).multiplyScalar(k).applyAxisAngle(new T.Vector3(0,1,0),yaw||0);o.position.copy(off);g.add(o);return true}
+// fill: stretch height to exactly h (wall kit: full cover must look full height).
+export function addProp(g,c,w,h,yaw,fill){const P=cache[PROP_OF[c]||c],M=P&&P.ok;if(!M)return false;const o=M.root.clone();
+ const kw=w/Math.max(M.size.x,M.size.z),k=fill?kw:Math.min(kw,h/M.size.y),ky=fill?h/M.size.y:k;o.scale.set(k,ky,k);o.rotation.y=yaw||0;
+ const off=new T.Vector3(-M.c.x,-M.min.y,-M.c.z).multiply(new T.Vector3(k,ky,k)).applyAxisAngle(new T.Vector3(0,1,0),yaw||0);o.position.copy(off);g.add(o);return true}
