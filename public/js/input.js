@@ -19,6 +19,7 @@ function boardClick(x,y){if(!S||S.phase!=='player'||S.over)return;
  if(g&&S.mode!=='move'&&canAct(S.sel)){if(S.pick&&S.pick.x===x&&S.pick.y===y)return exec(S.sel,S.mode,S.pick);S.pick=g;return render()}
  const u=unitAt(x,y);
  if(u&&u.side==='p'&&!u.hid)return select(u);
+ if(u&&u.side==='e'&&!u.hid&&S.mode!=='move'&&S.tg.length){S.peek=u;log(`${u.n} can't be targeted from here (range or line of sight).`);return render()}
  if(u&&u.side==='e'&&!u.hid){S.peek=S.peek===u?null:u;S.mode='move';S.tg=[];S.pick=null;return render()}
  if(S.peek){S.peek=null;return render()}
  if(S.mode==='move'&&canAct(S.sel))tryMove(S.sel,x,y)}
@@ -31,7 +32,7 @@ $('#board').addEventListener('mousemove',ev=>{const c=ev.target.closest('.cell')
 $('#board').addEventListener('mouseleave',()=>boardHover(-1,-1));
 function chooseAbility(k){const u=S.sel;if(!canAct(u)||!AB[k])return;
  if(AB[k].instant)return exec(u,k,null);
- S.pick=null;S.hpath=null;if(S.mode===k){S.mode='move';S.tg=[]}else{S.mode=k;S.tg=targetsFor(u,k)}render()}
+ S.pick=null;S.hpath=null;if(S.mode===k){S.mode='move';S.tg=[]}else{S.mode=k;S.tg=targetsFor(u,k);const b=S.tg.some(g=>g.area)?null:bestTarget();if(b&&b.t)S.pick=b}render()} // aiming starts on the best shot: one more click fires
 $('#acts').addEventListener('click',ev=>{const b=ev.target.closest('button[data-a]');if(!b||b.disabled)return;chooseAbility(b.dataset.a)});
 $('#odds').addEventListener('click',ev=>{const c=ev.target.closest('[data-cyc]');if(c){ev.stopPropagation();return cycleTarget(+c.dataset.cyc)}if(ev.target.closest('#confirm')&&S.pick&&canAct(S.sel))exec(S.sel,S.mode,S.pick)});
 $('#roster').addEventListener('click',ev=>{const b=ev.target.closest('button[data-u]');if(b)select(S.units.filter(u=>u.side==='p')[+b.dataset.u])});

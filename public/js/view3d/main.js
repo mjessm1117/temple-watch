@@ -45,7 +45,9 @@ function init(){const wrap=document.querySelector('.bwrap'),host=document.create
  ctl.addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(!c)return;({l:()=>rig.rotate(-1),r:()=>rig.rotate(1),i:()=>rig.zoom(1/1.2),o:()=>rig.zoom(1.2),f:()=>fit(),c:()=>View3D.cinematics=!V.cine.enabled})[c.dataset.c]()});
  host.appendChild(ctl);
  const ray=new THREE.Raycaster(),ndc=new THREE.Vector2(),ground=new THREE.Plane(new THREE.Vector3(0,1,0),0),hit=new THREE.Vector3();
- const pick=e=>{if(!S||!board.rows)return null;const r=renderer.domElement.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ndc,rig.cam);
+ const pick=e=>{if(!S||!board.rows)return null;const r=renderer.domElement.getBoundingClientRect();
+  if(S.mode!=='move'&&S.tg&&S.tg.length){let best=null,bd=70;for(const g of S.tg){if(!g.t)continue;const s=proj(board.pos(g.x,g.y,.8));if(!s)continue;const d=Math.hypot(s.x-(e.clientX-r.left),s.y-(e.clientY-r.top));if(d<bd){bd=d;best=g}}if(best)return{x:best.x,y:best.y}}
+  ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ndc,rig.cam);
   const roots=[...units.map.values()].filter(v=>!v.gone&&v.root.visible&&v.state!=='dead').map(v=>v.root),h=ray.intersectObjects(roots,true)[0];
   if(h){let o=h.object;while(o&&!roots.includes(o))o=o.parent;const v=[...units.map.values()].find(v=>v.root===o);if(v&&alive(v.u))return{x:v.u.x,y:v.u.y}}
   const top=board.tops&&board.tops.length&&ray.intersectObjects(board.tops,false)[0];if(top)return{...top.object.userData};
@@ -92,8 +94,8 @@ function models(){const want=new Set(S.units.map(u=>fileOf(kindOf(u))));
  loadProps(THREE,new Set(S.grid.map(r=>[...r]).flat()),['pillar','statue','brazier','container','gantry',WALL_OF(V.board.kit),'door_'+V.board.kit]).then(n=>{if(n&&V&&S){V.board.build(S.grid);V.scenery.apply(V.scenery.name,V.board.cols,V.board.rows,V.lights,V.renderer)}})}
 
 // Event queue: each beat waits for the previous one. A backlog (fast enemy turns) plays faster.
-function pump(ms){const sp=(Q.length>6?3:Q.length>2?1.8:1)*(V.units.reduce?2:1);busy-=ms*sp;
- while(busy<=0&&Q.length){const e=Q.shift();let d=0;try{d=play(e.type,e.d)||0}catch(err){console.error(err)}busy=Math.max(busy,0)+d}
+function pump(ms){const sp=(Q.length>12?1.5:1)*(V.units.reduce?2:1);busy-=ms*sp;
+ while(busy<=0&&Q.length){const e=Q[0];if(!e.cam){e.cam=1;const w=camFirst(e.type,e.d);if(w){busy=w;break}}Q.shift();let d=0;try{d=play(e.type,e.d)||0}catch(err){console.error(err)}busy=Math.max(busy,0)+d}
  if(busy<=0&&!Q.length){busy=0;settle();while(waiters.length)waiters.shift()()}}
 function settle(){const lost=V.board.sync(S.grid);for(const l of lost)V.fx3.debris(P(l,.3),6);
  V.units.reconcile(S.units);for(const u of S.units)hpShow.set(u.uid,u.hp);reveals()}
@@ -105,8 +107,10 @@ function reveals(){const fresh=S.units.filter(u=>u.side==='e'&&!u.hid&&alive(u)&
  V.cine.reveal(c,`<div style="font:600 18px 'Chakra Petch',sans-serif;letter-spacing:.14em;color:${horror?'#ef6a5d':'#e0bd78'}">${horror?'THREAT SIGHTED':'CONTACT'}</div><div style="font:500 13px 'IBM Plex Sans',sans-serif;color:#dbe7e4">${Object.entries(n).map(([k,v])=>v>1?k+' ×'+v:k).join(' · ')}</div>`)}
 // Enemy turn: the camera follows whoever acts (XCOM), only if they're near the screen edge.
 const offEdge=p=>{const s=proj(p),c=V.renderer.domElement;return !s||s.x<c.clientWidth*.2||s.x>c.clientWidth*.8||s.y<c.clientHeight*.15||s.y>c.clientHeight*.72};
+// Enemy turn: pan to whoever acts (XCOM) and give the camera time to arrive before the action plays. Returns the wait in ms.
+function camFirst(type,d){if(S.phase!=='enemy'||(type!=='move'&&type!=='shot'))return 0;const a=d.u||d.a,to=type==='move'&&d.path&&d.path.length?d.path.at(-1):a;
+ if(!a||a.side!=='e'||a.hid||!(offEdge(P(a))||offEdge(P(to))))return 0;V.rig.focus(P(a).lerp(P(to),.5));return V.units.reduce?150:550}
 function play(type,d){const {units,fx3,labels,board,rig}=V;
- if(S.phase==='enemy'&&(type==='move'||type==='shot')){const a=d.u||d.a,to=type==='move'&&d.path.length?d.path.at(-1):a;if(a&&a.side==='e'&&!a.hid&&offEdge(P(to)))rig.focus(P(a).lerp(P(to),.6))}
  switch(type){
   case 'move':{if(d.u.hid||!d.path.length)return 0;const v=units.get(d.u);if(v.state!=='ok')return 0;return v.walk([P(d.from),...d.path.map(p=>P(p))],d.path.at(-1))+40}
   case 'shot':{const a=units.get(d.a),tv=units.get(d.t),pa=P(d.from,.9),pt=tv.root.position.clone().setY(.8);a.faceTo(pt);
@@ -234,5 +238,5 @@ window.View3D={get dbg(){return V},get queue(){return {n:Q.length,busy,types:Q.s
  set cinematics(v){if(V){V.cine.setEnabled(v);cineBtn()}else try{localStorage.setItem('tw_cine',v?'on':'off')}catch(e){}},
  skipCinematic(){if(V)V.cine.skip()},sync(){if(!on||!V||!S)return;if(S!==lastS)rebuild();ui()},
  // Resolves once every queued animation has played (logic may await this between enemy actions; 2D/tests resolve at once).
- idle(){return on&&V&&S&&(Q.length||busy>0)&&!document.hidden?new Promise(r=>{waiters.push(r);setTimeout(r,4000)}):Promise.resolve()},hover(){if(on&&V&&S)ui()},get on(){return on}};
+ idle(){return on&&V&&S&&(Q.length||busy>0)&&!document.hidden?new Promise(r=>{waiters.push(()=>setTimeout(r,S&&S.phase==='enemy'?250:0));setTimeout(r,12000)}):Promise.resolve()},hover(){if(on&&V&&S)ui()},get on(){return on}};
 if(glOK){try{startPortraits();startDiorama();startGalaxy();startArmory()}catch(e){console.warn(e)}btn.hidden=false;btn.addEventListener('click',()=>setOn(!on));setOn(store.get()!=='2d')}

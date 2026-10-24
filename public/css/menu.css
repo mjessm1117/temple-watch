@@ -1,0 +1,8 @@
+/* Menu dialog (js/menu.js) */
+.box.menu{max-width:560px}
+.mnu{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.mnu h3{margin:0;font:600 13px var(--disp);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.mrow{display:flex;flex-wrap:wrap;gap:8px}
+.mnu .slot{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+.box.menu button.warn{border-color:var(--sith);color:var(--sith)}
+.box.menu button:disabled{opacity:.4;cursor:not-allowed}
