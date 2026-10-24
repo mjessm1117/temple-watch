@@ -20,7 +20,7 @@ check(!E("modReady('medical')"),'not ready until missions pass');E('templeAdvanc
 E("C.wings.training=1;C.wings.armory=1;C.mods.cd={};modUse('training');modUse('armory')");
 E("startMission('relay',C.roster.slice(0,4).map(battleUnit),{diff:'normal',map:0})");
 const tr=E("S.units.find(u=>u.side==='p'&&u.rid&&!u.jedi)");check(E("S.log.some(l=>/Temple support/.test(l.t))"),'buffs announced at deploy');
-check(E("(()=>{const u=S.units.find(u=>u.side==='p'&&u.rid&&!u.jedi),b=battleUnit(C.roster.find(r=>r.id===u.rid));return u.aim===b.aim+5&&u.armor===(b.armor||0)+1})()"),'trooper got +5 aim and +1 armor pip');
+check(E("(()=>{const u=S.units.find(u=>u.side==='p'&&u.rid&&!u.jedi),b=battleUnit(C.roster.find(r=>r.id===u.rid));return u.aim===b.aim+5+TROOP_BUFF.aim&&u.armor===(b.armor||0)+1})()"),'trooper got +5 aim and +1 armor pip');
 check(E("modNext()")==='','buffs clear after one battle');
 // graze: a shot that misses by < GRAZE still does half damage
 E("var A=S.units.find(u=>u.side==='p'&&!u.jedi),T={n:'Dummy',side:'e',x:0,y:0,hp:20,max:20,status:'ok'};S.units.push(T);var _r=Math.random;Math.random=()=>0.55");
