@@ -13,7 +13,7 @@ export const tileH=c=>{const h=(TILES[c]||{}).h||0;return h>=2?FULL_H:h>=1?HALF_
 export class Board{
  constructor(THREE,scene){this.T=THREE;this.scene=scene;this.root=new THREE.Group();scene.add(this.root);this.tiles=new Map();this.grid=null;
   const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.8,metalness:.15,...o});
-  const tex=this.wallTexture();this.m={cliff:M(0x3a4a50,{map:tex,roughness:.95,metalness:.05}),wall:M(0x2b3e46,{map:tex,roughness:.85}),wallTop:M(0x35505a,{map:tex}),trim:M(0x79d3e2,{emissive:0x79d3e2,emissiveIntensity:.5}),crate:M(0x7a6544),band:M(0x3b3123),
+  const tex=this.wallTexture();this.m={cliff:M(0xffffff,{map:tex,roughness:.95,metalness:.05,vertexColors:true}),wall:M(0x2b3e46,{map:tex,roughness:.85}),wallTop:M(0x35505a,{map:tex}),trim:M(0x79d3e2,{emissive:0x79d3e2,emissiveIntensity:.5}),crate:M(0x7a6544),band:M(0x3b3123),
    barrel:M(0xa8342a,{emissive:0x3a0804}),stripe:M(0xe0bd78,{emissive:0x3a2a08}),metal:M(0x4a5d64,{metalness:.5}),dark:M(0x17242a),
    screen:M(0x79d3e2,{emissive:0x79d3e2,emissiveIntensity:1.1}),clue:M(0xe0bd78,{emissive:0xe0bd78,emissiveIntensity:.9}),
    done:M(0x7fd99a,{emissive:0x7fd99a,emissiveIntensity:.9}),lock:M(0xef6a5d,{emissive:0xef6a5d,emissiveIntensity:1}),rubble:M(0x3a4a50),
@@ -30,7 +30,7 @@ export class Board{
  pos(x,y,h=0){const r=this.grid&&this.grid[y];return new this.T.Vector3(x+.5-this.cols/2,h+(r?elevOf(r[x])*EH:0),y+.5-this.rows/2)}
  elev(x,y){const r=this.grid&&this.grid[y];return r&&r[x]!=null?elevOf(r[x]):0}
  // Theme palette (themes.js): recolors shared materials; the floor texture is redrawn on the next build.
- setTheme(th){this.pal=th;const m=this.m;for(const [k,v] of [['cliff',th.rubble],['wall',th.wall],['wallTop',th.wallTop],['crate',th.crate],['band',th.band],['metal',th.metal],['rubble',th.rubble]])m[k].color.setHex(v);
+ setTheme(th){this.pal=th;const m=this.m;for(const [k,v] of [['wall',th.wall],['wallTop',th.wallTop],['crate',th.crate],['band',th.band],['metal',th.metal],['rubble',th.rubble]])m[k].color.setHex(v);
   m.trim.color.setHex(th.trim);m.trim.emissive.setHex(th.trim);m.dark.color.setHex(th.ground)}
  build(grid){this.clear();this.rows=grid.length;this.cols=grid[0].length;this.grid=grid.map(r=>[...r]);this.tops=[];
   const T=this.T,base=new T.Mesh(new RoundedBoxGeometry(this.cols+.6,.4,this.rows+.6,3,.18),this.m.dark);base.position.y=-.2;base.receiveShadow=true;this.root.add(base);
@@ -48,7 +48,7 @@ export class Board{
   const live=new Set(this.anim.map(a=>a.o)),tops=new Set(this.tops),B=new Map();this.root.updateMatrixWorld(true);
   for(const g of this.tiles.values())g.traverse(o=>{if(!o.isMesh||live.has(o)||tops.has(o))return;o.visible=false;const k=o.material.uuid+(o.castShadow?'s':'');
    if(!B.has(k))B.set(k,{m:o.material,cast:o.castShadow,g:[]});let ge=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();ge.applyMatrix4(o.matrixWorld);
-   for(const a of Object.keys(ge.attributes))if(a!=='position'&&a!=='normal'&&a!=='uv')ge.deleteAttribute(a);if(!ge.attributes.uv)ge.setAttribute('uv',new T.Float32BufferAttribute(new Float32Array(ge.attributes.position.count*2),2));B.get(k).g.push(ge)});
+   for(const a of Object.keys(ge.attributes))if(a!=='position'&&a!=='normal'&&a!=='uv'&&a!=='color')ge.deleteAttribute(a);if(!ge.attributes.uv)ge.setAttribute('uv',new T.Float32BufferAttribute(new Float32Array(ge.attributes.position.count*2),2));B.get(k).g.push(ge)});
   for(const b of B.values()){const ge=mergeGeometries(b.g,false);if(!ge)continue;const m=new T.Mesh(ge,b.m);m.castShadow=b.cast;m.receiveShadow=true;this.bRoot.add(m)}this.root.add(this.bRoot)}
  setTile(x,y,c){this.dirty=1;const e=elevOf(c);c=ALIAS[c]||(TILES[c]&&TILES[c].as3d)||c;const k=x+','+y,old=this.tiles.get(k);if(old){this.root.remove(old);this.anim=this.anim.filter(a=>a.g!==old);this.tops=this.tops.filter(t=>t.parent!==old)}
   let g=this.make(c,x,y);if(e>0)g=this.platform(g||new this.T.Group(),x,y,e,c);if(!g)return this.tiles.delete(k);g.position.copy(this.pos(x,y));g.traverse(o=>{if(o.isMesh){o.castShadow=o.userData.noShadow?false:true;o.receiveShadow=true}});
@@ -80,7 +80,10 @@ export class Board{
   for(let i=0;i<uv.count;i++)uv.setXY(i,(x+uv.getX(i))/this.cols,1-(y+1-uv.getY(i))/this.rows);
   const top=new T.Mesh(cap,this.floorMat);top.position.y=.004;top.userData={x,y};top.receiveShadow=true;g.add(top);this.tops.push(top);
   const drop=(dx,dy)=>{const n=(G[y+dy]||[])[x+dx];return Math.max(0,e-(n==null?0:elevOf(n)))*EH};
-  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]])if(drop(dx,dy)>0)g.add(new T.Mesh(this.skirt(x,y,dx,dy,drop(dx,dy),drop(-dy,dx)>0,drop(dy,-dx)>0),m.cliff));
+  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]])if(drop(dx,dy)>0){const D=drop(dx,dy);g.add(new T.Mesh(this.skirt(x,y,dx,dy,D,drop(-dy,dx)>0,drop(dy,-dx)>0),m.cliff));
+   // A couple of fallen stones at the foot of the slope (seeded, so every load matches).
+   this.rock||(this.rock=new T.IcosahedronGeometry(.5,1));for(let i=0;i<2;i++){const h=Math.abs(Math.sin(x*91.7+y*47.3+dx*13+dy*7+i*5.1)),q=new T.Mesh(this.rock,m.rubble),sz=.07+h*.09;
+    q.scale.set(sz*1.3,sz,sz);q.position.set(dx*(.62+D*.3)+(-dy)*(h-.5)*.8,-D+sz*.35,dy*(.62+D*.3)+dx*(h-.5)*.8);q.rotation.y=h*6;g.add(q)}}
   for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const n=(G[y+dy]||[])[x+dx];if(n==null)continue;const ne=elevOf(n);if(ne>=e)continue;
    const lip=new T.Mesh(this.box,m.trim);lip.scale.set(dx?.04:1,.04,dy?.04:1);lip.position.set(dx*.5,.02,dy*.5);lip.userData.noShadow=1;g.add(lip);
    // One-level drop to walkable ground: a ramp if the tile is marked ramp, otherwise two steps. Two levels = cliff (lip only).
@@ -91,13 +94,14 @@ export class Board{
  // Sloped, uneven rock face for one dropping side of a raised tile. Top edge stays on the tile edge (lips line up);
  // the foot flares out by F. Ends flare too when the side next to them also drops, so corners close without gaps.
  // Edge rows/columns get no noise, so neighbouring faces meet exactly.
- skirt(x,y,dx,dy,D,endP,endN){const T=this.T,NU=6,NV=3,F=Math.min(.3,.12+D*.25),tx=-dy,tz=dx,P=[],U=[],I=[];
+ skirt(x,y,dx,dy,D,endP,endN){const T=this.T,NU=6,NV=4,F=Math.min(.3,.12+D*.25),tx=-dy,tz=dx,P=[],U=[],I=[],C=[],pal=this.pal||{},top=new T.Color(pal.floor?pal.floor[0]:'#3a4a3a'),rock=new T.Color(pal.rubble??0x3a4a50);
   const hash=(a,b,c)=>{const v=Math.sin(a*12.99+b*78.23+c*37.71)*43758.55;return v-Math.floor(v)-.5};
   for(let j=0;j<=NV;j++)for(let i=0;i<=NU;i++){const f=j/NV,s=i/NU-.5,end=s>0?endP:endN,sx=s*(1+2*f*F*(end?1:0)),o=f*F;
-   const edge=i===0||i===NU||j===0,w=edge?0:hash(x*2+dx+s*tx*3,y*2+dy+s*tz*3,j)*.14,out=.5+o+w;
-   P.push(dx*out+tx*sx,-f*D+(edge||j===NV?0:hash(x+s,y-s,j+7)*.05),dy*out+tz*sx);U.push(i/NU,f*D)}
+   const edge=i===0||i===NU||j===0,w=edge?0:hash(x*2+dx+s*tx*3,y*2+dy+s*tz*3,j)*.14,out=.5+o+w+(j===1?.05:0); // j=1 bulges: the edge rolls over like a grassy lip
+   P.push(dx*out+tx*sx,-f*D+(edge||j===NV?0:hash(x+s,y-s,j+7)*.05),dy*out+tz*sx);U.push(i/NU,f*D);
+   const k=Math.min(1,Math.max(0,(f-.15)/.3));C.push(top.r+(rock.r-top.r)*k,top.g+(rock.g-top.g)*k,top.b+(rock.b-top.b)*k)}
   for(let j=0;j<NV;j++)for(let i=0;i<NU;i++){const a=j*(NU+1)+i,b=a+1,c=a+NU+1,d=c+1;I.push(a,c,b,b,c,d)}
-  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(P,3));g.setAttribute('uv',new T.Float32BufferAttribute(U,2));g.setIndex(I);
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(P,3));g.setAttribute('uv',new T.Float32BufferAttribute(U,2));g.setAttribute('color',new T.Float32BufferAttribute(C,3));g.setIndex(I);
   g.computeVertexNormals();const nz=g.attributes.normal;let dot=0;for(let k=0;k<nz.count;k++)dot+=nz.getX(k)*dx+nz.getZ(k)*dy;if(dot<0){g.setIndex(I.map((v,k)=>I[k-k%3+[0,2,1][k%3]]));g.computeVertexNormals()}
   return g}
  isNS(x,y){const w=c=>'#OdD_'.includes(c);const g=this.grid;return w((g[y-1]||[])[x]||'#')&&w((g[y+1]||[])[x]||'#')}

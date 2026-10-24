@@ -18,6 +18,7 @@ import {RV} from './rigged.js';
 import {initFigures,loadModel,fileOf} from './figures.js';
 import {loadProps,WALL_OF} from './props.js';
 import {kindOf} from './units.js';
+import {RoomEnvironment} from '../../vendor/RoomEnvironment.js';
 
 const btn=document.getElementById('viewBtn'),modal=document.getElementById('modal'),KEY='tw_view';
 const glOK=(()=>{try{const c=document.createElement('canvas');return !!(window.WebGLRenderingContext&&(c.getContext('webgl2')||c.getContext('webgl')))}catch(e){return false}})();
@@ -34,7 +35,10 @@ function init(){const wrap=document.querySelector('.bwrap'),host=document.create
  const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});const phone=matchMedia('(pointer:coarse)').matches;renderer.setPixelRatio(Math.min(devicePixelRatio,phone?1.5:2));
  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;
  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;host.appendChild(renderer.domElement);
- const scene=new THREE.Scene();scene.background=new THREE.Color(0x070d0f);scene.fog=new THREE.Fog(0x070d0f,24,48);
+ const scene=new THREE.Scene();scene.background=new THREE.Color(0x070d0f);
+ // Soft studio light from every side: models and terrain get gentle shading instead of flat dark backs.
+ {const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),.04).texture;scene.environmentIntensity=.35;pm.dispose()}
+scene.fog=new THREE.Fog(0x070d0f,24,48);
  const hemi=new THREE.HemisphereLight(0xa8dce8,0x0b1518,1.1);scene.add(hemi);
  const key=new THREE.DirectionalLight(0xfff0dc,2.4);key.position.set(5,11,6);key.castShadow=true;key.shadow.mapSize.set(phone?1024:2048,phone?1024:2048);
  Object.assign(key.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:1,far:30});key.shadow.bias=-.0006;key.shadow.normalBias=.02;scene.add(key);
@@ -128,11 +132,12 @@ function play(type,d){const {units,fx3,labels,board,rig}=V;
    const back=deflect&&upto.find(e=>e.type==='hit'&&e.d.src===d.t);
    if(deflect)setTimeout(()=>tv.block(),120);const ms=fx3.bolt(pa.setY(.95),pt,{color:boltColor(d.a),hit:d.hit,deflect:back?vpos(back.d.t,.9):deflect,w:/heavy|sithHeavy|bane/i.test(kindOf(d.a))?1.6:1})+60;
    return back?ms*2.2:ms}
-  case 'hit':{const v=units.get(d.t),at=d.src?vpos(d.src):null;v.flash();if(at)v.knock(at,d.d>=4?.34:.24);fx3.sparks(vpos(d.t,.8),d.src&&d.src.side==='e'?0xff8a6a:0x9fe7ff,16);
+  case 'hit':{const v=units.get(d.t),at=d.src?vpos(d.src):null;v.flash();if(at)v.knock(at,d.d>=4?.34:.24);fx3.sparks(vpos(d.t,.8),d.src&&d.src.side==='e'?0xff8a6a:0x9fe7ff,d.d>=4?26:16);fx3.flash(vpos(d.t,.9),d.src&&d.src.side==='e'?0xff6a4a:0x9fe7ff,d.d>=4?10:5);if(d.d>=4&&!units.reduce)rig.shake(.07);
    hpShow.set(d.t.uid,d.hp);return 130}
   case 'kill':{const v=units.get(d.t),p=vpos(d.t,.8);
    if(d.t.side==='e'&&(d.t.boss||!enemies().some(e=>e!==d.t&&alive(e)))&&V.cine.ready('finale',2))V.cine.finale(v.root.position.clone(),d.t.boss?finTitle(d.t):'');v.fall('dead',d.src?vpos(d.src):null);fx3.burst(p);labels.float(p.clone().setY(1.7),'KILL','kill',true);
-   if(!units.reduce)slowT=.25;hpShow.set(d.t.uid,0);return 700}
+   {const g=p.clone().setY(.03);fx3.ring(g,d.t.side==='e'?0xffb070:0xef6a5d,.2,1.7,.45,.05);fx3.scorch(g,.5);fx3.flash(p,0xffc070,18)}
+   if(!units.reduce){slowT=.45;rig.shake(.14)}hpShow.set(d.t.uid,0);return 700}
   case 'down':{const v=units.get(d.t);v.fall('down',d.src?vpos(d.src):null);fx3.puff(vpos(d.t,.4),6);hpShow.set(d.t.uid,0);return 520}
   case 'explode':{const d2=fx3.explosion(P(d,.2));setTimeout(()=>{if(V&&S){const lost=board.sync(S.grid);for(const l of lost)fx3.debris(P(l,.3),8)}},120);return d2}
   case 'coverBreak':{const lost=board.sync(S.grid);for(const l of lost)fx3.debris(P(l,.3),8);return 200}
