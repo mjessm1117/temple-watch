@@ -185,3 +185,15 @@ Rules unchanged: `git pull` first, own files only, cross-file needs go under "Re
 | M Maps & Tactics | `data.js`, `data-battle.js`, `rules.js`, `abilities.js`, `turns.js`, `ai.js`, `battle.js`, `hazards.js`, `util.js` (grid size), `tests/balance.test.js`, `tests/bot.js`; camera/board sizing in `view3d/board.js` + `view3d/main.js` only | Bigger maps with routes and movement objectives, enemies from several sides, stronger terrain/angles/sight lines, overwatch that visibly works |
 | N Command Console | `css/*`, `render.js`, `input.js`, `ui-*.js`, `index.html`, `temple-map.js`; screen markup in `base.js`/`temple-ui.js`/`galaxy.js` (look only, no logic) | Temple + HUD feel like a real command console, with more color |
 | Q Squad & Legacy | `campaign.js`, `data-campaign.js`, `temple*.js`, `data-life.js`, `data-trees.js`, `power.js`, new `data-legacy.js`/`legacy.js`; lore text in `data-codex.js` | Zero Company-style bonds and class ideas, characters with growing lore, retirement to Council or general, Council masters joining missions |
+
+---
+
+# Wave 9 (2026-10-23): Jess's play-test asks
+
+Rules unchanged: `git pull` first, own files only, cross-file needs go under "Requests" in `docs/STATUS.md`, `npm test` green before push. E coordinates and merges.
+
+| Chat | Owns | Goal |
+| --- | --- | --- |
+| E Coordinator | new `menu.js` + `css/menu.css`, `save.js`, `input.js`, `render.js`, `index.html`, `view3d/*`; tiny hooks in `turns.js` (restart/retreat only) | Menu button; turn rewind (last 3 turns) + 3 manual save slots + restart mission; retreat (mission lost, squad safe, no captures); easier target picking (Tab cycles, target bar with hit %, bigger click areas); on-screen action no longer skipped (enemy moves/attacks play at readable pace, camera follows) |
+| R Combat & Action Points | `data.js`, `rules.js`, `abilities.js`, `turns.js` (AP), `ai.js`, `power.js`, `data-trees.js`, `data-skills.js`, `skills.js`, `tests/balance.test.js`, `tests/bot.js` | 3 AP per unit like Zero Company (move cost by distance, attack cost by weapon, shooting doesn't end the turn) + perks that refund/grant AP (XCOM-style) + ally assists (Zero Company-style: free follow-up shot, covering fire, hand off an AP). Troopers stronger; every starting power a bit better. Combat chains (kill → bonus action, combo follow-ups). Enemies get 3 AP too; retune so bot bands still hold |
+| S Story chains | `data-story.js`, `story*.js`, `data-saga.js`, `saga.js`, `data-battle.js`, `battle.js`, `battle-ui.js`, `tests/saga.test.js`, `tests/variety.test.js` | Story chains: events that lead into follow-up events and missions across months (Era 1 first). In-battle twists that chain: one beat triggers the next (reinforcements → collapse → new objective) |
