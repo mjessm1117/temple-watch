@@ -20,15 +20,24 @@ check(!st.sig.length,'SIG for unknown missions: '+st.sig);
   const hp=u.hp;S.grid[3][8]='l';moveAlong(u,[{x:8,y:3}]);if(u.hp!==hp-TILES.l.hurt)bad.push('lava hp '+hp+'→'+u.hp);
   S.grid[5][1]='m';S.grid[4][1]='.';S.grid[6][1]='.';u.x=1;u.y=6;u.mob=5;const R=reach(u);if(R.d['1,4']!=null&&R.prev['1,4']==='1,5')bad.push('walked through mud');
   S.turn=1;if(hzLive('n'))bad.push('conduit live on odd turn');S.turn=2;if(!hzLive('n'))bad.push('conduit dead on even turn');
+  // Wave 9: hazards as weapons + squad chains. A trooper pushed toward a chasm falls; one shoved onto mud is stuck; a live conduit costs a player an action.
+  startMission('relay',sq(),{twist:'none',hazards:false});S.bv.hz='caves';S.phase='player';const P=players(),A=P[0],B=P[1];for(const r of S.grid)for(let x=0;x<r.length;x++)r[x]='.';
+  const e=enemies().find(e=>!e.boss&&!isElite(e)&&e.status==='ok');S.units=S.units.filter(o=>o===A||o===B||o===e);
+  A.x=1;A.y=5;e.x=2;e.y=5;S.grid[5][4]='V';pushN(A,e,1,0,2);if(e.status!=='dead')bad.push('chasm push: '+e.status+' at '+e.x);
+  e.status='ok';e.hp=e.max;e.x=2;e.y=5;S.grid[5][4]='m';pushN(A,e,1,0,2);if(!e.rooted||e.x!==4)bad.push('mud push: rooted='+e.rooted+' x='+e.x);
+  S.turn=2;B.ap=2;S.grid[7][3]='n';B.x=2;B.y=7;moveAlong(B,[{x:3,y:7}]);if(B.ap!==1)bad.push('conduit ap '+B.ap);
+  e.status='ok';e.rooted=0;e.touch=null;B.hp=B.max;const o0=odds(B,e).total;chTouch(A,e);const L=odds(B,e).lines.find(l=>/Squad chain/.test(l[0]));if(!L||odds(B,e).total<=o0&&o0<95)bad.push('squad chain missing');
+  if(odds(A,e).lines.some(l=>/Squad chain/.test(l[0])))bad.push('chain counted own action');
   return{bad,n}})()`);w1.close();check(!hz.bad.length,'hazards: '+hz.bad.slice(0,5).join(', '));console.log(JSON.stringify({hazardMaps:hz.n}))}else w1.close()}
 check(!st.badTheme.length,'twist rolled off-theme: '+st.badTheme);
-const cases=[...st.tw.map(t=>[{sandstorm:'relay',blizzard:'ilum',blackout:'envoy',ionstorm:'rescue',collapse:'archive',ally:'escort'}[t]||'relay',t]),...st.story.map(id=>[id,'none'])];
+const TW_CH={cascade:1,manhunt:1};const cases=[...st.tw.map(t=>[{sandstorm:'relay',blizzard:'ilum',blackout:'envoy',ionstorm:'rescue',collapse:'archive',ally:'escort',cascade:'archive',manhunt:'rescue'}[t]||'relay',t]),...st.story.map(id=>[id,'none'])];
 (async()=>{for(const [id,tw] of cases){const r={id,tw,win:0,err:0,beats:0,picks:0};
  for(let g=0;g<N;g++){const w=new JSDOM(html,{runScripts:'dangerously'}).window;const errs=[];w.addEventListener('error',e=>errs.push(e.message));
   try{w.eval(bot);w.eval(`startMission('${id}',START_ROSTER.map((r,i)=>battleUnit({id:'u'+i,rank:1,xp:0,dark:0,picks:[],...r})),{diff:'normal',twist:'${tw}'})`);
    if(g===0){const ok=w.eval(`(()=>{const G=SIG[S.id];if(!G)return true;const b=S.bv;return !!((!G.pads||b.pad.at.length===G.pads.at.length)&&(!G.relic||b.relic)&&(!G.pylons||Object.keys(b.pyl).length===G.pylons.at.length)&&(!G.switches||b.sw.need===G.switches.at.length)&&(!G.wounded||b.wd.length===G.wounded.at.length)&&(!G.runner||b.run)&&(!G.keyholder||b.key)&&(!G.barrage||b.bar.uid!=null))})()`);check(ok,`${id}: signature setup incomplete`);
     check(w.eval(`S.bv.tw===${tw==='none'?'null':`'${tw}'`}`),`${id}: twist ${tw} not applied`)}
    for(let i=0;i<40&&!w.eval('S.over');i++){w.eval('AI()');await w.eval('endTurn()')}if(!w.eval('S.over'))errs.push('mission never ended');
+   if(TW_CH[tw]&&w.eval('S.turn')>=4)check(w.eval('!S.bv.ch||S.bv.ch.i>0'),`${id}: chain ${tw} never advanced`);
    check(!w.eval('S.bv.q.length')||w.eval('S.over'),`${id}: decision left open`);r.beats+=w.eval('(S.bv.hist||[]).length');r.picks+=w.eval("(S.bv.hist||[]).filter(t=>t[0]==='→').length")}catch(e){errs.push(e.stack)}
   if(errs.length){r.err++;console.log(id,tw,errs[0])}if(w.eval('S.win'))r.win++;w.close()}
  if(r.err)fail++;console.log(JSON.stringify(r))}

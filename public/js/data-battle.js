@@ -19,6 +19,27 @@ const TWISTS={
   desc:'The floor is failing. Each turn 2 tiles near your squad crack; next turn they fall away: 3 damage to anyone standing there, and the tile becomes a chasm.'},
  ally:{n:'Unexpected ally',ic:'soldier',themes:null,w:3,guest:1,hud:'+1 guest fighter',
   desc:'A friendly fighter joins the squad for this mission. You control them; they are not part of your roster and earn nothing.'}};
+// Chained twists (Chat S, wave 9): one beat sets up the next. Every beat is announced the turn BEFORE it lands (warn).
+// Link: at = turns after the previous link (first link: absolute turn) · warn {who,txt} + prep (runs with the warning) · do + txt (runs on the turn).
+// Engine keys (battle.js chDo): crackMark n (cracked tiles near the squad) · crackFall · pad {need,do,txt} (hold a pad n turn-starts) ·
+// officer {turns,win,lose} (an enemy runs to call help: kill it in time) · anything bvDo knows (reinforce, strafe, heal, foeAim…).
+Object.assign(TWISTS,{
+ cascade:{n:'Chain: landing → cave-in → uplink',ic:'tremor',themes:['city','dock','caves','ruins','temple'],w:3,crisisOnly:1,hud:'Chained events',
+  desc:'Three linked events, each announced a turn ahead: a dropship lands, the landing cracks the ground, and the cave-in opens an uplink you can hold for a gunship pass.',
+  chain:[
+   {at:2,warn:{who:'{cmd}',txt:'Engines overhead. A dropship lands next turn.'},prep:{reinforce:['trooper','trooper']},txt:'The dropship is down. Hostiles on the ground.'},
+   {at:2,warn:{who:'{jedi}',txt:'That landing shook the ground loose. The red tiles fall next turn. Move!'},prep:{crackMark:3},do:{crackFall:1},txt:'The ground gives way.'},
+   {at:0,do:{pad:{need:1,do:{strafe:2},txt:'Uplink held. Gunship inbound: strafing run!'}},txt:'The cave-in exposed an old uplink pad. Start a turn on it: one gunship pass.'}]},
+ manhunt:{n:'Chain: hunters → runner → payback',ic:'dash',themes:['plains','jungle','snow','ruins'],w:3,crisisOnly:1,hud:'Chained events',
+  desc:'Three linked events, each announced a turn ahead: hunters arrive, their officer runs to call the fleet, and what happens next depends on whether you stop him.',
+  chain:[
+   {at:2,warn:{who:'{cmd}',txt:'Hunters on your trail. Two more land next turn.'},prep:{reinforce:['trooper','heavy']},txt:'The hunters are here.'},
+   {at:1,warn:{who:'{cmd}',txt:'Their officer is breaking off to call the fleet. Kill or stun him within 3 turns.'},prep:{officer:{turns:3,
+     win:{strafe:2,intel:1},winTxt:'Officer down. Republic gunship is clear to strafe!',
+     lose:{reinforce:['trooper','trooper','heavy']},loseTxt:'The call went out. A full dropship is coming.'}},txt:'Stop the officer before he calls it in.'}]}});
+// Squad chains (Chat S, wave 9): each different squadmate who already acted on an enemy this turn adds a link against it.
+// Links give aim (per link, capped) and, from a ×dmgAt chain, +dmg. Pushing an enemy past an ally on Overwatch triggers the shot (a link).
+const CHAIN={aim:10,maxAim:20,dmgAt:3,dmg:1};  // dmgAt = chain size (×3 = third squadmate) that adds the damage
 // Guests: built with battleUnit() like a roster unit, but with no roster id (the campaign ignores them). By era.
 const GUESTS={
  rennick:{era:1,n:'Cpl. Dace Rennick',cls:'Soldier',rank:2,col:'#e0bd78',line:'Rennick, Republic Army. Got separated from my unit. Point me at something.'},
@@ -183,16 +204,25 @@ const SIDES={
 // ---- 5. Biome hazards (hazards.js): every mission scatters hazard patches by theme. Tiles: hurt (damage on entering and at the
 // start of each round), slide (keep sliding the way you moved, up to 3 tiles), stop (entering ends your move), block (no walking,
 // sight passes). pulse: only live on even turns. Pushing someone into a hazard counts as entering it.
+// Hazards (Chat S, wave 9): five kinds, one rule each, same for both sides. They are weapons too: Push, Pull or Throw
+// enemies into them. `kind` keys HZ_KIND; hurt = damage; linger = again each round you stand in it; pulse = live on even turns only.
+const HZ_KIND={
+ burn:{n:'Burn',ic:'tremor',rule:'Damage when you enter, and again at the start of every round you stand in it.',weapon:'Push an enemy in: it burns now and every round it stays.'},
+ shock:{n:'Shock',ic:'ion',rule:'Live on even turns only (a warning comes the turn before). Live: 2 damage; enemies lose their turn, your troops lose 1 action.',weapon:'Push an enemy onto a live conduit: 2 damage and it loses its next turn.'},
+ slow:{n:'Slow',ic:'dash',rule:'Your move ends when you step in. You can stop in it, never walk through.',weapon:'Push an enemy in: it is stuck, no moving on its next turn.'},
+ slide:{n:'Slide',ic:'smoke',rule:'Step on and you keep sliding the same way, up to 3 tiles, until something stops you.',weapon:'Push an enemy on: it slides on and takes 1 if it slams into something.'},
+ fall:{n:'Fall',ic:'charge',rule:'A drop. Nobody walks into it; sight and shots pass over.',weapon:'Push an enemy over the edge: troopers fall and are gone; elites and bosses take 4 and climb out.'}};
 Object.assign(BV_TILES,{
- i:{n:'Ice',desc:'Slick ice. Step onto it and you keep sliding the same way (up to 3 tiles) until something stops you.',cover:0,h:0,walk:1,slide:1,as:'ice'},
- o:{n:'Oil slick',desc:'Slick fuel. Step onto it and you keep sliding the same way (up to 3 tiles) until something stops you.',cover:0,h:0,walk:1,slide:1,as:'oil'},
- l:{n:'Lava',desc:'Molten rock: 2 damage when you step in or are pushed in, and again at the start of each round you stand in it.',cover:0,h:0,walk:1,hurt:2,linger:1,as:'lava'},
- n:{n:'Live conduit',desc:'Exposed power line. On even turns it is live: 1 damage to anyone stepping on or standing there.',cover:0,h:0,walk:1,hurt:1,linger:1,pulse:1,as:'cond'},
- u:{n:'Toxic pool',desc:'Corrosive runoff: 1 damage when you step in.',cover:0,h:0,walk:1,hurt:1,as:'tox'},
- m:{n:'Mud',desc:'Deep mud. Stepping in ends your move for this action.',cover:0,h:0,walk:1,stop:1,as:'mud'},
- w:{n:'Deep water',desc:'Too deep to wade. Nothing walks through it; sight and shots pass over.',cover:0,h:0,walk:0,as:'wat'},
- j:{n:'Thorn brake',desc:'Razor thorns: you stop there.',cover:0,h:0,walk:1,stop:1,as:'thorn'}});
-// Per theme: which hazards appear and how many patches (2–3 tiles each). Twist "Unstable ground" already covers falling floors.
+ i:{n:'Ice',kind:'slide',desc:'Slide: you keep sliding the same way, up to 3 tiles.',cover:0,h:0,walk:1,slide:1,as:'ice'},
+ o:{n:'Fuel slick',kind:'slide',desc:'Slide: you keep sliding the same way, up to 3 tiles.',cover:0,h:0,walk:1,slide:1,as:'oil'},
+ l:{n:'Lava',kind:'burn',desc:'Burn 2: on entry and each round you stay.',cover:0,h:0,walk:1,hurt:2,linger:1,as:'lava'},
+ n:{n:'Live conduit',kind:'shock',desc:'Shock: live on even turns. Live = 2 damage; enemies lose their turn, your troops lose 1 action.',cover:0,h:0,walk:1,hurt:2,linger:1,pulse:1,stun:1,as:'cond'},
+ u:{n:'Acid pool',kind:'burn',desc:'Burn 1: on entry and each round you stay.',cover:0,h:0,walk:1,hurt:1,linger:1,as:'tox'},
+ m:{n:'Mud',kind:'slow',desc:'Slow: your move ends here.',cover:0,h:0,walk:1,stop:1,as:'mud'},
+ w:{n:'Deep water',desc:'Blocks movement. Sight and shots pass over.',cover:0,h:0,walk:0,as:'wat'},
+ j:{n:'Thorn brake',kind:'slow',desc:'Slow + 1 damage: your move ends here.',cover:0,h:0,walk:1,stop:1,hurt:1,as:'thorn'}});
+BV_TILES.V.kind='fall';BV_TILES.V.desc='Fall: a drop. Nobody walks in; push enemies over the edge.';
+// Per theme: which hazards appear and how many patches (2–3 tiles each).
 const HAZARDS={
  snow:{tiles:['i','i','V'],patches:3,n:'Ice and crevasses'},
  caves:{tiles:['l','V','V'],patches:2,n:'Lava and chasms'},
@@ -200,8 +230,8 @@ const HAZARDS={
  city:{tiles:['n','o'],patches:2,n:'Live conduits and fuel slicks'},
  jungle:{tiles:['m','j','w'],patches:3,n:'Mud, thorns and deep water'},
  plains:{tiles:['m','w'],patches:3,n:'Mud and deep water'},
- ruins:{tiles:['u','u','V'],patches:2,n:'Toxic pools and sinkholes'},
- temple:{tiles:['u','V'],patches:2,n:'Toxic runoff and broken floors'}};
+ ruins:{tiles:['u','u','V'],patches:2,n:'Acid pools and sinkholes'},
+ temple:{tiles:['u','V'],patches:2,n:'Acid runoff and broken floors'}};
 
 // B2 Balance (wave 7, 2026-10-22): per-map TUNE overrides after armor pips, melee charge, graze, hack, wing buffs, spires.
 // Pass 2 pairs with DIFF enemyAim +5 (data.js). Loads after data-era2/era3, so these rows win. Target: weak test bot wins 55–70% on Normal (spec A). Measured with tests/balance.test.js.

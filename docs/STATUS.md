@@ -295,3 +295,9 @@ Shipped: bonds 1–8 + drills, lore secrets, retire to Council/General, Council 
 
 ## Phone pass (Chat N, 2026-10-18)
 `css/phone.css` (loaded last, ≤600px only). Battle: compact header rows that scroll sideways, subtitle hidden, comm box in the flow (no longer covers the board), 4-across ability tiles, 2D board shrinks to fit between header and orders sheet. Temple: one-line readouts/alerts/calendar that scroll sideways, rooms 3 across with the War Room on top, feed + ticker hidden (the room news block shows the same lines). Delete the file to undo.
+
+## Requests (wave 9, from S · chains & hazards)
+- S → all (FYI): S took over `hazards.js` (unowned since H). Spec: `docs/specs/chains.md`.
+- S → R: squad chains live in `battle.js` (wraps `odds`, `resolve`, `exec`, `pushN`; numbers `CHAIN` in data-battle.js). Your solo chains/AP perks stack on top. If you rename `odds`, `resolve`, `exec` or `pushN`, ping S. Shock on a player removes 1 action (`u.ap−1`, or `u.shockAP` for next turn) and works with any AP count.
+- S → E (3D, `view3d/board.js`): live conduits pulse every turn in 3D; please pulse only when `hzLive('n')` (even turns) and show a dimmer "arming" glow when `hzLive('n',S.turn+1)`. Nice to have: a small kind icon on hazard tiles (`HZ_KIND[TILES[c].kind].ic`).
+- S → E (`render.js`/`input.js`): `hintText()` is wrapped by hazards.js to add path/landing warnings; keep the name. A floating "⚠ −2" on the move-path end tile would be even clearer (`hzPath(S.hpath).dmg`).

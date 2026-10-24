@@ -7,7 +7,8 @@ function twCard(T,G,D){return `${D?`<div class="twcard side"><b>${icon('scan')} 
 const _bvSquad=squadScreen;squadScreen=function(i,keep){_bvSquad(i,keep);try{const o=C.options[i],M=MISSIONS[o.mission],box=document.querySelector('#modal .box');if(!box||box.querySelector('.twcard'))return;
  const p=[...box.querySelectorAll(':scope > p')].find(p=>!p.classList.contains('muted'))||box.querySelector('h2');p.insertAdjacentHTML('afterend',twCard(TWISTS[twistFor(o)],SIG[o.mission],SIDES[sideFor(o)]))}catch(e){}};
 function bvHud(){const b=S.bv,T=TWISTS[b.tw],sg=sigStat(),rows=[];
- if(T)rows.push(`<div class="orow tw" title="${T.desc}"><span>${icon(T.ic)} ${T.n}</span><b>${T.hud}</b></div>`);
+ if(T)rows.push(`<div class="orow tw${b.ch&&b.ch.warned||b.cho&&!b.cho.done?' hot':''}" title="${T.desc}"><span>${icon(T.ic)} ${T.n}</span><b>${T.chain?chStat():T.hud}</b></div>`);
+ if(S.phase==='player')rows.push(`<div class="orow chain" title="Squad chain: hit an enemy that other squadmates already acted on this turn (shot, Push, Stun, Mark…). Each one before you: +${CHAIN.aim} aim (max +${CHAIN.maxAim}); a ×${CHAIN.dmgAt} chain also does +${CHAIN.dmg} damage. Push an enemy past a squadmate on Overwatch and they take the shot."><span>${icon('mark')} Squad chain</span><b>${b.chainBest>=2?'best ×'+b.chainBest+' this turn':'none yet'}</b></div>`);
  if(sg)rows.push(`<div class="orow sig" title="${sg.desc}"><span>${icon('mark')} ${sg.n}</span><b>${sg.v}</b></div><p class="ocall">${sg.desc}</p>`);
  const sd=sideStat();if(sd)rows.push(`<div class="orow side${sd.v.includes('✗')?' hot':''}" title="${sd.desc}"><span>${icon('scan')} ${sd.n}</span><b>${sd.v}</b></div>`);
  if(b.locks&&!sg)rows.push(`<div class="orow"><span>Locks</span><b>${b.locks}</b></div>`);

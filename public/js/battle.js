@@ -15,7 +15,7 @@ const floorNear=(p,r=3,ok=c=>c==='.')=>tilesWhere((c,x,y)=>ok(c)&&!unitAt(x,y)).
 function bvPlace(ch,at){const [x,y]=at;let p=tile(x,y)==='.'&&!unitAt(x,y)?{x,y}:floorNear(at,4)[0];if(!p)return null;S.grid[p.y][p.x]=ch;return p}
 
 // ---- Twist roll: weighted, filtered by mission theme. Kept on the crisis option so the briefing and the fight agree.
-function rollTwist(id){const B=MISSIONS[id],th=(B&&B.theme)||THEME_OF[id]||'plains',L=Object.entries(TWISTS).filter(([k,t])=>!t.themes||t.themes.includes(th));
+function rollTwist(id){const B=MISSIONS[id],th=(B&&B.theme)||THEME_OF[id]||'plains',L=Object.entries(TWISTS).filter(([k,t])=>(!t.themes||t.themes.includes(th))&&!(t.crisisOnly&&B&&(B.story||B.eraBoss)));
  const tot=L.reduce((s,[,t])=>s+t.w,0);let r=Math.random()*tot;for(const [k,t] of L)if((r-=t.w)<0)return k;return 'ally'}
 function twistFor(o){if(!o)return null;if(!o.twist||!TWISTS[o.twist])o.twist=rollTwist(o.mission);return o.twist}
 function rollSide(id){const B=MISSIONS[id];if(!B||B.story)return null;const L=Object.keys(SIDES).filter(k=>!SIDES[k].types||SIDES[k].types.includes(B.type));return pickOne(L)}
@@ -29,6 +29,7 @@ startMission=function(id,sq,o={}){const tw=o.twist||BV_NEXT||rollTwist(id),sd=o.
  bvFire('twist');bvFire('turn',{n:1});render();saveGame()};
 function bvSetup(){const T=TWISTS[S.bv.tw]||{},G=SIG[S.bv.sig]||{},b=S.bv;
  if(T.range)for(const u of S.units)bvRange(u);
+ if(T.chain)b.ch={i:0,at:T.chain[0].at,warned:0};
  // Ion storm swaps rank-and-file for war droids (same head count), so it changes the fight without making it bigger.
  if(T.droids){const G=enemies().filter(e=>!e.boss&&!e.key&&!e.envoy&&!e.horror&&!e.vip&&!isElite(e)&&!e.force).sort(()=>Math.random()-.5);
   for(const o of G.slice(0,T.droids)){const e=mkFoe('wardroid',o.x,o.y);e.pod=o.pod;e.lead=o.lead;S.units[S.units.indexOf(o)]=e}}
@@ -62,7 +63,7 @@ const _bvLos=los;los=function(a,b){if(S&&S.bv&&S.bv.tw){const v=(TWISTS[S.bv.tw]
 
 // ---- Turn flow
 const _bvSPT=startPlayerTurn;
-startPlayerTurn=function(){if(S.bv&&S.bv.mobB){for(const u of players())if(u.mobB){u.mob-=u.mobB;u.mobB=0}S.bv.mobB=0}
+startPlayerTurn=function(){if(S.bv){S.bv.chainBest=0;for(const u of S.units)u.touch=null}if(S.bv&&S.bv.mobB){for(const u of players())if(u.mobB){u.mob-=u.mobB;u.mobB=0}S.bv.mobB=0}
  _bvSPT();if(!bvOn()||S.phase!=='player')return;const b=S.bv,T=TWISTS[b.tw]||{},G=SIG[b.sig]||{};
  if(T.ionStun){for(const u of S.units.filter(u=>alive(u)&&!u.vip))u.shield=0;
   for(const e of S.units.filter(u=>alive(u)&&u.status==='ok'&&tagsOf(u).includes('droid')))if(rnd(T.ionStun)){e.status='stunned';fx(e,'ION','defl');log(`${e.n} shorts out in the ion storm.`,e.side==='e'?'good':'bad')}}
@@ -71,6 +72,7 @@ startPlayerTurn=function(){if(S.bv&&S.bv.mobB){for(const u of players())if(u.mob
  if(b.bombs)bvBombs(G.bombs);
  if(b.sp)bvSpread(G.spread);
  if(b.bar)bvBarrage(G.barrage);
+ if(b.ch||b.chp||b.cho)chTick();
  if(S.over)return;
  bvFire('turn',{n:S.turn});bvFire('threat',{n:S.threat});checkEnd();render()};
 const _bvEnd=endTurn;endTurn=async function(){if(S&&S.bv&&S.bv.q.length&&!S.over){render();return}return _bvEnd()};
@@ -85,6 +87,7 @@ function bvWatch(){const b=S.bv;
  if(b.key&&!b.key.done){const e=byId(b.key.uid);if(!e||!alive(e)){b.key.done=1;unlock(null);S.threat=Math.max(0,S.threat-1);fx(e||{x:5,y:3},'KEY','heal');log('The jailer\'s key opens the cell. Threat −1.','good');bvFire('keyTaken')}}
  if(b.bar&&b.bar.uid!=null){const e=byId(b.bar.uid);if(!e||!alive(e)||e.status!=='ok'&&e.status!=='stunned'){b.bar.uid=null;b.bar.zones=[];log('The spotter is down. The guns go blind.','good');bvFire('spotterDown')}}
  if(b.run&&b.run.on!==2){const e=byId(b.run.uid);if(e&&alive(e)&&e.status==='ok'&&!b.run.on&&(S.turn>=SIG[b.sig].runner.start||sqd().some(p=>dist(p,e)<=4&&los(p,e)))){b.run.on=1;e.ow=false;bvFire('runner')}}
+ if(b.cho&&!b.cho.done){const e=byId(b.cho.uid);if(!e||!alive(e)||['captured','surrender'].includes(e.status))chOfficer(1)}
  if(S.type==='defend'&&S.obj*2<=S.M.obj)bvFire('objHalf')}
 
 // ---- Beats
@@ -146,9 +149,10 @@ function bvDo(d,c={}){const b=S.bv,ok=sqd(),J=ok.filter(u=>u.jedi),E=()=>enemies
   case 'free':unlock(null);break}}
 
 // ---- Twist: unstable ground. Last turn's cracks fall; new ones open near the squad. Never cuts the squad off from evac.
-function bvCrack(n){const b=S.bv;for(const p of tilesWhere(c=>c==='z')){S.grid[p.y][p.x]='V';fx(p,'COLLAPSE','boom');const u=unitAt(p.x,p.y);
-  if(u){if(u.status==='ok')damage(u,3,null);const to=floorNear(p,2,c=>PASS(c))[0];if(to){u.x=to.x;u.y=to.y}log(`The floor gives way under ${u.n}!`,'bad')}else log('A section of floor falls away.')}
- if(S.turn<2||tilesWhere(c=>c==='V').length>=10)return;
+function bvCrack(n){bvFall();bvCrackMark(n)}
+function bvFall(){for(const p of tilesWhere(c=>c==='z')){S.grid[p.y][p.x]='V';fx(p,'COLLAPSE','boom');const u=unitAt(p.x,p.y);
+  if(u){if(u.status==='ok')damage(u,3,null);const to=floorNear(p,2,c=>PASS(c))[0];if(to){u.x=to.x;u.y=to.y}log(`The floor gives way under ${u.n}!`,'bad')}else log('A section of floor falls away.')}}
+function bvCrackMark(n,any){if(!any&&(S.turn<2||tilesWhere(c=>c==='V').length>=10))return;
  const near=sqd();for(let i=0;i<n;i++){const C=tilesWhere((c,x,y)=>c==='.'&&near.some(u=>cheb(u,{x,y})<=3)).sort(()=>Math.random()-.5);
   const p=C.find(p=>bvSafeCut(p));if(!p)break;S.grid[p.y][p.x]='z';fx(p,'CRACK','dmg')}
  if(tilesWhere(c=>c==='z').length)log('The floor cracks. Those tiles fall next turn.','bad')}
@@ -222,6 +226,49 @@ Object.assign(AB,{
   tg:u=>allyT(u,p=>p.wounded&&p.status==='down'&&cheb(u,p)===1),run:(u,g)=>{const t=g.t;t.status='ok';t.hp=3;t.wounded=0;t.ap=0;t.stable=0;fx(t,'UP','heal');log(`${u.n} gets ${t.n} back on their feet.`,'good');bvFire('rouse')}},
  wreck:{name:'Wreck',ic:'strike',ap:1,ctx:1,tip:'Hack at an adjacent pylon or stone: 3 damage. 1 action.',desc:'3 damage to an adjacent pylon or ritual stone. 1 action.',tg:u=>adjTiles(u,'P').map(p=>({...p,chance:100})),
   run:(u,g)=>{log(`${u.n} hacks at the ${TILES.P.n.toLowerCase()}.`);hitPylon(g.x,g.y,3)}}});
+
+// ---- Chained twists (Chat S, wave 9): TWISTS[x].chain. Each link is announced the turn before it lands (see data-battle.js).
+function chSay(who,txt,c={}){const W=bvSub(who||'{cmd}',c),X=bvSub(txt,c);S.bv.comm={who:W,txt:X,turn:S.turn};log(`${W}: “${X}”`,'beat');bvHist(`T${S.turn} ${W}: ${X}`)}
+function chTick(){const b=S.bv,L=(TWISTS[b.tw]||{}).chain||[];
+ if(b.chp&&!b.chp.done&&sqd().some(u=>u.x===b.chp.x&&u.y===b.chp.y)){const p=b.chp;p.n++;fx(p,'HELD','heal');
+  if(p.n>=p.need){p.done=1;if(S.grid[p.y][p.x]==='U')S.grid[p.y][p.x]='.';chSay('{cmd}',p.txt);bvDo(p.do)}}
+ if(b.cho&&!b.cho.done){const e=byId(b.cho.uid);if(e&&e.status==='stunned'){b.cho.by++;log(`${e.n} is stunned: the call slips a turn.`,'good')}if(S.turn>=b.cho.by)chOfficer(0)}
+ while(b.ch&&b.ch.i<L.length){const k=L[b.ch.i];
+  if(!b.ch.warned&&k.warn&&S.turn===b.ch.at-1){b.ch.warned=1;if(k.prep)chDo(k.prep);chSay(k.warn.who,k.warn.txt,{unit:b.cho&&b.cho.uid})}
+  if(S.turn<b.ch.at)break;
+  if(!b.ch.warned&&k.prep)chDo(k.prep);if(k.do)chDo(k.do);if(k.txt)chSay('{cmd}',k.txt);b.ch.i++;
+  const n=L[b.ch.i];if(!n){b.ch=null;break}b.ch.at=S.turn+n.at;b.ch.warned=0}}
+function chDo(d){const b=S.bv,rest={};
+ for(const [k,v] of Object.entries(d||{})){
+  if(k==='crackMark')bvCrackMark(v,1);else if(k==='crackFall')bvFall();
+  else if(k==='pad'){const Q=sqd(),cx=Math.round(Q.reduce((s,u)=>s+u.x,0)/(Q.length||1)),cy=Math.round(Q.reduce((s,u)=>s+u.y,0)/(Q.length||1));
+   const p=pickOne(tilesWhere((c,x,y)=>c==='.'&&!unitAt(x,y)&&cheb({x,y},{x:cx,y:cy})>=2&&cheb({x,y},{x:cx,y:cy})<=4))||floorNear([cx,cy],5)[0];
+   if(p){S.grid[p.y][p.x]='U';b.chp={x:p.x,y:p.y,need:v.need||1,n:0,do:v.do,txt:v.txt};fx(p,'UPLINK','heal')}}
+  else if(k==='officer'){const Q=sqd(),E=enemies().filter(e=>e.status==='ok'&&!e.boss&&!e.key&&!e.vip&&!e.horror&&!e.hid);
+   const e=E.sort((a,c)=>Math.min(...Q.map(u=>dist(u,c)))-Math.min(...Q.map(u=>dist(u,a))))[0];
+   if(e){e.officer=1;e.noCap=0;e.n='Officer '+e.n.replace(/ \d+$/,'');fx(e,'OFFICER','dmg');b.cho={uid:e.uid,by:S.turn+v.turns,win:v.win,lose:v.lose,winTxt:v.winTxt,loseTxt:v.loseTxt}}}
+  else rest[k]=v}
+ if(Object.keys(rest).length)bvDo(rest)}
+function chOfficer(won){const o=S.bv.cho;if(!o||o.done)return;o.done=1;chSay('{cmd}',won?o.winTxt:o.loseTxt);bvDo(won?o.win:o.lose)}
+function chStat(){const b=S.bv,L=(TWISTS[b.tw]||{}).chain;if(!L)return null;
+ if(b.cho&&!b.cho.done){const e=byId(b.cho.uid);return `Stop ${e?e.n:'the officer'}: ${Math.max(0,b.cho.by-S.turn)} turn${b.cho.by-S.turn===1?'':'s'}`}
+ if(b.chp&&!b.chp.done)return 'Hold the uplink pad (U)';
+ if(b.ch){const k=L[b.ch.i];return b.ch.warned?'Incoming next turn':`Next event: turn ${b.ch.at}`}return 'All events done'}
+
+// ---- Squad chains (Chat S, wave 9). Every squadmate who acts on an enemy is noted on it (u.touch, cleared each player turn).
+// Attacking an enemy that OTHER squadmates already acted on this turn adds links: +CHAIN.aim each (max CHAIN.maxAim), +CHAIN.dmg from CHAIN.dmgAt.
+const chLinks=(a,t)=>a&&t&&a.side==='p'&&t.side==='e'&&S&&S.phase==='player'&&t.touch?t.touch.filter(id=>id!==a.uid).length:0;
+const chTouch=(u,t)=>{if(!u||!t||u.side!=='p'||t.side!=='e'||!S||S.phase!=='player')return;t.touch=t.touch||[];if(!t.touch.includes(u.uid))t.touch.push(u.uid)};
+const _chOdds=odds;odds=function(a,t,o){const r=_chOdds(a,t,o),n=chLinks(a,t);if(!n)return r;const v=Math.min(CHAIN.maxAim,n*CHAIN.aim);
+ r.lines.push([`Squad chain ×${n+1}`,v]);r.total=Math.max(5,Math.min(95,r.total+v));return r};
+const _chRes=resolve;resolve=function(a,t,chance,dr,opt){const n=chLinks(a,t);if(n&&n+1>=CHAIN.dmgAt)dr=[dr[0]+CHAIN.dmg,dr[1]+CHAIN.dmg];
+ const hit=_chRes(a,t,chance,dr,opt);
+ if(n&&hit&&S.bv){const k=n+1;fx(t,`CHAIN ×${k}`,'heal');log(`Squad chain ×${k}: ${a.n} follows up on ${t.n}.`,'good');S.bv.chainBest=Math.max(S.bv.chainBest||0,k)}
+ chTouch(a,t);return hit};
+const _chExec=exec;exec=function(u,k,g){const r=_chExec(u,k,g);if(g&&g.t)chTouch(u,g.t);return r};
+// Shoved past a squadmate on Overwatch: they take the shot (counts as a link).
+const _chPush=pushN;pushN=function(u,t,dx,dy,n){const x0=t.x,y0=t.y;_chPush(u,t,dx,dy,n);
+ if(u&&u.side==='p'&&t.side==='e'&&alive(t)&&t.status==='ok'&&(t.x!==x0||t.y!==y0))for(const o of players().filter(o=>o!==u&&o.ow&&o.status==='ok')){if(t.status!=='ok')break;if(reactOne(o,t))log(`${o.n} catches ${t.n} in the open.`,'good')}};
 
 // ---- Results: signature rewards and flags on a win.
 function sigStat(){const b=S.bv,G=SIG[b&&b.sig];if(!G)return null;let v='';
