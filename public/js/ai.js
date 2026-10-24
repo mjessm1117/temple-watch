@@ -15,7 +15,7 @@ function eAttacks(e,pos){const a={...e,x:pos.x,y:pos.y},out=[];
  if(e.sithLord&&!e.disarmed&&!(e.pushT>=S.turn-1))for(const p of eTargets(e))if(cheb(pos,p)>1&&dist(pos,p)<=4&&los(pos,p)&&inCover(p))out.push({kind:'fpush',t:p,chance:90,dmg:[2,2],score:55+(p.hunker||p.guard||p.ow?20:0)+(N4.some(([dx,dy])=>FULL(tile(p.x+dx,p.y+dy)))?30:0)});
  // Focus fire: wounded targets and ones a squadmate already shot this turn score higher.
  for(const o of out){if(o.kind==='fpush')continue;let s=o.chance;if((o.dmg[0]+o.dmg[1])/2>=o.t.hp)s+=25;s+=Math.round((1-o.t.hp/o.t.max)*20);if((S.focusT||[]).includes(o.t.uid))s+=10;
-  if(o.kind==='shot'&&flanked(o.t,pos))s+=10;if(o.t.vip)s+=20;
+  if(o.kind==='shot'&&flanked(o.t,pos))s+=10;if(o.t.vip)s+=20;if(o.t.taunt===S.turn)s+=40;
   if(o.t.jedi){if(e.force||e.horror)s+=20;else if(o.kind==='shot')s-=(o.t.guard?o.t.guardDef:o.t.deflect)*.6}o.score=s}
  if(S.type==='defend'&&e.range>=2&&!e.disarmed){const c=nearestConsole(pos);if(dist(pos,c)<=e.range&&los(pos,c))out.push({kind:'console',c,chance:e.aim-15,dmg:e.dmg,score:34})}
  if(e.nades>0&&!e.disarmed){const g=bestBlast(e,pos);if(g&&g.score>=70)out.push(g)}
@@ -71,14 +71,26 @@ async function eAct0(e){
  // An enemy beside an idle alarm beacon trips it once the squad is in sight: reinforcements in 2 turns unless it is wrecked.
  if(!S.beacon&&!S.beaconUsed&&!e.hid){const b=tilesWhere((c,x,y)=>c==='b'&&cheb(e,{x,y})===1)[0];
   if(b&&players().some(p=>p.status==='ok'&&dist(p,e)<=9&&los(p,e))){S.beacon={x:b.x,y:b.y,turn:S.turn+2};S.beaconUsed=1;S.peek=e;fx(b,'ALARM','dmg');log(`${e.n} trips an alarm beacon! Help arrives in 2 turns unless you wreck it.`,'bad');render();await sleep(500);return}}
- S.peek=e.hid?null:e;let a=eAttacks(e,e);
- if(a&&a.score>=65)await eDo(e,a);
- else{const R=reach(e);let best=null,bs=-1e9;
-  for(const k of Object.keys(R.d)){const [x,y]=k.split(',').map(Number),s=tileScore(e,{x,y});if(s>bs){bs=s;best={x,y}}}
-  if(best&&(best.x!==e.x||best.y!==e.y)){moveAlong(e,pathTo(e,best.x,best.y,R.prev));render();await sleep(380)}
-  if(e.status==='ok'&&!S.over){a=eAttacks(e,e);if(a&&a.score>=15)await eDo(e,a)}}
+ S.peek=e.hid?null:e;await eTurn(e);
  if(e.horror&&e.status==='ok'){const j=S.units.find(u=>u.side==='p'&&u.jedi&&u.status==='down'&&!u.stable&&S.turn>u.downT&&cheb(u,e)===1);
   if(j){j.status='dead';j.consumed=1;fx(j,'TAKEN','dmg');log(`${e.n} drags ${j.n} into the dark. ${j.n} is gone.`,'bad');allyFell(j,30,`${j.n} taken by the beast`)}}}
+// ---- 3 AP (Chat R, wave 9): every enemy spends AP.max. A move is 1 AP (one full move); attacks cost by weapon
+// (melee, lightning, Force push 1; guns and grenades 2). A strong shot (65+) is taken from where it stands; otherwise it moves
+// (up to 2 moves) and attacks. 1-AP fighters may attack twice (AP.eAttacks). A gunner with AP left over after firing, standing
+// in the open, slips back into cover.
+const eCost=(e,a)=>a.kind==='melee'||a.kind==='lightning'||a.kind==='fpush'?1:a.kind==='nade'?2:e.range<2?1:AP.gunDef;
+async function eMove(e){const R=reach(e);let best=null,bs=-1e9;
+ for(const k of Object.keys(R.d)){const [x,y]=k.split(',').map(Number),s=tileScore(e,{x,y});if(s>bs){bs=s;best={x,y}}}
+ if(!best||best.x===e.x&&best.y===e.y)return false;moveAlong(e,pathTo(e,best.x,best.y,R.prev));render();await sleep(380);return true}
+const eOpen=e=>players().some(p=>p.status==='ok'&&!p.vip&&p.range>=2&&dist(p,e)<=p.range&&los(p,e)&&coverVal(e,p)<20);
+async function eTurn(e){let ap=AP.max,n=0,mv=0,a=eAttacks(e,e);const go=async a=>{await eDo(e,a);ap-=eCost(e,a);n++};
+ if(a&&a.score>=65)await go(a);
+ while(ap>0&&e.status==='ok'&&!S.over){
+  if(!n){if(mv>=2||!await eMove(e))break;mv++;ap--;if(e.status!=='ok'||S.over)break;a=eAttacks(e,e);if(a&&a.score>=15&&eCost(e,a)<=ap)await go(a);continue}
+  if(n>=AP.eAttacks)break;a=eAttacks(e,e);if(a&&a.score>=40&&eCost(e,a)<=ap){await go(a);continue}break}
+ if(ap>0&&n&&e.range>=2&&e.status==='ok'&&!S.over&&!e.horror&&eOpen(e)){const R=reach(e);let best=null,bs=-1e9;
+  for(const k of Object.keys(R.d)){const [x,y]=k.split(',').map(Number),sc=scamperScore(e,{x,y});if(sc>bs){bs=sc;best={x,y}}}
+  if(best&&(best.x!==e.x||best.y!==e.y)){moveAlong(e,pathTo(e,best.x,best.y,R.prev));log(`${e.n} ducks back into cover.`);render();await sleep(380)}}}
 // What this enemy would do right now, for the intent preview (spec D §5). Can change once you move.
 function intentOf(e){if(e.bane&&!players().some(p=>p.status==='ok'&&cheb(p,e)<=1))return{txt:`Watching from the ridge. Leaves on turn ${BANE.leaves}`};
  if(e.nexus)return{txt:`Spawns a Sith Spawn every ${e.nexus} turns`};

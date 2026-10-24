@@ -95,11 +95,11 @@ function addDark(u,n){const b=u.dark;u.dark=Math.max(0,Math.min(10,u.dark+n));
 function damage(t,d,src){
  if(src&&src.horror&&!t.jedi){fx(t,'IMMUNE');log(`${src.n} ignores ${t.n}. It hunts only the Force.`);return}
  // Armor pips (Jess 2026-10-19): each attack that lands is cut by 1 and strips 1 pip. Hazards ignore armor.
- if(t.armor>0&&src){t.armorMax=Math.max(t.armorMax||0,t.armor);d=Math.max(1,d-1);t.armor--;fx(t,t.armor?'ARMOR −1':'ARMOR BROKEN','defl');if(!t.armor)log(`${t.n}'s armor breaks.`)}
+ if(t.armor>0&&src){t.armorMax=Math.max(t.armorMax||0,t.armor);d=Math.max(1,d-(src.pierce?0:1));t.armor--;fx(t,t.armor?'ARMOR −1':'ARMOR BROKEN','defl');if(!t.armor)log(`${t.n}'s armor breaks.`)}
  // Thought Shield (Sith Lords): Force powers do half damage.
  if(S.forceAct&&t.sithLord&&src&&src.side==='p'){d=Math.ceil(d/2);fx(t,'SHIELDED','defl');log(`${t.n}'s Thought Shield blunts the Force.`)}
  if(t.shield>0){const a=Math.min(t.shield,d);t.shield-=a;d-=a;fx(t,'SHIELD','defl');log(`${t.n}'s shield soaks ${a}.`);if(!d)return}
- const wasSurr=t.status==='surrender';t.hp-=d;fx(t,'-'+d,'dmg');if(t.side==='p')t.hurt=1;
+ const wasSurr=t.status==='surrender';t.hp-=d;fx(t,'-'+d,'dmg');if(t.side==='e'&&src&&src.side==='p')S.mom=Math.min(AP.mom.max,(S.mom||0)+1+(t.hp<=0?1:0));if(t.side==='p')t.hurt=1;
  if(S.bmed===t.uid){S.bmed=null;log(`${t.n}'s Battle Meditation breaks.`)}
  if(t.hp<=0){t.hp=0;
   if(t.side==='p'){t.status='down';t.bleed=S.d.bleed;t.stable=0;t.downed=1;t.downT=S.turn;t.guard=t.ow=t.hunker=false;t.supT=null;t.panic=null;log(`${t.n} is down. Bleeding out in ${t.bleed} turns.`,'bad');if(!t.vip)allyFell(t,15,`${t.n} going down`)}
@@ -153,7 +153,7 @@ function push(u,t){const dx=Math.sign(t.x-u.x),dy=Math.sign(t.y-u.y),e0=uEl(t);p
  const drop=e0-uEl(t);if(drop>0&&alive(t)&&t.hp>0){log(`${t.n} falls ${drop} level${drop>1?'s':''}.`);damage(t,drop,u)}}
 function pushN(u,t,dx,dy,n){
  for(let i=0;i<n;i++){const nx=t.x+dx,ny=t.y+dy,c=tile(nx,ny),o=inb(nx,ny)&&unitAt(nx,ny);
-  if(!inb(nx,ny)||!PASS(c)||o||elevAt(nx,ny)-uEl(t)>1){log(`${t.n} slams into ${o?o.n:TILES[c]&&inb(nx,ny)?'a '+TILES[c].n.toLowerCase():'a wall'}.`);if(inb(nx,ny)&&TILES[c].breaks)degrade(nx,ny);damage(t,2,u);if(o&&o.side==='e'&&alive(o))damage(o,1,u);if(c==='x')explodeBarrel(nx,ny,u);return}
+  if(!inb(nx,ny)||!PASS(c)||o||elevAt(nx,ny)-uEl(t)>1){log(`${t.n} slams into ${o?o.n:TILES[c]&&inb(nx,ny)?'a '+TILES[c].n.toLowerCase():'a wall'}.`);if(inb(nx,ny)&&TILES[c].breaks)degrade(nx,ny);damage(t,u.side==='p'?3:2,u);if(o&&o.side==='e'&&alive(o))damage(o,1,u);if(c==='x')explodeBarrel(nx,ny,u);return}
   t.x=nx;t.y=ny}log(`${u.n} hurls ${t.n} back.`)}
 // Locked doors open everywhere at once (one security system per map). Frees a bound hostage.
 function unlock(u){for(const p of tilesWhere(c=>c==='D'))S.grid[p.y][p.x]='_';const h=hostage();

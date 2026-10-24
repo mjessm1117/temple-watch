@@ -1,7 +1,7 @@
 // Test bot, injected into the game page. One-ply greedy: objective first, then rescue allies, then the best attack, else advance or hold.
 window.AI=function(){while(S.bv&&S.bv.q&&S.bv.q.length&&!S.over)bvPick(Math.random()<.5?0:1);if(S.conc&&stealthTurn())return;for(let n=0;n<24;n++){const u=players().find(canAct);if(!u||S.over)break;S.sel=u;act(u)}};
-function pick(u,k){if(!u.abil.includes(k))return null;const ab=AB[k];if(ab.passive||(ab.f&&u.focus<ab.f)||(ab.avail&&ab.avail(u)))return null;
- if(ab.instant)return[k,null];const t=targetsFor(u,k).sort((a,b)=>(b.chance||0)-(a.chance||0))[0];return t?[k,t]:null}
+function pick(u,k){if(!u.abil.includes(k))return null;const ab=AB[k];if(ab.passive||(ab.f&&u.focus<ab.f)||(ab.avail&&ab.avail(u))||!apOk(u,k))return null;
+ if(ab.instant)return[k,null];const t=targetsFor(u,k).filter(g=>apOk(u,k,g)).sort((a,b)=>(b.chance||0)-(a.chance||0))[0];return t?[k,t]:null}
 function goalFor(u){u.stay=0;if(window.mapGoal){const g=mapGoal(u);if(g!==undefined){if(g&&g.x===u.x&&g.y===u.y){u.stay=1;return null}if(g)return g}}if(window.sigGoal){const g=sigGoal(u);if(g!==undefined){if(g&&g.x===u.x&&g.y===u.y){u.stay=1;return null}if(g)return g}}
  if(u.vip)return S.grid.flatMap((r,y)=>r.map((c,x)=>c==='E'?{x,y}:null)).filter(Boolean).sort((a,b)=>dist(u,a)-dist(u,b))[0];
  if(S.type==='investigate'){if(S.clues>=2)return goalFor({...u,vip:1});const q=tilesWhere(c=>c==='q').sort((a,b)=>dist(u,a)-dist(u,b))[0];
@@ -15,9 +15,12 @@ function moveToward(u,g,near=0){const R=reach(u);let best=null,bd=dist(u,g)-.5;
  for(const k of Object.keys(R.d)){const [x,y]=k.split(',').map(Number),t=TILES[tile(x,y)]||{},d=dist({x,y},g)-(inCover({x,y})?.4:0)+(t.hurt?2:0)+(t.slide?.6:0);if(R.d[k]>0&&d<bd){bd=d;best={x,y}}}
  if(!best)return false;moveAlong(u,pathTo(u,best.x,best.y,R.prev));u.ap--;after();return true}
 function act(u){const go=c=>{exec(u,c[0],c[1]);return true};
+ // Wave 9 assists: free Backup on the best target, Fire Support on 2+ foes, Surge when it lets this unit attack again.
+ {const b=pick(u,'backup');if(b&&b[1].chance>=50)return go(b);const f=targetsFor(u,'moStrike').map(g=>({g,n:enemies().filter(e=>e.status==='ok'&&!e.hid&&cheb(e,g)<=1).length,m:players().filter(p=>cheb(p,g)<=1).length})).filter(o=>o.n>=2&&!o.m).sort((a,b)=>b.n-a.n)[0];if(f)return go(['moStrike',f.g]);
+  if(u.ap<wpnAP(u)&&!u.vip){const s=pick(u,'moSurge');if(s)return go(s)}}
  for(const k of ['hack','console','scan','plant','door','defuse','light','rouse','wreck'])if(pick(u,k))return go(pick(u,k));
  let c=pick(u,'forceRevive')||pick(u,'stabilize');if(!c&&u.abil.includes('heal')){const d=pick(u,'heal');if(d&&d[1].t.status==='down')c=d}if(c)return go(c);
- const dn=players().find(p=>p.status==='down'&&!p.stable&&!p.vip&&dist(u,p)<=u.mob+1);if(dn&&!u.vip&&u.ap===2&&cheb(u,dn)>1&&moveToward(u,dn))return true;
+ const dn=players().find(p=>p.status==='down'&&!p.stable&&!p.vip&&dist(u,p)<=u.mob+1);if(dn&&!u.vip&&u.ap>=2&&cheb(u,dn)>1&&moveToward(u,dn))return true;
  const g=goalFor(u);if(g&&moveToward(u,g))return true;
  if(S.type==='sabotage'&&!u.vip&&tile(u.x,u.y)==='E'&&tilesWhere(c=>c==='X').length>=S.M.need){const s=pick(u,'shoot');return go(s&&s[1].t&&s[1].chance>=45?s:[u.jedi?'guard':'overwatch',null])}
  if(u.vip){u.ap=0;return after()}
@@ -28,11 +31,11 @@ function act(u){const go=c=>{exec(u,c[0],c[1]);return true};
  if(!c&&u.nades){const gs=targetsFor(u,'grenade').map(g=>({g,n:enemies().filter(e=>e.status==='ok'&&!e.hid&&cheb(e,g)<=1).length,m:players().filter(p=>cheb(p,g)<=1).length})).filter(o=>o.n>=2&&!o.m);if(gs.length)c=['grenade',gs[0].g]}
  if(!c&&!u.vip&&peekMove(u))return true;
  if(c)return go(kitUp(u,c));
- if(S.type!=='defend'&&u.ap===2&&!u.stay){const e=enemies().filter(e=>!e.hid&&e.status==='ok').sort((a,b)=>dist(u,a)-dist(u,b))[0];if(e&&dist(u,e)>(u.range<2?1.5:u.range*.6)&&moveToward(u,e))return true}
+ if(S.type!=='defend'&&u.ap>wpnAP(u)&&!u.stay){const e=enemies().filter(e=>!e.hid&&e.status==='ok').sort((a,b)=>dist(u,a)-dist(u,b))[0];if(e&&dist(u,e)>(u.range<2?1.5:u.range*.6)&&moveToward(u,e))return true}
  return go([u.jedi?'guard':u.abil.includes('hunker')&&u.hp*2<=u.max?'hunker':'overwatch',null])}
 
 // Corner peek (M→K): with no 45%+ shot, step to the tile with the best shot — often a wall end beside full cover, where los() lets a unit lean out.
-function peekMove(u){if(u.range<2||!u.abil.includes('shoot')||u.ap<2||u.stay)return false;const R=reach(u),now=bestShot(u,u);let best=null,bs=-1e9;
+function peekMove(u){if(u.range<2||!u.abil.includes('shoot')||u.ap<=wpnAP(u)||u.stay)return false;const R=reach(u),now=bestShot(u,u);let best=null,bs=-1e9;
  for(const k of Object.keys(R.d)){if(!R.d[k])continue;const [x,y]=k.split(',').map(Number),p={x,y};if((TILES[tile(x,y)]||{}).hurt)continue;const h=bestShot(u,p);
   if(h<45||h<now+10)continue;const s=h+(inCover(p)?12:0)-R.d[k];if(s>bs){bs=s;best=p}}
  if(!best)return false;moveAlong(u,pathTo(u,best.x,best.y,R.prev));u.ap--;after();return true}
@@ -42,7 +45,7 @@ function kitSupport(u){const P=k=>pick(u,k);
  if(hurt(u,4)>=2){const c=P('massHeal')||(hurt(u,3)>=2&&P('medBeacon'));if(c)return c}
  for(const k of ['forceHeal','reviveStim']){const c=P(k);if(c&&c[1].t&&(c[1].t.status==='down'&&!c[1].t.stable||c[1].t.hp*2<=c[1].t.max))return c}
  if(foesNear(u,3.2)>=2){const c=P('stasisField')||(foesNear(u,2.9)>=2&&P('forceWave'));if(c)return c}
- for(const k of ['battleMed','mark']){const c=P(k);if(c&&(k!=='battleMed'||foesNear(u,6)>=2)&&u.ap===2)return c}
+ for(const k of ['battleMed','mark']){const c=P(k);if(c&&(k!=='battleMed'||foesNear(u,6)>=2)&&u.ap>=2)return c}
  return null}
 function kitUp(u,c){const [k,g]=c,t=g&&g.t;if(!t||!t.side||t.side!=='e')return c;const same=k2=>{const o=pick(u,k2);return o&&o[1].t===t?o:null};
  if(k==='strike'&&cheb(u,t)===1)return same('precisionStrike')||same('mightyBlow')||same('flurry')||c;

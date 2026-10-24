@@ -7,23 +7,23 @@ const enemyT=(u,r,ch,extra=()=>true)=>foesIn(u,t=>dist(u,t)<=r&&los(u,t)&&extra(
 function pierceTarget(u,t){const dx=t.x-u.x,dy=t.y-u.y;
  for(const p of line(t.x,t.y,t.x+dx*3,t.y+dy*3).slice(1)){if(dist(u,p)>5||FULL(tile(p.x,p.y)))break;const o=unitAt(p.x,p.y);if(o&&o.side==='e'&&!o.hid)return o}return null}
 const AB={
- shoot:{name:'Shoot',ic:'shoot',tip:'Fire your weapon. Ends turn. Barrels and alarm beacons in sight can be shot (always hits).',dm:u=>u.dmg,
+ shoot:{name:'Shoot',ic:'shoot',tip:'Fire your weapon (pistols 1 AP, rifles 2). Barrels and alarm beacons in sight can be shot (always hits).',dm:u=>u.dmg,
   tg:u=>[...foesIn(u,t=>dist(u,t)<=u.range&&seenFor(u,t)).map(t=>({t,chance:hitChance(u,t)})),...tilesWhere((c,x,y)=>(c==='x'||c==='b')&&dist(u,{x,y})<=u.range&&los(u,{x,y})).map(p=>({...p,[tile(p.x,p.y)==='x'?'barrel':'beacon']:1,chance:100}))],
   run:(u,g)=>g.barrel?(log(`${u.n} shoots the barrel.`),explodeBarrel(g.x,g.y,u)):g.beacon?(log(`${u.n} shoots the alarm beacon.`),hitBeacon(g.x,g.y,ri(u.dmg[0],u.dmg[1]))):resolve(u,g.t,g.chance,u.dmg)},
- strike:{name:'Strike',ic:'strike',melee:1,tip:'Dash in and cut. Ignores cover. Ends turn.',dm:u=>u.dmg,tg:u=>{const R=reach(u);return foesIn(u,()=>true).map(t=>{let spot=null;
-   if(cheb(u,t)===1)spot={path:[]};else{let best=99;for(const [k,dd] of Object.entries(R.d)){const [x,y]=k.split(',').map(Number);if(dd>0&&dd<best&&cheb({x,y},t)===1){best=dd;spot={x,y}}}if(spot)spot.path=pathTo(u,spot.x,spot.y,R.prev)}
+ strike:{name:'Strike',ic:'strike',melee:1,tip:'Cut an adjacent enemy (1 AP), or dash in and cut (2 AP). Ignores cover.',dm:u=>u.dmg,tg:u=>{const R=reach(u);return foesIn(u,()=>true).map(t=>{let spot=null;
+   if(cheb(u,t)===1)spot={path:[]};else if(!S||S.phase!=='player'||u.ap>=AP.melee+1){let best=99;for(const [k,dd] of Object.entries(R.d)){const [x,y]=k.split(',').map(Number);if(dd>0&&dd<best&&cheb({x,y},t)===1){best=dd;spot={x,y}}}if(spot)spot.path=pathTo(u,spot.x,spot.y,R.prev)}
    return spot?{t,chance:hitChance(u,t,{melee:true,mod:u.leapAim||0}),spot}:null}).filter(Boolean)},
   run:(u,g)=>{moveAlong(u,g.spot.path);if(u.status==='ok'&&alive(g.t)&&cheb(u,g.t)===1)resolve(u,g.t,g.chance,u.dmg,{melee:true,label:'strike'});u.leapAim=0}},
  guard:{name:'Guard',ic:'guard',tip:'Deflect more bolts and cut enemies who come close, until your next turn.',instant:1,run:u=>{u.guard=true;u.guardStruck=false;log(`${u.n} takes a Guard stance.`)}},
  overwatch:{name:'Overwatch',ic:'overwatch',tip:'Shoot the first enemy that moves in sight (−15 aim).',instant:1,run:u=>{u.ow=true;log(`${u.n} is on overwatch.`)}},
- push:{name:'Push',ic:'push',f:2,tip:'Shove an enemy 2 tiles, out of cover. Slamming into things deals 2.',tg:u=>enemyT(u,4,90),run:(u,g)=>{if(!rnd(90)){log(`${u.n}'s Push slips.`);return}push(u,g.t)}},
+ push:{name:'Push',ic:'push',f:2,tip:'Shove an enemy 2 tiles, out of cover. Slamming into things deals 3.',tg:u=>enemyT(u,4,100),run:(u,g)=>{if(!rnd(100)){log(`${u.n}'s Push slips.`);return}push(u,g.t)}},
  collapse:{name:'Collapse',loud:1,ic:'collapse',f:3,tip:'Bring down a wall. Enemies beside it take 4. It becomes rubble.',tg:u=>tilesWhere((c,x,y)=>'#Bh'.includes(c)&&dist(u,{x,y})<=5&&los(u,{x,y})),
   run:(u,g)=>{S.grid[g.y][g.x]='r';fx(g,'CRASH','boom');log(`${u.n} tears the wall down.`);for(const e of enemies().filter(e=>cheb(e,g)<=1))damage(e,4,u)}},
- choke:{name:'Choke',ic:'choke',f:2,dm:()=>[4,5],tip:'4–5 damage, ignores cover. Darkness +2.',tg:u=>enemyT(u,5,85),run:(u,g)=>{addDark(u,2);resolve(u,g.t,85,[4,5],{ignoreDeflect:1,label:'Force choke'})}},
- stun:{name:'Stun',ic:'stunned',f:2,tip:'Cloud an enemy’s mind. They lose their next turn and are easier to capture.',tg:u=>enemyT(u,5,75,t=>t.status==='ok'),run:(u,g)=>{if(rnd(75)){g.t.status='stunned';g.t.ow=false;fx(g.t,'STUN');log(`${g.t.n} is stunned.`,'good')}else log(`${g.t.n} resists the stun.`)}},
+ choke:{name:'Choke',ic:'choke',f:2,dm:()=>[5,6],tip:'5–6 damage, ignores cover. Darkness +2.',tg:u=>enemyT(u,5,90),run:(u,g)=>{addDark(u,2);resolve(u,g.t,90,[5,6],{ignoreDeflect:1,label:'Force choke'})}},
+ stun:{name:'Stun',ic:'stunned',f:2,tip:'Cloud an enemy’s mind. They lose their next turn and are easier to capture.',tg:u=>enemyT(u,5,85,t=>t.status==='ok'),run:(u,g)=>{if(rnd(85)){g.t.status='stunned';g.t.ow=false;fx(g.t,'STUN');log(`${g.t.n} is stunned.`,'good')}else log(`${g.t.n} resists the stun.`)}},
  subdue:{name:'Subdue',ic:'captured',tip:'Capture an adjacent enemy who is stunned, surrendered, or at half health. Gives intel.',tg:u=>foesIn(u,t=>cheb(u,t)===1&&!t.noCap&&(t.status!=='ok'||t.hp*2<=t.max)).map(t=>({t,chance:t.status==='ok'?60:85})),
   run:(u,g)=>{if(rnd(g.chance)){g.t.status='captured';S.intel++;u.caps=(u.caps||0)+1;if(g.t.envoy){S.envoyTaken=1;S.intel++;log(`${u.n} takes the envoy alive. +2 intel.`,'good')}else log(`${u.n} captures ${g.t.n}. +1 intel.`,'good')}else{log(`${g.t.n} breaks free.`);if(g.t.status==='surrender')g.t.status='ok'}}},
- meditate:{name:'Meditate',ic:'meditate',tip:'+2 Focus. Ends turn.',instant:1,avail:u=>u.focus>=u.maxF?'Focus full':null,run:u=>{u.focus=Math.min(u.maxF,u.focus+(u.wildBond?3:2));log(`${u.n} meditates.`)}},
+ meditate:{name:'Meditate',ic:'meditate',tip:'+2 Focus. 2 AP.',instant:1,avail:u=>u.focus>=u.maxF?'Focus full':null,run:u=>{u.focus=Math.min(u.maxF,u.focus+(u.wildBond?3:2));log(`${u.n} meditates.`)}},
  heal:{name:'Medkit',ic:'medic',ap:1,tip:'Heal 4, or revive a downed ally at 2 HP. Adjacent only. Costs 1 action.',avail:u=>u.kits>0?null:'No medkits',
   tg:u=>allyT(u,p=>cheb(u,p)<=1&&!p.bound&&(p.status==='down'||p.hp<p.max)),
   run:(u,g)=>{u.kits--;const t=g.t;if(t.status==='down'){t.status='ok';t.hp=2;t.bleed=0;t.stable=0;t.ap=0;t.savedBy=u.rid;log(`${u.n} gets ${t.n} back on their feet.`,'good')}else{t.hp=Math.min(t.max,t.hp+4);log(`${u.n} patches up ${t.n}.`,'good')}fx(t,'+','heal')}},
@@ -42,8 +42,8 @@ const AB={
  plant:{name:'Plant charge',ic:'charge',ap:1,ctx:1,tip:'Arm an adjacent charge site. Enemy techs may defuse it once Threat rises. 1 action.',tg:u=>adjTiles(u,'C'),
   run:(u,g)=>{S.grid[g.y][g.x]='X';fx(g,'ARMED','heal');log(`${u.n} arms a charge (${tilesWhere(c=>c==='X').length}/${S.M.need}).`,'good')}},
  // --- Guardian ---
- saberThrow:{name:'Saber Throw',ic:'throw',f:2,dm:()=>[3,4],tip:'3–4 damage, ignores cover. Can also hit a second enemy behind the first.',tg:u=>enemyT(u,5,85),
-  run:(u,g)=>{const t2=pierceTarget(u,g.t);resolve(u,g.t,85,[3,4],{ignoreDeflect:1,label:'thrown saber'});if(t2&&alive(t2)){log('The blade keeps going…');resolve(u,t2,85,[3,4],{ignoreDeflect:1,label:'thrown saber'})}}},
+ saberThrow:{name:'Saber Throw',ic:'throw',f:2,dm:()=>[4,5],tip:'4–5 damage, ignores cover. Can also hit a second enemy behind the first.',tg:u=>enemyT(u,5,85),
+  run:(u,g)=>{const t2=pierceTarget(u,g.t);resolve(u,g.t,85,[4,5],{ignoreDeflect:1,label:'thrown saber'});if(t2&&alive(t2)){log('The blade keeps going…');resolve(u,t2,85,[4,5],{ignoreDeflect:1,label:'thrown saber'})}}},
  defLine:{name:'Defensive Line',passive:1,tip:'Adjacent allies get +15 defense.'},
  leap:{name:'Force Leap',ic:'leap',f:1,ap:1,tip:'Jump up to 6 tiles, over cover and units. Your next Strike this turn gets +15 aim.',
   tg:u=>tilesWhere((c,x,y)=>PASS(c)&&!unitAt(x,y)&&dist(u,{x,y})<=6&&cheb(u,{x,y})>1).map(p=>({...p,spot:1})),
@@ -52,8 +52,8 @@ const AB={
  sweep:{name:'Saber Sweep',ic:'sweep',f:2,melee:1,dm:u=>u.dmg,tip:'Strike every adjacent enemy at −10 aim.',tg:u=>foesIn(u,t=>cheb(u,t)===1).map(t=>({t,chance:hitChance(u,t,{melee:true,mod:-10})})),
   run:u=>{for(const e of foesIn(u,t=>cheb(u,t)===1))resolve(u,e,hitChance(u,e,{melee:true,mod:-10}),u.dmg,{melee:true,label:'sweep'})}},
  // --- Consular ---
- forceHeal:{name:'Force Heal',ic:'medic',f:2,ap:1,tip:'Heal 3 within 3 tiles, or stabilize a downed ally. 1 action.',tg:u=>allyT(u,p=>dist(u,p)<=3&&!p.bound&&(p.status==='down'?!p.stable:p.hp<p.max)),
-  run:(u,g)=>{const t=g.t;if(t.status==='down'){t.stable=1;t.savedBy=u.rid;log(`${u.n} holds ${t.n} in the Force. Stabilized.`,'good')}else{t.hp=Math.min(t.max,t.hp+3);log(`${u.n} heals ${t.n}.`,'good')}fx(t,'+','heal')}},
+ forceHeal:{name:'Force Heal',ic:'medic',f:2,ap:1,tip:'Heal 4 within 3 tiles, or stabilize a downed ally. 1 AP.',tg:u=>allyT(u,p=>dist(u,p)<=3&&!p.bound&&(p.status==='down'?!p.stable:p.hp<p.max)),
+  run:(u,g)=>{const t=g.t;if(t.status==='down'){t.stable=1;t.savedBy=u.rid;log(`${u.n} holds ${t.n} in the Force. Stabilized.`,'good')}else{t.hp=Math.min(t.max,t.hp+4);log(`${u.n} heals ${t.n}.`,'good')}fx(t,'+','heal')}},
  barrier:{name:'Force Barrier',ic:'barrier',f:2,ap:1,tip:'An ally within 4 counts as in full cover from every side until your next turn.',tg:u=>allyT(u,p=>p.status==='ok'&&dist(u,p)<=4&&!p.barrier),
   run:(u,g)=>{g.t.barrier=1;fx(g.t,'BARRIER','heal');log(`${u.n} wraps ${g.t.n} in a barrier.`,'good')}},
  battleMed:{name:'Battle Meditation',ic:'meditate',f:3,instant:1,tip:'Allies within 6 get +10 aim, enemies within 6 get −10, until your next turn. Breaks if you are hit.',
@@ -172,3 +172,46 @@ function healArea(u,r){for(const p of S.units.filter(p=>p.side==='p'&&alive(p)&&
  if(p.status==='down'){if(!p.stable){p.stable=1;p.savedBy=u.rid;fx(p,'STABLE','heal')}}else if(p.hp<p.max){p.hp=Math.min(p.max,p.hp+2);fx(p,'+2','heal')}}}
 // Mechanical one-liners for the codex/tooltips (U's describe()). Older abilities used `tip`.
 for(const a of Object.values(AB)){a.desc=a.desc||a.tip;a.tip=a.tip||a.desc}
+
+// ---- Wave 9 (Chat R): ally assists, squad Momentum, trooper identities. Costs live in AP (data.js); exec() charges them.
+// Momentum (S.mom, 0..AP.mom.max): +1 per hit on an enemy, +1 more per kill (damage hook in rules.js). Spent on the mo* abilities.
+const momOk=n=>S&&(S.mom||0)>=n,momSpend=(n,u,what)=>{S.mom-=n;fx(u,what.toUpperCase(),'heal');log(`Momentum: ${what} (−${n}, ${S.mom} left).`,'good')};
+const helpers=(u,t)=>players().filter(p=>p!==u&&p.status==='ok'&&!p.vip&&!p.bound&&p.abil.includes('shoot')&&p.range>=2&&dist(p,t)<=p.range&&los(p,t));
+const ALL_TROOP_ASSISTS=['backup','coverFire','handoff','moSurge','moRally','moStrike'];
+Object.assign(AB,{
+ backup:{name:'Call Backup',ic:'shoot',ap:0,ctx:1,tip:'Free, once a turn for the squad: the best-placed ally fires a follow-up shot at this enemy (−10 aim, −1 damage). Builds their bond.',
+  avail:u=>S.backupT===S.turn?'Used this turn':null,
+  tg:u=>S.backupT===S.turn?[]:foesIn(u,t=>seenFor(u,t)&&helpers(u,t).length).map(t=>{const h=helpers(u,t).sort((a,b)=>hitChance(b,t)-hitChance(a,t))[0];return{t,h,chance:Math.max(5,hitChance(h,t)+AP.backup.aim)}}),
+  dm:u=>[1,4],run:(u,g)=>{S.backupT=S.turn;const h=g.h;if(!h||!alive(g.t))return;fx(h,'BACKUP','heal');log(`${u.n} calls for backup. ${h.n} opens up on ${g.t.n}.`);
+   resolve(h,g.t,g.chance,[Math.max(1,h.dmg[0]+AP.backup.dmg),Math.max(1,h.dmg[1]+AP.backup.dmg)],{label:'backup shot'});
+   if(u.rid&&h.rid&&typeof bondPts==='function')try{bondPts(u.rid,h.rid,1,'backup')}catch(e){}}},
+ coverFire:{name:'Covering Fire',ic:'suppress',ctx:1,tip:'1 AP: pin an enemy in range (−30 aim until your next turn) so an ally can cross open ground.',
+  tg:u=>u.range<2?[]:enemyT(u,u.range,100,t=>!t.supp),run:(u,g)=>{g.t.supp=1;fx(g.t,'PINNED');log(`${u.n} lays down covering fire on ${g.t.n}.`)}},
+ handoff:{name:'Hand Off',ic:'dash',ctx:1,tip:'1 AP: give an ally within 4 tiles +1 AP this turn. Once a turn per unit.',avail:u=>u.hoT===S.turn?'Used this turn':null,
+  tg:u=>u.hoT===S.turn?[]:allyT(u,p=>p!==u&&p.status==='ok'&&!p.vip&&!p.bound&&dist(u,p)<=4&&p.ap<AP.max),
+  run:(u,g)=>{u.hoT=S.turn;g.t.ap++;fx(g.t,'+1 AP','heal');log(`${u.n} covers for ${g.t.n}: +1 AP.`,'good')}},
+ moSurge:{name:`Surge · ${AP.mom.ap} mom.`,ic:'dash',ap:0,ctx:1,tip:`Spend ${AP.mom.ap} Momentum: this unit gains +1 AP. Once a turn per unit.`,
+  tg:u=>momOk(AP.mom.ap)&&u.surgeT!==S.turn?[{t:u,ally:1,chance:100}]:[],run:u=>{u.surgeT=S.turn;u.ap++;momSpend(AP.mom.ap,u,'surge')}},
+ moRally:{name:`Rally · ${AP.mom.aim} mom.`,ic:'mark',ap:0,ctx:1,tip:`Spend ${AP.mom.aim} Momentum: the whole squad gets +${AP.mom.aimBuff} aim until your next turn.`,
+  tg:u=>momOk(AP.mom.aim)&&S.rallyT!==S.turn?[{t:u,ally:1,chance:100}]:[],run:u=>{S.rallyT=S.turn;for(const p of players())if(p.status==='ok')p.buffAim=(p.buffAim||0)+AP.mom.aimBuff;momSpend(AP.mom.aim,u,'rally')}},
+ moStrike:{name:`Fire Support · ${AP.mom.strike} mom.`,ic:'grenade',ap:0,ctx:1,loud:1,tip:`Spend ${AP.mom.strike} Momentum: a gunship hits a 3×3 area the squad can see for ${AP.mom.strikeDmg.join('–')} (breaks cover; allies are spared).`,
+  tg:u=>momOk(AP.mom.strike)?tilesWhere((c,x,y)=>!FULL(c)&&players().some(p=>p.status==='ok'&&dist(p,{x,y})<=8&&los(p,{x,y}))).map(p=>({...p,area:1})):[],
+  run:(u,g)=>{momSpend(AP.mom.strike,u,'fire support');const d=ri(...AP.mom.strikeDmg);fx(g,'BOOM','boom');log('A Republic gunship strafes the zone.','good');
+   for(const t of enemies().filter(t=>alive(t)&&!t.hid&&cheb(t,g)<=1))damage(t,d,u);
+   for(let yy=g.y-1;yy<=g.y+1;yy++)for(let xx=g.x-1;xx<=g.x+1;xx++)if(inb(xx,yy)&&TILES[S.grid[yy][xx]]&&TILES[S.grid[yy][xx]].breaks)degrade(xx,yy)}},
+ // Trooper identities (Jess 2026-10-23): sniper, heavy, tank, pistol fighter. Medic restock lives in turns.js.
+ snipe:{name:'Snipe',ic:'mark',tip:'3 AP: a braced long shot. +15 aim, +2 damage, +20 crit chance.',dm:u=>[u.dmg[0]+2,u.dmg[1]+2],
+  tg:u=>foesIn(u,t=>dist(u,t)<=u.range&&seenFor(u,t)).map(t=>({t,chance:Math.min(100,hitChance(u,t)+15)})),
+  run:(u,g)=>{u.crit=(u.crit||0)+20;try{resolve(u,g.t,g.chance,[u.dmg[0]+2,u.dmg[1]+2],{label:'aimed shot'})}finally{u.crit-=20}}},
+ barrage:{name:'Barrage',ic:'grenade',loud:1,tip:'3 AP: hose a 3×3 area within range: 3–5 to every enemy there, breaks half cover. Every other turn.',
+  avail:u=>u.barT&&S.turn<=u.barT+1?'Cooling down':null,
+  tg:u=>tilesWhere((c,x,y)=>!FULL(c)&&dist(u,{x,y})<=u.range&&los(u,{x,y})).map(p=>({...p,area:1})),
+  run:(u,g)=>{u.barT=S.turn;fx(g,'BOOM','boom');log(`${u.n} opens up with a heavy barrage.`);for(const t of enemies().filter(t=>alive(t)&&!t.hid&&cheb(t,g)<=1))damage(t,ri(3,5),u);
+   for(let yy=g.y-1;yy<=g.y+1;yy++)for(let xx=g.x-1;xx<=g.x+1;xx++)if(inb(xx,yy)&&TILES[S.grid[yy][xx]]&&TILES[S.grid[yy][xx]].breaks)degrade(xx,yy)}},
+ shieldWall:{name:'Shield Wall',ic:'barrier',instant:1,tip:'1 AP: plant the shield. You and adjacent allies get +20 defense until your next turn.',
+  run:u=>{for(const p of players())if(p.status==='ok'&&cheb(p,u)<=1)p.buffDef=(p.buffDef||0)+20;fx(u,'SHIELD WALL','heal');log(`${u.n} plants a shield wall.`,'good')}},
+ taunt:{name:'Draw Fire',ic:'guard',instant:1,tip:'1 AP: enemies within 8 who can reach you go for you first until your next turn.',
+  run:u=>{u.taunt=S.turn;fx(u,'COME ON!','dmg');log(`${u.n} draws the enemy's fire.`)}},
+ fanFire:{name:'Fan the Hammer',ic:'shoot',tip:'2 AP: three quick pistol shots at one target, −15 aim each, −1 damage.',dm:u=>[Math.max(1,u.dmg[0]-1),Math.max(1,u.dmg[1]-1)],
+  tg:u=>foesIn(u,t=>dist(u,t)<=u.range&&seenFor(u,t)).map(t=>({t,chance:Math.max(5,hitChance(u,t)-15)})),
+  run:(u,g)=>{for(let i=0;i<3&&alive(g.t)&&g.t.status==='ok';i++)resolve(u,g.t,g.chance,[Math.max(1,u.dmg[0]-1),Math.max(1,u.dmg[1]-1)],{label:'quick shot'})}}});

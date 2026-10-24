@@ -2,7 +2,7 @@
    Jess 2026-10-22: minimal hand-holding, asked at start, skippable. The in-mission hints live in ui-hud.js (TIPS) and share SETTINGS.tips. */
 const TUT_CARD=[
  ['Select','Click a squad member (or press Tab). Lit tiles show where it can move.'],
- ['Actions','Each unit gets 2 actions a turn. A short move costs 1; a long dash (gold) costs both.'],
+ ['Action points','Each unit gets 3 AP a turn. Each AP is one full move. Pistols and sabers cost 1 AP to attack, rifles 2. Shooting does not end your turn.'],
  ['Cover','Shield icons mark cover: solid = full, outline = half. End moves next to it. Hit enemies from the side to flank.'],
  ['Shoot','Pick an ability, click a target to see the hit %, then Confirm. Space aims at the best target; Space again fires.'],
  ['The Force','Jedi spend Focus on powers; Meditate refills it. Choke works but adds Darkness.'],

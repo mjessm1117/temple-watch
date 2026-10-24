@@ -163,3 +163,21 @@ Object.assign(ICONS,{defender:'M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6zM12 7v10M9 
 
 // ── Melee (power.js): a melee hit on a melee fighter may be answered. Force user vs Force user = blade lock (always answered). ──
 const MELEE={counter:20,lock:60,counterDmg:'low'};   // counter % for non-Force melee defenders; counter hits for the defender's low damage roll
+
+// ── Wave 9 (Chat R): Gunslinger (pistol fighter, invented class [N]) + XCOM-style AP perks. fx quickDraw/hitRun: turns.js apOf/exec.
+Object.assign(PERKS,{
+ gsQuickDraw:{name:'Quick Draw',ic:'shoot',desc:'Your first Shoot each turn costs 1 less AP (a pistol shot is free).',fx:{quickDraw:1}},
+ gsHitRun:{name:'Hit and Run',ic:'dash',desc:'Attacking a flanked enemy refunds 1 AP, once a turn.',fx:{hitRun:1}},
+ gsTrick:{name:'Trick Shot',ic:'shoot',desc:'+15 crit chance.',mod:{crit:15}},
+ gsDeadShot:{name:'Dead Shot',ic:'shoot',desc:'+2 damage within 4 tiles.',fx:{closeDmg:2}},
+ gsReflex:{name:'Reflexes',ic:'conceal',desc:'Enemies get −10 aim against you.',fx:{dodge:10}},
+ gsSpeed:{name:'Fast Hands',ic:'dash',desc:'+1 move. A kill refunds 1 AP, once a turn.',mod:{mob:1},fx:{chain:1}}});
+Object.assign(CLASS,{Gunslinger:{hp:10,aim:85,mob:6,dmg:[3,6],range:6,crit:15,armor:1,init:14,will:55,desc:'Pistol fighter. Cheap 1-AP shots, Fan the Hammer, hit-and-run.'}});
+TREES.Gunslinger={trunk:{1:['gsQuickDraw','mark','scFlanker'],2:['gsHitRun','runGun','scEvasive']},specs:{
+ duelist:{n:'Duelist',ic:'sp_sniper',desc:'Close, fast, deadly. Three shots a turn.',sig:'chainShot',4:['gsTrick','siKnife','killshot'],5:['ssExposed','svFury','veteran'],6:['svRush','smoke','soBreach'],7:['svRampage','gsDeadShot','ssStreak']},
+ outlaw:{n:'Outlaw',ic:'sp_infiltrator',desc:'Slippery. Hits and is gone.',sig:'ghost',4:['siVanish','fieldcraft','scSurvivor'],5:['ssBigGame','hCoverMe','gsReflex'],6:['gsSpeed','sSwift','scInfKnife'],7:['scInfPhantom','scInfStrike','scLegend']}}};
+Object.assign(SPEC_TRAITS,{duelist:{n:'Steady Hand',desc:'+10 aim, +10 crit, and +1 damage within 4 tiles.',mod:{aim:10,crit:10},fx:{closeDmg:1}},
+ outlaw:{n:'Slippery',desc:'Enemies get −10 aim against you; +1 move.',mod:{mob:1},fx:{dodge:10}}});
+Object.assign(ICONS,{gunslinger:'M3 9h12l2-2h3v4h-4l-1 2h-3l-1 5H8l1-5H3zM6 9V7'});
+(function(){const sp=document.querySelector('svg symbol')&&document.querySelector('svg symbol').parentNode;if(sp&&!sp.querySelector('#i-gunslinger'))sp.insertAdjacentHTML('beforeend',`<symbol id="i-gunslinger" viewBox="0 0 24 24"><path d="${ICONS.gunslinger}"/></symbol>`)})();
+Object.assign(FX_N,{quickDraw:'First shot −1 AP',hitRun:'Flank refunds AP'});

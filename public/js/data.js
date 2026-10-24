@@ -11,6 +11,18 @@ const DIFF={
  normal:{n:'Normal',enemyHp:0, enemyAim:5,  extra:0,bleed:5,lift:2,assist:10,bonusKit:0,income:1},
  hard:  {n:'Hard',  enemyHp:0, enemyAim:10, extra:1,bleed:3,assist:0, bonusKit:0,income:.85},
  legend:{n:'Legend',enemyHp:1, enemyAim:15, extra:1,bleed:2,assist:0, bonusKit:0,income:.7}};
+// ---- 3 AP combat (Chat R, wave 9; Jess 2026-10-23, Star Wars Zero Company style). Every unit gets AP.max a turn, enemies too.
+// 1 AP = one full move. Attacks cost AP by weapon and do NOT end the turn; only stances (AP.end) do. Code: apOf() in turns.js.
+const AP={max:3,
+ gun:{Gunslinger:1},gunDef:2,melee:1,     // Shoot cost by class: pistols 1, rifles 2. Melee strike 1 (+1 if it dashes in first)
+ force2:3,                                // a Force power costing this much Focus or more costs 2 AP, else 1
+ cost:{grenade:2,ionNade:2,meditate:2,collapse:2,chainShot:2,suppress:2,deadeye:3,snipe:3,barrage:3,fanFire:2,shieldWall:1,taunt:1,coverFire:1,handoff:1},
+ end:['overwatch','guard','hunker','holdLine'],
+ eAttacks:2,                              // most attacks an enemy makes per turn (1-AP weapons can strike twice)
+ backup:{aim:-10,dmg:-1},                 // Backup shot (free, once a turn): the best-placed ally fires at your target
+ // Momentum: a squad meter (0..max). +1 per hit on an enemy, +1 per kill. Spend for free actions (data in MOM, abilities.js).
+ foes:2,waveFoes:1,                       // more enemies (Jess 2026-10-24): extra grunts at mission start, extra per wave/dropship
+ mom:{max:10,ap:3,aim:5,aimBuff:10,strike:8,strikeDmg:[3,5]}};
 const FOES={
  trooper:{desc:'Standard rifleman: 4 HP, range 8. Seeks cover and flanks.',n:'Sith Trooper',ic:'e_trooper',hp:4,aim:65,mob:5,dmg:[2,4],range:8,init:8},
  heavy:{desc:'6 HP, 1 armor, one grenade. Its hits strip cover and armor.',n:'Sith Heavy',ic:'e_heavy',hp:6,aim:60,mob:4,dmg:[3,4],range:7,armor:1,nades:1,shredder:1,init:6},

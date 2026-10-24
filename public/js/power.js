@@ -123,7 +123,7 @@ function fxKill(u,t){const melee=cheb(u,t)<=1,far=dist(u,t)>=SKILL.chainR;
  for(const p of S.units)if(p!==u&&p.side==='p'&&p.status==='ok'&&(p.pairs||[]).some(q=>q.t==='rhythm'&&q.uid===u.uid)){
   if(p.hp<p.max){p.hp++;fx(p,'+1','heal')}if(p.maxF)p.focus=Math.min(p.maxF,(p.focus||0)+1);p.rhythm=1}}
 exec=(o=>function(u,k,g,...x){S.chainUnit=null;const r=o(u,k,g,...x);const c=S.chainUnit;S.chainUnit=null;
- if(c&&c===u&&u.status==='ok'&&!S.over&&S.phase==='player'){u.chainUsed=(u.chainUsed||0)+1;if(u.rhythm)u.rhythm=0;u.ap=Math.min(2,u.ap+1);
+ if(c&&c===u&&u.status==='ok'&&!S.over&&S.phase==='player'){u.chainUsed=(u.chainUsed||0)+1;if(u.rhythm)u.rhythm=0;u.ap=Math.min(AP.max,u.ap+1);
   fx(u,u.chainUsed>1?`CHAIN ×${u.chainUsed}`:'CHAIN!','heal');log(`${u.n} keeps going: +1 action.`,'good');S.sel=u;render()}return r})(exec);
 startPlayerTurn=(o=>function(...x){if(S&&S.units)for(const u of S.units)if(u.side==='p'){u.chainUsed=0;u.rhythm=0;
  if(u.status==='ok'&&fxv(u,'regen')&&u.hp<u.max){const n=Math.min(fxv(u,'regen'),u.max-u.hp);u.hp+=n;fx(u,'+'+n,'heal')}}return o(...x)})(startPlayerTurn);

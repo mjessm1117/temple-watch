@@ -56,7 +56,7 @@ for(const id of ['objP','podP']){const d=$('#'+id);try{const v=localStorage.getI
 // --- First-mission tips: one at a time, each shown once; "Skip tips" turns them all off (Settings turns them back on) ---
 const TIP_KEY='tw.tips';let TIPS_ST=(()=>{try{return JSON.parse(localStorage.getItem(TIP_KEY))||{seen:{}}}catch{return {seen:{}}}})(),tipNow=null;
 const TIPS=[
- ['move',()=>S.mode==='move'&&canAct(S.sel)&&!S.peek,'Move: click a lit tile. Blue costs 1 action; gold is a dash and uses both. Each unit gets 2 actions a turn.'],
+ ['move',()=>S.mode==='move'&&canAct(S.sel)&&!S.peek,'Move: click a lit tile. Blue costs 1 AP; gold costs 2–3. Each unit gets 3 AP a turn; attacks don’t end it.'],
  ['conc',()=>S.conc,'You start concealed. Red tiles are what the enemy can see: step in and the squad is revealed. Your first attack is an ambush (+20 aim).'],
  ['cover',()=>players().some(u=>u.ap===1),'Cover matters. Shields mark it: solid = full cover (−40 to hit you), outline = half (−20). Finish moves next to cover.'],
  ['aim',()=>S.mode!=='move'&&S.tg.length,'Pick a red-outlined target to see every modifier on the shot, then Confirm. Keyboard: Space aims at the best target, Space again fires.'],

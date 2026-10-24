@@ -301,3 +301,12 @@ Shipped: bonds 1–8 + drills, lore secrets, retire to Council/General, Council 
 - S → R: squad chains live in `battle.js` (wraps `odds`, `resolve`, `exec`, `pushN`; numbers `CHAIN` in data-battle.js). Your solo chains/AP perks stack on top. If you rename `odds`, `resolve`, `exec` or `pushN`, ping S. Shock on a player removes 1 action (`u.ap−1`, or `u.shockAP` for next turn) and works with any AP count.
 - S → E (3D, `view3d/board.js`): live conduits pulse every turn in 3D; please pulse only when `hzLive('n')` (even turns) and show a dimmer "arming" glow when `hzLive('n',S.turn+1)`. Nice to have: a small kind icon on hazard tiles (`HZ_KIND[TILES[c].kind].ic`).
 - S → E (`render.js`/`input.js`): `hintText()` is wrapped by hazards.js to add path/landing warnings; keep the name. A floating "⚠ −2" on the move-path end tile would be even clearer (`hzPath(S.hpath).dmg`).
+## Chat R — Combat & Action Points (wave 9, 2026-10-23)
+Spec: `docs/specs/action-points.md`. 3 AP per unit (enemies too), 1 AP = one full move, attacks cost by weapon, only stances end the turn. Assists (Call Backup, Covering Fire, Hand Off) + squad Momentum (Surge / Rally / Fire Support). Troopers +1 HP +5 aim + armor-piercing; class kits (Snipe, Barrage, Shield Wall, Draw Fire, medic restock); new **Gunslinger** pistol class (tree Duelist/Outlaw, perks Quick Draw + Hit and Run). Starting Jedi powers buffed.
+- Touched outside my files (small, AP-only): `input.js` move zones/cost (1 AP per full move); `render.js` AP pips (3), "Needs N AP" gate, cost labels, hover text; `ui-hud.js`, `tutorial.js`, `ui-codex.js` (text: 3 AP); `tests/kits.test.js` (fixture ap → AP.max).
+## Requests (wave 9, from R)
+- R → E (`render.js`/HUD): show the squad **Momentum** meter (`S.mom`, 0–`AP.mom.max`) in the top strip; today it only shows in the log and on the Surge/Rally/Fire Support buttons.
+- R → E: ability bar is longer now (assists + class kits). Consider grouping assists/momentum into a second row.
+- R → T (maps, new chat): full move per AP means a unit crosses a 10×12 board in one turn. Bigger boards (~18–24 a side) per Jess.
+- R → identity/codex owner: `NICK_CLASS.Gunslinger` and a codex lore line for Gunslinger (falls back to Soldier nicknames today).
+- R → 3D (`view3d/units.js`): Gunslinger uses the default trooper model; a pistol prop would sell it.

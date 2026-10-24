@@ -9,7 +9,7 @@ function arena(k,opt={}){newCampaign('normal');startMission('relay',START_ROSTER
  for(const row of S.grid)row.fill('.');for(const t of S.units)t.status='dead';S.conc=false;
  const base=opt.troop?START_ROSTER.find(r=>!CLASS[r.cls]?.jedi&&r.cls!=='Medic')||START_ROSTER[2]:START_ROSTER[0];
  const u=mk({...battleUnit({id:'k',rank:1,xp:0,dark:0,picks:[],...base}),abil:[...new Set([...(battleUnit({id:'k0',rank:1,xp:0,dark:0,picks:[],...base}).abil||[]),'shoot','strike',k])]},'p',{n:'Tester',rid:'k',x:4,y:6});
- Object.assign(u,{maxF:8,focus:8,nades:2,kits:2,ap:2,range:Math.max(u.range||0,8)});
+ Object.assign(u,{maxF:8,focus:8,nades:2,kits:2,ap:AP.max,range:Math.max(u.range||0,8)});
  const ally=mk({...battleUnit({id:'a',rank:1,xp:0,dark:0,picks:[],...START_ROSTER[1]})},'p',{n:'Ally',rid:'a',x:5,y:7});ally.hp=Math.max(1,ally.max-4);
  const down=mk({...battleUnit({id:'d',rank:1,xp:0,dark:0,picks:[],...START_ROSTER[1]})},'p',{n:'Downed',rid:'d',x:3,y:7});down.status='down';down.hp=0;down.bleed=3;
  const e1=mkFoe('trooper',4,5),e2=mkFoe('trooper',5,5),e3=mkFoe('trooper',4,2);
@@ -38,7 +38,7 @@ for(const k of ids){const ab=w.eval(`(({passive,instant,tg})=>({passive:!!passiv
    const why=ab.avail&&ab.avail(u);if(why)return{err:'not available: '+why};
    let g=null;if(!ab.instant){const T=targetsFor(u,'${k}');if(!T.length)return{err:'no targets'};
     g=T.find(g=>g.t&&g.t.side==='e')||T.find(g=>g.t&&g.t.status==='down')||T.find(g=>g.t&&g.t===s.ally)||T.slice().sort((a,b)=>dist(a,s.e1)-dist(b,s.e1))[0]}
-   const before=snap(),f0=u.focus;exec(u,'${k}',g);const changed=snap()!==before||u.ap>2||u.rgT||u.ow||u.guard;
+   const before=snap(),f0=u.focus;exec(u,'${k}',g);const changed=snap()!==before||u.ap>AP.max||u.rgT||u.ow||u.guard;
    return{changed,focus:f0-u.focus,cost:ab.f||0}})()`);
   Math.random=Math.random;
   if(r.err)check(false,k+': '+r.err);else{check(r.changed,k+': no effect on the board');check(r.focus===r.cost,k+': Focus cost '+r.focus+' vs '+r.cost)}

@@ -25,7 +25,7 @@ function cardHTML(){const u=S.peek||S.sel;
  const sub=u.side==='e'?'Hostile':u.vip?'Prisoner':`${u.title||'Rank '+(u.rank||1)} · ${u.cls}${u.masterN?` · <span data-tip="stat:padawan">Padawan of ${u.masterN}</span>`:''}`;
  let h=`<div class="who"><span class="mini" style="--uc:${u.side==='e'?'var(--sith)':u.col||'var(--troop)'}">${icon(unitIcon(u))}</span><div><div class="uname" style="${u.col?'color:'+u.col:''}">${u.n}${u.nick?` <small class="nick">${u.nick}</small>`:''}</div><div class="usub">${sub}${tags.length?' · '+tags.join(' · '):''}</div></div></div>`;
  h+=`<div class="row" style="--uc:${u.side==='e'?'var(--sith)':u.col||'var(--troop)'}"><span data-tip="stat:hp">HP</span>${pips(u.max,u.hp)}${S.info?`<b class="num">${u.hp}/${u.max}</b>`:''}</div>`;
- if(u.side==='p'&&!u.vip)h+=`<div class="row apr" style="--uc:var(--fg)"><span data-tip="stat:actions">Actions</span><span class="pips">${[0,1].map(i=>`<i class="${i<u.ap?'on':''}${i===u.ap-1?' s1':''}${i===u.ap-2?' s2':''}"></i>`).join('')}</span></div>`;
+ if(u.side==='p'&&!u.vip)h+=`<div class="row apr" style="--uc:var(--fg)"><span data-tip="stat:actions">Actions</span><span class="pips">${[...Array(Math.max(AP.max,u.ap)).keys()].map(i=>`<i class="${i<u.ap?'on':''}${i===u.ap-1?' s1':''}${i===u.ap-2?' s2':''}"></i>`).join('')}</span></div>`;
  if(u.jedi)h+=`<div class="row fr"><span data-tip="stat:focus">Focus</span><span class="pips f">${Array.from({length:u.maxF},(_,i)=>`<i class="${i<u.focus?'on':''}" data-k="${u.focus-i}"></i>`).join('')}</span></div><div class="row"><span data-tip="status:darkness">Darkness</span><span class="bar"><b style="width:${u.dark*10}%"></b></span><span>${u.dark}/10</span></div>`;
  if(u.side==='e'){const it=intentOf(u);h+=`<div class="intent">${icon('overwatch')}<span><b>Plan:</b> ${it.txt}<small>Best guess. It can change if you move first.</small></span></div>`}
  if(S.info||u.side==='e')h+=`<div class="grid2"><span data-tip="stat:aim">Aim <b>${u.aim}</b></span><span data-tip="stat:move">Move <b>${u.mob}</b></span><span data-tip="stat:damage">Damage <b>${u.dmg[0]}–${u.dmg[1]}</b></span><span data-tip="stat:range">Range <b>${u.range<2?'melee':u.range}</b></span>${u.deflect?`<span data-tip="stat:deflect">Deflect <b>${u.deflect}%</b></span>`:''}${u.crit?`<span data-tip="stat:crit">Crit <b>${u.crit}%</b></span>`:''}${u.kits!=null?`<span data-tip="stat:medkits">Medkits <b>${u.kits}</b></span>`:''}${u.nades!=null?`<span data-tip="stat:grenades">Grenades <b>${u.nades}</b></span>`:''}${u.will!=null?`<span data-tip="stat:will">Will <b>${u.will}</b></span>`:''}${u.stress?`<span data-tip="stat:stress">Stress <b>${u.stress}</b></span>`:''}</div>`;
@@ -36,10 +36,10 @@ const CTX_HINT={scan:()=>S.type==='investigate'&&tilesWhere(c=>c==='q').length?'
  plant:()=>S.type==='sabotage'&&tilesWhere(c=>c==='C').length?'Stand next to a charge site':''};
 function actsHTML(){const u=S.sel;if(!canAct(u)||S.peek)return '';
  let n=0;return u.abil.map(k=>{const ab=AB[k];if(!ab||ab.passive)return '';let why=null;
-  if(ab.f&&u.focus<ab.f)why=`Needs ${ab.f} Focus`;else if(ab.avail)why=ab.avail(u);
+  if(ab.f&&u.focus<ab.f)why=`Needs ${ab.f} Focus`;else if(ab.avail)why=ab.avail(u);if(!why&&!apOk(u,k))why=`Needs ${apOf(u,k)} AP`;
   if(!why&&!ab.instant&&!targetsFor(u,k).length){if(ab.ctx&&!CTX_HINT[k]?.(u))return '';why=ab.ctx?CTX_HINT[k](u):'No targets'}
-  const cost=[ab.f?ab.f+' Focus':'',ab.ap===1?'1 action':'ends turn'].filter(Boolean).join(' · ');
-  n++;return `<button type="button" data-a="${k}" data-tip="ability:${k}" data-cost="${ab.instant&&!ab.ap?'0':ab.ap===1?'1':'end'}" data-f="${ab.f||0}" class="act ${S.mode===k?'on':''}" ${why?'disabled':''}>${n<10?`<kbd>${n}</kbd>`:''}${icon(ab.ic)}<span>${ab.name}${window.pwTag&&u.pw?pwTag(u.pw[k]||0):''}<small>${why||cost}</small></span></button>`}).join('')}
+  const cost=[ab.f?ab.f+' Focus':'',apText(u,k)].filter(Boolean).join(' · ');
+  n++;return `<button type="button" data-a="${k}" data-tip="ability:${k}" data-cost="${apOf(u,k)}" data-f="${ab.f||0}" class="act ${S.mode===k?'on':''}" ${why?'disabled':''}>${n<10?`<kbd>${n}</kbd>`:''}${icon(ab.ic)}<span>${ab.name}${window.pwTag&&u.pw?pwTag(u.pw[k]||0):''}<small>${why||cost}</small></span></button>`}).join('')}
 // Names what the target hides behind, for the odds panel ("Half cover · crate").
 const COVER_N={'#':'wall',O:'objective',d:'door',D:'locked door',c:'crate',r:'rubble',x:'barrel',k:'console',q:'terminal',Q:'terminal'};
 function coverName(t,a){if(t.barrier)return 'Force Barrier';let best=null,bv=0;const dx=Math.sign(a.x-t.x),dy=Math.sign(a.y-t.y);
@@ -65,9 +65,9 @@ function hintText(){if(S.over)return '';if(S.phase==='enemy')return 'The enemy i
  if(u.status==='down')return `${u.n} is down. An adjacent ally can Stabilize; a medkit revives.`;
  if(!canAct(u))return players().some(canAct)?'This unit has acted. Pick another.':'All units have acted. End the turn.';
  if(S.pick)return 'Check the odds, then Confirm. Tap another target to switch.';
- if(S.mode==='move'&&S.hcost)return S.hcost===2?'Dash here: uses both actions. Click to move.':'Move here: 1 action. Click to move.';
+ if(S.mode==='move'&&S.hcost)return `Move here: ${S.hcost} AP. Click to move.`;
  if(S.mode==='move'&&canUndo()&&S.undo.uid===u.uid)return 'Moved. Press U (or Undo) to take it back while nothing was revealed.';
- if(S.mode==='move')return window.View3D&&View3D.on?'Click a lit tile: blue = 1 action, gold = dash (both actions). Shields mark cover: outline = half, solid = full.':'Tap a lit tile: blue = 1 action, gold = dash (both actions). Squares mark cover: hollow = half, solid = full.';
+ if(S.mode==='move')return window.View3D&&View3D.on?'Click a lit tile: blue = 1 AP, gold = 2–3 AP (each AP is one full move). Shields mark cover: outline = half, solid = full.':'Tap a lit tile: blue = 1 AP, gold = 2–3 AP (each AP is one full move). Squares mark cover: hollow = half, solid = full.';
  return AB[S.mode].tip+' Tap a highlighted target, or tap the ability again to cancel.'}
 function statsRender(){const M=S.M,set=(id,v)=>{$(id).textContent=v},show=(id,on)=>{$(id).hidden=!on};
  $('#where').textContent=`${M.n} · ${M.where}`;
@@ -83,7 +83,7 @@ function bannerRender(){const b=$('#banner'),ph=S.over?'over':S.phase;if(ph===la
  void b.offsetWidth;b.classList.add('sweep')}
 // SVG overlay: hover move path (solid holo), chosen shot (animated dashed holo), enemy intent (dashed red).
 function drawOver(){const o=$('#over');if(!o)return;const c=p=>`${p.x+.5},${p.y+.5}`;let h='';
- if(S.hpath&&S.hpath.length&&S.sel){const e=S.hpath.at(-1),d=S.hcost===2;h+=`<polyline class="mv${d?' dash':''}" points="${[S.sel,...S.hpath].map(c).join(' ')}"/><circle class="mvd" cx="${S.hpath.at(-1).x+.5}" cy="${S.hpath.at(-1).y+.5}" r=".12"/><g class="mvc${d?' dash':''}"><rect x="${e.x+.12}" y="${e.y+(e.y<1?1.02:-.32)}" width=".76" height=".34" rx=".08"/><text x="${e.x+.5}" y="${e.y+(e.y<1?1.27:-.07)}">${d?'DASH':'1 ACT'}</text></g>`}
+ if(S.hpath&&S.hpath.length&&S.sel){const e=S.hpath.at(-1),d=S.hcost>=2;h+=`<polyline class="mv${d?' dash':''}" points="${[S.sel,...S.hpath].map(c).join(' ')}"/><circle class="mvd" cx="${S.hpath.at(-1).x+.5}" cy="${S.hpath.at(-1).y+.5}" r=".12"/><g class="mvc${d?' dash':''}"><rect x="${e.x+.12}" y="${e.y+(e.y<1?1.02:-.32)}" width=".76" height=".34" rx=".08"/><text x="${e.x+.5}" y="${e.y+(e.y<1?1.27:-.07)}">${d?'DASH':'1 ACT'}</text></g>`}
  if(S.pick&&S.sel&&!S.pick.area&&!S.pick.spot)h+=`<line class="shot" x1="${S.sel.x+.5}" y1="${S.sel.y+.5}" x2="${S.pick.x+.5}" y2="${S.pick.y+.5}"/>`;
  {const A=S.pick&&S.pick.area?S.pick:S.mode!=='move'&&HOV&&S.sel&&S.tg.find(g=>g.area&&g.x===HOV.x&&g.y===HOV.y);
   if(A){h+=`<rect class="area${A===S.pick?'':' hov'}" x="${A.x-1}" y="${A.y-1}" width="3" height="3"/>`;

@@ -1,9 +1,9 @@
 /* Taps, clicks, hover paths, hotkeys, undo. Aiming is two steps: pick a target, then Confirm. */
-// Move zones (XCOM blue/yellow): d ≤ mob costs 1 action; mob < d ≤ 2×mob is a dash for both actions.
+// Move zones (3 AP, Chat R wave 9): 1 AP per full move (mob tiles); blue = 1 AP, gold = 2+ AP.
 // Reuses reach() so any movement rule in rules.js applies to both zones.
-function moveZones(u){if(!canAct(u))return {d:{},prev:{},mob:0};const m=u.mob;if(u.ap<2)return {...reach(u),mob:m};
- let R;try{u.mob=m*2;R=reach(u)}finally{u.mob=m}return {...R,mob:m}}
-const moveCost=(Z,k)=>Z.d[k]>0?(Z.d[k]>Z.mob?2:1):0;
+function moveZones(u){if(!canAct(u))return {d:{},prev:{},mob:0};const m=u.mob;
+ let R;try{u.mob=m*Math.max(1,u.ap);R=reach(u)}finally{u.mob=m}return {...R,mob:m}}
+const moveCost=(Z,k)=>Z.d[k]>0?Math.ceil(Z.d[k]/Math.max(1,Z.mob)):0;
 // Undo the last move while it revealed nothing and triggered nothing (no log lines, no reactions).
 function tryMove(u,x,y){const Z=moveZones(u),k=x+','+y,cost=moveCost(Z,k);if(!cost)return false;
  const before={uid:u.uid,x:u.x,y:u.y,ap:u.ap,turn:S.turn,hidN:enemies().filter(e=>e.hid).length,top:S.log[0]};

@@ -1,15 +1,20 @@
 /* Mission setup, turn flow, threat clock, evac, win/lose checks. */
-function mk(base,side,extra={}){const u={...base,...extra,side,status:'ok',ap:2,guard:false,ow:false,dark:base.dark||0,miss:0,uid:++S.uidN};
+function mk(base,side,extra={}){const u={...base,...extra,side,status:'ok',ap:AP.max,guard:false,ow:false,dark:base.dark||0,miss:0,uid:++S.uidN};
  if(u.abil){u.abil=[...u.abil];for(const k of u.abil)if(AB[k]&&AB[k].passive){u[k]=1;for(const [s,n] of Object.entries(AB[k].mod||{}))u[s]=(u[s]||0)+n}}
  if(u.pathfinder)u.mob++;
+ if(side==='p'&&!u.vip&&u.abil)waveKit(u);
  u.max=u.hp;u.focus=u.maxF?(u.wildBond?u.maxF:2):0;u.dmg=[...u.dmg];if(side==='p'&&!u.vip)u.will=willOf(u);return u}
+// Wave 9 (Chat R): troopers hit harder (+HP, +aim, armor-piercing), every class gets its identity kit, everyone gets the assists.
+const TROOP_BUFF={hp:1,aim:5,pierce:1},CLASS_KIT={Scout:['snipe'],Heavy:['barrage'],Shieldbearer:['shieldWall','taunt'],Defender:['taunt'],Gunslinger:['fanFire'],Medic:['heal']};
+function waveKit(u){if(!u.jedi){u.hp+=TROOP_BUFF.hp;u.aim+=TROOP_BUFF.aim;u.pierce=TROOP_BUFF.pierce;if(u.cls==='Heavy')u.dmg=[u.dmg[0]+1,u.dmg[1]+1];if(u.cls==='Medic')u.kits=Math.max(u.kits||0,2)}
+ for(const k of [...(CLASS_KIT[u.cls]||[]),...ALL_TROOP_ASSISTS])if(AB[k]&&!u.abil.includes(k)&&(k!=='coverFire'||u.range>=2))u.abil.push(k)}
 function mkFoe(t,x,y){const f=FOES[t],d=S.d;S.eCount[t]=(S.eCount[t]||0)+1;
  const cm=S.cm||{},tu=S.tune||{};return mk({...f,hp:Math.max(1,f.hp+(f.horror?0:d.enemyHp+(cm.enemyHp||0)+(tu.hp||0))),aim:f.aim+d.enemyAim+(cm.enemyAim||0)+(tu.aim||0)},'e',{type:t,n:f.envoy||f.boss||f.bane?f.n:`${f.n} ${S.eCount[t]}`,x,y})}
 // A landing wave scrambles a short way to cover before your overwatch drops, so overwatch can fire on it (XCOM reinforcements).
 function arrive(list){for(const e of list){if(S.over||e.side!=='e'||e.hid||e.status!=='ok')continue;
  const R=reach({...e,mob:Math.ceil(e.mob/2)+1});let best=null,bs=-1e9;for(const k of Object.keys(R.d)){const [x,y]=k.split(',').map(Number),sc=scamperScore(e,{x,y});if(sc>bs){bs=sc;best={x,y}}}
  if(best&&(best.x!==e.x||best.y!==e.y))moveAlong(e,pathTo(e,best.x,best.y,R.prev))}}
-function spawn(list){list=[...list];for(let i=0;i<S.d.extra;i++)list.push('trooper');
+function spawn(list){list=[...list];for(let i=0;i<S.d.extra+AP.waveFoes;i++)list.push(S.M.era?list[0]:'trooper');
  const spots=tilesWhere((c,x,y)=>y<2&&PASS(c)&&c!=='E'&&!unitAt(x,y)).sort(()=>Math.random()-.5);
  const got=[];list.forEach((t,i)=>{const p=spots[i];if(p){const e=mkFoe(t,p.x,p.y);S.units.push(e);got.push(e);horrorSeen(e)}});formPods(got);
  log(`Contact: ${list.length} hostiles at the north edge.`,'bad')}
@@ -32,7 +37,7 @@ function startMission(id,squad,o={}){const B=MISSIONS[id],n=1+(B.alts||[]).lengt
  const tu=S.tune,F=M.foes||[],grunt=F.map(f=>f[0]).sort((a,b)=>F.filter(f=>f[0]===b).length-F.filter(f=>f[0]===a).length).find(t=>!FOES[t].boss)||'trooper';
  let cut=Math.max(0,4-squad.length)+(tu.fewer||0)+(o.fewer||0);const foes=F.filter(f=>!(f[0]===grunt&&cut>0&&cut--));
  for(const [t,x,y,pod] of foes){const e=mkFoe(t,x,y);if(M.stealth)e.pod=pod??('g'+e.uid);S.units.push(e)}
- for(let i=0;i<(cm.extraEnemies||0)+(tu.extra||0);i++){const sq=players(),p=tilesWhere((c,x,y)=>y<5&&PASS(c)&&c!=='E'&&!unitAt(x,y)).sort((a,b)=>Math.min(...sq.map(q=>dist(q,b)))-Math.min(...sq.map(q=>dist(q,a))))[i%3];
+ for(let i=0;i<(cm.extraEnemies||0)+(tu.extra||0)+AP.foes;i++){const sq=players(),p=tilesWhere((c,x,y)=>y<5&&PASS(c)&&c!=='E'&&!unitAt(x,y)).sort((a,b)=>Math.min(...sq.map(q=>dist(q,b)))-Math.min(...sq.map(q=>dist(q,a))))[i%3];
   if(p){const e=mkFoe(i%3===2&&FOES.heavy&&!M.era?'heavy':grunt,p.x,p.y);if(M.stealth)e.pod='x'+(i>>1);S.units.push(e)}}
  if(M.waves)spawn(M.waves[1]);
  for(const g of groupFoes(enemies()))formPods(g);
@@ -43,10 +48,20 @@ function startMission(id,squad,o={}){const B=MISSIONS[id],n=1+(B.alts||[]).lengt
 function select(u){S.sel=u;S.peek=null;S.mode='move';S.tg=[];S.pick=null;render()}
 function canAct(u){return !!u&&u.side==='p'&&u.status==='ok'&&!u.bound&&u.ap>0&&S.phase==='player'&&!S.over}
 function targetsFor(u,k){const ab=AB[k];return(ab.tg?ab.tg(u):[]).map(g=>({...g,x:g.x??g.t.x,y:g.y??g.t.y}))}
-// Attacking from concealment springs an ambush. ap:1 costs one action, ap:0 is free, anything else ends the turn.
+// AP cost of an ability (3 AP, wave 9; numbers in AP, data.js): 'end' = ends the turn (stances), 0 = free, else that many AP.
+const wpnAP=u=>u.range<2?AP.melee:(AP.gun[u.cls]??AP.gunDef);
+function apOf(u,k,g){const ab=AB[k];if(!ab||AP.end.includes(k))return'end';if(ab.ap===0)return 0;if(AP.cost[k]!=null)return AP.cost[k];
+ if(k==='strike')return g&&g.spot&&g.spot.path&&g.spot.path.length?AP.melee+1:AP.melee;
+ if(ab.ap===1||ab.instant&&!ab.f||ab.melee||k==='subdue'||k==='hack')return 1;if(ab.f)return ab.f>=AP.force2?2:1;
+ const c=ab.dm?wpnAP(u):1;return k==='shoot'&&u.fx&&u.fx.quickDraw&&u.qdT!==S.turn?Math.max(0,c-1):c}
+const apOk=(u,k,g)=>{const c=apOf(u,k,g);return c==='end'?u.ap>0:u.ap>=c};
+const apText=(u,k)=>{const c=apOf(u,k);return c==='end'?'ends turn':c===0?'free':c+' AP'};
+// Attacking from concealment springs an ambush.
 const hostile=(k,g)=>!!AB[k].loud||!!g&&(!!(g.t&&g.t.side==='e')||!!g.barrel||!!g.beacon||(!!g.area&&!g.ally));
-function exec(u,k,g){const ab=AB[k],amb=(S.conc||u.conc)&&hostile(k,g);if(ab.f)u.focus-=ab.f;S.amb=amb?1:0;S.forceAct=!!(ab.f||ab.force);ab.run(u,g);S.amb=0;S.forceAct=0;
- if(ab.ap===1)u.ap=Math.max(0,u.ap-1);else if(ab.ap!==0)u.ap=0;
+function exec(u,k,g){const ab=AB[k],amb=(S.conc||u.conc)&&hostile(k,g),c=apOf(u,k,g);if(u.side==='p'&&S.phase==='player'&&!apOk(u,k,g))return;if(ab.f)u.focus-=ab.f;S.amb=amb?1:0;S.forceAct=!!(ab.f||ab.force);ab.run(u,g);S.amb=0;S.forceAct=0;
+ u.ap=c==='end'?0:Math.max(0,u.ap-c);if(k==='shoot')u.qdT=S.turn;
+ // Hit and Run (XCOM): a flanking attack refunds 1 AP, once a turn.
+ if(u.fx&&u.fx.hitRun&&u.hrT!==S.turn&&g&&g.t&&g.t.side==='e'&&c!=='end'&&u.status==='ok'&&flanked(g.t,u)){u.hrT=S.turn;u.ap++;fx(u,'HIT & RUN','heal')}
  if(amb){if(S.conc)breakConceal(`${u.n} opens fire. Ambush!`,g&&g.t,true);else u.conc=0}after()}
 function after(){S.mode='move';S.tg=[];S.pick=null;checkEnd();if(!canAct(S.sel)){const n=players().find(canAct);if(n)S.sel=n}render()}
 
@@ -60,7 +75,7 @@ function startPlayerTurn(){const M=S.M;
  for(const u of S.units){u.supp=0;u.marked=0;u.skip=0;if(u.side==='p'){u.supT=null;u.hunker=0;u.barrier=0;u.leapAim=0;u.buffAim=0;u.buffDef=0;u.owHit=null}}
  for(const u of players()){u.guard=false;u.guardStruck=false;u.ow=false;
   if(u.status==='down'){u.ap=0;if(u.stable)continue;u.bleed--;if(u.bleed<=0){u.status='dead';log(`${u.n} has become one with the Force.`,'bad');if(!u.vip)allyFell(u,30,`${u.n}'s death`)}else log(`${u.n} is bleeding out: ${u.bleed} turn${u.bleed>1?'s':''} left.`,'bad')}
-  else u.ap=u.vip&&S.type==='escort'?1:2}
+  else{u.ap=u.vip&&S.type==='escort'?1:AP.max;if(u.cls==='Medic'&&!(u.kits>0)){u.kits=1;log(`${u.n} rigs a field medkit.`)}}}
  for(const u of players())if(u.panic&&u.status==='ok')doPanic(u);
  S.sel=players().find(canAct)||null;S.mode='move';S.tg=[];S.pick=null;checkEnd();saveGame();render()}
 // Soft pressure: past the par turn, each turn raises Threat by 1 and the mission gets worse.
@@ -121,9 +136,9 @@ function finish(win,msg){S.over=true;S.phase='over';S.win=win;S.msg=msg;render()
 
 // ---- Dropships (wave 3): reinforcements are telegraphed. A red flare marks the landing zone (S.drops: {x,y,list,turn});
 // they land around it at the start of turn `turn` (delay 0 = right now). The LZ is 6+ tiles from the squad, toward the enemy side.
-function dropship(list,delay=1){list=[...list];for(let i=0;i<S.d.extra;i++)list.push('trooper');const P=players().filter(p=>p.status==='ok');
+function dropship(list,delay=1){list=[...list];for(let i=0;i<S.d.extra+AP.waveFoes;i++)list.push(S.M.era?list[0]:'trooper');const P=players().filter(p=>p.status==='ok');
  const C=tilesWhere((c,x,y)=>PASS(c)&&c!=='E'&&!unitAt(x,y)&&P.every(p=>dist(p,{x,y})>=6)&&N4.filter(([dx,dy])=>PASS(tile(x+dx,y+dy))).length>=3).sort((a,b)=>a.y-b.y);
- if(!C.length)return spawn(list.slice(0,list.length-S.d.extra));const lz=pickOne(C.slice(0,Math.max(4,C.length>>2))),d={x:lz.x,y:lz.y,list,turn:S.turn+delay};
+ if(!C.length)return spawn(list.slice(0,list.length-S.d.extra-AP.waveFoes));const lz=pickOne(C.slice(0,Math.max(4,C.length>>2))),d={x:lz.x,y:lz.y,list,turn:S.turn+delay};
  fx(lz,'FLARE','dmg');log(`Dropship inbound: ${list.length} hostiles land at the red flare${delay?' next turn':''}.`,'bad');S.drops.push(d);if(!delay)landDrops()}
 function landDrops(){for(const d of S.drops.filter(d=>d.turn<=S.turn)){S.drops=S.drops.filter(o=>o!==d);
  const spots=tilesWhere((c,x,y)=>PASS(c)&&!unitAt(x,y)&&cheb(d,{x,y})<=2).sort((a,b)=>dist(a,d)-dist(b,d)),got=[];
