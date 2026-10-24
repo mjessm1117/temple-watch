@@ -32,6 +32,8 @@ const AB={
  // --- shared field actions ---
  stabilize:{name:'Stabilize',ic:'stabilize',ap:1,ctx:1,tip:'Stop a downed ally’s bleeding. They stay down but can’t bleed out. Adjacent, 1 action.',
   tg:u=>allyT(u,p=>p.status==='down'&&!p.stable&&cheb(u,p)===1),run:(u,g)=>{g.t.stable=1;g.t.savedBy=u.rid;fx(g.t,'STABLE','heal');log(`${u.n} stabilizes ${g.t.n}.`,'good')}},
+ liftUp:{name:'Pick up',ic:'stabilize',ap:1,ctx:1,tip:'Get an adjacent downed ally back up (Story 4 HP, Normal 2 HP). Anyone can. 1 action.',   // Jess 2026-10-23: easier revives; lift per difficulty in DIFF
+  tg:u=>S.d.lift?allyT(u,p=>p.status==='down'&&!p.vip&&cheb(u,p)===1):[],run:(u,g)=>{const t=g.t;t.status='ok';t.hp=Math.min(t.max,S.d.lift);t.bleed=0;t.stable=0;t.ap=0;t.savedBy=u.rid;fx(t,'UP','heal');log(`${u.n} gets ${t.n} back up.`,'good')}},
  door:{name:'Open door',ic:'door',ap:1,ctx:1,tip:'Open an adjacent door. 1 action.',tg:u=>adjTiles(u,'d'),run:(u,g)=>{S.grid[g.y][g.x]='_';log(`${u.n} opens the door.`)}},
  console:{name:'Use console',ic:'hack',ap:1,ctx:1,tip:'Try to unlock the doors from an adjacent console. 50% for a Jedi. 1 action.',tg:u=>tilesWhere(c=>c==='D').length?adjTiles(u,'k').map(p=>({...p,chance:50})):[],
   run:u=>{if(rnd(50))unlock(u);else log(`${u.n} can't crack the console.`)}},

@@ -13,4 +13,4 @@ const TAUTO={base:47,perRank:3,lead:8,bond:3,bondMax:9,tired:5,short:6,min:10,ma
  xp:12,winWound:25,                         // win: +12 XP each; each member 25% chance of a light wound
  loseFavor:-3,loseStress:15,capture:30,death:7};   // loss: one serious wound for sure; then 7% one member dies, else 30% one is captured
 // Fatigue (soft, XCOM 2 WotC-style): fight 2 steps in a row (played or auto) → Tired. Tired = −10 aim and −5% auto odds. One step off clears it.
-const FATIGUE={at:2,aim:-10};
+const FATIGUE={at:Infinity,aim:-10};   // OFF (Jess 2026-10-23: no fatigue for now). Turn back on: at:2

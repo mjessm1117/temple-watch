@@ -10,8 +10,8 @@ function newCampaign(diff){
 // The first squad arrives trained (rank 2) and kitted: Jedi with an attuned saber and battle robes, troops with military blasters and light armor.
 const START_RANK=2,startGear=cls=>CLASS[cls]&&CLASS[cls].jedi?{w:0,armor:'robes',mods:[],saber:1,trait:null}:{w:1,armor:'light',mods:[],saber:0,trait:null};
 function abilFor(r){const P=picksOf(r).filter(k=>AB[k]),B=BASE_KIT[r.cls]||[];
- if(isJedi(r))return['strike',...B,...P,...(r.rank>=2?['choke']:[]),'push','guard','meditate','subdue','stabilize','door','console','scan'];
- return['shoot',...B,...P,'overwatch','subdue','stabilize','door',...(B.includes('scan')?[]:['scan'])]}   // anyone can copy a terminal (was Jedi + Medic only)
+ if(isJedi(r))return['strike',...B,...P,...(r.rank>=2?['choke']:[]),'push','guard','meditate','subdue','stabilize','liftUp','door','console','scan'];
+ return['shoot',...B,...P,'overwatch','subdue','stabilize','liftUp','door',...(B.includes('scan')?[]:['scan'])]}   // anyone can copy a terminal (was Jedi + Medic only)
 // Roster entry → battle stats: class base + RANK_GAIN for every rank reached (data-campaign.js), then gear/perks/stress (templeMods).
 function battleUnit(r){const b=CLASS[r.cls],u={...b,n:r.n,cls:r.cls,col:r.col,rid:r.id,rank:r.rank,title:r.title,dark:r.dark||0,dmg:[...b.dmg]};delete u.desc;
  for(let k=2;k<=r.rank;k++){const G=RANK_GAIN[k]||{};u.hp+=G.hp||0;u.aim+=G.aim||0;u.will+=G.will||0;
@@ -80,6 +80,8 @@ function buildWing(k){const l=C.wings[k],cost=WINGS[k].cost[l+1];if(C.build||cos
 function addTroop(){const used=new Set(C.roster.map(r=>r.n)),n=RECRUIT_NAMES.find(x=>!used.has(x))||'Recruit '+C.nid;
  C.roster.push({id:'u'+C.nid++,n,cls:pickOne(troopClasses()),rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0})}
 function pickAbility(id,k){const r=C.roster.find(r=>r.id===id),p=r&&pendingRank(r);if(!p||!treeOpts(r,p).includes(k))return;r.picks.push(k);if(p===3)r.spec=Object.keys(TREES[r.cls].specs).find(n=>TREES[r.cls].specs[n].sig===k);r.pick=pendingRank(r);saveGame()}
+// Free respec any time (Jess 2026-10-23): clear picks, spec and borrowed skills; ranks re-prompt one by one.
+function respec(id){const r=C.roster.find(r=>r.id===id);if(!r)return;r.picks=[];r.spec=null;r.borrow=[];r.alt=null;if(typeof fixExtra==='function')fixExtra(r);r.pick=pendingRank(r);saveGame()}
 function launchMission(i,ids){ensureTemple();const o=C.options[i],sq=ids.map(id=>battleUnit(C.roster.find(r=>r.id===id)));chooseOption(i);
  startMission(o.mission,sq,{diff:C.diff,hostage:hostageFor(o),crisis:o.crisis||null,fewer:o.fewer||0})}
 // Squad size rules. twin.js overrides this for the second front (4 units, 0–2 Jedi, squad A's units excluded).

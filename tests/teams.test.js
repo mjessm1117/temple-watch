@@ -27,7 +27,7 @@ E('advance({adv:1})');check(E('C.news.some(n=>/Team (won|lost)/.test(n))'),'repo
 check(E('t0.filter(id=>unit(id).status==="active").every(id=>unit(id).fat===1)')&&E('played.every(id=>unit(id).fat===1)'),'both teams get 1 fatigue');
 // Fatigue
 E('var r=C.roster.find(x=>x.status==="active");r.fat=2;var a=battleUnit(r).aim;r.fat=0;var b=battleUnit(r).aim');
-check(E('a')===E('b')-10,'tired = −10 aim in battle');
+check(E('FATIGUE.at')===Infinity?E('a')===E('b'):E('a')===E('b')-10,'tired = −10 aim in battle (or no change while fatigue is off)');
 E('C.tFought=[];templeAdvance()');check(E('C.roster.filter(x=>x.status==="active").every(x=>!x.fat)'),'a step off clears fatigue');
 // Forced loss: one serious wound for sure; capture/death never both
 E('var _r=Math.random;Math.random=()=>0.995');

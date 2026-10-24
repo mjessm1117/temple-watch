@@ -7,8 +7,8 @@ Object.defineProperty(window,'W',{value:10,configurable:true,writable:true});Obj
 //             ^ raised ground (elev 1, walkable) · M high ledge (elev 2; reach it from ^, a 2-level step is a cliff)
 // B2 wave 7: every enemyAim +5 (bot won ~75% on Normal after graze/hack/melee charge/wing buffs; band 55–70).
 const DIFF={
- story: {n:'Story', enemyHp:-1,enemyAim:-5,extra:0,bleed:6,assist:10,bonusKit:1,income:1.3},
- normal:{n:'Normal',enemyHp:0, enemyAim:5,  extra:0,bleed:4,assist:10,bonusKit:0,income:1},
+ story: {n:'Story', enemyHp:-1,enemyAim:-10,extra:0,bleed:8,lift:4,assist:10,bonusKit:1,income:1.3},
+ normal:{n:'Normal',enemyHp:0, enemyAim:5,  extra:0,bleed:5,lift:2,assist:10,bonusKit:0,income:1},
  hard:  {n:'Hard',  enemyHp:0, enemyAim:10, extra:1,bleed:3,assist:0, bonusKit:0,income:.85},
  legend:{n:'Legend',enemyHp:1, enemyAim:15, extra:1,bleed:2,assist:0, bonusKit:0,income:.7}};
 const FOES={
