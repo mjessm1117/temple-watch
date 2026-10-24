@@ -21,7 +21,7 @@ const AP={max:3,
  eAttacks:2,                              // most attacks an enemy makes per turn (1-AP weapons can strike twice)
  backup:{aim:-10,dmg:-1},                 // Backup shot (free, once a turn): the best-placed ally fires at your target
  // Momentum: a squad meter (0..max). +1 per hit on an enemy, +1 per kill. Spend for free actions (data in MOM, abilities.js).
- foes:2,waveFoes:1,                       // more enemies (Jess 2026-10-24): extra grunts at mission start, extra per wave/dropship
+ foes:3,waveFoes:2,                       // more enemies (Jess 2026-10-24): extra grunts at mission start, extra per wave/dropship
  mom:{max:10,ap:3,aim:5,aimBuff:10,strike:8,strikeDmg:[3,5]}};
 const FOES={
  trooper:{desc:'Standard rifleman: 4 HP, range 8. Seeks cover and flanks.',n:'Sith Trooper',ic:'e_trooper',hp:4,aim:65,mob:5,dmg:[2,4],range:8,init:8},
