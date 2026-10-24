@@ -307,6 +307,6 @@ Spec: `docs/specs/action-points.md`. 3 AP per unit (enemies too), 1 AP = one ful
 ## Requests (wave 9, from R)
 - R → E (`render.js`/HUD): show the squad **Momentum** meter (`S.mom`, 0–`AP.mom.max`) in the top strip; today it only shows in the log and on the Surge/Rally/Fire Support buttons.
 - R → E: ability bar is longer now (assists + class kits). Consider grouping assists/momentum into a second row.
-- R → T (maps, new chat): full move per AP means a unit crosses a 10×12 board in one turn. Bigger boards (~18–24 a side) per Jess.
+- R → U (Maps & Scale, new chat; T is Phone + App): full move per AP means a unit crosses a 10×12 board in one turn. Bigger boards (~18–24 a side) per Jess.
 - R → identity/codex owner: `NICK_CLASS.Gunslinger` and a codex lore line for Gunslinger (falls back to Soldier nicknames today).
 - R → 3D (`view3d/units.js`): Gunslinger uses the default trooper model; a pistol prop would sell it.
