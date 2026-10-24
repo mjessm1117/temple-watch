@@ -3,9 +3,9 @@
 import {GLTFLoader} from '../../vendor/GLTFLoader.js';
 import {MeshoptDecoder} from '../../vendor/meshopt_decoder.module.js';
 // Themes that borrow another theme's wall (their own Meshy walls kept coming out with openings).
-export const WALL_OF=t=>'wall_'+({temple:'ruins',dock:'city'}[t]||t);
+export const WALL_OF=t=>'wall_'+({temple:'ruins',dock:'metal',city:'metal'}[t]||t);
 export const PROPS=new Set(['crate','barrel','console','terminal','relay','rubble','pillar','statue','brazier','container','gantry',
- ...['dock','city','jungle','snow','temple','ruins','plains','caves'].flatMap(t=>['wall_'+t,'door_'+t])]); // wall/door kit per theme (board.js)
+ ...['dock','city','jungle','snow','temple','ruins','plains','caves'].flatMap(t=>['wall_'+t,'door_'+t]),'wall_metal']); // wall/door kit per theme (board.js)
 // tile char → prop file
 export const PROP_OF={c:'crate',h:'crate',x:'barrel',k:'console',b:'console',q:'terminal',Q:'terminal',C:'terminal',X:'terminal',r:'rubble',O:'relay'};
 const cache={};let T=null;

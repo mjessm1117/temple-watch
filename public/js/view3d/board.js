@@ -56,7 +56,7 @@ export class Board{
  make(c,x,y){const T=this.T,g=new T.Group(),m=this.m,add=(geo,mat,sx,sy,sz,px=0,py=0,pz=0,ry=0)=>{const o=new T.Mesh(geo,mat);o.scale.set(sx,sy,sz);o.position.set(px,py,pz);o.rotation.y=ry;g.add(o);return o};
   const seed=(x*73+y*37)%7;
   switch(c){
-   case '#':if(this.kit&&addProp(g,WALL_OF(this.kit),1,FULL_H,(this.isNS(x,y)?Math.PI/2:0)+(seed%2)*Math.PI,1))break; // slab follows the wall lineadd(this.rbox(1,FULL_H,1),m.wall,1,1,1,0,FULL_H/2);add(this.rbox(1.02,.1,1.02,.035),m.wallTop,1,1,1,0,FULL_H);for(const [sx,sz,px,pz] of [[1.02,.03,0,.5],[1.02,.03,0,-.5],[.03,1.02,.5,0],[.03,1.02,-.5,0]])add(this.box,m.trim,sx,.03,sz,px,FULL_H+.05,pz).userData.noShadow=1;break;
+   case '#':if(this.kit&&addProp(g,WALL_OF(this.kit),1,FULL_H,(this.isNS(x,y)?Math.PI/2:0)+(seed%2)*Math.PI,1))break;add(this.rbox(1,FULL_H,1),m.wall,1,1,1,0,FULL_H/2);add(this.rbox(1.02,.1,1.02,.035),m.wallTop,1,1,1,0,FULL_H);for(const [sx,sz,px,pz] of [[1.02,.03,0,.5],[1.02,.03,0,-.5],[.03,1.02,.5,0],[.03,1.02,-.5,0]])add(this.box,m.trim,sx,.03,sz,px,FULL_H+.05,pz).userData.noShadow=1;break;
    case 'O':{if(!addProp(g,'O',.9,FULL_H+.3)){add(this.cyl,m.metal,.8,.5,.8,0,.25);add(this.cyl,m.wall,.22,FULL_H,.22,0,FULL_H/2+.2)}const r=add(new T.TorusGeometry(.32,.03,6,24),m.screen,1,1,1,0,1.25);r.rotation.x=Math.PI/2;
     r.userData.noShadow=1;this.anim.push({g,o:r,spin:1.5});add(new T.OctahedronGeometry(.12),m.screen,1,1,1,0,FULL_H+.35).userData.noShadow=1;break}
    case 'd':case 'D':case '_':{if(c!=='_'&&this.kit&&addProp(g,'door_'+this.kit,1,FULL_H,0,1)){if(c==='D')add(this.box,m.lock,.5,.06,.2,0,FULL_H+.12).userData.noShadow=1;if(this.isNS(x,y))g.rotation.y=Math.PI/2;break}
@@ -84,9 +84,9 @@ export class Board{
   for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const n=(G[y+dy]||[])[x+dx];if(n==null)continue;const ne=elevOf(n);if(ne>=e)continue;
    const lip=new T.Mesh(this.box,m.trim);lip.scale.set(dx?.04:1,.04,dy?.04:1);lip.position.set(dx*.5,.02,dy*.5);lip.userData.noShadow=1;g.add(lip);
    // One-level drop to walkable ground: a ramp if the tile is marked ramp, otherwise two steps. Two levels = cliff (lip only).
-   if(e-ne===1&&(TILES[n]||{}).walk){const d=EH;if((TILES[c]||{}).ramp){const len=.46,r=new T.Mesh(this.box,m.wallTop);r.scale.set(dx?Math.hypot(len,d):.7,.05,dy?Math.hypot(len,d):.7);
+   if(e-ne===1&&(TILES[n]||{}).walk){const d=EH;if((TILES[c]||{}).ramp){const len=.46+Math.min(.3,.12+d*.25)*.8,r=new T.Mesh(this.box,m.wallTop);r.scale.set(dx?Math.hypot(len,d):.7,.05,dy?Math.hypot(len,d):.7);
      const ang=Math.atan2(d,len);r.position.set(dx*(.5+len/2),-d/2,dy*(.5+len/2));if(dx)r.rotation.z=dx*ang;else r.rotation.x=-dy*ang;r.castShadow=false;g.add(r)}
-    else for(let i=1;i<=2;i++){const dep=.16*i,sh=d*(3-i)/3,st=new T.Mesh(this.rbox(dx?dep:.6,sh,dy?dep:.6,Math.min(.04,sh/3)),m.wallTop);st.position.set(dx*(.5+dep/2),-d+d*(3-i)/6,dy*(.5+dep/2));g.add(st)}}}
+    else for(let i=1;i<=2;i++){const F=Math.min(.3,.12+d*.25),dep=i===1?.16+F*.4:.3+F*.75,sh=d*(3-i)/3,st=new T.Mesh(this.rbox(dx?dep:.7,sh,dy?dep:.7,Math.min(.04,sh/3)),m.wallTop);st.position.set(dx*(.5+dep/2),-d+d*(3-i)/6,dy*(.5+dep/2));g.add(st)}}}
   return g}
  // Sloped, uneven rock face for one dropping side of a raised tile. Top edge stays on the tile edge (lips line up);
  // the foot flares out by F. Ends flare too when the side next to them also drops, so corners close without gaps.
