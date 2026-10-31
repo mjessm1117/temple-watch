@@ -31,6 +31,7 @@ func run() -> void:
 	_test_bot_medical()
 	await ControlsTest.run_checks(self, check)
 	await FxTest.run_checks(self, check)
+	await load("res://tests/map_test.gd").run_checks(self, check)
 	if "--quick" in OS.get_cmdline_user_args():
 		print("TEST RESULTS: %d checks, %d failures" % [checks, failures])
 		quit(1 if failures > 0 else 0)
