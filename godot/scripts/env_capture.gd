@@ -7,7 +7,9 @@ func _initialize() -> void:
 func capture() -> void:
 	var game = load("res://scenes/rescue.tscn").instantiate()
 	root.add_child(game)
-	var overview := "overview" in OS.get_cmdline_user_args()
+	var args := OS.get_cmdline_user_args()
+	var overview := "overview" in args
+	var benchmark := "benchmark" in args
 	if overview:
 		game.pivot = Vector3(12.5, 0, 11.0)
 		game.zoom = 51.0
@@ -28,10 +30,30 @@ func capture() -> void:
 			if view.motion != null: view.motion.kill()
 			view.position = Vector3(int(unit.x), 0, int(unit.y))
 	game._update_camera()
+	if benchmark:
+		await _benchmark()
+		return
 	game.hud.visible = false
-	await process_frame
+	for i in range(4): await process_frame
 	await RenderingServer.frame_post_draw
 	var path := "res://../docs/godot/shots/art-overview.png" if overview else "res://../docs/godot/shots/art-closeup.png"
+	for arg in args:
+		if arg.begins_with("--output="): path = arg.trim_prefix("--output=")
 	var error: Error = game.get_viewport().get_texture().get_image().save_png(ProjectSettings.globalize_path(path))
 	print("ART SCREENSHOT: %s (%s)" % [path, "ok" if error == OK else "error %d" % error])
 	quit(0 if error == OK else 1)
+
+func _benchmark() -> void:
+	for i in range(60): await RenderingServer.frame_post_draw
+	var samples: Array[float] = []
+	var last := Time.get_ticks_usec()
+	for i in range(180):
+		await RenderingServer.frame_post_draw
+		var now := Time.get_ticks_usec()
+		samples.append(float(now - last) / 1000.0)
+		last = now
+	samples.sort()
+	var total := 0.0
+	for sample in samples: total += sample
+	print("ART FRAME ms: mean %.2f, median %.2f, p95 %.2f, max %.2f, fps %.1f" % [total / samples.size(), samples[90], samples[171], samples[-1], 180000.0 / total])
+	quit()
