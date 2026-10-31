@@ -1,0 +1,3016 @@
+{
+  "PERKS": {
+    "flakVest": {
+      "name": "Flak Vest",
+      "ic": "st_armor",
+      "tip": "+1 armor pip: softens one more hit by 1.",
+      "mod": {
+        "armor": 1
+      },
+      "desc": "+1 armor pip: softens one more hit by 1."
+    },
+    "veteran": {
+      "name": "Veteran",
+      "ic": "st_aim",
+      "tip": "+10 aim and +1 HP.",
+      "mod": {
+        "aim": 10,
+        "hp": 1
+      },
+      "desc": "+10 aim and +1 HP."
+    },
+    "longshot": {
+      "name": "Long Shot",
+      "ic": "st_range",
+      "tip": "+2 range and +10% crit chance.",
+      "mod": {
+        "range": 2,
+        "crit": 10
+      },
+      "desc": "+2 range and +10% crit chance."
+    },
+    "killshot": {
+      "name": "Killshot",
+      "ic": "st_dmg",
+      "tip": "+1 damage on every shot.",
+      "mod": {
+        "dmg": 1
+      },
+      "desc": "+1 damage on every shot."
+    },
+    "fieldcraft": {
+      "name": "Fieldcraft",
+      "ic": "st_mob",
+      "tip": "+1 move and +1 HP.",
+      "mod": {
+        "mob": 1,
+        "hp": 1
+      },
+      "desc": "+1 move and +1 HP."
+    },
+    "fieldKit": {
+      "name": "Field Kit",
+      "ic": "medic",
+      "tip": "+1 medkit every mission.",
+      "mod": {
+        "kits": 1
+      },
+      "desc": "+1 medkit every mission."
+    },
+    "combatMedic": {
+      "name": "Combat Medic",
+      "ic": "st_aim",
+      "tip": "+10 aim and +1 damage.",
+      "mod": {
+        "aim": 10,
+        "dmg": 1
+      },
+      "desc": "+10 aim and +1 damage."
+    },
+    "traumaBag": {
+      "name": "Trauma Bag",
+      "ic": "medic",
+      "tip": "+2 medkits every mission.",
+      "mod": {
+        "kits": 2
+      },
+      "desc": "+2 medkits every mission."
+    },
+    "bandolier": {
+      "name": "Bandolier",
+      "ic": "grenade",
+      "tip": "+1 grenade every mission.",
+      "mod": {
+        "nades": 1
+      },
+      "desc": "+1 grenade every mission."
+    },
+    "juggernaut": {
+      "name": "Juggernaut",
+      "ic": "st_hp",
+      "tip": "+2 HP and +1 armor.",
+      "mod": {
+        "hp": 2,
+        "armor": 1
+      },
+      "desc": "+2 HP and +1 armor."
+    },
+    "gIron": {
+      "name": "Iron Body",
+      "ic": "st_will",
+      "desc": "+1 HP and +10 will.",
+      "mod": {
+        "hp": 1,
+        "will": 10
+      },
+      "tip": "+1 HP and +10 will."
+    },
+    "gDuelist": {
+      "name": "Duelist",
+      "ic": "st_crit",
+      "desc": "+5 aim and +10% crit chance.",
+      "mod": {
+        "aim": 5,
+        "crit": 10
+      },
+      "tip": "+5 aim and +10% crit chance."
+    },
+    "gBulwark": {
+      "name": "Bulwark",
+      "ic": "guard",
+      "desc": "+1 armor and +10 deflect while on Guard.",
+      "mod": {
+        "armor": 1,
+        "guardDef": 10
+      },
+      "tip": "+1 armor and +10 deflect while on Guard."
+    },
+    "gVanguard": {
+      "name": "Vanguard",
+      "ic": "st_mob",
+      "desc": "+1 move and +1 damage.",
+      "mod": {
+        "mob": 1,
+        "dmg": 1
+      },
+      "tip": "+1 move and +1 damage."
+    },
+    "gWarden": {
+      "name": "Warden",
+      "ic": "guard",
+      "desc": "+15 deflect.",
+      "mod": {
+        "deflect": 15
+      },
+      "tip": "+15 deflect."
+    },
+    "gUnbreakable": {
+      "name": "Unbreakable",
+      "ic": "st_hp",
+      "desc": "+2 HP and +1 armor.",
+      "mod": {
+        "hp": 2,
+        "armor": 1
+      },
+      "tip": "+2 HP and +1 armor."
+    },
+    "gMasterBlade": {
+      "name": "Master Blade",
+      "ic": "st_crit",
+      "desc": "+1 damage and +15% crit chance.",
+      "mod": {
+        "dmg": 1,
+        "crit": 15
+      },
+      "tip": "+1 damage and +15% crit chance."
+    },
+    "cResolve": {
+      "name": "Resolve",
+      "ic": "st_hp",
+      "desc": "+2 HP and +10 will.",
+      "mod": {
+        "hp": 2,
+        "will": 10
+      },
+      "tip": "+2 HP and +10 will."
+    },
+    "cWellspring": {
+      "name": "Wellspring",
+      "ic": "st_focus",
+      "desc": "+1 max Focus and +5 deflect.",
+      "mod": {
+        "maxF": 1,
+        "deflect": 5
+      },
+      "tip": "+1 max Focus and +5 deflect."
+    },
+    "cSeer": {
+      "name": "Battle Seer",
+      "ic": "st_aim",
+      "desc": "+10 aim and +1 move.",
+      "mod": {
+        "aim": 10,
+        "mob": 1
+      },
+      "tip": "+10 aim and +1 move."
+    },
+    "cMaster": {
+      "name": "Master of the Force",
+      "ic": "st_hp",
+      "desc": "+1 max Focus and +2 HP.",
+      "mod": {
+        "maxF": 1,
+        "hp": 2
+      },
+      "tip": "+1 max Focus and +2 HP."
+    },
+    "sExecutioner": {
+      "name": "Killer Instinct",
+      "ic": "st_crit",
+      "desc": "+5 aim and +15% crit chance.",
+      "mod": {
+        "aim": 5,
+        "crit": 15
+      },
+      "tip": "+5 aim and +15% crit chance."
+    },
+    "sEdge": {
+      "name": "Keen Edge",
+      "ic": "st_dmg",
+      "desc": "+1 damage.",
+      "mod": {
+        "dmg": 1
+      },
+      "tip": "+1 damage."
+    },
+    "sGhost": {
+      "name": "Ghost Step",
+      "ic": "st_crit",
+      "desc": "+1 move and +10% crit chance.",
+      "mod": {
+        "mob": 1,
+        "crit": 10
+      },
+      "tip": "+1 move and +10% crit chance."
+    },
+    "sHunter": {
+      "name": "Hunter",
+      "ic": "st_aim",
+      "desc": "+15 aim.",
+      "mod": {
+        "aim": 15
+      },
+      "tip": "+15 aim."
+    },
+    "sBlademaster": {
+      "name": "Blademaster",
+      "ic": "st_crit",
+      "desc": "+2 damage and +15% crit chance.",
+      "mod": {
+        "dmg": 2,
+        "crit": 15
+      },
+      "tip": "+2 damage and +15% crit chance."
+    },
+    "sUntouchable": {
+      "name": "Untouchable",
+      "ic": "guard",
+      "desc": "+20 deflect and +1 armor.",
+      "mod": {
+        "deflect": 20,
+        "armor": 1
+      },
+      "tip": "+20 deflect and +1 armor."
+    },
+    "wStalker": {
+      "name": "Stalker",
+      "ic": "st_crit",
+      "desc": "+5 aim and +10% crit chance.",
+      "mod": {
+        "aim": 5,
+        "crit": 10
+      },
+      "tip": "+5 aim and +10% crit chance."
+    },
+    "wBond": {
+      "name": "Wild Bond",
+      "ic": "st_will",
+      "desc": "+1 max Focus and +10 will.",
+      "mod": {
+        "maxF": 1,
+        "will": 10
+      },
+      "tip": "+1 max Focus and +10 will."
+    },
+    "wSeer": {
+      "name": "Far Sight",
+      "ic": "st_aim",
+      "desc": "+10 aim.",
+      "mod": {
+        "aim": 10
+      },
+      "tip": "+10 aim."
+    },
+    "wPrimal": {
+      "name": "Primal",
+      "ic": "st_dmg",
+      "desc": "+2 damage and +1 move.",
+      "mod": {
+        "dmg": 2,
+        "mob": 1
+      },
+      "tip": "+2 damage and +1 move."
+    },
+    "soTough": {
+      "name": "Tough",
+      "ic": "st_hp",
+      "desc": "+2 HP.",
+      "mod": {
+        "hp": 2
+      },
+      "tip": "+2 HP."
+    },
+    "soMarksman": {
+      "name": "Marksman",
+      "ic": "st_aim",
+      "desc": "+10 aim and +2 range.",
+      "mod": {
+        "aim": 10,
+        "range": 2
+      },
+      "tip": "+10 aim and +2 range."
+    },
+    "soSteel": {
+      "name": "Nerves of Steel",
+      "ic": "st_will",
+      "desc": "+1 armor and +15 will.",
+      "mod": {
+        "armor": 1,
+        "will": 15
+      },
+      "tip": "+1 armor and +15 will."
+    },
+    "soIronWill": {
+      "name": "Iron Will",
+      "ic": "guard",
+      "desc": "+2 HP and +20 will.",
+      "mod": {
+        "hp": 2,
+        "will": 20
+      },
+      "tip": "+2 HP and +20 will."
+    },
+    "soCommander": {
+      "name": "Commander",
+      "ic": "st_hp",
+      "desc": "+10 aim, +3 HP, +1 armor and +1 move.",
+      "mod": {
+        "aim": 10,
+        "hp": 3,
+        "armor": 1,
+        "mob": 1
+      },
+      "tip": "+10 aim, +3 HP, +1 armor and +1 move."
+    },
+    "soLegend": {
+      "name": "Living Legend",
+      "ic": "st_dmg",
+      "desc": "+2 damage and +10% crit chance.",
+      "mod": {
+        "dmg": 2,
+        "crit": 10
+      },
+      "tip": "+2 damage and +10% crit chance."
+    },
+    "scEagle": {
+      "name": "Eagle Eye",
+      "ic": "st_range",
+      "desc": "+2 range and +5 aim.",
+      "mod": {
+        "range": 2,
+        "aim": 5
+      },
+      "tip": "+2 range and +5 aim."
+    },
+    "scSniper": {
+      "name": "Sniper",
+      "ic": "st_aim",
+      "desc": "+10 aim.",
+      "mod": {
+        "aim": 10
+      },
+      "tip": "+10 aim."
+    },
+    "scAssassin": {
+      "name": "Assassin",
+      "ic": "st_crit",
+      "desc": "+20% crit chance.",
+      "mod": {
+        "crit": 20
+      },
+      "tip": "+20% crit chance."
+    },
+    "scSurvivor": {
+      "name": "Survivor",
+      "ic": "st_hp",
+      "desc": "+2 HP.",
+      "mod": {
+        "hp": 2
+      },
+      "tip": "+2 HP."
+    },
+    "scDeadly": {
+      "name": "Deadly",
+      "ic": "st_dmg",
+      "desc": "+1 damage.",
+      "mod": {
+        "dmg": 1
+      },
+      "tip": "+1 damage."
+    },
+    "scLegend": {
+      "name": "Ghost of the Rim",
+      "ic": "st_dmg",
+      "desc": "+2 damage and +10% crit chance.",
+      "mod": {
+        "dmg": 2,
+        "crit": 10
+      },
+      "tip": "+2 damage and +10% crit chance."
+    },
+    "mDrilled": {
+      "name": "Drilled",
+      "ic": "st_aim",
+      "desc": "+5 aim and +1 HP.",
+      "mod": {
+        "aim": 5,
+        "hp": 1
+      },
+      "tip": "+5 aim and +1 HP."
+    },
+    "mSurgeon": {
+      "name": "Surgeon",
+      "ic": "medic",
+      "desc": "+1 medkit and +1 HP.",
+      "mod": {
+        "kits": 1,
+        "hp": 1
+      },
+      "tip": "+1 medkit and +1 HP."
+    },
+    "mStoic": {
+      "name": "Stoic",
+      "ic": "st_hp",
+      "desc": "+2 HP and +10 will.",
+      "mod": {
+        "hp": 2,
+        "will": 10
+      },
+      "tip": "+2 HP and +10 will."
+    },
+    "mFieldSurgeon": {
+      "name": "Field Surgeon",
+      "ic": "medic",
+      "desc": "+2 medkits.",
+      "mod": {
+        "kits": 2
+      },
+      "tip": "+2 medkits."
+    },
+    "mMarksman": {
+      "name": "Sharpshooting Medic",
+      "ic": "st_aim",
+      "desc": "+10 aim and +1 damage.",
+      "mod": {
+        "aim": 10,
+        "dmg": 1
+      },
+      "tip": "+10 aim and +1 damage."
+    },
+    "mAngel": {
+      "name": "Angel of Mercy",
+      "ic": "medic",
+      "desc": "+2 medkits and +2 HP.",
+      "mod": {
+        "kits": 2,
+        "hp": 2
+      },
+      "tip": "+2 medkits and +2 HP."
+    },
+    "mVeteran": {
+      "name": "Veteran Medic",
+      "ic": "st_aim",
+      "desc": "+1 armor, +1 move and +10 aim.",
+      "mod": {
+        "armor": 1,
+        "mob": 1,
+        "aim": 10
+      },
+      "tip": "+1 armor, +1 move and +10 aim."
+    },
+    "hBrute": {
+      "name": "Brute",
+      "ic": "st_hp",
+      "desc": "+2 HP.",
+      "mod": {
+        "hp": 2
+      },
+      "tip": "+2 HP."
+    },
+    "hBulwark": {
+      "name": "Walking Bulwark",
+      "ic": "st_will",
+      "desc": "+1 armor and +10 will.",
+      "mod": {
+        "armor": 1,
+        "will": 10
+      },
+      "tip": "+1 armor and +10 will."
+    },
+    "hGunner": {
+      "name": "Steady Gunner",
+      "ic": "st_aim",
+      "desc": "+10 aim.",
+      "mod": {
+        "aim": 10
+      },
+      "tip": "+10 aim."
+    },
+    "hHeavyWeapons": {
+      "name": "Heavy Weapons",
+      "ic": "st_dmg",
+      "desc": "+1 damage and +1 range.",
+      "mod": {
+        "dmg": 1,
+        "range": 1
+      },
+      "tip": "+1 damage and +1 range."
+    },
+    "hTitan": {
+      "name": "Titan",
+      "ic": "st_hp",
+      "desc": "+3 HP.",
+      "mod": {
+        "hp": 3
+      },
+      "tip": "+3 HP."
+    },
+    "hWarlord": {
+      "name": "Warlord",
+      "ic": "st_dmg",
+      "desc": "+2 damage and +1 grenade.",
+      "mod": {
+        "dmg": 2,
+        "nades": 1
+      },
+      "tip": "+2 damage and +1 grenade."
+    },
+    "gAegis": {
+      "name": "Aegis",
+      "ic": "st_hp",
+      "desc": "+2 HP, +10 Guard deflect and +10 will.",
+      "mod": {
+        "hp": 2,
+        "guardDef": 10,
+        "will": 10
+      }
+    },
+    "gLastStand": {
+      "name": "Last Stand",
+      "ic": "st_hp",
+      "desc": "+4 HP.",
+      "mod": {
+        "hp": 4
+      }
+    },
+    "gWMFocus": {
+      "name": "Blade Focus",
+      "ic": "st_aim",
+      "desc": "+1 damage and +10 aim.",
+      "mod": {
+        "dmg": 1,
+        "aim": 10
+      }
+    },
+    "gWMStorm": {
+      "name": "Bladestorm",
+      "ic": "st_crit",
+      "desc": "+1 damage, +1 move and +15% crit chance.",
+      "mod": {
+        "dmg": 1,
+        "mob": 1,
+        "crit": 15
+      }
+    },
+    "cSageLight": {
+      "name": "Inner Light",
+      "ic": "st_hp",
+      "desc": "+2 HP, +10 will and +5 deflect.",
+      "mod": {
+        "hp": 2,
+        "will": 10,
+        "deflect": 5
+      }
+    },
+    "cSageEmpathy": {
+      "name": "Empathy",
+      "ic": "st_hp",
+      "desc": "+1 max Focus and +2 HP.",
+      "mod": {
+        "maxF": 1,
+        "hp": 2
+      }
+    },
+    "cSageAvatar": {
+      "name": "Vessel of the Force",
+      "ic": "st_focus",
+      "desc": "+2 max Focus and +2 HP.",
+      "mod": {
+        "maxF": 2,
+        "hp": 2
+      }
+    },
+    "cShWhisper": {
+      "name": "Whisper Strike",
+      "ic": "st_aim",
+      "desc": "+10 aim and +10% crit chance.",
+      "mod": {
+        "aim": 10,
+        "crit": 10
+      }
+    },
+    "cShVeil": {
+      "name": "Shadow Veil",
+      "ic": "guard",
+      "desc": "+1 move and +15 deflect.",
+      "mod": {
+        "mob": 1,
+        "deflect": 15
+      }
+    },
+    "cShMaster": {
+      "name": "Master of Shadows",
+      "ic": "st_dmg",
+      "desc": "+2 damage and +1 max Focus.",
+      "mod": {
+        "dmg": 2,
+        "maxF": 1
+      }
+    },
+    "sWatchSense": {
+      "name": "Watchful",
+      "ic": "st_aim",
+      "desc": "+15 aim and +10 will.",
+      "mod": {
+        "aim": 15,
+        "will": 10
+      }
+    },
+    "sWatchJudge": {
+      "name": "Judgment",
+      "ic": "st_crit",
+      "desc": "+2 damage and +15% crit chance.",
+      "mod": {
+        "dmg": 2,
+        "crit": 15
+      }
+    },
+    "sDancer": {
+      "name": "Dancer",
+      "ic": "guard",
+      "desc": "+1 move and +10 deflect.",
+      "mod": {
+        "mob": 1,
+        "deflect": 10
+      }
+    },
+    "sDanceFlow": {
+      "name": "Flow",
+      "ic": "st_crit",
+      "desc": "+5 aim and +15% crit chance.",
+      "mod": {
+        "aim": 5,
+        "crit": 15
+      }
+    },
+    "sDanceWhirl": {
+      "name": "Whirlwind",
+      "ic": "st_dmg",
+      "desc": "+1 damage and +1 move.",
+      "mod": {
+        "dmg": 1,
+        "mob": 1
+      }
+    },
+    "sDanceStorm": {
+      "name": "Storm of Blades",
+      "ic": "st_dmg",
+      "desc": "+2 damage and +1 move.",
+      "mod": {
+        "dmg": 2,
+        "mob": 1
+      }
+    },
+    "wBeastHide": {
+      "name": "Thick Hide",
+      "ic": "st_hp",
+      "desc": "+2 HP and +1 armor.",
+      "mod": {
+        "hp": 2,
+        "armor": 1
+      }
+    },
+    "wBeastPack": {
+      "name": "Pack Sense",
+      "ic": "st_aim",
+      "desc": "+10 aim and +10 will.",
+      "mod": {
+        "aim": 10,
+        "will": 10
+      }
+    },
+    "wBeastKing": {
+      "name": "Lord of Beasts",
+      "ic": "st_hp",
+      "desc": "+3 HP and +1 damage.",
+      "mod": {
+        "hp": 3,
+        "dmg": 1
+      }
+    },
+    "wEarthRoot": {
+      "name": "Rooted",
+      "ic": "st_will",
+      "desc": "+1 armor and +10 will.",
+      "mod": {
+        "armor": 1,
+        "will": 10
+      }
+    },
+    "wEarthStone": {
+      "name": "Stoneskin",
+      "ic": "st_hp",
+      "desc": "+2 HP and +5 deflect.",
+      "mod": {
+        "hp": 2,
+        "deflect": 5
+      }
+    },
+    "wEarthReach": {
+      "name": "Long Reach",
+      "ic": "st_aim",
+      "desc": "+1 max Focus and +10 aim.",
+      "mod": {
+        "maxF": 1,
+        "aim": 10
+      }
+    },
+    "wEarthWorld": {
+      "name": "One with the World",
+      "ic": "st_focus",
+      "desc": "+2 max Focus and +1 armor.",
+      "mod": {
+        "maxF": 2,
+        "armor": 1
+      }
+    },
+    "soSgtDrill": {
+      "name": "Drill Sergeant",
+      "ic": "st_will",
+      "desc": "+5 aim, +1 HP and +10 will.",
+      "mod": {
+        "aim": 5,
+        "hp": 1,
+        "will": 10
+      }
+    },
+    "soSgtHero": {
+      "name": "Hero of the Line",
+      "ic": "st_will",
+      "desc": "+3 HP, +1 armor and +20 will.",
+      "mod": {
+        "hp": 3,
+        "armor": 1,
+        "will": 20
+      }
+    },
+    "soVanCharge": {
+      "name": "Charge",
+      "ic": "st_mob",
+      "desc": "+1 move and +1 damage.",
+      "mod": {
+        "mob": 1,
+        "dmg": 1
+      }
+    },
+    "soVanPlate": {
+      "name": "Assault Plate",
+      "ic": "st_hp",
+      "desc": "+1 armor and +2 HP.",
+      "mod": {
+        "armor": 1,
+        "hp": 2
+      }
+    },
+    "soVanShred": {
+      "name": "Point Blank",
+      "ic": "st_crit",
+      "desc": "+1 damage and +10% crit chance.",
+      "mod": {
+        "dmg": 1,
+        "crit": 10
+      }
+    },
+    "soVanStorm": {
+      "name": "Stormbreaker",
+      "ic": "st_dmg",
+      "desc": "+2 damage and +1 move.",
+      "mod": {
+        "dmg": 2,
+        "mob": 1
+      }
+    },
+    "scSnStill": {
+      "name": "Stillness",
+      "ic": "st_aim",
+      "desc": "+10 aim and +2 range.",
+      "mod": {
+        "aim": 10,
+        "range": 2
+      }
+    },
+    "scSnOneShot": {
+      "name": "One Shot",
+      "ic": "st_crit",
+      "desc": "+2 damage and +20% crit chance.",
+      "mod": {
+        "dmg": 2,
+        "crit": 20
+      }
+    },
+    "scInfShadow": {
+      "name": "Slip Away",
+      "ic": "st_crit",
+      "desc": "+1 move and +15% crit chance.",
+      "mod": {
+        "mob": 1,
+        "crit": 15
+      }
+    },
+    "scInfKnife": {
+      "name": "Close Work",
+      "ic": "st_aim",
+      "desc": "+1 damage and +10 aim.",
+      "mod": {
+        "dmg": 1,
+        "aim": 10
+      }
+    },
+    "scInfPhantom": {
+      "name": "Phantom",
+      "ic": "st_mob",
+      "desc": "+2 move and +2 HP.",
+      "mod": {
+        "mob": 2,
+        "hp": 2
+      }
+    },
+    "scInfStrike": {
+      "name": "First Strike",
+      "ic": "st_dmg",
+      "desc": "+2 damage and +1 move.",
+      "mod": {
+        "dmg": 2,
+        "mob": 1
+      }
+    },
+    "mSurgCalm": {
+      "name": "Calm Hands",
+      "ic": "st_will",
+      "desc": "+3 HP and +20 will.",
+      "mod": {
+        "hp": 3,
+        "will": 20
+      }
+    },
+    "mSurgMiracle": {
+      "name": "Miracle Worker",
+      "ic": "medic",
+      "desc": "+3 medkits.",
+      "mod": {
+        "kits": 3
+      }
+    },
+    "mTechArmor": {
+      "name": "Rigged Armor",
+      "ic": "st_armor",
+      "desc": "+1 armor and +1 HP.",
+      "mod": {
+        "armor": 1,
+        "hp": 1
+      }
+    },
+    "mTechOverclock": {
+      "name": "Overclocked Blaster",
+      "ic": "st_aim",
+      "desc": "+10 aim and +1 damage.",
+      "mod": {
+        "aim": 10,
+        "dmg": 1
+      }
+    },
+    "mTechDrones": {
+      "name": "Drone Swarm",
+      "ic": "medic",
+      "desc": "+2 medkits and +1 armor.",
+      "mod": {
+        "kits": 2,
+        "armor": 1
+      }
+    },
+    "hDemoExtra": {
+      "name": "Extra Charges",
+      "ic": "grenade",
+      "desc": "+1 grenade and +1 range.",
+      "mod": {
+        "nades": 1,
+        "range": 1
+      }
+    },
+    "hDemoBlast": {
+      "name": "Shaped Charges",
+      "ic": "st_dmg",
+      "desc": "+1 damage and +1 grenade.",
+      "mod": {
+        "dmg": 1,
+        "nades": 1
+      }
+    },
+    "hDemoSapper": {
+      "name": "Sapper",
+      "ic": "grenade",
+      "desc": "+2 grenades.",
+      "mod": {
+        "nades": 2
+      }
+    },
+    "hDemoBig": {
+      "name": "Big Gun",
+      "ic": "st_dmg",
+      "desc": "+2 damage and +1 range.",
+      "mod": {
+        "dmg": 2,
+        "range": 1
+      }
+    },
+    "hBulTaunt": {
+      "name": "Draw Fire",
+      "ic": "st_will",
+      "desc": "+2 HP and +20 will.",
+      "mod": {
+        "hp": 2,
+        "will": 20
+      }
+    },
+    "hBulFort": {
+      "name": "Fortress",
+      "ic": "st_hp",
+      "desc": "+1 armor and +2 HP.",
+      "mod": {
+        "armor": 1,
+        "hp": 2
+      }
+    },
+    "gChallenge": {
+      "name": "Riposte",
+      "ic": "strike",
+      "desc": "Enemies that hit you in melee take 1 damage. +5 Guard.",
+      "mod": {
+        "guardDef": 5
+      },
+      "fx": {
+        "riposte": 1
+      }
+    },
+    "gStalwart": {
+      "name": "Stalwart",
+      "ic": "guard",
+      "desc": "Once per mission, a killing blow leaves you at 1 HP instead. +1 HP.",
+      "mod": {
+        "hp": 1
+      },
+      "fx": {
+        "lastStand": 1
+      }
+    },
+    "cSerene": {
+      "name": "Serene",
+      "ic": "meditate",
+      "desc": "Start missions with +1 Focus. Your heals restore +1 HP.",
+      "fx": {
+        "focusStart": 1,
+        "healPlus": 1
+      }
+    },
+    "cPresence": {
+      "name": "Presence",
+      "ic": "sense",
+      "desc": "You and allies within 3 tiles get +5 aim.",
+      "fx": {
+        "auraAim": 5
+      }
+    },
+    "sSwift": {
+      "name": "Swift Kill",
+      "ic": "dash",
+      "desc": "Each kill gives +1 move for the mission (max +2).",
+      "fx": {
+        "killMove": 1
+      }
+    },
+    "sHunterMark": {
+      "name": "Hunter’s Mark",
+      "ic": "mark",
+      "desc": "+15 aim and +1 damage against elites and bosses.",
+      "fx": {
+        "eliteAim": 15,
+        "eliteDmg": 1
+      }
+    },
+    "wLiving": {
+      "name": "Living Force",
+      "ic": "meditate",
+      "desc": "Regain 1 HP at the start of each turn.",
+      "fx": {
+        "regen": 1
+      }
+    },
+    "wWind": {
+      "name": "Wind-walker",
+      "ic": "leap",
+      "desc": "+1 move. Enemies get −10 aim against you.",
+      "mod": {
+        "mob": 1
+      },
+      "fx": {
+        "dodge": 10
+      }
+    },
+    "soBreach": {
+      "name": "Breach",
+      "ic": "shoot",
+      "desc": "Your first hit each mission: +15 aim, +2 damage.",
+      "fx": {
+        "openAim": 15,
+        "openDmg": 2
+      }
+    },
+    "soAdrenaline": {
+      "name": "Adrenaline",
+      "ic": "st_dmg",
+      "desc": "At half HP or less: +10 aim and +1 damage.",
+      "fx": {
+        "lowAim": 10,
+        "lowDmg": 1
+      }
+    },
+    "scFlanker": {
+      "name": "Flanker",
+      "ic": "shoot",
+      "desc": "+10 aim and +1 damage against targets out of cover.",
+      "fx": {
+        "expAim": 10,
+        "expDmg": 1
+      }
+    },
+    "scEvasive": {
+      "name": "Evasive",
+      "ic": "conceal",
+      "desc": "Enemies get −15 aim against you.",
+      "fx": {
+        "dodge": 15
+      }
+    },
+    "mTriage": {
+      "name": "Triage Kit",
+      "ic": "medic",
+      "desc": "+1 medkit. Your heals restore +1 HP.",
+      "mod": {
+        "kits": 1
+      },
+      "fx": {
+        "healPlus": 1
+      }
+    },
+    "mHardy": {
+      "name": "Hard to Kill",
+      "ic": "guard",
+      "desc": "Once per mission, a killing blow leaves you at 1 HP instead.",
+      "fx": {
+        "lastStand": 1
+      }
+    },
+    "hCoverMe": {
+      "name": "Cover Me",
+      "ic": "guard",
+      "desc": "Allies next to you take 1 less damage.",
+      "fx": {
+        "ward": 1
+      }
+    },
+    "hPayload": {
+      "name": "Payload",
+      "ic": "grenade",
+      "desc": "+1 grenade. Grenades and rockets deal +1 damage.",
+      "mod": {
+        "nades": 1
+      },
+      "fx": {
+        "nadeDmg": 1
+      }
+    },
+    "gpBastion": {
+      "name": "Bastion",
+      "ic": "guard",
+      "desc": "Allies next to you take 1 less damage. +1 HP.",
+      "mod": {
+        "hp": 1
+      },
+      "fx": {
+        "ward": 1
+      }
+    },
+    "gpBeacon": {
+      "name": "Beacon of the Order",
+      "ic": "sense",
+      "desc": "You and allies within 3 tiles get +5 aim. +10 will.",
+      "mod": {
+        "will": 10
+      },
+      "fx": {
+        "auraAim": 5
+      }
+    },
+    "gpUndying": {
+      "name": "Undying",
+      "ic": "meditate",
+      "desc": "Survive one killing blow at 1 HP; regain 1 HP each turn.",
+      "fx": {
+        "lastStand": 1,
+        "regen": 1
+      }
+    },
+    "gpLiving": {
+      "name": "Living Shield",
+      "ic": "guard",
+      "desc": "Enemies −15 aim against you; allies next to you take 1 less damage.",
+      "fx": {
+        "dodge": 15,
+        "ward": 1
+      }
+    },
+    "gwForm": {
+      "name": "Opening Form",
+      "ic": "strike",
+      "desc": "Your first hit each mission: +20 aim, +2 damage.",
+      "fx": {
+        "openAim": 20,
+        "openDmg": 2
+      }
+    },
+    "gwWind": {
+      "name": "Second Wind",
+      "ic": "medic",
+      "desc": "Each kill heals you 2.",
+      "fx": {
+        "killHeal": 2
+      }
+    },
+    "gwCounter": {
+      "name": "Counter-cut",
+      "ic": "strike",
+      "desc": "Enemies that hit you in melee take 2 damage.",
+      "fx": {
+        "riposte": 2
+      }
+    },
+    "gwRampage": {
+      "name": "Rampage",
+      "ic": "sweep",
+      "desc": "Melee kills refund an action, up to 3 times a turn. Each kill +1 damage (max +3).",
+      "fx": {
+        "chainMelee": 3,
+        "killDmg": 1
+      }
+    },
+    "csTouch": {
+      "name": "Healing Touch",
+      "ic": "medic",
+      "desc": "Heals restore +1 HP. Start missions with +1 Focus.",
+      "fx": {
+        "healPlus": 1,
+        "focusStart": 1
+      }
+    },
+    "csCalm": {
+      "name": "Calm Center",
+      "ic": "meditate",
+      "desc": "You and allies within 3 tiles get +5 aim. +10 will.",
+      "mod": {
+        "will": 10
+      },
+      "fx": {
+        "auraAim": 5
+      }
+    },
+    "csWard": {
+      "name": "Warding Light",
+      "ic": "guard",
+      "desc": "Allies next to you take 1 less damage.",
+      "fx": {
+        "ward": 1
+      }
+    },
+    "csEternal": {
+      "name": "Light Eternal",
+      "ic": "meditate",
+      "desc": "Survive one killing blow at 1 HP. Start missions with +2 Focus.",
+      "fx": {
+        "lastStand": 1,
+        "focusStart": 2
+      }
+    },
+    "chUnseen": {
+      "name": "Unseen Strike",
+      "ic": "strike",
+      "desc": "Your first hit each mission: +20 aim, +3 damage.",
+      "fx": {
+        "openAim": 20,
+        "openDmg": 3
+      }
+    },
+    "chFade": {
+      "name": "Fade",
+      "ic": "conceal",
+      "desc": "Enemies get −15 aim against you.",
+      "fx": {
+        "dodge": 15
+      }
+    },
+    "chFeed": {
+      "name": "Feed on Fear",
+      "ic": "mark",
+      "desc": "Each kill restores 2 Focus.",
+      "fx": {
+        "killFocus": 2
+      }
+    },
+    "chCascade": {
+      "name": "Cascade",
+      "ic": "stunned",
+      "desc": "Kills refund an action, up to 2 times a turn. +15 aim, +2 damage vs elites.",
+      "fx": {
+        "chain": 2,
+        "eliteAim": 15,
+        "eliteDmg": 2
+      }
+    },
+    "swTrack": {
+      "name": "Tracker",
+      "ic": "mark",
+      "desc": "+15 aim and +1 damage against targets out of cover.",
+      "fx": {
+        "expAim": 15,
+        "expDmg": 1
+      }
+    },
+    "swNerve": {
+      "name": "Steel Nerve",
+      "ic": "guard",
+      "desc": "At half HP or less: +15 aim and +1 damage. +10 will.",
+      "mod": {
+        "will": 10
+      },
+      "fx": {
+        "lowAim": 15,
+        "lowDmg": 1
+      }
+    },
+    "swDuel": {
+      "name": "Duelist’s Eye",
+      "ic": "strike",
+      "desc": "+10 aim and +2 damage against elites and bosses.",
+      "fx": {
+        "eliteAim": 10,
+        "eliteDmg": 2
+      }
+    },
+    "swInquis": {
+      "name": "Inquisitor",
+      "ic": "sense",
+      "desc": "+15 aim vs Force users, +20 vs horrors. Kills refund an action, once a turn.",
+      "aimVs": {
+        "force": 15,
+        "horror": 20
+      },
+      "fx": {
+        "chain": 1
+      }
+    },
+    "sbBlur": {
+      "name": "Blur",
+      "ic": "leap",
+      "desc": "Enemies get −15 aim against you.",
+      "fx": {
+        "dodge": 15
+      }
+    },
+    "sbCombo": {
+      "name": "Combo",
+      "ic": "flurry",
+      "desc": "Each kill: +1 damage for the mission (max +3).",
+      "fx": {
+        "killDmg": 1
+      }
+    },
+    "sbRiposte": {
+      "name": "Riposte Dance",
+      "ic": "strike",
+      "desc": "Enemies that hit you in melee take 2 damage.",
+      "fx": {
+        "riposte": 2
+      }
+    },
+    "sbStorm": {
+      "name": "Whirling Rampage",
+      "ic": "sweep",
+      "desc": "Melee kills refund an action, up to 3 times a turn; each kill heals 1.",
+      "fx": {
+        "chainMelee": 3,
+        "killHeal": 1
+      }
+    },
+    "wbPack": {
+      "name": "Pack Hunter",
+      "ic": "mark",
+      "desc": "+10 aim when an ally is next to you.",
+      "fx": {
+        "adjAim": 10
+      }
+    },
+    "wbHide": {
+      "name": "Mending Hide",
+      "ic": "hunker",
+      "desc": "Regain 1 HP at the start of each turn.",
+      "fx": {
+        "regen": 1
+      }
+    },
+    "wbHowl": {
+      "name": "Rallying Howl",
+      "ic": "sense",
+      "desc": "You and allies within 3 tiles get +5 aim.",
+      "fx": {
+        "auraAim": 5
+      }
+    },
+    "wbAlpha": {
+      "name": "Alpha",
+      "ic": "strike",
+      "desc": "Kills refund an action, up to 2 times a turn; each kill heals 2.",
+      "fx": {
+        "chain": 2,
+        "killHeal": 2
+      }
+    },
+    "weFault": {
+      "name": "Fault Line",
+      "ic": "tremor",
+      "desc": "+2 damage against targets out of cover.",
+      "fx": {
+        "expDmg": 2
+      }
+    },
+    "weStone": {
+      "name": "Stone Ward",
+      "ic": "guard",
+      "desc": "Allies next to you take 1 less damage.",
+      "fx": {
+        "ward": 1
+      }
+    },
+    "weAnchor": {
+      "name": "Anchored",
+      "ic": "hunker",
+      "desc": "Survive one killing blow at 1 HP.",
+      "fx": {
+        "lastStand": 1
+      }
+    },
+    "weMountain": {
+      "name": "The Mountain",
+      "ic": "guard",
+      "desc": "Enemies −10 aim against you; regain 1 HP each turn.",
+      "fx": {
+        "dodge": 10,
+        "regen": 1
+      }
+    },
+    "sgCover": {
+      "name": "Cover Formation",
+      "ic": "guard",
+      "desc": "Allies next to you take 1 less damage.",
+      "fx": {
+        "ward": 1
+      }
+    },
+    "sgOrders": {
+      "name": "Orders",
+      "ic": "mark",
+      "desc": "You and allies within 3 tiles get +5 aim.",
+      "fx": {
+        "auraAim": 5
+      }
+    },
+    "sgStand": {
+      "name": "Last Man Standing",
+      "ic": "hunker",
+      "desc": "Survive one killing blow at 1 HP.",
+      "fx": {
+        "lastStand": 1
+      }
+    },
+    "sgVictory": {
+      "name": "Lead from the Front",
+      "ic": "shoot",
+      "desc": "Kills refund an action, once a turn. Each kill heals 2. +20 will.",
+      "mod": {
+        "will": 20
+      },
+      "fx": {
+        "chain": 1,
+        "killHeal": 2
+      }
+    },
+    "svRush": {
+      "name": "Momentum",
+      "ic": "dash",
+      "desc": "Each kill gives +1 move for the mission (max +2).",
+      "fx": {
+        "killMove": 1
+      }
+    },
+    "svBrawl": {
+      "name": "Brawler",
+      "ic": "strike",
+      "desc": "Enemies that hit you in melee take 2 damage.",
+      "fx": {
+        "riposte": 2
+      }
+    },
+    "svFury": {
+      "name": "Fury",
+      "ic": "st_dmg",
+      "desc": "At half HP or less: +2 damage.",
+      "fx": {
+        "lowDmg": 2
+      }
+    },
+    "svRampage": {
+      "name": "Rampage",
+      "ic": "shoot",
+      "desc": "Kills within 4 tiles refund an action, up to 3 times a turn.",
+      "fx": {
+        "chainMelee": 3,
+        "closeAim": 5
+      }
+    },
+    "ssPerch": {
+      "name": "Perch",
+      "ic": "mark",
+      "desc": "+10 aim and +1 damage against targets 7+ tiles away.",
+      "fx": {
+        "farAim": 10,
+        "farDmg": 1
+      }
+    },
+    "ssExposed": {
+      "name": "Exposed",
+      "ic": "shoot",
+      "desc": "+2 damage against targets out of cover.",
+      "fx": {
+        "expDmg": 2
+      }
+    },
+    "ssBigGame": {
+      "name": "Big Game",
+      "ic": "mark",
+      "desc": "+15 aim and +2 damage against elites and bosses.",
+      "fx": {
+        "eliteAim": 15,
+        "eliteDmg": 2
+      }
+    },
+    "ssStreak": {
+      "name": "Back to Back",
+      "ic": "shoot",
+      "desc": "Kills 5+ tiles away refund an action, up to 3 times a turn. First shot each mission +20 aim.",
+      "fx": {
+        "chainFar": 3,
+        "openAim": 20
+      }
+    },
+    "siVanish": {
+      "name": "Vanish",
+      "ic": "conceal",
+      "desc": "Enemies get −15 aim against you.",
+      "fx": {
+        "dodge": 15
+      }
+    },
+    "siKnife": {
+      "name": "Knife Work",
+      "ic": "strike",
+      "desc": "+15 aim and +1 damage within 4 tiles.",
+      "fx": {
+        "closeAim": 15,
+        "closeDmg": 1
+      }
+    },
+    "siHunt": {
+      "name": "Hunter",
+      "ic": "dash",
+      "desc": "Each kill: +1 move (max +2) and heal 1.",
+      "fx": {
+        "killMove": 1,
+        "killHeal": 1
+      }
+    },
+    "siSabo": {
+      "name": "Saboteur",
+      "ic": "grenade",
+      "desc": "+20 aim against droids. Grenades +1 damage. Kills refund an action, once a turn.",
+      "aimVs": {
+        "droid": 20
+      },
+      "fx": {
+        "nadeDmg": 1,
+        "chain": 1
+      }
+    },
+    "mdHands": {
+      "name": "Steady Hands",
+      "ic": "medic",
+      "desc": "Your heals restore +1 HP.",
+      "fx": {
+        "healPlus": 1
+      }
+    },
+    "mdCover": {
+      "name": "Medical Cover",
+      "ic": "guard",
+      "desc": "Allies next to you take 1 less damage.",
+      "fx": {
+        "ward": 1
+      }
+    },
+    "mdLast": {
+      "name": "Not Today",
+      "ic": "hunker",
+      "desc": "Survive one killing blow at 1 HP.",
+      "fx": {
+        "lastStand": 1
+      }
+    },
+    "mdMiracle": {
+      "name": "Miracle",
+      "ic": "medic",
+      "desc": "+1 medkit. Your heals restore +2 HP.",
+      "mod": {
+        "kits": 1
+      },
+      "fx": {
+        "healPlus": 2
+      }
+    },
+    "mtDroid": {
+      "name": "Droid Breaker",
+      "ic": "shoot",
+      "desc": "+20 aim against droids.",
+      "aimVs": {
+        "droid": 20
+      }
+    },
+    "mtPlate": {
+      "name": "Deflector Plate",
+      "ic": "hunker",
+      "desc": "+1 armor. Enemies get −10 aim against you.",
+      "mod": {
+        "armor": 1
+      },
+      "fx": {
+        "dodge": 10
+      }
+    },
+    "mtOver": {
+      "name": "Overcharge",
+      "ic": "shoot",
+      "desc": "+2 damage against targets out of cover.",
+      "fx": {
+        "expDmg": 2
+      }
+    },
+    "mtNet": {
+      "name": "Tactical Net",
+      "ic": "drone",
+      "desc": "You and allies within 3 tiles get +5 aim; allies next to you take 1 less damage.",
+      "fx": {
+        "auraAim": 5,
+        "ward": 1
+      }
+    },
+    "hdHeavy": {
+      "name": "Heavy Ordnance",
+      "ic": "grenade",
+      "desc": "Grenades and rockets deal +1 damage.",
+      "fx": {
+        "nadeDmg": 1
+      }
+    },
+    "hdShock": {
+      "name": "Shockwave",
+      "ic": "grenade",
+      "desc": "+1 range; +1 damage against targets out of cover.",
+      "mod": {
+        "range": 1
+      },
+      "fx": {
+        "expDmg": 1
+      }
+    },
+    "hdBuster": {
+      "name": "Bunker Buster",
+      "ic": "shoot",
+      "desc": "+2 damage against elites and bosses.",
+      "fx": {
+        "eliteDmg": 2
+      }
+    },
+    "hdArmageddon": {
+      "name": "Armageddon",
+      "ic": "grenade",
+      "desc": "+2 grenades; blasts +1 damage. Kills refund an action, once a turn.",
+      "mod": {
+        "nades": 2
+      },
+      "fx": {
+        "nadeDmg": 1,
+        "chain": 1
+      }
+    },
+    "hbWall": {
+      "name": "Wall",
+      "ic": "guard",
+      "desc": "Allies next to you take 1 less damage.",
+      "fx": {
+        "ward": 1
+      }
+    },
+    "hbSpite": {
+      "name": "Spite",
+      "ic": "strike",
+      "desc": "Enemies that hit you in melee take 2 damage.",
+      "fx": {
+        "riposte": 2
+      }
+    },
+    "hbIron": {
+      "name": "Iron Will",
+      "ic": "hunker",
+      "desc": "Survive one killing blow at 1 HP; regain 1 HP each turn.",
+      "fx": {
+        "lastStand": 1,
+        "regen": 1
+      }
+    },
+    "hbAnchor": {
+      "name": "Anchor",
+      "ic": "guard",
+      "desc": "+1 armor. You and allies within 3 tiles get +5 aim.",
+      "mod": {
+        "armor": 1
+      },
+      "fx": {
+        "auraAim": 5
+      }
+    },
+    "tkGuardPost": {
+      "name": "Guard Post",
+      "ic": "guard",
+      "desc": "Enemies get −10 aim against allies next to you.",
+      "fx": {
+        "shelter": 10
+      }
+    },
+    "tkFortress": {
+      "name": "Fortress",
+      "ic": "hunker",
+      "desc": "+1 armor and +2 HP.",
+      "mod": {
+        "armor": 1,
+        "hp": 2
+      }
+    },
+    "tkColossus": {
+      "name": "Colossus",
+      "ic": "guard",
+      "desc": "Survive one killing blow at 1 HP; regain 2 HP each turn; allies next to you take 1 less damage.",
+      "fx": {
+        "lastStand": 1,
+        "regen": 2,
+        "ward": 1
+      }
+    },
+    "tkParry": {
+      "name": "Parry",
+      "ic": "strike",
+      "desc": "+15 deflect. Enemies that hit you in melee take 1 damage.",
+      "mod": {
+        "deflect": 15
+      },
+      "fx": {
+        "riposte": 1
+      }
+    },
+    "tkRedirect": {
+      "name": "Redirect",
+      "ic": "guard",
+      "desc": "+10 deflect. Enemies get −10 aim against you.",
+      "mod": {
+        "deflect": 10
+      },
+      "fx": {
+        "dodge": 10
+      }
+    },
+    "tkWall": {
+      "name": "Wall of Light",
+      "ic": "guard",
+      "desc": "+15 deflect.",
+      "mod": {
+        "deflect": 15
+      }
+    },
+    "tkSoresu": {
+      "name": "Soresu Master",
+      "ic": "guard",
+      "desc": "+20 deflect, enemies −10 aim against you, melee attackers take 2.",
+      "mod": {
+        "deflect": 20
+      },
+      "fx": {
+        "dodge": 10,
+        "riposte": 2
+      }
+    },
+    "tkShieldWall": {
+      "name": "Shield Wall",
+      "ic": "guard",
+      "desc": "Enemies get −15 aim against allies next to you.",
+      "fx": {
+        "shelter": 15
+      }
+    },
+    "tkBastion": {
+      "name": "Living Bastion",
+      "ic": "hunker",
+      "desc": "+2 armor. Allies next to you take 1 less damage.",
+      "mod": {
+        "armor": 2
+      },
+      "fx": {
+        "ward": 1
+      }
+    },
+    "gsQuickDraw": {
+      "name": "Quick Draw",
+      "ic": "shoot",
+      "desc": "Your first Shoot each turn costs 1 less AP (a pistol shot is free).",
+      "fx": {
+        "quickDraw": 1
+      }
+    },
+    "gsHitRun": {
+      "name": "Hit and Run",
+      "ic": "dash",
+      "desc": "Attacking a flanked enemy refunds 1 AP, once a turn.",
+      "fx": {
+        "hitRun": 1
+      }
+    },
+    "gsTrick": {
+      "name": "Trick Shot",
+      "ic": "shoot",
+      "desc": "+15 crit chance.",
+      "mod": {
+        "crit": 15
+      }
+    },
+    "gsDeadShot": {
+      "name": "Dead Shot",
+      "ic": "shoot",
+      "desc": "+2 damage within 4 tiles.",
+      "fx": {
+        "closeDmg": 2
+      }
+    },
+    "gsReflex": {
+      "name": "Reflexes",
+      "ic": "conceal",
+      "desc": "Enemies get −10 aim against you.",
+      "fx": {
+        "dodge": 10
+      }
+    },
+    "gsSpeed": {
+      "name": "Fast Hands",
+      "ic": "dash",
+      "desc": "+1 move. A kill refunds 1 AP, once a turn.",
+      "mod": {
+        "mob": 1
+      },
+      "fx": {
+        "chain": 1
+      }
+    }
+  },
+  "TRAITS": {
+    "steady": {
+      "n": "Steady",
+      "tip": "+5 aim",
+      "mod": {
+        "aim": 5
+      }
+    },
+    "reckless": {
+      "n": "Reckless",
+      "tip": "+1 move, −5 aim",
+      "mod": {
+        "mob": 1,
+        "aim": -5
+      }
+    },
+    "compassionate": {
+      "n": "Compassionate",
+      "tip": "+1 HP",
+      "mod": {
+        "hp": 1
+      }
+    },
+    "ambitious": {
+      "n": "Ambitious",
+      "tip": "+10% XP",
+      "xp": 1.1
+    },
+    "curious": {
+      "n": "Curious",
+      "tip": "+1 Intel after every won mission",
+      "intel": 1
+    }
+  },
+  "ORIGINS": {
+    "jedi": [
+      "Temple-raised",
+      "Late found"
+    ],
+    "troop": [
+      "Republic Army",
+      "Temple Guard",
+      "Hired"
+    ]
+  },
+  "SPECIES": [
+    "Human",
+    "Twi'lek",
+    "Mirialan",
+    "Zabrak",
+    "Togruta",
+    "Kel Dor",
+    "Rodian"
+  ],
+  "AGES": {
+    "Padawan": [
+      14,
+      19
+    ],
+    "Knight": [
+      22,
+      40
+    ],
+    "troop": [
+      20,
+      35
+    ]
+  },
+  "JEDI_NAMES": [
+    "Vela Sorn",
+    "Arin Taal",
+    "Quin Vasro",
+    "Myra Kell",
+    "Teo Lanris",
+    "Shae Orrin",
+    "Bastil Rhe",
+    "Nim Calder"
+  ],
+  "BOND": {
+    "max": 8,
+    "need": [
+      8,
+      10,
+      12,
+      14,
+      16,
+      18,
+      20,
+      22
+    ],
+    "aim": 5,
+    "maxAim": 10,
+    "aimAt": 2,
+    "reactAt": 4,
+    "griefAt": 6,
+    "fear": 2,
+    "together": 6,
+    "win": 3,
+    "saved": 15,
+    "field": 5,
+    "den": 2
+  },
+  "QUESTS": {
+    "crystal": {
+      "n": "The crystal calls",
+      "who": "jedi",
+      "mission": "shrine",
+      "text": "{n} hears a kyber crystal singing at a shrine, and Sith boots closing in.",
+      "res": {
+        "kyber": 1
+      },
+      "mod": {
+        "aim": 5
+      },
+      "txt": "+1 Kyber; {n} bonds with the crystal: +5 aim"
+    },
+    "whisper": {
+      "n": "A dark whisper",
+      "who": "dark",
+      "mission": "shrine",
+      "text": "{n} keeps hearing a voice that promises strength. Face it at the old shrine.",
+      "dark": -4,
+      "txt": "{n} silences the voice: Darkness −4"
+    },
+    "master": {
+      "n": "The fallen master",
+      "who": "jedi",
+      "needLegend": 1,
+      "mission": "rescue",
+      "text": "{n} learns their old master’s things were taken by raiders. Get them back.",
+      "mod": {
+        "hp": 1,
+        "aim": 5
+      },
+      "txt": "{n} carries the master’s relic: +1 HP, +5 aim"
+    },
+    "family": {
+      "n": "Lost family",
+      "who": "troop",
+      "mission": "rescue",
+      "text": "{n}’s brother was seized by Sith raiders. {n} asks to go.",
+      "recruit": 1,
+      "mod": {
+        "hp": 1
+      },
+      "txt": "The brother joins up (free recruit); {n} +1 HP"
+    },
+    "debt": {
+      "n": "Old debt",
+      "who": "troop",
+      "mission": "rescue",
+      "text": "A Hutt broker holds a debt over {n}. Settle it the Jedi way: free his captive.",
+      "res": {
+        "credits": 120
+      },
+      "txt": "+120 Credits"
+    },
+    "home": {
+      "n": "Homeworld burns",
+      "who": "any",
+      "mission": "shrine",
+      "text": "Raiders are torching {n}’s home village. Hold the line until the militia comes.",
+      "res": {
+        "favor": 6,
+        "intel": 2
+      },
+      "txt": "+6 Senate Favor, +2 Intel"
+    }
+  },
+  "STRESS": {
+    "base": 3,
+    "light": 3,
+    "serious": 6,
+    "grave": 10,
+    "allyDied": 8,
+    "horror": 8,
+    "lost": 4,
+    "bench": 15,
+    "rest": 15,
+    "calm": 40,
+    "gardensStaff": 5,
+    "shaken": 50,
+    "breaking": 80
+  },
+  "STRESS_LV": [
+    {
+      "n": "Steady",
+      "at": 0,
+      "mod": {},
+      "desc": "No stress effects."
+    },
+    {
+      "n": "Shaken",
+      "at": 50,
+      "mod": {
+        "aim": -5,
+        "will": -10
+      },
+      "desc": "−5 aim, −10 will."
+    },
+    {
+      "n": "Breaking",
+      "at": 80,
+      "mod": {
+        "aim": -10,
+        "will": -20
+      },
+      "desc": "−10 aim, −20 will. Rest them."
+    }
+  ],
+  "SCARS": {
+    "oldWound": {
+      "n": "Old wound",
+      "kind": "wound",
+      "mod": {
+        "hp": -1
+      },
+      "desc": "−1 HP."
+    },
+    "shakyHand": {
+      "n": "Shaky hand",
+      "kind": "wound",
+      "mod": {
+        "aim": -5
+      },
+      "desc": "−5 aim."
+    },
+    "badLeg": {
+      "n": "Bad leg",
+      "kind": "wound",
+      "mod": {
+        "mob": -1
+      },
+      "desc": "−1 move."
+    },
+    "fearsHorrors": {
+      "n": "Fears horrors",
+      "kind": "trauma",
+      "mod": {
+        "aimVsHorror": -10
+      },
+      "desc": "−10 aim against horrors."
+    },
+    "guilt": {
+      "n": "Survivor’s guilt",
+      "kind": "trauma",
+      "mod": {
+        "will": -15
+      },
+      "desc": "−15 will."
+    },
+    "nightmares": {
+      "n": "Nightmares",
+      "kind": "trauma",
+      "stressX": 1.5,
+      "desc": "Gains 50% more stress."
+    },
+    "anger": {
+      "n": "Burning anger",
+      "kind": "trauma",
+      "mod": {
+        "crit": 10,
+        "will": -10
+      },
+      "dark": 1,
+      "desc": "+10% crit, −10 will; a Jedi gains 1 Darkness after every mission."
+    }
+  },
+  "SCAR": {
+    "grave": 40,
+    "trauma": 30,
+    "breaking": 25,
+    "max": 3,
+    "treat": 35
+  },
+  "SLOTS": [
+    {
+      "id": "t0",
+      "tier": "t",
+      "row": 0,
+      "x": 1,
+      "wing": 1,
+      "n": "Upper terrace 1",
+      "sn": "T1"
+    },
+    {
+      "id": "t1",
+      "tier": "t",
+      "row": 0,
+      "x": 2,
+      "wing": 1,
+      "n": "Upper terrace 2",
+      "sn": "T2"
+    },
+    {
+      "id": "m0",
+      "tier": "m",
+      "row": 1,
+      "x": 0.5,
+      "wing": 1,
+      "n": "Middle terrace 1",
+      "sn": "M1"
+    },
+    {
+      "id": "m1",
+      "tier": "m",
+      "row": 1,
+      "x": 1.5,
+      "wing": 1,
+      "n": "Middle terrace 2",
+      "sn": "M2"
+    },
+    {
+      "id": "m2",
+      "tier": "m",
+      "row": 1,
+      "x": 2.5,
+      "wing": 1,
+      "n": "Middle terrace 3",
+      "sn": "M3"
+    },
+    {
+      "id": "b0",
+      "tier": "b",
+      "row": 2,
+      "x": 0,
+      "wing": 1,
+      "n": "Base hall 1",
+      "sn": "B1"
+    },
+    {
+      "id": "b1",
+      "tier": "b",
+      "row": 2,
+      "x": 1,
+      "wing": 1,
+      "n": "Base hall 2",
+      "sn": "B2"
+    },
+    {
+      "id": "b2",
+      "tier": "b",
+      "row": 2,
+      "x": 2,
+      "wing": 1,
+      "n": "Base hall 3",
+      "sn": "B3"
+    },
+    {
+      "id": "b3",
+      "tier": "b",
+      "row": 2,
+      "x": 3,
+      "wing": 1,
+      "n": "Base hall 4",
+      "sn": "B4"
+    },
+    {
+      "id": "a0",
+      "tier": "a",
+      "row": 2,
+      "x": -1,
+      "wing": 1,
+      "n": "Annex 1",
+      "sn": "A1"
+    },
+    {
+      "id": "a1",
+      "tier": "a",
+      "row": 2,
+      "x": 4,
+      "wing": 1,
+      "n": "Annex 2",
+      "sn": "A2"
+    },
+    {
+      "id": "u0",
+      "tier": "u",
+      "row": 3,
+      "x": 0.5,
+      "wing": 0,
+      "n": "Undercroft vault 1",
+      "sn": "U1"
+    },
+    {
+      "id": "u1",
+      "tier": "u",
+      "row": 3,
+      "x": 1.5,
+      "wing": 0,
+      "n": "Undercroft vault 2",
+      "sn": "U2"
+    },
+    {
+      "id": "u2",
+      "tier": "u",
+      "row": 3,
+      "x": 2.5,
+      "wing": 0,
+      "n": "Undercroft vault 3",
+      "sn": "U3"
+    },
+    {
+      "id": "sp0",
+      "tier": "sp",
+      "row": -1,
+      "x": -0.5,
+      "wing": 0,
+      "n": "Spire 1",
+      "sn": "SP1"
+    },
+    {
+      "id": "sp1",
+      "tier": "sp",
+      "row": -1,
+      "x": 0.5,
+      "wing": 0,
+      "n": "Spire 2",
+      "sn": "SP2"
+    },
+    {
+      "id": "sp2",
+      "tier": "sp",
+      "row": -1,
+      "x": 2.5,
+      "wing": 0,
+      "n": "Spire 3",
+      "sn": "SP3"
+    },
+    {
+      "id": "sp3",
+      "tier": "sp",
+      "row": -1,
+      "x": 3.5,
+      "wing": 0,
+      "n": "Spire 4",
+      "sn": "SP4"
+    }
+  ],
+  "WING_HOME": {
+    "training": "b0",
+    "barracks": "b1",
+    "medical": "b2",
+    "forge": "b3",
+    "armory": "m0",
+    "comms": "m1",
+    "gardens": "m2",
+    "archives": "t1"
+  },
+  "WING_SHORT": {
+    "medical": "Medical",
+    "training": "Training",
+    "forge": "Forge",
+    "armory": "Armory",
+    "comms": "Comms",
+    "archives": "Archives",
+    "gardens": "Gardens",
+    "barracks": "Barracks"
+  },
+  "ADJ": [
+    {
+      "a": "medical",
+      "b": "gardens",
+      "n": "Recovery Ward",
+      "k": "heal",
+      "v": 3,
+      "tip": "Wounded units heal {v} extra days per mission."
+    },
+    {
+      "a": "gardens",
+      "b": "archives",
+      "n": "Still Minds",
+      "k": "research",
+      "v": 3,
+      "tip": "Research gains {v} extra days of progress per mission."
+    },
+    {
+      "a": "archives",
+      "b": "comms",
+      "n": "Signals Library",
+      "k": "intel",
+      "v": 1,
+      "tip": "+{v} Intel per month."
+    },
+    {
+      "a": "comms",
+      "b": "armory",
+      "n": "Quartermaster Net",
+      "k": "credits",
+      "v": 15,
+      "tip": "+{v} Credits per month."
+    },
+    {
+      "a": "armory",
+      "b": "forge",
+      "n": "Shared Smithy",
+      "k": "winCr",
+      "v": 10,
+      "tip": "+{v} Credits per won mission from salvaged parts."
+    },
+    {
+      "a": "forge",
+      "b": "training",
+      "n": "Saber Forms",
+      "k": "bench",
+      "v": 3,
+      "tip": "Every unit that sits out a mission gains {v} XP."
+    },
+    {
+      "a": "training",
+      "b": "barracks",
+      "n": "Drill Yard",
+      "k": "bench",
+      "v": 2,
+      "tip": "Every unit that sits out a mission gains {v} more XP."
+    },
+    {
+      "a": "barracks",
+      "b": "medical",
+      "n": "Infirmary Bunks",
+      "k": "stress",
+      "v": 4,
+      "tip": "Every unit sheds {v} stress per mission."
+    }
+  ],
+  "ADJ_STAFF_X": 2,
+  "WLOG_MAX": 12,
+  "MOD_ACTS": {
+    "medical": {
+      "n": "Bacta Rush",
+      "ic": "medic",
+      "cd": 3,
+      "cost": {
+        "credits": 30
+      },
+      "now": "heal",
+      "desc": "Fully heal the most wounded unit now (level 2: the two most wounded)."
+    },
+    "training": {
+      "n": "Live-fire Drill",
+      "ic": "mark",
+      "cd": 2,
+      "cost": {
+        "credits": 20
+      },
+      "next": {
+        "aim": 5
+      },
+      "desc": "Next battle: whole squad +5 aim."
+    },
+    "forge": {
+      "n": "Attune Sabers",
+      "ic": "kyber",
+      "cd": 2,
+      "cost": {
+        "kyber": 1
+      },
+      "next": {
+        "jdmg": 1
+      },
+      "desc": "Next battle: every Jedi +1 damage."
+    },
+    "armory": {
+      "n": "Field Kits",
+      "ic": "hunker",
+      "cd": 2,
+      "cost": {
+        "credits": 25
+      },
+      "next": {
+        "tarmor": 1,
+        "kit": 1
+      },
+      "desc": "Next battle: troopers +1 armor pip and +1 grenade or medkit."
+    },
+    "comms": {
+      "n": "Intercept",
+      "ic": "scan",
+      "cd": 2,
+      "cost": {},
+      "now": "intel",
+      "desc": "+3 Intel now from Sith traffic."
+    },
+    "archives": {
+      "n": "Study the Enemy",
+      "ic": "st_crit",
+      "cd": 2,
+      "cost": {
+        "credits": 15
+      },
+      "next": {
+        "crit": 10
+      },
+      "desc": "Next battle: whole squad +10% crit."
+    },
+    "gardens": {
+      "n": "Retreat",
+      "ic": "calm",
+      "cd": 3,
+      "cost": {},
+      "now": "calm",
+      "desc": "Every unit −20 stress; the darkest Jedi sheds 1 Darkness."
+    },
+    "barracks": {
+      "n": "Muster Call",
+      "ic": "guard",
+      "cd": 3,
+      "cost": {
+        "credits": 20
+      },
+      "now": "recruit",
+      "desc": "+1 Recruit now."
+    }
+  },
+  "TIER_OPEN": {
+    "m": {
+      "wings": 3,
+      "month": 3
+    },
+    "t": {
+      "wings": 5,
+      "month": 6
+    },
+    "a": {
+      "month": 5,
+      "era": 2
+    }
+  },
+  "SPIRES": {
+    "sp0": {
+      "n": "Tower of First Knowledge",
+      "ic": "scan",
+      "eff": {
+        "research": 4,
+        "month": {
+          "intel": 1
+        }
+      },
+      "tip": "Research +4 days per mission, +1 Intel a month."
+    },
+    "sp1": {
+      "n": "Tower of Reassurance",
+      "ic": "calm",
+      "eff": {
+        "stress": 8,
+        "will": 5
+      },
+      "tip": "Every unit sheds 8 stress per mission; squads get +5 will in battle."
+    },
+    "sp2": {
+      "n": "Tower of Reconciliation",
+      "ic": "relay",
+      "eff": {
+        "month": {
+          "favor": 3
+        }
+      },
+      "tip": "+3 Senate Favor a month: the Order mediates for the Republic."
+    },
+    "sp3": {
+      "n": "Tower of Guidance",
+      "ic": "mark",
+      "eff": {
+        "xp": 5
+      },
+      "tip": "Every unit you deploy gains 5 more XP per mission."
+    }
+  },
+  "SPIRE_COST": {
+    "credits": 350,
+    "kyber": 2
+  },
+  "SPIRE_TIME": 2,
+  "SPIRE_OPEN": {
+    "month": 4,
+    "era": 2
+  },
+  "UNDER_DIG": {
+    "u0": 60,
+    "u1": 100,
+    "u2": 140
+  },
+  "BAY_FEAT": {
+    "kyber2": {
+      "n": "Great Kyber cave",
+      "ic": "kyber",
+      "wings": [
+        "forge"
+      ],
+      "tip": "With the Kyber Forge built: +2 Kyber a month.",
+      "month": {
+        "kyber": 2
+      }
+    },
+    "holocron": {
+      "n": "Holocron chamber",
+      "ic": "scan",
+      "wings": [
+        "archives"
+      ],
+      "tip": "With the Archives built: research +6 days per mission. Found: +4 Intel.",
+      "research": 6,
+      "found": {
+        "intel": 4
+      }
+    },
+    "crypt": {
+      "n": "Jedi crypt",
+      "ic": "calm",
+      "wings": [],
+      "tip": "Order Darkness −1 a month. The old masters rest easy.",
+      "month": {
+        "orderDark": -1
+      }
+    },
+    "spring": {
+      "n": "Hot spring",
+      "ic": "stabilize",
+      "wings": [],
+      "tip": "Wounded heal 2 more days and everyone sheds 3 stress per mission.",
+      "heal": 2,
+      "stress": 3
+    },
+    "guard": {
+      "n": "Old Temple Guard barracks",
+      "ic": "guard",
+      "wings": [
+        "barracks"
+      ],
+      "tip": "With the Barracks built: +1 Recruit a month.",
+      "month": {
+        "recruits": 1
+      }
+    },
+    "cache": {
+      "n": "Forgotten arms cache",
+      "ic": "hunker",
+      "wings": [
+        "armory"
+      ],
+      "tip": "With the Armory built: +10 Credits per won mission. Found: +40 Credits.",
+      "winCr": 10,
+      "found": {
+        "credits": 40
+      }
+    },
+    "hall": {
+      "n": "Old sparring hall",
+      "ic": "strike",
+      "wings": [
+        "training"
+      ],
+      "tip": "With the Training Salle built: units who sit out a mission gain 4 XP.",
+      "bench": 4
+    }
+  },
+  "UNDER_POOL": [
+    "holocron",
+    "crypt",
+    "spring",
+    "guard",
+    "cache",
+    "hall"
+  ],
+  "SEATS": {
+    "zym": {
+      "n": "Grand Master Zym",
+      "era": 1,
+      "stance": "Guardian",
+      "chair": 1
+    },
+    "gnost": {
+      "n": "Gnost-Dural",
+      "era": 1,
+      "stance": "Sentinel"
+    },
+    "darach": {
+      "n": "Kao Cen Darach",
+      "era": 1,
+      "stance": "Consular"
+    },
+    "hoth": {
+      "n": "Lord Hoth",
+      "era": 2,
+      "stance": "Guardian",
+      "chair": 1
+    },
+    "farfalla": {
+      "n": "Lord Valenthyne Farfalla",
+      "era": 2,
+      "stance": "Consular"
+    }
+  },
+  "STANCE_PERK": {
+    "Guardian": {
+      "desc": "+5 aim for every Jedi.",
+      "jediAim": 5
+    },
+    "Consular": {
+      "desc": "+5 Senate Favor after each won Senate crisis.",
+      "senateFavor": 5
+    },
+    "Sentinel": {
+      "desc": "+1 Intel after each won mission.",
+      "winIntel": 1
+    },
+    "Wayseeker": {
+      "desc": "Order Darkness −1 each month.",
+      "monthDark": -1
+    }
+  },
+  "COUNCIL_RULES": {
+    "seats": 7,
+    "start": 60,
+    "agree": 5,
+    "dissent": -15,
+    "resign": 25,
+    "double": 80,
+    "replaceFavor": 10,
+    "replaceOthers": -5,
+    "appointRank": 5
+  },
+  "VOTES": {
+    "refugees": {
+      "n": "Refugees from Taris",
+      "text": "A hundred thousand refugees crowd Coruscant’s lower levels. The Senate asks the Order to help.",
+      "opts": [
+        {
+          "t": "Fund relief convoys",
+          "fx": {
+            "credits": -100,
+            "favor": 6
+          },
+          "pleases": [
+            "Consular"
+          ]
+        },
+        {
+          "t": "Send Knights to keep order",
+          "fx": {
+            "favor": 2,
+            "stress": 5
+          },
+          "pleases": [
+            "Guardian"
+          ]
+        },
+        {
+          "t": "Leave it to the Senate",
+          "fx": {
+            "favor": -4
+          },
+          "pleases": [
+            "Sentinel"
+          ]
+        }
+      ]
+    },
+    "defector": {
+      "n": "An Imperial defector",
+      "text": "An Imperial officer offers fleet codes for safe passage and a payout.",
+      "opts": [
+        {
+          "t": "Pay him",
+          "fx": {
+            "credits": -80,
+            "intel": 3
+          },
+          "pleases": [
+            "Sentinel"
+          ]
+        },
+        {
+          "t": "Hand him to the Senate",
+          "fx": {
+            "favor": 5
+          },
+          "pleases": [
+            "Consular"
+          ]
+        },
+        {
+          "t": "Refuse: it is a trap",
+          "fx": {},
+          "pleases": [
+            "Guardian"
+          ]
+        }
+      ]
+    },
+    "guard": {
+      "n": "Fortify the Temple",
+      "text": "Masters argue the Temple is too exposed. Hire Temple Guard, or trust the Force.",
+      "opts": [
+        {
+          "t": "Hire Temple Guard",
+          "fx": {
+            "credits": -120,
+            "recruits": 2
+          },
+          "pleases": [
+            "Guardian"
+          ]
+        },
+        {
+          "t": "Trust in the Force",
+          "fx": {
+            "orderDark": -2
+          },
+          "pleases": [
+            "Consular",
+            "Wayseeker"
+          ]
+        }
+      ]
+    },
+    "frontline": {
+      "n": "Jedi on the front lines",
+      "text": "The Senate wants Jedi leading Republic battalions.",
+      "opts": [
+        {
+          "t": "Agree",
+          "fx": {
+            "favor": 8,
+            "orderDark": 2
+          },
+          "pleases": [
+            "Guardian"
+          ]
+        },
+        {
+          "t": "Refuse: we are not an army",
+          "fx": {
+            "favor": -6
+          },
+          "pleases": [
+            "Consular",
+            "Wayseeker"
+          ]
+        },
+        {
+          "t": "Send observers only",
+          "fx": {
+            "favor": 2,
+            "intel": 1
+          },
+          "pleases": [
+            "Sentinel"
+          ]
+        }
+      ]
+    },
+    "acolyte": {
+      "n": "A captured acolyte",
+      "text": "A young Sith acolyte sits in the Temple cells. What do we do with her?",
+      "opts": [
+        {
+          "t": "Try to redeem her",
+          "fx": {
+            "credits": -40,
+            "orderDark": -3
+          },
+          "pleases": [
+            "Consular",
+            "Wayseeker"
+          ]
+        },
+        {
+          "t": "Interrogate her hard",
+          "fx": {
+            "intel": 3,
+            "orderDark": 4
+          },
+          "pleases": [
+            "Sentinel"
+          ]
+        },
+        {
+          "t": "Hand her to the Republic",
+          "fx": {
+            "favor": 4
+          },
+          "pleases": [
+            "Guardian"
+          ]
+        }
+      ]
+    },
+    "caravan": {
+      "n": "The Ilum caravan",
+      "text": "A kyber shipment can be bought for the Order before the Senate claims it.",
+      "opts": [
+        {
+          "t": "Buy the shipment",
+          "fx": {
+            "credits": -100,
+            "kyber": 1
+          },
+          "pleases": [
+            "Guardian",
+            "Wayseeker"
+          ]
+        },
+        {
+          "t": "Let the Senate have it",
+          "fx": {
+            "favor": 4
+          },
+          "pleases": [
+            "Consular"
+          ]
+        }
+      ]
+    },
+    "expedition": {
+      "n": "An archive expedition",
+      "text": "Archivists found coordinates to a lost Jedi outpost.",
+      "opts": [
+        {
+          "t": "Fund the expedition",
+          "fx": {
+            "credits": -90,
+            "intel": 2
+          },
+          "pleases": [
+            "Sentinel",
+            "Wayseeker"
+          ]
+        },
+        {
+          "t": "Postpone it",
+          "fx": {},
+          "pleases": [
+            "Guardian"
+          ]
+        }
+      ]
+    },
+    "hutts": {
+      "n": "Hutt protection",
+      "text": "A Hutt clan offers “protection” for Republic convoys near the Temple’s supply lanes.",
+      "opts": [
+        {
+          "t": "Pay the tribute",
+          "fx": {
+            "credits": -80,
+            "intel": 1
+          },
+          "pleases": [
+            "Sentinel"
+          ]
+        },
+        {
+          "t": "Report them to the Senate",
+          "fx": {
+            "favor": 3
+          },
+          "pleases": [
+            "Consular"
+          ]
+        },
+        {
+          "t": "Refuse",
+          "fx": {
+            "credits": -30
+          },
+          "pleases": [
+            "Guardian"
+          ]
+        }
+      ]
+    },
+    "memorial": {
+      "n": "A memorial for the fallen",
+      "text": "The war has taken many. Some ask for a memorial in the Temple gardens.",
+      "opts": [
+        {
+          "t": "Build a memorial",
+          "fx": {
+            "credits": -60,
+            "stress": -10
+          },
+          "pleases": [
+            "Consular",
+            "Wayseeker"
+          ]
+        },
+        {
+          "t": "Hold a vigil",
+          "fx": {
+            "stress": -4
+          },
+          "pleases": [
+            "Guardian",
+            "Sentinel"
+          ]
+        }
+      ]
+    },
+    "tithe": {
+      "n": "The Senate audit",
+      "text": "Senators question what the Order does with its stipend.",
+      "opts": [
+        {
+          "t": "Open the books (pay auditors)",
+          "fx": {
+            "credits": -70,
+            "favor": 5
+          },
+          "pleases": [
+            "Consular"
+          ]
+        },
+        {
+          "t": "Refuse the audit",
+          "fx": {
+            "favor": -5
+          },
+          "pleases": [
+            "Guardian",
+            "Wayseeker"
+          ]
+        },
+        {
+          "t": "Leak their own spending",
+          "fx": {
+            "intel": -1,
+            "favor": 2
+          },
+          "pleases": [
+            "Sentinel"
+          ]
+        }
+      ]
+    },
+    "initiates": {
+      "n": "Older initiates",
+      "text": "Force-sensitive teens beyond the usual age ask to train.",
+      "opts": [
+        {
+          "t": "Admit them",
+          "fx": {
+            "recruits": 1,
+            "orderDark": 1
+          },
+          "pleases": [
+            "Guardian",
+            "Wayseeker"
+          ]
+        },
+        {
+          "t": "Keep the tradition",
+          "fx": {
+            "favor": 2
+          },
+          "pleases": [
+            "Consular",
+            "Sentinel"
+          ]
+        }
+      ]
+    },
+    "spies": {
+      "n": "Spies in the Senate",
+      "text": "Intel suggests an Imperial spy in a senator’s office.",
+      "opts": [
+        {
+          "t": "Run a counter-op",
+          "fx": {
+            "credits": -60,
+            "intel": 2
+          },
+          "pleases": [
+            "Sentinel"
+          ]
+        },
+        {
+          "t": "Warn the Chancellor",
+          "fx": {
+            "favor": 3
+          },
+          "pleases": [
+            "Consular",
+            "Guardian"
+          ]
+        }
+      ]
+    }
+  }
+}
