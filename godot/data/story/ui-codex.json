@@ -1,0 +1,1462 @@
+{
+  "source": "public/js/ui-codex.js",
+  "sha256": "9027dfda5e0b81e5d445a4027022bbc973e7873ea4927f900e08ae7497cc3da7",
+  "lines": 87,
+  "counts": {
+    "KINDS": 11,
+    "STATUS_INFO": 17,
+    "STAT_INFO": 16,
+    "MOD_INFO": 29,
+    "SOURCE_LITERALS": 308
+  },
+  "records": {
+    "KINDS": [
+      [
+        "ability",
+        "Abilities"
+      ],
+      [
+        "enemy",
+        "Enemies"
+      ],
+      [
+        "class",
+        "Classes"
+      ],
+      [
+        "status",
+        "Status"
+      ],
+      [
+        "tile",
+        "Terrain"
+      ],
+      [
+        "gear",
+        "Gear"
+      ],
+      [
+        "wing",
+        "Temple"
+      ],
+      [
+        "research",
+        "Research"
+      ],
+      [
+        "mission",
+        "Missions"
+      ],
+      [
+        "planet",
+        "Planets"
+      ],
+      [
+        "character",
+        "Characters"
+      ]
+    ],
+    "STATUS_INFO": {
+      "down": [
+        "Down",
+        "Out of the fight and bleeding out. An adjacent ally can Stabilize; a medkit revives."
+      ],
+      "stunned": [
+        "Stunned",
+        "Loses its next turn."
+      ],
+      "surrender": [
+        "Surrendered",
+        "Gave up. Subdue it to take a prisoner."
+      ],
+      "captured": [
+        "Captured",
+        "Bound and out of the fight."
+      ],
+      "guard": [
+        "Guard",
+        "Deflects more bolts and strikes enemies who come close, until its next turn."
+      ],
+      "overwatch": [
+        "Overwatch",
+        "Fires at the first enemy that moves in range."
+      ],
+      "hunker": [
+        "Hunkered down",
+        "+30 defense and immune to flanking crits until its next turn."
+      ],
+      "barrier": [
+        "Force Barrier",
+        "Counts as full cover from every side until the caster's next turn."
+      ],
+      "suppress": [
+        "Suppressed",
+        "−30 aim; moving gives the suppressor a free shot."
+      ],
+      "mark": [
+        "Marked",
+        "Allies get +15 aim against it."
+      ],
+      "scan": [
+        "Carrying data",
+        "Get this unit to an evac zone to extract the data."
+      ],
+      "disarmed": [
+        "Disarmed",
+        "Can't shoot next turn; can still move and melee."
+      ],
+      "concealed": [
+        "Concealed",
+        "Unseen by the enemy until it attacks or is spotted."
+      ],
+      "graze": [
+        "Graze",
+        "A shot that just misses still clips the target for half damage. The band is 10% above the hit chance."
+      ],
+      "tired": [
+        "Tired",
+        "Fought the last two missions back to back: −10 aim. Sit out one mission to recover."
+      ],
+      "panic": [
+        "Panicked",
+        "Lost its nerve: may freeze, flee or fire wildly."
+      ],
+      "darkness": [
+        "Darkness",
+        "Dark-side pull. High Darkness adds damage and risks a fall."
+      ]
+    },
+    "STAT_INFO": {
+      "aim": [
+        "Aim",
+        "Base chance to hit before cover, range and other modifiers."
+      ],
+      "move": [
+        "Move",
+        "Tiles per AP spent moving. 3 AP = triple distance."
+      ],
+      "damage": [
+        "Damage",
+        "Damage range on a hit. Armor removes some; minimum 1."
+      ],
+      "range": [
+        "Range",
+        "Max shooting distance. Hit chance drops past 60% of it."
+      ],
+      "deflect": [
+        "Deflect",
+        "Chance a Jedi blocks a blaster bolt."
+      ],
+      "crit": [
+        "Crit",
+        "Chance a hit deals +2 damage. Flanking adds more."
+      ],
+      "padawan": [
+        "Padawan",
+        "Within 3 tiles of their Master: +10 aim. A Padawan kill gives the Master +1 Focus."
+      ],
+      "armor": [
+        "Armor",
+        "Each pip cuts one hit by 1, then breaks. Shredder strips an extra pip. Restored after every mission."
+      ],
+      "medkits": [
+        "Medkits",
+        "Heals or revives an adjacent ally."
+      ],
+      "grenades": [
+        "Grenades",
+        "3×3 blast; breaks half cover."
+      ],
+      "hp": [
+        "HP",
+        "Health. At 0 a unit goes down and starts to bleed out."
+      ],
+      "actions": [
+        "Action points",
+        "3 AP per turn. Each AP buys one full move. Pistols and sabers cost 1 AP to attack, rifles 2; only Overwatch, Guard and Hunker end the turn."
+      ],
+      "focus": [
+        "Focus",
+        "Fuel for Force powers. Meditate to regain it."
+      ],
+      "will": [
+        "Will",
+        "Resistance to panic from deaths, horrors and heavy damage."
+      ],
+      "stress": [
+        "Stress",
+        "Builds over missions; high stress lowers will."
+      ],
+      "threat": [
+        "Threat",
+        "Rises each turn past par. At 6 the mission fails."
+      ]
+    },
+    "MOD_INFO": {
+      "Aim": "The shooter's base aim.",
+      "Half cover": "Target behind half cover: −20.",
+      "Full cover": "Target behind full cover: −40.",
+      "Range": "Past 60% of weapon range, aim drops 3 per tile.",
+      "Close quarters": "Melee bonus.",
+      "Smoke": "Target in smoke.",
+      "Exposed target": "Snipers punish targets with no cover.",
+      "Hunkered down": "Target is hunkered.",
+      "Defensive Line": "A Guardian beside the target shields it.",
+      "Helpless": "Stunned or surrendered target.",
+      "Suppressed": "The shooter is pinned by suppressing fire.",
+      "Battle Meditation": "A Consular's meditation steadies allies and shakes foes.",
+      "Marked": "A Scout marked this target.",
+      "Bond": "Fighting near a bonded partner.",
+      "Ability bonus": "Bonus from the ability used.",
+      "Ability penalty": "Penalty from the ability used.",
+      "Height": "Shooting down from higher ground.",
+      "High ground": "+15 when shooting down at a lower target.",
+      "Cover seen from above": "Shooting down past cover: it protects less (up to +10).",
+      "Executioner": "+25 against targets at half HP or less.",
+      "Boosted": "An ally's buff raises this unit's aim.",
+      "Target shielded": "A buff on the target makes it harder to hit.",
+      "Sith Lord nearby": "A Sith Lord within 4 tiles drives nearby Sith to shoot straighter.",
+      "Vs": "Trained against this kind of foe.",
+      "Beast lore": "Knows how beasts fight.",
+      "Fear of horrors": "A scar: this unit fears horrors.",
+      "Flank": "Target has no cover against this angle.",
+      "Ambush": "First shot from concealment.",
+      "Will": "Shaken nerves."
+    },
+    "SOURCE_LITERALS": [
+      {
+        "line": 4,
+        "raw": "'ability'"
+      },
+      {
+        "line": 4,
+        "raw": "'Abilities'"
+      },
+      {
+        "line": 4,
+        "raw": "'enemy'"
+      },
+      {
+        "line": 4,
+        "raw": "'Enemies'"
+      },
+      {
+        "line": 4,
+        "raw": "'class'"
+      },
+      {
+        "line": 4,
+        "raw": "'Classes'"
+      },
+      {
+        "line": 4,
+        "raw": "'status'"
+      },
+      {
+        "line": 4,
+        "raw": "'Status'"
+      },
+      {
+        "line": 4,
+        "raw": "'tile'"
+      },
+      {
+        "line": 4,
+        "raw": "'Terrain'"
+      },
+      {
+        "line": 4,
+        "raw": "'gear'"
+      },
+      {
+        "line": 4,
+        "raw": "'Gear'"
+      },
+      {
+        "line": 4,
+        "raw": "'wing'"
+      },
+      {
+        "line": 4,
+        "raw": "'Temple'"
+      },
+      {
+        "line": 4,
+        "raw": "'research'"
+      },
+      {
+        "line": 4,
+        "raw": "'Research'"
+      },
+      {
+        "line": 4,
+        "raw": "'mission'"
+      },
+      {
+        "line": 4,
+        "raw": "'Missions'"
+      },
+      {
+        "line": 4,
+        "raw": "'planet'"
+      },
+      {
+        "line": 4,
+        "raw": "'Planets'"
+      },
+      {
+        "line": 4,
+        "raw": "'character'"
+      },
+      {
+        "line": 4,
+        "raw": "'Characters'"
+      },
+      {
+        "line": 6,
+        "raw": "`return typeof ${n}!=='undefined'?${n}:null`"
+      },
+      {
+        "line": 8,
+        "raw": "'Down'"
+      },
+      {
+        "line": 8,
+        "raw": "'Out of the fight and bleeding out. An adjacent ally can Stabilize; a medkit revives.'"
+      },
+      {
+        "line": 8,
+        "raw": "'Stunned'"
+      },
+      {
+        "line": 8,
+        "raw": "'Loses its next turn.'"
+      },
+      {
+        "line": 9,
+        "raw": "'Surrendered'"
+      },
+      {
+        "line": 9,
+        "raw": "'Gave up. Subdue it to take a prisoner.'"
+      },
+      {
+        "line": 9,
+        "raw": "'Captured'"
+      },
+      {
+        "line": 9,
+        "raw": "'Bound and out of the fight.'"
+      },
+      {
+        "line": 9,
+        "raw": "'Guard'"
+      },
+      {
+        "line": 9,
+        "raw": "'Deflects more bolts and strikes enemies who come close, until its next turn.'"
+      },
+      {
+        "line": 10,
+        "raw": "'Overwatch'"
+      },
+      {
+        "line": 10,
+        "raw": "'Fires at the first enemy that moves in range.'"
+      },
+      {
+        "line": 10,
+        "raw": "'Hunkered down'"
+      },
+      {
+        "line": 10,
+        "raw": "'+30 defense and immune to flanking crits until its next turn.'"
+      },
+      {
+        "line": 11,
+        "raw": "'Force Barrier'"
+      },
+      {
+        "line": 11,
+        "raw": "'Counts as full cover from every side until the caster\\'s next turn.'"
+      },
+      {
+        "line": 11,
+        "raw": "'Suppressed'"
+      },
+      {
+        "line": 11,
+        "raw": "'−30 aim; moving gives the suppressor a free shot.'"
+      },
+      {
+        "line": 12,
+        "raw": "'Marked'"
+      },
+      {
+        "line": 12,
+        "raw": "'Allies get +15 aim against it.'"
+      },
+      {
+        "line": 12,
+        "raw": "'Carrying data'"
+      },
+      {
+        "line": 12,
+        "raw": "'Get this unit to an evac zone to extract the data.'"
+      },
+      {
+        "line": 12,
+        "raw": "'Disarmed'"
+      },
+      {
+        "line": 12,
+        "raw": "'Can\\'t shoot next turn; can still move and melee.'"
+      },
+      {
+        "line": 13,
+        "raw": "'Concealed'"
+      },
+      {
+        "line": 13,
+        "raw": "'Unseen by the enemy until it attacks or is spotted.'"
+      },
+      {
+        "line": 13,
+        "raw": "'Graze'"
+      },
+      {
+        "line": 13,
+        "raw": "'A shot that just misses still clips the target for half damage. The band is 10% above the hit chance.'"
+      },
+      {
+        "line": 13,
+        "raw": "'Tired'"
+      },
+      {
+        "line": 13,
+        "raw": "'Fought the last two missions back to back: −10 aim. Sit out one mission to recover.'"
+      },
+      {
+        "line": 13,
+        "raw": "'Panicked'"
+      },
+      {
+        "line": 13,
+        "raw": "'Lost its nerve: may freeze, flee or fire wildly.'"
+      },
+      {
+        "line": 13,
+        "raw": "'Darkness'"
+      },
+      {
+        "line": 13,
+        "raw": "'Dark-side pull. High Darkness adds damage and risks a fall.'"
+      },
+      {
+        "line": 14,
+        "raw": "'Aim'"
+      },
+      {
+        "line": 14,
+        "raw": "'Base chance to hit before cover, range and other modifiers.'"
+      },
+      {
+        "line": 14,
+        "raw": "'Move'"
+      },
+      {
+        "line": 14,
+        "raw": "'Tiles per AP spent moving. 3 AP = triple distance.'"
+      },
+      {
+        "line": 15,
+        "raw": "'Damage'"
+      },
+      {
+        "line": 15,
+        "raw": "'Damage range on a hit. Armor removes some; minimum 1.'"
+      },
+      {
+        "line": 15,
+        "raw": "'Range'"
+      },
+      {
+        "line": 15,
+        "raw": "'Max shooting distance. Hit chance drops past 60% of it.'"
+      },
+      {
+        "line": 16,
+        "raw": "'Deflect'"
+      },
+      {
+        "line": 16,
+        "raw": "'Chance a Jedi blocks a blaster bolt.'"
+      },
+      {
+        "line": 16,
+        "raw": "'Crit'"
+      },
+      {
+        "line": 16,
+        "raw": "'Chance a hit deals +2 damage. Flanking adds more.'"
+      },
+      {
+        "line": 16,
+        "raw": "'Padawan'"
+      },
+      {
+        "line": 16,
+        "raw": "'Within 3 tiles of their Master: +10 aim. A Padawan kill gives the Master +1 Focus.'"
+      },
+      {
+        "line": 16,
+        "raw": "'Armor'"
+      },
+      {
+        "line": 16,
+        "raw": "'Each pip cuts one hit by 1, then breaks. Shredder strips an extra pip. Restored after every mission.'"
+      },
+      {
+        "line": 16,
+        "raw": "'Medkits'"
+      },
+      {
+        "line": 16,
+        "raw": "'Heals or revives an adjacent ally.'"
+      },
+      {
+        "line": 17,
+        "raw": "'Grenades'"
+      },
+      {
+        "line": 17,
+        "raw": "'3×3 blast; breaks half cover.'"
+      },
+      {
+        "line": 17,
+        "raw": "'HP'"
+      },
+      {
+        "line": 17,
+        "raw": "'Health. At 0 a unit goes down and starts to bleed out.'"
+      },
+      {
+        "line": 17,
+        "raw": "'Action points'"
+      },
+      {
+        "line": 17,
+        "raw": "'3 AP per turn. Each AP buys one full move. Pistols and sabers cost 1 AP to attack, rifles 2; only Overwatch, Guard and Hunker end the turn.'"
+      },
+      {
+        "line": 18,
+        "raw": "'Focus'"
+      },
+      {
+        "line": 18,
+        "raw": "'Fuel for Force powers. Meditate to regain it.'"
+      },
+      {
+        "line": 18,
+        "raw": "'Will'"
+      },
+      {
+        "line": 18,
+        "raw": "'Resistance to panic from deaths, horrors and heavy damage.'"
+      },
+      {
+        "line": 18,
+        "raw": "'Stress'"
+      },
+      {
+        "line": 18,
+        "raw": "'Builds over missions; high stress lowers will.'"
+      },
+      {
+        "line": 18,
+        "raw": "'Threat'"
+      },
+      {
+        "line": 18,
+        "raw": "'Rises each turn past par. At 6 the mission fails.'"
+      },
+      {
+        "line": 19,
+        "raw": "'Aim'"
+      },
+      {
+        "line": 19,
+        "raw": "'The shooter\\'s base aim.'"
+      },
+      {
+        "line": 19,
+        "raw": "'Half cover'"
+      },
+      {
+        "line": 19,
+        "raw": "'Target behind half cover: −20.'"
+      },
+      {
+        "line": 19,
+        "raw": "'Full cover'"
+      },
+      {
+        "line": 19,
+        "raw": "'Target behind full cover: −40.'"
+      },
+      {
+        "line": 19,
+        "raw": "'Range'"
+      },
+      {
+        "line": 19,
+        "raw": "'Past 60% of weapon range, aim drops 3 per tile.'"
+      },
+      {
+        "line": 20,
+        "raw": "'Close quarters'"
+      },
+      {
+        "line": 20,
+        "raw": "'Melee bonus.'"
+      },
+      {
+        "line": 20,
+        "raw": "'Smoke'"
+      },
+      {
+        "line": 20,
+        "raw": "'Target in smoke.'"
+      },
+      {
+        "line": 20,
+        "raw": "'Exposed target'"
+      },
+      {
+        "line": 20,
+        "raw": "'Snipers punish targets with no cover.'"
+      },
+      {
+        "line": 20,
+        "raw": "'Hunkered down'"
+      },
+      {
+        "line": 20,
+        "raw": "'Target is hunkered.'"
+      },
+      {
+        "line": 20,
+        "raw": "'Defensive Line'"
+      },
+      {
+        "line": 20,
+        "raw": "'A Guardian beside the target shields it.'"
+      },
+      {
+        "line": 21,
+        "raw": "'Helpless'"
+      },
+      {
+        "line": 21,
+        "raw": "'Stunned or surrendered target.'"
+      },
+      {
+        "line": 21,
+        "raw": "'Suppressed'"
+      },
+      {
+        "line": 21,
+        "raw": "'The shooter is pinned by suppressing fire.'"
+      },
+      {
+        "line": 21,
+        "raw": "'Battle Meditation'"
+      },
+      {
+        "line": 21,
+        "raw": "'A Consular\\'s meditation steadies allies and shakes foes.'"
+      },
+      {
+        "line": 22,
+        "raw": "'Marked'"
+      },
+      {
+        "line": 22,
+        "raw": "'A Scout marked this target.'"
+      },
+      {
+        "line": 22,
+        "raw": "'Bond'"
+      },
+      {
+        "line": 22,
+        "raw": "'Fighting near a bonded partner.'"
+      },
+      {
+        "line": 22,
+        "raw": "'Ability bonus'"
+      },
+      {
+        "line": 22,
+        "raw": "'Bonus from the ability used.'"
+      },
+      {
+        "line": 22,
+        "raw": "'Ability penalty'"
+      },
+      {
+        "line": 22,
+        "raw": "'Penalty from the ability used.'"
+      },
+      {
+        "line": 23,
+        "raw": "'Height'"
+      },
+      {
+        "line": 23,
+        "raw": "'Shooting down from higher ground.'"
+      },
+      {
+        "line": 23,
+        "raw": "'High ground'"
+      },
+      {
+        "line": 23,
+        "raw": "'+15 when shooting down at a lower target.'"
+      },
+      {
+        "line": 23,
+        "raw": "'Cover seen from above'"
+      },
+      {
+        "line": 23,
+        "raw": "'Shooting down past cover: it protects less (up to +10).'"
+      },
+      {
+        "line": 24,
+        "raw": "'Executioner'"
+      },
+      {
+        "line": 24,
+        "raw": "'+25 against targets at half HP or less.'"
+      },
+      {
+        "line": 24,
+        "raw": "'Boosted'"
+      },
+      {
+        "line": 24,
+        "raw": "'An ally\\'s buff raises this unit\\'s aim.'"
+      },
+      {
+        "line": 24,
+        "raw": "'Target shielded'"
+      },
+      {
+        "line": 24,
+        "raw": "'A buff on the target makes it harder to hit.'"
+      },
+      {
+        "line": 25,
+        "raw": "'Sith Lord nearby'"
+      },
+      {
+        "line": 25,
+        "raw": "'A Sith Lord within 4 tiles drives nearby Sith to shoot straighter.'"
+      },
+      {
+        "line": 25,
+        "raw": "'Vs'"
+      },
+      {
+        "line": 25,
+        "raw": "'Trained against this kind of foe.'"
+      },
+      {
+        "line": 25,
+        "raw": "'Beast lore'"
+      },
+      {
+        "line": 25,
+        "raw": "'Knows how beasts fight.'"
+      },
+      {
+        "line": 25,
+        "raw": "'Fear of horrors'"
+      },
+      {
+        "line": 25,
+        "raw": "'A scar: this unit fears horrors.'"
+      },
+      {
+        "line": 25,
+        "raw": "'Flank'"
+      },
+      {
+        "line": 25,
+        "raw": "'Target has no cover against this angle.'"
+      },
+      {
+        "line": 25,
+        "raw": "'Ambush'"
+      },
+      {
+        "line": 25,
+        "raw": "'First shot from concealment.'"
+      },
+      {
+        "line": 25,
+        "raw": "'Will'"
+      },
+      {
+        "line": 25,
+        "raw": "'Shaken nerves.'"
+      },
+      {
+        "line": 26,
+        "raw": "'CODEX'"
+      },
+      {
+        "line": 26,
+        "raw": "''"
+      },
+      {
+        "line": 27,
+        "raw": "'GEAR'"
+      },
+      {
+        "line": 27,
+        "raw": "'ARMOR'"
+      },
+      {
+        "line": 27,
+        "raw": "'MODS'"
+      },
+      {
+        "line": 27,
+        "raw": "'AMODS'"
+      },
+      {
+        "line": 27,
+        "raw": "'SMODS'"
+      },
+      {
+        "line": 27,
+        "raw": "'UTIL'"
+      },
+      {
+        "line": 27,
+        "raw": "'UTILITY'"
+      },
+      {
+        "line": 27,
+        "raw": "'STANCES'"
+      },
+      {
+        "line": 27,
+        "raw": "'FORMS'"
+      },
+      {
+        "line": 27,
+        "raw": "'CRYSTAL_FX'"
+      },
+      {
+        "line": 27,
+        "raw": "'SABER_TRAITS'"
+      },
+      {
+        "line": 27,
+        "raw": "'TRAITS'"
+      },
+      {
+        "line": 27,
+        "raw": "'PERKS'"
+      },
+      {
+        "line": 27,
+        "raw": "'SCARS'"
+      },
+      {
+        "line": 27,
+        "raw": "'object'"
+      },
+      {
+        "line": 28,
+        "raw": "'WEAPONS'"
+      },
+      {
+        "line": 28,
+        "raw": "'SABERS'"
+      },
+      {
+        "line": 29,
+        "raw": "`HP ${f.hp} · Aim ${f.aim} · Move ${f.mob} · Damage ${f.dmg[0]}–${f.dmg[1]} · Range ${f.range<2?'melee':f.range}`"
+      },
+      {
+        "line": 29,
+        "raw": "`Armor ${f.armor}.`"
+      },
+      {
+        "line": 29,
+        "raw": "''"
+      },
+      {
+        "line": 29,
+        "raw": "'Hurts only Force users; troops are immune.'"
+      },
+      {
+        "line": 29,
+        "raw": "''"
+      },
+      {
+        "line": 29,
+        "raw": "'Starts hidden.'"
+      },
+      {
+        "line": 29,
+        "raw": "''"
+      },
+      {
+        "line": 29,
+        "raw": "' '"
+      },
+      {
+        "line": 30,
+        "raw": "''"
+      },
+      {
+        "line": 31,
+        "raw": "'ability'"
+      },
+      {
+        "line": 31,
+        "raw": "'AB'"
+      },
+      {
+        "line": 31,
+        "raw": "''"
+      },
+      {
+        "line": 32,
+        "raw": "'enemy'"
+      },
+      {
+        "line": 32,
+        "raw": "'FOES'"
+      },
+      {
+        "line": 32,
+        "raw": "''"
+      },
+      {
+        "line": 33,
+        "raw": "'tile'"
+      },
+      {
+        "line": 33,
+        "raw": "'TILES'"
+      },
+      {
+        "line": 33,
+        "raw": "'Full cover.'"
+      },
+      {
+        "line": 33,
+        "raw": "'Half cover.'"
+      },
+      {
+        "line": 33,
+        "raw": "''"
+      },
+      {
+        "line": 33,
+        "raw": "''"
+      },
+      {
+        "line": 33,
+        "raw": "'Blocks movement.'"
+      },
+      {
+        "line": 33,
+        "raw": "`Raised ${c.elev}: +aim from above.`"
+      },
+      {
+        "line": 33,
+        "raw": "''"
+      },
+      {
+        "line": 33,
+        "raw": "'Explosions break it down.'"
+      },
+      {
+        "line": 33,
+        "raw": "''"
+      },
+      {
+        "line": 33,
+        "raw": "' '"
+      },
+      {
+        "line": 33,
+        "raw": "'Open ground.'"
+      },
+      {
+        "line": 34,
+        "raw": "'class'"
+      },
+      {
+        "line": 34,
+        "raw": "'CLASS'"
+      },
+      {
+        "line": 34,
+        "raw": "`${t[id].jedi?'Jedi':'Trooper'} · HP ${t[id].hp} · Aim ${t[id].aim} · Move ${t[id].mob}`"
+      },
+      {
+        "line": 35,
+        "raw": "'wing'"
+      },
+      {
+        "line": 35,
+        "raw": "'WINGS'"
+      },
+      {
+        "line": 35,
+        "raw": "''"
+      },
+      {
+        "line": 36,
+        "raw": "'research'"
+      },
+      {
+        "line": 36,
+        "raw": "'RESEARCH'"
+      },
+      {
+        "line": 36,
+        "raw": "''"
+      },
+      {
+        "line": 37,
+        "raw": "'mission'"
+      },
+      {
+        "line": 37,
+        "raw": "'MISSIONS'"
+      },
+      {
+        "line": 37,
+        "raw": "''"
+      },
+      {
+        "line": 38,
+        "raw": "'gear'"
+      },
+      {
+        "line": 38,
+        "raw": "''"
+      },
+      {
+        "line": 39,
+        "raw": "'status'"
+      },
+      {
+        "line": 39,
+        "raw": "'STATUS'"
+      },
+      {
+        "line": 39,
+        "raw": "''"
+      },
+      {
+        "line": 40,
+        "raw": "'stat'"
+      },
+      {
+        "line": 40,
+        "raw": "''"
+      },
+      {
+        "line": 41,
+        "raw": "'mod'"
+      },
+      {
+        "line": 41,
+        "raw": "''"
+      },
+      {
+        "line": 41,
+        "raw": "''"
+      },
+      {
+        "line": 42,
+        "raw": "'CODEX'"
+      },
+      {
+        "line": 45,
+        "raw": "'tw.codex'"
+      },
+      {
+        "line": 46,
+        "raw": "'stat'"
+      },
+      {
+        "line": 46,
+        "raw": "'mod'"
+      },
+      {
+        "line": 49,
+        "raw": "'mission'"
+      },
+      {
+        "line": 50,
+        "raw": "'.'"
+      },
+      {
+        "line": 50,
+        "raw": "'tile'"
+      },
+      {
+        "line": 51,
+        "raw": "'e'"
+      },
+      {
+        "line": 51,
+        "raw": "'enemy'"
+      },
+      {
+        "line": 51,
+        "raw": "'class'"
+      },
+      {
+        "line": 51,
+        "raw": "'ability'"
+      },
+      {
+        "line": 52,
+        "raw": "'status'"
+      },
+      {
+        "line": 52,
+        "raw": "'down'"
+      },
+      {
+        "line": 52,
+        "raw": "'status'"
+      },
+      {
+        "line": 52,
+        "raw": "'down'"
+      },
+      {
+        "line": 53,
+        "raw": "'AB'"
+      },
+      {
+        "line": 53,
+        "raw": "'FOES'"
+      },
+      {
+        "line": 53,
+        "raw": "'CLASS'"
+      },
+      {
+        "line": 53,
+        "raw": "'TILES'"
+      },
+      {
+        "line": 53,
+        "raw": "'WINGS'"
+      },
+      {
+        "line": 53,
+        "raw": "'RESEARCH'"
+      },
+      {
+        "line": 53,
+        "raw": "'MISSIONS'"
+      },
+      {
+        "line": 55,
+        "raw": "'status'"
+      },
+      {
+        "line": 55,
+        "raw": "'STATUS'"
+      },
+      {
+        "line": 56,
+        "raw": "'gear'"
+      },
+      {
+        "line": 56,
+        "raw": "'GEAR'"
+      },
+      {
+        "line": 56,
+        "raw": "'ARMOR'"
+      },
+      {
+        "line": 56,
+        "raw": "'MODS'"
+      },
+      {
+        "line": 56,
+        "raw": "'AMODS'"
+      },
+      {
+        "line": 56,
+        "raw": "'SMODS'"
+      },
+      {
+        "line": 56,
+        "raw": "'UTIL'"
+      },
+      {
+        "line": 56,
+        "raw": "'UTILITY'"
+      },
+      {
+        "line": 56,
+        "raw": "'STANCES'"
+      },
+      {
+        "line": 56,
+        "raw": "'FORMS'"
+      },
+      {
+        "line": 56,
+        "raw": "'none'"
+      },
+      {
+        "line": 57,
+        "raw": "'tile'"
+      },
+      {
+        "line": 57,
+        "raw": "'.'"
+      },
+      {
+        "line": 58,
+        "raw": "'CODEX'"
+      },
+      {
+        "line": 60,
+        "raw": "'ability'"
+      },
+      {
+        "line": 63,
+        "raw": "'C'"
+      },
+      {
+        "line": 63,
+        "raw": "'class'"
+      },
+      {
+        "line": 63,
+        "raw": "'wing'"
+      },
+      {
+        "line": 64,
+        "raw": "'codex'"
+      },
+      {
+        "line": 65,
+        "raw": "`<div class=\"ui-card wide\" role=\"dialog\" aria-label=\"Codex\"><div class=\"ui-head\"><h2>Codex</h2><span class=\"muted small\">${Object.values(CX_SEEN).reduce((s,k)=>s+Object.keys(k).length,0)} entries found</span><button type=\"button\" data-ui=\"close\" aria-label=\"Close\">✕</button></div>\n <div class=\"cxtabs\" role=\"tablist\">${KINDS.map(([k,n])=>{const a=codexIds(k),m=a.filter(i=>(CX_SEEN[k]||{})[i]).length;return a.length?`"
+      },
+      {
+        "line": 66,
+        "raw": "\"button\""
+      },
+      {
+        "line": 66,
+        "raw": "\"tab\""
+      },
+      {
+        "line": 66,
+        "raw": "\"${k}\""
+      },
+      {
+        "line": 66,
+        "raw": "\"${k===CX_TAB?'on':''}\""
+      },
+      {
+        "line": 66,
+        "raw": "`:''}).join('')}</div>\n <div class=\"cxlist\">${met.length?met.map(i=>{const d=describe(CX_TAB,i);return `"
+      },
+      {
+        "line": 67,
+        "raw": "\"cxe\""
+      },
+      {
+        "line": 67,
+        "raw": "''"
+      },
+      {
+        "line": 67,
+        "raw": "`<p>${d.desc}</p>`"
+      },
+      {
+        "line": 67,
+        "raw": "''"
+      },
+      {
+        "line": 67,
+        "raw": "`<p class=\"lore\">${d.lore}</p>`"
+      },
+      {
+        "line": 67,
+        "raw": "''"
+      },
+      {
+        "line": 67,
+        "raw": "`}).join(''):'<p class=\"muted\">Nothing here yet. Entries appear as you meet them.</p>'}\n ${ids.length>met.length?`"
+      },
+      {
+        "line": 68,
+        "raw": "\"muted small\""
+      },
+      {
+        "line": 68,
+        "raw": "`:''}</div></div>`"
+      },
+      {
+        "line": 69,
+        "raw": "'.cxtabs'"
+      },
+      {
+        "line": 69,
+        "raw": "'click'"
+      },
+      {
+        "line": 69,
+        "raw": "'[data-cx]'"
+      },
+      {
+        "line": 71,
+        "raw": "'div'"
+      },
+      {
+        "line": 71,
+        "raw": "'tip'"
+      },
+      {
+        "line": 71,
+        "raw": "'tip'"
+      },
+      {
+        "line": 71,
+        "raw": "'role'"
+      },
+      {
+        "line": 71,
+        "raw": "'tooltip'"
+      },
+      {
+        "line": 73,
+        "raw": "':'"
+      },
+      {
+        "line": 73,
+        "raw": "':'"
+      },
+      {
+        "line": 74,
+        "raw": "`<b>${d.name}</b>${d.desc?`"
+      },
+      {
+        "line": 74,
+        "raw": "`:''}${d.lore?`"
+      },
+      {
+        "line": 74,
+        "raw": "`:''}`"
+      },
+      {
+        "line": 75,
+        "raw": "'px'"
+      },
+      {
+        "line": 75,
+        "raw": "'px'"
+      },
+      {
+        "line": 77,
+        "raw": "'mouseover'"
+      },
+      {
+        "line": 77,
+        "raw": "'[data-tip]'"
+      },
+      {
+        "line": 78,
+        "raw": "'#board'"
+      },
+      {
+        "line": 79,
+        "raw": "'mousemove'"
+      },
+      {
+        "line": 79,
+        "raw": "'px'"
+      },
+      {
+        "line": 79,
+        "raw": "'px'"
+      },
+      {
+        "line": 80,
+        "raw": "'pointerdown'"
+      },
+      {
+        "line": 80,
+        "raw": "'touch'"
+      },
+      {
+        "line": 80,
+        "raw": "'[data-tip]'"
+      },
+      {
+        "line": 81,
+        "raw": "'1'"
+      },
+      {
+        "line": 82,
+        "raw": "'pointerup'"
+      },
+      {
+        "line": 82,
+        "raw": "'touch'"
+      },
+      {
+        "line": 84,
+        "raw": "'click'"
+      },
+      {
+        "line": 84,
+        "raw": "'[data-tipped]'"
+      },
+      {
+        "line": 85,
+        "raw": "'scroll'"
+      },
+      {
+        "line": 87,
+        "raw": "'#modal [data-tip]'"
+      },
+      {
+        "line": 87,
+        "raw": "':'"
+      },
+      {
+        "line": 87,
+        "raw": "\":\""
+      },
+      {
+        "line": 87,
+        "raw": "'modal'"
+      }
+    ]
+  },
+  "text": "/* Descriptions, tooltips and the Codex (Chat U).\n   describe(kind,id) → {name,desc,lore,ic}. desc = owner's one-line `desc` field (fallbacks below); lore = CODEX[kind][id].lore (Chat L).\n   Any element with data-tip=\"kind:id\" gets a hover tooltip (long-press on touch). codexSee(kind,id) unlocks a Codex entry. */\nconst KINDS=[['ability','Abilities'],['enemy','Enemies'],['class','Classes'],['status','Status'],['tile','Terrain'],['gear','Gear'],['wing','Temple'],['research','Research'],['mission','Missions'],['planet','Planets'],['character','Characters']];\n// Global lookup that also sees `const` tables from other scripts (they aren't on window).\nconst uiGv=n=>{try{return Function(`return typeof ${n}!=='undefined'?${n}:null`)()}catch{return null}};\n// Fallback text for things no data table describes yet. Owners' `desc` fields win.\nconst STATUS_INFO={down:['Down','Out of the fight and bleeding out. An adjacent ally can Stabilize; a medkit revives.'],stunned:['Stunned','Loses its next turn.'],\n surrender:['Surrendered','Gave up. Subdue it to take a prisoner.'],captured:['Captured','Bound and out of the fight.'],guard:['Guard','Deflects more bolts and strikes enemies who come close, until its next turn.'],\n overwatch:['Overwatch','Fires at the first enemy that moves in range.'],hunker:['Hunkered down','+30 defense and immune to flanking crits until its next turn.'],\n barrier:['Force Barrier','Counts as full cover from every side until the caster\\'s next turn.'],suppress:['Suppressed','−30 aim; moving gives the suppressor a free shot.'],\n mark:['Marked','Allies get +15 aim against it.'],scan:['Carrying data','Get this unit to an evac zone to extract the data.'],disarmed:['Disarmed','Can\\'t shoot next turn; can still move and melee.'],\n concealed:['Concealed','Unseen by the enemy until it attacks or is spotted.'],graze:['Graze','A shot that just misses still clips the target for half damage. The band is 10% above the hit chance.'],tired:['Tired','Fought the last two missions back to back: −10 aim. Sit out one mission to recover.'],panic:['Panicked','Lost its nerve: may freeze, flee or fire wildly.'],darkness:['Darkness','Dark-side pull. High Darkness adds damage and risks a fall.']};\nconst STAT_INFO={aim:['Aim','Base chance to hit before cover, range and other modifiers.'],move:['Move','Tiles per AP spent moving. 3 AP = triple distance.'],\n damage:['Damage','Damage range on a hit. Armor removes some; minimum 1.'],range:['Range','Max shooting distance. Hit chance drops past 60% of it.'],\n deflect:['Deflect','Chance a Jedi blocks a blaster bolt.'],crit:['Crit','Chance a hit deals +2 damage. Flanking adds more.'],padawan:['Padawan','Within 3 tiles of their Master: +10 aim. A Padawan kill gives the Master +1 Focus.'],armor:['Armor','Each pip cuts one hit by 1, then breaks. Shredder strips an extra pip. Restored after every mission.'],medkits:['Medkits','Heals or revives an adjacent ally.'],\n grenades:['Grenades','3×3 blast; breaks half cover.'],hp:['HP','Health. At 0 a unit goes down and starts to bleed out.'],actions:['Action points','3 AP per turn. Each AP buys one full move. Pistols and sabers cost 1 AP to attack, rifles 2; only Overwatch, Guard and Hunker end the turn.'],\n focus:['Focus','Fuel for Force powers. Meditate to regain it.'],will:['Will','Resistance to panic from deaths, horrors and heavy damage.'],stress:['Stress','Builds over missions; high stress lowers will.'],threat:['Threat','Rises each turn past par. At 6 the mission fails.']};\nconst MOD_INFO={'Aim':'The shooter\\'s base aim.','Half cover':'Target behind half cover: −20.','Full cover':'Target behind full cover: −40.','Range':'Past 60% of weapon range, aim drops 3 per tile.',\n 'Close quarters':'Melee bonus.','Smoke':'Target in smoke.','Exposed target':'Snipers punish targets with no cover.','Hunkered down':'Target is hunkered.','Defensive Line':'A Guardian beside the target shields it.',\n 'Helpless':'Stunned or surrendered target.','Suppressed':'The shooter is pinned by suppressing fire.','Battle Meditation':'A Consular\\'s meditation steadies allies and shakes foes.',\n 'Marked':'A Scout marked this target.','Bond':'Fighting near a bonded partner.','Ability bonus':'Bonus from the ability used.','Ability penalty':'Penalty from the ability used.',\n 'Height':'Shooting down from higher ground.','High ground':'+15 when shooting down at a lower target.','Cover seen from above':'Shooting down past cover: it protects less (up to +10).',\n 'Executioner':'+25 against targets at half HP or less.','Boosted':'An ally\\'s buff raises this unit\\'s aim.','Target shielded':'A buff on the target makes it harder to hit.',\n 'Sith Lord nearby':'A Sith Lord within 4 tiles drives nearby Sith to shoot straighter.','Vs':'Trained against this kind of foe.','Beast lore':'Knows how beasts fight.','Fear of horrors':'A scar: this unit fears horrors.','Flank':'Target has no cover against this angle.','Ambush':'First shot from concealment.','Will':'Shaken nerves.'};\nfunction loreOf(kind,id){const C=uiGv('CODEX');return C&&C[kind]&&C[kind][id]&&C[kind][id].lore||''}\nfunction gearItem(id){for(const n of ['GEAR','ARMOR','MODS','AMODS','SMODS','UTIL','UTILITY','STANCES','FORMS','CRYSTAL_FX','SABER_TRAITS','TRAITS','PERKS','SCARS']){const t=uiGv(n);if(t&&!Array.isArray(t)&&t[id]&&typeof t[id]==='object')return t[id]}\n for(const n of ['WEAPONS','SABERS']){const t=uiGv(n);if(Array.isArray(t)){const i=t.find((w,ix)=>w.id===id||String(ix)===String(id)||w.n===id);if(i)return i}}return null}\nfunction foeAuto(f){return [`HP ${f.hp} · Aim ${f.aim} · Move ${f.mob} · Damage ${f.dmg[0]}–${f.dmg[1]} · Range ${f.range<2?'melee':f.range}`,f.armor?`Armor ${f.armor}.`:'',f.horror||f.forceOnly?'Hurts only Force users; troops are immune.':'',f.hid?'Starts hidden.':''].filter(Boolean).join(' ')}\nfunction describe(kind,id){let name=id,desc='',ic=null,t;\n if(kind==='ability'&&(t=uiGv('AB'))&&t[id]){name=t[id].name;desc=t[id].desc||t[id].tip||'';ic=t[id].ic}\n else if(kind==='enemy'&&(t=uiGv('FOES'))&&t[id]){name=t[id].n.replace(/ \\d+$/,'');desc=t[id].desc||foeAuto(t[id]);ic=t[id].ic}\n else if(kind==='tile'&&(t=uiGv('TILES'))&&t[id]){const c=t[id];name=c.n;desc=c.desc||[c.cover===2?'Full cover.':c.cover?'Half cover.':'',c.walk?'':'Blocks movement.',c.elev?`Raised ${c.elev}: +aim from above.`:'',c.breaks?'Explosions break it down.':''].filter(Boolean).join(' ')||'Open ground.'}\n else if(kind==='class'&&(t=uiGv('CLASS'))&&t[id]){name=id;desc=t[id].desc||`${t[id].jedi?'Jedi':'Trooper'} · HP ${t[id].hp} · Aim ${t[id].aim} · Move ${t[id].mob}`;ic=id.toLowerCase()}\n else if(kind==='wing'&&(t=uiGv('WINGS'))&&t[id]){name=t[id].n;desc=t[id].desc||(t[id].eff&&t[id].eff[1])||''}\n else if(kind==='research'&&(t=uiGv('RESEARCH'))&&t[id]){name=t[id].n||t[id].name||id;desc=t[id].desc||''}\n else if(kind==='mission'&&(t=uiGv('MISSIONS'))&&t[id]){name=t[id].n;desc=t[id].desc||t[id].where||''}\n else if(kind==='gear'&&(t=gearItem(id))){name=t.n||t.name||id;desc=t.desc||t.tip||''}\n else if(kind==='status'){t=uiGv('STATUS');const s=t&&t[id];name=s&&s.n||(STATUS_INFO[id]||[id])[0];desc=s&&s.desc||(STATUS_INFO[id]||[])[1]||'';ic=id}\n else if(kind==='stat'){[name,desc]=STAT_INFO[id]||[id,'']}\n else if(kind==='mod'){name=id;desc=MOD_INFO[id]||MOD_INFO[id.replace(/ .*/,'')]||''}\n const C=uiGv('CODEX'),cx=C&&C[kind]&&C[kind][id];if(cx&&cx.n)name=cx.n;if(cx&&!desc&&cx.desc)desc=cx.desc;\n return {name,desc,lore:loreOf(kind,id),ic}}\n// --- What the player has met (per browser) ---\nconst CX_KEY='tw.codex';let CX_SEEN=(()=>{try{return JSON.parse(localStorage.getItem(CX_KEY))||{}}catch{return {}}})(),cxDirty=0;\nfunction codexSee(kind,id){if(id==null||kind==='stat'||kind==='mod')return;const k=CX_SEEN[kind]||(CX_SEEN[kind]={});if(k[id])return;k[id]=Date.now();\n if(!cxDirty){cxDirty=1;setTimeout(()=>{cxDirty=0;try{localStorage.setItem(CX_KEY,JSON.stringify(CX_SEEN))}catch{}},400)}}\n// Called from render(): everything on the board counts as met.\nfunction codexScan(){if(!S)return;codexSee('mission',S.id);\n for(const row of S.grid)for(const c of row)if(c!=='.')codexSee('tile',c);\n for(const u of S.units){if(u.hid)continue;if(u.side==='e')codexSee('enemy',u.type);else{if(u.cls&&!u.vip)codexSee('class',u.cls);for(const k of u.abil||[])codexSee('ability',k)}\n  const b=badge(u);if(b)codexSee('status',b);if(u.status==='down')codexSee('status','down')}}\nfunction codexIds(kind){const src={ability:'AB',enemy:'FOES',class:'CLASS',tile:'TILES',wing:'WINGS',research:'RESEARCH',mission:'MISSIONS'}[kind];\n let ids=src&&uiGv(src)?Object.keys(uiGv(src)):[];\n if(kind==='status')ids=Object.keys({...STATUS_INFO,...(uiGv('STATUS')||{})});\n if(kind==='gear')for(const n of ['GEAR','ARMOR','MODS','AMODS','SMODS','UTIL','UTILITY','STANCES','FORMS']){const t=uiGv(n);if(t&&!Array.isArray(t))ids.push(...Object.keys(t).filter(k=>k!=='none'))}\n if(kind==='tile')ids=ids.filter(c=>c!=='.');\n const C=uiGv('CODEX');if(C&&C[kind])for(const k of Object.keys(C[kind]))if(!ids.includes(k))ids.push(k);\n return [...new Set(ids)]}\nlet CX_TAB='ability';\nfunction codexOpen(tab){if(tab)CX_TAB=tab;\n // Squad and Temple count as met even before a mission.\n const Cg=uiGv('C');if(Cg){for(const r of Cg.roster||[])if(r.cls)codexSee('class',r.cls);const wl=Cg.wings||{};for(const k in wl)if((wl[k]&&wl[k].lvl!=null?wl[k].lvl:wl[k])>0)codexSee('wing',k)}\n const o=uiLayer('codex'),ids=codexIds(CX_TAB),seen=CX_SEEN[CX_TAB]||{},met=ids.filter(i=>seen[i]);\n o.innerHTML=`<div class=\"ui-card wide\" role=\"dialog\" aria-label=\"Codex\"><div class=\"ui-head\"><h2>Codex</h2><span class=\"muted small\">${Object.values(CX_SEEN).reduce((s,k)=>s+Object.keys(k).length,0)} entries found</span><button type=\"button\" data-ui=\"close\" aria-label=\"Close\">✕</button></div>\n <div class=\"cxtabs\" role=\"tablist\">${KINDS.map(([k,n])=>{const a=codexIds(k),m=a.filter(i=>(CX_SEEN[k]||{})[i]).length;return a.length?`<button type=\"button\" role=\"tab\" data-cx=\"${k}\" class=\"${k===CX_TAB?'on':''}\">${n} <small>${m}/${a.length}</small></button>`:''}).join('')}</div>\n <div class=\"cxlist\">${met.length?met.map(i=>{const d=describe(CX_TAB,i);return `<article class=\"cxe\">${d.ic&&ICONS[d.ic]?icon(d.ic):''}<div><b>${d.name}</b>${d.desc?`<p>${d.desc}</p>`:''}${d.lore?`<p class=\"lore\">${d.lore}</p>`:''}</div></article>`}).join(''):'<p class=\"muted\">Nothing here yet. Entries appear as you meet them.</p>'}\n ${ids.length>met.length?`<p class=\"muted small\">${ids.length-met.length} still unknown.</p>`:''}</div></div>`;\n o.querySelector('.cxtabs').addEventListener('click',ev=>{const b=ev.target.closest('[data-cx]');if(b){ev.stopPropagation();codexOpen(b.dataset.cx)}})}\n// --- Tooltips: hover (mouse) or long-press (touch) on any [data-tip=\"kind:id\"] ---\nconst UI_TIP=(()=>{const d=document.createElement('div');d.id='tip';d.className='tip';d.hidden=true;d.setAttribute('role','tooltip');document.body.appendChild(d);return d})();\nlet tipT=0,tipEl=null,tipTouch=0;\nfunction tipShow(el,x,y){const [kind,...r]=el.dataset.tip.split(':'),id=r.join(':'),d=describe(kind,id);if(!d.desc&&!d.lore)return;codexSee(kind,id);\n UI_TIP.innerHTML=`<b>${d.name}</b>${d.desc?`<span>${d.desc}</span>`:''}${d.lore?`<i>${d.lore}</i>`:''}`;UI_TIP.hidden=false;\n const w=UI_TIP.offsetWidth,h=UI_TIP.offsetHeight,vw=innerWidth,vh=innerHeight;let L=x+14,T=y+16;if(L+w>vw-8)L=Math.max(8,x-w-14);if(T+h>vh-8)T=Math.max(8,y-h-12);UI_TIP.style.left=L+'px';UI_TIP.style.top=T+'px'}\nfunction tipHide(){clearTimeout(tipT);tipEl=null;UI_TIP.hidden=true}\ndocument.addEventListener('mouseover',ev=>{if(tipTouch)return;const el=ev.target.closest&&ev.target.closest('[data-tip]');if(el===tipEl)return;tipHide();if(!el)return;tipEl=el;\n const delay=el.closest('#board')?700:350,{clientX:x,clientY:y}=ev;tipT=setTimeout(()=>tipShow(el,x,y),delay)});\ndocument.addEventListener('mousemove',ev=>{if(!UI_TIP.hidden&&tipEl){UI_TIP.style.left=Math.min(ev.clientX+14,innerWidth-UI_TIP.offsetWidth-8)+'px';UI_TIP.style.top=Math.min(ev.clientY+16,innerHeight-UI_TIP.offsetHeight-8)+'px'}},{passive:true});\ndocument.addEventListener('pointerdown',ev=>{if(ev.pointerType!=='touch'){tipHide();return}tipTouch=1;tipHide();const el=ev.target.closest('[data-tip]');if(!el)return;\n tipT=setTimeout(()=>{tipShow(el,ev.clientX,ev.clientY);el.dataset.tipped='1'},450)});\ndocument.addEventListener('pointerup',ev=>{if(ev.pointerType==='touch')clearTimeout(tipT)});\n// A long-press that opened a tooltip shouldn't also click the button.\ndocument.addEventListener('click',ev=>{const el=ev.target.closest&&ev.target.closest('[data-tipped]');if(el){delete el.dataset.tipped;ev.stopPropagation();ev.preventDefault();setTimeout(tipHide,1800)}},true);\naddEventListener('scroll',tipHide,{passive:true});\n// Base/Temple screens: anything they mark with data-tip also counts as met once shown.\nnew MutationObserver(()=>{try{for(const el of document.querySelectorAll('#modal [data-tip]')){const [k,...r]=el.dataset.tip.split(':');codexSee(k,r.join(\":\"))}}catch{}}).observe(document.getElementById('modal'),{childList:true,subtree:true});\n"
+}

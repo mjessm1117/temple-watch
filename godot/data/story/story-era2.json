@@ -1,0 +1,297 @@
+{
+  "source": "public/js/story-era2.js",
+  "sha256": "24ba0ab5a4e5ab75b669cdef5612a6afab2ceb9bf15b8a48cdf46b535f8da12d",
+  "lines": 100,
+  "counts": {
+    "SOURCE_LITERALS": 71
+  },
+  "records": {
+    "SOURCE_LITERALS": [
+      {
+        "line": 20,
+        "raw": "'active'"
+      },
+      {
+        "line": 20,
+        "raw": "'retired'"
+      },
+      {
+        "line": 20,
+        "raw": "`Became a Legend of the ${ERA1.n}`"
+      },
+      {
+        "line": 23,
+        "raw": "`${WINGS[k].n} ${l}→${l-1}`"
+      },
+      {
+        "line": 26,
+        "raw": "'Credits'"
+      },
+      {
+        "line": 26,
+        "raw": "`${c0} → ${R.credits} (30% kept + ${K.warChest} war chest)`"
+      },
+      {
+        "line": 26,
+        "raw": "'Intel'"
+      },
+      {
+        "line": 26,
+        "raw": "`${i0} → 0`"
+      },
+      {
+        "line": 26,
+        "raw": "'Kyber'"
+      },
+      {
+        "line": 26,
+        "raw": "`${R.kyber} kept`"
+      },
+      {
+        "line": 26,
+        "raw": "'Senate Favor'"
+      },
+      {
+        "line": 26,
+        "raw": "`${f0} → ${R.favor}`"
+      },
+      {
+        "line": 26,
+        "raw": "'Order Darkness'"
+      },
+      {
+        "line": 26,
+        "raw": "`${o0} → ${C.orderDark}`"
+      },
+      {
+        "line": 28,
+        "raw": "'u'"
+      },
+      {
+        "line": 28,
+        "raw": "'active'"
+      },
+      {
+        "line": 30,
+        "raw": "''"
+      },
+      {
+        "line": 31,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 31,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 32,
+        "raw": "`It is now ${bbyTxt(ERA2.bby)}. The Army of Light needs the Temple.`"
+      },
+      {
+        "line": 33,
+        "raw": "'#modal'"
+      },
+      {
+        "line": 34,
+        "raw": "`<div class=\"box wide\"><div class=\"eyebrow\">Era 2 · ${ERA2.n} · ${bbyTxt(ERA2.bby)}</div><h2>Centuries pass</h2><p>${ERA2.jump}</p>\n <div class=\"sum\"><div><span>Legends of the Archive</span><span>${J.legends.join(', ')||'none reached rank 3'}</span></div>\n <div><span>Temple wings</span><span>${J.wings.join(' · ')||'every wing held its level'}</span></div>\n ${J.res.map(([a,b])=>`"
+      },
+      {
+        "line": 37,
+        "raw": "`).join('')}\n <div><span>Research</span><span>The Archives keep everything</span></div>\n ${C.eraMod?`"
+      },
+      {
+        "line": 39,
+        "raw": "`:''}\n <div><span>The Vision</span><span>${SHADOW.word(s.shadow)} · ${s.shadow}/10</span></div></div>\n <h3>${ERA2.shard.t}</h3><p>${ERA2.shard.text}</p>\n <p class=\"muted\">New squad: ${C.roster.map(r=>r.n).join(', ')}. New Council voices: Lord Hoth, Lord Farfalla.</p>\n <button type=\"button\" class=\"primary\" id=\"jumpOk\">To Ruusan</button></div>`"
+      },
+      {
+        "line": 44,
+        "raw": "'#jumpOk'"
+      },
+      {
+        "line": 48,
+        "raw": "'loyal'"
+      },
+      {
+        "line": 50,
+        "raw": "'rescue'"
+      },
+      {
+        "line": 50,
+        "raw": "'r_prisoners'"
+      },
+      {
+        "line": 58,
+        "raw": "'restart'"
+      },
+      {
+        "line": 58,
+        "raw": "'nextEra'"
+      },
+      {
+        "line": 58,
+        "raw": "'beforebegin'"
+      },
+      {
+        "line": 58,
+        "raw": "'<button type=\"button\" class=\"primary\" id=\"nextEra\">Continue to Ruusan</button>'"
+      },
+      {
+        "line": 58,
+        "raw": "'primary'"
+      },
+      {
+        "line": 59,
+        "raw": "'nextEra'"
+      },
+      {
+        "line": 62,
+        "raw": "'dead'"
+      },
+      {
+        "line": 62,
+        "raw": "'captured'"
+      },
+      {
+        "line": 62,
+        "raw": "'escaped'"
+      },
+      {
+        "line": 62,
+        "raw": "'escaped'"
+      },
+      {
+        "line": 63,
+        "raw": "'lives'"
+      },
+      {
+        "line": 63,
+        "raw": "'died'"
+      },
+      {
+        "line": 63,
+        "raw": "'joined'"
+      },
+      {
+        "line": 63,
+        "raw": "'saved'"
+      },
+      {
+        "line": 63,
+        "raw": "'lost'"
+      },
+      {
+        "line": 65,
+        "raw": "'#modal'"
+      },
+      {
+        "line": 67,
+        "raw": "'e2_'"
+      },
+      {
+        "line": 67,
+        "raw": "`<p>${FLAG_LINES[k]}</p>`"
+      },
+      {
+        "line": 67,
+        "raw": "''"
+      },
+      {
+        "line": 68,
+        "raw": "`<div class=\"box wide\"><div class=\"eyebrow\">Era 2 ends · ${ERA2.n} · ${bbyTxt(s.bby)}</div><h2>The Army of Light</h2>\n <p>${won?STORY_TEXT2.eraWin:STORY_TEXT2.eraLose}</p><p>${BANE[b].line}</p>${od>=60?`"
+      },
+      {
+        "line": 69,
+        "raw": "\"dkt\""
+      },
+      {
+        "line": 69,
+        "raw": "`:''}\n <div class=\"sum\"><div><span>The Vision</span><span>${SHADOW.word(s.shadow)} · ${s.shadow}/10</span></div><div><span>Order Darkness</span><span>${od}/100</span></div>\n <div><span>Senate Favor</span><span>${C.res.favor}</span></div><div><span>Still serving</span><span>${C.roster.filter(r=>r.status==='active').map(r=>r.n).join(', ')||'none'}</span></div>\n <div><span>Fallen</span><span>${C.legends.map(l=>l.n).join(', ')||'none'}</span></div><div><span>Archive of Legends</span><span>${archiveLoad().length} names</span></div>\n <div><span>Lord Hoth</span><span>${C.flags.e2_hoth_lives?'lives':'died in the thought bomb'} · trust ${s.loyal.hoth}</span></div><div><span>Lord Farfalla</span><span>leads the Order · trust ${s.loyal.farfalla}</span></div></div>\n ${hist?`"
+      },
+      {
+        "line": 74,
+        "raw": "\"news\""
+      },
+      {
+        "line": 74,
+        "raw": "`:''}\n <p class=\"muted\">Centuries pass again. To be continued: ${ERA2.next}.</p>\n <button type=\"button\" class=\"primary\" id=\"restart\">New campaign</button></div>`"
+      },
+      {
+        "line": 77,
+        "raw": "'#restart'"
+      },
+      {
+        "line": 87,
+        "raw": "'r_ravine'"
+      },
+      {
+        "line": 87,
+        "raw": "'Johun Othone lives. He goes back to Hoth\\'s side, for now.'"
+      },
+      {
+        "line": 88,
+        "raw": "'r_sixth'"
+      },
+      {
+        "line": 89,
+        "raw": "'r_seventh'"
+      },
+      {
+        "line": 90,
+        "raw": "'r_caves'"
+      },
+      {
+        "line": 90,
+        "raw": "'The tablets describe a thought bomb. You will have more time to stop it.'"
+      },
+      {
+        "line": 91,
+        "raw": "' A scout saw one Sith walk away from the caves, alone.'"
+      },
+      {
+        "line": 92,
+        "raw": "'r_bomb'"
+      },
+      {
+        "line": 92,
+        "raw": "'escaped'"
+      },
+      {
+        "line": 92,
+        "raw": "'dead'"
+      },
+      {
+        "line": 92,
+        "raw": "'dead'"
+      },
+      {
+        "line": 92,
+        "raw": "'captured'"
+      },
+      {
+        "line": 92,
+        "raw": "'captured'"
+      },
+      {
+        "line": 93,
+        "raw": "'escaped'"
+      },
+      {
+        "line": 94,
+        "raw": "'favor'"
+      },
+      {
+        "line": 94,
+        "raw": "' '"
+      },
+      {
+        "line": 95,
+        "raw": "'favor'"
+      },
+      {
+        "line": 95,
+        "raw": "' '"
+      }
+    ]
+  },
+  "text": "/* Era 2: Ruusan. Era jump (spec B §1.4), time-skip scene, Era 2 plan, Ruusan foe mechanics, Kaan/Bane outcomes, era-end stub.\n   Data: data-era2.js. Load after story.js, before screens.js. Like story.js, it hooks in by wrapping globals:\n   trig, archive, baseScreen, endScreen, applyResults (story layer); newCampaign, continueGame, optionsFor (campaign/save); startMission (turns.js).\n   Entry point: startEra(2), called by the Era 1 ending. */\nconst era=()=>C&&C.era||1;\n\n// ── Era swap: PLAN, the Years-pass text (ACTS) and Act shards (SHARDS) hold the current era's data. (Council seats by era: SEATS, data-life.js.)\n// Era 1's copies are kept in ERA_SAVED so a new campaign can restore them. ──\nlet ERA_SAVED=null;\nfunction usePlan(n){const T=[[PLAN,PLAN2],[ACTS,ACTS2],[SHARDS,SHARDS2]];\n const put=(t,v)=>{if(Array.isArray(t)){t.length=0;t.push(...v)}else{for(const k of Object.keys(t))delete t[k];Object.assign(t,v)}};\n if(n===2&&!ERA_SAVED){ERA_SAVED=T.map(([t])=>Array.isArray(t)?t.slice():{...t});T.forEach(([t,v])=>put(t,v))}\n else if(n!==2&&ERA_SAVED){T.forEach(([t],i)=>put(t,ERA_SAVED[i]));ERA_SAVED=null}}\nconst _newCampaign=newCampaign;newCampaign=function(d){usePlan(1);return _newCampaign(d)};\nconst _continueGame=continueGame;continueGame=function(d){usePlan(d&&d.C&&d.C.era||1);return _continueGame(d)};\n\n// ── Era jump (spec B §1.4) ──\nfunction startEra(n){if(n!==2||!C||era()===2)return;storyInit();usePlan(2);const s=C.story,K=ERA2.carry,J={legends:[],wings:[],res:[]};\n // Rank 3+ heroes become Legends of the Archive; the rest are forgotten.\n for(const r of C.roster)if((r.status==='active'||r.status==='retired')&&(r.rank||1)>=3){J.legends.push(r.n);archive(r,`Became a Legend of the ${ERA1.n}`)}\n C.eras=[...(C.eras||[]),{era:1,shadow:s.shadow,legends:J.legends,fallen:C.legends.map(l=>l.n),won:!!C.flags.boss_or_won}];\n // Wings drop one level unless staffed (min 1). Staff leave with their era.\n for(const k of Object.keys(C.wings)){const l=C.wings[k];if(l>=2&&!(C.staff&&C.staff[k])){C.wings[k]=l-1;J.wings.push(`${WINGS[k].n} ${l}→${l-1}`)}}\n const R=C.res,c0=R.credits,f0=R.favor,i0=R.intel,o0=C.orderDark;\n R.credits=Math.round(c0*K.credits)+K.warChest;R.intel=0;R.favor=Math.round((f0+K.favorTo)/2);C.orderDark=Math.round(o0*K.orderDark);\n J.res=[['Credits',`${c0} → ${R.credits} (30% kept + ${K.warChest} war chest)`],['Intel',`${i0} → 0`],['Kyber',`${R.kyber} kept`],['Senate Favor',`${f0} → ${R.favor}`],['Order Darkness',`${o0} → ${C.orderDark}`]];\n C.eraMod=C.flags.boss_or_won?0:ERA2.eraMod;\n C.roster=ERA2_ROSTER.map(r=>({id:'u'+C.nid++,rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0,...r,picks:[...(r.picks||[])]}));\n C.legends=[];C.staff={};C.bonds={};C.quests={};C.cands=null;C.build=null;C.era=2;C.month=1;C.day=1;C.step=0;\n Object.assign(s,{bby:ERA2.bby,done:0,eraDone:0,visit:'',q:[],yrs:null,shard:1,jump:J});\n for(const k of ['hoth','farfalla'])if(s.loyal[k]==null)s.loyal[k]=COUNCIL_SEATS[k].loyalty;\n ensureTemple();C.options=optionsFor(0);C.news=[`It is now ${bbyTxt(ERA2.bby)}. The Army of Light needs the Temple.`];saveGame();jumpScreen()}\nfunction jumpScreen(){SCR=jumpScreen;const s=C.story,J=s.jump,m=$('#modal');m.hidden=false;\n m.innerHTML=`<div class=\"box wide\"><div class=\"eyebrow\">Era 2 · ${ERA2.n} · ${bbyTxt(ERA2.bby)}</div><h2>Centuries pass</h2><p>${ERA2.jump}</p>\n <div class=\"sum\"><div><span>Legends of the Archive</span><span>${J.legends.join(', ')||'none reached rank 3'}</span></div>\n <div><span>Temple wings</span><span>${J.wings.join(' · ')||'every wing held its level'}</span></div>\n ${J.res.map(([a,b])=>`<div><span>${a}</span><span>${b}</span></div>`).join('')}\n <div><span>Research</span><span>The Archives keep everything</span></div>\n ${C.eraMod?`<div><span>Malgus was not stopped</span><span>Ruusan foes are tougher (+${C.eraMod} HP)</span></div>`:''}\n <div><span>The Vision</span><span>${SHADOW.word(s.shadow)} · ${s.shadow}/10</span></div></div>\n <h3>${ERA2.shard.t}</h3><p>${ERA2.shard.text}</p>\n <p class=\"muted\">New squad: ${C.roster.map(r=>r.n).join(', ')}. New Council voices: Lord Hoth, Lord Farfalla.</p>\n <button type=\"button\" class=\"primary\" id=\"jumpOk\">To Ruusan</button></div>`;\n m.onclick=null;$('#jumpOk').onclick=()=>{s.jump=null;saveGame();baseScreen()}}\n\n// ── Story-layer hooks ──\n// Events carry their era in trigger.era (default 1). New trigger: loyal{seat,min} = a Council seat's loyalty is at least min.\nconst _trig=trig;trig=function(t){if((t.era||1)!==era())return false;if(t.type==='loyal')return((C.story.loyal||{})[t.seat]??60)>=t.min;return _trig(t)};\n// Era 2: a captured unit's rescue runs on a Ruusan map instead of Ord Mantell.\nconst _optionsFor=optionsFor;optionsFor=function(step){const o=_optionsFor(step);if(era()===2)for(const x of o)if(x.crisis==='rescue')x.mission='r_prisoners';return o};\nconst _archive=archive;archive=function(r,how,where){_archive(r,how,where);if(era()!==2)return;\n try{const a=archiveLoad();if(a[0]&&a[0].n===r.n){a[0].era=ERA2.n;a[0].ep=a[0].ep.replace(/~[\\d,]+ BBY/,bbyTxt(C.story.bby));localStorage.setItem(ARCH_KEY,JSON.stringify(a))}}catch(e){}};\nconst _baseScreen2=baseScreen;\nbaseScreen=function(){if(!C||era()!==2)return _baseScreen2();usePlan(2);if(C.story&&C.story.jump)return jumpScreen();_baseScreen2()};   // the Temple eyebrow reads C.era itself (eraLabel, ui-hud.js)\nconst _endScreen2=endScreen;\nendScreen=function(){if(!C||!C.story)return _endScreen2();if(era()!==2){_endScreen2();\n  // Era 1 end → offer Ruusan, unless the Era 1 ending already shows its own button (id nextEra).\n  const r=document.getElementById('restart');if(r&&!document.getElementById('nextEra')){r.insertAdjacentHTML('beforebegin','<button type=\"button\" class=\"primary\" id=\"nextEra\">Continue to Ruusan</button>');r.classList.remove('primary')}\n  const b=document.getElementById('nextEra');if(b&&!b.onclick)b.onclick=()=>startEra(2);return}\n era2End()};\n// What Era 3 reads: C.eras[1] = {era:2, shadow, bane:'dead'|'captured'|'escaped', hoth:'lives'|'died', johun, won, loyal}; flags e2_* and rule_of_two.\nfunction era2Record(){const s=C.story,F=C.flags,b=['dead','captured','escaped'].find(k=>F[BANE[k].flag])||'escaped';\n return{era:2,shadow:s.shadow,bane:b,hoth:F.e2_hoth_lives?'lives':'died',johun:F.johun_joined?'joined':F.e2_johun_saved?'saved':'lost',won:!!F.boss_ru_won,\n  loyal:{hoth:s.loyal.hoth,farfalla:s.loyal.farfalla},fallen:C.legends.map(l=>l.n)}}\nfunction era2End(){SCR=endScreen;const s=C.story,m=$('#modal'),od=odark();m.hidden=false;\n if(!s.eraDone){s.eraDone=1;if(od>=60)shadowAdd(1);C.eras=[...(C.eras||[]).filter(e=>e.era!==2),era2Record()];saveGame()}\n const won=!!C.flags.boss_ru_won,b=era2Record().bane,hist=Object.keys(FLAG_LINES).filter(k=>k.startsWith('e2_')&&C.flags[k]).map(k=>`<p>${FLAG_LINES[k]}</p>`).join('');\n m.innerHTML=`<div class=\"box wide\"><div class=\"eyebrow\">Era 2 ends · ${ERA2.n} · ${bbyTxt(s.bby)}</div><h2>The Army of Light</h2>\n <p>${won?STORY_TEXT2.eraWin:STORY_TEXT2.eraLose}</p><p>${BANE[b].line}</p>${od>=60?`<p class=\"dkt\">${STORY_TEXT2.darkWarn}</p>`:''}\n <div class=\"sum\"><div><span>The Vision</span><span>${SHADOW.word(s.shadow)} · ${s.shadow}/10</span></div><div><span>Order Darkness</span><span>${od}/100</span></div>\n <div><span>Senate Favor</span><span>${C.res.favor}</span></div><div><span>Still serving</span><span>${C.roster.filter(r=>r.status==='active').map(r=>r.n).join(', ')||'none'}</span></div>\n <div><span>Fallen</span><span>${C.legends.map(l=>l.n).join(', ')||'none'}</span></div><div><span>Archive of Legends</span><span>${archiveLoad().length} names</span></div>\n <div><span>Lord Hoth</span><span>${C.flags.e2_hoth_lives?'lives':'died in the thought bomb'} · trust ${s.loyal.hoth}</span></div><div><span>Lord Farfalla</span><span>leads the Order · trust ${s.loyal.farfalla}</span></div></div>\n ${hist?`<h3>What history changed</h3><div class=\"news\">${hist}</div>`:''}\n <p class=\"muted\">Centuries pass again. To be continued: ${ERA2.next}.</p>\n <button type=\"button\" class=\"primary\" id=\"restart\">New campaign</button></div>`;\n m.onclick=null;$('#restart').onclick=()=>{C=null;usePlan(1);briefing(true)}}\n\n// ── Missions: era difficulty mod, prisoner names, story results (Johun, Vell, Vorr, caves, Kaan/Bane) ──\nconst _startMission2=startMission;\nstartMission=function(id,sq,o){_startMission2(id,sq,o);if(!S.M.era)return;\n const h=S.M.hostN&&hostage();if(h&&!h.rid)h.n=S.M.hostN;   // Era 2 prisoner name (a captured squad member keeps theirs)\n if(C&&C.eraMod)for(const e of enemies())if(!e.horror&&!e.nexus){e.hp+=C.eraMod;e.max+=C.eraMod}render()};\nconst _applyResults2=applyResults;\napplyResults=function(win){const M=S.M,id=S.id,clues=S.clues,bane=S.units.find(u=>u.bane);const out=_applyResults2(win);if(!M.era)return out;\n const F=C.flags;\n if(id==='r_ravine'&&win){F.e2_johun_saved=1;out.flag='Johun Othone lives. He goes back to Hoth\\'s side, for now.'}\n if(id==='r_sixth'&&win)F.e2_vell_saved=1;\n if(id==='r_seventh'){F.e2_seventh_done=1;if(win)F.e2_vorr_down=1}\n if(id==='r_caves'){C.flags.e2_caves_done=1;if(win){C.flags.e2_bomb_known=1;out.flag='The tablets describe a thought bomb. You will have more time to stop it.';\n  if(clues>=3){C.flags.e2_bane_seen=1;out.flag+=' A scout saw one Sith walk away from the caves, alone.'}}}\n if(id==='r_bomb'){let k='escaped';if(bane&&bane.status==='dead')k='dead';else if(bane&&bane.status==='captured')k='captured';\n  F[BANE[k].flag]=1;if(k==='escaped')F.rule_of_two=1;shadowAdd(BANE[k].shadow);\n  if(win){F.boss_ru_won=1;F.e2_hoth_lives=1;gain('favor',10,out.res);out.flag=STORY_TEXT2.bossWin+' '+BANE[k].line}\n  else{F.e2_bomb_fired=1;gain('favor',-10,out.res);if(F.e2_hoth_waits)F.e2_hoth_lives=1;out.flag=(F.e2_hoth_waits?STORY_TEXT2.bossLoseHothOut:STORY_TEXT2.bossLose)+' '+BANE[k].line}}\n saveGame();return out};\n\n\n// Ruusan foe flags (lordAura, fanatic, rage, autoOW, nexus, bane) and Era 2 assault Threat text now live in rules.js / ai.js / turns.js (Chat X).\n\n"
+}

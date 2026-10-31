@@ -1,0 +1,5358 @@
+{
+  "source": "public/js/data-era2.js",
+  "sha256": "53c5a40ce7921787b0efca23ee9f842399b8a527215b01ac00e779fe2e609826",
+  "lines": 281,
+  "counts": {
+    "FOES": 10,
+    "MISSIONS": 13,
+    "CRISES": 7,
+    "ESCORTS": 2,
+    "EVENTS": 11,
+    "CODEX": 3,
+    "COUNCIL_SEATS": 2,
+    "STORY_RECRUITS": 2,
+    "FLAG_LINES": 14,
+    "EPI": 6,
+    "MISSION_LORE": 8,
+    "EVENT_LORE": 9,
+    "TUNE": 10,
+    "ERA2": 7,
+    "ACTS2": 2,
+    "SHARDS2": 2,
+    "PLAN2": 14,
+    "ERA2_ROSTER": 6,
+    "BANE": 4,
+    "STORY_TEXT2": 6,
+    "ERA2_LORE": 4,
+    "SOURCE_LITERALS": 656
+  },
+  "records": {
+    "FOES": {
+      "bh_trooper": {
+        "n": "Brotherhood Trooper",
+        "ic": "e_trooper",
+        "hp": 5,
+        "aim": 65,
+        "mob": 5,
+        "dmg": [
+          2,
+          4
+        ],
+        "range": 8,
+        "fanatic": 1,
+        "lordAura": 10,
+        "init": 8,
+        "desc": "Fanatic: never surrenders. +10 aim within 4 tiles of a Sith Lord."
+      },
+      "bh_marauder": {
+        "n": "Sith Marauder",
+        "ic": "e_acolyte",
+        "hp": 9,
+        "aim": 75,
+        "mob": 6,
+        "dmg": [
+          4,
+          6
+        ],
+        "range": 1.5,
+        "deflect": 25,
+        "guardDef": 25,
+        "force": 1,
+        "rage": 1,
+        "noCap": 1,
+        "init": 14,
+        "desc": "Melee duelist. Rage: +1 damage each time it is hit (max +3)."
+      },
+      "sith_lord": {
+        "n": "Sith Lord",
+        "ic": "e_acolyte",
+        "hp": 12,
+        "aim": 80,
+        "mob": 5,
+        "dmg": [
+          4,
+          6
+        ],
+        "range": 1.5,
+        "deflect": 30,
+        "guardDef": 30,
+        "force": 1,
+        "lightning": [
+          3,
+          5
+        ],
+        "sithLord": 1,
+        "noCap": 1,
+        "init": 15,
+        "desc": "Elite duelist with Force lightning. Brotherhood troopers near it aim better."
+      },
+      "bh_sniper": {
+        "n": "Mercenary Sniper",
+        "ic": "e_agent",
+        "hp": 5,
+        "aim": 75,
+        "mob": 4,
+        "dmg": [
+          4,
+          5
+        ],
+        "range": 11,
+        "autoOW": 1,
+        "init": 10,
+        "desc": "Long range. Goes on overwatch every turn it does not shoot."
+      },
+      "sith_spawn": {
+        "n": "Sith Spawn",
+        "ic": "e_horror",
+        "hp": 10,
+        "aim": 75,
+        "mob": 5,
+        "dmg": [
+          4,
+          6
+        ],
+        "range": 1.5,
+        "horror": 1,
+        "noCap": 1,
+        "init": 11,
+        "desc": "Force horror: only hurts Jedi. Troops are immune and are the counter."
+      },
+      "nexus": {
+        "n": "Dark Nexus",
+        "ic": "darkness",
+        "hp": 8,
+        "aim": 0,
+        "mob": 0,
+        "dmg": [
+          0,
+          0
+        ],
+        "range": 0,
+        "armor": 1,
+        "force": 1,
+        "noCap": 1,
+        "nexus": 3,
+        "init": 1,
+        "desc": "A wound in the Force. Does not move or attack; spawns a Sith Spawn beside it every 3 turns until destroyed."
+      },
+      "nexus_core": {
+        "n": "Heart of the Nexus",
+        "ic": "darkness",
+        "hp": 14,
+        "aim": 0,
+        "mob": 0,
+        "dmg": [
+          0,
+          0
+        ],
+        "range": 0,
+        "armor": 1,
+        "force": 1,
+        "noCap": 1,
+        "nexus": 3,
+        "boss": 1,
+        "init": 1,
+        "desc": "The cave's dark heart. Spawns a Sith Spawn every 3 turns. Destroy it to win."
+      },
+      "vorr": {
+        "n": "Lord Vorr",
+        "ic": "e_acolyte",
+        "hp": 12,
+        "aim": 80,
+        "mob": 5,
+        "dmg": [
+          4,
+          6
+        ],
+        "range": 1.5,
+        "deflect": 30,
+        "guardDef": 30,
+        "force": 1,
+        "lightning": [
+          3,
+          4
+        ],
+        "armor": 1,
+        "sithLord": 1,
+        "noCap": 1,
+        "boss": 1,
+        "init": 15,
+        "desc": "Kaan's field commander. Lightning and a hard saber, armor 1. Defeat him to break the line."
+      },
+      "kaan": {
+        "n": "Lord Kaan",
+        "ic": "e_acolyte",
+        "hp": 14,
+        "aim": 80,
+        "mob": 5,
+        "dmg": [
+          4,
+          6
+        ],
+        "range": 1.5,
+        "deflect": 30,
+        "guardDef": 30,
+        "force": 1,
+        "lightning": [
+          3,
+          5
+        ],
+        "armor": 1,
+        "sithLord": 1,
+        "noCap": 1,
+        "boss": 1,
+        "init": 16,
+        "desc": "Dark Lord of the Brotherhood. Lightning, a hard saber, armor 1. Defeat him to break the ritual."
+      },
+      "bane": {
+        "n": "Darth Bane",
+        "ic": "e_acolyte",
+        "hp": 12,
+        "aim": 80,
+        "mob": 5,
+        "dmg": [
+          5,
+          6
+        ],
+        "range": 1.5,
+        "deflect": 35,
+        "guardDef": 35,
+        "force": 1,
+        "lightning": [
+          3,
+          4
+        ],
+        "armor": 2,
+        "sithLord": 1,
+        "bane": 1,
+        "init": 15,
+        "desc": "Hidden target. Armor 2. Can be captured if stunned or beaten down. Watches from the ridge and fights only units next to him. Walks away on turn 4."
+      }
+    },
+    "MISSIONS": {
+      "r_muster": {
+        "n": "The Muster",
+        "where": "Army of Light landing field · Ruusan",
+        "type": "defend",
+        "story": 1,
+        "era": 2,
+        "theme": "plains",
+        "turns": 7,
+        "obj": 20,
+        "objName": "Landing beacon",
+        "lastWave": 5,
+        "map": [
+          "..........",
+          "..c....c..",
+          ".x..##..c.",
+          "....^^....",
+          ".c......c.",
+          "##.c..c.##",
+          "....^^....",
+          ".h......h.",
+          "..c.cc.c..",
+          "^........^",
+          "...cOOc...",
+          ".........."
+        ],
+        "waves": {
+          "1": [
+            "bh_trooper",
+            "bh_trooper",
+            "bh_trooper"
+          ],
+          "3": [
+            "bh_trooper",
+            "bh_marauder",
+            "bh_sniper"
+          ],
+          "5": [
+            "sith_lord",
+            "bh_marauder",
+            "bh_trooper"
+          ]
+        },
+        "start": [
+          [
+            3,
+            9
+          ],
+          [
+            6,
+            9
+          ],
+          [
+            2,
+            9
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ]
+        ],
+        "brief": "Lord Hoth is landing his army on Ruusan, and the Brotherhood knows it. Hold the landing beacon for 7 turns so the transports can find the field.",
+        "goal": "Hold the landing beacon for 7 turns. A Sith Lord leads the last wave; troopers near him aim better.",
+        "win": "The transports come down. The Army of Light is on Ruusan.",
+        "lose": "The beacon goes dark. Half the transports scatter.",
+        "reward": {
+          "credits": 80
+        },
+        "bonus": {
+          "credits": 30
+        },
+        "bonusTxt": "Beacon above 75%",
+        "quote": "“Hold the light, and the rest of us will find it.” — Lord Hoth"
+      },
+      "r_ravine": {
+        "n": "Ravine of the Wounded",
+        "where": "Field hospital ravine · Ruusan",
+        "type": "escort",
+        "story": 1,
+        "era": 2,
+        "theme": "plains",
+        "par": 6,
+        "vip": "johun",
+        "map": [
+          "EE...c..EE",
+          "E..c...c.E",
+          "..h....h..",
+          ".c..B..x..",
+          "....rr....",
+          "#..c..c..#",
+          "..x....c..",
+          ".h..BB..h.",
+          "..........",
+          ".c.r..r.c.",
+          "..........",
+          "..c.cc.c.."
+        ],
+        "hostage": [
+          4,
+          10
+        ],
+        "foes": [
+          [
+            "bh_trooper",
+            1,
+            2
+          ],
+          [
+            "bh_trooper",
+            8,
+            3
+          ],
+          [
+            "bh_marauder",
+            5,
+            5
+          ],
+          [
+            "bh_sniper",
+            6,
+            1
+          ],
+          [
+            "bh_trooper",
+            3,
+            6
+          ]
+        ],
+        "reinforce": [
+          "bh_trooper",
+          "bh_trooper"
+        ],
+        "start": [
+          [
+            2,
+            10
+          ],
+          [
+            3,
+            10
+          ],
+          [
+            5,
+            10
+          ],
+          [
+            6,
+            10
+          ],
+          [
+            0,
+            9
+          ],
+          [
+            7,
+            10
+          ]
+        ],
+        "brief": "A Brotherhood sweep is coming down the ravine. Lord Hoth's wounded are still in it, and one of them is his student, Johun Othone. Walk him to the evac at the north end.",
+        "goal": "Walk Johun to an evac zone (E). Threat rises after turn 6: more troopers arrive and they shoot the wounded on sight.",
+        "win": "The wounded are out. Hoth will remember who saved his student.",
+        "lose": "The ravine falls silent.",
+        "reward": {
+          "credits": 70,
+          "recruits": 1
+        },
+        "bonus": {
+          "favor": 4
+        },
+        "bonusTxt": "Done by turn 6",
+        "quote": "“Bring my student home. Bring them all home.” — Lord Hoth"
+      },
+      "r_caves": {
+        "n": "Kaan's Caves",
+        "where": "Cave network · Ruusan",
+        "type": "investigate",
+        "story": 1,
+        "era": 2,
+        "theme": "caves",
+        "par": 6,
+        "map": [
+          "###....q##",
+          "#.....h..#",
+          "#.q....c.#",
+          "#h..##..##",
+          "#...q....#",
+          "#.x.#..c.#",
+          "##..#.r.##",
+          "#.c....c.#",
+          "#..h..h..#",
+          "##.....###",
+          "#.c.rr.c.#",
+          "EE......EE"
+        ],
+        "foes": [
+          [
+            "bh_trooper",
+            1,
+            2
+          ],
+          [
+            "bh_trooper",
+            8,
+            2
+          ],
+          [
+            "bh_marauder",
+            5,
+            4
+          ],
+          [
+            "bh_sniper",
+            5,
+            0
+          ],
+          [
+            "sith_spawn",
+            3,
+            6
+          ]
+        ],
+        "reinforce": [
+          "bh_trooper",
+          "bh_trooper"
+        ],
+        "start": [
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            3,
+            10
+          ],
+          [
+            6,
+            10
+          ]
+        ],
+        "brief": "A prisoner says the Brotherhood is gathering in the caves. Copy the ritual tablets (Jedi or Medic, adjacent), then get anyone to an evac zone. Something in the dark only hunts Jedi.",
+        "goal": "Scan 2 of 3 tablets, then reach an evac zone. All 3 reveals more. Threat rises after turn 6: tablets get smashed. The Sith Spawn only hurts Jedi.",
+        "win": "The tablets are out. The Council reads them twice.",
+        "lose": "The caves collapse behind you. Whatever Kaan plans stays secret.",
+        "reward": {
+          "credits": 60,
+          "intel": 2
+        },
+        "bonus": {
+          "intel": 1
+        },
+        "bonusTxt": "All 3 tablets",
+        "quote": "“Kaan is afraid. Find out of what.” — Lord Farfalla"
+      },
+      "r_sixth": {
+        "n": "The Sixth Battle",
+        "where": "Brotherhood stockade · Ruusan",
+        "type": "rescue",
+        "story": 1,
+        "era": 2,
+        "theme": "plains",
+        "par": 5,
+        "hostN": "Lord Tarsus Vell",
+        "map": [
+          ".c..^^..c.",
+          "...#..#...",
+          ".k.#..#.x.",
+          "...##D#...",
+          ".c......c.",
+          "..^....^..",
+          "#..c..c..#",
+          ".h..##..h.",
+          "..........",
+          ".c..cc..c.",
+          "....^^....",
+          "EE......EE"
+        ],
+        "hostage": [
+          5,
+          2
+        ],
+        "foes": [
+          [
+            "bh_trooper",
+            2,
+            4
+          ],
+          [
+            "bh_trooper",
+            7,
+            4
+          ],
+          [
+            "bh_marauder",
+            4,
+            5
+          ],
+          [
+            "bh_sniper",
+            7,
+            0
+          ],
+          [
+            "bh_trooper",
+            6,
+            8
+          ]
+        ],
+        "reinforce": [
+          "bh_trooper",
+          "bh_trooper"
+        ],
+        "start": [
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            7,
+            10
+          ]
+        ],
+        "brief": "The sixth battle went badly. Kaan's men dragged an Army of Light Lord, Tarsus Vell, into a stockade. A Medic can Hack the cell door from 4 tiles; a Jedi can try the console. Then get him to an evac zone (E).",
+        "goal": "Open the cell (Hack or console), then get the prisoner to an evac zone. Threat rises after turn 5; at Threat 6 they march him to Kaan.",
+        "win": "Lord Vell is out. He owes the Temple his life.",
+        "lose": "Lord Vell is gone. Kaan will make an example of him.",
+        "reward": {
+          "credits": 90,
+          "favor": 5
+        },
+        "bonus": {
+          "recruits": 1
+        },
+        "bonusTxt": "Done by turn 5"
+      },
+      "r_seventh": {
+        "n": "The Seventh Battle",
+        "where": "Kaan's line · Ruusan",
+        "type": "assault",
+        "story": 1,
+        "era": 2,
+        "theme": "plains",
+        "par": 6,
+        "bossKey": "vorr",
+        "push": "Lord Vorr's line is holding.",
+        "near": "The line is about to hold for good. Next turn the attack fails.",
+        "escape": "The Army of Light falls back.",
+        "map": [
+          "..c.^^.c..",
+          ".c..MM..c.",
+          "....^^....",
+          ".x.B..B.x.",
+          "..........",
+          "#.c.cc.c.#",
+          "....rr....",
+          ".h......h.",
+          "...c..c...",
+          ".B......B.",
+          "..c.^^.c..",
+          ".........."
+        ],
+        "foes": [
+          [
+            "vorr",
+            4,
+            1
+          ],
+          [
+            "bh_marauder",
+            2,
+            2
+          ],
+          [
+            "bh_trooper",
+            1,
+            4
+          ],
+          [
+            "bh_trooper",
+            8,
+            4
+          ],
+          [
+            "bh_sniper",
+            5,
+            0
+          ]
+        ],
+        "reinforce": [
+          "bh_trooper",
+          "bh_marauder"
+        ],
+        "start": [
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            1,
+            11
+          ],
+          [
+            8,
+            11
+          ]
+        ],
+        "brief": "The seventh battle of Ruusan. Lord Vorr holds the high ground over Kaan's line. Break him and the Army of Light can push through.",
+        "goal": "Defeat Lord Vorr on the high ledge. Threat rises after turn 6; at Threat 6 the attack fails. Barrels (x) explode when shot.",
+        "win": "Vorr falls. Kaan's line breaks and his army runs for the caves.",
+        "lose": "The line holds. The Army of Light counts its dead.",
+        "reward": {
+          "credits": 100,
+          "kyber": 1
+        },
+        "bonus": {
+          "favor": 4
+        },
+        "bonusTxt": "Done by turn 6",
+        "quote": "“One more battle. It is always one more battle.” — Lord Farfalla"
+      },
+      "r_bomb": {
+        "n": "The Thought Bomb",
+        "where": "Kaan's ritual ground · Ruusan",
+        "type": "assault",
+        "story": 1,
+        "era": 2,
+        "theme": "plains",
+        "bossKey": "kaan",
+        "push": "Kaan's Lords chant louder.",
+        "near": "The ritual is almost complete. Next turn it fires.",
+        "escape": "The thought bomb fires.",
+        "par": 6,
+        "map": [
+          "..c.##.c..",
+          ".c..##..c.",
+          "....##....",
+          ".x..c..x..",
+          "..r....r..",
+          ".c.B..B.c.",
+          "..........",
+          "..h.cc.h..",
+          ".c......c.",
+          "...r..r...",
+          ".c..cc..c.",
+          ".........."
+        ],
+        "foes": [
+          [
+            "kaan",
+            6,
+            2
+          ],
+          [
+            "bh_marauder",
+            3,
+            3
+          ],
+          [
+            "bh_trooper",
+            1,
+            4
+          ],
+          [
+            "bh_trooper",
+            8,
+            4
+          ]
+        ],
+        "reinforce": [
+          "bh_trooper",
+          "bh_marauder"
+        ],
+        "start": [
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            1,
+            11
+          ],
+          [
+            8,
+            11
+          ]
+        ],
+        "brief": "Kaan has gathered his Lords to unleash a thought bomb, a ritual that could wipe out Jedi and Sith alike. Lord Hoth is walking into the caves to stop him. Break the ritual first: defeat Kaan.",
+        "goal": "Defeat Lord Kaan before Threat 6, when the bomb fires. If Darth Bane is here: kill or capture him BEFORE Kaan falls, or he walks away on turn 4.",
+        "win": "Kaan falls. The ritual breaks before it begins.",
+        "lose": "The thought bomb fires.",
+        "reward": {
+          "credits": 120,
+          "kyber": 1
+        },
+        "bonus": {
+          "favor": 5
+        },
+        "bonusTxt": "Done by the par turn",
+        "quote": "“If Kaan wants a storm, he can have one. I will be standing in it.” — Lord Hoth"
+      },
+      "r_hospital": {
+        "n": "The Field Hospital",
+        "where": "Army of Light field hospital · Ruusan",
+        "type": "defend",
+        "theme": "plains",
+        "turns": 6,
+        "obj": 16,
+        "objName": "Hospital",
+        "lastWave": 4,
+        "map": [
+          "..........",
+          ".c^^##^^c.",
+          "....cc....",
+          "#..c..c..#",
+          ".c......c.",
+          "...#..#...",
+          ".c..cc..c.",
+          "..........",
+          ".c.c..c.c.",
+          "...#OO#...",
+          "....OO....",
+          ".........."
+        ],
+        "waves": {
+          "1": [
+            "bh_trooper",
+            "bh_trooper",
+            "bh_trooper"
+          ],
+          "2": [
+            "bh_marauder",
+            "bh_trooper"
+          ],
+          "4": [
+            "bh_trooper",
+            "sith_lord"
+          ]
+        },
+        "start": [
+          [
+            7,
+            10
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            1,
+            9
+          ]
+        ],
+        "brief": "Brotherhood raiders are coming for an Army of Light field hospital. Hold it for 6 turns while the healers move the wounded.",
+        "goal": "Hold the hospital for 6 turns. A Sith Lord leads the last wave; troopers near him aim better.",
+        "win": "The healers get everyone out.",
+        "lose": "The hospital burns.",
+        "reward": {
+          "credits": 60,
+          "recruits": 1
+        },
+        "bonus": {
+          "favor": 3
+        },
+        "bonusTxt": "Hospital above 75%",
+        "alts": [],
+        "story": 0,
+        "era": 2
+      },
+      "r_nexus": {
+        "n": "The Spawn Pit",
+        "where": "Dark-side cave · Ruusan",
+        "type": "assault",
+        "era": 2,
+        "theme": "caves",
+        "par": 7,
+        "bossKey": "nexus_core",
+        "push": "The nexus pulses.",
+        "near": "The nexus is about to erupt.",
+        "escape": "The nexus erupts.",
+        "map": [
+          "##..##..##",
+          "#..c..c..#",
+          "#.r....r.#",
+          "##.#..#.##",
+          "#........#",
+          "#.c.##.c.#",
+          "#...#....#",
+          "##.r..r.##",
+          "#.c....c.#",
+          "#..h..h..#",
+          "#........#",
+          "##......##"
+        ],
+        "foes": [
+          [
+            "nexus_core",
+            5,
+            1
+          ],
+          [
+            "sith_spawn",
+            4,
+            2
+          ],
+          [
+            "bh_marauder",
+            5,
+            4
+          ],
+          [
+            "bh_trooper",
+            2,
+            4
+          ],
+          [
+            "bh_trooper",
+            7,
+            4
+          ],
+          [
+            "bh_sniper",
+            8,
+            1
+          ]
+        ],
+        "reinforce": [
+          "bh_trooper",
+          "bh_trooper"
+        ],
+        "start": [
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            7,
+            10
+          ]
+        ],
+        "brief": "A dark-side nexus is breeding Sith Spawn in the caves. Spawn only hurt Jedi. Send troops in front and destroy the nexus heart.",
+        "goal": "Destroy the Heart of the Nexus (14 HP, armor 1). It spawns a Sith Spawn every 3 turns. Threat rises after turn 7; at Threat 6 it erupts.",
+        "win": "The nexus goes dark. The cave is only a cave again.",
+        "lose": "The nexus erupts. Spawn pour into the hills.",
+        "reward": {
+          "credits": 50,
+          "kyber": 1
+        },
+        "bonus": {
+          "intel": 1
+        },
+        "bonusTxt": "Done by turn 7"
+      },
+      "r_snipers": {
+        "n": "Run the Gauntlet",
+        "where": "Ridge trail · Ruusan",
+        "type": "escort",
+        "theme": "plains",
+        "par": 6,
+        "vip": "courier",
+        "map": [
+          "EEE....c..",
+          ".....B....",
+          "^^b..x..h.",
+          "...h..B...",
+          ".c.B....c.",
+          ".....cc...",
+          "..h.....B.",
+          "....c.x...",
+          ".c.B....c.",
+          "......h...",
+          "^^......^^",
+          ".c..cc..c."
+        ],
+        "hostage": [
+          5,
+          10
+        ],
+        "foes": [
+          [
+            "bh_trooper",
+            7,
+            1
+          ],
+          [
+            "bh_trooper",
+            3,
+            1
+          ],
+          [
+            "bh_marauder",
+            4,
+            3
+          ],
+          [
+            "bh_sniper",
+            0,
+            3
+          ],
+          [
+            "bh_trooper",
+            1,
+            6
+          ],
+          [
+            "bh_trooper",
+            9,
+            6
+          ],
+          [
+            "bh_sniper",
+            8,
+            0
+          ],
+          [
+            "bh_marauder",
+            5,
+            4
+          ]
+        ],
+        "reinforce": [
+          "bh_trooper",
+          "bh_trooper"
+        ],
+        "start": [
+          [
+            7,
+            10
+          ],
+          [
+            6,
+            10
+          ],
+          [
+            4,
+            10
+          ],
+          [
+            3,
+            10
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            2,
+            9
+          ]
+        ],
+        "alts": [],
+        "brief": "Lord Farfalla's courier carries the Army's battle plans. Mercenary snipers hold the ridge. Get the courier to the shuttle.",
+        "goal": "Walk the VIP to an evac zone. Threat rises after turn 6: more hunters arrive and they shoot the VIP on sight.",
+        "win": "The plans reach Farfalla.",
+        "lose": "The plans are lost on the ridge.",
+        "reward": {
+          "credits": 70,
+          "favor": 4
+        },
+        "bonus": {
+          "recruits": 1
+        },
+        "bonusTxt": "Done by turn 6",
+        "story": 0,
+        "era": 2
+      },
+      "r_dump": {
+        "n": "The Munitions Dump",
+        "where": "Brotherhood munitions dump · Ruusan",
+        "type": "sabotage",
+        "par": 7,
+        "need": 2,
+        "field": [
+          "plant"
+        ],
+        "theme": "plains",
+        "stealth": 1,
+        "patrol": {
+          "2": [
+            [
+              3,
+              5
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              1,
+              8
+            ]
+          ]
+        },
+        "map": [
+          "EE.#..#.EE",
+          "E..#..#..E",
+          "...h..h...",
+          ".c..xx..c.",
+          ".C..##..C.",
+          ".h..^^..h.",
+          "...b..c...",
+          ".B..cc..B.",
+          "^^......^^",
+          ".c.h..h.c.",
+          "..........",
+          "..c....c.."
+        ],
+        "foes": [
+          [
+            "bh_trooper",
+            7,
+            2,
+            1
+          ],
+          [
+            "bh_trooper",
+            2,
+            2,
+            1
+          ],
+          [
+            "bh_marauder",
+            5,
+            1,
+            1
+          ],
+          [
+            "bh_trooper",
+            3,
+            5,
+            2
+          ],
+          [
+            "bh_trooper",
+            1,
+            8,
+            2
+          ],
+          [
+            "bh_sniper",
+            0,
+            6
+          ]
+        ],
+        "reinforce": [
+          "bh_trooper",
+          "bh_trooper"
+        ],
+        "start": [
+          [
+            6,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            2,
+            10
+          ]
+        ],
+        "alts": [],
+        "brief": "Kaan's army runs on this dump. Plant charges on 2 sites (anyone, adjacent, 1 action), then get every standing squad member onto the evac zone.",
+        "goal": "Plant 2 charges (adjacent, 1 action), then get everyone still standing onto the north evac zone. Threat rises after turn 7: techs defuse an armed charge each step.",
+        "win": "The dump goes up behind you. The Brotherhood fights hungry for a month.",
+        "lose": "The dump holds.",
+        "reward": {
+          "credits": 80,
+          "favor": 3
+        },
+        "bonus": {
+          "credits": 40
+        },
+        "bonusTxt": "Done by turn 7",
+        "story": 0,
+        "era": 2
+      },
+      "r_prisoners": {
+        "n": "The Prison Hulk",
+        "where": "Brotherhood prison camp · Ruusan",
+        "type": "rescue",
+        "par": 5,
+        "theme": "plains",
+        "patrol": {
+          "1": [
+            [
+              2,
+              4
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              2,
+              7
+            ]
+          ]
+        },
+        "map": [
+          "..c....c..",
+          "...####...",
+          ".c.#..#k..",
+          "...#D##...",
+          ".x......c.",
+          "..c.cc.x..",
+          "#^^....c.#",
+          ".c^.##..c.",
+          "....cc..^^",
+          ".c......c.",
+          "....c.c...",
+          "EE......EE"
+        ],
+        "hostage": [
+          5,
+          2
+        ],
+        "foes": [
+          [
+            "bh_trooper",
+            2,
+            4,
+            1
+          ],
+          [
+            "bh_trooper",
+            6,
+            4,
+            1
+          ],
+          [
+            "bh_marauder",
+            5,
+            0,
+            2
+          ],
+          [
+            "bh_sniper",
+            8,
+            1
+          ],
+          [
+            "bh_marauder",
+            6,
+            6
+          ],
+          [
+            "bh_trooper",
+            9,
+            8
+          ]
+        ],
+        "reinforce": [
+          "bh_trooper",
+          "bh_trooper"
+        ],
+        "start": [
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            7,
+            10
+          ]
+        ],
+        "brief": "The Brotherhood holds Army of Light prisoners in a locked cell. A Medic can Hack the door from 4 tiles; a Jedi can try the console. Then walk the prisoner to an evac zone (E).",
+        "goal": "Open the cell (Hack or console), then get the prisoner to an evac zone. Threat rises after turn 5; at Threat 6 they fly the prisoner out.",
+        "win": "The prisoner is out.",
+        "lose": "The prisoner is lost.",
+        "reward": {
+          "credits": 80,
+          "favor": 4
+        },
+        "bonus": {
+          "recruits": 1
+        },
+        "bonusTxt": "Done by turn 5",
+        "alts": [],
+        "story": 0,
+        "era": 2,
+        "flip": false,
+        "hostN": "Healer Amma Rin"
+      },
+      "r_codes": {
+        "n": "Brotherhood Codes",
+        "where": "Brotherhood signal camp · Ruusan",
+        "type": "investigate",
+        "par": 6,
+        "theme": "plains",
+        "stealth": 1,
+        "patrol": {
+          "2": [
+            [
+              1,
+              3
+            ],
+            [
+              1,
+              7
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              6,
+              3
+            ]
+          ]
+        },
+        "map": [
+          "......#q..",
+          "q#..c.#...",
+          ".h....B.c.",
+          ".^^..x....",
+          ".h..##..h.",
+          ".....q....",
+          ".c.B..B.c.",
+          "^^......^^",
+          ".c..cc..x.",
+          "..........",
+          "..c..h..c.",
+          "EE......EE"
+        ],
+        "foes": [
+          [
+            "bh_trooper",
+            8,
+            1,
+            1
+          ],
+          [
+            "bh_trooper",
+            3,
+            1,
+            2
+          ],
+          [
+            "bh_marauder",
+            4,
+            3,
+            3
+          ],
+          [
+            "bh_sniper",
+            2,
+            6
+          ],
+          [
+            "bh_trooper",
+            1,
+            3,
+            2
+          ]
+        ],
+        "reinforce": [
+          "bh_trooper",
+          "bh_trooper"
+        ],
+        "start": [
+          [
+            6,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            1,
+            10
+          ]
+        ],
+        "alts": [],
+        "brief": "A Brotherhood signal camp runs Kaan's orders to his Lords. Copy its terminals (Jedi or Medic, adjacent), then get anyone to an evac zone.",
+        "goal": "Scan 2 of 3 terminals, then reach an evac zone. Threat rises after turn 6: terminals get wiped. Shoot alarm beacons before they call help.",
+        "win": "Kaan's orders are ours for a month.",
+        "lose": "The camp burns its codes.",
+        "reward": {
+          "credits": 60,
+          "intel": 2
+        },
+        "bonus": {
+          "intel": 1
+        },
+        "bonusTxt": "All 3 terminals",
+        "story": 0,
+        "era": 2
+      },
+      "r_supply": {
+        "n": "The Supply Line",
+        "where": "Army of Light supply post · Ruusan",
+        "type": "defend",
+        "story": 0,
+        "theme": "plains",
+        "turns": 8,
+        "obj": 20,
+        "objName": "Supply post",
+        "lastWave": 5,
+        "map": [
+          "^^......^^",
+          "..#....#..",
+          ".c..cc..c.",
+          "....##....",
+          ".c......c.",
+          "##.c..c.##",
+          "....cc....",
+          ".#......#.",
+          ".c.c..c.c.",
+          "^^..##.c^^",
+          "M^.cOOc.^M",
+          ".........."
+        ],
+        "waves": {
+          "1": [
+            "bh_trooper",
+            "bh_trooper"
+          ],
+          "3": [
+            "bh_trooper",
+            "bh_trooper",
+            "bh_marauder"
+          ],
+          "5": [
+            "bh_trooper",
+            "bh_trooper",
+            "bh_trooper"
+          ]
+        },
+        "start": [
+          [
+            7,
+            11
+          ],
+          [
+            3,
+            9
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            0,
+            9
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            4,
+            8
+          ]
+        ],
+        "brief": "Brotherhood raiders want the supply post that feeds Hoth's front. Hold it for 8 turns until the convoy rolls out.",
+        "goal": "Hold the supply post for 8 turns.",
+        "win": "The convoy rolls out. The front eats.",
+        "lose": "The supplies burn.",
+        "reward": {
+          "credits": 80
+        },
+        "bonus": {
+          "credits": 30
+        },
+        "bonusTxt": "Post above 75%",
+        "alts": [],
+        "era": 2
+      }
+    },
+    "CRISES": {
+      "r_hospital": {
+        "n": "Raid on the field hospital",
+        "kind": "Defend",
+        "src": "Army of Light",
+        "mission": "r_hospital",
+        "text": "Brotherhood raiders are closing on a hospital full of wounded Jedi.",
+        "ignore": {
+          "recruits": -1,
+          "orderDark": 4
+        }
+      },
+      "r_nexus": {
+        "n": "The spawn pit",
+        "kind": "Assault",
+        "src": "Jedi",
+        "mission": "r_nexus",
+        "text": "Scouts found a cave where the dark side is breeding horrors. Only troops can stand near them.",
+        "ignore": {
+          "orderDark": 4
+        }
+      },
+      "r_snipers": {
+        "n": "Courier on the ridge",
+        "kind": "Escort",
+        "src": "Army of Light",
+        "mission": "r_snipers",
+        "text": "Farfalla's courier is pinned under sniper fire with the Army's plans.",
+        "ignore": {
+          "favor": -5
+        }
+      },
+      "r_dump": {
+        "n": "Brotherhood munitions dump",
+        "kind": "Sabotage",
+        "src": "Army of Light",
+        "mission": "r_dump",
+        "text": "Blow the dump that feeds Kaan's army.",
+        "ignore": {
+          "favor": -5
+        }
+      },
+      "r_prisoners": {
+        "n": "The prison hulk",
+        "kind": "Rescue",
+        "src": "Army of Light",
+        "mission": "r_prisoners",
+        "text": "A healer of the Army of Light is held in a Brotherhood camp.",
+        "ignore": {
+          "favor": -3,
+          "orderDark": 4
+        }
+      },
+      "r_codes": {
+        "n": "Brotherhood signal camp",
+        "kind": "Investigate",
+        "src": "Jedi",
+        "mission": "r_codes",
+        "text": "A camp is relaying Kaan's orders. Copy them and get out.",
+        "ignore": {
+          "favor": -3
+        }
+      },
+      "r_supply": {
+        "n": "The supply line",
+        "kind": "Defend",
+        "src": "Army of Light",
+        "mission": "r_supply",
+        "text": "Raiders are closing on the post that feeds Hoth's front.",
+        "ignore": {
+          "favor": -5
+        }
+      }
+    },
+    "ESCORTS": {
+      "johun": {
+        "n": "Johun Othone (wounded)",
+        "cls": "VIP",
+        "ic": "vip",
+        "hp": 6,
+        "aim": 60,
+        "mob": 3,
+        "dmg": [
+          2,
+          3
+        ],
+        "range": 1.5,
+        "init": 6,
+        "abil": [
+          "stabilize",
+          "door"
+        ]
+      },
+      "courier": {
+        "n": "Courier Ryl Danu",
+        "cls": "VIP",
+        "ic": "vip",
+        "hp": 6,
+        "aim": 55,
+        "mob": 4,
+        "dmg": [
+          1,
+          2
+        ],
+        "range": 6,
+        "init": 6,
+        "abil": [
+          "stabilize",
+          "door"
+        ]
+      }
+    },
+    "EVENTS": [
+      {
+        "id": "e2_lord_titles",
+        "trigger": {
+          "type": "era_start",
+          "era": 2
+        },
+        "text": "Army of Light Jedi call themselves Lords and give orders like generals. Some Masters hate it.",
+        "choices": [
+          {
+            "label": "Hoth's way: keep the titles",
+            "effects": {
+              "recruits": 2,
+              "orderDark": 4,
+              "loyalty": {
+                "seat": "hoth",
+                "n": 10
+              }
+            }
+          },
+          {
+            "label": "Farfalla's way: drop them",
+            "effects": {
+              "orderDark": -4,
+              "loyalty": {
+                "seat": "farfalla",
+                "n": 10
+              },
+              "loyalty_2": {
+                "seat": "hoth",
+                "n": -10
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "e2_deserter",
+        "trigger": {
+          "type": "month",
+          "min": 1,
+          "era": 2
+        },
+        "text": "A Brotherhood apprentice walks into camp, unarmed, asking for mercy.",
+        "choices": [
+          {
+            "label": "Accept him",
+            "effects": {
+              "recruit": "redeemed_apprentice",
+              "chance": 0.7,
+              "fail": {
+                "wound": {
+                  "who": "squad_leader",
+                  "turns": 2
+                }
+              }
+            }
+          },
+          {
+            "label": "Imprison him",
+            "effects": {
+              "intel": 2
+            }
+          },
+          {
+            "label": "Turn him away",
+            "effects": {}
+          }
+        ]
+      },
+      {
+        "id": "e2_hoth_charge",
+        "trigger": {
+          "type": "after_mission",
+          "min": 2,
+          "era": 2
+        },
+        "text": "Lord Hoth wants your strike teams at the front of his next charge. \"A Lord leads from the front.\"",
+        "choices": [
+          {
+            "label": "Hoth's way: lead the charge",
+            "effects": {
+              "favor": 3,
+              "loyalty": {
+                "seat": "hoth",
+                "n": 10
+              },
+              "chance": 0.6,
+              "fail": {
+                "wound": {
+                  "who": "squad_leader",
+                  "turns": 2
+                },
+                "loyalty": {
+                  "seat": "hoth",
+                  "n": 10
+                }
+              }
+            }
+          },
+          {
+            "label": "Farfalla's way: scout instead",
+            "effects": {
+              "intel": 2,
+              "loyalty": {
+                "seat": "farfalla",
+                "n": 10
+              },
+              "loyalty_2": {
+                "seat": "hoth",
+                "n": -10
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "e2_child_soldiers",
+        "trigger": {
+          "type": "after_mission",
+          "min": 3,
+          "era": 2
+        },
+        "text": "Villages are sending their teenagers to fight for the Army of Light. You need the numbers.",
+        "choices": [
+          {
+            "label": "Farfalla's way: send them home",
+            "effects": {
+              "recruits": -1,
+              "favor": 1,
+              "loyalty": {
+                "seat": "farfalla",
+                "n": 10
+              }
+            }
+          },
+          {
+            "label": "Rear duties only",
+            "effects": {
+              "recruits": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "e2_farfalla_amnesty",
+        "trigger": {
+          "type": "act",
+          "min": 2,
+          "era": 2
+        },
+        "text": "Farfalla wants to offer Brotherhood troopers amnesty if they lay down their arms. Hoth calls it a trick that will get Jedi killed.",
+        "choices": [
+          {
+            "label": "Farfalla's way: offer amnesty",
+            "effects": {
+              "recruits": 2,
+              "orderDark": -4,
+              "loyalty": {
+                "seat": "farfalla",
+                "n": 10
+              },
+              "loyalty_2": {
+                "seat": "hoth",
+                "n": -10
+              }
+            }
+          },
+          {
+            "label": "Hoth's way: no terms for Kaan's army",
+            "effects": {
+              "credits": 40,
+              "orderDark": 4,
+              "loyalty": {
+                "seat": "hoth",
+                "n": 10
+              },
+              "loyalty_2": {
+                "seat": "farfalla",
+                "n": -10
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "e2_cave_whispers",
+        "trigger": {
+          "type": "flag",
+          "flag": "e2_caves_done",
+          "era": 2
+        },
+        "text": "A Jedi back from the caves can't stop hearing a voice. It promises strength.",
+        "choices": [
+          {
+            "label": "Halls of Healing",
+            "effects": {
+              "wound": {
+                "who": "jedi_highestDark",
+                "turns": 2
+              },
+              "unitDark": {
+                "who": "jedi_highestDark",
+                "n": -2
+              }
+            }
+          },
+          {
+            "label": "Listen to it",
+            "effects": {
+              "unitDark": {
+                "who": "jedi_highestDark",
+                "n": 2
+              },
+              "intel": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "e2_farfalla",
+        "trigger": {
+          "type": "month",
+          "min": 4,
+          "era": 2
+        },
+        "text": "Lord Farfalla wants to pull the army back to save lives. Lord Hoth wants one last push.",
+        "choices": [
+          {
+            "label": "Hoth's way: one last push",
+            "effects": {
+              "loyalty": {
+                "seat": "hoth",
+                "n": 10
+              },
+              "loyalty_2": {
+                "seat": "farfalla",
+                "n": -10
+              },
+              "flag": "e2_push"
+            }
+          },
+          {
+            "label": "Farfalla's way: pull back",
+            "effects": {
+              "loyalty": {
+                "seat": "farfalla",
+                "n": 10
+              },
+              "loyalty_2": {
+                "seat": "hoth",
+                "n": -10
+              },
+              "recruits": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "e2_hoth_student",
+        "trigger": {
+          "type": "all",
+          "era": 2,
+          "all": [
+            {
+              "type": "flag",
+              "flag": "e2_johun_saved",
+              "era": 2
+            },
+            {
+              "type": "loyal",
+              "seat": "hoth",
+              "min": 70,
+              "era": 2
+            }
+          ]
+        },
+        "text": "Hoth trusts you now. He offers you the student you pulled out of the ravine: Johun Othone, a Knight with a long memory.",
+        "choices": [
+          {
+            "label": "Take Johun",
+            "effects": {
+              "recruit": "johun",
+              "flag": "johun_joined"
+            }
+          },
+          {
+            "label": "He belongs at his master's side",
+            "effects": {
+              "loyalty": {
+                "seat": "hoth",
+                "n": 10
+              },
+              "flag": "e2_johun_hoth"
+            }
+          }
+        ]
+      },
+      {
+        "id": "e2_farfalla_healers",
+        "trigger": {
+          "type": "loyal",
+          "seat": "farfalla",
+          "min": 70,
+          "era": 2
+        },
+        "text": "Farfalla sends his own healers to the Temple, no strings attached. \"Use them where they save the most.\"",
+        "choices": [
+          {
+            "label": "Keep them at the Temple",
+            "effects": {
+              "recruits": 2
+            }
+          },
+          {
+            "label": "Send them to the front",
+            "effects": {
+              "favor": 4
+            }
+          }
+        ]
+      },
+      {
+        "id": "e2_bane_rumor",
+        "trigger": {
+          "type": "all",
+          "era": 2,
+          "all": [
+            {
+              "type": "act",
+              "min": 3,
+              "era": 2
+            },
+            {
+              "type": "notFlag",
+              "flag": "e2_bane_seen",
+              "era": 2
+            }
+          ]
+        },
+        "text": "Scouts saw a Sith walk away from Kaan's camp at night. Nobody else cares.",
+        "choices": [
+          {
+            "label": "Assign trackers",
+            "effects": {
+              "intel": -1,
+              "flag": "e2_bane_tracked"
+            }
+          },
+          {
+            "label": "Focus on Kaan",
+            "effects": {}
+          }
+        ]
+      },
+      {
+        "id": "e2_hoth_last",
+        "trigger": {
+          "type": "flag",
+          "flag": "e2_seventh_done",
+          "era": 2
+        },
+        "text": "If the ritual starts, Hoth will walk into Kaan's caves himself. Farfalla begs him not to.",
+        "choices": [
+          {
+            "label": "Hoth's way: he goes in",
+            "effects": {
+              "flag": "e2_hoth_goes",
+              "loyalty": {
+                "seat": "hoth",
+                "n": 10
+              }
+            }
+          },
+          {
+            "label": "Farfalla's way: he waits outside",
+            "effects": {
+              "flag": "e2_hoth_waits",
+              "loyalty": {
+                "seat": "farfalla",
+                "n": 10
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "CODEX": {
+      "enemy": {
+        "trooper": {
+          "lore": "Sith Empire infantry, trained hard and ordered harder. Most of them believe in the Empire because they have never been offered another future."
+        },
+        "heavy": {
+          "lore": "A walking wall in Imperial plate, with a gun that wants to be heard. It is slow to turn and quick to punish those who stand still."
+        },
+        "agent": {
+          "lore": "Imperial Intelligence does not announce itself. A cold hide, a long rifle, and a patience the Temple’s own scouts would respect."
+        },
+        "acolyte": {
+          "lore": "A student of the Sith, hungry to be noticed by someone with more power. Lightning crackles in the fingers, and mercy has not yet been taught."
+        },
+        "husk": {
+          "lore": "What is left when a great horror feeds. A Dark Husk has no mind of its own, only hunger, and it moves when its maker kills."
+        },
+        "terentatek": {
+          "lore": "A beast bred, it is said, to hunt those who touch the Force. The Jedi who survive an encounter rarely describe it, but the nightmares do."
+        },
+        "envoy": {
+          "lore": "A Republic envoy with the right smile and the wrong friends. Whispers say that someone close to the talks is selling the schedule."
+        },
+        "malgus": {
+          "lore": "A Sith Lord who believes the Republic is a lie and means to prove it with fire. He fights like a man with nothing left to lose."
+        },
+        "mando": {
+          "lore": "Mandalorian clans, hired by the Empire for the oldest reason there is. They fight with honor and are paid in credits."
+        },
+        "adraas": {
+          "lore": "Lord Adraas fought beside Malgus in the strike on Coruscant. Those who faced him remember how little he seemed to care about the cost."
+        },
+        "bh_trooper": {
+          "lore": "Foot soldiers of the Brotherhood of Darkness, devoted to Lord Kaan’s vision. They fight as though the war were already won, and that certainty is their weapon."
+        },
+        "bh_marauder": {
+          "lore": "A Dark Side warrior who fights for rage as much as for Kaan. The wounds only seem to feed it."
+        },
+        "sith_lord": {
+          "lore": "One of the Brotherhood’s Lords, who sees the Light as a delay to be removed. The troopers around it fight as if its approval were air."
+        },
+        "bh_sniper": {
+          "lore": "A hired gun on the ridge who is paid to be patient. The Brotherhood buys loyalty with ideals and loyalty from this one with credits."
+        },
+        "sith_spawn": {
+          "lore": "A creature born of the dark side in the Ruusan caves, hungry only for the Force. Soldiers without the gift pass it unnoticed, and it cannot forgive that."
+        },
+        "nexus": {
+          "lore": "A wound in the world where the dark side pools and festers. It does not move or speak, but it makes more of itself."
+        },
+        "nexus_core": {
+          "lore": "The heart of the cave, where the dark gathers. It beats slowly, and anyone who stays near it begins to hear it."
+        },
+        "kaan": {
+          "lore": "Lord Kaan, leader of the Brotherhood of Darkness, sure that the Sith should lead the galaxy. He is brilliant, ruthless, and wrong in a way he will never accept."
+        },
+        "bane": {
+          "lore": "Darth Bane, a Sith apprentice who watches from the ridge and listens to the war with a stranger’s attention. He survives Ruusan, and what he builds from it will outlast everyone here."
+        },
+        "vorr": {
+          "lore": "Kaan's field commander, a soldier first and a Sith second. He holds high ground the way other men hold grudges. [N]"
+        }
+      },
+      "character": {
+        "zym": {
+          "lore": "Grand Master of the Order, tired and unyielding. He carries a Council’s worth of doubt, and does not let it show."
+        },
+        "gnost": {
+          "lore": "A Kel Dor Jedi historian, breath-masked and unhurried. He believes that the past is the only teacher that cannot be bribed."
+        },
+        "darach": {
+          "lore": "A Zabrak Jedi Master with a patient smile and a hard-earned scar. He teaches best by letting others make their own mistakes."
+        },
+        "satele": {
+          "lore": "A young Knight with a famous name and an unfinished story. She carries the weight of a lineage she did not choose."
+        },
+        "jace": {
+          "lore": "A Republic soldier who has seen too much and complained about it too little. His platoon would follow him anywhere sensible."
+        },
+        "malgus": {
+          "lore": "A Sith Lord of terrible resolve, who struck at the heart of the Republic and meant it. His pain is not hidden, and neither is his power."
+        },
+        "adraas": {
+          "lore": "A Sith Lord who commanded beside Malgus. He is cold, capable, and he regards the Temple as a trophy waiting to be taken."
+        },
+        "eleena": {
+          "lore": "A Twi’lek who stands at Malgus’s side by choice. She sees more of him than anyone else does, and she is not afraid."
+        },
+        "kira": {
+          "lore": "A Guardian Knight who leads from the front. She says little about the people she has lost, and carries every name."
+        },
+        "tor": {
+          "lore": "A Consular Padawan with a mind quicker than his nerve. He is learning that courage is just fear that keeps walking."
+        },
+        "dax": {
+          "lore": "A sergeant with twenty years of mud on his boots. He does not believe in luck, and keeps his squad alive anyway."
+        },
+        "ilsa": {
+          "lore": "A scout who moves like a rumor. She prefers to be forgotten, and rarely is."
+        },
+        "bren": {
+          "lore": "A medic with tired hands and a steady voice. He has lost patients, and has never stopped trying for the next one."
+        },
+        "grak": {
+          "lore": "A heavy trooper built like a doorframe. Gentle in the barracks, immovable on the line."
+        },
+        "saresh": {
+          "lore": "A Republic envoy with an easy manner and a careful vocabulary. Whatever he says, there seems to be something else behind it."
+        },
+        "ondo": {
+          "lore": "A Senator with a loyal voice and a long list of enemies. He wants the treaty badly, and the Temple wants him alive to sign it."
+        },
+        "corin": {
+          "lore": "An Imperial officer who changed sides at some personal cost. He is trusted a little less than he deserves, and a little more than he expects."
+        },
+        "mira": {
+          "lore": "An aide who knows where every document is and who has read most of them. Quiet, observant, and indispensable."
+        },
+        "thulHeir": {
+          "lore": "Lady Venna Thul, heir to an old Alderaanian house. She is young, careful, and aware that her name weighs more than she does."
+        },
+        "hoth": {
+          "lore": "Lord Hoth leads the Army of Light. A blunt soldier who never wanted to be one. In canon he dies in the thought bomb. (Legends, High)"
+        },
+        "farfalla": {
+          "lore": "Valenthyne Farfalla, a Lord of the Army of Light. Flamboyant, merciful, and the one who leads the Jedi after Ruusan. (Legends, High)"
+        },
+        "johun": {
+          "lore": "Johun Othone, Hoth's student. In canon he survives Ruusan and builds its memorial. (Legends, High)"
+        },
+        "kaan": {
+          "lore": "Lord Kaan built the Brotherhood of Darkness by making every Sith a Lord. Equality, he called it. It made the Sith easy to count. (Legends, High)"
+        },
+        "bane": {
+          "lore": "Darth Bane. In canon he walks away from Ruusan, the only Sith left, and writes the Rule of Two. (Legends, High)"
+        },
+        "tarn_vel": {
+          "lore": "A Brotherhood apprentice who walked into a Jedi camp with his hands open. Nobody is sure yet whether he meant it. [N]"
+        },
+        "vell": {
+          "lore": "Lord Tarsus Vell, an Army of Light Lord taken in the sixth battle. Loud, brave, and very glad to be alive. [N]"
+        }
+      },
+      "mission": {
+        "relay": {
+          "lore": "A lonely relay on the frontier, keeping the lanes open for ships that never learn its name. The Sith want it silent, and they are coming in waves."
+        },
+        "shrine": {
+          "lore": "Pilgrims have long come to a kyber shrine on Dantooine. Tonight something else has found it, and it has an appetite for the Force."
+        },
+        "rescue": {
+          "lore": "A supply depot on Ord Mantell holds prisoners who matter to someone. The plan is simple, which means it will not go simply."
+        },
+        "envoy": {
+          "lore": "Schedules leaked, secrets traded, and a trail that winds through the lower city. Someone near the talks is selling the Republic."
+        },
+        "archive": {
+          "lore": "An Imperial listening post on Balmorra, tucked between foundries. What it hears could hurt the Republic, and what it holds could help."
+        },
+        "sabotage": {
+          "lore": "An Imperial fuel depot on Balmorra, vast and poorly lit. A well-placed charge here could stall an advance for weeks."
+        },
+        "escort": {
+          "lore": "A Senator must walk the length of Coruscant’s lower streets to reach the talks. The Temple walks with him."
+        },
+        "blockade": {
+          "lore": "Mandalorians in Imperial pay have closed a stretch of the Hydian Way. A convoy is counting on the squad to open it."
+        },
+        "cache": {
+          "lore": "A listening post on the Inner Rim has gone quiet. The squad is sent to find out why before anyone else does."
+        },
+        "hutt": {
+          "lore": "A Hutt warehouse on Nar Shaddaa holds a ledger of debts and deals. In the right hands it could change the war."
+        },
+        "dock": {
+          "lore": "Docking Ring Nine. Malgus is coming for the Temple, and the Jedi have one chance to stop him at the door."
+        },
+        "vault": {
+          "lore": "Beneath the ruins of Ossus lie old records of the Sith wars. Gnost-Dural wants them saved, and the Empire wants them first."
+        },
+        "ilum": {
+          "lore": "A cave mouth on Ilum, cold and humming. Sergeant Malcom’s platoon holds it, and the Jedi arrive in time to share the watch."
+        },
+        "adraasHunt": {
+          "lore": "During the talks on Alderaan, Satele Shan leads a strike on Lord Adraas at an embassy hangar. It is a gamble with the treaty as the stake."
+        },
+        "taris": {
+          "lore": "A reclamation camp on Taris, where captives were put to work. The Jedi come to open the gates, and to see who is still inside."
+        },
+        "thul": {
+          "lore": "The heir to House Thul must cross Alderaan unseen. The Jedi go with her, because some journeys are not safe alone."
+        },
+        "depot": {
+          "lore": "Forward Depot Cresh keeps the enemy fed and armed. Take away the depot and the front shifts."
+        },
+        "fort": {
+          "lore": "Fort Garnik on Ord Mantell is old, battered, and still standing. The Republic means to keep it that way."
+        },
+        "r_ravine": {
+          "lore": "The wounded of the Army of Light lie in a ravine as the Brotherhood closes in. Among them is Johun Othone, a young Knight in Lord Hoth’s service."
+        },
+        "r_caves": {
+          "lore": "The caves of Ruusan run deep, and the Brotherhood is gathering in them. Some of what moves in the dark has no interest in soldiers at all."
+        },
+        "r_bomb": {
+          "lore": "Kaan’s ritual would end the Light and the Dark together. Hoth goes to stop it, and the squad goes ahead of him."
+        },
+        "r_hospital": {
+          "lore": "The Army of Light cares for its wounded far behind the line, and that is exactly where the Brotherhood strikes. The healers must be given time."
+        },
+        "r_nexus": {
+          "lore": "Deep in the caves, the dark side has found a place to grow. It breeds only what hunts the gifted, so the troops go first."
+        },
+        "r_snipers": {
+          "lore": "A courier carries the Army’s plans along a ridge trail, and the Brotherhood has paid for rifles to watch it. The road is short and the cover is thin."
+        },
+        "r_dump": {
+          "lore": "The Brotherhood marches on powder and fuel. Take away the dump and the army slows, and that may be the difference."
+        },
+        "r_muster": {
+          "lore": "The Army of Light came to Ruusan in transports, lit down by a single beacon. [N]"
+        },
+        "r_sixth": {
+          "lore": "The sixth battle of Ruusan went to the Brotherhood. Its prisoners went to Kaan. (battle count: Legends, High; details [N])"
+        },
+        "r_seventh": {
+          "lore": "The seventh and last battle of Ruusan. Kaan's army broke and fled into the caves. (Legends, High)"
+        },
+        "r_prisoners": {
+          "lore": "The Brotherhood took prisoners to break them, and sometimes to turn them. [N]"
+        },
+        "r_codes": {
+          "lore": "Kaan gave his orders by courier and by signal. The signals were faster, and easier to steal. [N]"
+        },
+        "r_supply": {
+          "lore": "Hoth's army ate what the convoys brought. When the convoys stopped, so did the army. [N]"
+        }
+      }
+    },
+    "COUNCIL_SEATS": {
+      "hoth": {
+        "n": "Lord Hoth",
+        "loyalty": 60
+      },
+      "farfalla": {
+        "n": "Lord Valenthyne Farfalla",
+        "loyalty": 60
+      }
+    },
+    "STORY_RECRUITS": {
+      "johun": {
+        "n": "Johun Othone",
+        "cls": "Guardian",
+        "title": "Knight",
+        "rank": 3,
+        "xp": 80,
+        "picks": [
+          "defLine",
+          "reflectM",
+          "sweep"
+        ],
+        "col": "#7fd99a",
+        "age": 22
+      },
+      "redeemed_apprentice": {
+        "n": "Tarn Vel",
+        "cls": "Consular",
+        "title": "Padawan",
+        "rank": 1,
+        "xp": 0,
+        "picks": [],
+        "col": "#c9b6ff",
+        "age": 19,
+        "dark": 4
+      }
+    },
+    "FLAG_LINES": {
+      "e2_bomb_known": "You read the ritual tablets: you knew about the thought bomb.",
+      "e2_bane_seen": "Your scouts saw a lone Sith walk away from the caves.",
+      "e2_hoth_lives": "Lord Hoth survived Ruusan. In canon he died in the thought bomb.",
+      "e2_bomb_fired": "The thought bomb fired, as it did in canon.",
+      "e2_bane_dead": "Darth Bane died on Ruusan. No one is left to teach the Rule of Two.",
+      "e2_bane_captured": "Darth Bane sits in a Jedi cell. The Sith line has no teacher.",
+      "e2_bane_escaped": "One Sith walked away from Ruusan. Always two, he says.",
+      "e2_bane_tracked": "Trackers followed the lone Sith into the hills.",
+      "e2_johun_saved": "You pulled Johun Othone out of the ravine.",
+      "johun_joined": "Johun Othone fought under your command.",
+      "e2_vell_saved": "Lord Tarsus Vell came home from the stockade.",
+      "e2_vorr_down": "Lord Vorr fell in the seventh battle.",
+      "e2_hoth_goes": "Hoth walked into the caves himself.",
+      "e2_hoth_waits": "Farfalla kept Hoth out of the caves."
+    },
+    "EPI": {
+      "r_muster": {
+        "win": "Hoth walks the field shaking hands. He remembers every name.",
+        "lose": "Half the army lands in the wrong valley."
+      },
+      "r_ravine": {
+        "win": "Johun asks your name twice so he won't forget it.",
+        "lose": "Hoth reads the list of the dead himself."
+      },
+      "r_caves": {
+        "win": "The tablets describe something no one on the Council wants to say out loud.",
+        "lose": "Whatever Kaan is planning, he plans it in the dark."
+      },
+      "r_sixth": {
+        "win": "Lord Vell can't hold a saber yet. He holds a cup of caf and doesn't let go.",
+        "lose": "Kaan sends Vell's saber back. Only the saber."
+      },
+      "r_seventh": {
+        "win": "Kaan's army runs for the caves. Nobody asks why the caves.",
+        "lose": "Six battles became seven. Nobody has won any of them."
+      },
+      "r_bomb": {
+        "win": "Two armies walk off Ruusan. One of them is much smaller.",
+        "lose": "The caves are a crater. The silence after is the loudest thing on Ruusan."
+      }
+    },
+    "MISSION_LORE": {
+      "r_ravine": [
+        "ruusan",
+        [
+          "johun",
+          "hoth"
+        ]
+      ],
+      "r_bomb": [
+        "ruusan",
+        [
+          "kaan",
+          "hoth",
+          "bane"
+        ]
+      ],
+      "r_muster": [
+        "ruusan"
+      ],
+      "r_sixth": [
+        "ruusan"
+      ],
+      "r_prisoners": [
+        "ruusan"
+      ],
+      "r_codes": [
+        "ruusan"
+      ],
+      "r_supply": [
+        "ruusan"
+      ],
+      "r_seventh": [
+        "ruusan",
+        [
+          "hoth",
+          "farfalla"
+        ]
+      ]
+    },
+    "EVENT_LORE": {
+      "e2_lord_titles": [
+        "hoth",
+        "farfalla"
+      ],
+      "e2_hoth_charge": [
+        "hoth"
+      ],
+      "e2_farfalla_amnesty": [
+        "farfalla",
+        "hoth"
+      ],
+      "e2_farfalla": [
+        "farfalla",
+        "hoth"
+      ],
+      "e2_hoth_student": [
+        "hoth",
+        "johun"
+      ],
+      "e2_farfalla_healers": [
+        "farfalla"
+      ],
+      "e2_bane_rumor": [
+        "bane"
+      ],
+      "e2_hoth_last": [
+        "hoth",
+        "farfalla"
+      ],
+      "e2_deserter": [
+        "tarn_vel"
+      ]
+    },
+    "TUNE": {
+      "r_ravine:0": {
+        "aim": 25,
+        "hp": 3,
+        "extra": 1
+      },
+      "r_caves:0": {
+        "aim": 0,
+        "hp": 1
+      },
+      "r_hospital:0": {
+        "aim": 1
+      },
+      "r_dump:0": {
+        "aim": 12,
+        "hp": 1
+      },
+      "r_muster:0": {
+        "aim": 10
+      },
+      "r_sixth:0": {
+        "aim": 10,
+        "extra": 1
+      },
+      "r_seventh:0": {
+        "aim": 8
+      },
+      "r_prisoners:0": {
+        "aim": -8
+      },
+      "r_codes:0": {
+        "aim": 15,
+        "hp": 1
+      },
+      "r_supply:0": {
+        "aim": -2
+      }
+    },
+    "ERA2": {
+      "n": "Ruusan",
+      "bby": 1006,
+      "next": "High Republic · ~232 BBY",
+      "shard": {
+        "t": "A second shard",
+        "text": "The sealed vision stirs again. One Sith walks out of a storm of light alone. A voice says: always two. The fire on the Temple steps burns a little brighter."
+      },
+      "jump": "Twenty-six centuries pass. The Sith Empire is gone, and the Sith came back anyway. The Order is an army now: Lord Hoth's Army of Light against Lord Kaan's Brotherhood of Darkness. The war is drifting toward a green world called Ruusan.",
+      "carry": {
+        "credits": 0.3,
+        "favorTo": 50,
+        "orderDark": 0.5,
+        "warChest": 200
+      },
+      "eraMod": 1
+    },
+    "ACTS2": {
+      "2": {
+        "t": "Years pass",
+        "text": "Three years of war. The Army of Light and the Brotherhood trade worlds and bodies. Both sides start calling Ruusan the place it ends."
+      },
+      "3": {
+        "t": "The last battles",
+        "text": "Three more years. Six battles on Ruusan and nobody has won. Kaan is losing, and losing men do desperate things."
+      }
+    },
+    "SHARDS2": {
+      "2": "The vision returns: a cave mouth full of light, and Jedi and Sith walking into it together.",
+      "3": "The vision is clear now: one Sith walking away from a storm of light. Behind him, nobody is left to follow."
+    },
+    "PLAN2": [
+      {
+        "story": "r_muster"
+      },
+      {
+        "crises": [
+          "r_hospital",
+          "r_snipers"
+        ]
+      },
+      {
+        "story": "r_ravine"
+      },
+      {
+        "crises": [
+          "r_dump",
+          "r_codes"
+        ]
+      },
+      {
+        "years": 3,
+        "act": 2
+      },
+      {
+        "crises": [
+          "r_nexus",
+          "r_prisoners"
+        ]
+      },
+      {
+        "story": "r_caves"
+      },
+      {
+        "crises": [
+          "r_supply",
+          "r_snipers"
+        ]
+      },
+      {
+        "story": "r_sixth"
+      },
+      {
+        "years": 3,
+        "act": 3
+      },
+      {
+        "crises": [
+          "r_dump",
+          "r_hospital",
+          "r_codes"
+        ]
+      },
+      {
+        "story": "r_seventh"
+      },
+      {
+        "crises": [
+          "r_nexus",
+          "r_prisoners",
+          "r_supply"
+        ]
+      },
+      {
+        "story": "r_bomb"
+      }
+    ],
+    "ERA2_ROSTER": [
+      {
+        "n": "Lord Ressa Vaun",
+        "cls": "Guardian",
+        "title": "Knight",
+        "rank": 2,
+        "xp": 30,
+        "picks": [
+          "saberThrow",
+          "leap"
+        ],
+        "col": "#ffd166",
+        "age": 31
+      },
+      {
+        "n": "Kell Darrow",
+        "cls": "Consular",
+        "title": "Padawan",
+        "col": "#8fe3ff",
+        "age": 17
+      },
+      {
+        "n": "Sgt. Bo Hallan",
+        "cls": "Soldier",
+        "age": 36
+      },
+      {
+        "n": "Mira Tesk",
+        "cls": "Scout",
+        "age": 24
+      },
+      {
+        "n": "Doc Ilo Venn",
+        "cls": "Medic",
+        "age": 41
+      },
+      {
+        "n": "Rusk Abernath",
+        "cls": "Heavy",
+        "age": 29
+      }
+    ],
+    "BANE": {
+      "leaves": 4,
+      "dead": {
+        "shadow": -3,
+        "flag": "e2_bane_dead",
+        "line": "Darth Bane died on Ruusan. No one is left to teach the Rule of Two."
+      },
+      "captured": {
+        "shadow": -2,
+        "flag": "e2_bane_captured",
+        "line": "Darth Bane sits in a Jedi cell. The Sith line has no teacher."
+      },
+      "escaped": {
+        "shadow": 1,
+        "flag": "e2_bane_escaped",
+        "line": "One Sith walked away from Ruusan. Always two, he says."
+      }
+    },
+    "STORY_TEXT2": {
+      "bossWin": "Kaan fell before the ritual. Lord Hoth lives, and takes a Council seat.",
+      "bossLose": "The thought bomb fired. Hoth is gone; the Army of Light buries its Lords.",
+      "bossLoseHothOut": "The thought bomb fired. Hoth waited outside, as Farfalla asked, and lives to bury his Lords.",
+      "eraWin": "The Brotherhood is broken. The Order begins to put down its Lord titles.",
+      "eraLose": "Ruusan is a graveyard. The Order rebuilds, quieter and more afraid.",
+      "darkWarn": "The Order is drifting. The Army of Light liked being an army."
+    },
+    "ERA2_LORE": {
+      "enemy": {
+        "bh_trooper": {
+          "lore": "Kaan's foot soldiers. They believe their Lords will make them more than human. Most die believing it."
+        },
+        "bh_marauder": {
+          "lore": "Sith who gave up everything but the fight. Every wound makes them hit harder."
+        },
+        "sith_lord": {
+          "lore": "The Brotherhood made everyone with a red blade a Lord. Kaan said it made them equal. It made them many."
+        },
+        "bh_sniper": {
+          "lore": "Hired guns from the Outer Rim. They don't care who wins Ruusan as long as someone pays."
+        },
+        "sith_spawn": {
+          "lore": "Dark-side things that crawl out where the Force is wounded. Blasters bother them. Jedi feed them."
+        },
+        "nexus": {
+          "lore": "A place where too much hate soaked into the ground. The Force sours around it."
+        },
+        "nexus_core": {
+          "lore": "The oldest, deepest wound in the caves. Destroy it and the Spawn stop coming."
+        },
+        "vorr": {
+          "lore": "Kaan's field commander, a soldier first and a Sith second. He holds high ground the way other men hold grudges. [N]"
+        },
+        "kaan": {
+          "lore": "Skere Kaan, Dark Lord of the Brotherhood. Charismatic, reckless, and out of options. (Legends, High)"
+        },
+        "bane": {
+          "lore": "A Sith who thinks Kaan's army is a mistake. He may be planning to let it die. (Legends, High)"
+        }
+      },
+      "character": {
+        "hoth": {
+          "lore": "Lord Hoth leads the Army of Light. A blunt soldier who never wanted to be one. In canon he dies in the thought bomb. (Legends, High)"
+        },
+        "farfalla": {
+          "lore": "Valenthyne Farfalla, a Lord of the Army of Light. Flamboyant, merciful, and the one who leads the Jedi after Ruusan. (Legends, High)"
+        },
+        "johun": {
+          "lore": "Johun Othone, Hoth's student. In canon he survives Ruusan and builds its memorial. (Legends, High)"
+        },
+        "kaan": {
+          "lore": "Lord Kaan built the Brotherhood of Darkness by making every Sith a Lord. Equality, he called it. It made the Sith easy to count. (Legends, High)"
+        },
+        "bane": {
+          "lore": "Darth Bane. In canon he walks away from Ruusan, the only Sith left, and writes the Rule of Two. (Legends, High)"
+        },
+        "tarn_vel": {
+          "lore": "A Brotherhood apprentice who walked into a Jedi camp with his hands open. Nobody is sure yet whether he meant it. [N]"
+        },
+        "vell": {
+          "lore": "Lord Tarsus Vell, an Army of Light Lord taken in the sixth battle. Loud, brave, and very glad to be alive. [N]"
+        }
+      },
+      "mission": {
+        "r_muster": {
+          "lore": "The Army of Light came to Ruusan in transports, lit down by a single beacon. [N]"
+        },
+        "r_ravine": {
+          "lore": "Ruusan's ravines filled with the wounded of seven battles."
+        },
+        "r_caves": {
+          "lore": "Kaan's Lords met in the caves to plan their last move."
+        },
+        "r_sixth": {
+          "lore": "The sixth battle of Ruusan went to the Brotherhood. Its prisoners went to Kaan. (battle count: Legends, High; details [N])"
+        },
+        "r_seventh": {
+          "lore": "The seventh and last battle of Ruusan. Kaan's army broke and fled into the caves. (Legends, High)"
+        },
+        "r_bomb": {
+          "lore": "The thought bomb: a ritual that drew in every Force user nearby and did not let go. (Legends, High)"
+        },
+        "r_hospital": {
+          "lore": "The Army of Light ran its hospitals in tents, close enough to the front to hear it. [N]"
+        },
+        "r_nexus": {
+          "lore": "Ruusan's caves held old dark-side wounds. The Spawn came from somewhere. [N]"
+        },
+        "r_snipers": {
+          "lore": "Kaan paid mercenaries in plunder. The ridges of Ruusan were full of them. [N]"
+        },
+        "r_dump": {
+          "lore": "An army of Lords still needs blaster gas. Kaan kept his in one place. [N]"
+        },
+        "r_prisoners": {
+          "lore": "The Brotherhood took prisoners to break them, and sometimes to turn them. [N]"
+        },
+        "r_codes": {
+          "lore": "Kaan gave his orders by courier and by signal. The signals were faster, and easier to steal. [N]"
+        },
+        "r_supply": {
+          "lore": "Hoth's army ate what the convoys brought. When the convoys stopped, so did the army. [N]"
+        }
+      },
+      "planet": {
+        "ruusan": {
+          "lore": "A green Mid Rim world that hosted seven battles between the Army of Light and the Brotherhood of Darkness. (Legends, High)"
+        }
+      }
+    },
+    "SOURCE_LITERALS": [
+      {
+        "line": 6,
+        "raw": "'Ruusan'"
+      },
+      {
+        "line": 6,
+        "raw": "'High Republic · ~232 BBY'"
+      },
+      {
+        "line": 7,
+        "raw": "'A second shard'"
+      },
+      {
+        "line": 7,
+        "raw": "'The sealed vision stirs again. One Sith walks out of a storm of light alone. A voice says: always two. The fire on the Temple steps burns a little brighter.'"
+      },
+      {
+        "line": 8,
+        "raw": "'Twenty-six centuries pass. The Sith Empire is gone, and the Sith came back anyway. The Order is an army now: Lord Hoth\\'s Army of Light against Lord Kaan\\'s Brotherhood of Darkness. The war is drifting toward a green world called Ruusan.'"
+      },
+      {
+        "line": 13,
+        "raw": "'Years pass'"
+      },
+      {
+        "line": 13,
+        "raw": "'Three years of war. The Army of Light and the Brotherhood trade worlds and bodies. Both sides start calling Ruusan the place it ends.'"
+      },
+      {
+        "line": 14,
+        "raw": "'The last battles'"
+      },
+      {
+        "line": 14,
+        "raw": "'Three more years. Six battles on Ruusan and nobody has won. Kaan is losing, and losing men do desperate things.'"
+      },
+      {
+        "line": 15,
+        "raw": "'The vision returns: a cave mouth full of light, and Jedi and Sith walking into it together.'"
+      },
+      {
+        "line": 16,
+        "raw": "'The vision is clear now: one Sith walking away from a storm of light. Behind him, nobody is left to follow.'"
+      },
+      {
+        "line": 20,
+        "raw": "'Brotherhood Trooper'"
+      },
+      {
+        "line": 20,
+        "raw": "'e_trooper'"
+      },
+      {
+        "line": 21,
+        "raw": "'Fanatic: never surrenders. +10 aim within 4 tiles of a Sith Lord.'"
+      },
+      {
+        "line": 22,
+        "raw": "'Sith Marauder'"
+      },
+      {
+        "line": 22,
+        "raw": "'e_acolyte'"
+      },
+      {
+        "line": 23,
+        "raw": "'Melee duelist. Rage: +1 damage each time it is hit (max +3).'"
+      },
+      {
+        "line": 24,
+        "raw": "'Sith Lord'"
+      },
+      {
+        "line": 24,
+        "raw": "'e_acolyte'"
+      },
+      {
+        "line": 25,
+        "raw": "'Elite duelist with Force lightning. Brotherhood troopers near it aim better.'"
+      },
+      {
+        "line": 26,
+        "raw": "'Mercenary Sniper'"
+      },
+      {
+        "line": 26,
+        "raw": "'e_agent'"
+      },
+      {
+        "line": 27,
+        "raw": "'Long range. Goes on overwatch every turn it does not shoot.'"
+      },
+      {
+        "line": 28,
+        "raw": "'Sith Spawn'"
+      },
+      {
+        "line": 28,
+        "raw": "'e_horror'"
+      },
+      {
+        "line": 29,
+        "raw": "'Force horror: only hurts Jedi. Troops are immune and are the counter.'"
+      },
+      {
+        "line": 30,
+        "raw": "'Dark Nexus'"
+      },
+      {
+        "line": 30,
+        "raw": "'darkness'"
+      },
+      {
+        "line": 31,
+        "raw": "'A wound in the Force. Does not move or attack; spawns a Sith Spawn beside it every 3 turns until destroyed.'"
+      },
+      {
+        "line": 32,
+        "raw": "'Heart of the Nexus'"
+      },
+      {
+        "line": 32,
+        "raw": "'darkness'"
+      },
+      {
+        "line": 33,
+        "raw": "'The cave\\'s dark heart. Spawns a Sith Spawn every 3 turns. Destroy it to win.'"
+      },
+      {
+        "line": 34,
+        "raw": "'Lord Vorr'"
+      },
+      {
+        "line": 34,
+        "raw": "'e_acolyte'"
+      },
+      {
+        "line": 35,
+        "raw": "'Kaan\\'s field commander. Lightning and a hard saber, armor 1. Defeat him to break the line.'"
+      },
+      {
+        "line": 36,
+        "raw": "'Lord Kaan'"
+      },
+      {
+        "line": 36,
+        "raw": "'e_acolyte'"
+      },
+      {
+        "line": 37,
+        "raw": "'Dark Lord of the Brotherhood. Lightning, a hard saber, armor 1. Defeat him to break the ritual.'"
+      },
+      {
+        "line": 38,
+        "raw": "'Darth Bane'"
+      },
+      {
+        "line": 38,
+        "raw": "'e_acolyte'"
+      },
+      {
+        "line": 39,
+        "raw": "'Hidden target. Armor 2. Can be captured if stunned or beaten down. Watches from the ridge and fights only units next to him. Walks away on turn 4.'"
+      },
+      {
+        "line": 43,
+        "raw": "'Johun Othone (wounded)'"
+      },
+      {
+        "line": 43,
+        "raw": "'VIP'"
+      },
+      {
+        "line": 43,
+        "raw": "'vip'"
+      },
+      {
+        "line": 43,
+        "raw": "'stabilize'"
+      },
+      {
+        "line": 43,
+        "raw": "'door'"
+      },
+      {
+        "line": 44,
+        "raw": "'Courier Ryl Danu'"
+      },
+      {
+        "line": 44,
+        "raw": "'VIP'"
+      },
+      {
+        "line": 44,
+        "raw": "'vip'"
+      },
+      {
+        "line": 44,
+        "raw": "'stabilize'"
+      },
+      {
+        "line": 44,
+        "raw": "'door'"
+      },
+      {
+        "line": 47,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 47,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 47,
+        "raw": "'bh_sniper'"
+      },
+      {
+        "line": 47,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 47,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 47,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 47,
+        "raw": "'sith_spawn'"
+      },
+      {
+        "line": 58,
+        "raw": "'The Muster'"
+      },
+      {
+        "line": 58,
+        "raw": "'Army of Light landing field · Ruusan'"
+      },
+      {
+        "line": 58,
+        "raw": "'defend'"
+      },
+      {
+        "line": 58,
+        "raw": "'plains'"
+      },
+      {
+        "line": 58,
+        "raw": "'Landing beacon'"
+      },
+      {
+        "line": 59,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 59,
+        "raw": "\"..c....c..\""
+      },
+      {
+        "line": 59,
+        "raw": "\".x..##..c.\""
+      },
+      {
+        "line": 59,
+        "raw": "\"....^^....\""
+      },
+      {
+        "line": 59,
+        "raw": "\".c......c.\""
+      },
+      {
+        "line": 59,
+        "raw": "\"##.c..c.##\""
+      },
+      {
+        "line": 59,
+        "raw": "\"....^^....\""
+      },
+      {
+        "line": 59,
+        "raw": "\".h......h.\""
+      },
+      {
+        "line": 59,
+        "raw": "\"..c.cc.c..\""
+      },
+      {
+        "line": 59,
+        "raw": "\"^........^\""
+      },
+      {
+        "line": 59,
+        "raw": "\"...cOOc...\""
+      },
+      {
+        "line": 59,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 60,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 60,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 60,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 60,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 60,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 60,
+        "raw": "'bh_sniper'"
+      },
+      {
+        "line": 60,
+        "raw": "'sith_lord'"
+      },
+      {
+        "line": 60,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 60,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 62,
+        "raw": "'Lord Hoth is landing his army on Ruusan, and the Brotherhood knows it. Hold the landing beacon for 7 turns so the transports can find the field.'"
+      },
+      {
+        "line": 63,
+        "raw": "'Hold the landing beacon for 7 turns. A Sith Lord leads the last wave; troopers near him aim better.'"
+      },
+      {
+        "line": 64,
+        "raw": "'The transports come down. The Army of Light is on Ruusan.'"
+      },
+      {
+        "line": 64,
+        "raw": "'The beacon goes dark. Half the transports scatter.'"
+      },
+      {
+        "line": 65,
+        "raw": "'Beacon above 75%'"
+      },
+      {
+        "line": 66,
+        "raw": "'Ravine of the Wounded'"
+      },
+      {
+        "line": 66,
+        "raw": "'Field hospital ravine · Ruusan'"
+      },
+      {
+        "line": 66,
+        "raw": "'escort'"
+      },
+      {
+        "line": 66,
+        "raw": "'plains'"
+      },
+      {
+        "line": 66,
+        "raw": "'johun'"
+      },
+      {
+        "line": 67,
+        "raw": "\"EE...c..EE\""
+      },
+      {
+        "line": 67,
+        "raw": "\"E..c...c.E\""
+      },
+      {
+        "line": 67,
+        "raw": "\"..h....h..\""
+      },
+      {
+        "line": 67,
+        "raw": "\".c..B..x..\""
+      },
+      {
+        "line": 67,
+        "raw": "\"....rr....\""
+      },
+      {
+        "line": 67,
+        "raw": "\"#..c..c..#\""
+      },
+      {
+        "line": 67,
+        "raw": "\"..x....c..\""
+      },
+      {
+        "line": 67,
+        "raw": "\".h..BB..h.\""
+      },
+      {
+        "line": 67,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 67,
+        "raw": "\".c.r..r.c.\""
+      },
+      {
+        "line": 67,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 67,
+        "raw": "\"..c.cc.c..\""
+      },
+      {
+        "line": 68,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 68,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 68,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 68,
+        "raw": "'bh_sniper'"
+      },
+      {
+        "line": 68,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 68,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 68,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 70,
+        "raw": "'A Brotherhood sweep is coming down the ravine. Lord Hoth\\'s wounded are still in it, and one of them is his student, Johun Othone. Walk him to the evac at the north end.'"
+      },
+      {
+        "line": 71,
+        "raw": "'Walk Johun to an evac zone (E). Threat rises after turn 6: more troopers arrive and they shoot the wounded on sight.'"
+      },
+      {
+        "line": 72,
+        "raw": "'The wounded are out. Hoth will remember who saved his student.'"
+      },
+      {
+        "line": 72,
+        "raw": "'The ravine falls silent.'"
+      },
+      {
+        "line": 73,
+        "raw": "'Done by turn 6'"
+      },
+      {
+        "line": 75,
+        "raw": "\"Kaan's Caves\""
+      },
+      {
+        "line": 75,
+        "raw": "'Cave network · Ruusan'"
+      },
+      {
+        "line": 75,
+        "raw": "'investigate'"
+      },
+      {
+        "line": 75,
+        "raw": "'caves'"
+      },
+      {
+        "line": 76,
+        "raw": "\"###....q##\""
+      },
+      {
+        "line": 76,
+        "raw": "\"#.....h..#\""
+      },
+      {
+        "line": 76,
+        "raw": "\"#.q....c.#\""
+      },
+      {
+        "line": 76,
+        "raw": "\"#h..##..##\""
+      },
+      {
+        "line": 76,
+        "raw": "\"#...q....#\""
+      },
+      {
+        "line": 76,
+        "raw": "\"#.x.#..c.#\""
+      },
+      {
+        "line": 76,
+        "raw": "\"##..#.r.##\""
+      },
+      {
+        "line": 76,
+        "raw": "\"#.c....c.#\""
+      },
+      {
+        "line": 76,
+        "raw": "\"#..h..h..#\""
+      },
+      {
+        "line": 76,
+        "raw": "\"##.....###\""
+      },
+      {
+        "line": 76,
+        "raw": "\"#.c.rr.c.#\""
+      },
+      {
+        "line": 76,
+        "raw": "\"EE......EE\""
+      },
+      {
+        "line": 77,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 77,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 77,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 77,
+        "raw": "'bh_sniper'"
+      },
+      {
+        "line": 77,
+        "raw": "'sith_spawn'"
+      },
+      {
+        "line": 77,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 77,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 79,
+        "raw": "'A prisoner says the Brotherhood is gathering in the caves. Copy the ritual tablets (Jedi or Medic, adjacent), then get anyone to an evac zone. Something in the dark only hunts Jedi.'"
+      },
+      {
+        "line": 80,
+        "raw": "'Scan 2 of 3 tablets, then reach an evac zone. All 3 reveals more. Threat rises after turn 6: tablets get smashed. The Sith Spawn only hurts Jedi.'"
+      },
+      {
+        "line": 81,
+        "raw": "'The tablets are out. The Council reads them twice.'"
+      },
+      {
+        "line": 81,
+        "raw": "'The caves collapse behind you. Whatever Kaan plans stays secret.'"
+      },
+      {
+        "line": 82,
+        "raw": "'All 3 tablets'"
+      },
+      {
+        "line": 83,
+        "raw": "'The Sixth Battle'"
+      },
+      {
+        "line": 83,
+        "raw": "'Brotherhood stockade · Ruusan'"
+      },
+      {
+        "line": 83,
+        "raw": "'rescue'"
+      },
+      {
+        "line": 83,
+        "raw": "'plains'"
+      },
+      {
+        "line": 83,
+        "raw": "'Lord Tarsus Vell'"
+      },
+      {
+        "line": 84,
+        "raw": "\".c..^^..c.\""
+      },
+      {
+        "line": 84,
+        "raw": "\"...#..#...\""
+      },
+      {
+        "line": 84,
+        "raw": "\".k.#..#.x.\""
+      },
+      {
+        "line": 84,
+        "raw": "\"...##D#...\""
+      },
+      {
+        "line": 84,
+        "raw": "\".c......c.\""
+      },
+      {
+        "line": 84,
+        "raw": "\"..^....^..\""
+      },
+      {
+        "line": 84,
+        "raw": "\"#..c..c..#\""
+      },
+      {
+        "line": 84,
+        "raw": "\".h..##..h.\""
+      },
+      {
+        "line": 84,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 84,
+        "raw": "\".c..cc..c.\""
+      },
+      {
+        "line": 84,
+        "raw": "\"....^^....\""
+      },
+      {
+        "line": 84,
+        "raw": "\"EE......EE\""
+      },
+      {
+        "line": 85,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 85,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 85,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 85,
+        "raw": "'bh_sniper'"
+      },
+      {
+        "line": 85,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 85,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 85,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 87,
+        "raw": "'The sixth battle went badly. Kaan\\'s men dragged an Army of Light Lord, Tarsus Vell, into a stockade. A Medic can Hack the cell door from 4 tiles; a Jedi can try the console. Then get him to an evac zone (E).'"
+      },
+      {
+        "line": 88,
+        "raw": "'Open the cell (Hack or console), then get the prisoner to an evac zone. Threat rises after turn 5; at Threat 6 they march him to Kaan.'"
+      },
+      {
+        "line": 89,
+        "raw": "'Lord Vell is out. He owes the Temple his life.'"
+      },
+      {
+        "line": 89,
+        "raw": "'Lord Vell is gone. Kaan will make an example of him.'"
+      },
+      {
+        "line": 90,
+        "raw": "'Done by turn 5'"
+      },
+      {
+        "line": 92,
+        "raw": "'The Seventh Battle'"
+      },
+      {
+        "line": 92,
+        "raw": "'Kaan\\'s line · Ruusan'"
+      },
+      {
+        "line": 92,
+        "raw": "'assault'"
+      },
+      {
+        "line": 92,
+        "raw": "'plains'"
+      },
+      {
+        "line": 92,
+        "raw": "'vorr'"
+      },
+      {
+        "line": 93,
+        "raw": "'Lord Vorr\\'s line is holding.'"
+      },
+      {
+        "line": 93,
+        "raw": "'The line is about to hold for good. Next turn the attack fails.'"
+      },
+      {
+        "line": 93,
+        "raw": "'The Army of Light falls back.'"
+      },
+      {
+        "line": 94,
+        "raw": "\"..c.^^.c..\""
+      },
+      {
+        "line": 94,
+        "raw": "\".c..MM..c.\""
+      },
+      {
+        "line": 94,
+        "raw": "\"....^^....\""
+      },
+      {
+        "line": 94,
+        "raw": "\".x.B..B.x.\""
+      },
+      {
+        "line": 94,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 94,
+        "raw": "\"#.c.cc.c.#\""
+      },
+      {
+        "line": 94,
+        "raw": "\"....rr....\""
+      },
+      {
+        "line": 94,
+        "raw": "\".h......h.\""
+      },
+      {
+        "line": 94,
+        "raw": "\"...c..c...\""
+      },
+      {
+        "line": 94,
+        "raw": "\".B......B.\""
+      },
+      {
+        "line": 94,
+        "raw": "\"..c.^^.c..\""
+      },
+      {
+        "line": 94,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 95,
+        "raw": "'vorr'"
+      },
+      {
+        "line": 95,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 95,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 95,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 95,
+        "raw": "'bh_sniper'"
+      },
+      {
+        "line": 95,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 95,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 97,
+        "raw": "'The seventh battle of Ruusan. Lord Vorr holds the high ground over Kaan\\'s line. Break him and the Army of Light can push through.'"
+      },
+      {
+        "line": 98,
+        "raw": "'Defeat Lord Vorr on the high ledge. Threat rises after turn 6; at Threat 6 the attack fails. Barrels (x) explode when shot.'"
+      },
+      {
+        "line": 99,
+        "raw": "'Vorr falls. Kaan\\'s line breaks and his army runs for the caves.'"
+      },
+      {
+        "line": 99,
+        "raw": "'The line holds. The Army of Light counts its dead.'"
+      },
+      {
+        "line": 100,
+        "raw": "'Done by turn 6'"
+      },
+      {
+        "line": 102,
+        "raw": "'The Thought Bomb'"
+      },
+      {
+        "line": 102,
+        "raw": "'Kaan\\'s ritual ground · Ruusan'"
+      },
+      {
+        "line": 102,
+        "raw": "'assault'"
+      },
+      {
+        "line": 102,
+        "raw": "'plains'"
+      },
+      {
+        "line": 102,
+        "raw": "'kaan'"
+      },
+      {
+        "line": 103,
+        "raw": "'Kaan\\'s Lords chant louder.'"
+      },
+      {
+        "line": 103,
+        "raw": "'The ritual is almost complete. Next turn it fires.'"
+      },
+      {
+        "line": 103,
+        "raw": "'The thought bomb fires.'"
+      },
+      {
+        "line": 104,
+        "raw": "'undefined'"
+      },
+      {
+        "line": 105,
+        "raw": "\"..c.##.c..\""
+      },
+      {
+        "line": 105,
+        "raw": "\".c..##..c.\""
+      },
+      {
+        "line": 105,
+        "raw": "\"....##....\""
+      },
+      {
+        "line": 105,
+        "raw": "\".x..c..x..\""
+      },
+      {
+        "line": 105,
+        "raw": "\"..r....r..\""
+      },
+      {
+        "line": 105,
+        "raw": "\".c.B..B.c.\""
+      },
+      {
+        "line": 105,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 105,
+        "raw": "\"..h.cc.h..\""
+      },
+      {
+        "line": 105,
+        "raw": "\".c......c.\""
+      },
+      {
+        "line": 105,
+        "raw": "\"...r..r...\""
+      },
+      {
+        "line": 105,
+        "raw": "\".c..cc..c.\""
+      },
+      {
+        "line": 105,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 106,
+        "raw": "'kaan'"
+      },
+      {
+        "line": 106,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 106,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 106,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 106,
+        "raw": "'undefined'"
+      },
+      {
+        "line": 107,
+        "raw": "'bane'"
+      },
+      {
+        "line": 108,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 108,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 109,
+        "raw": "'Kaan has gathered his Lords to unleash a thought bomb, a ritual that could wipe out Jedi and Sith alike. Lord Hoth is walking into the caves to stop him. Break the ritual first: defeat Kaan.'"
+      },
+      {
+        "line": 110,
+        "raw": "'Defeat Lord Kaan before Threat 6, when the bomb fires. If Darth Bane is here: kill or capture him BEFORE Kaan falls, or he walks away on turn 4.'"
+      },
+      {
+        "line": 111,
+        "raw": "'Kaan falls. The ritual breaks before it begins.'"
+      },
+      {
+        "line": 111,
+        "raw": "'The thought bomb fires.'"
+      },
+      {
+        "line": 112,
+        "raw": "'Done by the par turn'"
+      },
+      {
+        "line": 114,
+        "raw": "'shrine'"
+      },
+      {
+        "line": 114,
+        "raw": "'The Field Hospital'"
+      },
+      {
+        "line": 114,
+        "raw": "'Army of Light field hospital · Ruusan'"
+      },
+      {
+        "line": 114,
+        "raw": "'plains'"
+      },
+      {
+        "line": 114,
+        "raw": "'Hospital'"
+      },
+      {
+        "line": 115,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 115,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 115,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 115,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 115,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 115,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 115,
+        "raw": "'sith_lord'"
+      },
+      {
+        "line": 116,
+        "raw": "'Brotherhood raiders are coming for an Army of Light field hospital. Hold it for 6 turns while the healers move the wounded.'"
+      },
+      {
+        "line": 117,
+        "raw": "'Hold the hospital for 6 turns. A Sith Lord leads the last wave; troopers near him aim better.'"
+      },
+      {
+        "line": 118,
+        "raw": "'The healers get everyone out.'"
+      },
+      {
+        "line": 118,
+        "raw": "'The hospital burns.'"
+      },
+      {
+        "line": 118,
+        "raw": "'Hospital above 75%'"
+      },
+      {
+        "line": 119,
+        "raw": "'The Spawn Pit'"
+      },
+      {
+        "line": 119,
+        "raw": "'Dark-side cave · Ruusan'"
+      },
+      {
+        "line": 119,
+        "raw": "'assault'"
+      },
+      {
+        "line": 119,
+        "raw": "'caves'"
+      },
+      {
+        "line": 119,
+        "raw": "'nexus_core'"
+      },
+      {
+        "line": 120,
+        "raw": "'The nexus pulses.'"
+      },
+      {
+        "line": 120,
+        "raw": "'The nexus is about to erupt.'"
+      },
+      {
+        "line": 120,
+        "raw": "'The nexus erupts.'"
+      },
+      {
+        "line": 121,
+        "raw": "\"##..##..##\""
+      },
+      {
+        "line": 121,
+        "raw": "\"#..c..c..#\""
+      },
+      {
+        "line": 121,
+        "raw": "\"#.r....r.#\""
+      },
+      {
+        "line": 121,
+        "raw": "\"##.#..#.##\""
+      },
+      {
+        "line": 121,
+        "raw": "\"#........#\""
+      },
+      {
+        "line": 121,
+        "raw": "\"#.c.##.c.#\""
+      },
+      {
+        "line": 121,
+        "raw": "\"#...#....#\""
+      },
+      {
+        "line": 121,
+        "raw": "\"##.r..r.##\""
+      },
+      {
+        "line": 121,
+        "raw": "\"#.c....c.#\""
+      },
+      {
+        "line": 121,
+        "raw": "\"#..h..h..#\""
+      },
+      {
+        "line": 121,
+        "raw": "\"#........#\""
+      },
+      {
+        "line": 121,
+        "raw": "\"##......##\""
+      },
+      {
+        "line": 122,
+        "raw": "'nexus_core'"
+      },
+      {
+        "line": 122,
+        "raw": "'sith_spawn'"
+      },
+      {
+        "line": 122,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 122,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 122,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 122,
+        "raw": "'bh_sniper'"
+      },
+      {
+        "line": 122,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 122,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 124,
+        "raw": "'A dark-side nexus is breeding Sith Spawn in the caves. Spawn only hurt Jedi. Send troops in front and destroy the nexus heart.'"
+      },
+      {
+        "line": 125,
+        "raw": "'Destroy the Heart of the Nexus (14 HP, armor 1). It spawns a Sith Spawn every 3 turns. Threat rises after turn 7; at Threat 6 it erupts.'"
+      },
+      {
+        "line": 126,
+        "raw": "'The nexus goes dark. The cave is only a cave again.'"
+      },
+      {
+        "line": 126,
+        "raw": "'The nexus erupts. Spawn pour into the hills.'"
+      },
+      {
+        "line": 127,
+        "raw": "'Done by turn 7'"
+      },
+      {
+        "line": 128,
+        "raw": "'escort'"
+      },
+      {
+        "line": 128,
+        "raw": "'Run the Gauntlet'"
+      },
+      {
+        "line": 128,
+        "raw": "'Ridge trail · Ruusan'"
+      },
+      {
+        "line": 128,
+        "raw": "'plains'"
+      },
+      {
+        "line": 128,
+        "raw": "'courier'"
+      },
+      {
+        "line": 129,
+        "raw": "'Lord Farfalla\\'s courier carries the Army\\'s battle plans. Mercenary snipers hold the ridge. Get the courier to the shuttle.'"
+      },
+      {
+        "line": 130,
+        "raw": "'The plans reach Farfalla.'"
+      },
+      {
+        "line": 130,
+        "raw": "'The plans are lost on the ridge.'"
+      },
+      {
+        "line": 130,
+        "raw": "'Done by turn 6'"
+      },
+      {
+        "line": 131,
+        "raw": "'sabotage'"
+      },
+      {
+        "line": 131,
+        "raw": "'The Munitions Dump'"
+      },
+      {
+        "line": 131,
+        "raw": "'Brotherhood munitions dump · Ruusan'"
+      },
+      {
+        "line": 131,
+        "raw": "'plains'"
+      },
+      {
+        "line": 132,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 132,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 132,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 132,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 132,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 132,
+        "raw": "'bh_sniper'"
+      },
+      {
+        "line": 132,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 132,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 133,
+        "raw": "'Kaan\\'s army runs on this dump. Plant charges on 2 sites (anyone, adjacent, 1 action), then get every standing squad member onto the evac zone.'"
+      },
+      {
+        "line": 134,
+        "raw": "'The dump goes up behind you. The Brotherhood fights hungry for a month.'"
+      },
+      {
+        "line": 134,
+        "raw": "'The dump holds.'"
+      },
+      {
+        "line": 134,
+        "raw": "'Done by turn 7'"
+      },
+      {
+        "line": 135,
+        "raw": "'rescue'"
+      },
+      {
+        "line": 135,
+        "raw": "'The Prison Hulk'"
+      },
+      {
+        "line": 135,
+        "raw": "'Brotherhood prison camp · Ruusan'"
+      },
+      {
+        "line": 135,
+        "raw": "'plains'"
+      },
+      {
+        "line": 135,
+        "raw": "'Healer Amma Rin'"
+      },
+      {
+        "line": 136,
+        "raw": "'The Brotherhood holds Army of Light prisoners in a locked cell. A Medic can Hack the door from 4 tiles; a Jedi can try the console. Then walk the prisoner to an evac zone (E).'"
+      },
+      {
+        "line": 137,
+        "raw": "'The prisoner is out.'"
+      },
+      {
+        "line": 137,
+        "raw": "'The prisoner is lost.'"
+      },
+      {
+        "line": 137,
+        "raw": "'Done by turn 5'"
+      },
+      {
+        "line": 138,
+        "raw": "'archive'"
+      },
+      {
+        "line": 138,
+        "raw": "'Brotherhood Codes'"
+      },
+      {
+        "line": 138,
+        "raw": "'Brotherhood signal camp · Ruusan'"
+      },
+      {
+        "line": 138,
+        "raw": "'plains'"
+      },
+      {
+        "line": 139,
+        "raw": "'A Brotherhood signal camp runs Kaan\\'s orders to his Lords. Copy its terminals (Jedi or Medic, adjacent), then get anyone to an evac zone.'"
+      },
+      {
+        "line": 140,
+        "raw": "'Kaan\\'s orders are ours for a month.'"
+      },
+      {
+        "line": 140,
+        "raw": "'The camp burns its codes.'"
+      },
+      {
+        "line": 140,
+        "raw": "'All 3 terminals'"
+      },
+      {
+        "line": 141,
+        "raw": "'relay'"
+      },
+      {
+        "line": 141,
+        "raw": "'The Supply Line'"
+      },
+      {
+        "line": 141,
+        "raw": "'Army of Light supply post · Ruusan'"
+      },
+      {
+        "line": 141,
+        "raw": "'plains'"
+      },
+      {
+        "line": 141,
+        "raw": "'Supply post'"
+      },
+      {
+        "line": 142,
+        "raw": "'Brotherhood raiders want the supply post that feeds Hoth\\'s front. Hold it for 8 turns until the convoy rolls out.'"
+      },
+      {
+        "line": 143,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 143,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 143,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 143,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 143,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 143,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 143,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 143,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 144,
+        "raw": "'Hold the supply post for 8 turns.'"
+      },
+      {
+        "line": 144,
+        "raw": "'The convoy rolls out. The front eats.'"
+      },
+      {
+        "line": 144,
+        "raw": "'The supplies burn.'"
+      },
+      {
+        "line": 144,
+        "raw": "'Post above 75%'"
+      },
+      {
+        "line": 147,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 147,
+        "raw": "'bh_trooper'"
+      },
+      {
+        "line": 148,
+        "raw": "'bh_sniper'"
+      },
+      {
+        "line": 148,
+        "raw": "'bh_marauder'"
+      },
+      {
+        "line": 152,
+        "raw": "\"r_muster:0\""
+      },
+      {
+        "line": 152,
+        "raw": "\"r_ravine:0\""
+      },
+      {
+        "line": 152,
+        "raw": "\"r_caves:0\""
+      },
+      {
+        "line": 152,
+        "raw": "\"r_sixth:0\""
+      },
+      {
+        "line": 152,
+        "raw": "\"r_seventh:0\""
+      },
+      {
+        "line": 153,
+        "raw": "\"r_hospital:0\""
+      },
+      {
+        "line": 153,
+        "raw": "\"r_dump:0\""
+      },
+      {
+        "line": 153,
+        "raw": "\"r_prisoners:0\""
+      },
+      {
+        "line": 153,
+        "raw": "\"r_codes:0\""
+      },
+      {
+        "line": 153,
+        "raw": "\"r_supply:0\""
+      },
+      {
+        "line": 156,
+        "raw": "'Raid on the field hospital'"
+      },
+      {
+        "line": 156,
+        "raw": "'Defend'"
+      },
+      {
+        "line": 156,
+        "raw": "'Army of Light'"
+      },
+      {
+        "line": 156,
+        "raw": "'r_hospital'"
+      },
+      {
+        "line": 156,
+        "raw": "'Brotherhood raiders are closing on a hospital full of wounded Jedi.'"
+      },
+      {
+        "line": 157,
+        "raw": "'The spawn pit'"
+      },
+      {
+        "line": 157,
+        "raw": "'Assault'"
+      },
+      {
+        "line": 157,
+        "raw": "'Jedi'"
+      },
+      {
+        "line": 157,
+        "raw": "'r_nexus'"
+      },
+      {
+        "line": 157,
+        "raw": "'Scouts found a cave where the dark side is breeding horrors. Only troops can stand near them.'"
+      },
+      {
+        "line": 158,
+        "raw": "'Courier on the ridge'"
+      },
+      {
+        "line": 158,
+        "raw": "'Escort'"
+      },
+      {
+        "line": 158,
+        "raw": "'Army of Light'"
+      },
+      {
+        "line": 158,
+        "raw": "'r_snipers'"
+      },
+      {
+        "line": 158,
+        "raw": "'Farfalla\\'s courier is pinned under sniper fire with the Army\\'s plans.'"
+      },
+      {
+        "line": 159,
+        "raw": "'Brotherhood munitions dump'"
+      },
+      {
+        "line": 159,
+        "raw": "'Sabotage'"
+      },
+      {
+        "line": 159,
+        "raw": "'Army of Light'"
+      },
+      {
+        "line": 159,
+        "raw": "'r_dump'"
+      },
+      {
+        "line": 159,
+        "raw": "'Blow the dump that feeds Kaan\\'s army.'"
+      },
+      {
+        "line": 160,
+        "raw": "'The prison hulk'"
+      },
+      {
+        "line": 160,
+        "raw": "'Rescue'"
+      },
+      {
+        "line": 160,
+        "raw": "'Army of Light'"
+      },
+      {
+        "line": 160,
+        "raw": "'r_prisoners'"
+      },
+      {
+        "line": 160,
+        "raw": "'A healer of the Army of Light is held in a Brotherhood camp.'"
+      },
+      {
+        "line": 161,
+        "raw": "'Brotherhood signal camp'"
+      },
+      {
+        "line": 161,
+        "raw": "'Investigate'"
+      },
+      {
+        "line": 161,
+        "raw": "'Jedi'"
+      },
+      {
+        "line": 161,
+        "raw": "'r_codes'"
+      },
+      {
+        "line": 161,
+        "raw": "'A camp is relaying Kaan\\'s orders. Copy them and get out.'"
+      },
+      {
+        "line": 162,
+        "raw": "'The supply line'"
+      },
+      {
+        "line": 162,
+        "raw": "'Defend'"
+      },
+      {
+        "line": 162,
+        "raw": "'Army of Light'"
+      },
+      {
+        "line": 162,
+        "raw": "'r_supply'"
+      },
+      {
+        "line": 162,
+        "raw": "'Raiders are closing on the post that feeds Hoth\\'s front.'"
+      },
+      {
+        "line": 166,
+        "raw": "'r_muster'"
+      },
+      {
+        "line": 166,
+        "raw": "'r_hospital'"
+      },
+      {
+        "line": 166,
+        "raw": "'r_snipers'"
+      },
+      {
+        "line": 166,
+        "raw": "'r_ravine'"
+      },
+      {
+        "line": 166,
+        "raw": "'r_dump'"
+      },
+      {
+        "line": 166,
+        "raw": "'r_codes'"
+      },
+      {
+        "line": 168,
+        "raw": "'r_nexus'"
+      },
+      {
+        "line": 168,
+        "raw": "'r_prisoners'"
+      },
+      {
+        "line": 168,
+        "raw": "'r_caves'"
+      },
+      {
+        "line": 168,
+        "raw": "'r_supply'"
+      },
+      {
+        "line": 168,
+        "raw": "'r_snipers'"
+      },
+      {
+        "line": 168,
+        "raw": "'r_sixth'"
+      },
+      {
+        "line": 170,
+        "raw": "'r_dump'"
+      },
+      {
+        "line": 170,
+        "raw": "'r_hospital'"
+      },
+      {
+        "line": 170,
+        "raw": "'r_codes'"
+      },
+      {
+        "line": 170,
+        "raw": "'r_seventh'"
+      },
+      {
+        "line": 170,
+        "raw": "'r_nexus'"
+      },
+      {
+        "line": 170,
+        "raw": "'r_prisoners'"
+      },
+      {
+        "line": 170,
+        "raw": "'r_supply'"
+      },
+      {
+        "line": 170,
+        "raw": "'r_bomb'"
+      },
+      {
+        "line": 174,
+        "raw": "'Lord Ressa Vaun'"
+      },
+      {
+        "line": 174,
+        "raw": "'Guardian'"
+      },
+      {
+        "line": 174,
+        "raw": "'Knight'"
+      },
+      {
+        "line": 174,
+        "raw": "'saberThrow'"
+      },
+      {
+        "line": 174,
+        "raw": "'leap'"
+      },
+      {
+        "line": 174,
+        "raw": "'#ffd166'"
+      },
+      {
+        "line": 175,
+        "raw": "'Kell Darrow'"
+      },
+      {
+        "line": 175,
+        "raw": "'Consular'"
+      },
+      {
+        "line": 175,
+        "raw": "'Padawan'"
+      },
+      {
+        "line": 175,
+        "raw": "'#8fe3ff'"
+      },
+      {
+        "line": 176,
+        "raw": "'Sgt. Bo Hallan'"
+      },
+      {
+        "line": 176,
+        "raw": "'Soldier'"
+      },
+      {
+        "line": 176,
+        "raw": "'Mira Tesk'"
+      },
+      {
+        "line": 176,
+        "raw": "'Scout'"
+      },
+      {
+        "line": 176,
+        "raw": "'Doc Ilo Venn'"
+      },
+      {
+        "line": 176,
+        "raw": "'Medic'"
+      },
+      {
+        "line": 176,
+        "raw": "'Rusk Abernath'"
+      },
+      {
+        "line": 176,
+        "raw": "'Heavy'"
+      },
+      {
+        "line": 179,
+        "raw": "'Lord Hoth'"
+      },
+      {
+        "line": 179,
+        "raw": "'Lord Valenthyne Farfalla'"
+      },
+      {
+        "line": 182,
+        "raw": "'Johun Othone'"
+      },
+      {
+        "line": 182,
+        "raw": "'Guardian'"
+      },
+      {
+        "line": 182,
+        "raw": "'Knight'"
+      },
+      {
+        "line": 182,
+        "raw": "'defLine'"
+      },
+      {
+        "line": 182,
+        "raw": "'reflectM'"
+      },
+      {
+        "line": 182,
+        "raw": "'sweep'"
+      },
+      {
+        "line": 182,
+        "raw": "'#7fd99a'"
+      },
+      {
+        "line": 183,
+        "raw": "'Tarn Vel'"
+      },
+      {
+        "line": 183,
+        "raw": "'Consular'"
+      },
+      {
+        "line": 183,
+        "raw": "'Padawan'"
+      },
+      {
+        "line": 183,
+        "raw": "'#c9b6ff'"
+      },
+      {
+        "line": 188,
+        "raw": "'e2_lord_titles'"
+      },
+      {
+        "line": 188,
+        "raw": "'era_start'"
+      },
+      {
+        "line": 188,
+        "raw": "'Army of Light Jedi call themselves Lords and give orders like generals. Some Masters hate it.'"
+      },
+      {
+        "line": 189,
+        "raw": "'Hoth\\'s way: keep the titles'"
+      },
+      {
+        "line": 189,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 189,
+        "raw": "'Farfalla\\'s way: drop them'"
+      },
+      {
+        "line": 189,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 189,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 190,
+        "raw": "'e2_deserter'"
+      },
+      {
+        "line": 190,
+        "raw": "'month'"
+      },
+      {
+        "line": 190,
+        "raw": "'A Brotherhood apprentice walks into camp, unarmed, asking for mercy.'"
+      },
+      {
+        "line": 191,
+        "raw": "'Accept him'"
+      },
+      {
+        "line": 191,
+        "raw": "'redeemed_apprentice'"
+      },
+      {
+        "line": 191,
+        "raw": "'squad_leader'"
+      },
+      {
+        "line": 191,
+        "raw": "'Imprison him'"
+      },
+      {
+        "line": 191,
+        "raw": "'Turn him away'"
+      },
+      {
+        "line": 192,
+        "raw": "'e2_hoth_charge'"
+      },
+      {
+        "line": 192,
+        "raw": "'after_mission'"
+      },
+      {
+        "line": 192,
+        "raw": "'Lord Hoth wants your strike teams at the front of his next charge. \"A Lord leads from the front.\"'"
+      },
+      {
+        "line": 193,
+        "raw": "'Hoth\\'s way: lead the charge'"
+      },
+      {
+        "line": 193,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 193,
+        "raw": "'squad_leader'"
+      },
+      {
+        "line": 193,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 194,
+        "raw": "'Farfalla\\'s way: scout instead'"
+      },
+      {
+        "line": 194,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 194,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 195,
+        "raw": "'e2_child_soldiers'"
+      },
+      {
+        "line": 195,
+        "raw": "'after_mission'"
+      },
+      {
+        "line": 195,
+        "raw": "'Villages are sending their teenagers to fight for the Army of Light. You need the numbers.'"
+      },
+      {
+        "line": 196,
+        "raw": "'Farfalla\\'s way: send them home'"
+      },
+      {
+        "line": 196,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 196,
+        "raw": "'Rear duties only'"
+      },
+      {
+        "line": 197,
+        "raw": "'e2_farfalla_amnesty'"
+      },
+      {
+        "line": 197,
+        "raw": "'act'"
+      },
+      {
+        "line": 197,
+        "raw": "'Farfalla wants to offer Brotherhood troopers amnesty if they lay down their arms. Hoth calls it a trick that will get Jedi killed.'"
+      },
+      {
+        "line": 198,
+        "raw": "'Farfalla\\'s way: offer amnesty'"
+      },
+      {
+        "line": 198,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 198,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 199,
+        "raw": "'Hoth\\'s way: no terms for Kaan\\'s army'"
+      },
+      {
+        "line": 199,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 199,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 200,
+        "raw": "'e2_cave_whispers'"
+      },
+      {
+        "line": 200,
+        "raw": "'flag'"
+      },
+      {
+        "line": 200,
+        "raw": "'e2_caves_done'"
+      },
+      {
+        "line": 200,
+        "raw": "'A Jedi back from the caves can\\'t stop hearing a voice. It promises strength.'"
+      },
+      {
+        "line": 201,
+        "raw": "'Halls of Healing'"
+      },
+      {
+        "line": 201,
+        "raw": "'jedi_highestDark'"
+      },
+      {
+        "line": 201,
+        "raw": "'jedi_highestDark'"
+      },
+      {
+        "line": 201,
+        "raw": "'Listen to it'"
+      },
+      {
+        "line": 201,
+        "raw": "'jedi_highestDark'"
+      },
+      {
+        "line": 202,
+        "raw": "'e2_farfalla'"
+      },
+      {
+        "line": 202,
+        "raw": "'month'"
+      },
+      {
+        "line": 202,
+        "raw": "'Lord Farfalla wants to pull the army back to save lives. Lord Hoth wants one last push.'"
+      },
+      {
+        "line": 203,
+        "raw": "'Hoth\\'s way: one last push'"
+      },
+      {
+        "line": 203,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 203,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 203,
+        "raw": "'e2_push'"
+      },
+      {
+        "line": 203,
+        "raw": "'Farfalla\\'s way: pull back'"
+      },
+      {
+        "line": 203,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 203,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 204,
+        "raw": "'e2_hoth_student'"
+      },
+      {
+        "line": 204,
+        "raw": "'all'"
+      },
+      {
+        "line": 204,
+        "raw": "'flag'"
+      },
+      {
+        "line": 204,
+        "raw": "'e2_johun_saved'"
+      },
+      {
+        "line": 204,
+        "raw": "'loyal'"
+      },
+      {
+        "line": 204,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 205,
+        "raw": "'Hoth trusts you now. He offers you the student you pulled out of the ravine: Johun Othone, a Knight with a long memory.'"
+      },
+      {
+        "line": 206,
+        "raw": "'Take Johun'"
+      },
+      {
+        "line": 206,
+        "raw": "'johun'"
+      },
+      {
+        "line": 206,
+        "raw": "'johun_joined'"
+      },
+      {
+        "line": 206,
+        "raw": "'He belongs at his master\\'s side'"
+      },
+      {
+        "line": 206,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 206,
+        "raw": "'e2_johun_hoth'"
+      },
+      {
+        "line": 207,
+        "raw": "'e2_farfalla_healers'"
+      },
+      {
+        "line": 207,
+        "raw": "'loyal'"
+      },
+      {
+        "line": 207,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 207,
+        "raw": "'Farfalla sends his own healers to the Temple, no strings attached. \"Use them where they save the most.\"'"
+      },
+      {
+        "line": 208,
+        "raw": "'Keep them at the Temple'"
+      },
+      {
+        "line": 208,
+        "raw": "'Send them to the front'"
+      },
+      {
+        "line": 209,
+        "raw": "'e2_bane_rumor'"
+      },
+      {
+        "line": 209,
+        "raw": "'all'"
+      },
+      {
+        "line": 209,
+        "raw": "'act'"
+      },
+      {
+        "line": 209,
+        "raw": "'notFlag'"
+      },
+      {
+        "line": 209,
+        "raw": "'e2_bane_seen'"
+      },
+      {
+        "line": 209,
+        "raw": "'Scouts saw a Sith walk away from Kaan\\'s camp at night. Nobody else cares.'"
+      },
+      {
+        "line": 210,
+        "raw": "'Assign trackers'"
+      },
+      {
+        "line": 210,
+        "raw": "'e2_bane_tracked'"
+      },
+      {
+        "line": 210,
+        "raw": "'Focus on Kaan'"
+      },
+      {
+        "line": 211,
+        "raw": "'e2_hoth_last'"
+      },
+      {
+        "line": 211,
+        "raw": "'flag'"
+      },
+      {
+        "line": 211,
+        "raw": "'e2_seventh_done'"
+      },
+      {
+        "line": 211,
+        "raw": "'If the ritual starts, Hoth will walk into Kaan\\'s caves himself. Farfalla begs him not to.'"
+      },
+      {
+        "line": 212,
+        "raw": "'Hoth\\'s way: he goes in'"
+      },
+      {
+        "line": 212,
+        "raw": "'e2_hoth_goes'"
+      },
+      {
+        "line": 212,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 212,
+        "raw": "'Farfalla\\'s way: he waits outside'"
+      },
+      {
+        "line": 212,
+        "raw": "'e2_hoth_waits'"
+      },
+      {
+        "line": 212,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 215,
+        "raw": "'e2_bane_dead'"
+      },
+      {
+        "line": 215,
+        "raw": "'Darth Bane died on Ruusan. No one is left to teach the Rule of Two.'"
+      },
+      {
+        "line": 216,
+        "raw": "'e2_bane_captured'"
+      },
+      {
+        "line": 216,
+        "raw": "'Darth Bane sits in a Jedi cell. The Sith line has no teacher.'"
+      },
+      {
+        "line": 217,
+        "raw": "'e2_bane_escaped'"
+      },
+      {
+        "line": 217,
+        "raw": "'One Sith walked away from Ruusan. Always two, he says.'"
+      },
+      {
+        "line": 219,
+        "raw": "'Kaan fell before the ritual. Lord Hoth lives, and takes a Council seat.'"
+      },
+      {
+        "line": 220,
+        "raw": "'The thought bomb fired. Hoth is gone; the Army of Light buries its Lords.'"
+      },
+      {
+        "line": 221,
+        "raw": "'The thought bomb fired. Hoth waited outside, as Farfalla asked, and lives to bury his Lords.'"
+      },
+      {
+        "line": 222,
+        "raw": "'The Brotherhood is broken. The Order begins to put down its Lord titles.'"
+      },
+      {
+        "line": 223,
+        "raw": "'Ruusan is a graveyard. The Order rebuilds, quieter and more afraid.'"
+      },
+      {
+        "line": 224,
+        "raw": "'The Order is drifting. The Army of Light liked being an army.'"
+      },
+      {
+        "line": 225,
+        "raw": "'You read the ritual tablets: you knew about the thought bomb.'"
+      },
+      {
+        "line": 225,
+        "raw": "'Your scouts saw a lone Sith walk away from the caves.'"
+      },
+      {
+        "line": 226,
+        "raw": "'Lord Hoth survived Ruusan. In canon he died in the thought bomb.'"
+      },
+      {
+        "line": 226,
+        "raw": "'The thought bomb fired, as it did in canon.'"
+      },
+      {
+        "line": 227,
+        "raw": "'Trackers followed the lone Sith into the hills.'"
+      },
+      {
+        "line": 228,
+        "raw": "'You pulled Johun Othone out of the ravine.'"
+      },
+      {
+        "line": 228,
+        "raw": "'Johun Othone fought under your command.'"
+      },
+      {
+        "line": 228,
+        "raw": "'Lord Tarsus Vell came home from the stockade.'"
+      },
+      {
+        "line": 229,
+        "raw": "'Lord Vorr fell in the seventh battle.'"
+      },
+      {
+        "line": 229,
+        "raw": "'Hoth walked into the caves himself.'"
+      },
+      {
+        "line": 229,
+        "raw": "'Farfalla kept Hoth out of the caves.'"
+      },
+      {
+        "line": 232,
+        "raw": "'Hoth walks the field shaking hands. He remembers every name.'"
+      },
+      {
+        "line": 232,
+        "raw": "'Half the army lands in the wrong valley.'"
+      },
+      {
+        "line": 233,
+        "raw": "'Johun asks your name twice so he won\\'t forget it.'"
+      },
+      {
+        "line": 233,
+        "raw": "'Hoth reads the list of the dead himself.'"
+      },
+      {
+        "line": 234,
+        "raw": "'The tablets describe something no one on the Council wants to say out loud.'"
+      },
+      {
+        "line": 234,
+        "raw": "'Whatever Kaan is planning, he plans it in the dark.'"
+      },
+      {
+        "line": 235,
+        "raw": "'Lord Vell can\\'t hold a saber yet. He holds a cup of caf and doesn\\'t let go.'"
+      },
+      {
+        "line": 235,
+        "raw": "'Kaan sends Vell\\'s saber back. Only the saber.'"
+      },
+      {
+        "line": 236,
+        "raw": "'Kaan\\'s army runs for the caves. Nobody asks why the caves.'"
+      },
+      {
+        "line": 236,
+        "raw": "'Six battles became seven. Nobody has won any of them.'"
+      },
+      {
+        "line": 237,
+        "raw": "'Two armies walk off Ruusan. One of them is much smaller.'"
+      },
+      {
+        "line": 237,
+        "raw": "'The caves are a crater. The silence after is the loudest thing on Ruusan.'"
+      },
+      {
+        "line": 238,
+        "raw": "'“Hold the light, and the rest of us will find it.” — Lord Hoth'"
+      },
+      {
+        "line": 239,
+        "raw": "'“Bring my student home. Bring them all home.” — Lord Hoth'"
+      },
+      {
+        "line": 240,
+        "raw": "'“Kaan is afraid. Find out of what.” — Lord Farfalla'"
+      },
+      {
+        "line": 241,
+        "raw": "'“One more battle. It is always one more battle.” — Lord Farfalla'"
+      },
+      {
+        "line": 242,
+        "raw": "'“If Kaan wants a storm, he can have one. I will be standing in it.” — Lord Hoth'"
+      },
+      {
+        "line": 246,
+        "raw": "'Kaan\\'s foot soldiers. They believe their Lords will make them more than human. Most die believing it.'"
+      },
+      {
+        "line": 247,
+        "raw": "'Sith who gave up everything but the fight. Every wound makes them hit harder.'"
+      },
+      {
+        "line": 248,
+        "raw": "'The Brotherhood made everyone with a red blade a Lord. Kaan said it made them equal. It made them many.'"
+      },
+      {
+        "line": 249,
+        "raw": "'Hired guns from the Outer Rim. They don\\'t care who wins Ruusan as long as someone pays.'"
+      },
+      {
+        "line": 250,
+        "raw": "'Dark-side things that crawl out where the Force is wounded. Blasters bother them. Jedi feed them.'"
+      },
+      {
+        "line": 251,
+        "raw": "'A place where too much hate soaked into the ground. The Force sours around it.'"
+      },
+      {
+        "line": 252,
+        "raw": "'The oldest, deepest wound in the caves. Destroy it and the Spawn stop coming.'"
+      },
+      {
+        "line": 253,
+        "raw": "'Kaan\\'s field commander, a soldier first and a Sith second. He holds high ground the way other men hold grudges. [N]'"
+      },
+      {
+        "line": 254,
+        "raw": "'Skere Kaan, Dark Lord of the Brotherhood. Charismatic, reckless, and out of options. (Legends, High)'"
+      },
+      {
+        "line": 255,
+        "raw": "'A Sith who thinks Kaan\\'s army is a mistake. He may be planning to let it die. (Legends, High)'"
+      },
+      {
+        "line": 256,
+        "raw": "'Lord Hoth leads the Army of Light. A blunt soldier who never wanted to be one. In canon he dies in the thought bomb. (Legends, High)'"
+      },
+      {
+        "line": 257,
+        "raw": "'Valenthyne Farfalla, a Lord of the Army of Light. Flamboyant, merciful, and the one who leads the Jedi after Ruusan. (Legends, High)'"
+      },
+      {
+        "line": 258,
+        "raw": "'Johun Othone, Hoth\\'s student. In canon he survives Ruusan and builds its memorial. (Legends, High)'"
+      },
+      {
+        "line": 259,
+        "raw": "'Lord Kaan built the Brotherhood of Darkness by making every Sith a Lord. Equality, he called it. It made the Sith easy to count. (Legends, High)'"
+      },
+      {
+        "line": 260,
+        "raw": "'Darth Bane. In canon he walks away from Ruusan, the only Sith left, and writes the Rule of Two. (Legends, High)'"
+      },
+      {
+        "line": 261,
+        "raw": "'A Brotherhood apprentice who walked into a Jedi camp with his hands open. Nobody is sure yet whether he meant it. [N]'"
+      },
+      {
+        "line": 262,
+        "raw": "'Lord Tarsus Vell, an Army of Light Lord taken in the sixth battle. Loud, brave, and very glad to be alive. [N]'"
+      },
+      {
+        "line": 263,
+        "raw": "'The Army of Light came to Ruusan in transports, lit down by a single beacon. [N]'"
+      },
+      {
+        "line": 264,
+        "raw": "'Ruusan\\'s ravines filled with the wounded of seven battles.'"
+      },
+      {
+        "line": 264,
+        "raw": "'Kaan\\'s Lords met in the caves to plan their last move.'"
+      },
+      {
+        "line": 265,
+        "raw": "'The sixth battle of Ruusan went to the Brotherhood. Its prisoners went to Kaan. (battle count: Legends, High; details [N])'"
+      },
+      {
+        "line": 266,
+        "raw": "'The seventh and last battle of Ruusan. Kaan\\'s army broke and fled into the caves. (Legends, High)'"
+      },
+      {
+        "line": 267,
+        "raw": "'The thought bomb: a ritual that drew in every Force user nearby and did not let go. (Legends, High)'"
+      },
+      {
+        "line": 268,
+        "raw": "'The Army of Light ran its hospitals in tents, close enough to the front to hear it. [N]'"
+      },
+      {
+        "line": 269,
+        "raw": "'Ruusan\\'s caves held old dark-side wounds. The Spawn came from somewhere. [N]'"
+      },
+      {
+        "line": 270,
+        "raw": "'Kaan paid mercenaries in plunder. The ridges of Ruusan were full of them. [N]'"
+      },
+      {
+        "line": 271,
+        "raw": "'An army of Lords still needs blaster gas. Kaan kept his in one place. [N]'"
+      },
+      {
+        "line": 272,
+        "raw": "'The Brotherhood took prisoners to break them, and sometimes to turn them. [N]'"
+      },
+      {
+        "line": 273,
+        "raw": "'Kaan gave his orders by courier and by signal. The signals were faster, and easier to steal. [N]'"
+      },
+      {
+        "line": 274,
+        "raw": "'Hoth\\'s army ate what the convoys brought. When the convoys stopped, so did the army. [N]'"
+      },
+      {
+        "line": 275,
+        "raw": "'A green Mid Rim world that hosted seven battles between the Army of Light and the Brotherhood of Darkness. (Legends, High)'"
+      },
+      {
+        "line": 276,
+        "raw": "'undefined'"
+      },
+      {
+        "line": 278,
+        "raw": "'r_muster'"
+      },
+      {
+        "line": 278,
+        "raw": "'r_caves'"
+      },
+      {
+        "line": 278,
+        "raw": "'r_sixth'"
+      },
+      {
+        "line": 278,
+        "raw": "'r_hospital'"
+      },
+      {
+        "line": 278,
+        "raw": "'r_nexus'"
+      },
+      {
+        "line": 278,
+        "raw": "'r_snipers'"
+      },
+      {
+        "line": 278,
+        "raw": "'r_dump'"
+      },
+      {
+        "line": 278,
+        "raw": "'r_prisoners'"
+      },
+      {
+        "line": 278,
+        "raw": "'r_codes'"
+      },
+      {
+        "line": 278,
+        "raw": "'r_supply'"
+      },
+      {
+        "line": 278,
+        "raw": "'ruusan'"
+      },
+      {
+        "line": 279,
+        "raw": "'ruusan'"
+      },
+      {
+        "line": 279,
+        "raw": "'johun'"
+      },
+      {
+        "line": 279,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 279,
+        "raw": "'ruusan'"
+      },
+      {
+        "line": 279,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 279,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 279,
+        "raw": "'ruusan'"
+      },
+      {
+        "line": 279,
+        "raw": "'kaan'"
+      },
+      {
+        "line": 279,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 279,
+        "raw": "'bane'"
+      },
+      {
+        "line": 280,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 280,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 280,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 280,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 280,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 280,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 280,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 281,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 281,
+        "raw": "'johun'"
+      },
+      {
+        "line": 281,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 281,
+        "raw": "'bane'"
+      },
+      {
+        "line": 281,
+        "raw": "'hoth'"
+      },
+      {
+        "line": 281,
+        "raw": "'farfalla'"
+      },
+      {
+        "line": 281,
+        "raw": "'tarn_vel'"
+      }
+    ]
+  },
+  "text": "/* Era 2 data: Ruusan (~1,006–1,000 BBY), 12 missions in 3 Acts. Spec: docs/specs/story.md §2 Era 2, combat.md §3 (Ruusan roster), campaign.md §1.4 (era jump).\n   Loads after data-story.js and data-codex.js; adds to FOES, MISSIONS, CRISES, ESCORTS, EVENTS, COUNCIL_SEATS, STORY_RECRUITS, FLAG_LINES, EPI, CODEX. Logic: story-era2.js.\n   Lore confidence (Legends): Army of Light vs Brotherhood of Darkness, seven battles of Ruusan, ending ~1,000 BBY (High); Brotherhood founded ~1,006 BBY (Med);\n   thought bomb killed Hoth and Kaan (High); Bane survived and founded the Rule of Two (High); Farfalla led the Jedi after (High);\n   Johun Othone was Hoth's student and built the Ruusan memorial (High). [N] = our invention. */\nconst ERA2={n:'Ruusan',bby:1006,next:'High Republic · ~232 BBY',\n shard:{t:'A second shard',text:'The sealed vision stirs again. One Sith walks out of a storm of light alone. A voice says: always two. The fire on the Temple steps burns a little brighter.'},\n jump:'Twenty-six centuries pass. The Sith Empire is gone, and the Sith came back anyway. The Order is an army now: Lord Hoth\\'s Army of Light against Lord Kaan\\'s Brotherhood of Darkness. The war is drifting toward a green world called Ruusan.',\n // Era jump (spec B §1.4). warChest = Army of Light funds on arrival [Default, not in spec].\n carry:{credits:.3,favorTo:50,orderDark:.5,warChest:200},\n eraMod:1};   // +1 HP to every Era 2 foe if Malgus was not stopped (spec B: +1 enemy tier per lost boss)\n// Years pass text and Act shards for Era 2 (swapped into ACTS/SHARDS while Era 2 runs).\nconst ACTS2={2:{t:'Years pass',text:'Three years of war. The Army of Light and the Brotherhood trade worlds and bodies. Both sides start calling Ruusan the place it ends.'},\n 3:{t:'The last battles',text:'Three more years. Six battles on Ruusan and nobody has won. Kaan is losing, and losing men do desperate things.'}};\nconst SHARDS2={2:'The vision returns: a cave mouth full of light, and Jedi and Sith walking into it together.',\n 3:'The vision is clear now: one Sith walking away from a storm of light. Behind him, nobody is left to follow.'};\n\n// Ruusan roster (spec A §3). Engine flags (Chat X: rules.js/ai.js): lordAura, fanatic, rage, autoOW, nexus, bane.\nObject.assign(FOES,{\n bh_trooper:{n:'Brotherhood Trooper',ic:'e_trooper',hp:5,aim:65,mob:5,dmg:[2,4],range:8,fanatic:1,lordAura:10,init:8,\n  desc:'Fanatic: never surrenders. +10 aim within 4 tiles of a Sith Lord.'},\n bh_marauder:{n:'Sith Marauder',ic:'e_acolyte',hp:9,aim:75,mob:6,dmg:[4,6],range:1.5,deflect:25,guardDef:25,force:1,rage:1,noCap:1,init:14,\n  desc:'Melee duelist. Rage: +1 damage each time it is hit (max +3).'},\n sith_lord:{n:'Sith Lord',ic:'e_acolyte',hp:12,aim:80,mob:5,dmg:[4,6],range:1.5,deflect:30,guardDef:30,force:1,lightning:[3,5],sithLord:1,noCap:1,init:15,\n  desc:'Elite duelist with Force lightning. Brotherhood troopers near it aim better.'},\n bh_sniper:{n:'Mercenary Sniper',ic:'e_agent',hp:5,aim:75,mob:4,dmg:[4,5],range:11,autoOW:1,init:10,\n  desc:'Long range. Goes on overwatch every turn it does not shoot.'},\n sith_spawn:{n:'Sith Spawn',ic:'e_horror',hp:10,aim:75,mob:5,dmg:[4,6],range:1.5,horror:1,noCap:1,init:11,\n  desc:'Force horror: only hurts Jedi. Troops are immune and are the counter.'},\n nexus:{n:'Dark Nexus',ic:'darkness',hp:8,aim:0,mob:0,dmg:[0,0],range:0,armor:1,force:1,noCap:1,nexus:3,init:1,\n  desc:'A wound in the Force. Does not move or attack; spawns a Sith Spawn beside it every 3 turns until destroyed.'},\n nexus_core:{n:'Heart of the Nexus',ic:'darkness',hp:14,aim:0,mob:0,dmg:[0,0],range:0,armor:1,force:1,noCap:1,nexus:3,boss:1,init:1,\n  desc:'The cave\\'s dark heart. Spawns a Sith Spawn every 3 turns. Destroy it to win.'},\n vorr:{n:'Lord Vorr',ic:'e_acolyte',hp:12,aim:80,mob:5,dmg:[4,6],range:1.5,deflect:30,guardDef:30,force:1,lightning:[3,4],armor:1,sithLord:1,noCap:1,boss:1,init:15,\n  desc:'Kaan\\'s field commander. Lightning and a hard saber, armor 1. Defeat him to break the line.'},  // [N]\n kaan:{n:'Lord Kaan',ic:'e_acolyte',hp:14,aim:80,mob:5,dmg:[4,6],range:1.5,deflect:30,guardDef:30,force:1,lightning:[3,5],armor:1,sithLord:1,noCap:1,boss:1,init:16,\n  desc:'Dark Lord of the Brotherhood. Lightning, a hard saber, armor 1. Defeat him to break the ritual.'},\n bane:{n:'Darth Bane',ic:'e_acolyte',hp:12,aim:80,mob:5,dmg:[5,6],range:1.5,deflect:35,guardDef:35,force:1,lightning:[3,4],armor:2,sithLord:1,bane:1,init:15,\n  desc:'Hidden target. Armor 2. Can be captured if stunned or beaten down. Watches from the ridge and fights only units next to him. Walks away on turn 4.'}});\n\n// Escort VIPs for Ruusan.\nObject.assign(ESCORTS,{\n johun:{n:'Johun Othone (wounded)',cls:'VIP',ic:'vip',hp:6,aim:60,mob:3,dmg:[2,3],range:1.5,init:6,abil:['stabilize','door']},\n courier:{n:'Courier Ryl Danu',cls:'VIP',ic:'vip',hp:6,aim:55,mob:4,dmg:[1,2],range:6,init:6,abil:['stabilize','door']}});\n\n// Reskin an Era 1 mission (or one of its alt layouts) for Ruusan: mirrored layout (flip:false keeps it as is), foe types swapped, pods and patrol routes kept, Era 1 alts dropped.\nconst RU_FOES={trooper:'bh_trooper',heavy:'bh_marauder',agent:'bh_sniper',mando:'bh_trooper',envoy:'bh_trooper',acolyte:'bh_marauder',terentatek:'sith_spawn'};\nfunction ruusanOf(id,x,alt){const B=alt!=null?{...MISSIONS[id],...MISSIONS[id].alts[alt]}:MISSIONS[id],f=t=>RU_FOES[t]||t,o={alts:[],era:2,quote:undefined,...x},fl=x.flip===false?X=>X:X=>W-1-X;\n const M=x.flip===false?{...B,story:0,...o}:mirrorMission(B,o);\n if(!x.foes&&B.foes)M.foes=B.foes.map(([t,X,Y,...r])=>[f(t),fl(X),Y,...r]);\n if(!x.reinforce&&B.reinforce)M.reinforce=B.reinforce.map(f);\n if(!x.waves&&B.waves){M.waves={};for(const k in B.waves)M.waves[k]=B.waves[k].map(f)}\n if(!x.patrol&&B.patrol){M.patrol={};for(const k in B.patrol)M.patrol[k]=B.patrol[k].map(([X,Y])=>[fl(X),Y])}\n return M}\n\nObject.assign(MISSIONS,{\n // ── Act I (~1,006 BBY) ──\n r_muster:{n:'The Muster',where:'Army of Light landing field · Ruusan',type:'defend',story:1,era:2,theme:'plains',turns:7,obj:20,objName:'Landing beacon',lastWave:5,\n  map:[\"..........\",\"..c....c..\",\".x..##..c.\",\"....^^....\",\".c......c.\",\"##.c..c.##\",\"....^^....\",\".h......h.\",\"..c.cc.c..\",\"^........^\",\"...cOOc...\",\"..........\"],\n  waves:{1:['bh_trooper','bh_trooper','bh_trooper'],3:['bh_trooper','bh_marauder','bh_sniper'],5:['sith_lord','bh_marauder','bh_trooper']},\n  start:[[3,9],[6,9],[2,9],[7,9],[4,11],[5,11]],\n  brief:'Lord Hoth is landing his army on Ruusan, and the Brotherhood knows it. Hold the landing beacon for 7 turns so the transports can find the field.',\n  goal:'Hold the landing beacon for 7 turns. A Sith Lord leads the last wave; troopers near him aim better.',\n  win:'The transports come down. The Army of Light is on Ruusan.',lose:'The beacon goes dark. Half the transports scatter.',\n  reward:{credits:80},bonus:{credits:30},bonusTxt:'Beacon above 75%'},\n r_ravine:{n:'Ravine of the Wounded',where:'Field hospital ravine · Ruusan',type:'escort',story:1,era:2,theme:'plains',par:6,vip:'johun',\n  map:[\"EE...c..EE\",\"E..c...c.E\",\"..h....h..\",\".c..B..x..\",\"....rr....\",\"#..c..c..#\",\"..x....c..\",\".h..BB..h.\",\"..........\",\".c.r..r.c.\",\"..........\",\"..c.cc.c..\"],\n  hostage:[4,10],foes:[['bh_trooper',1,2],['bh_trooper',8,3],['bh_marauder',5,5],['bh_sniper',6,1],['bh_trooper',3,6]],reinforce:['bh_trooper','bh_trooper'],\n  start:[[2,10],[3,10],[5,10],[6,10],[0,9],[7,10]],\n  brief:'A Brotherhood sweep is coming down the ravine. Lord Hoth\\'s wounded are still in it, and one of them is his student, Johun Othone. Walk him to the evac at the north end.',\n  goal:'Walk Johun to an evac zone (E). Threat rises after turn 6: more troopers arrive and they shoot the wounded on sight.',\n  win:'The wounded are out. Hoth will remember who saved his student.',lose:'The ravine falls silent.',\n  reward:{credits:70,recruits:1},bonus:{favor:4},bonusTxt:'Done by turn 6'},\n // ── Act II (~1,003 BBY) ──\n r_caves:{n:\"Kaan's Caves\",where:'Cave network · Ruusan',type:'investigate',story:1,era:2,theme:'caves',par:6,\n  map:[\"###....q##\",\"#.....h..#\",\"#.q....c.#\",\"#h..##..##\",\"#...q....#\",\"#.x.#..c.#\",\"##..#.r.##\",\"#.c....c.#\",\"#..h..h..#\",\"##.....###\",\"#.c.rr.c.#\",\"EE......EE\"],\n  foes:[['bh_trooper',1,2],['bh_trooper',8,2],['bh_marauder',5,4],['bh_sniper',5,0],['sith_spawn',3,6]],reinforce:['bh_trooper','bh_trooper'],\n  start:[[3,11],[4,11],[5,11],[6,11],[3,10],[6,10]],\n  brief:'A prisoner says the Brotherhood is gathering in the caves. Copy the ritual tablets (Jedi or Medic, adjacent), then get anyone to an evac zone. Something in the dark only hunts Jedi.',\n  goal:'Scan 2 of 3 tablets, then reach an evac zone. All 3 reveals more. Threat rises after turn 6: tablets get smashed. The Sith Spawn only hurts Jedi.',\n  win:'The tablets are out. The Council reads them twice.',lose:'The caves collapse behind you. Whatever Kaan plans stays secret.',\n  reward:{credits:60,intel:2},bonus:{intel:1},bonusTxt:'All 3 tablets'},\n r_sixth:{n:'The Sixth Battle',where:'Brotherhood stockade · Ruusan',type:'rescue',story:1,era:2,theme:'plains',par:5,hostN:'Lord Tarsus Vell',\n  map:[\".c..^^..c.\",\"...#..#...\",\".k.#..#.x.\",\"...##D#...\",\".c......c.\",\"..^....^..\",\"#..c..c..#\",\".h..##..h.\",\"..........\",\".c..cc..c.\",\"....^^....\",\"EE......EE\"],\n  hostage:[5,2],foes:[['bh_trooper',2,4],['bh_trooper',7,4],['bh_marauder',4,5],['bh_sniper',7,0],['bh_trooper',6,8]],reinforce:['bh_trooper','bh_trooper'],\n  start:[[3,11],[4,11],[5,11],[6,11],[2,10],[7,10]],\n  brief:'The sixth battle went badly. Kaan\\'s men dragged an Army of Light Lord, Tarsus Vell, into a stockade. A Medic can Hack the cell door from 4 tiles; a Jedi can try the console. Then get him to an evac zone (E).',\n  goal:'Open the cell (Hack or console), then get the prisoner to an evac zone. Threat rises after turn 5; at Threat 6 they march him to Kaan.',\n  win:'Lord Vell is out. He owes the Temple his life.',lose:'Lord Vell is gone. Kaan will make an example of him.',\n  reward:{credits:90,favor:5},bonus:{recruits:1},bonusTxt:'Done by turn 5'},\n // ── Act III (~1,000 BBY) ──\n r_seventh:{n:'The Seventh Battle',where:'Kaan\\'s line · Ruusan',type:'assault',story:1,era:2,theme:'plains',par:6,bossKey:'vorr',\n  push:'Lord Vorr\\'s line is holding.',near:'The line is about to hold for good. Next turn the attack fails.',escape:'The Army of Light falls back.',\n  map:[\"..c.^^.c..\",\".c..MM..c.\",\"....^^....\",\".x.B..B.x.\",\"..........\",\"#.c.cc.c.#\",\"....rr....\",\".h......h.\",\"...c..c...\",\".B......B.\",\"..c.^^.c..\",\"..........\"],\n  foes:[['vorr',4,1],['bh_marauder',2,2],['bh_trooper',1,4],['bh_trooper',8,4],['bh_sniper',5,0]],reinforce:['bh_trooper','bh_marauder'],\n  start:[[3,11],[4,11],[5,11],[6,11],[1,11],[8,11]],\n  brief:'The seventh battle of Ruusan. Lord Vorr holds the high ground over Kaan\\'s line. Break him and the Army of Light can push through.',\n  goal:'Defeat Lord Vorr on the high ledge. Threat rises after turn 6; at Threat 6 the attack fails. Barrels (x) explode when shot.',\n  win:'Vorr falls. Kaan\\'s line breaks and his army runs for the caves.',lose:'The line holds. The Army of Light counts its dead.',\n  reward:{credits:100,kyber:1},bonus:{favor:4},bonusTxt:'Done by turn 6'},\n // S3 boss: The Thought Bomb. Assault: defeat Kaan before Threat 6. Bane is there if you saw him (caves, all 3 tablets) or tracked him.\n r_bomb:{n:'The Thought Bomb',where:'Kaan\\'s ritual ground · Ruusan',type:'assault',story:1,era:2,theme:'plains',bossKey:'kaan',\n  push:'Kaan\\'s Lords chant louder.',near:'The ritual is almost complete. Next turn it fires.',escape:'The thought bomb fires.',\n  get par(){const f=typeof C!=='undefined'&&C?C.flags:{};return 6+(f.e2_bomb_known?2:0)+(f.e2_hoth_goes?1:0)},\n  map:[\"..c.##.c..\",\".c..##..c.\",\"....##....\",\".x..c..x..\",\"..r....r..\",\".c.B..B.c.\",\"..........\",\"..h.cc.h..\",\".c......c.\",\"...r..r...\",\".c..cc..c.\",\"..........\"],\n  get foes(){const f=[['kaan',6,2],['bh_marauder',3,3],['bh_trooper',1,4],['bh_trooper',8,4]],F=typeof C!=='undefined'&&C?C.flags:{};\n   if(F.e2_bane_seen||F.e2_bane_tracked)f.push(['bane',9,1]);return f},\n  reinforce:['bh_trooper','bh_marauder'],start:[[3,11],[4,11],[5,11],[6,11],[1,11],[8,11]],\n  brief:'Kaan has gathered his Lords to unleash a thought bomb, a ritual that could wipe out Jedi and Sith alike. Lord Hoth is walking into the caves to stop him. Break the ritual first: defeat Kaan.',\n  goal:'Defeat Lord Kaan before Threat 6, when the bomb fires. If Darth Bane is here: kill or capture him BEFORE Kaan falls, or he walks away on turn 4.',\n  win:'Kaan falls. The ritual breaks before it begins.',lose:'The thought bomb fires.',\n  reward:{credits:120,kyber:1},bonus:{favor:5},bonusTxt:'Done by the par turn'},\n // ── Crises ──\n r_hospital:ruusanOf('shrine',{n:'The Field Hospital',where:'Army of Light field hospital · Ruusan',theme:'plains',objName:'Hospital',\n  waves:{1:['bh_trooper','bh_trooper','bh_trooper'],2:['bh_marauder','bh_trooper'],4:['bh_trooper','sith_lord']},\n  brief:'Brotherhood raiders are coming for an Army of Light field hospital. Hold it for 6 turns while the healers move the wounded.',\n  goal:'Hold the hospital for 6 turns. A Sith Lord leads the last wave; troopers near him aim better.',\n  win:'The healers get everyone out.',lose:'The hospital burns.',reward:{credits:60,recruits:1},bonus:{favor:3},bonusTxt:'Hospital above 75%'}),\n r_nexus:{n:'The Spawn Pit',where:'Dark-side cave · Ruusan',type:'assault',era:2,theme:'caves',par:7,bossKey:'nexus_core',\n  push:'The nexus pulses.',near:'The nexus is about to erupt.',escape:'The nexus erupts.',\n  map:[\"##..##..##\",\"#..c..c..#\",\"#.r....r.#\",\"##.#..#.##\",\"#........#\",\"#.c.##.c.#\",\"#...#....#\",\"##.r..r.##\",\"#.c....c.#\",\"#..h..h..#\",\"#........#\",\"##......##\"],\n  foes:[['nexus_core',5,1],['sith_spawn',4,2],['bh_marauder',5,4],['bh_trooper',2,4],['bh_trooper',7,4],['bh_sniper',8,1]],reinforce:['bh_trooper','bh_trooper'],\n  start:[[3,11],[4,11],[5,11],[6,11],[2,10],[7,10]],\n  brief:'A dark-side nexus is breeding Sith Spawn in the caves. Spawn only hurt Jedi. Send troops in front and destroy the nexus heart.',\n  goal:'Destroy the Heart of the Nexus (14 HP, armor 1). It spawns a Sith Spawn every 3 turns. Threat rises after turn 7; at Threat 6 it erupts.',\n  win:'The nexus goes dark. The cave is only a cave again.',lose:'The nexus erupts. Spawn pour into the hills.',\n  reward:{credits:50,kyber:1},bonus:{intel:1},bonusTxt:'Done by turn 7'},\n r_snipers:ruusanOf('escort',{n:'Run the Gauntlet',where:'Ridge trail · Ruusan',theme:'plains',vip:'courier',\n  brief:'Lord Farfalla\\'s courier carries the Army\\'s battle plans. Mercenary snipers hold the ridge. Get the courier to the shuttle.',\n  win:'The plans reach Farfalla.',lose:'The plans are lost on the ridge.',reward:{credits:70,favor:4},bonus:{recruits:1},bonusTxt:'Done by turn 6'}),\n r_dump:ruusanOf('sabotage',{n:'The Munitions Dump',where:'Brotherhood munitions dump · Ruusan',theme:'plains',\n  foes:[['bh_trooper',7,2,1],['bh_trooper',2,2,1],['bh_marauder',5,1,1],['bh_trooper',3,5,2],['bh_trooper',1,8,2],['bh_sniper',0,6]],reinforce:['bh_trooper','bh_trooper'],\n  brief:'Kaan\\'s army runs on this dump. Plant charges on 2 sites (anyone, adjacent, 1 action), then get every standing squad member onto the evac zone.',\n  win:'The dump goes up behind you. The Brotherhood fights hungry for a month.',lose:'The dump holds.',reward:{credits:80,favor:3},bonus:{credits:40},bonusTxt:'Done by turn 7'}),\n r_prisoners:ruusanOf('rescue',{flip:false,n:'The Prison Hulk',where:'Brotherhood prison camp · Ruusan',theme:'plains',hostN:'Healer Amma Rin',\n  brief:'The Brotherhood holds Army of Light prisoners in a locked cell. A Medic can Hack the door from 4 tiles; a Jedi can try the console. Then walk the prisoner to an evac zone (E).',\n  win:'The prisoner is out.',lose:'The prisoner is lost.',reward:{credits:80,favor:4},bonus:{recruits:1},bonusTxt:'Done by turn 5'}),\n r_codes:ruusanOf('archive',{n:'Brotherhood Codes',where:'Brotherhood signal camp · Ruusan',theme:'plains',\n  brief:'A Brotherhood signal camp runs Kaan\\'s orders to his Lords. Copy its terminals (Jedi or Medic, adjacent), then get anyone to an evac zone.',\n  win:'Kaan\\'s orders are ours for a month.',lose:'The camp burns its codes.',reward:{credits:60,intel:2},bonus:{intel:1},bonusTxt:'All 3 terminals'}),\n r_supply:ruusanOf('relay',{n:'The Supply Line',where:'Army of Light supply post · Ruusan',theme:'plains',objName:'Supply post',\n  brief:'Brotherhood raiders want the supply post that feeds Hoth\\'s front. Hold it for 8 turns until the convoy rolls out.',\n  waves:{1:['bh_trooper','bh_trooper'],3:['bh_trooper','bh_trooper','bh_marauder'],5:['bh_trooper','bh_trooper','bh_trooper']},\n  goal:'Hold the supply post for 8 turns.',win:'The convoy rolls out. The front eats.',lose:'The supplies burn.',reward:{credits:80},bonus:{credits:30},bonusTxt:'Post above 75%'})});\n\n// Extra guards so the reused Era 1 layouts aren't walkovers.\nMISSIONS.r_prisoners.foes.push(['bh_marauder',6,6],['bh_trooper',9,8]);\nMISSIONS.r_snipers.foes.push(['bh_sniper',8,0],['bh_marauder',5,4]);\n\n// Per-map balance for Ruusan (Chat R owns these rows; they replace Chat X's earlier r_ rows in TUNE, data.js). Same format: enemy aim/HP offsets,\n// extra/fewer rank-and-file foes. Target: weak test bot wins ~55–70% on Normal. Measured 16–30 bot games each on the wave-3 engine.\nObject.assign(TUNE,{\"r_muster:0\":{aim:10},\"r_ravine:0\":{aim:25,hp:3,extra:1},\"r_caves:0\":{aim:0,hp:1},\"r_sixth:0\":{aim:10,extra:1},\"r_seventh:0\":{aim:8},\n \"r_hospital:0\":{aim:1},\"r_dump:0\":{aim:12,hp:1},\"r_prisoners:0\":{aim:-8},\"r_codes:0\":{aim:15,hp:1},\"r_supply:0\":{aim:-2}});\n\nObject.assign(CRISES,{\n r_hospital:{n:'Raid on the field hospital',kind:'Defend',src:'Army of Light',mission:'r_hospital',text:'Brotherhood raiders are closing on a hospital full of wounded Jedi.',ignore:{recruits:-1,orderDark:4}},\n r_nexus:{n:'The spawn pit',kind:'Assault',src:'Jedi',mission:'r_nexus',text:'Scouts found a cave where the dark side is breeding horrors. Only troops can stand near them.',ignore:{orderDark:4}},\n r_snipers:{n:'Courier on the ridge',kind:'Escort',src:'Army of Light',mission:'r_snipers',text:'Farfalla\\'s courier is pinned under sniper fire with the Army\\'s plans.',ignore:{favor:-5}},\n r_dump:{n:'Brotherhood munitions dump',kind:'Sabotage',src:'Army of Light',mission:'r_dump',text:'Blow the dump that feeds Kaan\\'s army.',ignore:{favor:-5}},\n r_prisoners:{n:'The prison hulk',kind:'Rescue',src:'Army of Light',mission:'r_prisoners',text:'A healer of the Army of Light is held in a Brotherhood camp.',ignore:{favor:-3,orderDark:4}},\n r_codes:{n:'Brotherhood signal camp',kind:'Investigate',src:'Jedi',mission:'r_codes',text:'A camp is relaying Kaan\\'s orders. Copy them and get out.',ignore:{favor:-3}},\n r_supply:{n:'The supply line',kind:'Defend',src:'Army of Light',mission:'r_supply',text:'Raiders are closing on the post that feeds Hoth\\'s front.',ignore:{favor:-5}}});\n\n// Era 2 plan (swapped in for PLAN by story-era2.js): Act I (1,006) · Years pass +3 · Act II (1,003) · Years pass +3 · Act III (1,000, the thought bomb).\nconst PLAN2=[\n {story:'r_muster'},{crises:['r_hospital','r_snipers']},{story:'r_ravine'},{crises:['r_dump','r_codes']},\n {years:3,act:2},\n {crises:['r_nexus','r_prisoners']},{story:'r_caves'},{crises:['r_supply','r_snipers']},{story:'r_sixth'},\n {years:3,act:3},\n {crises:['r_dump','r_hospital','r_codes']},{story:'r_seventh'},{crises:['r_nexus','r_prisoners','r_supply']},{story:'r_bomb'}];\n\n// Fresh Era 2 squad. Everyone from Era 1 is a Legend or forgotten by now. [N]\nconst ERA2_ROSTER=[\n {n:'Lord Ressa Vaun',cls:'Guardian',title:'Knight',rank:2,xp:30,picks:['saberThrow','leap'],col:'#ffd166',age:31},\n {n:'Kell Darrow',cls:'Consular',title:'Padawan',col:'#8fe3ff',age:17},\n {n:'Sgt. Bo Hallan',cls:'Soldier',age:36},{n:'Mira Tesk',cls:'Scout',age:24},{n:'Doc Ilo Venn',cls:'Medic',age:41},{n:'Rusk Abernath',cls:'Heavy',age:29}];\n\n// Council cameos (spec C §6). Loyalty 0–100; ≥70 unlocks their favor events.\nObject.assign(COUNCIL_SEATS,{hoth:{n:'Lord Hoth',loyalty:60},farfalla:{n:'Lord Valenthyne Farfalla',loyalty:60}});\n// Rare recruits. Johun Othone: Hoth's student (Legends, High on role; age [N]). Only joins if you saved him AND Hoth trusts you (loyalty ≥70).\nObject.assign(STORY_RECRUITS,{\n johun:{n:'Johun Othone',cls:'Guardian',title:'Knight',rank:3,xp:80,picks:['defLine','reflectM','sweep'],col:'#7fd99a',age:22},\n redeemed_apprentice:{n:'Tarn Vel',cls:'Consular',title:'Padawan',rank:1,xp:0,picks:[],col:'#c9b6ff',age:19,dark:4}});  // [N]\n\n// Era 2 events (spec C §3). trigger.era:2 keeps them out of Era 1 (sub-triggers of `all` need it too). Extra trigger: loyal{seat,min}.\n// Hoth = Guardian stance (bold, front line); Farfalla = Consular stance (mercy, saving lives). Choices name whose way they follow.\nEVENTS.push(\n {id:'e2_lord_titles',trigger:{type:'era_start',era:2},text:'Army of Light Jedi call themselves Lords and give orders like generals. Some Masters hate it.',\n  choices:[{label:'Hoth\\'s way: keep the titles',effects:{recruits:2,orderDark:4,loyalty:{seat:'hoth',n:10}}},{label:'Farfalla\\'s way: drop them',effects:{orderDark:-4,loyalty:{seat:'farfalla',n:10},loyalty_2:{seat:'hoth',n:-10}}}]},\n {id:'e2_deserter',trigger:{type:'month',min:1,era:2},text:'A Brotherhood apprentice walks into camp, unarmed, asking for mercy.',\n  choices:[{label:'Accept him',effects:{recruit:'redeemed_apprentice',chance:.7,fail:{wound:{who:'squad_leader',turns:2}}}},{label:'Imprison him',effects:{intel:2}},{label:'Turn him away',effects:{}}]},\n {id:'e2_hoth_charge',trigger:{type:'after_mission',min:2,era:2},text:'Lord Hoth wants your strike teams at the front of his next charge. \"A Lord leads from the front.\"',\n  choices:[{label:'Hoth\\'s way: lead the charge',effects:{favor:3,loyalty:{seat:'hoth',n:10},chance:.6,fail:{wound:{who:'squad_leader',turns:2},loyalty:{seat:'hoth',n:10}}}},\n   {label:'Farfalla\\'s way: scout instead',effects:{intel:2,loyalty:{seat:'farfalla',n:10},loyalty_2:{seat:'hoth',n:-10}}}]},\n {id:'e2_child_soldiers',trigger:{type:'after_mission',min:3,era:2},text:'Villages are sending their teenagers to fight for the Army of Light. You need the numbers.',\n  choices:[{label:'Farfalla\\'s way: send them home',effects:{recruits:-1,favor:1,loyalty:{seat:'farfalla',n:10}}},{label:'Rear duties only',effects:{recruits:1}}]},\n {id:'e2_farfalla_amnesty',trigger:{type:'act',min:2,era:2},text:'Farfalla wants to offer Brotherhood troopers amnesty if they lay down their arms. Hoth calls it a trick that will get Jedi killed.',\n  choices:[{label:'Farfalla\\'s way: offer amnesty',effects:{recruits:2,orderDark:-4,loyalty:{seat:'farfalla',n:10},loyalty_2:{seat:'hoth',n:-10}}},\n   {label:'Hoth\\'s way: no terms for Kaan\\'s army',effects:{credits:40,orderDark:4,loyalty:{seat:'hoth',n:10},loyalty_2:{seat:'farfalla',n:-10}}}]},\n {id:'e2_cave_whispers',trigger:{type:'flag',flag:'e2_caves_done',era:2},text:'A Jedi back from the caves can\\'t stop hearing a voice. It promises strength.',\n  choices:[{label:'Halls of Healing',effects:{wound:{who:'jedi_highestDark',turns:2},unitDark:{who:'jedi_highestDark',n:-2}}},{label:'Listen to it',effects:{unitDark:{who:'jedi_highestDark',n:2},intel:2}}]},\n {id:'e2_farfalla',trigger:{type:'month',min:4,era:2},text:'Lord Farfalla wants to pull the army back to save lives. Lord Hoth wants one last push.',\n  choices:[{label:'Hoth\\'s way: one last push',effects:{loyalty:{seat:'hoth',n:10},loyalty_2:{seat:'farfalla',n:-10},flag:'e2_push'}},{label:'Farfalla\\'s way: pull back',effects:{loyalty:{seat:'farfalla',n:10},loyalty_2:{seat:'hoth',n:-10},recruits:1}}]},\n {id:'e2_hoth_student',trigger:{type:'all',era:2,all:[{type:'flag',flag:'e2_johun_saved',era:2},{type:'loyal',seat:'hoth',min:70,era:2}]},\n  text:'Hoth trusts you now. He offers you the student you pulled out of the ravine: Johun Othone, a Knight with a long memory.',\n  choices:[{label:'Take Johun',effects:{recruit:'johun',flag:'johun_joined'}},{label:'He belongs at his master\\'s side',effects:{loyalty:{seat:'hoth',n:10},flag:'e2_johun_hoth'}}]},\n {id:'e2_farfalla_healers',trigger:{type:'loyal',seat:'farfalla',min:70,era:2},text:'Farfalla sends his own healers to the Temple, no strings attached. \"Use them where they save the most.\"',\n  choices:[{label:'Keep them at the Temple',effects:{recruits:2}},{label:'Send them to the front',effects:{favor:4}}]},\n {id:'e2_bane_rumor',trigger:{type:'all',era:2,all:[{type:'act',min:3,era:2},{type:'notFlag',flag:'e2_bane_seen',era:2}]},text:'Scouts saw a Sith walk away from Kaan\\'s camp at night. Nobody else cares.',\n  choices:[{label:'Assign trackers',effects:{intel:-1,flag:'e2_bane_tracked'}},{label:'Focus on Kaan',effects:{}}]},\n {id:'e2_hoth_last',trigger:{type:'flag',flag:'e2_seventh_done',era:2},text:'If the ritual starts, Hoth will walk into Kaan\\'s caves himself. Farfalla begs him not to.',\n  choices:[{label:'Hoth\\'s way: he goes in',effects:{flag:'e2_hoth_goes',loyalty:{seat:'hoth',n:10}}},{label:'Farfalla\\'s way: he waits outside',effects:{flag:'e2_hoth_waits',loyalty:{seat:'farfalla',n:10}}}]});\n\n// Bane outcome (spec C §1): dead −3 · captured −2 · escapes +1 Vision. Era 3 reads C.flags.e2_bane_* / rule_of_two and C.eras[1].bane.\nconst BANE={leaves:4,dead:{shadow:-3,flag:'e2_bane_dead',line:'Darth Bane died on Ruusan. No one is left to teach the Rule of Two.'},\n captured:{shadow:-2,flag:'e2_bane_captured',line:'Darth Bane sits in a Jedi cell. The Sith line has no teacher.'},\n escaped:{shadow:1,flag:'e2_bane_escaped',line:'One Sith walked away from Ruusan. Always two, he says.'}};\nconst STORY_TEXT2={\n bossWin:'Kaan fell before the ritual. Lord Hoth lives, and takes a Council seat.',\n bossLose:'The thought bomb fired. Hoth is gone; the Army of Light buries its Lords.',\n bossLoseHothOut:'The thought bomb fired. Hoth waited outside, as Farfalla asked, and lives to bury his Lords.',\n eraWin:'The Brotherhood is broken. The Order begins to put down its Lord titles.',\n eraLose:'Ruusan is a graveyard. The Order rebuilds, quieter and more afraid.',\n darkWarn:'The Order is drifting. The Army of Light liked being an army.'};\nObject.assign(FLAG_LINES,{e2_bomb_known:'You read the ritual tablets: you knew about the thought bomb.',e2_bane_seen:'Your scouts saw a lone Sith walk away from the caves.',\n e2_hoth_lives:'Lord Hoth survived Ruusan. In canon he died in the thought bomb.',e2_bomb_fired:'The thought bomb fired, as it did in canon.',\n e2_bane_dead:BANE.dead.line,e2_bane_captured:BANE.captured.line,e2_bane_escaped:BANE.escaped.line,e2_bane_tracked:'Trackers followed the lone Sith into the hills.',\n e2_johun_saved:'You pulled Johun Othone out of the ravine.',johun_joined:'Johun Othone fought under your command.',e2_vell_saved:'Lord Tarsus Vell came home from the stockade.',\n e2_vorr_down:'Lord Vorr fell in the seventh battle.',e2_hoth_goes:'Hoth walked into the caves himself.',e2_hoth_waits:'Farfalla kept Hoth out of the caves.'});\n// Debrief epilogue and Council briefing lines (spec C §9 voice). [N]\nObject.assign(EPI,{\n r_muster:{win:'Hoth walks the field shaking hands. He remembers every name.',lose:'Half the army lands in the wrong valley.'},\n r_ravine:{win:'Johun asks your name twice so he won\\'t forget it.',lose:'Hoth reads the list of the dead himself.'},\n r_caves:{win:'The tablets describe something no one on the Council wants to say out loud.',lose:'Whatever Kaan is planning, he plans it in the dark.'},\n r_sixth:{win:'Lord Vell can\\'t hold a saber yet. He holds a cup of caf and doesn\\'t let go.',lose:'Kaan sends Vell\\'s saber back. Only the saber.'},\n r_seventh:{win:'Kaan\\'s army runs for the caves. Nobody asks why the caves.',lose:'Six battles became seven. Nobody has won any of them.'},\n r_bomb:{win:'Two armies walk off Ruusan. One of them is much smaller.',lose:'The caves are a crater. The silence after is the loudest thing on Ruusan.'}});\nObject.assign(MISSIONS.r_muster,{quote:'“Hold the light, and the rest of us will find it.” — Lord Hoth'});\nObject.assign(MISSIONS.r_ravine,{quote:'“Bring my student home. Bring them all home.” — Lord Hoth'});\nObject.assign(MISSIONS.r_caves,{quote:'“Kaan is afraid. Find out of what.” — Lord Farfalla'});\nObject.assign(MISSIONS.r_seventh,{quote:'“One more battle. It is always one more battle.” — Lord Farfalla'});\nObject.assign(MISSIONS.r_bomb,{quote:'“If Kaan wants a storm, he can have one. I will be standing in it.” — Lord Hoth'});\n\n// Codex lore, merged into CODEX (data-codex.js, Chat L). ≤280 chars, spec C §9 voice. Legends unless tagged [N].\nconst ERA2_LORE={\n enemy:{bh_trooper:{lore:'Kaan\\'s foot soldiers. They believe their Lords will make them more than human. Most die believing it.'},\n  bh_marauder:{lore:'Sith who gave up everything but the fight. Every wound makes them hit harder.'},\n  sith_lord:{lore:'The Brotherhood made everyone with a red blade a Lord. Kaan said it made them equal. It made them many.'},\n  bh_sniper:{lore:'Hired guns from the Outer Rim. They don\\'t care who wins Ruusan as long as someone pays.'},\n  sith_spawn:{lore:'Dark-side things that crawl out where the Force is wounded. Blasters bother them. Jedi feed them.'},\n  nexus:{lore:'A place where too much hate soaked into the ground. The Force sours around it.'},\n  nexus_core:{lore:'The oldest, deepest wound in the caves. Destroy it and the Spawn stop coming.'},\n  vorr:{lore:'Kaan\\'s field commander, a soldier first and a Sith second. He holds high ground the way other men hold grudges. [N]'},\n  kaan:{lore:'Skere Kaan, Dark Lord of the Brotherhood. Charismatic, reckless, and out of options. (Legends, High)'},\n  bane:{lore:'A Sith who thinks Kaan\\'s army is a mistake. He may be planning to let it die. (Legends, High)'}},\n character:{hoth:{lore:'Lord Hoth leads the Army of Light. A blunt soldier who never wanted to be one. In canon he dies in the thought bomb. (Legends, High)'},\n  farfalla:{lore:'Valenthyne Farfalla, a Lord of the Army of Light. Flamboyant, merciful, and the one who leads the Jedi after Ruusan. (Legends, High)'},\n  johun:{lore:'Johun Othone, Hoth\\'s student. In canon he survives Ruusan and builds its memorial. (Legends, High)'},\n  kaan:{lore:'Lord Kaan built the Brotherhood of Darkness by making every Sith a Lord. Equality, he called it. It made the Sith easy to count. (Legends, High)'},\n  bane:{lore:'Darth Bane. In canon he walks away from Ruusan, the only Sith left, and writes the Rule of Two. (Legends, High)'},\n  tarn_vel:{lore:'A Brotherhood apprentice who walked into a Jedi camp with his hands open. Nobody is sure yet whether he meant it. [N]'},\n  vell:{lore:'Lord Tarsus Vell, an Army of Light Lord taken in the sixth battle. Loud, brave, and very glad to be alive. [N]'}},\n mission:{r_muster:{lore:'The Army of Light came to Ruusan in transports, lit down by a single beacon. [N]'},\n  r_ravine:{lore:'Ruusan\\'s ravines filled with the wounded of seven battles.'},r_caves:{lore:'Kaan\\'s Lords met in the caves to plan their last move.'},\n  r_sixth:{lore:'The sixth battle of Ruusan went to the Brotherhood. Its prisoners went to Kaan. (battle count: Legends, High; details [N])'},\n  r_seventh:{lore:'The seventh and last battle of Ruusan. Kaan\\'s army broke and fled into the caves. (Legends, High)'},\n  r_bomb:{lore:'The thought bomb: a ritual that drew in every Force user nearby and did not let go. (Legends, High)'},\n  r_hospital:{lore:'The Army of Light ran its hospitals in tents, close enough to the front to hear it. [N]'},\n  r_nexus:{lore:'Ruusan\\'s caves held old dark-side wounds. The Spawn came from somewhere. [N]'},\n  r_snipers:{lore:'Kaan paid mercenaries in plunder. The ridges of Ruusan were full of them. [N]'},\n  r_dump:{lore:'An army of Lords still needs blaster gas. Kaan kept his in one place. [N]'},\n  r_prisoners:{lore:'The Brotherhood took prisoners to break them, and sometimes to turn them. [N]'},\n  r_codes:{lore:'Kaan gave his orders by courier and by signal. The signals were faster, and easier to steal. [N]'},\n  r_supply:{lore:'Hoth\\'s army ate what the convoys brought. When the convoys stopped, so did the army. [N]'}},\n planet:{ruusan:{lore:'A green Mid Rim world that hosted seven battles between the Army of Light and the Brotherhood of Darkness. (Legends, High)'}}};\nif(typeof CODEX!=='undefined')for(const [k,v] of Object.entries(ERA2_LORE)){CODEX[k]=CODEX[k]||{};for(const [id,o] of Object.entries(v))if(!CODEX[k][id])CODEX[k][id]=o}\n// Codex unlocks: mission → [planet, [characters]]; event → [characters] (L's MISSION_LORE / EVENT_LORE in data-story.js).\nfor(const id of ['r_muster','r_caves','r_sixth','r_hospital','r_nexus','r_snipers','r_dump','r_prisoners','r_codes','r_supply'])MISSION_LORE[id]=MISSION_LORE[id]||['ruusan'];\nObject.assign(MISSION_LORE,{r_ravine:['ruusan',['johun','hoth']],r_seventh:['ruusan',['hoth','farfalla']],r_bomb:['ruusan',['kaan','hoth','bane']]});\nObject.assign(EVENT_LORE,{e2_lord_titles:['hoth','farfalla'],e2_hoth_charge:['hoth'],e2_farfalla_amnesty:['farfalla','hoth'],e2_farfalla:['farfalla','hoth'],\n e2_hoth_student:['hoth','johun'],e2_farfalla_healers:['farfalla'],e2_bane_rumor:['bane'],e2_hoth_last:['hoth','farfalla'],e2_deserter:['tarn_vel']});\n"
+}

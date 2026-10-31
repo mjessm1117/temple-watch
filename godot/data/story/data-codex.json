@@ -1,0 +1,2363 @@
+{
+  "source": "public/js/data-codex.js",
+  "sha256": "d3b060fd0e09fc182019828dd670e47f8a9fe45d8a380263347e0b0e425a7c33",
+  "lines": 353,
+  "counts": {
+    "CODEX": 11,
+    "SOURCE_LITERALS": 336
+  },
+  "records": {
+    "CODEX": {
+      "ability": {
+        "shoot": {
+          "lore": "Patient hands, steady breath. A trooper learns that one clean shot saves more lives than ten loud ones."
+        },
+        "strike": {
+          "lore": "The blade moves before the thought finishes. Every Padawan is taught that the strike is the last answer, not the first."
+        },
+        "guard": {
+          "lore": "To stand between a blow and a friend is the oldest Jedi lesson. The Guardian does not ask who deserves it."
+        },
+        "overwatch": {
+          "lore": "Waiting is a kind of fighting. The soldier who holds still and watches the door decides who walks through it."
+        },
+        "push": {
+          "lore": "A breath of the Force, shaped into a shove. It carries no malice, only a firm request to be elsewhere."
+        },
+        "collapse": {
+          "lore": "The Force gathers, then falls on one place at once. Masters warn that power taken this wide leaves a mark on the one who takes it."
+        },
+        "choke": {
+          "lore": "The Council forbids it. A hand closes on a throat from across the room, and the one who holds it feels the dark answer back."
+        },
+        "stun": {
+          "lore": "A pulse that quiets the body without breaking it. Mercy is a discipline, and it is harder than the alternative."
+        },
+        "subdue": {
+          "lore": "The Jedi prefer a prisoner who can talk to a corpse who cannot. Many a captive has surprised them with what they knew."
+        },
+        "meditate": {
+          "lore": "Stillness is not rest. The Jedi sits inside the storm and listens for what the Force is trying to say."
+        },
+        "heal": {
+          "lore": "The Force knits what the blade has opened. It does not take away the fear, and the Jedi never claims that it does."
+        },
+        "grenade": {
+          "lore": "A small sphere, a short fuse, a loud decision. Troopers throw them at cover, and cover rarely argues."
+        },
+        "stabilize": {
+          "lore": "A field medic’s first rule: keep them here. Everything else can be solved once the bleeding stops."
+        },
+        "door": {
+          "lore": "Every door in the Temple was built to open to a hand that is welcome. Out in the field, doors are less polite."
+        },
+        "console": {
+          "lore": "Old machines hold new secrets. A steady hand and a patient tech can still coax the truth out of them."
+        },
+        "scan": {
+          "lore": "The Force reaches out and returns with shapes, heartbeats, and the cold spots where something is hiding."
+        },
+        "plant": {
+          "lore": "Set the charge, count the steps, leave. Sabotage is quiet work done by people who would rather not be thanked."
+        },
+        "saberThrow": {
+          "lore": "A lightsaber thrown is a lightsaber risked. The Force brings it back, but the Jedi learns the length of a moment without it."
+        },
+        "defLine": {
+          "lore": "The blade turns the bolt. Another Jedi stands at the shoulder, and together they make a wall no blaster wants to test."
+        },
+        "leap": {
+          "lore": "A Jedi’s jump is not strength but trust. The Force holds the air for the length of a heartbeat, and that is enough."
+        },
+        "reflectM": {
+          "lore": "The Force shows the bolt before it leaves the barrel. The blade is only there to finish the thought."
+        },
+        "sweep": {
+          "lore": "One wide arc, and the room is a different place. The Guardian’s answer to being surrounded is to become the center."
+        },
+        "forceHeal": {
+          "lore": "The deeper art. A Consular gives of their own strength to restore another’s, and rests afterward without complaint."
+        },
+        "barrier": {
+          "lore": "A shell of will, thin as breath and hard as durasteel while it holds. Consulars say it is easier to build for others than for oneself."
+        },
+        "battleMed": {
+          "lore": "Bacta, a steady voice, and a Force touch when the bacta runs short. The Temple’s healers learned to work under fire."
+        },
+        "mindTrick": {
+          "lore": "A suggestion, offered so gently that the listener believes it was their own idea. The Consulars say it is not a trick but a courtesy."
+        },
+        "forceRevive": {
+          "lore": "The Force can call back a life that has barely left. It asks a great deal, and the Jedi who answers is never quite the same."
+        },
+        "suppress": {
+          "lore": "Fire that does not seek to hit, only to keep heads down. A soldier’s way of buying others a few seconds of safe ground."
+        },
+        "hunker": {
+          "lore": "Get low, get small, let the world pass over. Surviving a bad moment is also a victory."
+        },
+        "mark": {
+          "lore": "A spotter calls the target and everyone’s aim improves. Calm voices win more battles than brave ones."
+        },
+        "smoke": {
+          "lore": "A cloud to move behind. The enemy fires at where you were, and you are somewhere else."
+        },
+        "hack": {
+          "lore": "Slicers say every lock is a conversation. Patience and a little cleverness will make most systems say yes."
+        },
+        "shredder": {
+          "lore": "Armor is a promise that a shot will not matter. The shredder round exists to break that promise."
+        },
+        "rapidFire": {
+          "lore": "All the weapon’s patience spent at once. The heavy trooper trades accuracy for the certainty that something will land."
+        },
+        "deadeye": {
+          "lore": "One shot, taken after the long wait. A scout learns to hold their breath until the world holds still with them."
+        },
+        "rally": {
+          "lore": "A word at the right moment. Veterans know that courage is mostly borrowed, passed hand to hand along the line."
+        },
+        "reviveStim": {
+          "lore": "A sharp sting and a gasp. Medics carry the stim for the worst day, and hope never to need it."
+        },
+        "rocket": {
+          "lore": "It is loud, and it is meant to be. The heavy trooper fires one when quiet has already failed."
+        },
+        "flurry": {
+          "lore": "The Form takes over. Cut follows cut so quickly that the opponent has no time to be afraid of the next one."
+        },
+        "shadowStep": {
+          "lore": "A Sentinel moves where eyes do not rest. They are there, and then they are behind you."
+        },
+        "executioner": {
+          "lore": "Some blows end a fight before it begins. Jedi who learn this also learn how heavy it is to use."
+        },
+        "sense": {
+          "lore": "The Force whispers before the danger arrives. Sentinels trust that whisper and have been alive longer for it."
+        },
+        "disarm": {
+          "lore": "A flick of the wrist and the weapon is somewhere else. The Jedi way is to end the fight without ending the foe."
+        },
+        "pathfinder": {
+          "lore": "Where others see rubble, a scout sees a road. The best ones leave no tracks for anyone to follow."
+        },
+        "beastCalm": {
+          "lore": "Even a hungry thing can be soothed by a patient mind. It is slow work, and a gentle one."
+        },
+        "pull": {
+          "lore": "The Force draws what you need into your hand, or an enemy into your reach. Take care, because it works both directions."
+        },
+        "tremor": {
+          "lore": "The ground itself remembers the Jedi’s step. A tremor rolls outward and knocks the unready off their feet."
+        },
+        "wildBond": {
+          "lore": "Some Jedi feel the creatures of the wild more clearly than they feel people. The bond is quiet, and it is real."
+        },
+        "runGun": {
+          "lore": "A good soldier fires while moving, and a great one forgets the difference. Practice, bruises, and more practice."
+        },
+        "spotter": {
+          "lore": "A second pair of eyes behind the first. The shot is the shooter’s, but the war is won by the one who sees the whole field."
+        },
+        "ghost": {
+          "lore": "Gone before the alarm sounds. A scout who is never noticed is a scout whose reports always arrive."
+        },
+        "protocol": {
+          "lore": "Orders, drilled until they are habit. In the dark and the noise, protocol is what remains when thinking is too slow."
+        },
+        "shieldDrone": {
+          "lore": "A small hovering disc that does one thing well. Soldiers name them anyway, and are not embarrassed to."
+        },
+        "ionNade": {
+          "lore": "It does not harm flesh, only wires. Machines go quiet and the battle changes shape."
+        },
+        "holdLine": {
+          "lore": "Not one step back. The line holds because each person on it decides, separately, that it will."
+        },
+        "flakVest": {
+          "lore": "Layered plating, scuffed and patched. Every trooper has a story about the bolt it stopped."
+        },
+        "veteran": {
+          "lore": "Experience is a kind of armor. The veteran has seen this before, and the calm they carry spreads along the line."
+        },
+        "longshot": {
+          "lore": "Distance is only a matter of patience. The long barrel, the steady breath, the shot that nobody heard coming."
+        },
+        "killshot": {
+          "lore": "A trained eye finds the gap in the armor. It is not cruelty, only competence at a hard trade."
+        },
+        "fieldcraft": {
+          "lore": "Cover, concealment, silence. The things that are not in the manual but have kept every old scout alive."
+        },
+        "fieldKit": {
+          "lore": "Bandages, a stim, and one clean cloth. Small things that matter most when everything else has gone wrong."
+        },
+        "combatMedic": {
+          "lore": "The medic fights because the line breaks without them. Carrying a rifle and a kit takes a particular kind of courage."
+        },
+        "traumaBag": {
+          "lore": "Heavy and worn, it never leaves the medic’s shoulder. What is inside has stopped more wounds than any speech."
+        },
+        "bandolier": {
+          "lore": "Spare cells across the chest, clipped and counted. A soldier who runs dry is a soldier who is no longer useful to the people next to them."
+        },
+        "juggernaut": {
+          "lore": "The heavy trooper walks into the fire because the others cannot. Armor, mass, and the stubbornness to keep walking."
+        },
+        "mightyBlow": {
+          "lore": "All the weight of the Form behind one stroke. Guardians are taught that restraint is what makes such a blow safe to swing."
+        },
+        "precisionStrike": {
+          "lore": "Not the hardest cut but the truest. The blade goes exactly where the Force showed it would be needed."
+        },
+        "massHeal": {
+          "lore": "The Force spreads outward like warmth through a cold room. Every hurt in reach eases, and the Consular asks nothing in return."
+        },
+        "forceWave": {
+          "lore": "A ring of pressure rolls out from the Jedi’s hands. Nothing in its path is spared, and nothing in its path is meant to be killed."
+        },
+        "stasisField": {
+          "lore": "The air thickens, then stops. Those caught in it find their limbs unwilling, and the Consular holds the pause with great effort."
+        },
+        "chainShot": {
+          "lore": "The first shot is a question and the second is the answer. A good gunner learns to ask twice before the target can react."
+        },
+        "medBeacon": {
+          "lore": "A single bright signal and the wounded know where to crawl. The medic can give it only once, and gives it fully."
+        },
+        "gIron": {
+          "lore": "Years of drills in the Salle have taught the body to take a blow and keep standing. The Guardian counts bruises as lessons."
+        },
+        "gDuelist": {
+          "lore": "A Guardian who studies a rival’s feet more than their blade. The duel is often won before the first stroke."
+        },
+        "gBulwark": {
+          "lore": "On guard, the Jedi becomes a fixed point. Allies know exactly where the line is and trust that it will not move."
+        },
+        "gVanguard": {
+          "lore": "The first through every door. A Vanguard takes the risk so that those behind can measure it."
+        },
+        "gWarden": {
+          "lore": "The Warden’s blade seems to be wherever the bolt is going. Those who watch it work call it luck, and the Warden calls it attention."
+        },
+        "gUnbreakable": {
+          "lore": "Some Guardians simply refuse to fall. It is not stubbornness, they say, but a promise made to everyone standing behind them."
+        },
+        "gMasterBlade": {
+          "lore": "The sum of a lifetime of patient practice. The blade is no longer a tool but a part of the hand."
+        },
+        "cSerene": {
+          "lore": "A mind that has learned to be quiet. The Force flows more freely through a Jedi who is not arguing with themselves."
+        },
+        "cResolve": {
+          "lore": "Fear is acknowledged, then set down. The Consular who has done this once finds it easier to do again."
+        },
+        "cWellspring": {
+          "lore": "A deep calm that seems to refill itself. Consulars say the Force is not spent so much as borrowed and returned."
+        },
+        "cSeer": {
+          "lore": "The battle slows to those who have learned to read it. The Consular steps where the next moment will be, not where the last one was."
+        },
+        "cMaster": {
+          "lore": "A Consular who has stopped fearing the Force and started listening to it. Such Jedi are rare, and rarely proud of it."
+        },
+        "sKeenEye": {
+          "lore": "A Sentinel notices the loose stone, the shifted shadow, the breath held too long. Most of survival is simply noticing."
+        },
+        "sExecutioner": {
+          "lore": "A Sentinel who has learned exactly where a fight turns. The finishing stroke is quick, and no one is allowed to enjoy it."
+        },
+        "sTracker": {
+          "lore": "Footprints, scorch marks, the stillness of a room just emptied. The Tracker follows the story the enemy leaves behind."
+        },
+        "sVigil": {
+          "lore": "The Sentinel who keeps watch through the dark hours. Nothing reaches the camp that has not first reached them."
+        },
+        "sEdge": {
+          "lore": "A blade kept honest by daily care. The Sentinel treats sharpening as a kind of meditation."
+        },
+        "sGhost": {
+          "lore": "The Sentinel crosses open ground as if the ground were reluctant to notice. Lessons in stealth are never entirely spoken."
+        },
+        "sHunter": {
+          "lore": "Patient and unhurried, the Hunter lets the quarry make the first mistake. It always does."
+        },
+        "sBlademaster": {
+          "lore": "The Forms are no longer steps to be remembered. The Sentinel lives inside them and the blade simply follows."
+        },
+        "sUntouchable": {
+          "lore": "Bolts and blades pass through spaces the Jedi has already left. It looks like grace, and it is years of discipline."
+        },
+        "wPathfinder": {
+          "lore": "Where the map ends, the Wayseeker keeps walking. A path appears for anyone who truly expects one."
+        },
+        "wWild": {
+          "lore": "The Force in living things, felt in the roots as clearly as in the stars. The Wayseeker draws on a deeper spring."
+        },
+        "wRoots": {
+          "lore": "A body trained by long travel and little comfort. The Wayseeker endures what would send others home."
+        },
+        "wStalker": {
+          "lore": "Someone who learned to move through wild places learned to move quietly. The skill carries over to every other kind of ground."
+        },
+        "wBond": {
+          "lore": "The creatures of the wild trust the Wayseeker, and the Wayseeker returns the trust. Neither side has ever been disappointed."
+        },
+        "wSeer": {
+          "lore": "Distance is no barrier for those who listen. The Wayseeker sees the far ridge as clearly as the near."
+        },
+        "wPrimal": {
+          "lore": "Old instincts woken beneath careful training. The Wayseeker is a little frightening to watch, and knows it."
+        },
+        "soGunner": {
+          "lore": "Hours at the range and nights cleaning the barrel. Good shooting is mostly habit and a little stubbornness."
+        },
+        "soTough": {
+          "lore": "A trooper who has been knocked down enough times to know how to get up. The lesson is physical, and also not."
+        },
+        "soMarksman": {
+          "lore": "The kind of shooter who is quiet at the range because the targets have said all there is to say."
+        },
+        "soSteel": {
+          "lore": "Fear is a visitor, and the veteran does not offer it a chair. The line holds because the people on it are calm."
+        },
+        "soIronWill": {
+          "lore": "Orders, duty, and a stubborn refusal to be turned. Few things are as hard to move as a soldier who has decided."
+        },
+        "soCommander": {
+          "lore": "A trooper whose voice carries and whose plans work. Others fall in without being asked, and are glad to."
+        },
+        "soLegend": {
+          "lore": "Stories are told about this one in barracks across the Republic. The trooper rolls their eyes and keeps shooting."
+        },
+        "scEagle": {
+          "lore": "A scout whose sight is a gift and a discipline. Distant things become plain, and plain things become useful."
+        },
+        "scQuick": {
+          "lore": "Light on the feet and quick to the next cover. A scout lives in the spaces between where the enemy is looking."
+        },
+        "scSniper": {
+          "lore": "One breath held, one shot let go. The Sniper is a rumor that sometimes becomes a fact."
+        },
+        "scAssassin": {
+          "lore": "Cold work for a necessary end. The scout who does it well rarely speaks of it afterward."
+        },
+        "scSurvivor": {
+          "lore": "Others would have been left behind long ago. The Survivor has learned that coming home is a skill like any other."
+        },
+        "scSpotter": {
+          "lore": "The scout calls the range, the wind, and the target in one calm sentence. Every rifle nearby gets a little better."
+        },
+        "scDeadly": {
+          "lore": "Familiar with every gap in every armor design. The scout is not cruel, only precise."
+        },
+        "scLegend": {
+          "lore": "A name whispered on the Rim and rarely seen on a report. The scout prefers it that way."
+        },
+        "scPhantom": {
+          "lore": "Across rubble and open street without a sound. By the time the enemy turns, the Phantom is elsewhere."
+        },
+        "mDrilled": {
+          "lore": "Field medicine learned by the book, then by the bruise. The drills make the hands steady when the voice is not."
+        },
+        "mSurgeon": {
+          "lore": "Clean cuts and clean thinking on the worst night. A good surgeon is calm because someone else cannot be."
+        },
+        "mStoic": {
+          "lore": "The medic has seen the worst a battlefield can offer. They keep working, and the squad draws strength from it."
+        },
+        "mFieldSurgeon": {
+          "lore": "Full kits, sorted by urgency, ready in the dark. The medic can find what they need by touch."
+        },
+        "mMarksman": {
+          "lore": "A medic who learned that sometimes the best treatment is keeping the enemy from firing. Few argue with the logic."
+        },
+        "mAngel": {
+          "lore": "Soldiers on three worlds swear to have been saved by this one. The medic shrugs and moves on to the next."
+        },
+        "mVeteran": {
+          "lore": "Years in the field have taught this medic where to stand and when to run. Survivors remember the lessons gladly."
+        },
+        "hDemo": {
+          "lore": "A heavy trooper with a respect for chemistry. Everything that explodes is eventually a tool."
+        },
+        "hBrute": {
+          "lore": "Built to carry, built to endure. The heavy trooper does the work nobody else wants and does not complain."
+        },
+        "hBulwark": {
+          "lore": "A slow and steady wall of armor and nerve. Allies shelter behind it, and it does not flinch."
+        },
+        "hGunner": {
+          "lore": "Heavy weapons need a steady hand and a patient eye. The gunner has both, which is rarer than it sounds."
+        },
+        "hHeavyWeapons": {
+          "lore": "Years of training with weapons that others cannot lift. The recoil is a conversation the gunner has learned to win."
+        },
+        "hTitan": {
+          "lore": "A figure out of old stories, mountainous in plate. The trooper walks through fire and the enemy remembers it."
+        },
+        "hWarlord": {
+          "lore": "A heavy trooper who has stopped waiting for orders. On this ground, the Warlord is the order."
+        }
+      },
+      "enemy": {
+        "trooper": {
+          "lore": "Sith Empire infantry, trained hard and ordered harder. Most of them believe in the Empire because they have never been offered another future."
+        },
+        "heavy": {
+          "lore": "A walking wall in Imperial plate, with a gun that wants to be heard. It is slow to turn and quick to punish those who stand still."
+        },
+        "agent": {
+          "lore": "Imperial Intelligence does not announce itself. A cold hide, a long rifle, and a patience the Temple’s own scouts would respect."
+        },
+        "acolyte": {
+          "lore": "A student of the Sith, hungry to be noticed by someone with more power. Lightning crackles in the fingers, and mercy has not yet been taught."
+        },
+        "husk": {
+          "lore": "What is left when a great horror feeds. A Dark Husk has no mind of its own, only hunger, and it moves when its maker kills."
+        },
+        "terentatek": {
+          "lore": "A beast bred, it is said, to hunt those who touch the Force. The Jedi who survive an encounter rarely describe it, but the nightmares do."
+        },
+        "envoy": {
+          "lore": "A Republic envoy with the right smile and the wrong friends. Whispers say that someone close to the talks is selling the schedule."
+        },
+        "malgus": {
+          "lore": "A Sith Lord who believes the Republic is a lie and means to prove it with fire. He fights like a man with nothing left to lose."
+        },
+        "mando": {
+          "lore": "Mandalorian clans, hired by the Empire for the oldest reason there is. They fight with honor and are paid in credits."
+        },
+        "adraas": {
+          "lore": "Lord Adraas fought beside Malgus in the strike on Coruscant. Those who faced him remember how little he seemed to care about the cost."
+        },
+        "bh_trooper": {
+          "lore": "Foot soldiers of the Brotherhood of Darkness, devoted to Lord Kaan’s vision. They fight as though the war were already won, and that certainty is their weapon."
+        },
+        "bh_marauder": {
+          "lore": "A Dark Side warrior who fights for rage as much as for Kaan. The wounds only seem to feed it."
+        },
+        "sith_lord": {
+          "lore": "One of the Brotherhood’s Lords, who sees the Light as a delay to be removed. The troopers around it fight as if its approval were air."
+        },
+        "bh_sniper": {
+          "lore": "A hired gun on the ridge who is paid to be patient. The Brotherhood buys loyalty with ideals and loyalty from this one with credits."
+        },
+        "sith_spawn": {
+          "lore": "A creature born of the dark side in the Ruusan caves, hungry only for the Force. Soldiers without the gift pass it unnoticed, and it cannot forgive that."
+        },
+        "nexus": {
+          "lore": "A wound in the world where the dark side pools and festers. It does not move or speak, but it makes more of itself."
+        },
+        "nexus_core": {
+          "lore": "The heart of the cave, where the dark gathers. It beats slowly, and anyone who stays near it begins to hear it."
+        },
+        "kaan": {
+          "lore": "Lord Kaan, leader of the Brotherhood of Darkness, sure that the Sith should lead the galaxy. He is brilliant, ruthless, and wrong in a way he will never accept."
+        },
+        "bane": {
+          "lore": "Darth Bane, a Sith apprentice who watches from the ridge and listens to the war with a stranger’s attention. He survives Ruusan, and what he builds from it will outlast everyone here."
+        }
+      },
+      "gear": {
+        "Standard blaster": {
+          "lore": "A standard-issue Republic blaster, worn smooth by many hands. It is not elegant, but it fires every time."
+        },
+        "Military blaster": {
+          "lore": "A military-grade piece, better balanced and kept clean. Quartermasters hand them out with a nod and a warning."
+        },
+        "Elite blaster": {
+          "lore": "Elite work, tuned by someone who cared. Troopers who are issued one tend to take better care of it than of themselves."
+        },
+        "none": {
+          "lore": "No armor at all. Quick, light, and a little reckless. The Jedi have always trusted the Force over plating."
+        },
+        "light": {
+          "lore": "Flexible plates under a Republic jacket. It turns a glancing bolt and weighs almost nothing."
+        },
+        "heavy": {
+          "lore": "Layered ceramic and alloy, built to take hits that would drop anyone else. It makes a trooper slow and very hard to move."
+        },
+        "scope": {
+          "lore": "A narrow window on a far place. Scouts say the world looks calmer through glass, which is a lie worth believing."
+        },
+        "barrel": {
+          "lore": "A longer barrel, a tighter bolt. Gunsmiths on Coruscant argue about the exact length, and nobody wins."
+        },
+        "cell": {
+          "lore": "A power cell with a little more kick. It runs hot, and troopers learn to count their shots."
+        },
+        "Training saber": {
+          "lore": "Padawans build their first blade under a Master’s eye. The training blade is simple, and it teaches by being forgiving."
+        },
+        "Attuned saber": {
+          "lore": "Attuned to its owner. The crystal hums at a pitch only they can feel, and the blade answers their intent."
+        },
+        "Master-forged saber": {
+          "lore": "Forged by a Master’s hand. It is not a weapon so much as a conversation between a Jedi and the Force."
+        },
+        "focused": {
+          "lore": "A tightly bound beam that cuts where it is aimed and nowhere else. Some Jedi prefer clarity to power."
+        },
+        "swift": {
+          "lore": "A lighter hilt and a quicker blade. It rewards those who prefer to finish a motion before the other side begins."
+        },
+        "warden": {
+          "lore": "A blade made to protect. It turns away what it can, and the Jedi who carries it takes pride in what never gets through."
+        },
+        "blue": {
+          "lore": "The blue crystal is the Guardian’s companion. It carries a calm, steady light and a reputation for defending first."
+        },
+        "green": {
+          "lore": "The green blade is associated with the Consular, a Jedi of insight and negotiation. It is the color of patient hands."
+        },
+        "yellow": {
+          "lore": "The yellow crystal is often chosen by Sentinels, who walk between study and duty. It burns bright, and it burns honestly."
+        },
+        "violet": {
+          "lore": "A rare hue, said to come when a Jedi’s heart is torn two ways. Those who carry it speak little of why."
+        },
+        "white": {
+          "lore": "A white blade is the mark of a crystal that was cleansed or purified. Jedi treat it as a quiet sign of a hard road walked."
+        },
+        "shiiCho": {
+          "lore": "Form I, the Way of the Sarlacc. The first form: broad, forgiving, and the foundation on which every other Jedi is built."
+        },
+        "makashi": {
+          "lore": "Form II, the Way of the Ysalamiri. The duelist’s Form: precise footwork, elegant strokes, built for facing another blade."
+        },
+        "soresu": {
+          "lore": "Form III, the Way of the Mynock. Efficient and patient, it asks the Jedi to endure and to wait for the other side to tire."
+        },
+        "ataru": {
+          "lore": "Form IV, the Way of the Hawk-Bat. Acrobatic and fast, it uses the Force to leap and strike, and tires its user quickly."
+        },
+        "djemSo": {
+          "lore": "Form V, the Way of the Krayt Dragon. Also called Djem So, it blends strong defense with strong offense, and it prizes the deflected bolt returned."
+        },
+        "niman": {
+          "lore": "Form VI, the Way of the Rancor. A moderate Form, balancing blade and Force, favored by those who see the Jedi as scholars first."
+        },
+        "juyo": {
+          "lore": "Form VII, the Way of the Vornskr. Ferocious, almost too intense, it is taught with caution because of what it can do to a Jedi’s mind."
+        },
+        "medium": {
+          "lore": "Plate that is neither light nor heavy, the quartermaster’s compromise. It lets a trooper run, kneel, and take a hit in the same afternoon."
+        },
+        "robes": {
+          "lore": "Plain cloth worn by a thousand Jedi before. The weave is old, and it carries an odd comfort of its own."
+        },
+        "armoredRobes": {
+          "lore": "A Jedi’s robes with plating hidden in the folds. The wearer looks like a pilgrim until the first bolt glances away."
+        },
+        "stock": {
+          "lore": "A reworked grip and shoulder rest, made to steady a shot. It adds nothing flashy, only fewer misses."
+        },
+        "trigger": {
+          "lore": "A lighter pull and a quicker break. The kind of change that makes a gunsmith smile and a rifleman nervous."
+        },
+        "frag": {
+          "lore": "Compact, familiar, and exactly as loud as expected. Troopers carry them for the day when talking stops working."
+        },
+        "medpac": {
+          "lore": "Bandage, stim, and sealant in a case the size of a hand. Every medic has watched it do more good than any speech."
+        },
+        "boots": {
+          "lore": "Fitted with small servos that lengthen the stride. Scouts who wear them say the ground feels shorter."
+        },
+        "visor": {
+          "lore": "A narrow lens that sharpens the distance and flags the faint shapes in it. It is a small thing, and it is why many troopers come home."
+        },
+        "shield": {
+          "lore": "A belt-mounted emitter that throws up a thin film of energy. It blunts the worst and runs down quickly, so the wearer learns to stay alert."
+        }
+      },
+      "wing": {
+        "medical": {
+          "lore": "Quiet beds and quiet voices. The Halls smell of bacta and clean linen, and everyone who passes through remembers them gently."
+        },
+        "training": {
+          "lore": "The Salle echoes with practice blades and patient correction. Every Jedi has lost their first bout here and learned from it."
+        },
+        "forge": {
+          "lore": "The crystal hums in the dark. Here a Jedi builds the blade they will carry, and learns something about themselves in the doing."
+        },
+        "armory": {
+          "lore": "Racks of blasters and plates for the Republic soldiers who share the Temple’s halls. Not every defender carries a lightsaber."
+        },
+        "comms": {
+          "lore": "Holos, relays, and a watch that never sleeps. In the Hub, news from the war arrives a little late and a little changed."
+        },
+        "barracks": {
+          "lore": "Bunks, boots, and a card table nobody admits to owning. The troopers make a home out of whatever space they are given."
+        },
+        "archives": {
+          "lore": "Millennia of memory, shelved and catalogued. The Archives hold the answer to many questions, and some questions the answer may not welcome."
+        },
+        "gardens": {
+          "lore": "Moss, water, and a quiet that is carefully maintained. A good place to sit with a troubled thought until it loosens."
+        }
+      },
+      "tile": {
+        ".": {
+          "lore": "Open floor. Plain, scuffed, and honest. Most battles are decided on ground like this."
+        },
+        "_": {
+          "lore": "A door left open. It invites movement, for friend and foe alike."
+        },
+        "E": {
+          "lore": "The evacuation zone. A gunship waits, engines warm. Getting everyone to it is the whole point."
+        },
+        "r": {
+          "lore": "Broken stone and twisted metal. Rubble slows the careless and shelters the careful."
+        },
+        "c": {
+          "lore": "Stacked crates, supplies for someone’s better day. Good cover, and sometimes something useful inside."
+        },
+        "h": {
+          "lore": "A wall torn open by force, leaving a ragged window. Sightlines appear where none were meant to."
+        },
+        "x": {
+          "lore": "A drum of volatile fuel. Everyone nearby thinks about it at the same time."
+        },
+        "k": {
+          "lore": "A control console, blinking patiently. Whoever sits at it learns what the building knows."
+        },
+        "q": {
+          "lore": "A data terminal with unread files. Someone will want what it holds, and someone else will want it gone."
+        },
+        "Q": {
+          "lore": "A terminal already copied. Its secrets now travel with the squad, and the building does not know."
+        },
+        "b": {
+          "lore": "An alarm beacon, dark for now. If it lights, the room fills with more guests than were invited."
+        },
+        "C": {
+          "lore": "A place for a charge. Whoever planted the last one here is long gone, and whoever plants this one should be too."
+        },
+        "X": {
+          "lore": "A charge, armed and counting. No one stands near it on purpose."
+        },
+        "#": {
+          "lore": "A solid wall. It keeps the dark outside and the light in, or the other way around."
+        },
+        "B": {
+          "lore": "A reinforced blast wall, thick and sealed. Whoever built it expected a bad day."
+        },
+        "O": {
+          "lore": "The objective. A relay, a shrine, a cave mouth. Something that matters more than the people who have come for it."
+        },
+        "d": {
+          "lore": "A closed door. It opens to a hand, a will, or a well-aimed charge."
+        },
+        "D": {
+          "lore": "A locked door, sealed against casual visitors. Locks are only questions, and some people are good at answers."
+        }
+      },
+      "status": {
+        "guard": {
+          "lore": "Standing at a friend’s shoulder, blade ready. Guarding is an act of faith in the one beside you."
+        },
+        "overwatch": {
+          "lore": "Silent, still, and watching the door. Whoever steps through will be met."
+        },
+        "down": {
+          "lore": "Fallen, but not gone. Someone is already moving to reach them."
+        },
+        "stunned": {
+          "lore": "The world has gone soft and distant. A moment’s vulnerability is all the enemy needs."
+        },
+        "surrender": {
+          "lore": "Hands up, weapon down. The Jedi accept the offer, because they were never here to kill anyone they did not have to."
+        },
+        "captured": {
+          "lore": "Held, not harmed. A prisoner is a promise that someone will need to be answered later."
+        },
+        "disarmed": {
+          "lore": "Empty hands in a fight that does not care. Resourcefulness fills in where equipment ends."
+        },
+        "marked": {
+          "lore": "Singled out and called by name. Every weapon on the field now knows who to watch."
+        },
+        "concealed": {
+          "lore": "Unseen, and counting on it. Stillness is a weapon too."
+        },
+        "suppressed": {
+          "lore": "Pinned under steady fire. Raising a head is possible, but costly."
+        },
+        "darkness": {
+          "lore": "The dark side whispers that the cost of a thing is a reason to do more of it. Jedi who listen find the voice grows louder."
+        },
+        "panic": {
+          "lore": "Fear breaks free of its leash. Training says to breathe, and training is very far away."
+        },
+        "highground": {
+          "lore": "The advantage of height. Seen from above, even an ugly battle makes a certain sense."
+        },
+        "hunker": {
+          "lore": "Low behind cover, making the most of whatever stands between them and the next bolt. Not heroic, but very sensible."
+        },
+        "barrier": {
+          "lore": "A wall of will in the air, thin and shimmering. Those behind it feel the Force holding the world back for a moment."
+        },
+        "rooted": {
+          "lore": "Feet fixed to the ground by a will not their own. The world moves, and they do not."
+        },
+        "shield": {
+          "lore": "A faint shimmer of energy over the skin. It drinks the first blows, and then it is gone."
+        },
+        "stable": {
+          "lore": "The bleeding has slowed and the breath has steadied. They are still down, but they are no longer slipping away."
+        },
+        "tricked": {
+          "lore": "A voice in the mind whispers a suggestion, and it sounds exactly like their own. The thought is not theirs, but they act on it."
+        },
+        "stress0": {
+          "lore": "Breathing evenly, shoulders loose, mind clear. The squad notices the calm and draws on it."
+        },
+        "stress1": {
+          "lore": "A tremor in the hands, a thin edge to the voice. It passes for most, and those who feel it are not weak for it."
+        },
+        "stress2": {
+          "lore": "Past the point where willpower is enough. They need rest and quiet, and their friends need to let them have it."
+        },
+        "oldWound": {
+          "lore": "The scar aches with the weather. It is a record of a hard day and a reminder of how it ended."
+        },
+        "shakyHand": {
+          "lore": "A faint tremor that was not there before. The Jedi watch it, and the wearer learns to work around it."
+        },
+        "badLeg": {
+          "lore": "A bad step that never quite healed. The limp is slight, and always noticed by the one who has it."
+        },
+        "fearsHorrors": {
+          "lore": "Something in the dark found them once. They carry the memory into every cave afterward."
+        },
+        "guilt": {
+          "lore": "They lived when others did not, and no one has convinced them it was acceptable. The weight is real, and so is the effort of carrying it."
+        },
+        "nightmares": {
+          "lore": "Sleep brings back what the day forgot. They wake tired, and try again."
+        },
+        "anger": {
+          "lore": "An old fury that fits in the hand like a stone. The Jedi who carries it feels stronger, and that is the warning."
+        }
+      },
+      "class": {
+        "Guardian": {
+          "lore": "The Guardian stands between harm and the people who cannot defend themselves. Strength, discipline, and a blade that serves protection first."
+        },
+        "Consular": {
+          "lore": "The Consular seeks understanding before conflict. Diplomats, healers, and scholars of the Force, they would rather solve a problem than win it."
+        },
+        "Sentinel": {
+          "lore": "The Sentinel walks between the two paths, balancing combat and insight. Cautious, adaptable, and never quite where the enemy expects."
+        },
+        "Wayseeker": {
+          "lore": "A name from a much later age. In this era the term is unknown, and no Jedi here will answer to it."
+        },
+        "Soldier": {
+          "lore": "The Republic’s trooper: disciplined, loyal, and trained to follow a plan through its worst hour."
+        },
+        "Scout": {
+          "lore": "The scout goes ahead and returns with what the squad needs to know. Quiet, quick, and rarely thanked."
+        },
+        "Medic": {
+          "lore": "The medic runs toward the wounded when everyone else runs away. A kit, a steady voice, and a lot of nerve."
+        },
+        "Heavy": {
+          "lore": "The heavy carries what the others cannot. A big weapon, a big pack, and a stubbornness to match."
+        },
+        "Defender": {
+          "lore": "Soresu masters who never strike first. They stand in the fire so others can walk out of it."
+        },
+        "Shieldbearer": {
+          "lore": "Troopers in heavy plate behind a riot shield. Slow, loud, and the last thing a raider wants to charge."
+        },
+        "VIP": {
+          "lore": "Someone whose survival matters more than their own preferences. They did not choose the role, and many of them handle it with grace."
+        }
+      },
+      "planet": {
+        "coruscant": {
+          "lore": "The capital of the Republic, a world of endless towers and the Jedi Temple above the noise. For centuries it has felt untouchable."
+        },
+        "alderaan": {
+          "lore": "A world of mountains and old noble houses. In this age it hosts the peace talks that the galaxy has been waiting for."
+        },
+        "balmorra": {
+          "lore": "A world of foundries and weapon yards, fought over by both sides. Little of it has been left unscarred."
+        },
+        "ordMantell": {
+          "lore": "A rough Mid Rim world of depots, smugglers, and Republic outposts. Easy to reach, hard to hold."
+        },
+        "dantooine": {
+          "lore": "Open plains and quiet ruins, once home to a Jedi enclave. Rumor says the grassland hides things that hunt by night."
+        },
+        "narShaddaa": {
+          "lore": "The Smuggler’s Moon, a glittering stack of neon and debt. Anything can be bought here, at a price someone else usually pays."
+        },
+        "ossus": {
+          "lore": "A world of ruined Jedi archives, scoured by old wars. The shelves are empty in places, and the silence is not entirely empty."
+        },
+        "ilum": {
+          "lore": "The ice world where Jedi come to find their kyber. The caves hum with something older than the Order."
+        },
+        "taris": {
+          "lore": "A city world that has been burned and rebuilt more than once. The old towers still stand above the ruins of what they were."
+        },
+        "tython": {
+          "lore": "The birthplace of the Jedi Order, far from the noise of the core. After the treaty, the Order turns toward it again."
+        },
+        "korriban": {
+          "lore": "The tomb world of the ancient Sith. Dust and stone, and a presence that waits."
+        },
+        "dromundKaas": {
+          "lore": "A jungle world of storms and predators, the seat of the Sith Empire. Its capital rises out of the rain like a threat."
+        },
+        "hydianWay": {
+          "lore": "A hyperspace road that carries trade and troops alike. Whoever holds it holds the pulse of the Outer Rim."
+        },
+        "ruusan": {
+          "lore": "A world scarred by a war that burned a thousand years later in memory. Its forests remember the cost of certainty."
+        }
+      },
+      "character": {
+        "zym": {
+          "lore": "Grand Master of the Order, tired and unyielding. He carries a Council’s worth of doubt, and does not let it show."
+        },
+        "gnost": {
+          "lore": "A Kel Dor Jedi historian, breath-masked and unhurried. He believes that the past is the only teacher that cannot be bribed."
+        },
+        "darach": {
+          "lore": "A Zabrak Jedi Master with a patient smile and a hard-earned scar. He teaches best by letting others make their own mistakes."
+        },
+        "satele": {
+          "lore": "A young Knight with a famous name and an unfinished story. She carries the weight of a lineage she did not choose."
+        },
+        "jace": {
+          "lore": "A Republic soldier who has seen too much and complained about it too little. His platoon would follow him anywhere sensible."
+        },
+        "malgus": {
+          "lore": "A Sith Lord of terrible resolve, who struck at the heart of the Republic and meant it. His pain is not hidden, and neither is his power."
+        },
+        "adraas": {
+          "lore": "A Sith Lord who commanded beside Malgus. He is cold, capable, and he regards the Temple as a trophy waiting to be taken."
+        },
+        "eleena": {
+          "lore": "A Twi’lek who stands at Malgus’s side by choice. She sees more of him than anyone else does, and she is not afraid."
+        },
+        "kira": {
+          "lore": "A Guardian Knight who leads from the front. She says little about the people she has lost, and carries every name."
+        },
+        "tor": {
+          "lore": "A Consular Padawan with a mind quicker than his nerve. He is learning that courage is just fear that keeps walking."
+        },
+        "dax": {
+          "lore": "A sergeant with twenty years of mud on his boots. He does not believe in luck, and keeps his squad alive anyway."
+        },
+        "ilsa": {
+          "lore": "A scout who moves like a rumor. She prefers to be forgotten, and rarely is."
+        },
+        "bren": {
+          "lore": "A medic with tired hands and a steady voice. He has lost patients, and has never stopped trying for the next one."
+        },
+        "grak": {
+          "lore": "A heavy trooper built like a doorframe. Gentle in the barracks, immovable on the line."
+        },
+        "saresh": {
+          "lore": "A Republic envoy with an easy manner and a careful vocabulary. Whatever he says, there seems to be something else behind it."
+        },
+        "ondo": {
+          "lore": "A Senator with a loyal voice and a long list of enemies. He wants the treaty badly, and the Temple wants him alive to sign it."
+        },
+        "corin": {
+          "lore": "An Imperial officer who changed sides at some personal cost. He is trusted a little less than he deserves, and a little more than he expects."
+        },
+        "mira": {
+          "lore": "An aide who knows where every document is and who has read most of them. Quiet, observant, and indispensable."
+        },
+        "thulHeir": {
+          "lore": "Lady Venna Thul, heir to an old Alderaanian house. She is young, careful, and aware that her name weighs more than she does."
+        }
+      },
+      "mission": {
+        "relay": {
+          "lore": "A lonely relay on the frontier, keeping the lanes open for ships that never learn its name. The Sith want it silent, and they are coming in waves."
+        },
+        "shrine": {
+          "lore": "Pilgrims have long come to a kyber shrine on Dantooine. Tonight something else has found it, and it has an appetite for the Force."
+        },
+        "rescue": {
+          "lore": "A supply depot on Ord Mantell holds prisoners who matter to someone. The plan is simple, which means it will not go simply."
+        },
+        "envoy": {
+          "lore": "Schedules leaked, secrets traded, and a trail that winds through the lower city. Someone near the talks is selling the Republic."
+        },
+        "archive": {
+          "lore": "An Imperial listening post on Balmorra, tucked between foundries. What it hears could hurt the Republic, and what it holds could help."
+        },
+        "sabotage": {
+          "lore": "An Imperial fuel depot on Balmorra, vast and poorly lit. A well-placed charge here could stall an advance for weeks."
+        },
+        "escort": {
+          "lore": "A Senator must walk the length of Coruscant’s lower streets to reach the talks. The Temple walks with him."
+        },
+        "blockade": {
+          "lore": "Mandalorians in Imperial pay have closed a stretch of the Hydian Way. A convoy is counting on the squad to open it."
+        },
+        "cache": {
+          "lore": "A listening post on the Inner Rim has gone quiet. The squad is sent to find out why before anyone else does."
+        },
+        "hutt": {
+          "lore": "A Hutt warehouse on Nar Shaddaa holds a ledger of debts and deals. In the right hands it could change the war."
+        },
+        "dock": {
+          "lore": "Docking Ring Nine. Malgus is coming for the Temple, and the Jedi have one chance to stop him at the door."
+        },
+        "vault": {
+          "lore": "Beneath the ruins of Ossus lie old records of the Sith wars. Gnost-Dural wants them saved, and the Empire wants them first."
+        },
+        "ilum": {
+          "lore": "A cave mouth on Ilum, cold and humming. Sergeant Malcom’s platoon holds it, and the Jedi arrive in time to share the watch."
+        },
+        "adraasHunt": {
+          "lore": "During the talks on Alderaan, Satele Shan leads a strike on Lord Adraas at an embassy hangar. It is a gamble with the treaty as the stake."
+        },
+        "taris": {
+          "lore": "A reclamation camp on Taris, where captives were put to work. The Jedi come to open the gates, and to see who is still inside."
+        },
+        "thul": {
+          "lore": "The heir to House Thul must cross Alderaan unseen. The Jedi go with her, because some journeys are not safe alone."
+        },
+        "depot": {
+          "lore": "Forward Depot Cresh keeps the enemy fed and armed. Take away the depot and the front shifts."
+        },
+        "fort": {
+          "lore": "Fort Garnik on Ord Mantell is old, battered, and still standing. The Republic means to keep it that way."
+        },
+        "r_ravine": {
+          "lore": "The wounded of the Army of Light lie in a ravine as the Brotherhood closes in. Among them is Johun Othone, a young Knight in Lord Hoth’s service."
+        },
+        "r_caves": {
+          "lore": "The caves of Ruusan run deep, and the Brotherhood is gathering in them. Some of what moves in the dark has no interest in soldiers at all."
+        },
+        "r_bomb": {
+          "lore": "Kaan’s ritual would end the Light and the Dark together. Hoth goes to stop it, and the squad goes ahead of him."
+        },
+        "r_hospital": {
+          "lore": "The Army of Light cares for its wounded far behind the line, and that is exactly where the Brotherhood strikes. The healers must be given time."
+        },
+        "r_nexus": {
+          "lore": "Deep in the caves, the dark side has found a place to grow. It breeds only what hunts the gifted, so the troops go first."
+        },
+        "r_snipers": {
+          "lore": "A courier carries the Army’s plans along a ridge trail, and the Brotherhood has paid for rifles to watch it. The road is short and the cover is thin."
+        },
+        "r_dump": {
+          "lore": "The Brotherhood marches on powder and fuel. Take away the dump and the army slows, and that may be the difference."
+        }
+      },
+      "research": {
+        "ataru": {
+          "lore": "Acrobatics and the Force woven into every stroke. Padawans who study it often take a little too much joy in the leap."
+        },
+        "djemSo": {
+          "lore": "Strike and counterstrike are the same motion seen from two sides. Masters teach it to those with the nerve to be struck first."
+        },
+        "niman": {
+          "lore": "A balanced Form for Jedi who walk between the saber and the book. Many Masters have settled into it as the years grew long."
+        },
+        "juyo": {
+          "lore": "The Form that burns too brightly. It is taught rarely, and always with one eye on the student’s heart."
+        },
+        "fieldMed": {
+          "lore": "New protocols from the Temple’s healers, carried to the field in plain satchels. Another life saved is the only proof they ask for."
+        },
+        "bacta": {
+          "lore": "Great tanks of the amber fluid, filled and tended. The Halls grow warmer, and the beds more often empty."
+        },
+        "curriculum": {
+          "lore": "The Masters write down what they know and pass it on. The Salle grows stricter, and the Padawans grow stronger."
+        },
+        "holocron": {
+          "lore": "Old holocrons, opened with care and heard patiently. Every mission leaves more to learn than before."
+        },
+        "eliteMods": {
+          "lore": "A craftsman’s corner of the armory. Small changes, done well, quietly improve every shot."
+        },
+        "visors": {
+          "lore": "Optics salvaged, refined, and issued to those who need to see farther. A small piece of glass that can change an afternoon."
+        },
+        "shields": {
+          "lore": "Compact emitters brought up from the engineers. The troopers wear them with a mixture of gratitude and suspicion."
+        },
+        "armorWeave": {
+          "lore": "A fiber woven with an old ore that resists the saber. The robes look the same and feel a little heavier."
+        },
+        "kyberLore": {
+          "lore": "The old crafts, relearned and refined. Each crystal is a little less costly to bring to song."
+        },
+        "codebreak": {
+          "lore": "Imperial ciphers broken one at a time by patient hands. A little more is known, and a little less is a surprise."
+        },
+        "sithTactics": {
+          "lore": "Captured manuals read by the Temple’s tacticians. Knowing the enemy’s habits is the oldest advantage."
+        },
+        "beastLore": {
+          "lore": "Reports from every survivor, collected and sorted. The monsters are less strange once they have been described."
+        },
+        "logistics": {
+          "lore": "Rations, bunks, and rosters, made to run on time. No glamour in it, and nothing works without it."
+        }
+      }
+    },
+    "SOURCE_LITERALS": [
+      {
+        "line": 5,
+        "raw": "'Patient hands, steady breath. A trooper learns that one clean shot saves more lives than ten loud ones.'"
+      },
+      {
+        "line": 6,
+        "raw": "'The blade moves before the thought finishes. Every Padawan is taught that the strike is the last answer, not the first.'"
+      },
+      {
+        "line": 7,
+        "raw": "'To stand between a blow and a friend is the oldest Jedi lesson. The Guardian does not ask who deserves it.'"
+      },
+      {
+        "line": 8,
+        "raw": "'Waiting is a kind of fighting. The soldier who holds still and watches the door decides who walks through it.'"
+      },
+      {
+        "line": 9,
+        "raw": "'A breath of the Force, shaped into a shove. It carries no malice, only a firm request to be elsewhere.'"
+      },
+      {
+        "line": 10,
+        "raw": "'The Force gathers, then falls on one place at once. Masters warn that power taken this wide leaves a mark on the one who takes it.'"
+      },
+      {
+        "line": 11,
+        "raw": "'The Council forbids it. A hand closes on a throat from across the room, and the one who holds it feels the dark answer back.'"
+      },
+      {
+        "line": 12,
+        "raw": "'A pulse that quiets the body without breaking it. Mercy is a discipline, and it is harder than the alternative.'"
+      },
+      {
+        "line": 13,
+        "raw": "'The Jedi prefer a prisoner who can talk to a corpse who cannot. Many a captive has surprised them with what they knew.'"
+      },
+      {
+        "line": 14,
+        "raw": "'Stillness is not rest. The Jedi sits inside the storm and listens for what the Force is trying to say.'"
+      },
+      {
+        "line": 15,
+        "raw": "'The Force knits what the blade has opened. It does not take away the fear, and the Jedi never claims that it does.'"
+      },
+      {
+        "line": 16,
+        "raw": "'A small sphere, a short fuse, a loud decision. Troopers throw them at cover, and cover rarely argues.'"
+      },
+      {
+        "line": 17,
+        "raw": "'A field medic’s first rule: keep them here. Everything else can be solved once the bleeding stops.'"
+      },
+      {
+        "line": 18,
+        "raw": "'Every door in the Temple was built to open to a hand that is welcome. Out in the field, doors are less polite.'"
+      },
+      {
+        "line": 19,
+        "raw": "'Old machines hold new secrets. A steady hand and a patient tech can still coax the truth out of them.'"
+      },
+      {
+        "line": 20,
+        "raw": "'The Force reaches out and returns with shapes, heartbeats, and the cold spots where something is hiding.'"
+      },
+      {
+        "line": 21,
+        "raw": "'Set the charge, count the steps, leave. Sabotage is quiet work done by people who would rather not be thanked.'"
+      },
+      {
+        "line": 22,
+        "raw": "'A lightsaber thrown is a lightsaber risked. The Force brings it back, but the Jedi learns the length of a moment without it.'"
+      },
+      {
+        "line": 23,
+        "raw": "'The blade turns the bolt. Another Jedi stands at the shoulder, and together they make a wall no blaster wants to test.'"
+      },
+      {
+        "line": 24,
+        "raw": "'A Jedi’s jump is not strength but trust. The Force holds the air for the length of a heartbeat, and that is enough.'"
+      },
+      {
+        "line": 25,
+        "raw": "'The Force shows the bolt before it leaves the barrel. The blade is only there to finish the thought.'"
+      },
+      {
+        "line": 26,
+        "raw": "'One wide arc, and the room is a different place. The Guardian’s answer to being surrounded is to become the center.'"
+      },
+      {
+        "line": 27,
+        "raw": "'The deeper art. A Consular gives of their own strength to restore another’s, and rests afterward without complaint.'"
+      },
+      {
+        "line": 28,
+        "raw": "'A shell of will, thin as breath and hard as durasteel while it holds. Consulars say it is easier to build for others than for oneself.'"
+      },
+      {
+        "line": 29,
+        "raw": "'Bacta, a steady voice, and a Force touch when the bacta runs short. The Temple’s healers learned to work under fire.'"
+      },
+      {
+        "line": 30,
+        "raw": "'A suggestion, offered so gently that the listener believes it was their own idea. The Consulars say it is not a trick but a courtesy.'"
+      },
+      {
+        "line": 31,
+        "raw": "'The Force can call back a life that has barely left. It asks a great deal, and the Jedi who answers is never quite the same.'"
+      },
+      {
+        "line": 32,
+        "raw": "'Fire that does not seek to hit, only to keep heads down. A soldier’s way of buying others a few seconds of safe ground.'"
+      },
+      {
+        "line": 33,
+        "raw": "'Get low, get small, let the world pass over. Surviving a bad moment is also a victory.'"
+      },
+      {
+        "line": 34,
+        "raw": "'A spotter calls the target and everyone’s aim improves. Calm voices win more battles than brave ones.'"
+      },
+      {
+        "line": 35,
+        "raw": "'A cloud to move behind. The enemy fires at where you were, and you are somewhere else.'"
+      },
+      {
+        "line": 36,
+        "raw": "'Slicers say every lock is a conversation. Patience and a little cleverness will make most systems say yes.'"
+      },
+      {
+        "line": 37,
+        "raw": "'Armor is a promise that a shot will not matter. The shredder round exists to break that promise.'"
+      },
+      {
+        "line": 38,
+        "raw": "'All the weapon’s patience spent at once. The heavy trooper trades accuracy for the certainty that something will land.'"
+      },
+      {
+        "line": 39,
+        "raw": "'One shot, taken after the long wait. A scout learns to hold their breath until the world holds still with them.'"
+      },
+      {
+        "line": 40,
+        "raw": "'A word at the right moment. Veterans know that courage is mostly borrowed, passed hand to hand along the line.'"
+      },
+      {
+        "line": 41,
+        "raw": "'A sharp sting and a gasp. Medics carry the stim for the worst day, and hope never to need it.'"
+      },
+      {
+        "line": 42,
+        "raw": "'It is loud, and it is meant to be. The heavy trooper fires one when quiet has already failed.'"
+      },
+      {
+        "line": 43,
+        "raw": "'The Form takes over. Cut follows cut so quickly that the opponent has no time to be afraid of the next one.'"
+      },
+      {
+        "line": 44,
+        "raw": "'A Sentinel moves where eyes do not rest. They are there, and then they are behind you.'"
+      },
+      {
+        "line": 45,
+        "raw": "'Some blows end a fight before it begins. Jedi who learn this also learn how heavy it is to use.'"
+      },
+      {
+        "line": 46,
+        "raw": "'The Force whispers before the danger arrives. Sentinels trust that whisper and have been alive longer for it.'"
+      },
+      {
+        "line": 47,
+        "raw": "'A flick of the wrist and the weapon is somewhere else. The Jedi way is to end the fight without ending the foe.'"
+      },
+      {
+        "line": 48,
+        "raw": "'Where others see rubble, a scout sees a road. The best ones leave no tracks for anyone to follow.'"
+      },
+      {
+        "line": 49,
+        "raw": "'Even a hungry thing can be soothed by a patient mind. It is slow work, and a gentle one.'"
+      },
+      {
+        "line": 50,
+        "raw": "'The Force draws what you need into your hand, or an enemy into your reach. Take care, because it works both directions.'"
+      },
+      {
+        "line": 51,
+        "raw": "'The ground itself remembers the Jedi’s step. A tremor rolls outward and knocks the unready off their feet.'"
+      },
+      {
+        "line": 52,
+        "raw": "'Some Jedi feel the creatures of the wild more clearly than they feel people. The bond is quiet, and it is real.'"
+      },
+      {
+        "line": 53,
+        "raw": "'A good soldier fires while moving, and a great one forgets the difference. Practice, bruises, and more practice.'"
+      },
+      {
+        "line": 54,
+        "raw": "'A second pair of eyes behind the first. The shot is the shooter’s, but the war is won by the one who sees the whole field.'"
+      },
+      {
+        "line": 55,
+        "raw": "'Gone before the alarm sounds. A scout who is never noticed is a scout whose reports always arrive.'"
+      },
+      {
+        "line": 56,
+        "raw": "'Orders, drilled until they are habit. In the dark and the noise, protocol is what remains when thinking is too slow.'"
+      },
+      {
+        "line": 57,
+        "raw": "'A small hovering disc that does one thing well. Soldiers name them anyway, and are not embarrassed to.'"
+      },
+      {
+        "line": 58,
+        "raw": "'It does not harm flesh, only wires. Machines go quiet and the battle changes shape.'"
+      },
+      {
+        "line": 59,
+        "raw": "'Not one step back. The line holds because each person on it decides, separately, that it will.'"
+      },
+      {
+        "line": 60,
+        "raw": "'Layered plating, scuffed and patched. Every trooper has a story about the bolt it stopped.'"
+      },
+      {
+        "line": 61,
+        "raw": "'Experience is a kind of armor. The veteran has seen this before, and the calm they carry spreads along the line.'"
+      },
+      {
+        "line": 62,
+        "raw": "'Distance is only a matter of patience. The long barrel, the steady breath, the shot that nobody heard coming.'"
+      },
+      {
+        "line": 63,
+        "raw": "'A trained eye finds the gap in the armor. It is not cruelty, only competence at a hard trade.'"
+      },
+      {
+        "line": 64,
+        "raw": "'Cover, concealment, silence. The things that are not in the manual but have kept every old scout alive.'"
+      },
+      {
+        "line": 65,
+        "raw": "'Bandages, a stim, and one clean cloth. Small things that matter most when everything else has gone wrong.'"
+      },
+      {
+        "line": 66,
+        "raw": "'The medic fights because the line breaks without them. Carrying a rifle and a kit takes a particular kind of courage.'"
+      },
+      {
+        "line": 67,
+        "raw": "'Heavy and worn, it never leaves the medic’s shoulder. What is inside has stopped more wounds than any speech.'"
+      },
+      {
+        "line": 68,
+        "raw": "'Spare cells across the chest, clipped and counted. A soldier who runs dry is a soldier who is no longer useful to the people next to them.'"
+      },
+      {
+        "line": 69,
+        "raw": "'The heavy trooper walks into the fire because the others cannot. Armor, mass, and the stubbornness to keep walking.'"
+      },
+      {
+        "line": 70,
+        "raw": "'All the weight of the Form behind one stroke. Guardians are taught that restraint is what makes such a blow safe to swing.'"
+      },
+      {
+        "line": 71,
+        "raw": "'Not the hardest cut but the truest. The blade goes exactly where the Force showed it would be needed.'"
+      },
+      {
+        "line": 72,
+        "raw": "'The Force spreads outward like warmth through a cold room. Every hurt in reach eases, and the Consular asks nothing in return.'"
+      },
+      {
+        "line": 73,
+        "raw": "'A ring of pressure rolls out from the Jedi’s hands. Nothing in its path is spared, and nothing in its path is meant to be killed.'"
+      },
+      {
+        "line": 74,
+        "raw": "'The air thickens, then stops. Those caught in it find their limbs unwilling, and the Consular holds the pause with great effort.'"
+      },
+      {
+        "line": 75,
+        "raw": "'The first shot is a question and the second is the answer. A good gunner learns to ask twice before the target can react.'"
+      },
+      {
+        "line": 76,
+        "raw": "'A single bright signal and the wounded know where to crawl. The medic can give it only once, and gives it fully.'"
+      },
+      {
+        "line": 77,
+        "raw": "'Years of drills in the Salle have taught the body to take a blow and keep standing. The Guardian counts bruises as lessons.'"
+      },
+      {
+        "line": 78,
+        "raw": "'A Guardian who studies a rival’s feet more than their blade. The duel is often won before the first stroke.'"
+      },
+      {
+        "line": 79,
+        "raw": "'On guard, the Jedi becomes a fixed point. Allies know exactly where the line is and trust that it will not move.'"
+      },
+      {
+        "line": 80,
+        "raw": "'The first through every door. A Vanguard takes the risk so that those behind can measure it.'"
+      },
+      {
+        "line": 81,
+        "raw": "'The Warden’s blade seems to be wherever the bolt is going. Those who watch it work call it luck, and the Warden calls it attention.'"
+      },
+      {
+        "line": 82,
+        "raw": "'Some Guardians simply refuse to fall. It is not stubbornness, they say, but a promise made to everyone standing behind them.'"
+      },
+      {
+        "line": 83,
+        "raw": "'The sum of a lifetime of patient practice. The blade is no longer a tool but a part of the hand.'"
+      },
+      {
+        "line": 84,
+        "raw": "'A mind that has learned to be quiet. The Force flows more freely through a Jedi who is not arguing with themselves.'"
+      },
+      {
+        "line": 85,
+        "raw": "'Fear is acknowledged, then set down. The Consular who has done this once finds it easier to do again.'"
+      },
+      {
+        "line": 86,
+        "raw": "'A deep calm that seems to refill itself. Consulars say the Force is not spent so much as borrowed and returned.'"
+      },
+      {
+        "line": 87,
+        "raw": "'The battle slows to those who have learned to read it. The Consular steps where the next moment will be, not where the last one was.'"
+      },
+      {
+        "line": 88,
+        "raw": "'A Consular who has stopped fearing the Force and started listening to it. Such Jedi are rare, and rarely proud of it.'"
+      },
+      {
+        "line": 89,
+        "raw": "'A Sentinel notices the loose stone, the shifted shadow, the breath held too long. Most of survival is simply noticing.'"
+      },
+      {
+        "line": 90,
+        "raw": "'A Sentinel who has learned exactly where a fight turns. The finishing stroke is quick, and no one is allowed to enjoy it.'"
+      },
+      {
+        "line": 91,
+        "raw": "'Footprints, scorch marks, the stillness of a room just emptied. The Tracker follows the story the enemy leaves behind.'"
+      },
+      {
+        "line": 92,
+        "raw": "'The Sentinel who keeps watch through the dark hours. Nothing reaches the camp that has not first reached them.'"
+      },
+      {
+        "line": 93,
+        "raw": "'A blade kept honest by daily care. The Sentinel treats sharpening as a kind of meditation.'"
+      },
+      {
+        "line": 94,
+        "raw": "'The Sentinel crosses open ground as if the ground were reluctant to notice. Lessons in stealth are never entirely spoken.'"
+      },
+      {
+        "line": 95,
+        "raw": "'Patient and unhurried, the Hunter lets the quarry make the first mistake. It always does.'"
+      },
+      {
+        "line": 96,
+        "raw": "'The Forms are no longer steps to be remembered. The Sentinel lives inside them and the blade simply follows.'"
+      },
+      {
+        "line": 97,
+        "raw": "'Bolts and blades pass through spaces the Jedi has already left. It looks like grace, and it is years of discipline.'"
+      },
+      {
+        "line": 98,
+        "raw": "'Where the map ends, the Wayseeker keeps walking. A path appears for anyone who truly expects one.'"
+      },
+      {
+        "line": 99,
+        "raw": "'The Force in living things, felt in the roots as clearly as in the stars. The Wayseeker draws on a deeper spring.'"
+      },
+      {
+        "line": 100,
+        "raw": "'A body trained by long travel and little comfort. The Wayseeker endures what would send others home.'"
+      },
+      {
+        "line": 101,
+        "raw": "'Someone who learned to move through wild places learned to move quietly. The skill carries over to every other kind of ground.'"
+      },
+      {
+        "line": 102,
+        "raw": "'The creatures of the wild trust the Wayseeker, and the Wayseeker returns the trust. Neither side has ever been disappointed.'"
+      },
+      {
+        "line": 103,
+        "raw": "'Distance is no barrier for those who listen. The Wayseeker sees the far ridge as clearly as the near.'"
+      },
+      {
+        "line": 104,
+        "raw": "'Old instincts woken beneath careful training. The Wayseeker is a little frightening to watch, and knows it.'"
+      },
+      {
+        "line": 105,
+        "raw": "'Hours at the range and nights cleaning the barrel. Good shooting is mostly habit and a little stubbornness.'"
+      },
+      {
+        "line": 106,
+        "raw": "'A trooper who has been knocked down enough times to know how to get up. The lesson is physical, and also not.'"
+      },
+      {
+        "line": 107,
+        "raw": "'The kind of shooter who is quiet at the range because the targets have said all there is to say.'"
+      },
+      {
+        "line": 108,
+        "raw": "'Fear is a visitor, and the veteran does not offer it a chair. The line holds because the people on it are calm.'"
+      },
+      {
+        "line": 109,
+        "raw": "'Orders, duty, and a stubborn refusal to be turned. Few things are as hard to move as a soldier who has decided.'"
+      },
+      {
+        "line": 110,
+        "raw": "'A trooper whose voice carries and whose plans work. Others fall in without being asked, and are glad to.'"
+      },
+      {
+        "line": 111,
+        "raw": "'Stories are told about this one in barracks across the Republic. The trooper rolls their eyes and keeps shooting.'"
+      },
+      {
+        "line": 112,
+        "raw": "'A scout whose sight is a gift and a discipline. Distant things become plain, and plain things become useful.'"
+      },
+      {
+        "line": 113,
+        "raw": "'Light on the feet and quick to the next cover. A scout lives in the spaces between where the enemy is looking.'"
+      },
+      {
+        "line": 114,
+        "raw": "'One breath held, one shot let go. The Sniper is a rumor that sometimes becomes a fact.'"
+      },
+      {
+        "line": 115,
+        "raw": "'Cold work for a necessary end. The scout who does it well rarely speaks of it afterward.'"
+      },
+      {
+        "line": 116,
+        "raw": "'Others would have been left behind long ago. The Survivor has learned that coming home is a skill like any other.'"
+      },
+      {
+        "line": 117,
+        "raw": "'The scout calls the range, the wind, and the target in one calm sentence. Every rifle nearby gets a little better.'"
+      },
+      {
+        "line": 118,
+        "raw": "'Familiar with every gap in every armor design. The scout is not cruel, only precise.'"
+      },
+      {
+        "line": 119,
+        "raw": "'A name whispered on the Rim and rarely seen on a report. The scout prefers it that way.'"
+      },
+      {
+        "line": 120,
+        "raw": "'Across rubble and open street without a sound. By the time the enemy turns, the Phantom is elsewhere.'"
+      },
+      {
+        "line": 121,
+        "raw": "'Field medicine learned by the book, then by the bruise. The drills make the hands steady when the voice is not.'"
+      },
+      {
+        "line": 122,
+        "raw": "'Clean cuts and clean thinking on the worst night. A good surgeon is calm because someone else cannot be.'"
+      },
+      {
+        "line": 123,
+        "raw": "'The medic has seen the worst a battlefield can offer. They keep working, and the squad draws strength from it.'"
+      },
+      {
+        "line": 124,
+        "raw": "'Full kits, sorted by urgency, ready in the dark. The medic can find what they need by touch.'"
+      },
+      {
+        "line": 125,
+        "raw": "'A medic who learned that sometimes the best treatment is keeping the enemy from firing. Few argue with the logic.'"
+      },
+      {
+        "line": 126,
+        "raw": "'Soldiers on three worlds swear to have been saved by this one. The medic shrugs and moves on to the next.'"
+      },
+      {
+        "line": 127,
+        "raw": "'Years in the field have taught this medic where to stand and when to run. Survivors remember the lessons gladly.'"
+      },
+      {
+        "line": 128,
+        "raw": "'A heavy trooper with a respect for chemistry. Everything that explodes is eventually a tool.'"
+      },
+      {
+        "line": 129,
+        "raw": "'Built to carry, built to endure. The heavy trooper does the work nobody else wants and does not complain.'"
+      },
+      {
+        "line": 130,
+        "raw": "'A slow and steady wall of armor and nerve. Allies shelter behind it, and it does not flinch.'"
+      },
+      {
+        "line": 131,
+        "raw": "'Heavy weapons need a steady hand and a patient eye. The gunner has both, which is rarer than it sounds.'"
+      },
+      {
+        "line": 132,
+        "raw": "'Years of training with weapons that others cannot lift. The recoil is a conversation the gunner has learned to win.'"
+      },
+      {
+        "line": 133,
+        "raw": "'A figure out of old stories, mountainous in plate. The trooper walks through fire and the enemy remembers it.'"
+      },
+      {
+        "line": 134,
+        "raw": "'A heavy trooper who has stopped waiting for orders. On this ground, the Warlord is the order.'"
+      },
+      {
+        "line": 137,
+        "raw": "'Sith Empire infantry, trained hard and ordered harder. Most of them believe in the Empire because they have never been offered another future.'"
+      },
+      {
+        "line": 138,
+        "raw": "'A walking wall in Imperial plate, with a gun that wants to be heard. It is slow to turn and quick to punish those who stand still.'"
+      },
+      {
+        "line": 139,
+        "raw": "'Imperial Intelligence does not announce itself. A cold hide, a long rifle, and a patience the Temple’s own scouts would respect.'"
+      },
+      {
+        "line": 140,
+        "raw": "'A student of the Sith, hungry to be noticed by someone with more power. Lightning crackles in the fingers, and mercy has not yet been taught.'"
+      },
+      {
+        "line": 141,
+        "raw": "'What is left when a great horror feeds. A Dark Husk has no mind of its own, only hunger, and it moves when its maker kills.'"
+      },
+      {
+        "line": 142,
+        "raw": "'A beast bred, it is said, to hunt those who touch the Force. The Jedi who survive an encounter rarely describe it, but the nightmares do.'"
+      },
+      {
+        "line": 143,
+        "raw": "'A Republic envoy with the right smile and the wrong friends. Whispers say that someone close to the talks is selling the schedule.'"
+      },
+      {
+        "line": 144,
+        "raw": "'A Sith Lord who believes the Republic is a lie and means to prove it with fire. He fights like a man with nothing left to lose.'"
+      },
+      {
+        "line": 145,
+        "raw": "'Mandalorian clans, hired by the Empire for the oldest reason there is. They fight with honor and are paid in credits.'"
+      },
+      {
+        "line": 146,
+        "raw": "'Lord Adraas fought beside Malgus in the strike on Coruscant. Those who faced him remember how little he seemed to care about the cost.'"
+      },
+      {
+        "line": 147,
+        "raw": "'Foot soldiers of the Brotherhood of Darkness, devoted to Lord Kaan’s vision. They fight as though the war were already won, and that certainty is their weapon.'"
+      },
+      {
+        "line": 148,
+        "raw": "'A Dark Side warrior who fights for rage as much as for Kaan. The wounds only seem to feed it.'"
+      },
+      {
+        "line": 149,
+        "raw": "'One of the Brotherhood’s Lords, who sees the Light as a delay to be removed. The troopers around it fight as if its approval were air.'"
+      },
+      {
+        "line": 150,
+        "raw": "'A hired gun on the ridge who is paid to be patient. The Brotherhood buys loyalty with ideals and loyalty from this one with credits.'"
+      },
+      {
+        "line": 151,
+        "raw": "'A creature born of the dark side in the Ruusan caves, hungry only for the Force. Soldiers without the gift pass it unnoticed, and it cannot forgive that.'"
+      },
+      {
+        "line": 152,
+        "raw": "'A wound in the world where the dark side pools and festers. It does not move or speak, but it makes more of itself.'"
+      },
+      {
+        "line": 153,
+        "raw": "'The heart of the cave, where the dark gathers. It beats slowly, and anyone who stays near it begins to hear it.'"
+      },
+      {
+        "line": 154,
+        "raw": "'Lord Kaan, leader of the Brotherhood of Darkness, sure that the Sith should lead the galaxy. He is brilliant, ruthless, and wrong in a way he will never accept.'"
+      },
+      {
+        "line": 155,
+        "raw": "'Darth Bane, a Sith apprentice who watches from the ridge and listens to the war with a stranger’s attention. He survives Ruusan, and what he builds from it will outlast everyone here.'"
+      },
+      {
+        "line": 158,
+        "raw": "'Standard blaster'"
+      },
+      {
+        "line": 158,
+        "raw": "'A standard-issue Republic blaster, worn smooth by many hands. It is not elegant, but it fires every time.'"
+      },
+      {
+        "line": 159,
+        "raw": "'Military blaster'"
+      },
+      {
+        "line": 159,
+        "raw": "'A military-grade piece, better balanced and kept clean. Quartermasters hand them out with a nod and a warning.'"
+      },
+      {
+        "line": 160,
+        "raw": "'Elite blaster'"
+      },
+      {
+        "line": 160,
+        "raw": "'Elite work, tuned by someone who cared. Troopers who are issued one tend to take better care of it than of themselves.'"
+      },
+      {
+        "line": 161,
+        "raw": "'No armor at all. Quick, light, and a little reckless. The Jedi have always trusted the Force over plating.'"
+      },
+      {
+        "line": 162,
+        "raw": "'Flexible plates under a Republic jacket. It turns a glancing bolt and weighs almost nothing.'"
+      },
+      {
+        "line": 163,
+        "raw": "'Layered ceramic and alloy, built to take hits that would drop anyone else. It makes a trooper slow and very hard to move.'"
+      },
+      {
+        "line": 164,
+        "raw": "'A narrow window on a far place. Scouts say the world looks calmer through glass, which is a lie worth believing.'"
+      },
+      {
+        "line": 165,
+        "raw": "'A longer barrel, a tighter bolt. Gunsmiths on Coruscant argue about the exact length, and nobody wins.'"
+      },
+      {
+        "line": 166,
+        "raw": "'A power cell with a little more kick. It runs hot, and troopers learn to count their shots.'"
+      },
+      {
+        "line": 167,
+        "raw": "'Training saber'"
+      },
+      {
+        "line": 167,
+        "raw": "'Padawans build their first blade under a Master’s eye. The training blade is simple, and it teaches by being forgiving.'"
+      },
+      {
+        "line": 168,
+        "raw": "'Attuned saber'"
+      },
+      {
+        "line": 168,
+        "raw": "'Attuned to its owner. The crystal hums at a pitch only they can feel, and the blade answers their intent.'"
+      },
+      {
+        "line": 169,
+        "raw": "'Master-forged saber'"
+      },
+      {
+        "line": 169,
+        "raw": "'Forged by a Master’s hand. It is not a weapon so much as a conversation between a Jedi and the Force.'"
+      },
+      {
+        "line": 170,
+        "raw": "'A tightly bound beam that cuts where it is aimed and nowhere else. Some Jedi prefer clarity to power.'"
+      },
+      {
+        "line": 171,
+        "raw": "'A lighter hilt and a quicker blade. It rewards those who prefer to finish a motion before the other side begins.'"
+      },
+      {
+        "line": 172,
+        "raw": "'A blade made to protect. It turns away what it can, and the Jedi who carries it takes pride in what never gets through.'"
+      },
+      {
+        "line": 173,
+        "raw": "'The blue crystal is the Guardian’s companion. It carries a calm, steady light and a reputation for defending first.'"
+      },
+      {
+        "line": 174,
+        "raw": "'The green blade is associated with the Consular, a Jedi of insight and negotiation. It is the color of patient hands.'"
+      },
+      {
+        "line": 175,
+        "raw": "'The yellow crystal is often chosen by Sentinels, who walk between study and duty. It burns bright, and it burns honestly.'"
+      },
+      {
+        "line": 176,
+        "raw": "'A rare hue, said to come when a Jedi’s heart is torn two ways. Those who carry it speak little of why.'"
+      },
+      {
+        "line": 177,
+        "raw": "'A white blade is the mark of a crystal that was cleansed or purified. Jedi treat it as a quiet sign of a hard road walked.'"
+      },
+      {
+        "line": 178,
+        "raw": "'Form I, the Way of the Sarlacc. The first form: broad, forgiving, and the foundation on which every other Jedi is built.'"
+      },
+      {
+        "line": 179,
+        "raw": "'Form II, the Way of the Ysalamiri. The duelist’s Form: precise footwork, elegant strokes, built for facing another blade.'"
+      },
+      {
+        "line": 180,
+        "raw": "'Form III, the Way of the Mynock. Efficient and patient, it asks the Jedi to endure and to wait for the other side to tire.'"
+      },
+      {
+        "line": 181,
+        "raw": "'Form IV, the Way of the Hawk-Bat. Acrobatic and fast, it uses the Force to leap and strike, and tires its user quickly.'"
+      },
+      {
+        "line": 182,
+        "raw": "'Form V, the Way of the Krayt Dragon. Also called Djem So, it blends strong defense with strong offense, and it prizes the deflected bolt returned.'"
+      },
+      {
+        "line": 183,
+        "raw": "'Form VI, the Way of the Rancor. A moderate Form, balancing blade and Force, favored by those who see the Jedi as scholars first.'"
+      },
+      {
+        "line": 184,
+        "raw": "'Form VII, the Way of the Vornskr. Ferocious, almost too intense, it is taught with caution because of what it can do to a Jedi’s mind.'"
+      },
+      {
+        "line": 185,
+        "raw": "'Plate that is neither light nor heavy, the quartermaster’s compromise. It lets a trooper run, kneel, and take a hit in the same afternoon.'"
+      },
+      {
+        "line": 186,
+        "raw": "'Plain cloth worn by a thousand Jedi before. The weave is old, and it carries an odd comfort of its own.'"
+      },
+      {
+        "line": 187,
+        "raw": "'A Jedi’s robes with plating hidden in the folds. The wearer looks like a pilgrim until the first bolt glances away.'"
+      },
+      {
+        "line": 188,
+        "raw": "'A reworked grip and shoulder rest, made to steady a shot. It adds nothing flashy, only fewer misses.'"
+      },
+      {
+        "line": 189,
+        "raw": "'A lighter pull and a quicker break. The kind of change that makes a gunsmith smile and a rifleman nervous.'"
+      },
+      {
+        "line": 190,
+        "raw": "'Compact, familiar, and exactly as loud as expected. Troopers carry them for the day when talking stops working.'"
+      },
+      {
+        "line": 191,
+        "raw": "'Bandage, stim, and sealant in a case the size of a hand. Every medic has watched it do more good than any speech.'"
+      },
+      {
+        "line": 192,
+        "raw": "'Fitted with small servos that lengthen the stride. Scouts who wear them say the ground feels shorter.'"
+      },
+      {
+        "line": 193,
+        "raw": "'A narrow lens that sharpens the distance and flags the faint shapes in it. It is a small thing, and it is why many troopers come home.'"
+      },
+      {
+        "line": 194,
+        "raw": "'A belt-mounted emitter that throws up a thin film of energy. It blunts the worst and runs down quickly, so the wearer learns to stay alert.'"
+      },
+      {
+        "line": 197,
+        "raw": "'Quiet beds and quiet voices. The Halls smell of bacta and clean linen, and everyone who passes through remembers them gently.'"
+      },
+      {
+        "line": 198,
+        "raw": "'The Salle echoes with practice blades and patient correction. Every Jedi has lost their first bout here and learned from it.'"
+      },
+      {
+        "line": 199,
+        "raw": "'The crystal hums in the dark. Here a Jedi builds the blade they will carry, and learns something about themselves in the doing.'"
+      },
+      {
+        "line": 200,
+        "raw": "'Racks of blasters and plates for the Republic soldiers who share the Temple’s halls. Not every defender carries a lightsaber.'"
+      },
+      {
+        "line": 201,
+        "raw": "'Holos, relays, and a watch that never sleeps. In the Hub, news from the war arrives a little late and a little changed.'"
+      },
+      {
+        "line": 202,
+        "raw": "'Bunks, boots, and a card table nobody admits to owning. The troopers make a home out of whatever space they are given.'"
+      },
+      {
+        "line": 203,
+        "raw": "'Millennia of memory, shelved and catalogued. The Archives hold the answer to many questions, and some questions the answer may not welcome.'"
+      },
+      {
+        "line": 204,
+        "raw": "'Moss, water, and a quiet that is carefully maintained. A good place to sit with a troubled thought until it loosens.'"
+      },
+      {
+        "line": 207,
+        "raw": "'.'"
+      },
+      {
+        "line": 207,
+        "raw": "'Open floor. Plain, scuffed, and honest. Most battles are decided on ground like this.'"
+      },
+      {
+        "line": 208,
+        "raw": "'_'"
+      },
+      {
+        "line": 208,
+        "raw": "'A door left open. It invites movement, for friend and foe alike.'"
+      },
+      {
+        "line": 209,
+        "raw": "'The evacuation zone. A gunship waits, engines warm. Getting everyone to it is the whole point.'"
+      },
+      {
+        "line": 210,
+        "raw": "'Broken stone and twisted metal. Rubble slows the careless and shelters the careful.'"
+      },
+      {
+        "line": 211,
+        "raw": "'Stacked crates, supplies for someone’s better day. Good cover, and sometimes something useful inside.'"
+      },
+      {
+        "line": 212,
+        "raw": "'A wall torn open by force, leaving a ragged window. Sightlines appear where none were meant to.'"
+      },
+      {
+        "line": 213,
+        "raw": "'A drum of volatile fuel. Everyone nearby thinks about it at the same time.'"
+      },
+      {
+        "line": 214,
+        "raw": "'A control console, blinking patiently. Whoever sits at it learns what the building knows.'"
+      },
+      {
+        "line": 215,
+        "raw": "'A data terminal with unread files. Someone will want what it holds, and someone else will want it gone.'"
+      },
+      {
+        "line": 216,
+        "raw": "'A terminal already copied. Its secrets now travel with the squad, and the building does not know.'"
+      },
+      {
+        "line": 217,
+        "raw": "'An alarm beacon, dark for now. If it lights, the room fills with more guests than were invited.'"
+      },
+      {
+        "line": 218,
+        "raw": "'A place for a charge. Whoever planted the last one here is long gone, and whoever plants this one should be too.'"
+      },
+      {
+        "line": 219,
+        "raw": "'A charge, armed and counting. No one stands near it on purpose.'"
+      },
+      {
+        "line": 220,
+        "raw": "'#'"
+      },
+      {
+        "line": 220,
+        "raw": "'A solid wall. It keeps the dark outside and the light in, or the other way around.'"
+      },
+      {
+        "line": 221,
+        "raw": "'A reinforced blast wall, thick and sealed. Whoever built it expected a bad day.'"
+      },
+      {
+        "line": 222,
+        "raw": "'The objective. A relay, a shrine, a cave mouth. Something that matters more than the people who have come for it.'"
+      },
+      {
+        "line": 223,
+        "raw": "'A closed door. It opens to a hand, a will, or a well-aimed charge.'"
+      },
+      {
+        "line": 224,
+        "raw": "'A locked door, sealed against casual visitors. Locks are only questions, and some people are good at answers.'"
+      },
+      {
+        "line": 227,
+        "raw": "'Standing at a friend’s shoulder, blade ready. Guarding is an act of faith in the one beside you.'"
+      },
+      {
+        "line": 228,
+        "raw": "'Silent, still, and watching the door. Whoever steps through will be met.'"
+      },
+      {
+        "line": 229,
+        "raw": "'Fallen, but not gone. Someone is already moving to reach them.'"
+      },
+      {
+        "line": 230,
+        "raw": "'The world has gone soft and distant. A moment’s vulnerability is all the enemy needs.'"
+      },
+      {
+        "line": 231,
+        "raw": "'Hands up, weapon down. The Jedi accept the offer, because they were never here to kill anyone they did not have to.'"
+      },
+      {
+        "line": 232,
+        "raw": "'Held, not harmed. A prisoner is a promise that someone will need to be answered later.'"
+      },
+      {
+        "line": 233,
+        "raw": "'Empty hands in a fight that does not care. Resourcefulness fills in where equipment ends.'"
+      },
+      {
+        "line": 234,
+        "raw": "'Singled out and called by name. Every weapon on the field now knows who to watch.'"
+      },
+      {
+        "line": 235,
+        "raw": "'Unseen, and counting on it. Stillness is a weapon too.'"
+      },
+      {
+        "line": 236,
+        "raw": "'Pinned under steady fire. Raising a head is possible, but costly.'"
+      },
+      {
+        "line": 237,
+        "raw": "'The dark side whispers that the cost of a thing is a reason to do more of it. Jedi who listen find the voice grows louder.'"
+      },
+      {
+        "line": 238,
+        "raw": "'Fear breaks free of its leash. Training says to breathe, and training is very far away.'"
+      },
+      {
+        "line": 239,
+        "raw": "'The advantage of height. Seen from above, even an ugly battle makes a certain sense.'"
+      },
+      {
+        "line": 240,
+        "raw": "'Low behind cover, making the most of whatever stands between them and the next bolt. Not heroic, but very sensible.'"
+      },
+      {
+        "line": 241,
+        "raw": "'A wall of will in the air, thin and shimmering. Those behind it feel the Force holding the world back for a moment.'"
+      },
+      {
+        "line": 242,
+        "raw": "'Feet fixed to the ground by a will not their own. The world moves, and they do not.'"
+      },
+      {
+        "line": 243,
+        "raw": "'A faint shimmer of energy over the skin. It drinks the first blows, and then it is gone.'"
+      },
+      {
+        "line": 244,
+        "raw": "'The bleeding has slowed and the breath has steadied. They are still down, but they are no longer slipping away.'"
+      },
+      {
+        "line": 245,
+        "raw": "'A voice in the mind whispers a suggestion, and it sounds exactly like their own. The thought is not theirs, but they act on it.'"
+      },
+      {
+        "line": 246,
+        "raw": "'Breathing evenly, shoulders loose, mind clear. The squad notices the calm and draws on it.'"
+      },
+      {
+        "line": 247,
+        "raw": "'A tremor in the hands, a thin edge to the voice. It passes for most, and those who feel it are not weak for it.'"
+      },
+      {
+        "line": 248,
+        "raw": "'Past the point where willpower is enough. They need rest and quiet, and their friends need to let them have it.'"
+      },
+      {
+        "line": 249,
+        "raw": "'The scar aches with the weather. It is a record of a hard day and a reminder of how it ended.'"
+      },
+      {
+        "line": 250,
+        "raw": "'A faint tremor that was not there before. The Jedi watch it, and the wearer learns to work around it.'"
+      },
+      {
+        "line": 251,
+        "raw": "'A bad step that never quite healed. The limp is slight, and always noticed by the one who has it.'"
+      },
+      {
+        "line": 252,
+        "raw": "'Something in the dark found them once. They carry the memory into every cave afterward.'"
+      },
+      {
+        "line": 253,
+        "raw": "'They lived when others did not, and no one has convinced them it was acceptable. The weight is real, and so is the effort of carrying it.'"
+      },
+      {
+        "line": 254,
+        "raw": "'Sleep brings back what the day forgot. They wake tired, and try again.'"
+      },
+      {
+        "line": 255,
+        "raw": "'An old fury that fits in the hand like a stone. The Jedi who carries it feels stronger, and that is the warning.'"
+      },
+      {
+        "line": 258,
+        "raw": "'The Guardian stands between harm and the people who cannot defend themselves. Strength, discipline, and a blade that serves protection first.'"
+      },
+      {
+        "line": 259,
+        "raw": "'The Consular seeks understanding before conflict. Diplomats, healers, and scholars of the Force, they would rather solve a problem than win it.'"
+      },
+      {
+        "line": 260,
+        "raw": "'The Sentinel walks between the two paths, balancing combat and insight. Cautious, adaptable, and never quite where the enemy expects.'"
+      },
+      {
+        "line": 261,
+        "raw": "'A name from a much later age. In this era the term is unknown, and no Jedi here will answer to it.'"
+      },
+      {
+        "line": 262,
+        "raw": "'The Republic’s trooper: disciplined, loyal, and trained to follow a plan through its worst hour.'"
+      },
+      {
+        "line": 263,
+        "raw": "'The scout goes ahead and returns with what the squad needs to know. Quiet, quick, and rarely thanked.'"
+      },
+      {
+        "line": 264,
+        "raw": "'The medic runs toward the wounded when everyone else runs away. A kit, a steady voice, and a lot of nerve.'"
+      },
+      {
+        "line": 265,
+        "raw": "'The heavy carries what the others cannot. A big weapon, a big pack, and a stubbornness to match.'"
+      },
+      {
+        "line": 266,
+        "raw": "'Soresu masters who never strike first. They stand in the fire so others can walk out of it.'"
+      },
+      {
+        "line": 267,
+        "raw": "'Troopers in heavy plate behind a riot shield. Slow, loud, and the last thing a raider wants to charge.'"
+      },
+      {
+        "line": 268,
+        "raw": "'Someone whose survival matters more than their own preferences. They did not choose the role, and many of them handle it with grace.'"
+      },
+      {
+        "line": 271,
+        "raw": "'The capital of the Republic, a world of endless towers and the Jedi Temple above the noise. For centuries it has felt untouchable.'"
+      },
+      {
+        "line": 272,
+        "raw": "'A world of mountains and old noble houses. In this age it hosts the peace talks that the galaxy has been waiting for.'"
+      },
+      {
+        "line": 273,
+        "raw": "'A world of foundries and weapon yards, fought over by both sides. Little of it has been left unscarred.'"
+      },
+      {
+        "line": 274,
+        "raw": "'A rough Mid Rim world of depots, smugglers, and Republic outposts. Easy to reach, hard to hold.'"
+      },
+      {
+        "line": 275,
+        "raw": "'Open plains and quiet ruins, once home to a Jedi enclave. Rumor says the grassland hides things that hunt by night.'"
+      },
+      {
+        "line": 276,
+        "raw": "'The Smuggler’s Moon, a glittering stack of neon and debt. Anything can be bought here, at a price someone else usually pays.'"
+      },
+      {
+        "line": 277,
+        "raw": "'A world of ruined Jedi archives, scoured by old wars. The shelves are empty in places, and the silence is not entirely empty.'"
+      },
+      {
+        "line": 278,
+        "raw": "'The ice world where Jedi come to find their kyber. The caves hum with something older than the Order.'"
+      },
+      {
+        "line": 279,
+        "raw": "'A city world that has been burned and rebuilt more than once. The old towers still stand above the ruins of what they were.'"
+      },
+      {
+        "line": 280,
+        "raw": "'The birthplace of the Jedi Order, far from the noise of the core. After the treaty, the Order turns toward it again.'"
+      },
+      {
+        "line": 281,
+        "raw": "'The tomb world of the ancient Sith. Dust and stone, and a presence that waits.'"
+      },
+      {
+        "line": 282,
+        "raw": "'A jungle world of storms and predators, the seat of the Sith Empire. Its capital rises out of the rain like a threat.'"
+      },
+      {
+        "line": 283,
+        "raw": "'A hyperspace road that carries trade and troops alike. Whoever holds it holds the pulse of the Outer Rim.'"
+      },
+      {
+        "line": 284,
+        "raw": "'A world scarred by a war that burned a thousand years later in memory. Its forests remember the cost of certainty.'"
+      },
+      {
+        "line": 287,
+        "raw": "'Grand Master of the Order, tired and unyielding. He carries a Council’s worth of doubt, and does not let it show.'"
+      },
+      {
+        "line": 288,
+        "raw": "'A Kel Dor Jedi historian, breath-masked and unhurried. He believes that the past is the only teacher that cannot be bribed.'"
+      },
+      {
+        "line": 289,
+        "raw": "'A Zabrak Jedi Master with a patient smile and a hard-earned scar. He teaches best by letting others make their own mistakes.'"
+      },
+      {
+        "line": 290,
+        "raw": "'A young Knight with a famous name and an unfinished story. She carries the weight of a lineage she did not choose.'"
+      },
+      {
+        "line": 291,
+        "raw": "'A Republic soldier who has seen too much and complained about it too little. His platoon would follow him anywhere sensible.'"
+      },
+      {
+        "line": 292,
+        "raw": "'A Sith Lord of terrible resolve, who struck at the heart of the Republic and meant it. His pain is not hidden, and neither is his power.'"
+      },
+      {
+        "line": 293,
+        "raw": "'A Sith Lord who commanded beside Malgus. He is cold, capable, and he regards the Temple as a trophy waiting to be taken.'"
+      },
+      {
+        "line": 294,
+        "raw": "'A Twi’lek who stands at Malgus’s side by choice. She sees more of him than anyone else does, and she is not afraid.'"
+      },
+      {
+        "line": 295,
+        "raw": "'A Guardian Knight who leads from the front. She says little about the people she has lost, and carries every name.'"
+      },
+      {
+        "line": 296,
+        "raw": "'A Consular Padawan with a mind quicker than his nerve. He is learning that courage is just fear that keeps walking.'"
+      },
+      {
+        "line": 297,
+        "raw": "'A sergeant with twenty years of mud on his boots. He does not believe in luck, and keeps his squad alive anyway.'"
+      },
+      {
+        "line": 298,
+        "raw": "'A scout who moves like a rumor. She prefers to be forgotten, and rarely is.'"
+      },
+      {
+        "line": 299,
+        "raw": "'A medic with tired hands and a steady voice. He has lost patients, and has never stopped trying for the next one.'"
+      },
+      {
+        "line": 300,
+        "raw": "'A heavy trooper built like a doorframe. Gentle in the barracks, immovable on the line.'"
+      },
+      {
+        "line": 301,
+        "raw": "'A Republic envoy with an easy manner and a careful vocabulary. Whatever he says, there seems to be something else behind it.'"
+      },
+      {
+        "line": 302,
+        "raw": "'A Senator with a loyal voice and a long list of enemies. He wants the treaty badly, and the Temple wants him alive to sign it.'"
+      },
+      {
+        "line": 303,
+        "raw": "'An Imperial officer who changed sides at some personal cost. He is trusted a little less than he deserves, and a little more than he expects.'"
+      },
+      {
+        "line": 304,
+        "raw": "'An aide who knows where every document is and who has read most of them. Quiet, observant, and indispensable.'"
+      },
+      {
+        "line": 305,
+        "raw": "'Lady Venna Thul, heir to an old Alderaanian house. She is young, careful, and aware that her name weighs more than she does.'"
+      },
+      {
+        "line": 308,
+        "raw": "'A lonely relay on the frontier, keeping the lanes open for ships that never learn its name. The Sith want it silent, and they are coming in waves.'"
+      },
+      {
+        "line": 309,
+        "raw": "'Pilgrims have long come to a kyber shrine on Dantooine. Tonight something else has found it, and it has an appetite for the Force.'"
+      },
+      {
+        "line": 310,
+        "raw": "'A supply depot on Ord Mantell holds prisoners who matter to someone. The plan is simple, which means it will not go simply.'"
+      },
+      {
+        "line": 311,
+        "raw": "'Schedules leaked, secrets traded, and a trail that winds through the lower city. Someone near the talks is selling the Republic.'"
+      },
+      {
+        "line": 312,
+        "raw": "'An Imperial listening post on Balmorra, tucked between foundries. What it hears could hurt the Republic, and what it holds could help.'"
+      },
+      {
+        "line": 313,
+        "raw": "'An Imperial fuel depot on Balmorra, vast and poorly lit. A well-placed charge here could stall an advance for weeks.'"
+      },
+      {
+        "line": 314,
+        "raw": "'A Senator must walk the length of Coruscant’s lower streets to reach the talks. The Temple walks with him.'"
+      },
+      {
+        "line": 315,
+        "raw": "'Mandalorians in Imperial pay have closed a stretch of the Hydian Way. A convoy is counting on the squad to open it.'"
+      },
+      {
+        "line": 316,
+        "raw": "'A listening post on the Inner Rim has gone quiet. The squad is sent to find out why before anyone else does.'"
+      },
+      {
+        "line": 317,
+        "raw": "'A Hutt warehouse on Nar Shaddaa holds a ledger of debts and deals. In the right hands it could change the war.'"
+      },
+      {
+        "line": 318,
+        "raw": "'Docking Ring Nine. Malgus is coming for the Temple, and the Jedi have one chance to stop him at the door.'"
+      },
+      {
+        "line": 319,
+        "raw": "'Beneath the ruins of Ossus lie old records of the Sith wars. Gnost-Dural wants them saved, and the Empire wants them first.'"
+      },
+      {
+        "line": 320,
+        "raw": "'A cave mouth on Ilum, cold and humming. Sergeant Malcom’s platoon holds it, and the Jedi arrive in time to share the watch.'"
+      },
+      {
+        "line": 321,
+        "raw": "'During the talks on Alderaan, Satele Shan leads a strike on Lord Adraas at an embassy hangar. It is a gamble with the treaty as the stake.'"
+      },
+      {
+        "line": 322,
+        "raw": "'A reclamation camp on Taris, where captives were put to work. The Jedi come to open the gates, and to see who is still inside.'"
+      },
+      {
+        "line": 323,
+        "raw": "'The heir to House Thul must cross Alderaan unseen. The Jedi go with her, because some journeys are not safe alone.'"
+      },
+      {
+        "line": 324,
+        "raw": "'Forward Depot Cresh keeps the enemy fed and armed. Take away the depot and the front shifts.'"
+      },
+      {
+        "line": 325,
+        "raw": "'Fort Garnik on Ord Mantell is old, battered, and still standing. The Republic means to keep it that way.'"
+      },
+      {
+        "line": 326,
+        "raw": "'The wounded of the Army of Light lie in a ravine as the Brotherhood closes in. Among them is Johun Othone, a young Knight in Lord Hoth’s service.'"
+      },
+      {
+        "line": 327,
+        "raw": "'The caves of Ruusan run deep, and the Brotherhood is gathering in them. Some of what moves in the dark has no interest in soldiers at all.'"
+      },
+      {
+        "line": 328,
+        "raw": "'Kaan’s ritual would end the Light and the Dark together. Hoth goes to stop it, and the squad goes ahead of him.'"
+      },
+      {
+        "line": 329,
+        "raw": "'The Army of Light cares for its wounded far behind the line, and that is exactly where the Brotherhood strikes. The healers must be given time.'"
+      },
+      {
+        "line": 330,
+        "raw": "'Deep in the caves, the dark side has found a place to grow. It breeds only what hunts the gifted, so the troops go first.'"
+      },
+      {
+        "line": 331,
+        "raw": "'A courier carries the Army’s plans along a ridge trail, and the Brotherhood has paid for rifles to watch it. The road is short and the cover is thin.'"
+      },
+      {
+        "line": 332,
+        "raw": "'The Brotherhood marches on powder and fuel. Take away the dump and the army slows, and that may be the difference.'"
+      },
+      {
+        "line": 335,
+        "raw": "'Acrobatics and the Force woven into every stroke. Padawans who study it often take a little too much joy in the leap.'"
+      },
+      {
+        "line": 336,
+        "raw": "'Strike and counterstrike are the same motion seen from two sides. Masters teach it to those with the nerve to be struck first.'"
+      },
+      {
+        "line": 337,
+        "raw": "'A balanced Form for Jedi who walk between the saber and the book. Many Masters have settled into it as the years grew long.'"
+      },
+      {
+        "line": 338,
+        "raw": "'The Form that burns too brightly. It is taught rarely, and always with one eye on the student’s heart.'"
+      },
+      {
+        "line": 339,
+        "raw": "'New protocols from the Temple’s healers, carried to the field in plain satchels. Another life saved is the only proof they ask for.'"
+      },
+      {
+        "line": 340,
+        "raw": "'Great tanks of the amber fluid, filled and tended. The Halls grow warmer, and the beds more often empty.'"
+      },
+      {
+        "line": 341,
+        "raw": "'The Masters write down what they know and pass it on. The Salle grows stricter, and the Padawans grow stronger.'"
+      },
+      {
+        "line": 342,
+        "raw": "'Old holocrons, opened with care and heard patiently. Every mission leaves more to learn than before.'"
+      },
+      {
+        "line": 343,
+        "raw": "'A craftsman’s corner of the armory. Small changes, done well, quietly improve every shot.'"
+      },
+      {
+        "line": 344,
+        "raw": "'Optics salvaged, refined, and issued to those who need to see farther. A small piece of glass that can change an afternoon.'"
+      },
+      {
+        "line": 345,
+        "raw": "'Compact emitters brought up from the engineers. The troopers wear them with a mixture of gratitude and suspicion.'"
+      },
+      {
+        "line": 346,
+        "raw": "'A fiber woven with an old ore that resists the saber. The robes look the same and feel a little heavier.'"
+      },
+      {
+        "line": 347,
+        "raw": "'The old crafts, relearned and refined. Each crystal is a little less costly to bring to song.'"
+      },
+      {
+        "line": 348,
+        "raw": "'Imperial ciphers broken one at a time by patient hands. A little more is known, and a little less is a surprise.'"
+      },
+      {
+        "line": 349,
+        "raw": "'Captured manuals read by the Temple’s tacticians. Knowing the enemy’s habits is the oldest advantage.'"
+      },
+      {
+        "line": 350,
+        "raw": "'Reports from every survivor, collected and sorted. The monsters are less strange once they have been described.'"
+      },
+      {
+        "line": 351,
+        "raw": "'Rations, bunks, and rosters, made to run on time. No glamour in it, and nothing works without it.'"
+      }
+    ]
+  },
+  "text": "/* Codex lore (flavor) for every id. U’s describe(kind,id) shows CODEX[kind][id].lore next to the owner’s mechanical desc. ≤280 chars each. Voice: docs/specs/story.md §9.\n   Confidence tags in comments: [C]=Disney canon, [L]=Legends, [N]=invented for this game; H/M/L = confidence. */\nconst CODEX={\n ability:{\n  shoot:{lore:'Patient hands, steady breath. A trooper learns that one clean shot saves more lives than ten loud ones.'}, // [N]\n  strike:{lore:'The blade moves before the thought finishes. Every Padawan is taught that the strike is the last answer, not the first.'}, // [N]\n  guard:{lore:'To stand between a blow and a friend is the oldest Jedi lesson. The Guardian does not ask who deserves it.'}, // [L H] Guardian ideal; [N] phrasing\n  overwatch:{lore:'Waiting is a kind of fighting. The soldier who holds still and watches the door decides who walks through it.'}, // [N]\n  push:{lore:'A breath of the Force, shaped into a shove. It carries no malice, only a firm request to be elsewhere.'}, // [N]\n  collapse:{lore:'The Force gathers, then falls on one place at once. Masters warn that power taken this wide leaves a mark on the one who takes it.'}, // [N]\n  choke:{lore:'The Council forbids it. A hand closes on a throat from across the room, and the one who holds it feels the dark answer back.'}, // [N]\n  stun:{lore:'A pulse that quiets the body without breaking it. Mercy is a discipline, and it is harder than the alternative.'}, // [N]\n  subdue:{lore:'The Jedi prefer a prisoner who can talk to a corpse who cannot. Many a captive has surprised them with what they knew.'}, // [N]\n  meditate:{lore:'Stillness is not rest. The Jedi sits inside the storm and listens for what the Force is trying to say.'}, // [N]\n  heal:{lore:'The Force knits what the blade has opened. It does not take away the fear, and the Jedi never claims that it does.'}, // [N]\n  grenade:{lore:'A small sphere, a short fuse, a loud decision. Troopers throw them at cover, and cover rarely argues.'}, // [N]\n  stabilize:{lore:'A field medic’s first rule: keep them here. Everything else can be solved once the bleeding stops.'}, // [N]\n  door:{lore:'Every door in the Temple was built to open to a hand that is welcome. Out in the field, doors are less polite.'}, // [N]\n  console:{lore:'Old machines hold new secrets. A steady hand and a patient tech can still coax the truth out of them.'}, // [N]\n  scan:{lore:'The Force reaches out and returns with shapes, heartbeats, and the cold spots where something is hiding.'}, // [N]\n  plant:{lore:'Set the charge, count the steps, leave. Sabotage is quiet work done by people who would rather not be thanked.'}, // [N]\n  saberThrow:{lore:'A lightsaber thrown is a lightsaber risked. The Force brings it back, but the Jedi learns the length of a moment without it.'}, // [N]\n  defLine:{lore:'The blade turns the bolt. Another Jedi stands at the shoulder, and together they make a wall no blaster wants to test.'}, // [N]\n  leap:{lore:'A Jedi’s jump is not strength but trust. The Force holds the air for the length of a heartbeat, and that is enough.'}, // [N]\n  reflectM:{lore:'The Force shows the bolt before it leaves the barrel. The blade is only there to finish the thought.'}, // [N]\n  sweep:{lore:'One wide arc, and the room is a different place. The Guardian’s answer to being surrounded is to become the center.'}, // [N]\n  forceHeal:{lore:'The deeper art. A Consular gives of their own strength to restore another’s, and rests afterward without complaint.'}, // [N]\n  barrier:{lore:'A shell of will, thin as breath and hard as durasteel while it holds. Consulars say it is easier to build for others than for oneself.'}, // [N]\n  battleMed:{lore:'Bacta, a steady voice, and a Force touch when the bacta runs short. The Temple’s healers learned to work under fire.'}, // [N]\n  mindTrick:{lore:'A suggestion, offered so gently that the listener believes it was their own idea. The Consulars say it is not a trick but a courtesy.'}, // [N]\n  forceRevive:{lore:'The Force can call back a life that has barely left. It asks a great deal, and the Jedi who answers is never quite the same.'}, // [N]\n  suppress:{lore:'Fire that does not seek to hit, only to keep heads down. A soldier’s way of buying others a few seconds of safe ground.'}, // [N]\n  hunker:{lore:'Get low, get small, let the world pass over. Surviving a bad moment is also a victory.'}, // [N]\n  mark:{lore:'A spotter calls the target and everyone’s aim improves. Calm voices win more battles than brave ones.'}, // [N]\n  smoke:{lore:'A cloud to move behind. The enemy fires at where you were, and you are somewhere else.'}, // [N]\n  hack:{lore:'Slicers say every lock is a conversation. Patience and a little cleverness will make most systems say yes.'}, // [N]\n  shredder:{lore:'Armor is a promise that a shot will not matter. The shredder round exists to break that promise.'}, // [N]\n  rapidFire:{lore:'All the weapon’s patience spent at once. The heavy trooper trades accuracy for the certainty that something will land.'}, // [N]\n  deadeye:{lore:'One shot, taken after the long wait. A scout learns to hold their breath until the world holds still with them.'}, // [N]\n  rally:{lore:'A word at the right moment. Veterans know that courage is mostly borrowed, passed hand to hand along the line.'}, // [N]\n  reviveStim:{lore:'A sharp sting and a gasp. Medics carry the stim for the worst day, and hope never to need it.'}, // [N]\n  rocket:{lore:'It is loud, and it is meant to be. The heavy trooper fires one when quiet has already failed.'}, // [N]\n  flurry:{lore:'The Form takes over. Cut follows cut so quickly that the opponent has no time to be afraid of the next one.'}, // [N]\n  shadowStep:{lore:'A Sentinel moves where eyes do not rest. They are there, and then they are behind you.'}, // [N]\n  executioner:{lore:'Some blows end a fight before it begins. Jedi who learn this also learn how heavy it is to use.'}, // [N]\n  sense:{lore:'The Force whispers before the danger arrives. Sentinels trust that whisper and have been alive longer for it.'}, // [N]\n  disarm:{lore:'A flick of the wrist and the weapon is somewhere else. The Jedi way is to end the fight without ending the foe.'}, // [N]\n  pathfinder:{lore:'Where others see rubble, a scout sees a road. The best ones leave no tracks for anyone to follow.'}, // [N]\n  beastCalm:{lore:'Even a hungry thing can be soothed by a patient mind. It is slow work, and a gentle one.'}, // [N]\n  pull:{lore:'The Force draws what you need into your hand, or an enemy into your reach. Take care, because it works both directions.'}, // [N]\n  tremor:{lore:'The ground itself remembers the Jedi’s step. A tremor rolls outward and knocks the unready off their feet.'}, // [N]\n  wildBond:{lore:'Some Jedi feel the creatures of the wild more clearly than they feel people. The bond is quiet, and it is real.'}, // [N]\n  runGun:{lore:'A good soldier fires while moving, and a great one forgets the difference. Practice, bruises, and more practice.'}, // [N]\n  spotter:{lore:'A second pair of eyes behind the first. The shot is the shooter’s, but the war is won by the one who sees the whole field.'}, // [N]\n  ghost:{lore:'Gone before the alarm sounds. A scout who is never noticed is a scout whose reports always arrive.'}, // [N]\n  protocol:{lore:'Orders, drilled until they are habit. In the dark and the noise, protocol is what remains when thinking is too slow.'}, // [N]\n  shieldDrone:{lore:'A small hovering disc that does one thing well. Soldiers name them anyway, and are not embarrassed to.'}, // [N]\n  ionNade:{lore:'It does not harm flesh, only wires. Machines go quiet and the battle changes shape.'}, // [N]\n  holdLine:{lore:'Not one step back. The line holds because each person on it decides, separately, that it will.'}, // [N]\n  flakVest:{lore:'Layered plating, scuffed and patched. Every trooper has a story about the bolt it stopped.'}, // [N]\n  veteran:{lore:'Experience is a kind of armor. The veteran has seen this before, and the calm they carry spreads along the line.'}, // [N]\n  longshot:{lore:'Distance is only a matter of patience. The long barrel, the steady breath, the shot that nobody heard coming.'}, // [N]\n  killshot:{lore:'A trained eye finds the gap in the armor. It is not cruelty, only competence at a hard trade.'}, // [N]\n  fieldcraft:{lore:'Cover, concealment, silence. The things that are not in the manual but have kept every old scout alive.'}, // [N]\n  fieldKit:{lore:'Bandages, a stim, and one clean cloth. Small things that matter most when everything else has gone wrong.'}, // [N]\n  combatMedic:{lore:'The medic fights because the line breaks without them. Carrying a rifle and a kit takes a particular kind of courage.'}, // [N]\n  traumaBag:{lore:'Heavy and worn, it never leaves the medic’s shoulder. What is inside has stopped more wounds than any speech.'}, // [N]\n  bandolier:{lore:'Spare cells across the chest, clipped and counted. A soldier who runs dry is a soldier who is no longer useful to the people next to them.'}, // [N]\n  juggernaut:{lore:'The heavy trooper walks into the fire because the others cannot. Armor, mass, and the stubbornness to keep walking.'}, // [N]\n  mightyBlow:{lore:'All the weight of the Form behind one stroke. Guardians are taught that restraint is what makes such a blow safe to swing.'}, // [N]\n  precisionStrike:{lore:'Not the hardest cut but the truest. The blade goes exactly where the Force showed it would be needed.'}, // [N]\n  massHeal:{lore:'The Force spreads outward like warmth through a cold room. Every hurt in reach eases, and the Consular asks nothing in return.'}, // [N]\n  forceWave:{lore:'A ring of pressure rolls out from the Jedi’s hands. Nothing in its path is spared, and nothing in its path is meant to be killed.'}, // [N]\n  stasisField:{lore:'The air thickens, then stops. Those caught in it find their limbs unwilling, and the Consular holds the pause with great effort.'}, // [N]\n  chainShot:{lore:'The first shot is a question and the second is the answer. A good gunner learns to ask twice before the target can react.'}, // [N]\n  medBeacon:{lore:'A single bright signal and the wounded know where to crawl. The medic can give it only once, and gives it fully.'}, // [N]\n  gIron:{lore:'Years of drills in the Salle have taught the body to take a blow and keep standing. The Guardian counts bruises as lessons.'}, // [N]\n  gDuelist:{lore:'A Guardian who studies a rival’s feet more than their blade. The duel is often won before the first stroke.'}, // [N]\n  gBulwark:{lore:'On guard, the Jedi becomes a fixed point. Allies know exactly where the line is and trust that it will not move.'}, // [N]\n  gVanguard:{lore:'The first through every door. A Vanguard takes the risk so that those behind can measure it.'}, // [N]\n  gWarden:{lore:'The Warden’s blade seems to be wherever the bolt is going. Those who watch it work call it luck, and the Warden calls it attention.'}, // [N]\n  gUnbreakable:{lore:'Some Guardians simply refuse to fall. It is not stubbornness, they say, but a promise made to everyone standing behind them.'}, // [N]\n  gMasterBlade:{lore:'The sum of a lifetime of patient practice. The blade is no longer a tool but a part of the hand.'}, // [N]\n  cSerene:{lore:'A mind that has learned to be quiet. The Force flows more freely through a Jedi who is not arguing with themselves.'}, // [N]\n  cResolve:{lore:'Fear is acknowledged, then set down. The Consular who has done this once finds it easier to do again.'}, // [N]\n  cWellspring:{lore:'A deep calm that seems to refill itself. Consulars say the Force is not spent so much as borrowed and returned.'}, // [N]\n  cSeer:{lore:'The battle slows to those who have learned to read it. The Consular steps where the next moment will be, not where the last one was.'}, // [N]\n  cMaster:{lore:'A Consular who has stopped fearing the Force and started listening to it. Such Jedi are rare, and rarely proud of it.'}, // [N]\n  sKeenEye:{lore:'A Sentinel notices the loose stone, the shifted shadow, the breath held too long. Most of survival is simply noticing.'}, // [N]\n  sExecutioner:{lore:'A Sentinel who has learned exactly where a fight turns. The finishing stroke is quick, and no one is allowed to enjoy it.'}, // [N]\n  sTracker:{lore:'Footprints, scorch marks, the stillness of a room just emptied. The Tracker follows the story the enemy leaves behind.'}, // [N]\n  sVigil:{lore:'The Sentinel who keeps watch through the dark hours. Nothing reaches the camp that has not first reached them.'}, // [N]\n  sEdge:{lore:'A blade kept honest by daily care. The Sentinel treats sharpening as a kind of meditation.'}, // [N]\n  sGhost:{lore:'The Sentinel crosses open ground as if the ground were reluctant to notice. Lessons in stealth are never entirely spoken.'}, // [N]\n  sHunter:{lore:'Patient and unhurried, the Hunter lets the quarry make the first mistake. It always does.'}, // [N]\n  sBlademaster:{lore:'The Forms are no longer steps to be remembered. The Sentinel lives inside them and the blade simply follows.'}, // [N]\n  sUntouchable:{lore:'Bolts and blades pass through spaces the Jedi has already left. It looks like grace, and it is years of discipline.'}, // [N]\n  wPathfinder:{lore:'Where the map ends, the Wayseeker keeps walking. A path appears for anyone who truly expects one.'}, // [N]\n  wWild:{lore:'The Force in living things, felt in the roots as clearly as in the stars. The Wayseeker draws on a deeper spring.'}, // [N]\n  wRoots:{lore:'A body trained by long travel and little comfort. The Wayseeker endures what would send others home.'}, // [N]\n  wStalker:{lore:'Someone who learned to move through wild places learned to move quietly. The skill carries over to every other kind of ground.'}, // [N]\n  wBond:{lore:'The creatures of the wild trust the Wayseeker, and the Wayseeker returns the trust. Neither side has ever been disappointed.'}, // [N]\n  wSeer:{lore:'Distance is no barrier for those who listen. The Wayseeker sees the far ridge as clearly as the near.'}, // [N]\n  wPrimal:{lore:'Old instincts woken beneath careful training. The Wayseeker is a little frightening to watch, and knows it.'}, // [N]\n  soGunner:{lore:'Hours at the range and nights cleaning the barrel. Good shooting is mostly habit and a little stubbornness.'}, // [N]\n  soTough:{lore:'A trooper who has been knocked down enough times to know how to get up. The lesson is physical, and also not.'}, // [N]\n  soMarksman:{lore:'The kind of shooter who is quiet at the range because the targets have said all there is to say.'}, // [N]\n  soSteel:{lore:'Fear is a visitor, and the veteran does not offer it a chair. The line holds because the people on it are calm.'}, // [N]\n  soIronWill:{lore:'Orders, duty, and a stubborn refusal to be turned. Few things are as hard to move as a soldier who has decided.'}, // [N]\n  soCommander:{lore:'A trooper whose voice carries and whose plans work. Others fall in without being asked, and are glad to.'}, // [N]\n  soLegend:{lore:'Stories are told about this one in barracks across the Republic. The trooper rolls their eyes and keeps shooting.'}, // [N]\n  scEagle:{lore:'A scout whose sight is a gift and a discipline. Distant things become plain, and plain things become useful.'}, // [N]\n  scQuick:{lore:'Light on the feet and quick to the next cover. A scout lives in the spaces between where the enemy is looking.'}, // [N]\n  scSniper:{lore:'One breath held, one shot let go. The Sniper is a rumor that sometimes becomes a fact.'}, // [N]\n  scAssassin:{lore:'Cold work for a necessary end. The scout who does it well rarely speaks of it afterward.'}, // [N]\n  scSurvivor:{lore:'Others would have been left behind long ago. The Survivor has learned that coming home is a skill like any other.'}, // [N]\n  scSpotter:{lore:'The scout calls the range, the wind, and the target in one calm sentence. Every rifle nearby gets a little better.'}, // [N]\n  scDeadly:{lore:'Familiar with every gap in every armor design. The scout is not cruel, only precise.'}, // [N]\n  scLegend:{lore:'A name whispered on the Rim and rarely seen on a report. The scout prefers it that way.'}, // [N]\n  scPhantom:{lore:'Across rubble and open street without a sound. By the time the enemy turns, the Phantom is elsewhere.'}, // [N]\n  mDrilled:{lore:'Field medicine learned by the book, then by the bruise. The drills make the hands steady when the voice is not.'}, // [N]\n  mSurgeon:{lore:'Clean cuts and clean thinking on the worst night. A good surgeon is calm because someone else cannot be.'}, // [N]\n  mStoic:{lore:'The medic has seen the worst a battlefield can offer. They keep working, and the squad draws strength from it.'}, // [N]\n  mFieldSurgeon:{lore:'Full kits, sorted by urgency, ready in the dark. The medic can find what they need by touch.'}, // [N]\n  mMarksman:{lore:'A medic who learned that sometimes the best treatment is keeping the enemy from firing. Few argue with the logic.'}, // [N]\n  mAngel:{lore:'Soldiers on three worlds swear to have been saved by this one. The medic shrugs and moves on to the next.'}, // [N]\n  mVeteran:{lore:'Years in the field have taught this medic where to stand and when to run. Survivors remember the lessons gladly.'}, // [N]\n  hDemo:{lore:'A heavy trooper with a respect for chemistry. Everything that explodes is eventually a tool.'}, // [N]\n  hBrute:{lore:'Built to carry, built to endure. The heavy trooper does the work nobody else wants and does not complain.'}, // [N]\n  hBulwark:{lore:'A slow and steady wall of armor and nerve. Allies shelter behind it, and it does not flinch.'}, // [N]\n  hGunner:{lore:'Heavy weapons need a steady hand and a patient eye. The gunner has both, which is rarer than it sounds.'}, // [N]\n  hHeavyWeapons:{lore:'Years of training with weapons that others cannot lift. The recoil is a conversation the gunner has learned to win.'}, // [N]\n  hTitan:{lore:'A figure out of old stories, mountainous in plate. The trooper walks through fire and the enemy remembers it.'}, // [N]\n  hWarlord:{lore:'A heavy trooper who has stopped waiting for orders. On this ground, the Warlord is the order.'}, // [N]\n },\n enemy:{\n  trooper:{lore:'Sith Empire infantry, trained hard and ordered harder. Most of them believe in the Empire because they have never been offered another future.'}, // [L H] Imperial trooper; [N] characterization\n  heavy:{lore:'A walking wall in Imperial plate, with a gun that wants to be heard. It is slow to turn and quick to punish those who stand still.'}, // [N]\n  agent:{lore:'Imperial Intelligence does not announce itself. A cold hide, a long rifle, and a patience the Temple’s own scouts would respect.'}, // [L H] Imperial Intelligence; [N] sniper role\n  acolyte:{lore:'A student of the Sith, hungry to be noticed by someone with more power. Lightning crackles in the fingers, and mercy has not yet been taught.'}, // [L H] Sith acolytes; [N] characterization\n  husk:{lore:'What is left when a great horror feeds. A Dark Husk has no mind of its own, only hunger, and it moves when its maker kills.'}, // [N]\n  terentatek:{lore:'A beast bred, it is said, to hunt those who touch the Force. The Jedi who survive an encounter rarely describe it, but the nightmares do.'}, // [L H] Terentatek hunts Force users\n  envoy:{lore:'A Republic envoy with the right smile and the wrong friends. Whispers say that someone close to the talks is selling the schedule.'}, // [N]\n  malgus:{lore:'A Sith Lord who believes the Republic is a lie and means to prove it with fire. He fights like a man with nothing left to lose.'}, // [L H] Darth Malgus; [N] phrasing\n  mando:{lore:'Mandalorian clans, hired by the Empire for the oldest reason there is. They fight with honor and are paid in credits.'}, // [L H] Mandalorians in Imperial pay; [N] phrasing\n  adraas:{lore:'Lord Adraas fought beside Malgus in the strike on Coruscant. Those who faced him remember how little he seemed to care about the cost.'}, // [L H] Adraas with Malgus; [N] phrasing\n  bh_trooper:{lore:'Foot soldiers of the Brotherhood of Darkness, devoted to Lord Kaan’s vision. They fight as though the war were already won, and that certainty is their weapon.'}, // [L H]\n  bh_marauder:{lore:'A Dark Side warrior who fights for rage as much as for Kaan. The wounds only seem to feed it.'}, // [L M]\n  sith_lord:{lore:'One of the Brotherhood’s Lords, who sees the Light as a delay to be removed. The troopers around it fight as if its approval were air.'}, // [L H]\n  bh_sniper:{lore:'A hired gun on the ridge who is paid to be patient. The Brotherhood buys loyalty with ideals and loyalty from this one with credits.'}, // [L M]\n  sith_spawn:{lore:'A creature born of the dark side in the Ruusan caves, hungry only for the Force. Soldiers without the gift pass it unnoticed, and it cannot forgive that.'}, // [N]\n  nexus:{lore:'A wound in the world where the dark side pools and festers. It does not move or speak, but it makes more of itself.'}, // [N]\n  nexus_core:{lore:'The heart of the cave, where the dark gathers. It beats slowly, and anyone who stays near it begins to hear it.'}, // [N]\n  kaan:{lore:'Lord Kaan, leader of the Brotherhood of Darkness, sure that the Sith should lead the galaxy. He is brilliant, ruthless, and wrong in a way he will never accept.'}, // [L H]\n  bane:{lore:'Darth Bane, a Sith apprentice who watches from the ridge and listens to the war with a stranger’s attention. He survives Ruusan, and what he builds from it will outlast everyone here.'}, // [L H]\n },\n gear:{\n  'Standard blaster':{lore:'A standard-issue Republic blaster, worn smooth by many hands. It is not elegant, but it fires every time.'}, // [N]\n  'Military blaster':{lore:'A military-grade piece, better balanced and kept clean. Quartermasters hand them out with a nod and a warning.'}, // [N]\n  'Elite blaster':{lore:'Elite work, tuned by someone who cared. Troopers who are issued one tend to take better care of it than of themselves.'}, // [N]\n  none:{lore:'No armor at all. Quick, light, and a little reckless. The Jedi have always trusted the Force over plating.'}, // [N]\n  light:{lore:'Flexible plates under a Republic jacket. It turns a glancing bolt and weighs almost nothing.'}, // [N]\n  heavy:{lore:'Layered ceramic and alloy, built to take hits that would drop anyone else. It makes a trooper slow and very hard to move.'}, // [N]\n  scope:{lore:'A narrow window on a far place. Scouts say the world looks calmer through glass, which is a lie worth believing.'}, // [N]\n  barrel:{lore:'A longer barrel, a tighter bolt. Gunsmiths on Coruscant argue about the exact length, and nobody wins.'}, // [N]\n  cell:{lore:'A power cell with a little more kick. It runs hot, and troopers learn to count their shots.'}, // [N]\n  'Training saber':{lore:'Padawans build their first blade under a Master’s eye. The training blade is simple, and it teaches by being forgiving.'}, // [N]\n  'Attuned saber':{lore:'Attuned to its owner. The crystal hums at a pitch only they can feel, and the blade answers their intent.'}, // [N]\n  'Master-forged saber':{lore:'Forged by a Master’s hand. It is not a weapon so much as a conversation between a Jedi and the Force.'}, // [N]\n  focused:{lore:'A tightly bound beam that cuts where it is aimed and nowhere else. Some Jedi prefer clarity to power.'}, // [N]\n  swift:{lore:'A lighter hilt and a quicker blade. It rewards those who prefer to finish a motion before the other side begins.'}, // [N]\n  warden:{lore:'A blade made to protect. It turns away what it can, and the Jedi who carries it takes pride in what never gets through.'}, // [N]\n  blue:{lore:'The blue crystal is the Guardian’s companion. It carries a calm, steady light and a reputation for defending first.'}, // [L H] blue common among Guardians; [N] phrasing\n  green:{lore:'The green blade is associated with the Consular, a Jedi of insight and negotiation. It is the color of patient hands.'}, // [L H] green and Consulars; [N] phrasing\n  yellow:{lore:'The yellow crystal is often chosen by Sentinels, who walk between study and duty. It burns bright, and it burns honestly.'}, // [L H] yellow and Sentinels; [N] phrasing\n  violet:{lore:'A rare hue, said to come when a Jedi’s heart is torn two ways. Those who carry it speak little of why.'}, // [N]\n  white:{lore:'A white blade is the mark of a crystal that was cleansed or purified. Jedi treat it as a quiet sign of a hard road walked.'}, // [C M] white/purified crystals; [N] phrasing\n  shiiCho:{lore:'Form I, the Way of the Sarlacc. The first form: broad, forgiving, and the foundation on which every other Jedi is built.'}, // [L H] Shii-Cho Form I\n  makashi:{lore:'Form II, the Way of the Ysalamiri. The duelist’s Form: precise footwork, elegant strokes, built for facing another blade.'}, // [L H] Makashi Form II\n  soresu:{lore:'Form III, the Way of the Mynock. Efficient and patient, it asks the Jedi to endure and to wait for the other side to tire.'}, // [L H] Soresu Form III\n  ataru:{lore:'Form IV, the Way of the Hawk-Bat. Acrobatic and fast, it uses the Force to leap and strike, and tires its user quickly.'}, // [L H] Ataru Form IV\n  djemSo:{lore:'Form V, the Way of the Krayt Dragon. Also called Djem So, it blends strong defense with strong offense, and it prizes the deflected bolt returned.'}, // [L H] Shien/Djem So Form V\n  niman:{lore:'Form VI, the Way of the Rancor. A moderate Form, balancing blade and Force, favored by those who see the Jedi as scholars first.'}, // [L H] Niman Form VI\n  juyo:{lore:'Form VII, the Way of the Vornskr. Ferocious, almost too intense, it is taught with caution because of what it can do to a Jedi’s mind.'}, // [L H] Juyo Form VII\n  medium:{lore:'Plate that is neither light nor heavy, the quartermaster’s compromise. It lets a trooper run, kneel, and take a hit in the same afternoon.'}, // [N]\n  robes:{lore:'Plain cloth worn by a thousand Jedi before. The weave is old, and it carries an odd comfort of its own.'}, // [N]\n  armoredRobes:{lore:'A Jedi’s robes with plating hidden in the folds. The wearer looks like a pilgrim until the first bolt glances away.'}, // [N]\n  stock:{lore:'A reworked grip and shoulder rest, made to steady a shot. It adds nothing flashy, only fewer misses.'}, // [N]\n  trigger:{lore:'A lighter pull and a quicker break. The kind of change that makes a gunsmith smile and a rifleman nervous.'}, // [N]\n  frag:{lore:'Compact, familiar, and exactly as loud as expected. Troopers carry them for the day when talking stops working.'}, // [N]\n  medpac:{lore:'Bandage, stim, and sealant in a case the size of a hand. Every medic has watched it do more good than any speech.'}, // [N]\n  boots:{lore:'Fitted with small servos that lengthen the stride. Scouts who wear them say the ground feels shorter.'}, // [N]\n  visor:{lore:'A narrow lens that sharpens the distance and flags the faint shapes in it. It is a small thing, and it is why many troopers come home.'}, // [N]\n  shield:{lore:'A belt-mounted emitter that throws up a thin film of energy. It blunts the worst and runs down quickly, so the wearer learns to stay alert.'}, // [N]\n },\n wing:{\n  medical:{lore:'Quiet beds and quiet voices. The Halls smell of bacta and clean linen, and everyone who passes through remembers them gently.'}, // [N]\n  training:{lore:'The Salle echoes with practice blades and patient correction. Every Jedi has lost their first bout here and learned from it.'}, // [N]\n  forge:{lore:'The crystal hums in the dark. Here a Jedi builds the blade they will carry, and learns something about themselves in the doing.'}, // [N]\n  armory:{lore:'Racks of blasters and plates for the Republic soldiers who share the Temple’s halls. Not every defender carries a lightsaber.'}, // [N]\n  comms:{lore:'Holos, relays, and a watch that never sleeps. In the Hub, news from the war arrives a little late and a little changed.'}, // [N]\n  barracks:{lore:'Bunks, boots, and a card table nobody admits to owning. The troopers make a home out of whatever space they are given.'}, // [N]\n  archives:{lore:'Millennia of memory, shelved and catalogued. The Archives hold the answer to many questions, and some questions the answer may not welcome.'}, // [N]\n  gardens:{lore:'Moss, water, and a quiet that is carefully maintained. A good place to sit with a troubled thought until it loosens.'}, // [N]\n },\n tile:{\n  '.':{lore:'Open floor. Plain, scuffed, and honest. Most battles are decided on ground like this.'}, // [N]\n  '_':{lore:'A door left open. It invites movement, for friend and foe alike.'}, // [N]\n  E:{lore:'The evacuation zone. A gunship waits, engines warm. Getting everyone to it is the whole point.'}, // [N]\n  r:{lore:'Broken stone and twisted metal. Rubble slows the careless and shelters the careful.'}, // [N]\n  c:{lore:'Stacked crates, supplies for someone’s better day. Good cover, and sometimes something useful inside.'}, // [N]\n  h:{lore:'A wall torn open by force, leaving a ragged window. Sightlines appear where none were meant to.'}, // [N]\n  x:{lore:'A drum of volatile fuel. Everyone nearby thinks about it at the same time.'}, // [N]\n  k:{lore:'A control console, blinking patiently. Whoever sits at it learns what the building knows.'}, // [N]\n  q:{lore:'A data terminal with unread files. Someone will want what it holds, and someone else will want it gone.'}, // [N]\n  Q:{lore:'A terminal already copied. Its secrets now travel with the squad, and the building does not know.'}, // [N]\n  b:{lore:'An alarm beacon, dark for now. If it lights, the room fills with more guests than were invited.'}, // [N]\n  C:{lore:'A place for a charge. Whoever planted the last one here is long gone, and whoever plants this one should be too.'}, // [N]\n  X:{lore:'A charge, armed and counting. No one stands near it on purpose.'}, // [N]\n  '#':{lore:'A solid wall. It keeps the dark outside and the light in, or the other way around.'}, // [N]\n  B:{lore:'A reinforced blast wall, thick and sealed. Whoever built it expected a bad day.'}, // [N]\n  O:{lore:'The objective. A relay, a shrine, a cave mouth. Something that matters more than the people who have come for it.'}, // [N]\n  d:{lore:'A closed door. It opens to a hand, a will, or a well-aimed charge.'}, // [N]\n  D:{lore:'A locked door, sealed against casual visitors. Locks are only questions, and some people are good at answers.'}, // [N]\n },\n status:{\n  guard:{lore:'Standing at a friend’s shoulder, blade ready. Guarding is an act of faith in the one beside you.'}, // [N]\n  overwatch:{lore:'Silent, still, and watching the door. Whoever steps through will be met.'}, // [N]\n  down:{lore:'Fallen, but not gone. Someone is already moving to reach them.'}, // [N]\n  stunned:{lore:'The world has gone soft and distant. A moment’s vulnerability is all the enemy needs.'}, // [N]\n  surrender:{lore:'Hands up, weapon down. The Jedi accept the offer, because they were never here to kill anyone they did not have to.'}, // [N]\n  captured:{lore:'Held, not harmed. A prisoner is a promise that someone will need to be answered later.'}, // [N]\n  disarmed:{lore:'Empty hands in a fight that does not care. Resourcefulness fills in where equipment ends.'}, // [N]\n  marked:{lore:'Singled out and called by name. Every weapon on the field now knows who to watch.'}, // [N]\n  concealed:{lore:'Unseen, and counting on it. Stillness is a weapon too.'}, // [N]\n  suppressed:{lore:'Pinned under steady fire. Raising a head is possible, but costly.'}, // [N]\n  darkness:{lore:'The dark side whispers that the cost of a thing is a reason to do more of it. Jedi who listen find the voice grows louder.'}, // [L H] dark side temptation; [N] phrasing\n  panic:{lore:'Fear breaks free of its leash. Training says to breathe, and training is very far away.'}, // [N]\n  highground:{lore:'The advantage of height. Seen from above, even an ugly battle makes a certain sense.'}, // [N]\n  hunker:{lore:'Low behind cover, making the most of whatever stands between them and the next bolt. Not heroic, but very sensible.'}, // [N]\n  barrier:{lore:'A wall of will in the air, thin and shimmering. Those behind it feel the Force holding the world back for a moment.'}, // [N]\n  rooted:{lore:'Feet fixed to the ground by a will not their own. The world moves, and they do not.'}, // [N]\n  shield:{lore:'A faint shimmer of energy over the skin. It drinks the first blows, and then it is gone.'}, // [N]\n  stable:{lore:'The bleeding has slowed and the breath has steadied. They are still down, but they are no longer slipping away.'}, // [N]\n  tricked:{lore:'A voice in the mind whispers a suggestion, and it sounds exactly like their own. The thought is not theirs, but they act on it.'}, // [N]\n  stress0:{lore:'Breathing evenly, shoulders loose, mind clear. The squad notices the calm and draws on it.'}, // [N]\n  stress1:{lore:'A tremor in the hands, a thin edge to the voice. It passes for most, and those who feel it are not weak for it.'}, // [N]\n  stress2:{lore:'Past the point where willpower is enough. They need rest and quiet, and their friends need to let them have it.'}, // [N]\n  oldWound:{lore:'The scar aches with the weather. It is a record of a hard day and a reminder of how it ended.'}, // [N]\n  shakyHand:{lore:'A faint tremor that was not there before. The Jedi watch it, and the wearer learns to work around it.'}, // [N]\n  badLeg:{lore:'A bad step that never quite healed. The limp is slight, and always noticed by the one who has it.'}, // [N]\n  fearsHorrors:{lore:'Something in the dark found them once. They carry the memory into every cave afterward.'}, // [N]\n  guilt:{lore:'They lived when others did not, and no one has convinced them it was acceptable. The weight is real, and so is the effort of carrying it.'}, // [N]\n  nightmares:{lore:'Sleep brings back what the day forgot. They wake tired, and try again.'}, // [N]\n  anger:{lore:'An old fury that fits in the hand like a stone. The Jedi who carries it feels stronger, and that is the warning.'}, // [N]\n },\n class:{\n  Guardian:{lore:'The Guardian stands between harm and the people who cannot defend themselves. Strength, discipline, and a blade that serves protection first.'}, // [L H] Jedi Guardian branch\n  Consular:{lore:'The Consular seeks understanding before conflict. Diplomats, healers, and scholars of the Force, they would rather solve a problem than win it.'}, // [L H] Jedi Consular branch\n  Sentinel:{lore:'The Sentinel walks between the two paths, balancing combat and insight. Cautious, adaptable, and never quite where the enemy expects.'}, // [L H] Jedi Sentinel branch\n  Wayseeker:{lore:'A name from a much later age. In this era the term is unknown, and no Jedi here will answer to it.'}, // [C H] Wayseeker is a High Republic-era term; unavailable in this era\n  Soldier:{lore:'The Republic’s trooper: disciplined, loyal, and trained to follow a plan through its worst hour.'}, // [N]\n  Scout:{lore:'The scout goes ahead and returns with what the squad needs to know. Quiet, quick, and rarely thanked.'}, // [N]\n  Medic:{lore:'The medic runs toward the wounded when everyone else runs away. A kit, a steady voice, and a lot of nerve.'}, // [N]\n  Heavy:{lore:'The heavy carries what the others cannot. A big weapon, a big pack, and a stubbornness to match.'}, // [N]\n  Defender:{lore:'Soresu masters who never strike first. They stand in the fire so others can walk out of it.'}, // [L M] Soresu is the defensive lightsaber form; the class is ours [N]\n  Shieldbearer:{lore:'Troopers in heavy plate behind a riot shield. Slow, loud, and the last thing a raider wants to charge.'}, // [N]\n  VIP:{lore:'Someone whose survival matters more than their own preferences. They did not choose the role, and many of them handle it with grace.'} // [N]\n },\n planet:{\n  coruscant:{lore:'The capital of the Republic, a world of endless towers and the Jedi Temple above the noise. For centuries it has felt untouchable.'}, // [C/L H] Coruscant, Republic capital and Jedi Temple\n  alderaan:{lore:'A world of mountains and old noble houses. In this age it hosts the peace talks that the galaxy has been waiting for.'}, // [L H] Alderaan hosts talks leading to the Treaty of Coruscant\n  balmorra:{lore:'A world of foundries and weapon yards, fought over by both sides. Little of it has been left unscarred.'}, // [L H] Balmorra, weapons world contested in the war\n  ordMantell:{lore:'A rough Mid Rim world of depots, smugglers, and Republic outposts. Easy to reach, hard to hold.'}, // [L M] Ord Mantell as Mid Rim hub; [N] phrasing\n  dantooine:{lore:'Open plains and quiet ruins, once home to a Jedi enclave. Rumor says the grassland hides things that hunt by night.'}, // [L H] Dantooine; [N] rumor phrasing\n  narShaddaa:{lore:'The Smuggler’s Moon, a glittering stack of neon and debt. Anything can be bought here, at a price someone else usually pays.'}, // [L H] Nar Shaddaa; [N] phrasing\n  ossus:{lore:'A world of ruined Jedi archives, scoured by old wars. The shelves are empty in places, and the silence is not entirely empty.'}, // [L H] Ossus as ruined Jedi archive world\n  ilum:{lore:'The ice world where Jedi come to find their kyber. The caves hum with something older than the Order.'}, // [C/L H] Ilum, kyber crystal world\n  taris:{lore:'A city world that has been burned and rebuilt more than once. The old towers still stand above the ruins of what they were.'}, // [L M] Taris history; [N] phrasing\n  tython:{lore:'The birthplace of the Jedi Order, far from the noise of the core. After the treaty, the Order turns toward it again.'}, // [L M-H] Tython; Order resettles after the treaty\n  korriban:{lore:'The tomb world of the ancient Sith. Dust and stone, and a presence that waits.'}, // [L H] Korriban, Sith tomb world\n  dromundKaas:{lore:'A jungle world of storms and predators, the seat of the Sith Empire. Its capital rises out of the rain like a threat.'}, // [L H] Dromund Kaas, Sith Empire capital; [N] phrasing\n  hydianWay:{lore:'A hyperspace road that carries trade and troops alike. Whoever holds it holds the pulse of the Outer Rim.'}, // [C/L H] Hydian Way trade route\n  ruusan:{lore:'A world scarred by a war that burned a thousand years later in memory. Its forests remember the cost of certainty.'} // [L M] Ruusan, Sith/Jedi war; ~1,000 BBY\n },\n character:{\n  zym:{lore:'Grand Master of the Order, tired and unyielding. He carries a Council’s worth of doubt, and does not let it show.'}, // [L M] Zym as Master of the Order; [N] characterization\n  gnost:{lore:'A Kel Dor Jedi historian, breath-masked and unhurried. He believes that the past is the only teacher that cannot be bribed.'}, // [L H] Gnost-Dural, Kel Dor archivist; [N] phrasing\n  darach:{lore:'A Zabrak Jedi Master with a patient smile and a hard-earned scar. He teaches best by letting others make their own mistakes.'}, // [L M] Kao Cen Darach, Zabrak Master; [N] phrasing\n  satele:{lore:'A young Knight with a famous name and an unfinished story. She carries the weight of a lineage she did not choose.'}, // [L H] Satele Shan, descendant of Bastila; [N] phrasing\n  jace:{lore:'A Republic soldier who has seen too much and complained about it too little. His platoon would follow him anywhere sensible.'}, // [L H] Jace Malcom; [N] characterization\n  malgus:{lore:'A Sith Lord of terrible resolve, who struck at the heart of the Republic and meant it. His pain is not hidden, and neither is his power.'}, // [L H] Malgus; [N] phrasing\n  adraas:{lore:'A Sith Lord who commanded beside Malgus. He is cold, capable, and he regards the Temple as a trophy waiting to be taken.'}, // [L H] Adraas; [N] characterization\n  eleena:{lore:'A Twi’lek who stands at Malgus’s side by choice. She sees more of him than anyone else does, and she is not afraid.'}, // [L H] Eleena Daru; [N] phrasing\n  kira:{lore:'A Guardian Knight who leads from the front. She says little about the people she has lost, and carries every name.'}, // [N]\n  tor:{lore:'A Consular Padawan with a mind quicker than his nerve. He is learning that courage is just fear that keeps walking.'}, // [N]\n  dax:{lore:'A sergeant with twenty years of mud on his boots. He does not believe in luck, and keeps his squad alive anyway.'}, // [N]\n  ilsa:{lore:'A scout who moves like a rumor. She prefers to be forgotten, and rarely is.'}, // [N]\n  bren:{lore:'A medic with tired hands and a steady voice. He has lost patients, and has never stopped trying for the next one.'}, // [N]\n  grak:{lore:'A heavy trooper built like a doorframe. Gentle in the barracks, immovable on the line.'}, // [N]\n  saresh:{lore:'A Republic envoy with an easy manner and a careful vocabulary. Whatever he says, there seems to be something else behind it.'}, // [N]\n  ondo:{lore:'A Senator with a loyal voice and a long list of enemies. He wants the treaty badly, and the Temple wants him alive to sign it.'}, // [N]\n  corin:{lore:'An Imperial officer who changed sides at some personal cost. He is trusted a little less than he deserves, and a little more than he expects.'}, // [N]\n  mira:{lore:'An aide who knows where every document is and who has read most of them. Quiet, observant, and indispensable.'}, // [N]\n  thulHeir:{lore:'Lady Venna Thul, heir to an old Alderaanian house. She is young, careful, and aware that her name weighs more than she does.'} // [L H] House Thul of Alderaan; [N] Venna Thul\n },\n mission:{\n  relay:{lore:'A lonely relay on the frontier, keeping the lanes open for ships that never learn its name. The Sith want it silent, and they are coming in waves.'}, // [N]\n  shrine:{lore:'Pilgrims have long come to a kyber shrine on Dantooine. Tonight something else has found it, and it has an appetite for the Force.'}, // [N]\n  rescue:{lore:'A supply depot on Ord Mantell holds prisoners who matter to someone. The plan is simple, which means it will not go simply.'}, // [N]\n  envoy:{lore:'Schedules leaked, secrets traded, and a trail that winds through the lower city. Someone near the talks is selling the Republic.'}, // [N]\n  archive:{lore:'An Imperial listening post on Balmorra, tucked between foundries. What it hears could hurt the Republic, and what it holds could help.'}, // [N]\n  sabotage:{lore:'An Imperial fuel depot on Balmorra, vast and poorly lit. A well-placed charge here could stall an advance for weeks.'}, // [N]\n  escort:{lore:'A Senator must walk the length of Coruscant’s lower streets to reach the talks. The Temple walks with him.'}, // [N]\n  blockade:{lore:'Mandalorians in Imperial pay have closed a stretch of the Hydian Way. A convoy is counting on the squad to open it.'}, // [N]\n  cache:{lore:'A listening post on the Inner Rim has gone quiet. The squad is sent to find out why before anyone else does.'}, // [N]\n  hutt:{lore:'A Hutt warehouse on Nar Shaddaa holds a ledger of debts and deals. In the right hands it could change the war.'}, // [N]\n  dock:{lore:'Docking Ring Nine. Malgus is coming for the Temple, and the Jedi have one chance to stop him at the door.'}, // [L H] Malgus’s strike on the Temple; [N] mission framing\n  vault:{lore:'Beneath the ruins of Ossus lie old records of the Sith wars. Gnost-Dural wants them saved, and the Empire wants them first.'}, // [L H] Ossus ruins, Gnost-Dural; [N] vault mission\n  ilum:{lore:'A cave mouth on Ilum, cold and humming. Sergeant Malcom’s platoon holds it, and the Jedi arrive in time to share the watch.'}, // [N]\n  adraasHunt:{lore:'During the talks on Alderaan, Satele Shan leads a strike on Lord Adraas at an embassy hangar. It is a gamble with the treaty as the stake.'}, // [L H] Adraas, Satele Shan; [N] mission framing\n  taris:{lore:'A reclamation camp on Taris, where captives were put to work. The Jedi come to open the gates, and to see who is still inside.'}, // [N]\n  thul:{lore:'The heir to House Thul must cross Alderaan unseen. The Jedi go with her, because some journeys are not safe alone.'}, // [L H] House Thul of Alderaan; [N] mission framing\n  depot:{lore:'Forward Depot Cresh keeps the enemy fed and armed. Take away the depot and the front shifts.'}, // [N]\n  fort:{lore:'Fort Garnik on Ord Mantell is old, battered, and still standing. The Republic means to keep it that way.'}, // [N]\n  r_ravine:{lore:'The wounded of the Army of Light lie in a ravine as the Brotherhood closes in. Among them is Johun Othone, a young Knight in Lord Hoth’s service.'}, // [L M]\n  r_caves:{lore:'The caves of Ruusan run deep, and the Brotherhood is gathering in them. Some of what moves in the dark has no interest in soldiers at all.'}, // [L M]\n  r_bomb:{lore:'Kaan’s ritual would end the Light and the Dark together. Hoth goes to stop it, and the squad goes ahead of him.'}, // [L H]\n  r_hospital:{lore:'The Army of Light cares for its wounded far behind the line, and that is exactly where the Brotherhood strikes. The healers must be given time.'}, // [L M]\n  r_nexus:{lore:'Deep in the caves, the dark side has found a place to grow. It breeds only what hunts the gifted, so the troops go first.'}, // [N]\n  r_snipers:{lore:'A courier carries the Army’s plans along a ridge trail, and the Brotherhood has paid for rifles to watch it. The road is short and the cover is thin.'}, // [L M]\n  r_dump:{lore:'The Brotherhood marches on powder and fuel. Take away the dump and the army slows, and that may be the difference.'}, // [N]\n },\n research:{\n  ataru:{lore:'Acrobatics and the Force woven into every stroke. Padawans who study it often take a little too much joy in the leap.'}, // [L H]\n  djemSo:{lore:'Strike and counterstrike are the same motion seen from two sides. Masters teach it to those with the nerve to be struck first.'}, // [L H]\n  niman:{lore:'A balanced Form for Jedi who walk between the saber and the book. Many Masters have settled into it as the years grew long.'}, // [L H]\n  juyo:{lore:'The Form that burns too brightly. It is taught rarely, and always with one eye on the student’s heart.'}, // [L H]\n  fieldMed:{lore:'New protocols from the Temple’s healers, carried to the field in plain satchels. Another life saved is the only proof they ask for.'}, // [N]\n  bacta:{lore:'Great tanks of the amber fluid, filled and tended. The Halls grow warmer, and the beds more often empty.'}, // [N]\n  curriculum:{lore:'The Masters write down what they know and pass it on. The Salle grows stricter, and the Padawans grow stronger.'}, // [N]\n  holocron:{lore:'Old holocrons, opened with care and heard patiently. Every mission leaves more to learn than before.'}, // [L M]\n  eliteMods:{lore:'A craftsman’s corner of the armory. Small changes, done well, quietly improve every shot.'}, // [N]\n  visors:{lore:'Optics salvaged, refined, and issued to those who need to see farther. A small piece of glass that can change an afternoon.'}, // [N]\n  shields:{lore:'Compact emitters brought up from the engineers. The troopers wear them with a mixture of gratitude and suspicion.'}, // [N]\n  armorWeave:{lore:'A fiber woven with an old ore that resists the saber. The robes look the same and feel a little heavier.'}, // [L M]\n  kyberLore:{lore:'The old crafts, relearned and refined. Each crystal is a little less costly to bring to song.'}, // [L M]\n  codebreak:{lore:'Imperial ciphers broken one at a time by patient hands. A little more is known, and a little less is a surprise.'}, // [L M]\n  sithTactics:{lore:'Captured manuals read by the Temple’s tacticians. Knowing the enemy’s habits is the oldest advantage.'}, // [N]\n  beastLore:{lore:'Reports from every survivor, collected and sorted. The monsters are less strange once they have been described.'}, // [N]\n  logistics:{lore:'Rations, bunks, and rosters, made to run on time. No glamour in it, and nothing works without it.'}, // [N]\n }\n};\n"
+}

@@ -1,0 +1,741 @@
+{
+  "source": "public/js/story-era3.js",
+  "sha256": "159e9ca2d80b6bbf969869b01d4a10ea25771d1e73f8ae5cac32322887b73cdf",
+  "lines": 157,
+  "counts": {
+    "SEATS": 2,
+    "PLANETS": 5,
+    "FIELD_PLANETS": 1,
+    "REDEEM_TXT": 1,
+    "GUESTS": 2,
+    "SOURCE_LITERALS": 162
+  },
+  "records": {
+    "SEATS": {
+      "veter": {
+        "n": "Grand Master Pra-Tre Veter",
+        "era": 3,
+        "stance": "Consular",
+        "chair": 1
+      },
+      "gios": {
+        "n": "Master Stellan Gios",
+        "era": 3,
+        "stance": "Guardian"
+      }
+    },
+    "PLANETS": {
+      "Hetzal": {
+        "x": 545,
+        "y": 175,
+        "reg": "outer"
+      },
+      "Starlight Beacon": {
+        "x": 560,
+        "y": 225,
+        "reg": "outer"
+      },
+      "Valo": {
+        "x": 470,
+        "y": 325,
+        "reg": "outer"
+      },
+      "Wild Space": {
+        "x": 585,
+        "y": 120,
+        "reg": "outer"
+      },
+      "Outer Rim": {
+        "x": 520,
+        "y": 290,
+        "reg": "outer"
+      }
+    },
+    "FIELD_PLANETS": {
+      "3": [
+        "Hetzal",
+        "Valo",
+        "Starlight Beacon",
+        "Wild Space",
+        "Ord Mantell",
+        "Dantooine",
+        "Nar Shaddaa"
+      ]
+    },
+    "REDEEM_TXT": {
+      "3": {
+        "n": "The way back",
+        "text": "{n} has seen the husks the Nameless leave behind, and the fear has turned to hate. Settlers are trapped by a Nihil Cloud. Bring them out alive, with {n} leading."
+      }
+    },
+    "GUESTS": {
+      "venz": {
+        "era": 3,
+        "n": "Lt. Arra Venz",
+        "cls": "Soldier",
+        "rank": 2,
+        "col": "#e0bd78",
+        "line": "Republic Defense Coalition. Starlight sent me. Point me at the Nihil."
+      },
+      "tal": {
+        "era": 3,
+        "n": "Knight Ember Tal",
+        "cls": "Guardian",
+        "rank": 2,
+        "col": "#62b3ff",
+        "line": "I heard the fight from the next valley. For light and life."
+      }
+    },
+    "SOURCE_LITERALS": [
+      {
+        "line": 5,
+        "raw": "'undefined'"
+      },
+      {
+        "line": 8,
+        "raw": "'Grand Master Pra-Tre Veter'"
+      },
+      {
+        "line": 8,
+        "raw": "'Consular'"
+      },
+      {
+        "line": 8,
+        "raw": "'Master Stellan Gios'"
+      },
+      {
+        "line": 8,
+        "raw": "'Guardian'"
+      },
+      {
+        "line": 10,
+        "raw": "'Hetzal'"
+      },
+      {
+        "line": 10,
+        "raw": "'outer'"
+      },
+      {
+        "line": 10,
+        "raw": "'Starlight Beacon'"
+      },
+      {
+        "line": 10,
+        "raw": "'outer'"
+      },
+      {
+        "line": 10,
+        "raw": "'Valo'"
+      },
+      {
+        "line": 10,
+        "raw": "'outer'"
+      },
+      {
+        "line": 10,
+        "raw": "'Wild Space'"
+      },
+      {
+        "line": 10,
+        "raw": "'outer'"
+      },
+      {
+        "line": 10,
+        "raw": "'Outer Rim'"
+      },
+      {
+        "line": 10,
+        "raw": "'outer'"
+      },
+      {
+        "line": 11,
+        "raw": "'Hetzal'"
+      },
+      {
+        "line": 11,
+        "raw": "'Valo'"
+      },
+      {
+        "line": 11,
+        "raw": "'Starlight Beacon'"
+      },
+      {
+        "line": 11,
+        "raw": "'Wild Space'"
+      },
+      {
+        "line": 11,
+        "raw": "'Ord Mantell'"
+      },
+      {
+        "line": 11,
+        "raw": "'Dantooine'"
+      },
+      {
+        "line": 11,
+        "raw": "'Nar Shaddaa'"
+      },
+      {
+        "line": 12,
+        "raw": "'The way back'"
+      },
+      {
+        "line": 12,
+        "raw": "'{n} has seen the husks the Nameless leave behind, and the fear has turned to hate. Settlers are trapped by a Nihil Cloud. Bring them out alive, with {n} leading.'"
+      },
+      {
+        "line": 13,
+        "raw": "'undefined'"
+      },
+      {
+        "line": 14,
+        "raw": "'Lt. Arra Venz'"
+      },
+      {
+        "line": 14,
+        "raw": "'Soldier'"
+      },
+      {
+        "line": 14,
+        "raw": "'#e0bd78'"
+      },
+      {
+        "line": 14,
+        "raw": "'Republic Defense Coalition. Starlight sent me. Point me at the Nihil.'"
+      },
+      {
+        "line": 15,
+        "raw": "'Knight Ember Tal'"
+      },
+      {
+        "line": 15,
+        "raw": "'Guardian'"
+      },
+      {
+        "line": 15,
+        "raw": "'#62b3ff'"
+      },
+      {
+        "line": 15,
+        "raw": "'I heard the fight from the next valley. For light and life.'"
+      },
+      {
+        "line": 34,
+        "raw": "'active'"
+      },
+      {
+        "line": 34,
+        "raw": "'retired'"
+      },
+      {
+        "line": 34,
+        "raw": "`Became a Legend of ${from===2?ERA2.n:ERA1.n}`"
+      },
+      {
+        "line": 36,
+        "raw": "`${WINGS[k].n} ${l}→${l-1}`"
+      },
+      {
+        "line": 39,
+        "raw": "'Credits'"
+      },
+      {
+        "line": 39,
+        "raw": "`${c0} → ${R.credits} (30% kept + ${K.warChest} from the Republic)`"
+      },
+      {
+        "line": 39,
+        "raw": "'Intel'"
+      },
+      {
+        "line": 39,
+        "raw": "`${i0} → 0`"
+      },
+      {
+        "line": 39,
+        "raw": "'Kyber'"
+      },
+      {
+        "line": 39,
+        "raw": "`${R.kyber} kept`"
+      },
+      {
+        "line": 39,
+        "raw": "'Senate Favor'"
+      },
+      {
+        "line": 39,
+        "raw": "`${f0} → ${R.favor}`"
+      },
+      {
+        "line": 39,
+        "raw": "'Order Darkness'"
+      },
+      {
+        "line": 39,
+        "raw": "`${o0} → ${C.orderDark}`"
+      },
+      {
+        "line": 43,
+        "raw": "'No Sith walked away from Ruusan. The Archives call the Sith extinct, and for once they may be right.'"
+      },
+      {
+        "line": 44,
+        "raw": "'Darth Bane died in a Jedi cell. His holocron is still in the Temple vault.'"
+      },
+      {
+        "line": 44,
+        "raw": "'One Sith walked away from Ruusan. Nobody has seen his line since. Nobody has looked.'"
+      },
+      {
+        "line": 44,
+        "raw": "''"
+      },
+      {
+        "line": 45,
+        "raw": "'lives'"
+      },
+      {
+        "line": 45,
+        "raw": "'Lord Hoth lived. His rule that no Jedi takes a war title still stands in the Temple.'"
+      },
+      {
+        "line": 46,
+        "raw": "'u'"
+      },
+      {
+        "line": 46,
+        "raw": "'active'"
+      },
+      {
+        "line": 48,
+        "raw": "''"
+      },
+      {
+        "line": 49,
+        "raw": "'veter'"
+      },
+      {
+        "line": 49,
+        "raw": "'gios'"
+      },
+      {
+        "line": 50,
+        "raw": "`It is now ${bbyTxt(ERA3.bby)}. Starlight Beacon is lit. The Republic reaches for the frontier.`"
+      },
+      {
+        "line": 51,
+        "raw": "'#modal'"
+      },
+      {
+        "line": 52,
+        "raw": "`<div class=\"box wide\"><div class=\"eyebrow\">Era 3 · ${ERA3.n} · ${bbyTxt(ERA3.bby)}</div><h2>Centuries pass</h2><p>${ERA3.jump}</p>\n <div class=\"sum\"><div><span>Legends of the Archive</span><span>${J.legends.join(', ')||'none reached rank 3'}</span></div>\n <div><span>Temple wings</span><span>${J.wings.join(' · ')||'every wing held its level'}</span></div>\n ${J.res.map(([a,b])=>`"
+      },
+      {
+        "line": 55,
+        "raw": "`).join('')}\n <div><span>Research</span><span>The Archives keep everything</span></div>\n ${C.eraMod?`"
+      },
+      {
+        "line": 57,
+        "raw": "`:''}\n <div><span>The Vision</span><span>${SHADOW.word(s.shadow)} · ${s.shadow}/10</span></div></div>\n ${(J.echo||[]).filter(Boolean).map(t=>`"
+      },
+      {
+        "line": 59,
+        "raw": "\"muted\""
+      },
+      {
+        "line": 59,
+        "raw": "`).join('')}\n <h3>${ERA3.shard.t}</h3><p>${ERA3.shard.text}</p>\n <p class=\"muted\">New squad: ${C.roster.map(r=>r.n).join(', ')}. ${C.roster[1].n} walks the Wayseeker path: Jedi who answer to the Force, not the Council. New Council voices: Grand Master Veter, Master Gios.</p>\n <button type=\"button\" class=\"primary\" id=\"jumpOk\">To the frontier</button></div>`"
+      },
+      {
+        "line": 63,
+        "raw": "'#jumpOk'"
+      },
+      {
+        "line": 66,
+        "raw": "'rescue'"
+      },
+      {
+        "line": 66,
+        "raw": "'r_prisoners'"
+      },
+      {
+        "line": 66,
+        "raw": "'h_prisoners'"
+      },
+      {
+        "line": 74,
+        "raw": "'restart'"
+      },
+      {
+        "line": 74,
+        "raw": "'nextEra3'"
+      },
+      {
+        "line": 75,
+        "raw": "'beforebegin'"
+      },
+      {
+        "line": 75,
+        "raw": "'<button type=\"button\" class=\"primary\" id=\"nextEra3\">Continue to the High Republic</button>'"
+      },
+      {
+        "line": 75,
+        "raw": "'primary'"
+      },
+      {
+        "line": 76,
+        "raw": "'#modal p.muted'"
+      },
+      {
+        "line": 76,
+        "raw": "`Centuries pass again. Next: ${ERA2.next}.`"
+      },
+      {
+        "line": 77,
+        "raw": "'nextEra3'"
+      },
+      {
+        "line": 80,
+        "raw": "'saved'"
+      },
+      {
+        "line": 80,
+        "raw": "'fell'"
+      },
+      {
+        "line": 80,
+        "raw": "'down'"
+      },
+      {
+        "line": 80,
+        "raw": "'fled'"
+      },
+      {
+        "line": 80,
+        "raw": "'dead'"
+      },
+      {
+        "line": 80,
+        "raw": "'escaped'"
+      },
+      {
+        "line": 80,
+        "raw": "'unmet'"
+      },
+      {
+        "line": 81,
+        "raw": "'dead'"
+      },
+      {
+        "line": 81,
+        "raw": "'lives'"
+      },
+      {
+        "line": 81,
+        "raw": "'joined'"
+      },
+      {
+        "line": 81,
+        "raw": "'walked'"
+      },
+      {
+        "line": 82,
+        "raw": "'#modal'"
+      },
+      {
+        "line": 84,
+        "raw": "'e3_'"
+      },
+      {
+        "line": 84,
+        "raw": "'orla_joined'"
+      },
+      {
+        "line": 84,
+        "raw": "`<p>${FLAG_LINES[k]}</p>`"
+      },
+      {
+        "line": 84,
+        "raw": "''"
+      },
+      {
+        "line": 85,
+        "raw": "`<div class=\"box wide\"><div class=\"eyebrow\">Era 3 ends · ${ERA3.n} · ${bbyTxt(s.bby)}</div><h2>Light and Life</h2>\n <p>${won?STORY_TEXT3.eraWin:STORY_TEXT3.eraLose}</p>${od>=60?`"
+      },
+      {
+        "line": 86,
+        "raw": "\"dkt\""
+      },
+      {
+        "line": 86,
+        "raw": "`:''}\n <div class=\"sum\"><div><span>Starlight Beacon</span><span>${rec.beacon==='saved'?'still shines':'fell into the sea of Eiram'}</span></div>\n <div><span>Marchion Ro</span><span>${rec.ro==='down'?'fell on Starlight':'escaped into the dark'}</span></div>\n <div><span>Lourna Dee</span><span>${{dead:'fell at her hideout',escaped:'got away',unmet:'never cornered'}[rec.lourna]}</span></div>\n <div><span>The Great Progenitor</span><span>${rec.progenitor==='dead'?'withered':'still growing somewhere'}</span></div>\n <div><span>The Vision</span><span>${SHADOW.word(s.shadow)} · ${s.shadow}/10</span></div><div><span>Order Darkness</span><span>${od}/100</span></div>\n <div><span>Senate Favor</span><span>${C.res.favor}</span></div><div><span>Still serving</span><span>${C.roster.filter(r=>r.status==='active').map(r=>r.n).join(', ')||'none'}</span></div>\n <div><span>Fallen</span><span>${C.legends.map(l=>l.n).join(', ')||'none'}</span></div><div><span>Archive of Legends</span><span>${archiveLoad().length} names</span></div>\n <div><span>Grand Master Veter</span><span>trust ${s.loyal.veter}</span></div><div><span>Master Gios</span><span>trust ${s.loyal.gios}</span></div></div>\n ${hist?`"
+      },
+      {
+        "line": 95,
+        "raw": "\"news\""
+      },
+      {
+        "line": 95,
+        "raw": "`:''}\n <p class=\"muted\">Two centuries pass. To be continued: ${ERA3.next}.</p>\n <button type=\"button\" class=\"primary\" id=\"restart\">New campaign</button></div>`"
+      },
+      {
+        "line": 98,
+        "raw": "'#restart'"
+      },
+      {
+        "line": 103,
+        "raw": "'function'"
+      },
+      {
+        "line": 103,
+        "raw": "'Starlight Command'"
+      },
+      {
+        "line": 109,
+        "raw": "`${u.n} drops out of hyperspace behind your line!`"
+      },
+      {
+        "line": 109,
+        "raw": "'bad'"
+      },
+      {
+        "line": 112,
+        "raw": "'h_hetzal'"
+      },
+      {
+        "line": 112,
+        "raw": "'Marshal Avar Kriss noted your squad\\'s name.'"
+      },
+      {
+        "line": 113,
+        "raw": "'h_grove'"
+      },
+      {
+        "line": 114,
+        "raw": "'h_valo'"
+      },
+      {
+        "line": 114,
+        "raw": "'A captured Nihil talks. The Eye has a name.'"
+      },
+      {
+        "line": 115,
+        "raw": "'h_tempest'"
+      },
+      {
+        "line": 115,
+        "raw": "'dead'"
+      },
+      {
+        "line": 115,
+        "raw": "'dead'"
+      },
+      {
+        "line": 115,
+        "raw": "'escaped'"
+      },
+      {
+        "line": 115,
+        "raw": "'e3_lourna_'"
+      },
+      {
+        "line": 116,
+        "raw": "'h_husks'"
+      },
+      {
+        "line": 116,
+        "raw": "'The logs show how the Leveler hunts. You will have more time on Starlight.'"
+      },
+      {
+        "line": 117,
+        "raw": "'h_beacon'"
+      },
+      {
+        "line": 117,
+        "raw": "'favor'"
+      },
+      {
+        "line": 118,
+        "raw": "'favor'"
+      },
+      {
+        "line": 123,
+        "raw": "'dead'"
+      },
+      {
+        "line": 124,
+        "raw": "'PATH JUMP'"
+      },
+      {
+        "line": 124,
+        "raw": "'dmg'"
+      },
+      {
+        "line": 124,
+        "raw": "'bad'"
+      },
+      {
+        "line": 126,
+        "raw": "'SPROUT'"
+      },
+      {
+        "line": 126,
+        "raw": "'dmg'"
+      },
+      {
+        "line": 126,
+        "raw": "`A ${FOES[type].n} tears out of the soil beside ${e.n}.`"
+      },
+      {
+        "line": 126,
+        "raw": "'bad'"
+      },
+      {
+        "line": 127,
+        "raw": "'p'"
+      },
+      {
+        "line": 127,
+        "raw": "'ok'"
+      },
+      {
+        "line": 131,
+        "raw": "'ok'"
+      },
+      {
+        "line": 133,
+        "raw": "`${e.n} drops out of hyperspace behind your line!`"
+      },
+      {
+        "line": 134,
+        "raw": "`${e.n} hits a Path beacon and jumps across the field, patching her wounds.`"
+      },
+      {
+        "line": 135,
+        "raw": "'drengir'"
+      },
+      {
+        "line": 138,
+        "raw": "'ok'"
+      },
+      {
+        "line": 139,
+        "raw": "'ok'"
+      },
+      {
+        "line": 139,
+        "raw": "'DREAD'"
+      },
+      {
+        "line": 139,
+        "raw": "'dark'"
+      },
+      {
+        "line": 141,
+        "raw": "'ok'"
+      },
+      {
+        "line": 142,
+        "raw": "','"
+      },
+      {
+        "line": 143,
+        "raw": "`${e.n} fires and dashes back into cover.`"
+      },
+      {
+        "line": 146,
+        "raw": "'shot'"
+      },
+      {
+        "line": 146,
+        "raw": "'ok'"
+      },
+      {
+        "line": 146,
+        "raw": "'MARKED'"
+      },
+      {
+        "line": 146,
+        "raw": "'dmg'"
+      },
+      {
+        "line": 146,
+        "raw": "`${e.n} marks ${t.n}. Every Nihil gun turns that way.`"
+      },
+      {
+        "line": 146,
+        "raw": "'bad'"
+      },
+      {
+        "line": 147,
+        "raw": "'melee'"
+      },
+      {
+        "line": 147,
+        "raw": "'ok'"
+      },
+      {
+        "line": 147,
+        "raw": "'ROOTED'"
+      },
+      {
+        "line": 147,
+        "raw": "'dmg'"
+      },
+      {
+        "line": 147,
+        "raw": "`Vines lock ${t.n} in place.`"
+      },
+      {
+        "line": 147,
+        "raw": "'bad'"
+      },
+      {
+        "line": 148,
+        "raw": "'nade'"
+      },
+      {
+        "line": 148,
+        "raw": "'ok'"
+      },
+      {
+        "line": 148,
+        "raw": "'CHOKING'"
+      },
+      {
+        "line": 148,
+        "raw": "'dmg'"
+      },
+      {
+        "line": 151,
+        "raw": "'Choking gas'"
+      },
+      {
+        "line": 152,
+        "raw": "'Dread'"
+      },
+      {
+        "line": 153,
+        "raw": "'e'"
+      },
+      {
+        "line": 153,
+        "raw": "'ok'"
+      },
+      {
+        "line": 153,
+        "raw": "'Marked by the Eye'"
+      },
+      {
+        "line": 156,
+        "raw": "`On a hyperspace Path. Drops in behind you on turn ${Math.max(S.turn,e.jumpT||0)}`"
+      },
+      {
+        "line": 157,
+        "raw": "`Grows a Drengir every ${e.seed} turns`"
+      }
+    ]
+  },
+  "text": "/* Era 3: the High Republic. Era jump from Ruusan, time-skip scene, Era 3 plan, Nihil/Drengir/Nameless foe behaviors, Act boss results, era-end screen.\n   Data: data-era3.js. Load after story-era2.js (wraps its usePlan/startEra/endScreen), before battle.js. Hooks in by wrapping globals, like story-era2.js:\n   usePlan, yearsJump, startEra, baseScreen, endScreen, optionsFor, archive, startMission, applyResults (story layer); eAct, eDo, intentOf (ai.js); odds (rules.js).\n   Entry point: startEra(3), from the Era 2 end screen. */\nconst isE3=()=>typeof S!=='undefined'&&S&&S.M&&S.M.era===3;\n\n// ── Rows for tables that load after data-era3.js ──\nObject.assign(SEATS,{veter:{n:'Grand Master Pra-Tre Veter',era:3,stance:'Consular',chair:1},gios:{n:'Master Stellan Gios',era:3,stance:'Guardian'}});\nObject.assign(PLANETS,{   // frontier placements: Hetzal, Starlight, Valo = Outer Rim frontier (C, Med); Wild Space beyond the rim (C, Med)\n 'Hetzal':{x:545,y:175,reg:'outer'},'Starlight Beacon':{x:560,y:225,reg:'outer'},'Valo':{x:470,y:325,reg:'outer'},'Wild Space':{x:585,y:120,reg:'outer'},'Outer Rim':{x:520,y:290,reg:'outer'}});\nFIELD_PLANETS[3]=['Hetzal','Valo','Starlight Beacon','Wild Space','Ord Mantell','Dantooine','Nar Shaddaa'];\nREDEEM_TXT[3]={n:'The way back',text:'{n} has seen the husks the Nameless leave behind, and the fear has turned to hate. Settlers are trapped by a Nihil Cloud. Bring them out alive, with {n} leading.'};\nif(typeof GUESTS!=='undefined')Object.assign(GUESTS,{   // [N]\n venz:{era:3,n:'Lt. Arra Venz',cls:'Soldier',rank:2,col:'#e0bd78',line:'Republic Defense Coalition. Starlight sent me. Point me at the Nihil.'},\n tal:{era:3,n:'Knight Ember Tal',cls:'Guardian',rank:2,col:'#62b3ff',line:'I heard the fight from the next valley. For light and life.'}});\n\n// ── Era swap: PLAN, ACTS, SHARDS hold the current era's data. Era 2's usePlan handles 1↔2; this adds 3. ──\nlet ERA3_SAVED=null;\nconst e3T=()=>[[PLAN,PLAN3],[ACTS,ACTS3],[SHARDS,SHARDS3]],\n e3Put=(t,v)=>{if(Array.isArray(t)){t.length=0;t.push(...v)}else{for(const k of Object.keys(t))delete t[k];Object.assign(t,v)}};\nconst _usePlan3=usePlan;\nusePlan=function(n){if(ERA3_SAVED){e3T().forEach(([t],i)=>e3Put(t,ERA3_SAVED[i]));ERA3_SAVED=null}\n if(n!==3)return _usePlan3(n);\n _usePlan3(1);ERA3_SAVED=e3T().map(([t])=>Array.isArray(t)?t.slice():{...t});e3T().forEach(([t,v])=>e3Put(t,v))};\n// Years pass: story.js treats {years:1} as the default 5-year jump; in Era 3 a step marked years:1 really is one year (232 → 231 → 230 BBY).\nconst _yearsJump3=yearsJump;\nyearsJump=function(){const P=PLAN[C.step];if(era()!==3||!P||P.years!==1)return _yearsJump3();const j=YEARS.jump;YEARS.jump=1;try{return _yearsJump3()}finally{YEARS.jump=j}};\n\n// ── Era jump (spec B §1.4), Ruusan → High Republic ──\nconst _startEra3=startEra;\nstartEra=function(n){if(n!==3)return _startEra3(n);if(!C||era()===3)return;storyInit();const from=era();\n if(from===2&&!(C.eras||[]).some(e=>e.era===2))C.eras=[...(C.eras||[]),era2Record()];\n const s=C.story,K=ERA3.carry,J={legends:[],wings:[],res:[],echo:[]},F=C.flags,from2=(C.eras||[]).find(e=>e.era===2);\n for(const r of C.roster)if((r.status==='active'||r.status==='retired')&&(r.rank||1)>=3){J.legends.push(r.n);archive(r,`Became a Legend of ${from===2?ERA2.n:ERA1.n}`)}\n usePlan(3);\n for(const k of Object.keys(C.wings)){const l=C.wings[k];if(l>=2&&!(C.staff&&C.staff[k])){C.wings[k]=l-1;J.wings.push(`${WINGS[k].n} ${l}→${l-1}`)}}\n const R=C.res,c0=R.credits,f0=R.favor,i0=R.intel,o0=C.orderDark;\n R.credits=Math.round(c0*K.credits)+K.warChest;R.intel=0;R.favor=Math.round((f0+K.favorTo)/2);C.orderDark=Math.round(o0*K.orderDark);\n J.res=[['Credits',`${c0} → ${R.credits} (30% kept + ${K.warChest} from the Republic)`],['Intel',`${i0} → 0`],['Kyber',`${R.kyber} kept`],['Senate Favor',`${f0} → ${R.favor}`],['Order Darkness',`${o0} → ${C.orderDark}`]];\n // +1 foe HP per lost era boss so far (Malgus, Kaan), cap +2.\n C.eraMod=Math.min(ERA3.eraModMax,(F.boss_or_won?0:1)+(from===2&&!F.boss_ru_won?1:0));\n // Ruusan echoes (Era 2 record).\n if(from2){J.echo.push(BANE[from2.bane]?{dead:'No Sith walked away from Ruusan. The Archives call the Sith extinct, and for once they may be right.',\n  captured:'Darth Bane died in a Jedi cell. His holocron is still in the Temple vault.',escaped:'One Sith walked away from Ruusan. Nobody has seen his line since. Nobody has looked.'}[from2.bane]:'');\n  if(from2.hoth==='lives')J.echo.push('Lord Hoth lived. His rule that no Jedi takes a war title still stands in the Temple.')}\n C.roster=ERA3_ROSTER.map(r=>({id:'u'+C.nid++,rank:1,xp:0,dark:0,picks:[],pick:0,wound:0,status:'active',kills:0,missions:0,...r,picks:[...(r.picks||[])]}));\n C.legends=[];C.staff={};C.bonds={};C.quests={};C.cands=null;C.build=null;C.era=3;C.month=1;C.day=1;C.step=0;\n Object.assign(s,{bby:ERA3.bby,done:0,eraDone:0,visit:'',q:[],yrs:null,shard:1,jump:J});\n s.loyal=s.loyal||{};for(const k of ['veter','gios'])if(s.loyal[k]==null)s.loyal[k]=COUNCIL_SEATS[k].loyalty;\n ensureTemple();C.options=optionsFor(0);C.news=[`It is now ${bbyTxt(ERA3.bby)}. Starlight Beacon is lit. The Republic reaches for the frontier.`];saveGame();jumpScreen3()};\nfunction jumpScreen3(){SCR=jumpScreen3;const s=C.story,J=s.jump,m=$('#modal');m.hidden=false;\n m.innerHTML=`<div class=\"box wide\"><div class=\"eyebrow\">Era 3 · ${ERA3.n} · ${bbyTxt(ERA3.bby)}</div><h2>Centuries pass</h2><p>${ERA3.jump}</p>\n <div class=\"sum\"><div><span>Legends of the Archive</span><span>${J.legends.join(', ')||'none reached rank 3'}</span></div>\n <div><span>Temple wings</span><span>${J.wings.join(' · ')||'every wing held its level'}</span></div>\n ${J.res.map(([a,b])=>`<div><span>${a}</span><span>${b}</span></div>`).join('')}\n <div><span>Research</span><span>The Archives keep everything</span></div>\n ${C.eraMod?`<div><span>Old defeats</span><span>Foes this era are tougher (+${C.eraMod} HP)</span></div>`:''}\n <div><span>The Vision</span><span>${SHADOW.word(s.shadow)} · ${s.shadow}/10</span></div></div>\n ${(J.echo||[]).filter(Boolean).map(t=>`<p class=\"muted\">${t}</p>`).join('')}\n <h3>${ERA3.shard.t}</h3><p>${ERA3.shard.text}</p>\n <p class=\"muted\">New squad: ${C.roster.map(r=>r.n).join(', ')}. ${C.roster[1].n} walks the Wayseeker path: Jedi who answer to the Force, not the Council. New Council voices: Grand Master Veter, Master Gios.</p>\n <button type=\"button\" class=\"primary\" id=\"jumpOk\">To the frontier</button></div>`;\n m.onclick=null;$('#jumpOk').onclick=()=>{s.jump=null;saveGame();baseScreen()}}\n\n// ── Story-layer hooks (event era filter + loyal trigger already come from story-era2.js's trig wrapper) ──\nconst _optionsFor3=optionsFor;optionsFor=function(step){const o=_optionsFor3(step);if(era()===3)for(const x of o)if(x.crisis==='rescue'||x.mission==='r_prisoners')x.mission='h_prisoners';return o};\nconst _archive3=archive;archive=function(r,how,where){_archive3(r,how,where);if(era()!==3)return;\n try{const a=archiveLoad();if(a[0]&&a[0].n===r.n){a[0].era=ERA3.n;a[0].ep=a[0].ep.replace(/~[\\d,]+ BBY/,bbyTxt(C.story.bby));localStorage.setItem(ARCH_KEY,JSON.stringify(a))}}catch(e){}};\nconst _baseScreen3=baseScreen;\nbaseScreen=function(){if(!C||era()!==3)return _baseScreen3();usePlan(3);if(C.story&&C.story.jump)return jumpScreen3();_baseScreen3()};\nconst _endScreen3=endScreen;\nendScreen=function(){if(C&&C.story&&era()===3)return era3End();_endScreen3();if(!C||!C.story||era()!==2)return;\n // Era 2 end → offer the High Republic.\n const r=document.getElementById('restart');if(!r||document.getElementById('nextEra3'))return;\n r.insertAdjacentHTML('beforebegin','<button type=\"button\" class=\"primary\" id=\"nextEra3\">Continue to the High Republic</button>');r.classList.remove('primary');\n for(const p of document.querySelectorAll('#modal p.muted'))if(/To be continued/.test(p.textContent))p.textContent=`Centuries pass again. Next: ${ERA2.next}.`;\n document.getElementById('nextEra3').onclick=()=>startEra(3)};\n// What Era 4 reads: C.eras.find(e=>e.era===3).\nfunction era3Record(){const s=C.story,F=C.flags;\n return{era:3,shadow:s.shadow,beacon:F.e3_beacon_saved?'saved':'fell',ro:F.e3_ro_down?'down':'fled',lourna:F.e3_lourna_dead?'dead':F.e3_lourna_escaped?'escaped':'unmet',\n  progenitor:F.e3_progenitor_down?'dead':'lives',orla:F.orla_joined?'joined':'walked',won:!!F.boss_hr_won,loyal:{veter:s.loyal.veter,gios:s.loyal.gios},fallen:C.legends.map(l=>l.n)}}\nfunction era3End(){SCR=endScreen;const s=C.story,m=$('#modal'),od=odark(),F=C.flags;m.hidden=false;\n if(!s.eraDone){s.eraDone=1;if(od>=60)shadowAdd(1);C.eras=[...(C.eras||[]).filter(e=>e.era!==3),era3Record()];saveGame()}\n const won=!!F.boss_hr_won,rec=era3Record(),hist=Object.keys(FLAG_LINES).filter(k=>(k.startsWith('e3_')||k==='orla_joined')&&F[k]).map(k=>`<p>${FLAG_LINES[k]}</p>`).join('');\n m.innerHTML=`<div class=\"box wide\"><div class=\"eyebrow\">Era 3 ends · ${ERA3.n} · ${bbyTxt(s.bby)}</div><h2>Light and Life</h2>\n <p>${won?STORY_TEXT3.eraWin:STORY_TEXT3.eraLose}</p>${od>=60?`<p class=\"dkt\">${STORY_TEXT3.darkWarn}</p>`:''}\n <div class=\"sum\"><div><span>Starlight Beacon</span><span>${rec.beacon==='saved'?'still shines':'fell into the sea of Eiram'}</span></div>\n <div><span>Marchion Ro</span><span>${rec.ro==='down'?'fell on Starlight':'escaped into the dark'}</span></div>\n <div><span>Lourna Dee</span><span>${{dead:'fell at her hideout',escaped:'got away',unmet:'never cornered'}[rec.lourna]}</span></div>\n <div><span>The Great Progenitor</span><span>${rec.progenitor==='dead'?'withered':'still growing somewhere'}</span></div>\n <div><span>The Vision</span><span>${SHADOW.word(s.shadow)} · ${s.shadow}/10</span></div><div><span>Order Darkness</span><span>${od}/100</span></div>\n <div><span>Senate Favor</span><span>${C.res.favor}</span></div><div><span>Still serving</span><span>${C.roster.filter(r=>r.status==='active').map(r=>r.n).join(', ')||'none'}</span></div>\n <div><span>Fallen</span><span>${C.legends.map(l=>l.n).join(', ')||'none'}</span></div><div><span>Archive of Legends</span><span>${archiveLoad().length} names</span></div>\n <div><span>Grand Master Veter</span><span>trust ${s.loyal.veter}</span></div><div><span>Master Gios</span><span>trust ${s.loyal.gios}</span></div></div>\n ${hist?`<h3>What history changed</h3><div class=\"news\">${hist}</div>`:''}\n <p class=\"muted\">Two centuries pass. To be continued: ${ERA3.next}.</p>\n <button type=\"button\" class=\"primary\" id=\"restart\">New campaign</button></div>`;\n m.onclick=null;$('#restart').onclick=()=>{C=null;usePlan(1);briefing(true)}}\n\n// ── Missions: Path-Runners start out of sight; story results ──\nconst _startMission3=startMission;\n// Comm beats say {cmd}; battle.js maps any era ≥2 to \"Army of Light\". Era 3 answers to Starlight. (Wrapped lazily: battle.js loads after this file. E: fold into bvSub.)\nlet e3CmdW=0;function e3Cmd(){if(e3CmdW||typeof bvSub!=='function')return;e3CmdW=1;const f=bvSub;bvSub=function(s,c){const r=f(s,c);return isE3()?r.replace(/Army of Light/g,'Starlight Command'):r}}\nstartMission=function(id,sq,o){e3Cmd();_startMission3(id,sq,o);if(!isE3())return;for(const e of enemies())if(e.pathJump){e.hid=1;e.jumpT=e.pathJump}render()};\n// Path-Runners that arrive with a wave drop in behind the squad at once.\nconst _mkFoe3=mkFoe;\nmkFoe=function(t,x,y){const u=_mkFoe3(t,x,y);if(!isE3()||!u.pathJump||S.turn<2||!players().length)return u;\n const T=freeTiles().filter(p=>!(p.x===x&&p.y===y)).map(p=>({...p,d:nearP(p)})).filter(p=>p.d>=3&&p.d<=7).sort((a,b)=>b.y-a.y+Math.random()-.5);\n if(T[0]){u.x=T[0].x;u.y=T[0].y;u.jumped=1;log(`${u.n} drops out of hyperspace behind your line!`,'bad')}return u};\nconst _applyResults3=applyResults;\napplyResults=function(win){const M=S.M,id=S.id,clues=S.clues,boss=S.units.find(u=>u.boss);const out=_applyResults3(win);if(M.era!==3)return out;const F=C.flags;\n if(id==='h_hetzal'&&win){F.e3_hetzal_saved=1;out.flag='Marshal Avar Kriss noted your squad\\'s name.'}\n if(id==='h_grove'){F.e3_grove_done=1;if(win){F.e3_progenitor_down=1;out.flag=STORY_TEXT3.groveWin}else out.flag=STORY_TEXT3.groveLose}\n if(id==='h_valo'&&win){F.e3_valo_held=1;F.e3_ro_named=1;out.flag='A captured Nihil talks. The Eye has a name.'}\n if(id==='h_tempest'){const k=win&&boss&&boss.status==='dead'?'dead':'escaped';F['e3_lourna_'+k]=1;out.flag=STORY_TEXT3.tempest[k]}\n if(id==='h_husks'&&win){F.e3_nameless_known=1;if(clues>=3){F.e3_leveler_found=1;out.flag='The logs show how the Leveler hunts. You will have more time on Starlight.'}}\n if(id==='h_beacon'){if(win){F.boss_hr_won=1;F.e3_beacon_saved=1;F.e3_ro_down=1;shadowAdd(-1);gain('favor',10,out.res);out.flag=STORY_TEXT3.bossWin}\n  else{F.e3_beacon_fell=1;shadowAdd(1);gain('favor',-10,out.res);out.flag=STORY_TEXT3.bossLose}}\n saveGame();return out};\n\n// ── Foe behaviors (Era 3 only). hitRun · gas · pathJump · root · seed · dread · pathEscape · eyeMark ──\nconst freeTiles=()=>{const o=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(PASS(tile(x,y))&&!unitAt(x,y))o.push({x,y});return o};\nconst nearP=p=>{const P=players().filter(u=>u.status!=='dead');return P.length?Math.min(...P.map(u=>dist(u,p))):99};\nfunction e3Jump(e,pick,txt){const T=freeTiles();if(!T.length)return;const t=T.sort((a,b)=>pick(b)-pick(a))[0];e.x=t.x;e.y=t.y;e.hid=0;fx(e,'PATH JUMP','dmg');log(txt,'bad');render()}\nfunction e3Spawn(e,type){const p=N4.map(([dx,dy])=>({x:e.x+dx,y:e.y+dy})).find(p=>inb(p.x,p.y)&&PASS(tile(p.x,p.y))&&!unitAt(p.x,p.y));\n if(p){S.units.push(mkFoe(type,p.x,p.y));fx(p,'SPROUT','dmg');log(`A ${FOES[type].n} tears out of the soil beside ${e.n}.`,'bad')}}\nconst dreadNear=u=>u.jedi&&u.side==='p'&&enemies().some(e=>e.dread&&e.status==='ok'&&dist(e,u)<=3);\nconst _eAct3=eAct;\neAct=async function(e){if(!isE3())return _eAct3(e);\n if(S.e3t!==S.turn){S.e3t=S.turn;for(const p of players())if(p.rooted&&p.rootT<S.turn){p.rooted=0}}   // roots hold through one player turn\n if(e.status!=='ok')return _eAct3(e);\n if(e.pathJump&&!e.jumped){if(S.turn<(e.jumpT||0))return;e.jumped=1;\n  e3Jump(e,t=>{const d=nearP(t);return d<3||d>7?-99:t.y*2+Math.random()},`${e.n} drops out of hyperspace behind your line!`)}\n if(e.pathEscape&&!e.escaped&&e.hp*2<=e.max){e.escaped=1;e.hp=Math.min(e.max,e.hp+e.pathEscape);e3Jump(e,t=>nearP(t)+Math.random(),`${e.n} hits a Path beacon and jumps across the field, patching her wounds.`)}\n if(e.seed&&S.turn%e.seed===0&&e.seedT!==S.turn){e.seedT=S.turn;e3Spawn(e,'drengir')}\n if(e.eyeMark)S.roMark=null;\n if(e.seed&&!e.mob)return;   // the Root-Mother only grows\n e.shot=0;await _eAct3(e);if(S.over||e.status!=='ok')return;\n if(e.dread)for(const u of players())if(u.jedi&&u.status==='ok'&&dist(u,e)<=3&&u.focus>0){u.focus--;fx(u,'DREAD','dark')}\n // Hit and run: after a shot, dash up to 3 tiles back toward cover.\n if(e.hitRun&&e.shot&&!e.rooted){const m0=e.mob;e.mob=3;const R=reach(e);e.mob=m0;const P=players().filter(p=>p.status==='ok');let best=null,bs=-1e9;\n  for(const k of Object.keys(R.d)){const [x,y]=k.split(',').map(Number),pos={x,y};let s=Math.random();for(const p of P)if(dist(p,pos)<=10&&los(p,pos))s-=(40-coverVal(pos,p))/2;if(s>bs){bs=s;best=pos}}\n  if(best&&(best.x!==e.x||best.y!==e.y)){moveAlong(e,pathTo(e,best.x,best.y,R.prev));log(`${e.n} fires and dashes back into cover.`);render()}}};\nconst _eDo3=eDo;\neDo=async function(e,a){if(!isE3())return _eDo3(e,a);const t=a.t,hp0=t?t.hp:0;await _eDo3(e,a);\n if(a.kind==='shot'){e.shot=1;if(e.eyeMark&&t&&t.status==='ok'){S.roMark=t.uid;fx(t,'MARKED','dmg');log(`${e.n} marks ${t.n}. Every Nihil gun turns that way.`,'bad')}}\n if(e.root&&a.kind==='melee'&&t&&t.hp<hp0&&t.status==='ok'){t.rooted=1;t.rootT=S.turn;fx(t,'ROOTED','dmg');log(`Vines lock ${t.n} in place.`,'bad')}\n if(e.gas&&a.kind==='nade')for(const u of players())if(u.status==='ok'&&cheb(u,a)<=1){u.choke=S.turn+1;fx(u,'CHOKING','dmg')}};\nconst _odds3=odds;\nodds=function(a,t,o){const r=_odds3(a,t,o);if(!isE3())return r;const L=r.lines;\n if(a.choke>=S.turn)L.push(['Choking gas',-15]);\n if(dreadNear(a))L.push(['Dread',-15]);\n if(a.side==='e'&&S.roMark&&t.uid===S.roMark&&enemies().some(e=>e.eyeMark&&e.status==='ok'))L.push(['Marked by the Eye',15]);\n const raw=L.reduce((s,l)=>s+l[1],0);r.total=Math.max(5,Math.min(95,Math.round(raw)));return r};\nconst _intentOf3=intentOf;\nintentOf=function(e){if(isE3()){if(e.pathJump&&!e.jumped)return{txt:`On a hyperspace Path. Drops in behind you on turn ${Math.max(S.turn,e.jumpT||0)}`};\n if(e.seed&&!e.mob)return{txt:`Grows a Drengir every ${e.seed} turns`}}return _intentOf3(e)};\n"
+}
