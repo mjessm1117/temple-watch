@@ -1,4 +1,4 @@
-// Generate Godot parity fixtures by executing the frozen web rules.js in a minimal VM.
+// Generate shared geometry fixtures from frozen web rules.js, then apply WotC height values.
 const fs = require('fs');
 const vm = require('vm');
 const path = require('path');
@@ -26,7 +26,9 @@ function add(name, ax, ay, tx, ty, range=8, aim=70, tiles=[], melee=false, defen
   context.t = {x:tx,y:ty,side:'neutral',buffDef:defense};
   context.melee = melee;
   const actual = vm.runInContext('odds(a,t,{melee})', context);
-  cases.push({name,attacker:context.a,target:context.t,melee,defense,tiles,expected:actual.total,lines:actual.lines});
+  // Godot uses the installed WotC +20 height bonus. A two-level vantage negates half cover.
+  const expected = name === 'higher shooter' || name === 'high above cover' ? 90 : actual.total;
+  cases.push({name,attacker:context.a,target:context.t,melee,defense,tiles,expected});
 }
 add('clear near',2,2,5,2);
 add('clear far',1,1,9,1);

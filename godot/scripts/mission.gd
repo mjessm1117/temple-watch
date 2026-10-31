@@ -19,6 +19,9 @@ var reinforcement_announced := false
 var reinforcement_dropped := false
 var next_id := 0
 var difficulty: Dictionary = {}
+var cover_hp: Dictionary = {}
+var reinforcement_marker: Vector2i = Vector2i(-1, -1)
+var terrain_revision := 0
 
 func _init(seed_value: int = 1) -> void:
 	rng.seed = seed_value
@@ -28,6 +31,10 @@ func _init(seed_value: int = 1) -> void:
 	catalog = _json("res://data/units.json")
 	abilities = _json("res://data/abilities.json")
 	for row in spec.rows: board.append(str(row))
+	for y in range(board.size()):
+		for x in range(board[y].length()):
+			var p := Vector2i(x, y)
+			if _destructible(p): cover_hp[p] = 8 if tile(p) == "#" else 4
 	prisoner = spec.prisoner.duplicate(true)
 	prisoner["freed"] = false
 	for entry in spec.squad: _spawn(str(entry[0]), int(entry[1]), int(entry[2]), -1)
@@ -35,7 +42,8 @@ func _init(seed_value: int = 1) -> void:
 		for entry in spec.groups[group_index]: _spawn(str(entry[0]), int(entry[1]), int(entry[2]), group_index)
 		for extra in range(int(difficulty.get("extra_per_group", 0))):
 			var anchor: Array = spec.groups[group_index][extra % spec.groups[group_index].size()]
-			_spawn_near("trooper", Vector2i(int(anchor[1]), int(anchor[2])), group_index)
+			var kinds: Array = difficulty.get("extra_kinds", ["trooper", "trooper", "trooper"])
+			_spawn_near(str(kinds[group_index % kinds.size()]), Vector2i(int(anchor[1]), int(anchor[2])), group_index)
 	message("Rescue Aide Mira Tal, then escort her to the blue evac tiles before turn %d." % int(spec.turn_limit))
 
 static func _json(path: String) -> Dictionary:
@@ -56,13 +64,19 @@ func _spawn(kind: String, x: int, y: int, group: int) -> void:
 		u.hp = maxi(1, int(u.hp) + int(difficulty.get("enemy_hp", 0)))
 		u.max_hp = int(u.hp)
 		u.aim = int(u.aim) + int(difficulty.get("enemy_aim", 0))
-	else: u.aim = int(u.aim) + int(difficulty.get("player_aim", 0))
+		var penalty := int(difficulty.get("enemy_damage", 0))
+		u.damage = [maxi(1, int(u.damage[0]) + penalty), maxi(2, int(u.damage[1]) + penalty)]
+	else:
+		u.aim = int(u.aim) + int(difficulty.get("player_aim", 0))
+		u.hp = int(u.hp) + int(difficulty.get("player_hp", 0))
+		u.max_hp = int(u.hp)
 	u["ap"] = 3 if str(u.side) == "player" else 0
 	u["focus_left"] = int(u.get("focus", 0))
 	u["group"] = group
 	u["awake"] = group < 0
 	u["spotted"] = group < 0
 	u["overwatch"] = false
+	u["hunkered"] = false
 	units.append(u)
 
 func _spawn_near(kind: String, anchor: Vector2i, group: int) -> void:
@@ -84,6 +98,34 @@ func tile(p: Vector2i) -> String:
 func set_tile(p: Vector2i, c: String) -> void:
 	if not in_bounds(p): return
 	board[p.y] = board[p.y].substr(0, p.x) + c + board[p.y].substr(p.x + 1)
+	cover_hp.erase(p)
+	if _destructible(p): cover_hp[p] = 8 if c == "#" else 4
+
+func _destructible(p: Vector2i) -> bool:
+	if not in_bounds(p) or p.x == 0 or p.y == 0 or p.x == int(spec.width) - 1 or p.y == int(spec.height) - 1: return false
+	return tile(p) in ["#", "c", "h", "k"]
+
+func damage_cover(p: Vector2i, damage: int) -> String:
+	if not _destructible(p) or damage <= 0: return tile(p)
+	var before := tile(p)
+	if not cover_hp.has(p): cover_hp[p] = 8 if tile(p) == "#" else 4
+	var remaining: int = int(cover_hp[p]) - damage
+	if remaining <= 0:
+		set_tile(p, "r")
+		message("Cover collapses into rubble.")
+	elif tile(p) == "#" and remaining <= 4:
+		set_tile(p, "c")
+		cover_hp[p] = remaining
+		message("Full cover cracks into half cover.")
+	else: cover_hp[p] = remaining
+	if tile(p) != before: terrain_revision += 1
+	return tile(p)
+
+func explode(center: Vector2i, damage: int, radius: int = 1) -> void:
+	for y in range(center.y - radius, center.y + radius + 1):
+		for x in range(center.x - radius, center.x + radius + 1):
+			var p := Vector2i(x, y)
+			if center.distance_to(p) <= float(radius): damage_cover(p, damage)
 
 func passable(p: Vector2i) -> bool:
 	return in_bounds(p) and tile(p) not in ["#", "c", "h", "k"]
@@ -212,6 +254,9 @@ func _apply_attack(a: Dictionary, t: Dictionary, info: Dictionary, mode: String)
 		damage = max(1, damage - armor)
 		t.hp = max(0, int(t.hp) - damage)
 		if armor > 0: t.armor = armor - 1
+		if str(a.get("class_name", "")) == "Heavy" and mode == "shoot":
+			var direction := Vector2i(signi(int(a.x) - int(t.x)), signi(int(a.y) - int(t.y)))
+			for q in [Shot.pos(t) + Vector2i(direction.x, 0), Shot.pos(t) + Vector2i(0, direction.y)]: damage_cover(q, 3)
 	message("%s %s %s%s" % [a.name, outcome, t.name, " for %d." % damage if damage > 0 else "."])
 	if int(t.hp) <= 0: message("%s is down." % t.name)
 
@@ -231,9 +276,7 @@ func push(id: int, target_id: int) -> bool:
 		if not passable(q) or occupied(q, int(t.id)):
 			t.hp = max(0, int(t.hp) - int(abilities.push.collision_damage))
 			message("%s slams %s into cover for 3." % [a.name, t.name])
-			if in_bounds(q) and tile(q) in ["#", "c", "h"]:
-				set_tile(q, "r")
-				message("Cover breaks into rubble.")
+			if in_bounds(q): damage_cover(q, 4)
 			break
 		t.x = q.x; t.y = q.y
 	message("%s pushes %s out of position." % [a.name, t.name])
@@ -297,6 +340,15 @@ func overwatch(id: int) -> bool:
 	message("%s watches the lane." % u.name)
 	return true
 
+func hunker(id: int) -> bool:
+	var u := unit_by_id(id)
+	if u.is_empty() or u.side != "player" or phase != "player" or int(u.ap) <= 0 or result != "": return false
+	u.ap = 0
+	u.hunkered = true
+	u.overwatch = false
+	message("%s hunkers down (+30 defense; flank critical blocked)." % u.name)
+	return true
+
 func end_turn() -> void:
 	if result != "" or phase != "player": return
 	if bool(prisoner.freed): _civilian_advance()
@@ -316,12 +368,14 @@ func end_turn() -> void:
 		message("The evacuation window closes. Mission failed.")
 		return
 	phase = "player"
-	for p in living("player"): p.ap = 3; p.overwatch = false
+	for p in living("player"): p.ap = 3; p.overwatch = false; p.hunkered = false
 	if turn == int(spec.reinforcement.announce_turn) and int(difficulty.get("reinforcement_size", 2)) > 0:
 		reinforcement_announced = true
-		message("INBOUND: Sith reinforcements approaching from the east next turn!")
+		reinforcement_marker = Vector2i(int(spec.reinforcement.units[0][1]), int(spec.reinforcement.units[0][2]))
+		message("INBOUND: Sith reinforcements at (%d,%d) next turn!" % [reinforcement_marker.x, reinforcement_marker.y])
 	if turn == int(spec.reinforcement.drop_turn) and int(difficulty.get("reinforcement_size", 2)) > 0:
 		reinforcement_dropped = true
+		reinforcement_marker = Vector2i(-1, -1)
 		for i in range(int(difficulty.get("reinforcement_size", 2))):
 			var entry: Array = spec.reinforcement.units[i % spec.reinforcement.units.size()]
 			_spawn_near(str(entry[0]), Vector2i(int(entry[1]), int(entry[2])), 99)
