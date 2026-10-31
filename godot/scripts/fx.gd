@@ -182,3 +182,9 @@ func float_text(at: Vector3, value: String, color: Color, large := false) -> voi
 	tween.tween_property(label, "position:y", label.position.y - 75, 0.8)
 	tween.tween_property(label, "modulate:a", 0.0, 0.8).set_delay(0.2)
 	tween.chain().tween_callback(label.queue_free)
+
+func heal(at: Vector3, amount: int) -> void:
+	var color := Color("60ed97")
+	_flash(at, color, 1.8, 0.42)
+	burst(at, color, 14)
+	float_text(at + Vector3.UP * 0.7, "+%d HP" % amount if amount > 0 else "PROTECTED", color, true)

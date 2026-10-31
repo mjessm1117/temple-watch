@@ -14,6 +14,7 @@ var foot: AudioStreamPlayer
 var _step_stream: AudioStreamWAV
 var _action_serial := 0
 var _cover_level := 0
+var downed := false
 
 func setup(u: Dictionary, scene: PackedScene, at: Vector3) -> void:
 	unit_id = int(u.id)
@@ -61,6 +62,7 @@ func set_selected(value: bool, enemy: bool) -> void:
 	ring.scale = Vector3.ONE * (1.15 if value else 1.0)
 
 func set_cover(level: int) -> void:
+	if downed: return
 	level = clampi(level, 0, 2)
 	if level == _cover_level: return
 	_cover_level = level
@@ -68,6 +70,16 @@ func set_cover(level: int) -> void:
 	var target_y := -0.24 if _cover_level == 2 else -0.12 if _cover_level == 1 else 0.0
 	var tween := create_tween()
 	tween.tween_property(model, "position:y", target_y, 0.16)
+
+func set_downed(value: bool) -> void:
+	if value == downed or not alive or model == null: return
+	downed = value
+	if pose_motion != null and pose_motion.is_running(): pose_motion.kill()
+	pose_motion = create_tween().set_parallel(true)
+	pose_motion.tween_property(model, "rotation:z", 1.35 if value else 0.0, 0.35)
+	pose_motion.tween_property(model, "position:y", -0.48 if value else 0.0, 0.35)
+	if value: play("death")
+	else: play(base_clip)
 
 func stagger_to(point: Vector3) -> void:
 	if not alive: return
@@ -77,7 +89,7 @@ func stagger_to(point: Vector3) -> void:
 	motion.tween_property(self, "position", point, 0.27).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 func act(clip: String) -> void:
-	if not alive: return
+	if not alive or downed: return
 	_action_serial += 1
 	var serial := _action_serial
 	if pose_motion != null and pose_motion.is_running(): pose_motion.kill()
@@ -108,7 +120,7 @@ func face(point: Vector3) -> void:
 
 func travel(route: Array) -> void:
 	if motion != null and motion.is_running(): motion.kill()
-	if route.is_empty() or not alive: return
+	if route.is_empty() or not alive or downed: return
 	_action_serial += 1
 	motion = create_tween()
 	play("run")

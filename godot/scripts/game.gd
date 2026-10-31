@@ -9,6 +9,7 @@ const HudControls = preload("res://scripts/hud_controls.gd")
 const InputControls = preload("res://scripts/input_controls.gd")
 const EnemyPresentation = preload("res://scripts/enemy_presentation.gd")
 const AttackPresentation = preload("res://scripts/attack_presentation.gd")
+const Ability = preload("res://scripts/abilities_engine.gd")
 var mission: RefCounted
 var camera: Camera3D
 var pivot: Vector3 = Vector3(9, 0, 17)
@@ -190,7 +191,7 @@ func _refresh_figures() -> void:
 	var seen: Dictionary = {}
 	for u in mission.units:
 		var id := int(u.id)
-		if int(u.hp) <= 0 or (str(u.side) == "enemy" and not bool(u.awake)):
+		if (int(u.hp) <= 0 and str(u.side) == "enemy") or (str(u.side) == "enemy" and not bool(u.awake)):
 			if playing_enemy_events and views.has(id): continue
 			if views.has(id):
 				var fallen: Node3D = views[id]
@@ -212,6 +213,7 @@ func _refresh_figures() -> void:
 		elif views.has(id) and not playing_enemy_events and views[id].position.distance_to(at) > 0.05 and (views[id].motion == null or not views[id].motion.is_running()):
 			views[id].travel([at])
 		if views.has(id):
+			views[id].set_downed(str(u.get("status", "ok")) == "down")
 			views[id].set_selected(id == selected_id, str(u.side) == "enemy")
 			var cover_level := 0
 			var threat := -1
@@ -239,12 +241,22 @@ func _build_ui() -> void:
 
 func _choose_action(mode: String) -> void:
 	if player_attack_pending or playing_enemy_events or mission.phase != "player" or mission.result != "": return
+	if mode != "move" and mission.ability_reason(selected_id, mode) != "":
+		warning_label.text = mission.ability_reason(selected_id, mode)
+		_refresh()
+		return
 	if cinematic: _skip_cinematic()
 	preview_tile = Vector2i(-1, -1)
 	target_id = -1
 	end_turn_armed = false
 	warning_label.text = ""
 	action = mode
+	if mission.abilities.has(mode) and mode not in ["move", "shoot", "strike", "push", "free", "overwatch", "hunker"]:
+		if mission.ability_reason(selected_id, mode) != "": warning_label.text = mission.ability_reason(selected_id, mode)
+		elif str(mission.abilities[mode].target) == "self": _use_ability(-1)
+		elif str(mission.abilities[mode].target).begins_with("ally") or str(mission.abilities[mode].target).begins_with("enemy"): _cycle_target(1)
+		else: warning_label.text = "Choose a tile, then click or press Enter to confirm."
+		_refresh(); return
 	if mode == "overwatch":
 		if mission.overwatch(selected_id): _after_action()
 	elif mode == "hunker":
@@ -252,6 +264,32 @@ func _choose_action(mode: String) -> void:
 	elif mode in ["shoot", "strike", "push"]:
 		_cycle_target(1)
 	sound.play("click")
+	_refresh()
+
+func _use_ability(id: int = -1, tile: Vector2i = Vector2i(-1, -1)) -> void:
+	var target: Dictionary = mission.unit_by_id(id)
+	var old_hp := int(target.get("hp", 0))
+	var was_down := str(target.get("status", "ok")) == "down"
+	if not mission.use_ability(selected_id, action, id, tile): return
+	if not target.is_empty() and (int(target.hp) > old_hp or was_down):
+		var p: Vector2i = Shot.pos(target)
+		var at := Vector3(p.x, Shot.elevation(mission, p) * 0.7 + 1.1, p.y)
+		fx.heal(at, int(target.hp) - old_hp)
+		if views.has(id): views[id].set_downed(false)
+	elif not target.is_empty() and str(target.side) == "enemy":
+		var p: Vector2i = Shot.pos(target)
+		var at := Vector3(p.x, Shot.elevation(mission, p) * 0.7 + 1.1, p.y)
+		if int(target.hp) < old_hp:
+			var actor: Dictionary = mission.unit_by_id(selected_id)
+			var from := Vector3(int(actor.x), Shot.elevation(mission, Shot.pos(actor)) * 0.7 + 1.1, int(actor.y))
+			if str(actor.class_name) in ["Guardian", "Consular"]: fx.saber(from, at)
+			else: fx.bolt(from, at, false, false)
+			fx.float_text(at + Vector3.UP * 0.7, "-%d" % (old_hp - int(target.hp)), Color("ff736c"), true)
+		else: fx.float_text(at + Vector3.UP * 0.7, str(mission.abilities[action].name).to_upper(), Color("f4ce79"), true)
+	elif action in ["smoke", "barrier", "shieldDrone", "battleMed", "rally"]:
+		var p: Vector2i = tile if tile.x >= 0 else Shot.pos(target) if not target.is_empty() else Shot.pos(mission.unit_by_id(selected_id))
+		fx.heal(Vector3(p.x, Shot.elevation(mission, p) * 0.7 + 1.1, p.y), 0)
+	_after_action()
 	_refresh()
 
 func _select(id: int) -> void:
@@ -284,7 +322,7 @@ func _cycle_target(direction: int) -> void:
 	var options: Array[Dictionary] = InputControls.valid_targets(mission, mission.unit_by_id(selected_id), action)
 	if options.is_empty():
 		target_id = -1
-		warning_label.text = "No valid targets for %s." % action.capitalize()
+		warning_label.text = "No valid targets for %s." % str(mission.abilities.get(action, {}).get("name", action))
 		return
 	var current := -1
 	for i in range(options.size()):
@@ -434,6 +472,28 @@ func _end_turn() -> void:
 
 func _demo(kind: String) -> void:
 	demo_mode = true
+	var path := ""
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--capture="): path = arg.trim_prefix("--capture=")
+	if kind == "skills-bar":
+		selected_id = int(mission.living("player")[1].id)
+		_refresh()
+		if path != "": _capture(path, 2)
+		return
+	if kind in ["skills-heal", "skills-revive"]:
+		var consular: Dictionary = mission.living("player")[1]
+		var patient: Dictionary = mission.living("player")[2]
+		selected_id = int(consular.id)
+		if kind == "skills-revive":
+			mission.apply_damage(patient, 99)
+			_refresh()
+			await get_tree().create_timer(0.5).timeout
+		else: patient.hp = maxi(1, int(patient.hp) - 4)
+		action = "forceHeal"
+		_use_ability(int(patient.id))
+		if kind == "skills-revive": selected_id = int(patient.id); _refresh()
+		if path != "": _capture(path, 2)
+		return
 	var enemy: Dictionary = mission.living("enemy")[0]
 	enemy.awake = true
 	if kind == "push":
@@ -445,9 +505,6 @@ func _demo(kind: String) -> void:
 	selected_id = int(mission.living("player")[0].id) if kind == "push" else int(mission.living("player")[2].id)
 	if kind in ["shot", "aim"]: hovered = Shot.pos(enemy)
 	_refresh()
-	var path := ""
-	for arg in OS.get_cmdline_user_args():
-		if arg.begins_with("--capture="): path = arg.trim_prefix("--capture=")
 	if kind == "aim":
 		_choose_action("shoot")
 		if path != "": _capture(path, 5)

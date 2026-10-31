@@ -42,14 +42,15 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 		assertion.call(Controls.move_preview(m, actor, dash).is_empty(), "dash disabled with one AP")
 		actor.ap = 3
 	assertion.call(Controls.move_preview(m, actor, start).is_empty(), "current tile cannot be ordered")
-	assertion.call(Controls.valid_targets(m, actor, "shoot").is_empty(), "unspotted enemies cannot be targeted")
+	assertion.call(Controls.valid_targets(m, squad[2], "shoot").is_empty(), "unspotted enemies cannot be targeted")
 	var enemy: Dictionary = m.living("enemy")[0]
 	enemy.awake = true
 	enemy.x = int(actor.x) + 1; enemy.y = int(actor.y)
-	assertion.call(Controls.valid_targets(m, actor, "shoot").size() == 1, "legal spotted shooter target appears")
-	actor.ap = 1
-	assertion.call(Controls.valid_targets(m, actor, "shoot").is_empty(), "shot unavailable without AP")
-	actor.ap = 3
+	var shooter: Dictionary = squad[2]
+	assertion.call(Controls.valid_targets(m, shooter, "shoot").size() == 1, "legal spotted shooter target appears")
+	shooter.ap = 1
+	assertion.call(Controls.valid_targets(m, shooter, "shoot").is_empty(), "shot unavailable without AP")
+	shooter.ap = 3
 	assertion.call(Controls.next_squad(m, int(actor.id), 1) == int(squad[1].id), "Tab advances squad")
 	var tracked: RefCounted = Mission.new(7)
 	var mover: Dictionary = tracked.living("enemy")[0]
@@ -71,6 +72,8 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 		runner.root.add_child(game)
 		await runner.process_frame
 		assertion.call(game.action_buttons["shoot"].focus_mode == Control.FOCUS_NONE, "ability button leaves Enter available for target confirmation")
+		var guardian_id: int = game.selected_id
+		game._select(int(game.mission.living("player")[2].id))
 		var game_actor: Dictionary = game.mission.unit_by_id(game.selected_id)
 		var game_enemy: Dictionary = game.mission.living("enemy")[0]
 		game_enemy.awake = true
@@ -80,6 +83,7 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 		assertion.call(game.target_id == int(game_enemy.id), "shoot mode selects a legal target")
 		assertion.call(game.hit_big_label.text.contains("HIT") and game.shot_label.text.contains("Base aim"), "shot panel shows odds and modifiers")
 		assertion.call(game.shot_label.text.contains("FLANKED") and game.shot_label.text.contains("Flanking critical chance"), "flank critical is shown before confirmation")
+		game._select(guardian_id)
 		game._choose_action("push")
 		assertion.call(game.hit_big_label.text == "PUSH" and game.shot_label.text.contains("No hit or crit roll"), "Push presents no roll")
 		var cancel := InputEventKey.new()
@@ -116,7 +120,8 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 		game.mission.damage_cover(cover_tile, 99)
 		game._refresh()
 		assertion.call(game.terrain_seen_revision == game.mission.terrain_revision, "changed cover rebuilds during refresh")
-		var hunker_id: int = game.selected_id
+		var hunker_id: int = int(game.mission.living("player")[2].id)
+		game._select(hunker_id)
 		game._choose_action("hunker")
 		assertion.call(bool(game.mission.unit_by_id(hunker_id).hunkered), "Hunker ability applies defense")
 		game._select(hunker_id)

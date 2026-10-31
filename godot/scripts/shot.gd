@@ -86,7 +86,7 @@ static func in_cover(m: RefCounted, target: Vector2i) -> bool:
 static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, melee: bool = false, modifier: int = 0) -> Dictionary:
 	var a := pos(attacker)
 	var t := pos(target)
-	var lines: Array = [["Base aim", int(attacker.aim)]]
+	var lines: Array = [["Base aim", int(attacker.aim) + int(attacker.get("buff_aim", 0)) + int(attacker.get("debuff_aim", 0)) + int(target.get("marked_aim", 0))]]
 	var cv := 0
 	if melee: lines.append(["Close quarters", 10])
 	else:
@@ -100,6 +100,13 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 	if elevation(m, a) > elevation(m, t): lines.append(["High ground", 20])
 	var defense := int(target.get("defense", 0))
 	if bool(target.get("hunkered", false)): defense += 30
+	defense += int(target.get("buff_defense", 0))
+	if bool(target.get("guard", false)): defense += 25
+	if str(target.get("side", "")) == "player":
+		for ally in m.units:
+			if str(ally.get("side", "")) == "player" and int(ally.get("hp", 0)) > 0 and int(ally.get("id", -1)) != int(target.get("id", -2)) and "defLine" in ally.get("passives", []) and distance(pos(ally), t) <= 1.5:
+				defense += 15
+				break
 	if defense > 0: lines.append(["Defense", -defense])
 	if modifier != 0: lines.append(["Ability", modifier])
 	var raw := 0
@@ -109,4 +116,8 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 	if flanked: lines.append(["Flanking critical chance", 50])
 	if bool(target.get("hunkered", false)) and flanked: lines.append(["Hunker blocks flank critical", -50])
 	var crit := int(attacker.get("crit", 0)) + (50 if flanked and not bool(target.get("hunkered", false)) else 0)
-	return {"lines": lines, "hit": hit, "crit": crit, "graze": 0 if melee else min(GRAZE, 100 - hit), "cover": cv, "flanked": flanked, "los": melee or los(m, a, t), "range_ok": melee or distance(a, t) <= float(attacker.range)}
+	var sight := melee or los(m, a, t)
+	if not sight and str(attacker.get("side", "")) == "player" and str(target.get("side", "")) == "enemy":
+		for ally in m.units:
+			if int(ally.get("hp", 0)) > 0 and "spotter" in ally.get("passives", []) and distance(pos(ally), t) <= 11.0 and los(m, pos(ally), t): sight = true; break
+	return {"lines": lines, "hit": hit, "crit": crit, "graze": 0 if melee else min(GRAZE, 100 - hit), "cover": cv, "flanked": flanked, "los": sight, "range_ok": melee or distance(a, t) <= float(attacker.range)}
