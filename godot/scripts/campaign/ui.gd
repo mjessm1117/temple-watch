@@ -34,6 +34,7 @@ static func button(message: String, action: Callable, enabled: bool = true) -> B
 	b.disabled = not enabled
 	b.custom_minimum_size.y = 40
 	b.add_theme_font_size_override("font_size", 16)
+	style_button(b)
 	b.pressed.connect(action)
 	return b
 
@@ -46,3 +47,15 @@ static func clear(node: Node) -> void:
 	for child in node.get_children():
 		node.remove_child(child)
 		child.queue_free()
+
+static func style_button(b: Button) -> void:
+	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+		var style := StyleBoxFlat.new()
+		style.bg_color = PANEL_ALT if state == "hover" else PANEL
+		style.border_color = ACCENT if state in ["hover", "pressed", "focus"] else BORDER
+		style.set_border_width_all(1)
+		style.set_corner_radius_all(4)
+		style.set_content_margin_all(8)
+		b.add_theme_stylebox_override(state, style)
+	b.add_theme_color_override("font_color", TEXT)
+	b.add_theme_color_override("font_disabled_color", Color("617681"))

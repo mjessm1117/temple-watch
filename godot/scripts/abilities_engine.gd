@@ -133,6 +133,7 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 		"capture":
 			var capture_chance := int(def.get("stunned_chance", 85)) if bool(t.get("stunned", false)) else int(def.get("chance", 60))
 			if m.rng.randi_range(1, 100) <= capture_chance:
+				u.captures = int(u.get("captures", 0)) + 1
 				t.hp = 0; t.status = "captured"; m.message("%s captures %s." % [u.name, t.name])
 		"guard": u.guard = true; u.guard_until = m.turn + 1
 		"overwatch": u.overwatch = true
@@ -148,6 +149,7 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 static func _heal(m: RefCounted, u: Dictionary, t: Dictionary, def: Dictionary) -> void:
 	var before := int(t.hp)
 	if str(t.get("status", "ok")) == "down":
+		if t.has("rid") and u.has("rid"): m.saved_by[str(t.rid)] = str(u.rid)
 		t.status = "ok"; t.hp = mini(int(t.max_hp), int(def.get("revive", 2))); t.ap = 0; t.wounded = true
 	else: t.hp = mini(int(t.max_hp), int(t.hp) + int(def.get("heal", 0)))
 	m.action_events.append({"kind": "heal", "actor": int(u.id), "target": int(t.id), "amount": int(t.hp) - before, "revived": before == 0})

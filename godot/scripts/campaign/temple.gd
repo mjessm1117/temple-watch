@@ -6,7 +6,7 @@ const Gear = preload("res://scripts/campaign/gear.gd")
 const Modules = preload("res://scripts/campaign/modules.gd")
 const Legacy = preload("res://scripts/campaign/legacy.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
-var campaign = Campaign.new()
+var campaign: Campaign = Campaign.new()
 var page := "Command"
 var selected_id := "u1"
 var page_content: VBoxContainer
@@ -15,9 +15,12 @@ var notice_label: Label
 var nav_buttons: Dictionary = {}
 
 func _ready() -> void:
-	campaign.load_save()
+	campaign = get_node("/root/CampaignFlow").session()
+	get_node("/root/CampaignFlow").active = true
+	if campaign.soldier(selected_id).is_empty() and not campaign.state.roster.is_empty(): selected_id = str(campaign.state.roster[0].id)
 	_build_shell()
 	_show_page()
+	if get_tree().current_scene == self: get_node("/root/CampaignFlow").temple_story.call_deferred()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -47,7 +50,9 @@ func _build_shell() -> void:
 	for name in ["Command", "Roster", "Research", "Build", "Arsenal", "Teams", "Legacy"]:
 		var b := UI.button(name, _change_page.bind(name)); nav.add_child(b); nav_buttons[name] = b
 	nav.add_spacer(false)
+	nav.add_child(UI.button("CODEX", get_node("/root/CampaignFlow").open_codex))
 	nav.add_child(UI.button("GALAXY  →", _open_galaxy))
+	nav.add_child(UI.button("MAIN MENU", func(): get_node("/root/CampaignFlow").go("menu")))
 	nav.add_child(UI.label("1–7 stations  •  G galaxy", 13, UI.MUTED))
 	var content_panel := UI.panel(); content_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL; body.add_child(content_panel)
 	var scroll := ScrollContainer.new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL; scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; content_panel.add_child(scroll)
@@ -105,6 +110,13 @@ func _command() -> void:
 	var next := "A story mission awaits." if int(campaign.state.step) in [0, 2] else "%d crises await your decision." % campaign.state.options.size()
 	var box := _card("NEXT DEPLOYMENT", next)
 	box.add_child(UI.button("OPEN GALAXY  →", _open_galaxy))
+	box.add_child(UI.button("Rest 7 days", _rest))
+	var flow = get_node("/root/CampaignFlow")
+	if not campaign.state.pending_mission.is_empty(): box.add_child(UI.button("Resume deployment", func(): flow.go("squad")))
+	var era := int(campaign.state.era)
+	if era < 3 and (campaign.state.flags.get("boss_or_won" if era == 1 else "boss_ru_won", false) or campaign.state.flags.get("temple_scarred" if era == 1 else "e2_bomb_fired", false)):
+		box.add_child(UI.button("Begin the next era →", flow.advance_era))
+	if campaign.state.options.is_empty(): _card("CHAPTER COMPLETE", "The Order’s record endures. Tend your roster, explore the Codex, or begin a new campaign from the main menu.")
 	if str(campaign.state.build) != "": _card("CONSTRUCTION", "%s completes after the next mission." % Data.get_table("core", "WINGS")[str(campaign.state.build)].n)
 	if str(campaign.state.research.cur) != "":
 		var project: Dictionary = Data.get_table("research", "RESEARCH")[str(campaign.state.research.cur)]
@@ -182,7 +194,7 @@ func _build() -> void:
 			else: box.add_child(UI.label("Staffed by %s" % campaign.soldier(staffer).n, 15, UI.ACCENT))
 
 func _arsenal() -> void:
-	var row := HBoxContainer.new(); page_content.add_child(row)
+	var row := HFlowContainer.new(); page_content.add_child(row)
 	for r in campaign.state.roster:
 		if str(r.status) != "dead": row.add_child(UI.button(str(r.n), _select_unit.bind(str(r.id))))
 	var r: Dictionary = campaign.soldier(selected_id)
@@ -255,36 +267,41 @@ func _legacy() -> void:
 		_card("IN MEMORY · %s" % legend.n, "%s  ·  %s" % [legend.cls, legend.where])
 
 func _open_galaxy() -> void:
-	campaign.save()
+	get_node("/root/CampaignFlow").save()
 	get_tree().change_scene_to_file("res://scenes/galaxy.tscn")
 
 func _pick(id: String, key: String) -> void:
-	if Progression.choose(campaign.soldier(id), key): campaign.save(); _show_page()
+	if Progression.choose(campaign.soldier(id), key): get_node("/root/CampaignFlow").save(); _show_page()
 func _assign(id: String, job: String) -> void:
-	if campaign.assign(id, job): campaign.save(); _refresh_shell()
+	if campaign.assign(id, job): get_node("/root/CampaignFlow").save(); _refresh_shell()
 func _start_research(id: String) -> void:
-	if campaign.start_research(id): campaign.save(); _refresh_shell()
+	if campaign.start_research(id): get_node("/root/CampaignFlow").save(); _refresh_shell()
 func _build_wing(id: String) -> void:
-	if campaign.build_wing(id): campaign.save(); _refresh_shell()
+	if campaign.build_wing(id): get_node("/root/CampaignFlow").save(); _refresh_shell()
 func _select_unit(id: String) -> void:
 	selected_id = id; _show_page()
 func _buy_weapon(id: String) -> void:
-	if Gear.buy_weapon(campaign, id): campaign.save(); _refresh_shell()
+	if Gear.buy_weapon(campaign, id): get_node("/root/CampaignFlow").save(); _refresh_shell()
 func _craft_saber(id: String) -> void:
-	if Gear.craft_saber(campaign, id): campaign.save(); _refresh_shell()
+	if Gear.craft_saber(campaign, id): get_node("/root/CampaignFlow").save(); _refresh_shell()
 func _buy_armor(id: String, key: String) -> void:
-	if Gear.buy_armor(campaign, id, key): campaign.save(); _refresh_shell()
+	if Gear.buy_armor(campaign, id, key): get_node("/root/CampaignFlow").save(); _refresh_shell()
 func _fit_mod(id: String, kind: String, key: String) -> void:
-	if Gear.fit_module(campaign, id, kind, key): campaign.save(); _refresh_shell()
+	if Gear.fit_module(campaign, id, kind, key): get_node("/root/CampaignFlow").save(); _refresh_shell()
 func _upgrade_mod(id: String, kind: String, key: String) -> void:
-	if Gear.upgrade_module(campaign, id, kind, key): campaign.save(); _refresh_shell()
+	if Gear.upgrade_module(campaign, id, kind, key): get_node("/root/CampaignFlow").save(); _refresh_shell()
 func _buy_utility(id: String, key: String) -> void:
-	if Gear.buy_utility(campaign, id, key): campaign.save(); _refresh_shell()
+	if Gear.buy_utility(campaign, id, key): get_node("/root/CampaignFlow").save(); _refresh_shell()
 func _set_form(id: String, key: String) -> void:
-	if Gear.set_form(campaign, id, key): campaign.save(); _refresh_shell()
+	if Gear.set_form(campaign, id, key): get_node("/root/CampaignFlow").save(); _refresh_shell()
 func _module_action(wing: String) -> void:
-	if Modules.use(campaign, wing): campaign.save(); _refresh_shell()
+	if Modules.use(campaign, wing): get_node("/root/CampaignFlow").save(); _refresh_shell()
 func _set_nick(value: String, id: String) -> void:
-	if Legacy.set_nickname(campaign, id, value): campaign.save(); _show_page()
+	if Legacy.set_nickname(campaign, id, value): get_node("/root/CampaignFlow").save(); _show_page()
 func _retire(id: String) -> void:
-	if Legacy.retire(campaign, id): campaign.save(); _refresh_shell()
+	if Legacy.retire(campaign, id): get_node("/root/CampaignFlow").save(); _refresh_shell()
+
+func _rest() -> void:
+	campaign.advance_days(7)
+	get_node("/root/CampaignFlow").save()
+	_refresh_shell()

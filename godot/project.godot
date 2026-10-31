@@ -5,6 +5,9 @@ config/name="Temple Watch — Rescue"
 run/main_scene="res://scenes/menu.tscn"
 config/features=PackedStringArray("4.4", "Forward Plus")
 
+[autoload]
+CampaignFlow="*res://scripts/campaign_bridge.gd"
+
 [display]
 window/size/viewport_width=1366
 window/size/viewport_height=768

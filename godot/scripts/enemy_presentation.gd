@@ -62,3 +62,4 @@ static func play(game: Node3D, events: Array[Dictionary], sequence: int) -> void
 	game._refresh()
 	var active: Dictionary = game.mission.unit_by_id(game.selected_id)
 	if not active.is_empty(): game._glide_to(_point(game.mission, Shot.pos(active)), 0.3)
+	game.get_node("/root/CampaignFlow").battle_beat(game)

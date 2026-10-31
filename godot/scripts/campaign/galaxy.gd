@@ -4,14 +4,14 @@ const Campaign = preload("res://scripts/campaign/state.gd")
 const Data = preload("res://scripts/campaign/data.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const GalaxyMap = preload("res://scripts/campaign/galaxy_map.gd")
-var campaign = Campaign.new()
+var campaign: Campaign = Campaign.new()
 var selected := 0
 var detail: VBoxContainer
 var map_view: Control
 var message: Label
 
 func _ready() -> void:
-	campaign.load_save()
+	campaign = get_node("/root/CampaignFlow").session()
 	_build()
 	_show_details()
 
@@ -56,15 +56,15 @@ func _show_details() -> void:
 	var options: Array = campaign.state.options
 	if options.is_empty():
 		detail.add_child(UI.label("No active missions", 25, UI.GOLD))
-		detail.add_child(UI.label("The current story chapter is complete. The story lane will supply later era plans.", 16, UI.MUTED))
+		detail.add_child(UI.label("This chapter is complete. Return to the Temple to continue the Order’s story.", 16, UI.MUTED))
 		return
 	selected = clampi(selected, 0, options.size() - 1)
 	var o: Dictionary = options[selected]
-	var m: Dictionary = Data.get_table("missions", "MISSIONS").get(str(o.mission), {})
+	var m: Dictionary = get_node("/root/CampaignFlow").story.mission(str(o.mission))
 	detail.add_child(UI.label("MISSION SIGNALS  ·  %d AVAILABLE" % options.size(), 15, UI.ACCENT))
 	for i in range(options.size()):
 		var option: Dictionary = options[i]
-		var mission: Dictionary = Data.get_table("missions", "MISSIONS").get(str(option.mission), {})
+		var mission: Dictionary = get_node("/root/CampaignFlow").story.mission(str(option.mission))
 		var b := UI.button("%d  %s" % [i + 1, option.get("n", mission.get("n", option.mission))], _select.bind(i))
 		b.button_pressed = i == selected
 		detail.add_child(b)
@@ -84,9 +84,9 @@ func _show_details() -> void:
 	var squad: Array = campaign.default_squad(o)
 	var names := []
 	for id in squad: names.append(str(campaign.soldier(str(id)).n))
-	detail.add_child(UI.label("SQUAD  ·  %s" % ", ".join(names), 15, UI.MUTED))
-	detail.add_child(UI.button("LAUNCH MISSION  →", _launch, not squad.is_empty() and campaign.state.pending_mission.is_empty()))
-	if not campaign.state.pending_mission.is_empty(): detail.add_child(UI.label("Mission prepared. Battle integration pending.", 15, UI.GOLD))
+	detail.add_child(UI.label("AVAILABLE ROSTER  ·  %s" % ", ".join(names), 15, UI.MUTED))
+	detail.add_child(UI.button("MISSION BRIEFING  →", _launch, not squad.is_empty() and campaign.state.pending_mission.is_empty()))
+	if not campaign.state.pending_mission.is_empty(): detail.add_child(UI.label("Deployment ready. Return to the Temple to resume.", 15, UI.GOLD))
 	var field_box := UI.panel(UI.PANEL_ALT); detail.add_child(field_box)
 	var f := UI.column(7); field_box.add_child(f)
 	f.add_child(UI.label("FIELD OPERATIONS", 18, UI.ACCENT))
@@ -112,20 +112,16 @@ func _select(index: int) -> void:
 func _send_field(key: String) -> void:
 	var ids := campaign.default_squad()
 	if ids.size() >= 2 and campaign.send_field_op(key, [ids[0], ids[1]]):
-		campaign.save(); message.text = "%s team deployed." % Data.get_table("galaxy", "FIELD_OPS")[key].n
+		get_node("/root/CampaignFlow").save(); message.text = "%s team deployed." % Data.get_table("galaxy", "FIELD_OPS")[key].n
 func _assign_team(crisis: String, team_id: String) -> void:
 	if campaign.assign_team_to_crisis(crisis, team_id):
-		campaign.save()
+		get_node("/root/CampaignFlow").save()
 		_show_details()
 
 func _launch() -> void:
-	var o: Dictionary = campaign.select_mission(selected)
-	if o.is_empty(): return
-	campaign.save()
-	mission_launch_requested.emit(str(o.mission_id), o.squad, o)
-	message.text = "%s prepared. Battle integration will launch this mission." % str(o.mission_id).capitalize()
-	_show_details()
+	if campaign.state.options.is_empty() or not campaign.state.pending_mission.is_empty(): return
+	get_node("/root/CampaignFlow").prepare_briefing(selected)
 
 func _back() -> void:
-	campaign.save()
+	get_node("/root/CampaignFlow").save()
 	get_tree().change_scene_to_file("res://scenes/temple.tscn")

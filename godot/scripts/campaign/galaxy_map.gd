@@ -30,14 +30,11 @@ func _draw() -> void:
 			draw_string(ThemeDB.fallback_font, pos + Vector2(6, -5), str(name), HORIZONTAL_ALIGNMENT_LEFT, -1, 13 * scale_value, UI.MUTED)
 	for i in range(campaign.state.options.size()):
 		var option: Dictionary = campaign.state.options[i]
-		var mission: Dictionary = Data.get_table("missions", "MISSIONS").get(str(option.mission), {})
-		var planet := str(mission.get("where", "")).split("·")[-1].strip_edges()
-		var point: Dictionary = Data.get_table("galaxy", "PLANETS").get(planet, {"x": 300, "y": 190})
-		var pos := origin + Vector2(float(point.x), float(point.y)) * scale_value
+		var pos := _signal_position(i, origin, scale_value)
 		var color: Color = UI.ACCENT if bool(option.get("story", false)) else UI.GOLD
 		if i == selected: draw_circle(pos, 15.0 * scale_value, Color(color, 0.25))
 		draw_circle(pos, (9.0 if i == selected else 7.0) * scale_value, color)
-		draw_string(ThemeDB.fallback_font, pos + Vector2(15, 18), str(option.get("n", mission.get("n", option.mission))), HORIZONTAL_ALIGNMENT_LEFT, -1, 14 * scale_value, UI.TEXT)
+		draw_string(ThemeDB.fallback_font, pos + Vector2(13, 5), str(i + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 14 * scale_value, UI.TEXT)
 
 func _on_input(event: InputEvent) -> void:
 	if not event is InputEventMouseButton or not event.pressed or event.button_index != MOUSE_BUTTON_LEFT: return
@@ -45,11 +42,23 @@ func _on_input(event: InputEvent) -> void:
 	var origin := Vector2((size.x - 600.0 * scale_value) / 2.0, (size.y - 410.0 * scale_value) / 2.0)
 	for i in range(campaign.state.options.size()):
 		var option: Dictionary = campaign.state.options[i]
-		var mission: Dictionary = Data.get_table("missions", "MISSIONS").get(str(option.mission), {})
-		var planet := str(mission.get("where", "")).split("·")[-1].strip_edges()
-		var point: Dictionary = Data.get_table("galaxy", "PLANETS").get(planet, {"x": 300, "y": 190})
-		var pos := origin + Vector2(float(point.x), float(point.y)) * scale_value
+		var pos := _signal_position(i, origin, scale_value)
 		if pos.distance_to(event.position) <= 20.0 * scale_value:
 			mission_selected.emit(i)
 			accept_event()
 			return
+
+func _signal_position(index: int, origin: Vector2, scale_value: float) -> Vector2:
+	var positions: Array[Vector2] = []
+	for i in range(index + 1):
+		var option: Dictionary = campaign.state.options[i]
+		var mission: Dictionary = campaign.story.mission(str(option.mission))
+		var planet := str(mission.get("where", "")).split("·")[-1].strip_edges()
+		var point: Dictionary = Data.get_table("galaxy", "PLANETS").get(planet, {"x":300, "y":190})
+		var pos := origin + Vector2(float(point.x), float(point.y)) * scale_value
+		pos.x = clampf(pos.x, 24, size.x - 36)
+		pos.y = clampf(pos.y, 24, size.y - 24)
+		for prior in positions:
+			if pos.distance_to(prior) < 35 * scale_value: pos.y = prior.y + 38 * scale_value
+		positions.append(pos)
+	return positions[-1]

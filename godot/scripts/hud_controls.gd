@@ -145,6 +145,7 @@ func _build_ui() -> void:
 	var result_box := VBoxContainer.new(); g.result_panel.add_child(result_box)
 	g.result_label = _label("", 28); result_box.add_child(g.result_label)
 	result_box.add_child(_button("Restart mission", func() -> void: g.get_tree().reload_current_scene()))
+	result_box.add_child(_button("Main menu", func() -> void: g.get_node("/root/CampaignFlow").go("menu")))
 
 
 func _refresh() -> void:
@@ -171,7 +172,7 @@ func _refresh() -> void:
 	for mode in g.action_buttons:
 		var button: Button = g.action_buttons[mode]
 		var core: bool = mode in ["move", "shoot", "strike", "push", "free", "overwatch", "hunker"]
-		button.visible = core or mode in extras
+		button.visible = mode in ["move", "free"] or mode in u.get("kit", []) or mode in extras
 		if not button.visible: continue
 		var def: Dictionary = g.mission.abilities[mode]
 		var reason: String = "" if mode == "move" else g.mission.ability_reason(g.selected_id, mode)

@@ -26,10 +26,11 @@ var terrain_revision := 0
 var action_events: Array[Dictionary] = []
 var ability_uses: Dictionary = {}
 var clues := 0
+var saved_by: Dictionary = {}
 
-func _init(seed_value: int = 1) -> void:
+func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") -> void:
 	rng.seed = seed_value
-	spec = _json("res://data/rescue.json")
+	spec = _json(data_path)
 	difficulty = Settings.selected()
 	spec.turn_limit = int(difficulty.get("turn_clock", spec.turn_limit))
 	catalog = _json("res://data/units.json")
@@ -177,7 +178,9 @@ func apply_damage(target: Dictionary, amount: int, _source: Dictionary = {}) -> 
 	if int(target.hp) <= 0 and str(target.side) == "player":
 		target.status = "down"; target.wounded = true; target.ap = 0; target.overwatch = false; target.hunkered = false
 		message("%s is Downed. Revive them this mission." % target.name)
-	elif int(target.hp) <= 0: message("%s is down." % target.name)
+	elif int(target.hp) <= 0:
+		message("%s is down." % target.name)
+		if _source.get("side", "") == "player": _source.kills = int(_source.get("kills", 0)) + 1
 	if actual > 0 and int(target.get("battle_med_source", -1)) == int(target.get("id", -2)):
 		for member in units:
 			if int(member.get("battle_med_source", -1)) == int(target.id): member.erase("buff_aim"); member.erase("battle_med_source")
@@ -265,7 +268,7 @@ func shot(id: int, target_id: int, mode: String = "shoot") -> bool:
 	var melee := mode == "strike"
 	var ap_cost := int(abilities[mode].ap)
 	if int(a.ap) < ap_cost: return false
-	if melee and str(a.get("class_name", "")) not in ["Guardian", "Consular", "Sith Warrior"]: return false
+	if melee and "strike" not in a.get("kit", []) and str(a.get("side", "")) == "player": return false
 	if melee and max(abs(int(a.x) - int(t.x)), abs(int(a.y) - int(t.y))) > 1: return false
 	var info: Dictionary = Shot.calculate(self, a, t, melee, int(a.get("leap_aim", 0)) if melee else 0)
 	if not bool(info.los) or not bool(info.range_ok): return false

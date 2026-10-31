@@ -1,4 +1,5 @@
 extends Control
+signal completed
 ## Shared visual controller for briefing, dialogue, and Codex scenes.
 
 const StoryEngine = preload("res://scripts/story/story_engine.gd")
@@ -22,6 +23,11 @@ func show_scene(value: Dictionary) -> void:
 	if is_node_ready(): _build()
 
 func _ready() -> void:
+	var flow = get_node_or_null("/root/CampaignFlow")
+	if flow != null and flow.active and demo_mode:
+		set_campaign_state(flow.session().state)
+		show_scene(flow.screen)
+		completed.connect(flow.story_finished)
 	if engine == null: engine = StoryEngine.new(campaign_state)
 	if campaign_state.is_empty(): campaign_state = engine.state
 	if demo_mode and mode == "briefing" and scene_data.is_empty(): scene_data = engine.start_briefing("relay")
@@ -69,8 +75,9 @@ func _button(text: String, description: String = "") -> Button:
 	var button := Button.new()
 	button.text = text
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.custom_minimum_size.y = 56
-	button.add_theme_font_size_override("font_size", 23)
+	button.add_theme_font_size_override("font_size", 18)
 	button.add_theme_color_override("font_color",Color("f3f2ec"))
 	button.add_theme_color_override("font_hover_color",Color("f6d796"))
 	button.add_theme_stylebox_override("normal",_style(Color("23364c"),Color("49647d")))
@@ -108,26 +115,26 @@ func _build_story() -> void:
 	columns.add_theme_constant_override("separation", 38)
 	body.add_child(columns)
 	var left := VBoxContainer.new()
-	left.custom_minimum_size.x = 430
+	left.custom_minimum_size.x = 400
 	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	left.add_theme_constant_override("separation", 27)
-	columns.add_child(left)
+	_scroll_column(columns, left)
 	left.add_child(_label("MISSION FILE  /  %s" % scene_data.get("eyebrow","TEMPLE"),20,Color("d6ac70")))
-	left.add_child(_label(scene_data.get("title","The Temple"),50))
+	left.add_child(_label(scene_data.get("title","The Temple"),34))
 	if scene_data.has("who") and scene_data.who != "":
 		var name: String = scene_data.get("name",engine.table("CAST").get(scene_data.who,{}).get("n",scene_data.who))
 		left.add_child(_label(name.to_upper(),25,Color("a9d1d8")))
-	var narrative := _label(scene_data.get("text",""),27,Color("dce5ec"))
+	var narrative := _label(scene_data.get("text",""),21,Color("dce5ec"))
 	narrative.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	left.add_child(narrative)
 	if scene_data.get("goal","") != "":
 		left.add_child(_label("OBJECTIVE",19,Color("d6ac70")))
-		left.add_child(_label(scene_data.goal,24,Color("b8c7d3")))
+		left.add_child(_label(scene_data.goal,19,Color("b8c7d3")))
 	var right := VBoxContainer.new()
-	right.custom_minimum_size.x = 500
+	right.custom_minimum_size.x = 440
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	right.add_theme_constant_override("separation", 16)
-	columns.add_child(right)
+	_scroll_column(columns, right)
 	right.add_child(_label("YOUR DECISION",20,Color("d6ac70")))
 	if scene_data.get("kind","") == "briefing":
 		right.add_child(_label("Choose an approach before deployment.",24,Color("b8c7d3")))
@@ -137,7 +144,9 @@ func _build_story() -> void:
 		right.add_child(button)
 		if choice.get("text","") != "": right.add_child(_label(choice.text,18,Color("a9bdcf")))
 	if scene_data.get("choices",[]).is_empty():
-		right.add_child(_label("The record is complete.",25,Color("b8c7d3")))
+		var next := _button("Return to Temple" if scene_data.get("kind") == "debrief" else "Continue")
+		next.pressed.connect(func(): completed.emit())
+		right.add_child(next)
 	result_label = _label("",20,Color("b9dca9"))
 	result_label.custom_minimum_size.y = 50
 	right.add_child(result_label)
@@ -157,6 +166,7 @@ func _choose(id: String) -> void:
 		result_label.text = result.get("reason","Unavailable")
 		return
 	result_label.text = "Decision recorded: %s" % result.choice.get("label","")
+	completed.emit()
 	for node in result_label.get_parent().get_children():
 		if node is Button: node.disabled = true
 
@@ -180,7 +190,11 @@ func _build_codex() -> void:
 	var rail := VBoxContainer.new()
 	rail.custom_minimum_size.x = 290
 	rail.add_theme_constant_override("separation",4)
-	columns.add_child(rail)
+	var rail_scroll := ScrollContainer.new()
+	rail_scroll.custom_minimum_size.x = 310
+	rail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	columns.add_child(rail_scroll)
+	rail_scroll.add_child(rail)
 	for item in engine.table("KINDS"):
 		var category: String = item[0]
 		var button := _button(str(item[1]))
@@ -217,7 +231,17 @@ func _build_codex() -> void:
 		content.add_child(_label(str(entry.name).replace("_"," ").capitalize(),29,Color("f2e6cd")))
 		content.add_child(_label(entry.lore,22,Color("d0dce6")))
 	body.add_child(_label("New entries appear as missions, people and places become known to your Order.",18,Color("8398ad")))
+	var back := _button("← Return to Temple")
+	back.pressed.connect(func(): completed.emit())
+	body.add_child(back)
 
 func _category(category: String) -> void:
 	codex_category = category
 	_build()
+
+func _scroll_column(parent: Node, column: VBoxContainer) -> void:
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_horizontal = SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	parent.add_child(scroll)
+	scroll.add_child(column)

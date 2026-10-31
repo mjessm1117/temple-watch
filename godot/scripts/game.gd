@@ -65,7 +65,7 @@ var terrain_seen_board: Array[String] = []
 var reinforcement_view: Node3D
 
 func _ready() -> void:
-	mission = Mission.new(7)
+	mission = get_node("/root/CampaignFlow").create_battle(7)
 	hud_controls = HudControls.new()
 	hud_controls.g = self
 	input_controls = InputControls.new()
@@ -467,6 +467,7 @@ func _end_turn() -> void:
 	_refresh()
 	if events.is_empty():
 		phase_banner.visible = false
+		get_node("/root/CampaignFlow").battle_beat(self)
 	else:
 		EnemyPresentation.play(self, events, enemy_frame_sequence)
 
@@ -516,6 +517,7 @@ func _demo(kind: String) -> void:
 		_capture(path, 1)
 
 func _refresh() -> void:
+	get_node("/root/CampaignFlow").battle_refresh(self)
 	_sync_terrain()
 	reinforcement_view.show_tile(mission.reinforcement_marker, mission)
 	hud_controls._refresh()

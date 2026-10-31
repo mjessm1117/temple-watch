@@ -4,6 +4,8 @@ const Data = preload("res://scripts/campaign/data.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
 const Modules = preload("res://scripts/campaign/modules.gd")
 const Legacy = preload("res://scripts/campaign/legacy.gd")
+const Story = preload("res://scripts/story/story_engine.gd")
+var story: RefCounted
 const SAVE_PATH = "user://campaign.json"
 var state: Dictionary = {}
 
@@ -34,6 +36,7 @@ func new_campaign(difficulty: String = "normal") -> void:
 			"trait": "", "util": "none", "form": "shiiCho", "mk": {"w": 1, "a": 1, "s": 1}}
 		r.pick = Progression.pending_rank(r)
 		state.roster.append(r)
+	story = Story.new(state)
 	ensure_teams()
 	refresh_options()
 
@@ -61,14 +64,18 @@ func _migrate() -> void:
 	if not state.has("team_assignments"): state.team_assignments = {}
 	if not state.has("elapsed_days"): state.elapsed_days = (int(state.month) - 1) * 30 + int(state.day) - 1
 	for r in state.roster:
+		var defaults := {"rank":2, "xp":30, "pick":0, "dark":0, "wound":0, "status":"active", "kills":0, "missions":0, "bonus":{}}
+		for key in defaults:
+			if not r.has(key): r[key] = defaults[key]
 		for key in ["picks", "scars"]:
 			if not r.has(key): r[key] = []
-		if not r.has("gear"): r.gear = {"w": 0, "armor": "none", "mods": [], "saber": 0, "util": "none", "form": "shiiCho", "mk": {"w": 1, "a": 1, "s": 1}}
+		if not r.has("gear"): r.gear = {"w": 0 if Progression.is_jedi(r) else 1, "armor": "robes" if Progression.is_jedi(r) else "light", "mods": [], "saber": 1 if Progression.is_jedi(r) else 0, "util": "none", "form": "shiiCho", "mk": {"w": 1, "a": 1, "s": 1}}
 		for key in ["mods", "amods", "smods"]:
 			if not r.gear.has(key): r.gear[key] = []
 		if not r.gear.has("mk"): r.gear.mk = {}
 		if not r.has("assign"): r.assign = ""
 		if not r.has("stress"): r.stress = 0
+	story = Story.new(state)
 	ensure_teams()
 	refresh_options()
 
@@ -214,7 +221,7 @@ func apply_mission_result(result: Dictionary) -> Dictionary:
 	## Contract: {mission_id, win, units:[{id,status,hp,max_hp,downed,hurt,kills,captures,dark}],
 	## rewards:{credits,intel,...}, intel, loot_credits, order_dark, story}. One call per finished mission.
 	var id := str(result.get("mission_id", state.pending_mission.get("mission_id", "")))
-	var mission: Dictionary = Data.get_table("missions", "MISSIONS").get(id, {})
+	var mission: Dictionary = story.mission(id)
 	var win := bool(result.get("win", false))
 	var deployed: Array = result.get("units", [])
 	var summary := {"rows": [], "promotions": [], "rewards": {}}
@@ -260,7 +267,7 @@ func apply_mission_result(result: Dictionary) -> Dictionary:
 		r.kills = int(r.kills) + kills; r.missions = int(r.missions) + 1; r.xp = int(r.xp) + xp
 		if str(r.status) == "active" and Progression.promote(r): summary.promotions.append(r.id)
 		summary.rows.append({"id": r.id, "xp": xp, "status": r.status, "wound": r.wound, "rank": r.rank})
-	for i in range(deployed.size()):
+	for i in range(0 if result.get("bonds_recorded", false) else deployed.size()):
 		for j in range(i + 1, deployed.size()):
 			var a := soldier(str(deployed[i].get("id", deployed[i].get("rid", ""))))
 			var b := soldier(str(deployed[j].get("id", deployed[j].get("rid", ""))))
@@ -281,7 +288,11 @@ func apply_mission_result(result: Dictionary) -> Dictionary:
 	return summary
 
 func refresh_options() -> Array:
-	var plan: Array = Data.get_table("core", "PLAN")
+	var era := int(state.era)
+	var plan: Array = story.data[["data-story", "data-era2", "data-era3"][era - 1]].get("PLAN" if era == 1 else "PLAN%d" % era, [])
+	while int(state.step) < plan.size() and plan[int(state.step)].has("years"):
+		state.story.bby = int(state.story.bby) - int(plan[int(state.step)].years)
+		state.step = int(state.step) + 1
 	var step := int(state.step)
 	var options := []
 	if step < plan.size():
@@ -289,7 +300,7 @@ func refresh_options() -> Array:
 		if part.has("story"):
 			options.append({"mission": str(part.story), "story": true, "adv": true, "kind": "Story"})
 		for crisis_id in part.get("crises", []):
-			var crisis: Dictionary = Data.get_table("core", "CRISES").get(str(crisis_id), {}).duplicate(true)
+			var crisis: Dictionary = story.table("BASE_CRISES").get(str(crisis_id), story.table("CRISES").get(str(crisis_id), {})).duplicate(true)
 			crisis.crisis = str(crisis_id); crisis.adv = true
 			options.append(crisis)
 		var captives := []
@@ -346,7 +357,7 @@ func default_squad(option: Dictionary = {}) -> Array:
 	return out
 
 func region_for_mission(id: String) -> String:
-	var mission: Dictionary = Data.get_table("missions", "MISSIONS").get(id, {})
+	var mission: Dictionary = story.mission(id)
 	var where := str(mission.get("where", ""))
 	var planet := where.split("·")[-1].strip_edges()
 	return str(Data.get_table("galaxy", "PLANETS").get(planet, {}).get("reg", ""))

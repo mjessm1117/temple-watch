@@ -3,12 +3,14 @@ set -euo pipefail
 cd "$(dirname "$0")"
 test_log=$(mktemp)
 trap 'rm -f "$test_log"' EXIT
-set +e
-"${GODOT_BIN:-/home/jess/projects/.tools/godot/godot}" --headless --path . -s tests/run.gd 2>&1 | tee "$test_log"
-test_status=${PIPESTATUS[0]}
-set -e
-if rg -q 'SCRIPT ERROR|Parse Error' "$test_log"; then
-  echo 'Godot reported a script error.' >&2
-  exit 1
-fi
-exit "$test_status"
+for suite in run campaign_test story_port_test loop_test; do
+  set +e
+  "${GODOT_BIN:-/home/jess/projects/.tools/godot/godot}" --headless --path . -s "tests/$suite.gd" 2>&1 | tee "$test_log"
+  test_status=${PIPESTATUS[0]}
+  set -e
+  if grep -Eq 'SCRIPT ERROR|Parse Error|ERROR:|[1-9][0-9]* failures' "$test_log"; then
+    echo "Godot reported a failure in $suite." >&2
+    exit 1
+  fi
+  if [ "$test_status" -ne 0 ]; then exit "$test_status"; fi
+done
