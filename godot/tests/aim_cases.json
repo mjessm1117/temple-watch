@@ -17,13 +17,7 @@
     "melee": false,
     "defense": 0,
     "tiles": [],
-    "expected": 70,
-    "lines": [
-      [
-        "Aim",
-        70
-      ]
-    ]
+    "expected": 70
   },
   {
     "name": "clear far",
@@ -43,17 +37,7 @@
     "melee": false,
     "defense": 0,
     "tiles": [],
-    "expected": 60,
-    "lines": [
-      [
-        "Aim",
-        70
-      ],
-      [
-        "Range",
-        -10
-      ]
-    ]
+    "expected": 60
   },
   {
     "name": "half front",
@@ -79,17 +63,7 @@
         "c"
       ]
     ],
-    "expected": 50,
-    "lines": [
-      [
-        "Aim",
-        70
-      ],
-      [
-        "Half cover",
-        -20
-      ]
-    ]
+    "expected": 50
   },
   {
     "name": "full front",
@@ -115,17 +89,7 @@
         "#"
       ]
     ],
-    "expected": 30,
-    "lines": [
-      [
-        "Aim",
-        70
-      ],
-      [
-        "Full cover",
-        -40
-      ]
-    ]
+    "expected": 30
   },
   {
     "name": "flank half",
@@ -151,13 +115,7 @@
         "c"
       ]
     ],
-    "expected": 70,
-    "lines": [
-      [
-        "Aim",
-        70
-      ]
-    ]
+    "expected": 70
   },
   {
     "name": "higher shooter",
@@ -183,17 +141,7 @@
         "^"
       ]
     ],
-    "expected": 85,
-    "lines": [
-      [
-        "Aim",
-        70
-      ],
-      [
-        "High ground",
-        15
-      ]
-    ]
+    "expected": 90
   },
   {
     "name": "higher target",
@@ -219,13 +167,7 @@
         "^"
       ]
     ],
-    "expected": 70,
-    "lines": [
-      [
-        "Aim",
-        70
-      ]
-    ]
+    "expected": 70
   },
   {
     "name": "high above cover",
@@ -256,25 +198,7 @@
         "c"
       ]
     ],
-    "expected": 75,
-    "lines": [
-      [
-        "Aim",
-        70
-      ],
-      [
-        "Half cover",
-        -20
-      ],
-      [
-        "Cover seen from above",
-        10
-      ],
-      [
-        "High ground",
-        15
-      ]
-    ]
+    "expected": 90
   },
   {
     "name": "long range clamp",
@@ -294,17 +218,7 @@
     "melee": false,
     "defense": 0,
     "tiles": [],
-    "expected": 5,
-    "lines": [
-      [
-        "Aim",
-        5
-      ],
-      [
-        "Range",
-        -31
-      ]
-    ]
+    "expected": 5
   },
   {
     "name": "high aim clamp",
@@ -324,13 +238,7 @@
     "melee": false,
     "defense": 0,
     "tiles": [],
-    "expected": 95,
-    "lines": [
-      [
-        "Aim",
-        120
-      ]
-    ]
+    "expected": 95
   },
   {
     "name": "melee",
@@ -350,17 +258,7 @@
     "melee": true,
     "defense": 0,
     "tiles": [],
-    "expected": 85,
-    "lines": [
-      [
-        "Aim",
-        75
-      ],
-      [
-        "Close quarters",
-        10
-      ]
-    ]
+    "expected": 85
   },
   {
     "name": "defense",
@@ -380,16 +278,6 @@
     "melee": false,
     "defense": 15,
     "tiles": [],
-    "expected": 55,
-    "lines": [
-      [
-        "Aim",
-        70
-      ],
-      [
-        "Target shielded",
-        -15
-      ]
-    ]
+    "expected": 55
   }
 ]

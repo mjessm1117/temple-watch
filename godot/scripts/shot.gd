@@ -91,17 +91,22 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 	if melee: lines.append(["Close quarters", 10])
 	else:
 		cv = cover(m, t, a)
+		# A two-level vantage sees over one tier of nearby cover.
+		if elevation(m, a) - elevation(m, t) >= 2: cv = maxi(0, cv - 20)
 		if cv > 0: lines.append(["Full cover" if cv == 40 else "Half cover", -cv])
 		var d := distance(a, t)
 		var r := float(attacker.range)
 		if d > r * 0.6: lines.append(["Range", -roundi((d - r * 0.6) * 3)])
-		if cv > 0 and elevation(m, a) > elevation(m, t): lines.append(["Cover seen from above", min(10, cv)])
-	if elevation(m, a) > elevation(m, t): lines.append(["High ground", 15])
+	if elevation(m, a) > elevation(m, t): lines.append(["High ground", 20])
 	var defense := int(target.get("defense", 0))
+	if bool(target.get("hunkered", false)): defense += 30
 	if defense > 0: lines.append(["Defense", -defense])
 	if modifier != 0: lines.append(["Ability", modifier])
 	var raw := 0
 	for item in lines: raw += int(item[1])
 	var hit := clampi(raw, 5, 95)
 	var flanked := not melee and in_cover(m, t) and cv == 0
-	return {"lines": lines, "hit": hit, "crit": 50 if flanked else int(attacker.get("crit", 0)), "graze": 0 if melee else min(GRAZE, 100 - hit), "cover": cv, "flanked": flanked, "los": melee or los(m, a, t), "range_ok": melee or distance(a, t) <= float(attacker.range)}
+	if flanked: lines.append(["Flanking critical chance", 50])
+	if bool(target.get("hunkered", false)) and flanked: lines.append(["Hunker blocks flank critical", -50])
+	var crit := int(attacker.get("crit", 0)) + (50 if flanked and not bool(target.get("hunkered", false)) else 0)
+	return {"lines": lines, "hit": hit, "crit": crit, "graze": 0 if melee else min(GRAZE, 100 - hit), "cover": cv, "flanked": flanked, "los": melee or los(m, a, t), "range_ok": melee or distance(a, t) <= float(attacker.range)}

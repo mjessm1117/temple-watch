@@ -23,7 +23,13 @@ func run() -> void:
 	_test_mission_layout()
 	_test_ai()
 	_test_difficulty()
+	_test_wave4_rules()
 	if "--quick" in OS.get_cmdline_user_args():
+		print("TEST RESULTS: %d checks, %d failures" % [checks, failures])
+		quit(1 if failures > 0 else 0)
+		return
+	if "--balance" in OS.get_cmdline_user_args():
+		_test_bot()
 		print("TEST RESULTS: %d checks, %d failures" % [checks, failures])
 		quit(1 if failures > 0 else 0)
 		return
@@ -71,8 +77,8 @@ func _test_aim() -> void:
 		var t: Dictionary = c.target.duplicate(true)
 		t.defense = int(c.defense)
 		var result: Dictionary = Shot.calculate(m, a, t, bool(c.melee))
-		check(int(result.hit) == int(c.expected), "aim %s: got %d, web expected %d" % [c.name, result.hit, c.expected])
-	print("aim: %d web rules.js fixture cases" % cases.size())
+		check(int(result.hit) == int(c.expected), "aim %s: got %d, expected %d" % [c.name, result.hit, c.expected])
+	print("aim: %d geometry and WotC height fixture cases" % cases.size())
 
 func _test_geometry() -> void:
 	var m = _blank()
@@ -172,6 +178,11 @@ func _test_ai() -> void:
 	sith._spawn("soldier", 5, 5, -1)
 	sith._spawn("guardian", 4, 6, -1)
 	check(str(AI.choose_target(sith, sith.units[0]).class_name) == "Guardian", "Sith targets Jedi")
+	var spread = _blank()
+	spread._spawn("trooper", 5, 5, -1)
+	spread._spawn("soldier", 8, 4, -1)
+	spread._spawn("soldier", 8, 6, -1)
+	check(int(AI.choose_target(spread, spread.units[0], {int(spread.units[1].id): 2}).id) == int(spread.units[2].id), "AI spreads fire across equal targets")
 	var throttle = Mission.new(3)
 	throttle.difficulty.active_cap = 2
 	for foe in throttle.living("enemy"): foe.spotted = true
@@ -207,9 +218,49 @@ func _test_difficulty() -> void:
 		Settings.difficulty = id
 		var m = Mission.new(1)
 		check(not m.difficulty.is_empty() and int(m.spec.turn_limit) == int(choices[id].turn_clock), "%s difficulty loads" % id)
+		check(abs(int(m.difficulty.enemy_aim) - int(m.difficulty.web_diff.enemy_aim)) <= 10 and abs(int(m.difficulty.player_aim) - int(m.difficulty.web_diff.player_aim)) <= 10, "%s aim stays within web difficulty table" % id)
 	Settings.difficulty = "legend"
 	check(int(Mission.new(4).difficulty.active_cap) == 99, "difficulty survives mission recreation")
 	Settings.difficulty = "normal"
+
+func _test_wave4_rules() -> void:
+	var m = _blank()
+	m._spawn("soldier", 2, 5, -1)
+	m._spawn("trooper", 5, 5, -1)
+	var a: Dictionary = m.units[0]
+	var t: Dictionary = m.units[1]
+	m.set_tile(Vector2i(4, 5), "#")
+	check(Shot.cover(m, Shot.pos(t), Shot.pos(a)) == 40, "full cover faces shooter")
+	check(Shot.cover(m, Shot.pos(t), Vector2i(8, 5)) == 0, "full cover has open flank")
+	var flank: Dictionary = Shot.calculate(m, {"x": 8, "y": 5, "aim": 70, "range": 9}, t)
+	check(bool(flank.flanked) and int(flank.crit) == 50 and flank.lines.any(func(line: Array) -> bool: return line[0] == "Flanking critical chance"), "flank crit visible in breakdown")
+	m.damage_cover(Vector2i(4, 5), 4)
+	check(m.tile(Vector2i(4, 5)) == "c" and Shot.cover(m, Shot.pos(t), Shot.pos(a)) == 20, "heavy impact reduces full to half")
+	m.damage_cover(Vector2i(4, 5), 4)
+	check(m.tile(Vector2i(4, 5)) == "r" and Shot.cover(m, Shot.pos(t), Shot.pos(a)) == 0, "second impact destroys cover")
+	m.set_tile(Vector2i(4, 5), "c")
+	m.explode(Vector2i(4, 5), 4)
+	check(m.tile(Vector2i(4, 5)) == "r", "explosion destroys cover")
+	var heavy = _blank()
+	heavy._spawn("heavy", 2, 5, -1)
+	heavy._spawn("soldier", 5, 5, -1)
+	heavy.set_tile(Vector2i(4, 5), "c")
+	heavy._apply_attack(heavy.units[0], heavy.units[1], {"hit": 100, "crit": 0}, "shoot")
+	check(int(heavy.cover_hp[Vector2i(4, 5)]) == 1, "heavy hit damages adjacent cover")
+	check(m.hunker(int(a.id)) and int(a.ap) == 0, "hunker ends action")
+	check(Shot.calculate(m, t, a).lines.any(func(line: Array) -> bool: return line[0] == "Defense" and int(line[1]) == -30), "hunker grants 30 defense")
+	m.set_tile(Vector2i(3, 5), "c")
+	var hunker_flank: Dictionary = Shot.calculate(m, {"x": 1, "y": 5, "aim": 70, "range": 9}, a)
+	check(bool(hunker_flank.flanked) and int(hunker_flank.crit) == 0, "hunker blocks flank critical")
+	m.end_turn()
+	check(not bool(a.hunkered), "hunker expires at next player turn")
+	var map = Mission.new(1)
+	check(map.tile(Vector2i(16, 9)) == "^" and map.paths({"id": -99, "x": 14, "y": 9, "mob": 10}, 10).costs.has(Vector2i(17, 9)), "eastern high ground is reachable")
+	for i in range(3): map.end_turn()
+	check(map.reinforcement_marker.x >= 0 and map.reinforcement_announced, "entry marker set on announcement")
+	check(map.reinforcement_marker.x > int(map.spec.groups[0][0][1]) + 10, "reinforcements enter east of first contact")
+	map.end_turn()
+	check(map.reinforcement_marker.x < 0 and map.reinforcement_dropped, "entry marker clears on arrival")
 
 func _distance_field(m: RefCounted, goal: Vector2i) -> Dictionary:
 	var field: Dictionary = {goal: 0}
@@ -266,6 +317,7 @@ func _test_bot() -> int:
 		Settings.difficulty = id
 		var wins := 0
 		var losses_by_clock := 0
+		var freed := 0
 		for seed_value in range(1, 21):
 			var m = Mission.new(seed_value)
 			var guard := 0
@@ -273,9 +325,13 @@ func _test_bot() -> int:
 				_bot_turn(m)
 				guard += 1
 			if m.result == "win": wins += 1
+			if bool(m.prisoner.freed): freed += 1
 			if m.turn > int(m.spec.turn_limit): losses_by_clock += 1
 			check(m.result != "", "%s bot %d terminates" % [id, seed_value])
-		print("rescue bot %s: %d/20 wins (%.0f%%), %d clock losses" % [id, wins, wins * 5.0, losses_by_clock])
+		print("rescue bot %s: %d/20 wins (%.0f%%), %d freed, %d clock losses" % [id, wins, wins * 5.0, freed, losses_by_clock])
+		var minimum: int = {"story": 14, "normal": 9, "hard": 4, "legend": 1}[id]
+		var maximum: int = {"story": 20, "normal": 12, "hard": 7, "legend": 3}[id]
+		check(wins >= minimum and wins <= maximum, "%s bot win band %d-%d, got %d" % [id, minimum, maximum, wins])
 		if id == "normal": normal_wins = wins
 	Settings.difficulty = "normal"
 	return normal_wins
