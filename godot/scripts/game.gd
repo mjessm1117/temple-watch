@@ -98,7 +98,7 @@ func _setup_scene() -> void:
 	env.fog_light_color = Color("253c50")
 	env.fog_density = 0.008
 	world.environment = env; add_child(world)
-	var sun := DirectionalLight3D.new(); sun.rotation_degrees = Vector3(-55, -35, 0); sun.light_energy = 1.65; sun.light_color = Color("ffe1ae"); sun.shadow_enabled = true; add_child(sun)
+	var sun := DirectionalLight3D.new(); sun.rotation_degrees = Vector3(-55, -35, 0); sun.light_energy = 1.65; sun.light_color = Color("ffe1ae"); sun.shadow_enabled = true; sun.light_angular_distance = 2.5; add_child(sun)
 	var fill := DirectionalLight3D.new(); fill.rotation_degrees = Vector3(-30, 140, 0); fill.light_energy = 0.55; fill.light_color = Color("78bde5"); add_child(fill)
 	var dust := MultiMeshInstance3D.new()
 	var multimesh := MultiMesh.new()
@@ -437,19 +437,26 @@ func _attack(target_id: int, mode: String) -> void:
 	if mode == "push" and terrain_before != mission.tile(old_target + Vector2i(signi(int(target.x) - int(actor.x)), signi(int(target.y) - int(actor.y)))):
 		_build_terrain()
 		fx.cover_chunks(to)
+		_shake(0.1)
 	_refresh()
 
 func _end_turn() -> void:
 	phase_banner.visible = true
 	sound.play("turn")
 	var before: Dictionary = {}
-	for u in mission.units: before[int(u.id)] = {"position": Shot.pos(u), "hp": int(u.hp)}
+	for u in mission.units: before[int(u.id)] = {"position": Shot.pos(u), "hp": int(u.hp), "prev": mission.paths(u, int(u.mob)).prev if str(u.side) == "enemy" and bool(u.awake) else {}}
 	mission.end_turn()
 	for u in mission.units:
 		var id := int(u.id)
 		if not before.has(id): continue
 		if str(u.side) == "enemy" and before[id].position != Shot.pos(u) and views.has(id):
-			views[id].travel([Vector3(int(u.x), Shot.elevation(mission, Shot.pos(u)) * 0.7, int(u.y))])
+			var cursor: Vector2i = Shot.pos(u)
+			var route: Array[Vector3] = []
+			while before[id].prev.has(cursor):
+				route.push_front(Vector3(cursor.x, Shot.elevation(mission, cursor) * 0.7, cursor.y))
+				cursor = before[id].prev[cursor]
+			if route.is_empty(): route.append(Vector3(int(u.x), Shot.elevation(mission, Shot.pos(u)) * 0.7, int(u.y)))
+			views[id].travel(route)
 		if int(u.hp) < int(before[id].hp) and views.has(id):
 			views[id].act("hit")
 			fx.float_text(views[id].position + Vector3.UP * 1.7, "-%d" % (int(before[id].hp) - int(u.hp)), Color("ffad8d"))
