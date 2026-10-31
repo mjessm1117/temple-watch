@@ -1,0 +1,1317 @@
+{
+  "RESEARCH": {
+    "ataru": {
+      "n": "Ataru katas",
+      "days": 15,
+      "cost": {
+        "credits": 40
+      },
+      "desc": "Unlocks the Ataru saber form."
+    },
+    "djemSo": {
+      "n": "Djem So drills",
+      "days": 15,
+      "cost": {
+        "credits": 40
+      },
+      "desc": "Unlocks the Djem So saber form."
+    },
+    "niman": {
+      "n": "Niman discipline",
+      "days": 20,
+      "cost": {
+        "credits": 60
+      },
+      "need": [
+        "ataru"
+      ],
+      "desc": "Unlocks the Niman saber form."
+    },
+    "juyo": {
+      "n": "Juyo, the forbidden form",
+      "days": 30,
+      "cost": {
+        "credits": 80,
+        "intel": 1
+      },
+      "need": [
+        "djemSo"
+      ],
+      "dark": 4,
+      "desc": "Unlocks the Juyo saber form. Order Darkness +4."
+    },
+    "fieldMed": {
+      "n": "Field medicine",
+      "days": 15,
+      "cost": {
+        "credits": 60
+      },
+      "desc": "Every Medic carries +1 medkit."
+    },
+    "bacta": {
+      "n": "Bacta tanks",
+      "days": 25,
+      "cost": {
+        "credits": 120
+      },
+      "need": [
+        "fieldMed"
+      ],
+      "desc": "Unlocks Medical Halls level 3."
+    },
+    "curriculum": {
+      "n": "Master curriculum",
+      "days": 25,
+      "cost": {
+        "credits": 100
+      },
+      "desc": "Unlocks Training Salle level 2."
+    },
+    "holocron": {
+      "n": "Holocron studies",
+      "days": 25,
+      "cost": {
+        "intel": 2
+      },
+      "need": [
+        "curriculum"
+      ],
+      "desc": "+10% XP from every mission."
+    },
+    "eliteMods": {
+      "n": "Weapon smithing",
+      "days": 15,
+      "cost": {
+        "credits": 60
+      },
+      "desc": "Unlocks the Stock and Hair trigger weapon mods."
+    },
+    "visors": {
+      "n": "Targeting visors",
+      "days": 15,
+      "cost": {
+        "credits": 60
+      },
+      "desc": "Unlocks the Targeting visor utility item."
+    },
+    "shields": {
+      "n": "Personal shields",
+      "days": 25,
+      "cost": {
+        "credits": 100,
+        "intel": 1
+      },
+      "need": [
+        "visors"
+      ],
+      "desc": "Unlocks the Personal shield utility item."
+    },
+    "armorWeave": {
+      "n": "Cortosis weave",
+      "days": 20,
+      "cost": {
+        "credits": 80
+      },
+      "desc": "Unlocks Armored robes for Jedi."
+    },
+    "kyberLore": {
+      "n": "Kyber lore",
+      "days": 20,
+      "cost": {
+        "credits": 60
+      },
+      "desc": "+1 Kyber now; saber crafts cost 1 less Kyber."
+    },
+    "codebreak": {
+      "n": "Imperial codebreaking",
+      "days": 20,
+      "cost": {
+        "intel": 2
+      },
+      "desc": "Countering a Sith op with Intel costs 1 less."
+    },
+    "sithTactics": {
+      "n": "Sith tactics",
+      "days": 30,
+      "cost": {
+        "intel": 3
+      },
+      "need": [
+        "codebreak"
+      ],
+      "desc": "+5 aim for every unit."
+    },
+    "beastLore": {
+      "n": "Beast lore",
+      "days": 20,
+      "cost": {
+        "credits": 40,
+        "intel": 1
+      },
+      "desc": "+10 aim against horrors; horror traumas are half as likely."
+    },
+    "logistics": {
+      "n": "Logistics",
+      "days": 20,
+      "cost": {
+        "credits": 100
+      },
+      "desc": "Unlocks Barracks level 3."
+    },
+    "tibanna": {
+      "n": "Tibanna gas chargers",
+      "days": 15,
+      "cost": {
+        "credits": 60
+      },
+      "need": [
+        "eliteMods"
+      ],
+      "desc": "Unlocks the Tibanna charger and Bipod weapon modules."
+    },
+    "gunMk2": {
+      "n": "Refit line Mk II",
+      "days": 20,
+      "cost": {
+        "credits": 80
+      },
+      "need": [
+        "eliteMods"
+      ],
+      "desc": "Weapon modules can be upgraded to Mk II."
+    },
+    "ordnance": {
+      "n": "Heavy ordnance",
+      "days": 15,
+      "cost": {
+        "credits": 60
+      },
+      "need": [
+        "visors"
+      ],
+      "desc": "Every Heavy carries +1 grenade."
+    },
+    "eliteProgram": {
+      "n": "SpecForce program",
+      "days": 25,
+      "cost": {
+        "credits": 120,
+        "intel": 2
+      },
+      "need": [
+        "gunMk2"
+      ],
+      "desc": "Troopers at rank 4+ can evolve into an elite class."
+    },
+    "gunMk3": {
+      "n": "Refit line Mk III",
+      "days": 25,
+      "cost": {
+        "credits": 140
+      },
+      "need": [
+        "gunMk2"
+      ],
+      "era": 2,
+      "desc": "Weapon modules can be upgraded to Mk III."
+    },
+    "repeaters": {
+      "n": "Repeating blasters",
+      "days": 30,
+      "cost": {
+        "credits": 160,
+        "intel": 2
+      },
+      "need": [
+        "gunMk3"
+      ],
+      "era": 3,
+      "desc": "Every trooper +1 damage."
+    },
+    "alloys": {
+      "n": "Durasteel alloys",
+      "days": 15,
+      "cost": {
+        "credits": 60
+      },
+      "desc": "Unlocks the Durasteel plates armor module."
+    },
+    "reflec": {
+      "n": "Reflec coating",
+      "days": 20,
+      "cost": {
+        "credits": 80
+      },
+      "need": [
+        "alloys"
+      ],
+      "desc": "Unlocks the Reflec coating armor module."
+    },
+    "armMk2": {
+      "n": "Armorsmith Mk II",
+      "days": 20,
+      "cost": {
+        "credits": 80
+      },
+      "need": [
+        "alloys"
+      ],
+      "desc": "Armor modules can be upgraded to Mk II."
+    },
+    "beskar": {
+      "n": "Mandalorian iron",
+      "days": 25,
+      "cost": {
+        "credits": 120,
+        "intel": 1
+      },
+      "need": [
+        "armMk2"
+      ],
+      "desc": "Unlocks Beskar plate for troopers (Armory 2)."
+    },
+    "armMk3": {
+      "n": "Armorsmith Mk III",
+      "days": 25,
+      "cost": {
+        "credits": 140
+      },
+      "need": [
+        "armMk2"
+      ],
+      "era": 2,
+      "desc": "Armor modules can be upgraded to Mk III. Unlocks Master’s robes for Jedi."
+    },
+    "saberMk2": {
+      "n": "Saber smithing Mk II",
+      "days": 20,
+      "cost": {
+        "credits": 80
+      },
+      "need": [
+        "kyberLore"
+      ],
+      "desc": "Saber modules can be upgraded to Mk II. Unlocks Diatium cell, Energy gate and Shroud ring."
+    },
+    "saberMk3": {
+      "n": "Saber smithing Mk III",
+      "days": 25,
+      "cost": {
+        "credits": 140,
+        "intel": 1
+      },
+      "need": [
+        "saberMk2"
+      ],
+      "era": 2,
+      "desc": "Saber modules can be upgraded to Mk III."
+    },
+    "wards": {
+      "n": "Force wards",
+      "days": 20,
+      "cost": {
+        "credits": 60,
+        "intel": 1
+      },
+      "need": [
+        "beastLore"
+      ],
+      "desc": "Unlocks the Warding sigils armor module."
+    },
+    "mastery": {
+      "n": "Trials of mastery",
+      "days": 25,
+      "cost": {
+        "credits": 100,
+        "intel": 2
+      },
+      "need": [
+        "holocron"
+      ],
+      "desc": "Jedi at rank 4+ can evolve into an advanced path."
+    },
+    "livingForce": {
+      "n": "The Living Force",
+      "days": 25,
+      "cost": {
+        "credits": 100,
+        "intel": 2
+      },
+      "need": [
+        "mastery"
+      ],
+      "era": 2,
+      "desc": "Every Jedi +10 will and +5 deflect."
+    },
+    "namelessLore": {
+      "n": "Nameless studies",
+      "days": 30,
+      "cost": {
+        "credits": 120,
+        "intel": 3
+      },
+      "need": [
+        "wards"
+      ],
+      "era": 3,
+      "desc": "+10 more aim against horrors for every unit."
+    },
+    "supply": {
+      "n": "Supply contracts",
+      "days": 20,
+      "cost": {
+        "credits": 120
+      },
+      "need": [
+        "logistics"
+      ],
+      "era": 2,
+      "desc": "All gear and modules cost 15% less."
+    },
+    "holonet": {
+      "n": "Holonet relays",
+      "days": 25,
+      "cost": {
+        "credits": 100,
+        "intel": 2
+      },
+      "need": [
+        "codebreak"
+      ],
+      "era": 3,
+      "desc": "+1 Intel after every won mission."
+    }
+  },
+  "RES_TREE": [
+    {
+      "n": "Weapons",
+      "ic": "shoot",
+      "ids": [
+        "eliteMods",
+        "visors",
+        "tibanna",
+        "gunMk2",
+        "ordnance",
+        "eliteProgram",
+        "gunMk3",
+        "repeaters"
+      ]
+    },
+    {
+      "n": "Armor",
+      "ic": "hunker",
+      "ids": [
+        "armorWeave",
+        "alloys",
+        "shields",
+        "reflec",
+        "armMk2",
+        "beskar",
+        "armMk3"
+      ]
+    },
+    {
+      "n": "Lightsabers",
+      "ic": "kyber",
+      "ids": [
+        "kyberLore",
+        "ataru",
+        "djemSo",
+        "saberMk2",
+        "niman",
+        "juyo",
+        "saberMk3"
+      ]
+    },
+    {
+      "n": "Force",
+      "ic": "calm",
+      "ids": [
+        "curriculum",
+        "beastLore",
+        "holocron",
+        "wards",
+        "mastery",
+        "livingForce",
+        "namelessLore"
+      ]
+    },
+    {
+      "n": "Logistics",
+      "ic": "scan",
+      "ids": [
+        "fieldMed",
+        "codebreak",
+        "logistics",
+        "bacta",
+        "sithTactics",
+        "supply",
+        "holonet"
+      ]
+    }
+  ],
+  "TREES": {
+    "Guardian": {
+      "trunk": {
+        "1": [
+          "saberThrow",
+          "defLine",
+          "gChallenge"
+        ],
+        "2": [
+          "leap",
+          "reflectM",
+          "gStalwart"
+        ]
+      },
+      "specs": {
+        "protector": {
+          "4": [
+            "gIron",
+            "gBulwark",
+            "gpBastion"
+          ],
+          "5": [
+            "collapse",
+            "gWarden",
+            "gpBeacon"
+          ],
+          "6": [
+            "forceWave",
+            "gAegis",
+            "gpUndying"
+          ],
+          "7": [
+            "gUnbreakable",
+            "gLastStand",
+            "gpLiving"
+          ],
+          "n": "Protector",
+          "ic": "sp_protector",
+          "desc": "Shields the squad and holds the line.",
+          "sig": "barrier"
+        },
+        "weaponMaster": {
+          "4": [
+            "gDuelist",
+            "gVanguard",
+            "gwForm"
+          ],
+          "5": [
+            "mightyBlow",
+            "flurry",
+            "gwWind"
+          ],
+          "6": [
+            "precisionStrike",
+            "gWMFocus",
+            "gwCounter"
+          ],
+          "7": [
+            "gMasterBlade",
+            "gWMStorm",
+            "gwRampage"
+          ],
+          "n": "Weapon Master",
+          "ic": "sp_weaponMaster",
+          "desc": "Lives in melee and cuts through crowds.",
+          "sig": "sweep"
+        }
+      }
+    },
+    "Consular": {
+      "trunk": {
+        "1": [
+          "stun",
+          "forceHeal",
+          "cSerene"
+        ],
+        "2": [
+          "barrier",
+          "battleMed",
+          "cPresence"
+        ]
+      },
+      "specs": {
+        "sage": {
+          "4": [
+            "massHeal",
+            "cResolve",
+            "csTouch"
+          ],
+          "5": [
+            "cWellspring",
+            "cSageLight",
+            "csCalm"
+          ],
+          "6": [
+            "cSeer",
+            "cSageEmpathy",
+            "csWard"
+          ],
+          "7": [
+            "cMaster",
+            "cSageAvatar",
+            "csEternal"
+          ],
+          "n": "Sage",
+          "ic": "sp_sage",
+          "desc": "Healer. Keeps everyone standing.",
+          "sig": "forceRevive"
+        },
+        "shadow": {
+          "4": [
+            "pull",
+            "shadowStep",
+            "chUnseen"
+          ],
+          "5": [
+            "forceWave",
+            "cShWhisper",
+            "chFade"
+          ],
+          "6": [
+            "stasisField",
+            "cShVeil",
+            "chFeed"
+          ],
+          "7": [
+            "cShMaster",
+            "disarm",
+            "chCascade"
+          ],
+          "n": "Shadow",
+          "ic": "sp_shadow",
+          "desc": "Controls minds and strikes unseen.",
+          "sig": "mindTrick"
+        }
+      }
+    },
+    "Sentinel": {
+      "trunk": {
+        "1": [
+          "flurry",
+          "sense",
+          "sSwift"
+        ],
+        "2": [
+          "shadowStep",
+          "sExecutioner",
+          "sHunterMark"
+        ]
+      },
+      "specs": {
+        "watchman": {
+          "4": [
+            "disarm",
+            "sHunter",
+            "swTrack"
+          ],
+          "5": [
+            "sGhost",
+            "sWatchSense",
+            "swNerve"
+          ],
+          "6": [
+            "precisionStrike",
+            "spotter",
+            "swDuel"
+          ],
+          "7": [
+            "sUntouchable",
+            "sWatchJudge",
+            "swInquis"
+          ],
+          "n": "Watchman",
+          "ic": "sp_watchman",
+          "desc": "Hunter and investigator. Finishes the wounded.",
+          "sig": "executioner"
+        },
+        "bladeDancer": {
+          "4": [
+            "sEdge",
+            "sDancer",
+            "sbBlur"
+          ],
+          "5": [
+            "sweep",
+            "sDanceFlow",
+            "sbCombo"
+          ],
+          "6": [
+            "leap",
+            "sDanceWhirl",
+            "sbRiposte"
+          ],
+          "7": [
+            "sBlademaster",
+            "sDanceStorm",
+            "sbStorm"
+          ],
+          "n": "Blade Dancer",
+          "ic": "sp_bladeDancer",
+          "desc": "Fast, mobile, always moving.",
+          "sig": "saberThrow"
+        }
+      }
+    },
+    "Wayseeker": {
+      "trunk": {
+        "1": [
+          "pathfinder",
+          "wildBond",
+          "wLiving"
+        ],
+        "2": [
+          "tremor",
+          "barrier",
+          "wWind"
+        ]
+      },
+      "specs": {
+        "beastwarden": {
+          "4": [
+            "wStalker",
+            "forceHeal",
+            "wbPack"
+          ],
+          "5": [
+            "wBond",
+            "wBeastHide",
+            "wbHide"
+          ],
+          "6": [
+            "wSeer",
+            "wBeastPack",
+            "wbHowl"
+          ],
+          "7": [
+            "wPrimal",
+            "wBeastKing",
+            "wbAlpha"
+          ],
+          "n": "Beastwarden",
+          "ic": "sp_beastwarden",
+          "desc": "Tames creatures and horrors.",
+          "sig": "beastCalm"
+        },
+        "earthshaper": {
+          "4": [
+            "saberThrow",
+            "wEarthRoot",
+            "weFault"
+          ],
+          "5": [
+            "forceWave",
+            "wEarthStone",
+            "weStone"
+          ],
+          "6": [
+            "collapse",
+            "wEarthReach",
+            "weAnchor"
+          ],
+          "7": [
+            "stasisField",
+            "wEarthWorld",
+            "weMountain"
+          ],
+          "n": "Earthshaper",
+          "ic": "sp_earthshaper",
+          "desc": "Bends the ground and drags enemies around.",
+          "sig": "pull"
+        }
+      }
+    },
+    "Soldier": {
+      "trunk": {
+        "1": [
+          "suppress",
+          "hunker",
+          "soBreach"
+        ],
+        "2": [
+          "rapidFire",
+          "flakVest",
+          "soAdrenaline"
+        ]
+      },
+      "specs": {
+        "sergeant": {
+          "4": [
+            "holdLine",
+            "soSteel",
+            "sgCover"
+          ],
+          "5": [
+            "mark",
+            "soSgtDrill",
+            "sgOrders"
+          ],
+          "6": [
+            "smoke",
+            "soTough",
+            "sgStand"
+          ],
+          "7": [
+            "soCommander",
+            "soSgtHero",
+            "sgVictory"
+          ],
+          "n": "Sergeant",
+          "ic": "sp_sergeant",
+          "desc": "Leader. Rallies and steadies the squad.",
+          "sig": "rally"
+        },
+        "vanguard": {
+          "4": [
+            "veteran",
+            "soVanCharge",
+            "svRush"
+          ],
+          "5": [
+            "soMarksman",
+            "soVanPlate",
+            "svBrawl"
+          ],
+          "6": [
+            "runGun",
+            "soVanShred",
+            "svFury"
+          ],
+          "7": [
+            "soLegend",
+            "soVanStorm",
+            "svRampage"
+          ],
+          "n": "Vanguard",
+          "ic": "sp_vanguard",
+          "desc": "Assault trooper. Closes in and hits hard.",
+          "sig": "chainShot"
+        }
+      }
+    },
+    "Scout": {
+      "trunk": {
+        "1": [
+          "mark",
+          "scEagle",
+          "scFlanker"
+        ],
+        "2": [
+          "deadeye",
+          "longshot",
+          "scEvasive"
+        ]
+      },
+      "specs": {
+        "sniper": {
+          "4": [
+            "killshot",
+            "scSniper",
+            "ssPerch"
+          ],
+          "5": [
+            "scAssassin",
+            "scSnStill",
+            "ssExposed"
+          ],
+          "6": [
+            "scDeadly",
+            "chainShot",
+            "ssBigGame"
+          ],
+          "7": [
+            "scLegend",
+            "scSnOneShot",
+            "ssStreak"
+          ],
+          "n": "Sniper",
+          "ic": "sp_sniper",
+          "desc": "Long range. One shot, one kill.",
+          "sig": "spotter"
+        },
+        "infiltrator": {
+          "4": [
+            "fieldcraft",
+            "ghost",
+            "siVanish"
+          ],
+          "5": [
+            "scSurvivor",
+            "scInfShadow",
+            "siKnife"
+          ],
+          "6": [
+            "smoke",
+            "scInfKnife",
+            "siHunt"
+          ],
+          "7": [
+            "scInfPhantom",
+            "scInfStrike",
+            "siSabo"
+          ],
+          "n": "Infiltrator",
+          "ic": "sp_infiltrator",
+          "desc": "Moves unseen and strikes first.",
+          "sig": "runGun"
+        }
+      }
+    },
+    "Medic": {
+      "trunk": {
+        "1": [
+          "smoke",
+          "mDrilled",
+          "mTriage"
+        ],
+        "2": [
+          "reviveStim",
+          "fieldKit",
+          "mHardy"
+        ]
+      },
+      "specs": {
+        "surgeon": {
+          "4": [
+            "traumaBag",
+            "mSurgeon",
+            "mdHands"
+          ],
+          "5": [
+            "mStoic",
+            "mFieldSurgeon",
+            "mdCover"
+          ],
+          "6": [
+            "rally",
+            "mSurgCalm",
+            "mdLast"
+          ],
+          "7": [
+            "mAngel",
+            "mSurgMiracle",
+            "mdMiracle"
+          ],
+          "n": "Field Surgeon",
+          "ic": "sp_surgeon",
+          "desc": "Saves lives. More kits, steadier hands.",
+          "sig": "medBeacon"
+        },
+        "tech": {
+          "4": [
+            "combatMedic",
+            "mTechArmor",
+            "mtDroid"
+          ],
+          "5": [
+            "mMarksman",
+            "mark",
+            "mtPlate"
+          ],
+          "6": [
+            "suppress",
+            "mTechOverclock",
+            "mtOver"
+          ],
+          "7": [
+            "mVeteran",
+            "mTechDrones",
+            "mtNet"
+          ],
+          "n": "Combat Tech",
+          "ic": "sp_tech",
+          "desc": "Drones, armor and a sharper blaster.",
+          "sig": "shieldDrone"
+        }
+      }
+    },
+    "Heavy": {
+      "trunk": {
+        "1": [
+          "suppress",
+          "shredder",
+          "hCoverMe"
+        ],
+        "2": [
+          "bandolier",
+          "flakVest",
+          "hPayload"
+        ]
+      },
+      "specs": {
+        "demolitionist": {
+          "4": [
+            "ionNade",
+            "hDemoExtra",
+            "hdHeavy"
+          ],
+          "5": [
+            "hHeavyWeapons",
+            "hDemoBlast",
+            "hdShock"
+          ],
+          "6": [
+            "hGunner",
+            "hDemoSapper",
+            "hdBuster"
+          ],
+          "7": [
+            "hWarlord",
+            "hDemoBig",
+            "hdArmageddon"
+          ],
+          "n": "Demolitionist",
+          "ic": "sp_demolitionist",
+          "desc": "Explosives expert. Rockets and more grenades.",
+          "sig": "rocket"
+        },
+        "bulwark": {
+          "4": [
+            "juggernaut",
+            "hBrute",
+            "hbWall"
+          ],
+          "5": [
+            "hBulwark",
+            "hunker",
+            "hbSpite"
+          ],
+          "6": [
+            "chainShot",
+            "hBulTaunt",
+            "hbIron"
+          ],
+          "7": [
+            "hTitan",
+            "hBulFort",
+            "hbAnchor"
+          ],
+          "n": "Bulwark",
+          "ic": "sp_bulwark",
+          "desc": "Walking cover. Soaks fire and holds ground.",
+          "sig": "holdLine"
+        }
+      }
+    },
+    "Defender": {
+      "trunk": {
+        "1": [
+          "defLine",
+          "saberThrow",
+          "gChallenge"
+        ],
+        "2": [
+          "leap",
+          "gStalwart",
+          "tkGuardPost"
+        ]
+      },
+      "specs": {
+        "bastion": {
+          "4": [
+            "gIron",
+            "gpBastion",
+            "tkFortress"
+          ],
+          "5": [
+            "collapse",
+            "gAegis",
+            "gpBeacon"
+          ],
+          "6": [
+            "forceWave",
+            "gpUndying",
+            "tkShieldWall"
+          ],
+          "7": [
+            "gUnbreakable",
+            "gpLiving",
+            "tkColossus"
+          ],
+          "n": "Bastion",
+          "ic": "sp_protector",
+          "desc": "Unmovable. Soaks fire and shelters allies.",
+          "sig": "barrier"
+        },
+        "soresu": {
+          "4": [
+            "tkParry",
+            "gBulwark",
+            "chFade"
+          ],
+          "5": [
+            "gwCounter",
+            "sbBlur",
+            "tkRedirect"
+          ],
+          "6": [
+            "precisionStrike",
+            "tkWall",
+            "gLastStand"
+          ],
+          "7": [
+            "tkSoresu",
+            "sUntouchable",
+            "gwRampage"
+          ],
+          "n": "Soresu",
+          "ic": "sp_weaponMaster",
+          "desc": "Perfect defense. Deflects, dodges, counters.",
+          "sig": "reflectM"
+        }
+      }
+    },
+    "Shieldbearer": {
+      "trunk": {
+        "1": [
+          "hunker",
+          "suppress",
+          "hCoverMe"
+        ],
+        "2": [
+          "flakVest",
+          "mHardy",
+          "tkGuardPost"
+        ]
+      },
+      "specs": {
+        "phalanx": {
+          "4": [
+            "juggernaut",
+            "hbWall",
+            "tkShieldWall"
+          ],
+          "5": [
+            "hBulwark",
+            "hbIron",
+            "rally"
+          ],
+          "6": [
+            "smoke",
+            "hTitan",
+            "tkFortress"
+          ],
+          "7": [
+            "hbAnchor",
+            "soSgtHero",
+            "tkBastion"
+          ],
+          "n": "Phalanx",
+          "ic": "sp_bulwark",
+          "desc": "Shield line. Everyone behind you lives.",
+          "sig": "holdLine"
+        },
+        "breacher": {
+          "4": [
+            "soVanPlate",
+            "svBrawl",
+            "soBreach"
+          ],
+          "5": [
+            "svFury",
+            "veteran",
+            "hBrute"
+          ],
+          "6": [
+            "runGun",
+            "soVanCharge",
+            "svRush"
+          ],
+          "7": [
+            "soLegend",
+            "svRampage",
+            "hWarlord"
+          ],
+          "n": "Breacher",
+          "ic": "sp_vanguard",
+          "desc": "Shield-first assault. Kicks the door and keeps going.",
+          "sig": "chainShot"
+        }
+      }
+    },
+    "Gunslinger": {
+      "trunk": {
+        "1": [
+          "gsQuickDraw",
+          "mark",
+          "scFlanker"
+        ],
+        "2": [
+          "gsHitRun",
+          "runGun",
+          "scEvasive"
+        ]
+      },
+      "specs": {
+        "duelist": {
+          "4": [
+            "gsTrick",
+            "siKnife",
+            "killshot"
+          ],
+          "5": [
+            "ssExposed",
+            "svFury",
+            "veteran"
+          ],
+          "6": [
+            "svRush",
+            "smoke",
+            "soBreach"
+          ],
+          "7": [
+            "svRampage",
+            "gsDeadShot",
+            "ssStreak"
+          ],
+          "n": "Duelist",
+          "ic": "sp_sniper",
+          "desc": "Close, fast, deadly. Three shots a turn.",
+          "sig": "chainShot"
+        },
+        "outlaw": {
+          "4": [
+            "siVanish",
+            "fieldcraft",
+            "scSurvivor"
+          ],
+          "5": [
+            "ssBigGame",
+            "hCoverMe",
+            "gsReflex"
+          ],
+          "6": [
+            "gsSpeed",
+            "sSwift",
+            "scInfKnife"
+          ],
+          "7": [
+            "scInfPhantom",
+            "scInfStrike",
+            "scLegend"
+          ],
+          "n": "Outlaw",
+          "ic": "sp_infiltrator",
+          "desc": "Slippery. Hits and is gone.",
+          "sig": "ghost"
+        }
+      }
+    }
+  },
+  "POWER_W": {
+    "dodge": 0.6,
+    "fx": 2,
+    "hp": 2,
+    "aim": 0.5,
+    "dmg": 3,
+    "armor": 5,
+    "crit": 0.2,
+    "focus": 1.5,
+    "mob": 1,
+    "deflect": 0.2,
+    "range": 1.5,
+    "rangeCap": 12,
+    "kit": 3,
+    "nade": 3,
+    "skill": 2,
+    "active": 4,
+    "spec": 4
+  },
+  "SITH_OPS": {
+    "fortify": {
+      "n": "Fortified garrisons",
+      "intel": 2,
+      "mod": {
+        "enemyHp": 1
+      },
+      "missions": 2,
+      "desc": "If ignored: enemies get +1 HP for 2 missions."
+    },
+    "snipers": {
+      "n": "Sharpshooter cadre",
+      "intel": 2,
+      "mod": {
+        "enemyAim": 5
+      },
+      "missions": 2,
+      "desc": "If ignored: enemies get +5 aim for 2 missions."
+    },
+    "surge": {
+      "n": "Troop surge",
+      "intel": 3,
+      "mod": {
+        "extraEnemies": 1
+      },
+      "missions": 2,
+      "desc": "If ignored: +1 enemy per wave for 2 missions."
+    },
+    "spies": {
+      "n": "Spy ring",
+      "intel": 2,
+      "mod": {
+        "squadAim": -5
+      },
+      "missions": 2,
+      "desc": "If ignored: your squads get −5 aim for 2 missions."
+    },
+    "propaganda": {
+      "n": "Holonet propaganda",
+      "intel": 1,
+      "res": {
+        "favor": -6
+      },
+      "desc": "If ignored: Senate Favor −6."
+    },
+    "supply": {
+      "n": "Supply raids",
+      "intel": 1,
+      "res": {
+        "credits": -80
+      },
+      "desc": "If ignored: Credits −80."
+    },
+    "kyberRaid": {
+      "n": "Kyber raid",
+      "intel": 2,
+      "res": {
+        "kyber": -1
+      },
+      "desc": "If ignored: Kyber −1."
+    },
+    "bounty": {
+      "n": "Bounty on the Order",
+      "intel": 2,
+      "hurt": 1,
+      "desc": "If ignored: an assassin wounds a random unit (10 days, +20 stress)."
+    },
+    "saboteurs": {
+      "n": "Temple saboteurs",
+      "intel": 2,
+      "jam": 2,
+      "desc": "If ignored: saboteurs jam 2 wing actions for 3 missions."
+    },
+    "ritual": {
+      "n": "Dark ritual",
+      "intel": 3,
+      "res": {
+        "orderDark": 5
+      },
+      "desc": "If ignored: Order Darkness +5."
+    },
+    "hunter": {
+      "n": "Sith hunter",
+      "intel": 3,
+      "hunt": 1,
+      "desc": "If ignored: a hunter stalks your best unit (wounded 14 days, +30 stress)."
+    }
+  },
+  "OPS": {
+    "teamBase": 50,
+    "perRank": 6,
+    "max": 95,
+    "xp": 15,
+    "failStress": 20
+  }
+}

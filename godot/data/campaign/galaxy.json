@@ -1,0 +1,493 @@
+{
+  "REGIONS": [
+    [
+      "deep",
+      "Deep Core",
+      30,
+      "Old, crowded stars. Few lanes reach in."
+    ],
+    [
+      "core",
+      "Core Worlds",
+      62,
+      "Coruscant and the oldest Republic worlds. The Senate listens to them first."
+    ],
+    [
+      "colonies",
+      "Colonies",
+      95,
+      "The first worlds settled from the Core. Rich, loyal, nervous."
+    ],
+    [
+      "inner",
+      "Inner Rim",
+      130,
+      "Settled frontier of an older age. Trade lanes, shipyards, refugees."
+    ],
+    [
+      "mid",
+      "Mid Rim",
+      185,
+      "Thinly policed worlds between Republic and lawless space."
+    ],
+    [
+      "outer",
+      "Outer Rim",
+      255,
+      "The edge. Hutts, pirates, Sith raiders, and worlds the Senate forgets."
+    ],
+    [
+      "unknown",
+      "Unknown Regions",
+      0,
+      "Unmapped space beyond the western rim. Ilum hides here."
+    ]
+  ],
+  "PLANETS": {
+    "Coruscant": {
+      "x": 300,
+      "y": 182,
+      "reg": "core"
+    },
+    "Alderaan": {
+      "x": 335,
+      "y": 200,
+      "reg": "core"
+    },
+    "Balmorra": {
+      "x": 360,
+      "y": 165,
+      "reg": "colonies"
+    },
+    "Inner Rim": {
+      "x": 200,
+      "y": 225,
+      "reg": "inner"
+    },
+    "Ord Mantell": {
+      "x": 290,
+      "y": 85,
+      "reg": "mid"
+    },
+    "Mid Rim": {
+      "x": 185,
+      "y": 265,
+      "reg": "mid"
+    },
+    "Hydian Way": {
+      "x": 455,
+      "y": 205,
+      "reg": "mid"
+    },
+    "Ruusan": {
+      "x": 395,
+      "y": 272,
+      "reg": "mid"
+    },
+    "Dantooine": {
+      "x": 280,
+      "y": 50,
+      "reg": "outer"
+    },
+    "Taris": {
+      "x": 430,
+      "y": 80,
+      "reg": "outer"
+    },
+    "Sith frontier": {
+      "x": 500,
+      "y": 110,
+      "reg": "outer"
+    },
+    "Nar Shaddaa": {
+      "x": 515,
+      "y": 250,
+      "reg": "outer"
+    },
+    "Ossus": {
+      "x": 470,
+      "y": 300,
+      "reg": "outer"
+    },
+    "Ilum": {
+      "x": 72,
+      "y": 160,
+      "reg": "unknown"
+    }
+  },
+  "RISK": [
+    [
+      0,
+      "Low",
+      1
+    ],
+    [
+      9,
+      "Moderate",
+      2
+    ],
+    [
+      13.5,
+      "High",
+      3
+    ],
+    [
+      18,
+      "Severe",
+      4
+    ]
+  ],
+  "RISK_W": {
+    "boss": 3.5,
+    "threat": 12,
+    "clock": [
+      "rescue",
+      "investigate",
+      "sabotage",
+      "escort"
+    ],
+    "solo": 3.6
+  },
+  "FIELD_OPS": {
+    "convoy": {
+      "n": "Relief convoy",
+      "want": [
+        "Medic",
+        "Consular"
+      ],
+      "days": 15,
+      "stars": 1,
+      "res": {
+        "favor": 3
+      },
+      "desc": "Escort bacta and grain to a world the war forgot."
+    },
+    "smugglers": {
+      "n": "Smuggler route",
+      "want": [
+        "Scout",
+        "Sentinel"
+      ],
+      "days": 15,
+      "stars": 1,
+      "res": {
+        "intel": 2
+      },
+      "desc": "Trace the spice route the Empire uses to move its agents."
+    },
+    "pirates": {
+      "n": "Pirate cell",
+      "want": [
+        "Soldier",
+        "Heavy",
+        "Guardian"
+      ],
+      "days": 15,
+      "stars": 2,
+      "res": {
+        "credits": 80
+      },
+      "desc": "Break a pirate crew preying on Republic freighters. Their hold pays."
+    },
+    "pilgrimage": {
+      "n": "Kyber pilgrimage",
+      "want": [
+        "jedi"
+      ],
+      "days": 30,
+      "stars": 2,
+      "res": {
+        "kyber": 1
+      },
+      "desc": "A cave sings in the Force. A Jedi must go and listen."
+    },
+    "militia": {
+      "n": "Train a militia",
+      "want": [
+        "Soldier",
+        "Guardian"
+      ],
+      "days": 30,
+      "stars": 1,
+      "res": {
+        "favor": 3,
+        "recruits": 1
+      },
+      "desc": "Drill farmers into a militia. One of them may follow you home."
+    },
+    "shadow": {
+      "n": "Shadow an agent",
+      "want": [
+        "Scout",
+        "Sentinel"
+      ],
+      "days": 15,
+      "stars": 3,
+      "res": {
+        "intel": 3
+      },
+      "desc": "An Imperial agent is meeting a senator's aide. Watch, record, stay unseen."
+    },
+    "broker": {
+      "n": "Talk to a broker",
+      "want": [
+        "Consular"
+      ],
+      "days": 15,
+      "stars": 2,
+      "res": {
+        "credits": 90
+      },
+      "desc": "A Hutt broker owes the Republic. Collect, politely."
+    },
+    "ruins": {
+      "n": "Survey the ruins",
+      "want": [
+        "jedi",
+        "Scout"
+      ],
+      "days": 30,
+      "stars": 2,
+      "res": {
+        "intel": 2,
+        "kyber": 1
+      },
+      "desc": "Old Jedi ruins, half buried. Something in them still hums."
+    },
+    "pilots": {
+      "n": "Downed pilots",
+      "want": [
+        "Medic",
+        "Scout"
+      ],
+      "days": 15,
+      "stars": 2,
+      "res": {
+        "favor": 2,
+        "intel": 1
+      },
+      "desc": "A Republic flight went down behind the lines. Find them first."
+    },
+    "mines": {
+      "n": "Clear the lanes",
+      "want": [
+        "Heavy",
+        "Soldier"
+      ],
+      "days": 15,
+      "stars": 2,
+      "res": {
+        "credits": 60,
+        "favor": 2
+      },
+      "desc": "Sith mines choke a trade lane. Clear them, convoy by convoy."
+    },
+    "vault": {
+      "n": "Covert: paymaster vault",
+      "covert": 1,
+      "fee": 60,
+      "want": [
+        "Scout",
+        "Sentinel"
+      ],
+      "days": 30,
+      "stars": 2,
+      "res": {
+        "credits": 300
+      },
+      "desc": "A Sith paymaster banks on a neutral world. Pay the slicers, lift the vault."
+    },
+    "mole": {
+      "n": "Covert: plant a mole",
+      "covert": 1,
+      "fee": 50,
+      "want": [
+        "Consular",
+        "Scout"
+      ],
+      "days": 30,
+      "stars": 2,
+      "res": {
+        "intel": 5
+      },
+      "desc": "Buy a clerk inside Imperial Intelligence. Someone has to make the deal in person."
+    },
+    "kyberrun": {
+      "n": "Covert: kyber run",
+      "covert": 1,
+      "fee": 80,
+      "want": [
+        "jedi",
+        "Scout"
+      ],
+      "days": 30,
+      "stars": 3,
+      "res": {
+        "kyber": 2,
+        "intel": 1
+      },
+      "desc": "A Hutt hoard holds Ilum-grade crystals. Bribe the guards, walk them out."
+    },
+    "yard": {
+      "n": "Covert: cripple a shipyard",
+      "covert": 1,
+      "fee": 70,
+      "want": [
+        "Heavy",
+        "Medic"
+      ],
+      "days": 30,
+      "stars": 3,
+      "res": {
+        "favor": 6,
+        "intel": 2
+      },
+      "desc": "Sabotage a Sith yard so it looks like an accident. The Senate will notice the quiet."
+    }
+  },
+  "FIELD": {
+    "cr": 0.5,
+    "base": 45,
+    "perRank": 5,
+    "match": 10,
+    "matchMax": 2,
+    "three": 8,
+    "star": 12,
+    "min": 10,
+    "max": 92,
+    "xp": 15,
+    "expire": 30,
+    "perMonth": [
+      1,
+      2
+    ],
+    "team": [
+      2,
+      3
+    ],
+    "failStress": 15,
+    "failWound": 10,
+    "badRoll": 12,
+    "badWound": 20,
+    "log": 6,
+    "covert": {
+      "perMonth": 1,
+      "from": 2,
+      "capture": 25
+    }
+  },
+  "FIELD_PLANETS": {
+    "1": [
+      "Balmorra",
+      "Ord Mantell",
+      "Dantooine",
+      "Taris",
+      "Nar Shaddaa",
+      "Ossus",
+      "Alderaan",
+      "Hydian Way"
+    ],
+    "2": [
+      "Ruusan",
+      "Ord Mantell",
+      "Dantooine",
+      "Nar Shaddaa",
+      "Ossus",
+      "Hydian Way",
+      "Balmorra"
+    ]
+  },
+  "UNREST": {
+    "max": 5,
+    "ignore": 1,
+    "lose": 1,
+    "win": -1,
+    "opHit": 1,
+    "lapse": 1,
+    "fieldWin": -1,
+    "hostile": 3,
+    "aimAt3": 5,
+    "fieldAt3": -10,
+    "favorAt": 4,
+    "favor": -1
+  },
+  "UNREST_WORD": [
+    "Calm",
+    "Uneasy",
+    "Restless",
+    "Hostile",
+    "Burning",
+    "Fallen"
+  ],
+  "TWIN": {
+    "perEra": 2,
+    "unlock": {
+      "barracks": 2,
+      "era": 2
+    },
+    "minFit": 8,
+    "minB": 2,
+    "bMax": 4,
+    "bJedi": 2,
+    "fewer": 1,
+    "autoBase": 25,
+    "autoPerRank": 6,
+    "autoMax": 70,
+    "autoXp": 10,
+    "loseFavor": -3,
+    "loseStress": 15,
+    "loseWound": 10
+  },
+  "TEAMS": {
+    "base": 2,
+    "max": 4,
+    "barracks": [
+      2,
+      3
+    ],
+    "size": 4,
+    "min": 2,
+    "names": [
+      "Aurek",
+      "Besh",
+      "Cresh",
+      "Dorn"
+    ],
+    "log": 6
+  },
+  "TAUTO": {
+    "base": 47,
+    "perRank": 3,
+    "lead": 8,
+    "bond": 3,
+    "bondMax": 9,
+    "tired": 5,
+    "short": 6,
+    "min": 10,
+    "max": 85,
+    "diff": {
+      "story": 8,
+      "normal": 0,
+      "hard": -8,
+      "legend": -15
+    },
+    "scale": 1.5,
+    "risk": [
+      0,
+      6,
+      0,
+      -5,
+      -18
+    ],
+    "xp": 12,
+    "winWound": 25,
+    "loseFavor": -3,
+    "loseStress": 15,
+    "capture": 30,
+    "death": 7
+  },
+  "FATIGUE": {
+    "at": null,
+    "aim": -10
+  }
+}

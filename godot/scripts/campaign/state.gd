@@ -1,0 +1,479 @@
+extends RefCounted
+## Persistent strategy layer. Pass battle results to apply_mission_result(), then save().
+const Data = preload("res://scripts/campaign/data.gd")
+const Progression = preload("res://scripts/campaign/progression.gd")
+const Modules = preload("res://scripts/campaign/modules.gd")
+const Legacy = preload("res://scripts/campaign/legacy.gd")
+const SAVE_PATH = "user://campaign.json"
+var state: Dictionary = {}
+
+func _init(difficulty: String = "normal") -> void:
+	new_campaign(difficulty)
+
+func new_campaign(difficulty: String = "normal") -> void:
+	var core: Dictionary = Data.all("core")
+	var wings := {"medical": 1, "training": 0, "forge": 0, "armory": 0, "comms": 0, "archives": 0, "gardens": 0, "barracks": 1}
+	state = {"v": 2, "diff": difficulty, "era": 1, "month": 1, "day": 1, "elapsed_days": 0,
+		"step": 0, "res": core.START_RES.duplicate(true), "orderDark": 0, "wings": wings,
+		"build": "", "roster": [], "nid": 7, "research": {"done": [], "cur": "", "prog": 0.0},
+		"staff": {}, "teams": [], "field": {"list": [], "log": []}, "unrest": {},
+		"team_assignments": {},
+		"bonds": {}, "quests": {}, "legacy": {"retired": [], "generals": {}}, "flags": {},
+		"legends": [], "news": [], "pending_mission": {}, "chosen": -1}
+	var id := 1
+	for item in core.START_ROSTER:
+		var r: Dictionary = item.duplicate(true)
+		r.id = "u%d" % id; id += 1
+		r.rank = int(r.get("rank", 2)); r.xp = int(r.get("xp", 30))
+		r.dark = 0; r.picks = r.get("picks", []); r.pick = 0
+		r.wound = 0; r.status = "active"; r.kills = 0; r.missions = 0
+		r.stress = 0; r.scars = []; r.assign = ""; r.bonus = {}
+		var jedi := Progression.is_jedi(r)
+		r.gear = {"w": 0 if jedi else 1, "armor": "robes" if jedi else "light",
+			"mods": [], "amods": [], "smods": [], "saber": 1 if jedi else 0,
+			"trait": "", "util": "none", "form": "shiiCho", "mk": {"w": 1, "a": 1, "s": 1}}
+		r.pick = Progression.pending_rank(r)
+		state.roster.append(r)
+	ensure_teams()
+	refresh_options()
+
+func save(path: String = SAVE_PATH) -> bool:
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null: return false
+	file.store_string(JSON.stringify({"v": 2, "C": state, "at": Time.get_unix_time_from_system()}))
+	return true
+
+func load_save(path: String = SAVE_PATH) -> bool:
+	if not FileAccess.file_exists(path): return false
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not parsed is Dictionary or int(parsed.get("v", 0)) != 2 or not parsed.get("C") is Dictionary: return false
+	state = parsed.C
+	_migrate()
+	return true
+
+func _migrate() -> void:
+	for key in ["staff", "teams", "unrest", "bonds", "quests", "flags", "legends", "news"]:
+		if not state.has(key): state[key] = [] if key in ["teams", "legends", "news"] else {}
+	if not state.has("field"): state.field = {"list": [], "log": []}
+	if not state.has("research"): state.research = {"done": [], "cur": "", "prog": 0.0}
+	Modules.ensure(self)
+	if not state.has("pending_mission"): state.pending_mission = {}
+	if not state.has("team_assignments"): state.team_assignments = {}
+	if not state.has("elapsed_days"): state.elapsed_days = (int(state.month) - 1) * 30 + int(state.day) - 1
+	for r in state.roster:
+		for key in ["picks", "scars"]:
+			if not r.has(key): r[key] = []
+		if not r.has("gear"): r.gear = {"w": 0, "armor": "none", "mods": [], "saber": 0, "util": "none", "form": "shiiCho", "mk": {"w": 1, "a": 1, "s": 1}}
+		for key in ["mods", "amods", "smods"]:
+			if not r.gear.has(key): r.gear[key] = []
+		if not r.gear.has("mk"): r.gear.mk = {}
+		if not r.has("assign"): r.assign = ""
+		if not r.has("stress"): r.stress = 0
+	ensure_teams()
+	refresh_options()
+
+func soldier(id: String) -> Dictionary:
+	for r in state.roster:
+		if str(r.id) == id: return r
+	return {}
+
+func week() -> int:
+	return int(state.elapsed_days) / 7 + 1
+
+func gain(key: String, amount: int) -> void:
+	if key == "orderDark": state.orderDark = clampi(int(state.orderDark) + amount, 0, 100)
+	else:
+		state.res[key] = int(state.res.get(key, 0)) + amount
+		if key == "favor": state.res.favor = clampi(int(state.res.favor), 0, 100)
+		if key == "kyber": state.res.kyber = maxi(0, int(state.res.kyber))
+
+func can_afford(cost: Dictionary) -> bool:
+	for key in cost:
+		if int(state.res.get(key, 0)) < int(cost[key]): return false
+	return true
+
+func spend(cost: Dictionary) -> bool:
+	if not can_afford(cost): return false
+	for key in cost: gain(str(key), -int(cost[key]))
+	return true
+
+func build_wing(key: String) -> bool:
+	var wing: Dictionary = Data.get_table("core", "WINGS").get(key, {})
+	if wing.is_empty() or str(state.build) != "": return false
+	var level := int(state.wings.get(key, 0)) + 1
+	if level >= wing.cost.size(): return false
+	if wing.has("req") and level < wing.req.size() and not researched(str(wing.req[level])): return false
+	var cost := int(wing.cost[level])
+	if not spend({"credits": cost}): return false
+	state.build = key
+	return true
+
+func researched(id: String) -> bool:
+	return id in ["", "0", "0.0"] or state.research.done.has(id)
+
+func start_research(id: String) -> bool:
+	var project: Dictionary = Data.get_table("research", "RESEARCH").get(id, {})
+	if project.is_empty() or int(state.wings.archives) < 1 or str(state.research.cur) != "": return false
+	if researched(id) or int(project.get("era", 1)) > int(state.era): return false
+	for need in project.get("need", []):
+		if not researched(str(need)): return false
+	if not spend(project.get("cost", {})): return false
+	state.research.cur = id; state.research.prog = 0.0
+	return true
+
+func assign(id: String, job: String) -> bool:
+	var r := soldier(id)
+	if r.is_empty() or str(r.status) != "active": return false
+	if str(r.get("assign", "")).begins_with("staff:"):
+		state.staff.erase(str(r.assign).trim_prefix("staff:"))
+	if job.begins_with("staff:"):
+		var wing := job.trim_prefix("staff:")
+		if int(state.wings.get(wing, 0)) < 1 or state.staff.has(wing): return false
+		state.staff[wing] = id
+	elif job == "train" and int(state.wings.training) < 1: return false
+	elif job == "rest" and int(state.wings.medical) < 1: return false
+	elif job == "calm" and int(state.wings.gardens) < 1: return false
+	r.assign = job
+	return true
+
+func heal_multiplier() -> float:
+	var level := int(state.wings.medical)
+	return (2.5 if level >= 3 else 2.0 if level >= 2 else 1.5 if level >= 1 else 1.0) * (1.25 if state.staff.has("medical") else 1.0)
+
+func advance_days(days: int) -> void:
+	if days <= 0: return
+	state.elapsed_days = int(state.elapsed_days) + days
+	state.day = int(state.day) + days
+	while int(state.day) > 30:
+		state.day = int(state.day) - 30; state.month = int(state.month) + 1
+		_month_tick()
+	for r in state.roster:
+		if int(r.get("wound", 0)) > 0:
+			r.wound = maxi(0, int(r.wound) - days * (2 if str(r.get("assign", "")) == "rest" else 1))
+		if str(r.get("assign", "")) == "rest" and int(r.wound) == 0: r.assign = ""
+		if str(r.get("assign", "")) == "train":
+			r.xp = int(r.xp) + int(Data.get_table("core", "TRAIN_XP")) * (2 if int(state.wings.training) >= 2 else 1)
+			Progression.promote(r)
+		if str(r.get("status", "")) == "captured":
+			r.capT = int(r.get("capT", 1)) - 1
+			if int(r.capT) <= 0:
+				r.status = "active"; r.wound = ceili(float(Data.get_table("core", "WOUND").serious) / heal_multiplier())
+				r.stress = mini(100, int(r.stress) + 25)
+		if str(r.get("status", "")) == "active" and int(r.get("stress", 0)) > 0:
+			r.stress = maxi(0, int(r.stress) - int(Data.get_table("temple", "STRESS").bench))
+	_tick_research(days)
+	_tick_field(days)
+
+func advance_mission() -> void:
+	advance_days(int(Data.get_table("core", "DAYS")))
+	Modules.advance_mission(self)
+	if str(state.build) != "":
+		var wing := str(state.build)
+		state.wings[wing] = int(state.wings.get(wing, 0)) + 1
+		state.news.append("%s level %d is ready." % [Data.get_table("core", "WINGS")[wing].n, state.wings[wing]])
+		state.build = ""
+	ensure_teams()
+
+func _tick_research(days: int) -> void:
+	var id := str(state.research.cur)
+	if id == "" or int(state.wings.archives) < 1: return
+	var speed := (1.5 if int(state.wings.archives) >= 2 else 1.0) * (1.25 if state.staff.has("archives") else 1.0)
+	state.research.prog = float(state.research.prog) + days * speed
+	var project: Dictionary = Data.get_table("research", "RESEARCH")[id]
+	if float(state.research.prog) >= float(project.days):
+		state.research.done.append(id)
+		state.news.append("Research complete: %s." % project.n)
+		if id == "kyberLore": gain("kyber", 1)
+		if project.has("dark"): gain("orderDark", int(project.dark))
+		state.research.cur = ""; state.research.prog = 0.0
+
+func _month_tick() -> void:
+	var core: Dictionary = Data.all("core")
+	var income := float(Data.get_table("missions", "DIFF").get(str(state.diff), {}).get("income", 1.0))
+	var stipend := roundi((float(core.STIPEND[0]) + float(core.STIPEND[1]) * int(state.res.favor)) * income)
+	var upkeep := 0
+	for key in state.wings:
+		var up: Array = core.WINGS[key].up
+		upkeep += int(up[mini(int(state.wings[key]), up.size() - 1)])
+	var troop_count := 0
+	for r in state.roster:
+		if str(r.status) == "active" and not Progression.is_jedi(r): troop_count += 1
+	gain("credits", stipend - upkeep - troop_count * int(core.TROOP_PAY))
+	if int(state.res.credits) < 0:
+		state.res.credits = 0; gain("favor", -5)
+	gain("recruits", 1 + int(state.res.favor) / 40)
+	if state.staff.has("comms"): gain("intel", 1)
+	if state.staff.has("barracks"): gain("recruits", 1)
+	for r in state.roster:
+		if str(r.get("assign", "")) == "calm" and Progression.is_jedi(r):
+			r.dark = maxi(0, int(r.dark) - int([0, 1, 2][mini(int(state.wings.gardens), 2)]))
+	if state.staff.has("gardens"): gain("orderDark", -1)
+	state.news.append("Month %d: stipend +%d, upkeep -%d." % [state.month, stipend, upkeep])
+
+func apply_mission_result(result: Dictionary) -> Dictionary:
+	## Contract: {mission_id, win, units:[{id,status,hp,max_hp,downed,hurt,kills,captures,dark}],
+	## rewards:{credits,intel,...}, intel, loot_credits, order_dark, story}. One call per finished mission.
+	var id := str(result.get("mission_id", state.pending_mission.get("mission_id", "")))
+	var mission: Dictionary = Data.get_table("missions", "MISSIONS").get(id, {})
+	var win := bool(result.get("win", false))
+	var deployed: Array = result.get("units", [])
+	var summary := {"rows": [], "promotions": [], "rewards": {}}
+	if win:
+		var rewards: Dictionary = result.get("rewards", mission.get("reward", {}))
+		var income := float(Data.get_table("missions", "DIFF").get(str(state.diff), {}).get("income", 1.0))
+		for key in rewards:
+			var value := int(rewards[key])
+			if key == "credits": value = roundi(value * income * float(Data.get_table("core", "MISSION_CR")))
+			gain(str(key), value); summary.rewards[key] = value
+	else: gain("favor", -3)
+	gain("intel", int(result.get("intel", 0)))
+	gain("credits", int(result.get("loot_credits", 0)))
+	gain("orderDark", 4 * int(result.get("order_dark", 0)))
+	var xp_data: Dictionary = Data.get_table("core", "XP")
+	var wound_data: Dictionary = Data.get_table("core", "WOUND")
+	for unit_result in deployed:
+		var r := soldier(str(unit_result.get("id", unit_result.get("rid", ""))))
+		if r.is_empty(): continue
+		var fate := str(unit_result.get("status", "active"))
+		var kills := int(unit_result.get("kills", 0))
+		var xp := 0
+		if fate == "dead":
+			r.status = "dead"; r.assign = ""
+			state.legends.append({"n": r.n, "cls": r.cls, "how": "Fell in battle", "where": mission.get("n", id)})
+		elif fate == "captured" or (fate == "down" and not win):
+			r.status = "captured"; r.capT = int(Data.get_table("core", "CAPTIVE")); r.assign = ""
+		else:
+			r.status = "active"
+			xp = int(xp_data.survive) + kills * int(xp_data.kill) + int(unit_result.get("captures", 0)) * int(xp_data.capture)
+			if win and bool(result.get("story", false)): xp += int(xp_data.story)
+			var mult := (1.2 if int(state.wings.training) >= 2 else 1.1 if int(state.wings.training) >= 1 else 1.0)
+			if state.staff.has("training"): mult *= 1.1
+			if researched("holocron"): mult *= 1.1
+			xp = roundi(xp * mult)
+			var wound := 0
+			if bool(unit_result.get("downed", false)): wound = int(wound_data.graveL2 if int(state.wings.medical) >= 2 else wound_data.grave)
+			elif int(unit_result.get("hp", unit_result.get("max_hp", 1))) * 2 <= int(unit_result.get("max_hp", 1)): wound = int(wound_data.serious)
+			elif bool(unit_result.get("hurt", false)): wound = int(wound_data.light)
+			r.wound = ceili(float(wound) / heal_multiplier())
+		if unit_result.has("dark"): r.dark = int(unit_result.dark)
+		if kills > 0: Legacy.add_deed(self, str(r.id), "kills", kills)
+		r.kills = int(r.kills) + kills; r.missions = int(r.missions) + 1; r.xp = int(r.xp) + xp
+		if str(r.status) == "active" and Progression.promote(r): summary.promotions.append(r.id)
+		summary.rows.append({"id": r.id, "xp": xp, "status": r.status, "wound": r.wound, "rank": r.rank})
+	for i in range(deployed.size()):
+		for j in range(i + 1, deployed.size()):
+			var a := soldier(str(deployed[i].get("id", deployed[i].get("rid", ""))))
+			var b := soldier(str(deployed[j].get("id", deployed[j].get("rid", ""))))
+			if not a.is_empty() and not b.is_empty() and str(a.status) == "active" and str(b.status) == "active":
+				Legacy.bond_points(self, str(a.id), str(b.id), int(Data.get_table("temple", "BOND").together) + (int(Data.get_table("temple", "BOND").win) if win else 0))
+	change_unrest(region_for_mission(id), int(Data.get_table("galaxy", "UNREST").win if win else Data.get_table("galaxy", "UNREST").lose))
+	if win and not state.pending_mission.is_empty() and state.pending_mission.has("hostages"):
+		for captive_id in state.pending_mission.hostages:
+			var captive := soldier(str(captive_id))
+			if not captive.is_empty() and str(captive.status) == "captured":
+				captive.status = "active"; captive.capT = 0
+				captive.wound = ceili(float(wound_data.serious) / heal_multiplier())
+	advance_mission()
+	var selected: Dictionary = state.pending_mission
+	if not selected.is_empty() and bool(selected.get("adv", false)): state.step = int(state.step) + 1
+	state.pending_mission = {}; state.chosen = -1
+	refresh_options()
+	return summary
+
+func refresh_options() -> Array:
+	var plan: Array = Data.get_table("core", "PLAN")
+	var step := int(state.step)
+	var options := []
+	if step < plan.size():
+		var part: Dictionary = plan[step]
+		if part.has("story"):
+			options.append({"mission": str(part.story), "story": true, "adv": true, "kind": "Story"})
+		for crisis_id in part.get("crises", []):
+			var crisis: Dictionary = Data.get_table("core", "CRISES").get(str(crisis_id), {}).duplicate(true)
+			crisis.crisis = str(crisis_id); crisis.adv = true
+			options.append(crisis)
+		var captives := []
+		for r in state.roster:
+			if str(r.status) == "captured": captives.append(r.id)
+		if not captives.is_empty():
+			var rescue := false
+			for option in options:
+				if str(option.get("mission", "")) == "rescue":
+					option.hostages = captives; rescue = true
+			if not rescue:
+				options.append({"mission": "rescue", "crisis": "rescue", "kind": "Rescue", "hostages": captives, "adv": false})
+		for r in state.roster:
+			if options.size() >= 6: break
+			if str(r.status) == "active" and Progression.is_jedi(r) and int(r.get("dark", 0)) >= 6 and not state.get("redeem", {}).has(str(r.id)):
+				options.append({"mission": "shrine", "kind": "Redemption", "redeem": r.id, "adv": false, "n": "The way back · %s" % r.n})
+	state.options = options
+	return options
+
+func select_mission(index: int, squad: Array = []) -> Dictionary:
+	if index < 0 or index >= state.options.size() or not state.pending_mission.is_empty(): return {}
+	var option: Dictionary = state.options[index]
+	var selected := squad.duplicate()
+	if selected.is_empty(): selected = default_squad(option)
+	if selected.is_empty(): return {}
+	for id in selected:
+		var r := soldier(str(id))
+		if r.is_empty() or str(r.status) != "active" or int(r.wound) > 0 or str(r.assign) != "": return {}
+	if bool(option.get("adv", false)):
+		for other in state.options:
+			if other != option and bool(other.get("adv", false)):
+				var assigned := str(state.team_assignments.get(str(other.get("crisis", "")), ""))
+				if assigned == "" or not _resolve_team(other, assigned, selected):
+					for key in other.get("ignore", {}): gain(str(key), int(other.ignore[key]))
+					change_unrest(region_for_mission(str(other.mission)), int(Data.get_table("galaxy", "UNREST").ignore))
+		state.team_assignments.clear()
+	state.chosen = index
+	state.pending_mission = option.duplicate(true)
+	state.pending_mission.mission_id = str(option.mission)
+	state.pending_mission.squad = selected
+	return state.pending_mission
+
+func default_squad(option: Dictionary = {}) -> Array:
+	var jedi := []; var troops := []
+	for r in state.roster:
+		if str(r.status) != "active" or int(r.wound) > 0 or str(r.assign) != "" or option.get("hostages", []).has(r.id): continue
+		if Progression.is_jedi(r): jedi.append(r.id)
+		else: troops.append(r.id)
+	var out := []
+	for id in jedi.slice(0, 3): out.append(id)
+	for id in troops:
+		if out.size() >= 6: break
+		out.append(id)
+	return out
+
+func region_for_mission(id: String) -> String:
+	var mission: Dictionary = Data.get_table("missions", "MISSIONS").get(id, {})
+	var where := str(mission.get("where", ""))
+	var planet := where.split("·")[-1].strip_edges()
+	return str(Data.get_table("galaxy", "PLANETS").get(planet, {}).get("reg", ""))
+
+func change_unrest(region: String, delta: int) -> void:
+	if region == "": return
+	state.unrest[region] = clampi(int(state.unrest.get(region, 0)) + delta, 0, int(Data.get_table("galaxy", "UNREST").max))
+
+func ensure_teams() -> void:
+	var rules: Dictionary = Data.get_table("galaxy", "TEAMS")
+	var cap := int(rules.base)
+	for level in rules.barracks:
+		if int(state.wings.barracks) >= int(level): cap += 1
+	cap = mini(cap, int(rules.max))
+	while state.teams.size() < cap:
+		var index: int = state.teams.size()
+		state.teams.append({"id": "t%d" % (index + 1), "n": "%s Team" % rules.names[index], "lead": "", "mem": []})
+	var free_jedi := []; var free_troops := []
+	for r in state.roster:
+		if str(r.status) != "active": continue
+		var assigned := false
+		for team in state.teams:
+			if str(team.lead) == str(r.id) or team.mem.has(r.id): assigned = true
+		if not assigned:
+			if Progression.is_jedi(r): free_jedi.append(r.id)
+			else: free_troops.append(r.id)
+	for team in state.teams:
+		if str(team.lead) == "" and not free_jedi.is_empty(): team.lead = free_jedi.pop_front()
+	for team in state.teams:
+		while team.mem.size() < int(rules.size) - 1 and not free_troops.is_empty(): team.mem.append(free_troops.pop_front())
+
+func team_capacity() -> int:
+	ensure_teams()
+	return state.teams.size()
+
+func assign_team_to_crisis(crisis: String, team_id: String) -> bool:
+	var found := false
+	for option in state.options:
+		if str(option.get("crisis", "")) == crisis and bool(option.get("adv", false)): found = true
+	if not found: return false
+	for team in state.teams:
+		if str(team.id) == team_id:
+			for other in state.team_assignments.keys():
+				if str(state.team_assignments[other]) == team_id: state.team_assignments.erase(other)
+			state.team_assignments[crisis] = team_id
+			return true
+	return false
+
+func _resolve_team(option: Dictionary, team_id: String, player_squad: Array) -> bool:
+	var team: Dictionary = {}
+	for candidate in state.teams:
+		if str(candidate.id) == team_id: team = candidate
+	if team.is_empty(): return false
+	var members := []
+	for id in [team.lead] + team.mem:
+		var r := soldier(str(id))
+		if not r.is_empty() and str(r.status) == "active" and int(r.wound) == 0 and str(r.assign) == "" and not player_squad.has(r.id): members.append(r)
+	var rules: Dictionary = Data.get_table("galaxy", "TEAMS")
+	if members.size() < int(rules.min): return false
+	var auto: Dictionary = Data.get_table("galaxy", "TAUTO")
+	var odds := int(auto.base) + int(auto.lead) + int(auto.diff.get(str(state.diff), 0))
+	for r in members: odds += int(auto.perRank) * int(r.rank)
+	odds -= int(auto.short) * (int(rules.size) - members.size())
+	odds = clampi(odds, int(auto.min), int(auto.max))
+	var win := randi_range(0, 99) < odds
+	if win:
+		var mission: Dictionary = Data.get_table("missions", "MISSIONS").get(str(option.mission), {})
+		for key in mission.get("reward", {}):
+			var amount := int(mission.reward[key])
+			if key == "credits": amount = roundi(amount * float(Data.get_table("core", "MISSION_CR")) * float(Data.get_table("missions", "DIFF")[str(state.diff)].income))
+			gain(str(key), amount)
+		for r in members:
+			r.xp = int(r.xp) + int(auto.xp); r.missions = int(r.missions) + 1
+			Progression.promote(r)
+		change_unrest(region_for_mission(str(option.mission)), int(Data.get_table("galaxy", "UNREST").win))
+	else:
+		gain("favor", int(auto.loseFavor))
+		for r in members: r.stress = mini(100, int(r.stress) + int(auto.loseStress))
+		members[0].wound = ceili(float(Data.get_table("core", "WOUND").serious) / heal_multiplier())
+		change_unrest(region_for_mission(str(option.mission)), int(Data.get_table("galaxy", "UNREST").lose))
+	state.news.append("%s %s %s (auto, %d%%)." % [team.n, "won" if win else "lost", option.get("n", option.mission), odds])
+	return true
+
+func field_odds(op_id: String, team: Array) -> int:
+	var definition: Dictionary = Data.get_table("galaxy", "FIELD_OPS").get(op_id, {})
+	if definition.is_empty() or team.size() < 2 or team.size() > 3: return 0
+	var rules: Dictionary = Data.get_table("galaxy", "FIELD")
+	var total := int(rules.base) - int(rules.star) * (int(definition.stars) - 1)
+	var matches := 0
+	for id in team:
+		var r := soldier(str(id))
+		if r.is_empty() or str(r.status) != "active" or int(r.wound) > 0 or str(r.assign) != "": return 0
+		total += int(rules.perRank) * int(r.rank)
+		if definition.want.has(r.cls) or (definition.want.has("jedi") and Progression.is_jedi(r)): matches += 1
+	total += int(rules.match) * mini(matches, int(rules.matchMax))
+	if team.size() == 3: total += int(rules.three)
+	return clampi(total, int(rules.min), int(rules.max))
+
+func send_field_op(op_id: String, team: Array) -> bool:
+	var definition: Dictionary = Data.get_table("galaxy", "FIELD_OPS").get(op_id, {})
+	var odds := field_odds(op_id, team)
+	if definition.is_empty() or odds == 0: return false
+	if not spend({"credits": int(definition.get("fee", 0))}): return false
+	var op := {"id": "f%d" % (state.field.list.size() + 1), "k": op_id, "st": "team", "team": team.duplicate(), "left": int(definition.days), "ch": odds}
+	for id in team: soldier(str(id)).assign = "field:%s" % op.id
+	state.field.list.append(op)
+	return true
+
+func _tick_field(days: int) -> void:
+	var rules: Dictionary = Data.get_table("galaxy", "FIELD")
+	for op in state.field.list:
+		if str(op.st) != "team": continue
+		op.left = int(op.left) - days
+		if int(op.left) > 0: continue
+		var won := randi_range(0, 99) < int(op.ch)
+		var definition: Dictionary = Data.get_table("galaxy", "FIELD_OPS")[str(op.k)]
+		for id in op.team:
+			var r := soldier(str(id)); r.assign = ""
+			if won:
+				r.xp = int(r.xp) + int(rules.xp); Progression.promote(r)
+			else:
+				r.stress = mini(100, int(r.stress) + int(rules.failStress))
+		if won:
+			for key in definition.res:
+				var reward := int(definition.res[key])
+				if key == "credits": reward = roundi(reward * float(rules.cr) * float(Data.get_table("missions", "DIFF").get(str(state.diff), {}).get("income", 1.0)))
+				gain(str(key), reward)
+		op.st = "won" if won else "lost"
+		state.field.log.push_front({"k": op.k, "win": won, "month": state.month})
+		if state.field.log.size() > int(rules.log): state.field.log.resize(int(rules.log))

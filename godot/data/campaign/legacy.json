@@ -1,0 +1,705 @@
+{
+  "DRILLS": {
+    "range": {
+      "n": "Range drills",
+      "desc": "+3 aim.",
+      "mod": {
+        "aim": 3
+      },
+      "min": 1
+    },
+    "fitness": {
+      "n": "Fitness work",
+      "desc": "+1 HP.",
+      "mod": {
+        "hp": 1
+      },
+      "min": 1
+    },
+    "trust": {
+      "n": "Trust exercises",
+      "desc": "+5 will (harder to panic).",
+      "mod": {
+        "will": 5
+      },
+      "min": 1
+    },
+    "talk": {
+      "n": "Conflict resolution",
+      "desc": "No stat. Moves the pair halfway to the next bond level.",
+      "pts": 0.5,
+      "min": 1
+    },
+    "timing": {
+      "n": "Timing exercises",
+      "desc": "+5 crit chance.",
+      "mod": {
+        "crit": 5
+      },
+      "min": 3
+    },
+    "hard": {
+      "n": "Hard-hitting drills",
+      "desc": "+1 max damage.",
+      "mod": {
+        "dmgHi": 1
+      },
+      "min": 3
+    },
+    "medic": {
+      "n": "Field medicine",
+      "desc": "+1 medkit (units that carry kits).",
+      "mod": {
+        "kits": 1
+      },
+      "min": 3
+    },
+    "cover": {
+      "n": "Cover drills",
+      "desc": "+5 will and +1 HP.",
+      "mod": {
+        "will": 5,
+        "hp": 1
+      },
+      "min": 5
+    },
+    "footwork": {
+      "n": "Footwork",
+      "desc": "+1 move.",
+      "mod": {
+        "mob": 1
+      },
+      "min": 5
+    }
+  },
+  "BOND_MAX_PERK": {
+    "n": "Unbreakable",
+    "desc": "+10 aim (instead of +5) near the partner, and +10 will.",
+    "will": 10
+  },
+  "LEGACY": {
+    "retireRank": 4,
+    "councilRank": 3,
+    "revealRank": 4,
+    "genField": 15,
+    "genCap": 2,
+    "slots": {
+      "boss": 3,
+      "story": 1,
+      "any": 1
+    },
+    "loyCost": 10,
+    "masterRank": 6,
+    "rest": 1,
+    "fallLoy": -5
+  },
+  "BACKSTORY": {
+    "Temple-raised": [
+      "{n} came to the Temple before they could walk. The Archives were their playground.",
+      "{n} was raised by the crèche masters and never knew another home. They are calm in a way that unsettles people.",
+      "{n} grew up in the Temple’s lower halls, fixing droids for the Guard. They still talk to machines."
+    ],
+    "Late found": [
+      "{n} was found at nine, picking pockets in a spaceport. The Council argued for a week before taking them.",
+      "{n} lived on a farm until a Jedi noticed the crops never failed. They miss the rain.",
+      "{n} was found late, after a fire nobody else walked out of. They don’t talk about it."
+    ],
+    "Republic Army": [
+      "{n} enlisted at seventeen to get off a mining world. Three tours later, they asked for Temple duty.",
+      "{n} comes from an army family. Their mother still writes, asking when they’ll come home.",
+      "{n} served on the Outer Rim pickets. They know what Sith raiders leave behind."
+    ],
+    "Temple Guard": [
+      "{n} stood guard at the Temple doors for six years without seeing a fight. They volunteered for the field.",
+      "{n} is the first of their clan to wear the Guard’s mask. They take it off for no one.",
+      "{n} trained with the Guard but was never chosen for the inner halls. They mean to earn it."
+    ],
+    "Hired": [
+      "{n} was a mercenary until a Jedi paid them in mercy instead of credits. They stayed.",
+      "{n} signed on for the pay. Nobody has asked them to leave, and they haven’t asked to.",
+      "{n} drifted in from the Hutt worlds with a good rifle and no references."
+    ]
+  },
+  "SECRETS": {
+    "brother": {
+      "who": "troop",
+      "quest": "family",
+      "n": "The brother",
+      "hints": [
+        "{n} sends half their pay to a Mid Rim address every month.",
+        "{n} keeps a holo of two kids, face down, in their footlocker.",
+        "{n} told {p}: “My brother picked the wrong side.”"
+      ],
+      "reveal": "{n}’s brother rides with Sith raiders. {n} wants him back, alive.",
+      "ask": "{n}’s brother was seen with a raider crew. {n} asks to go, and asks you not to shoot him."
+    },
+    "debt": {
+      "who": "troop",
+      "quest": "debt",
+      "n": "The debt",
+      "hints": [
+        "A Hutt courier asked for {n} by name at the Temple gate.",
+        "{n} flinches at the sound of Huttese.",
+        "{n} admitted to {p} that they owe more than they’ll ever earn."
+      ],
+      "reveal": "{n} owes a Hutt broker a fortune from their merc days. The broker has started collecting.",
+      "ask": "The broker holds a hostage against {n}’s debt. Free the hostage and the debt dies with the deal."
+    },
+    "deserter": {
+      "who": "troop",
+      "quest": "home",
+      "n": "The desertion",
+      "hints": [
+        "{n} won’t talk about their first unit.",
+        "{n} wakes up shouting a village name.",
+        "{n} told {p}: “I ran once. Never again.”"
+      ],
+      "reveal": "{n} deserted a picket under fire years ago. The village it guarded burned.",
+      "ask": "Raiders are back at the village {n} once abandoned. {n} wants to hold the line this time."
+    },
+    "song": {
+      "who": "jedi",
+      "quest": "crystal",
+      "n": "The song",
+      "hints": [
+        "{n} hums a tune nobody taught them.",
+        "{n} stops mid-step sometimes, listening.",
+        "{n} told {p} a crystal has been singing to them since childhood."
+      ],
+      "reveal": "A kyber crystal has called to {n} all their life. Now they know where it is.",
+      "ask": "{n} finally knows where the singing crystal lies, and so do the Sith."
+    },
+    "voice": {
+      "who": "jedi",
+      "quest": "whisper",
+      "n": "The voice",
+      "hints": [
+        "{n} meditates alone, at night, more than anyone.",
+        "{n}’s eyes went yellow for a heartbeat. Maybe a trick of the light.",
+        "{n} told {p} about a voice that promises them strength."
+      ],
+      "reveal": "A dark voice has whispered to {n} since an old shrine visit. It is getting louder.",
+      "ask": "{n} wants to face the voice at its source: the old shrine."
+    },
+    "master": {
+      "who": "jedi",
+      "quest": "master",
+      "n": "The first master",
+      "hints": [
+        "{n} keeps a broken saber hilt that isn’t theirs.",
+        "{n} asks the Archives about one mission, over and over.",
+        "{n} told {p}: “My first master didn’t die the way the records say.”"
+      ],
+      "reveal": "{n}’s first master was betrayed, and their relics were sold to raiders.",
+      "ask": "Raiders are selling {n}’s first master’s relics. {n} wants them back."
+    },
+    "bloodline": {
+      "who": "jedi",
+      "quest": "whisper",
+      "n": "The bloodline",
+      "hints": [
+        "{n} reads Old Sith script without trying.",
+        "{n} avoids the Archive wing on the Sith wars.",
+        "{n} told {p} their grandmother was a Sith Lord."
+      ],
+      "reveal": "{n} descends from a Sith family. They fear what that means.",
+      "ask": "A Sith shrine of {n}’s bloodline is waking. {n} must face it, or be claimed by it."
+    },
+    "survivor": {
+      "who": "any",
+      "quest": "home",
+      "n": "The survivor",
+      "hints": [
+        "{n} counts the exits in every room.",
+        "{n} keeps a list of names. It is long.",
+        "{n} told {p} they were the only one who walked out of their village."
+      ],
+      "reveal": "{n} is the only survivor of a Sith raid on their home. They saw who led it.",
+      "ask": "The raiders who burned {n}’s home are back in the same valley."
+    },
+    "oath": {
+      "who": "any",
+      "quest": "home",
+      "n": "The oath",
+      "hints": [
+        "{n} sends a message home every month. It always says the same thing.",
+        "{n} keeps a farmer’s token on their belt.",
+        "{n} told {p} about a promise to a dying man."
+      ],
+      "reveal": "{n} swore to protect a dying farmer’s village. They joined to keep that oath.",
+      "ask": "The village {n} swore to protect is under attack. An oath is an oath."
+    }
+  },
+  "HINT_TRIGGERS": {
+    "m3": "3 missions served",
+    "r3": "reached rank 3",
+    "down": "survived being downed",
+    "bond": "bond level 4 with someone",
+    "field": "came back from a field op"
+  },
+  "VOICES": {
+    "veteran": {
+      "n": "Veteran",
+      "who": "troop",
+      "select": [
+        "Seen worse. Where to?",
+        "On it."
+      ],
+      "kill": [
+        "Stay down, son.",
+        "That’s how it’s done."
+      ],
+      "crit": [
+        "Thirty years of practice."
+      ],
+      "hit": [
+        "Just a scratch. Keep moving."
+      ],
+      "down": [
+        "Leave me. Finish it."
+      ],
+      "allyDown": [
+        "Get them out of the open!",
+        "Cover them, now!"
+      ],
+      "panic": [
+        "Not again. Not again."
+      ]
+    },
+    "joker": {
+      "n": "Joker",
+      "who": "troop",
+      "select": [
+        "Somebody call me?",
+        "Your favorite trooper, reporting."
+      ],
+      "kill": [
+        "And stay out!",
+        "Ha! Didn’t see that coming."
+      ],
+      "crit": [
+        "Tell me you saw that."
+      ],
+      "hit": [
+        "Ow. Rude."
+      ],
+      "down": [
+        "Okay… not funny anymore…"
+      ],
+      "allyDown": [
+        "Hey! Hey, stay with me!"
+      ],
+      "panic": [
+        "Nope. Nope. Nope."
+      ]
+    },
+    "rookie": {
+      "n": "Rookie",
+      "who": "troop",
+      "select": [
+        "Y-yes, sir!",
+        "Ready. I think."
+      ],
+      "kill": [
+        "I got one! I got one!",
+        "Did… did I do that?"
+      ],
+      "crit": [
+        "Just like the sims!"
+      ],
+      "hit": [
+        "They shot me! They actually shot me!"
+      ],
+      "down": [
+        "Tell my mom…"
+      ],
+      "allyDown": [
+        "Oh no. Oh no, they’re down!"
+      ],
+      "panic": [
+        "I can’t do this!"
+      ]
+    },
+    "stoic": {
+      "n": "Stoic",
+      "who": "troop",
+      "select": [
+        "Ready.",
+        "Moving."
+      ],
+      "kill": [
+        "Down.",
+        "One."
+      ],
+      "crit": [
+        "Clean."
+      ],
+      "hit": [
+        "Hit. Still in it."
+      ],
+      "down": [
+        "…"
+      ],
+      "allyDown": [
+        "Man down. Holding."
+      ],
+      "panic": [
+        "Too much. Too much."
+      ]
+    },
+    "hothead": {
+      "n": "Hothead",
+      "who": "troop",
+      "select": [
+        "Point me at them!",
+        "Finally!"
+      ],
+      "kill": [
+        "Who’s next?!",
+        "Come on, then!"
+      ],
+      "crit": [
+        "Feel that?!"
+      ],
+      "hit": [
+        "You’re gonna pay for that!"
+      ],
+      "down": [
+        "Lucky… shot…"
+      ],
+      "allyDown": [
+        "They’ll burn for that!"
+      ],
+      "panic": [
+        "Get them off me!"
+      ]
+    },
+    "believer": {
+      "n": "Believer",
+      "who": "troop",
+      "select": [
+        "For the Republic.",
+        "The Jedi lead, I follow."
+      ],
+      "kill": [
+        "Light take you.",
+        "For the Temple."
+      ],
+      "crit": [
+        "The Force was with that one."
+      ],
+      "hit": [
+        "The Force… protects. Mostly."
+      ],
+      "down": [
+        "I’m not afraid…"
+      ],
+      "allyDown": [
+        "Hold on! Help is coming!"
+      ],
+      "panic": [
+        "Where are the Jedi?!"
+      ]
+    },
+    "cynic": {
+      "n": "Cynic",
+      "who": "troop",
+      "select": [
+        "What now.",
+        "Great. Another plan."
+      ],
+      "kill": [
+        "There. Happy?",
+        "One less."
+      ],
+      "crit": [
+        "Even a broken clock."
+      ],
+      "hit": [
+        "Of course."
+      ],
+      "down": [
+        "Figures…"
+      ],
+      "allyDown": [
+        "Told you this was a bad idea. Medic!"
+      ],
+      "panic": [
+        "We’re all dead anyway!"
+      ]
+    },
+    "pro": {
+      "n": "Professional",
+      "who": "troop",
+      "select": [
+        "Awaiting orders.",
+        "Copy."
+      ],
+      "kill": [
+        "Target neutralized.",
+        "Confirmed kill."
+      ],
+      "crit": [
+        "Center mass."
+      ],
+      "hit": [
+        "Taking fire. Operational."
+      ],
+      "down": [
+        "Need extraction…"
+      ],
+      "allyDown": [
+        "Casualty! Priority evac!"
+      ],
+      "panic": [
+        "Losing it. Losing it."
+      ]
+    },
+    "serene": {
+      "n": "Serene",
+      "who": "jedi",
+      "select": [
+        "I am here.",
+        "As the Force wills."
+      ],
+      "kill": [
+        "Be at peace.",
+        "It is done."
+      ],
+      "crit": [
+        "There."
+      ],
+      "hit": [
+        "Pain passes."
+      ],
+      "down": [
+        "I am… one with…"
+      ],
+      "allyDown": [
+        "Hold on to me. Breathe."
+      ],
+      "panic": [
+        "The calm… I can’t find it."
+      ]
+    },
+    "fierce": {
+      "n": "Fierce",
+      "who": "jedi",
+      "select": [
+        "Let’s end this.",
+        "Lead on."
+      ],
+      "kill": [
+        "You chose this.",
+        "Stand down or fall."
+      ],
+      "crit": [
+        "Too slow."
+      ],
+      "hit": [
+        "Is that all?"
+      ],
+      "down": [
+        "Not… finished…"
+      ],
+      "allyDown": [
+        "Get behind me!"
+      ],
+      "panic": [
+        "The anger… it’s too loud."
+      ]
+    },
+    "scholar": {
+      "n": "Scholar",
+      "who": "jedi",
+      "select": [
+        "Fascinating ground. Yes?",
+        "Interesting."
+      ],
+      "kill": [
+        "Regrettable.",
+        "The archives will note it."
+      ],
+      "crit": [
+        "A known weakness."
+      ],
+      "hit": [
+        "Hm. Miscalculated."
+      ],
+      "down": [
+        "Record… what happened…"
+      ],
+      "allyDown": [
+        "No! Stabilize them, quickly!"
+      ],
+      "panic": [
+        "None of the texts said this."
+      ]
+    },
+    "warm": {
+      "n": "Warm",
+      "who": "jedi",
+      "select": [
+        "With you.",
+        "I’ve got your back."
+      ],
+      "kill": [
+        "I’m sorry it came to this.",
+        "Forgive me."
+      ],
+      "crit": [
+        "Opening!"
+      ],
+      "hit": [
+        "I’m all right. Keep going."
+      ],
+      "down": [
+        "Look after… each other…"
+      ],
+      "allyDown": [
+        "No, no, stay with me!"
+      ],
+      "panic": [
+        "I can’t lose anyone else."
+      ]
+    },
+    "haunted": {
+      "n": "Haunted",
+      "who": "jedi",
+      "select": [
+        "…Yes.",
+        "I see it again."
+      ],
+      "kill": [
+        "Another one for the vision.",
+        "The fire takes them all."
+      ],
+      "crit": [
+        "I saw it before it came."
+      ],
+      "hit": [
+        "I’ve felt worse in dreams."
+      ],
+      "down": [
+        "The Temple… burning…"
+      ],
+      "allyDown": [
+        "Not them. Not like the vision."
+      ],
+      "panic": [
+        "The fire! It’s here!"
+      ]
+    }
+  },
+  "DEEDS": [
+    {
+      "k": "crit",
+      "at": 3,
+      "troop": "Deadeye",
+      "jedi": "the Precise",
+      "why": "3+ critical hits"
+    },
+    {
+      "k": "multi",
+      "at": 1,
+      "troop": "Havoc",
+      "jedi": "the Storm",
+      "why": "3+ kills in one mission"
+    },
+    {
+      "k": "clutch",
+      "at": 1,
+      "troop": "Lucky",
+      "jedi": "the Fortunate",
+      "why": "finished a mission on 1 HP"
+    },
+    {
+      "k": "save",
+      "at": 2,
+      "troop": "Angel",
+      "jedi": "the Healer",
+      "why": "saved 2+ downed allies"
+    },
+    {
+      "k": "downed",
+      "at": 2,
+      "troop": "Iron",
+      "jedi": "the Unbroken",
+      "why": "went down twice and came back"
+    },
+    {
+      "k": "cap",
+      "at": 3,
+      "troop": "Shackles",
+      "jedi": "the Merciful",
+      "why": "3+ captures"
+    },
+    {
+      "k": "melee",
+      "at": 3,
+      "troop": "Knuckles",
+      "jedi": "the Blade",
+      "why": "3+ melee kills"
+    },
+    {
+      "k": "tank",
+      "at": 25,
+      "troop": "Brick",
+      "jedi": "the Wall",
+      "why": "soaked 25+ damage"
+    },
+    {
+      "k": "kill",
+      "at": 8,
+      "troop": "Reaper",
+      "jedi": "the Relentless",
+      "why": "8+ kills"
+    },
+    {
+      "k": "mission",
+      "at": 6,
+      "troop": "Old Hand",
+      "jedi": "the Patient",
+      "why": "6+ missions"
+    }
+  ],
+  "NICK_CLASS": {
+    "Soldier": [
+      "Sarge",
+      "Trigger",
+      "Rook"
+    ],
+    "Scout": [
+      "Hawk",
+      "Ghost",
+      "Longshot"
+    ],
+    "Medic": [
+      "Patch",
+      "Stitches",
+      "Doc"
+    ],
+    "Heavy": [
+      "Boomer",
+      "Tank",
+      "Thunder"
+    ],
+    "Shieldbearer": [
+      "Bulwark",
+      "Gate",
+      "Anvil"
+    ],
+    "jedi": [
+      "the Steadfast",
+      "the Quiet",
+      "the Bright",
+      "the Wanderer"
+    ]
+  },
+  "NICK_MAX": 16,
+  "PAD": {
+    "r": 3,
+    "aim": 10,
+    "focus": 1
+  }
+}
