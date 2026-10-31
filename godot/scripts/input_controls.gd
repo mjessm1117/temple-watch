@@ -1,0 +1,108 @@
+extends RefCounted
+
+const Shot = preload("res://scripts/shot.gd")
+
+static func move_preview(m: RefCounted, unit: Dictionary, dest: Vector2i) -> Dictionary:
+	if unit.is_empty() or int(unit.get("ap", 0)) <= 0: return {}
+	var route: Dictionary = m.paths(unit, int(unit.mob) * 2)
+	if not route.costs.has(dest) or dest == Shot.pos(unit): return {}
+	var cost: int = int(route.costs[dest])
+	var ap_cost: int = 1 if cost <= int(unit.mob) else 2
+	if int(unit.ap) < ap_cost: return {}
+	var shields: Dictionary = {}
+	for entry in [["N", Vector2i.UP], ["E", Vector2i.RIGHT], ["S", Vector2i.DOWN], ["W", Vector2i.LEFT]]:
+		shields[entry[0]] = Shot.cover(m, dest, dest + entry[1] * 2)
+	return {"ap": ap_cost, "tiles": cost, "prev": route.prev, "shields": shields}
+
+static func valid_targets(m: RefCounted, unit: Dictionary, mode: String) -> Array[Dictionary]:
+	var targets: Array[Dictionary] = []
+	if unit.is_empty() or mode not in ["shoot", "strike", "push"] or m.phase != "player" or m.result != "": return targets
+	if int(unit.ap) < int(m.abilities[mode].ap): return targets
+	if mode == "push" and int(unit.get("focus_left", 0)) < int(m.abilities.push.focus): return targets
+	if mode in ["strike", "push"] and str(unit.get("class_name", "")) not in ["Guardian", "Consular"]: return targets
+	for target in m.living("enemy"):
+		if not bool(target.awake): continue
+		if mode == "strike" and max(abs(int(unit.x) - int(target.x)), abs(int(unit.y) - int(target.y))) > 1: continue
+		if mode == "push" and Shot.distance(Shot.pos(unit), Shot.pos(target)) > float(m.abilities.push.range): continue
+		var info: Dictionary = Shot.calculate(m, unit, target, mode == "strike")
+		if not bool(info.los) or (mode != "push" and not bool(info.range_ok)): continue
+		targets.append(target)
+	targets.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.id) < int(b.id))
+	return targets
+
+static func next_squad(m: RefCounted, current_id: int, direction: int = 1, only_ready: bool = false) -> int:
+	var squad: Array[Dictionary] = m.living("player")
+	if squad.is_empty(): return -1
+	var index := -1
+	for i in range(squad.size()):
+		if int(squad[i].id) == current_id: index = i
+	for offset in range(1, squad.size() + 1):
+		var candidate: Dictionary = squad[posmod(index + offset * direction, squad.size())]
+		if not only_ready or int(candidate.ap) > 0: return int(candidate.id)
+	return -1
+
+var g
+
+func handle_event(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN] and event.pressed:
+			if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
+			g.camera_tween = g.create_tween()
+			g.camera_tween.tween_property(g, "zoom", g.zoom + (-2.5 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 2.5), 0.25).set_trans(Tween.TRANS_SINE)
+		elif event.button_index == MOUSE_BUTTON_MIDDLE:
+			g.drag_button = MOUSE_BUTTON_MIDDLE if event.pressed else 0
+		elif event.button_index == MOUSE_BUTTON_RIGHT:
+			if event.pressed and (g.action in ["shoot", "strike", "push"] or g.preview_tile.x >= 0): g._cancel_order(); return
+			g.drag_button = MOUSE_BUTTON_RIGHT if event.pressed else 0
+		elif event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			if g.cinematic: g._skip_cinematic()
+			var p: Vector2i = g._screen_tile(event.position)
+			if p.x < 0: return
+			for u in g.mission.living("player"):
+				if Shot.pos(u) == p: g._select(int(u.id)); return
+			if g.action == "move":
+				var preview: Dictionary = move_preview(g.mission, g.mission.unit_by_id(g.selected_id), p)
+				if preview.is_empty(): return
+				if g.preview_tile == p: g._move_selected(p)
+				else:
+					g.preview_tile = p
+					g._refresh_highlights()
+			elif g.action == "free":
+				if g.mission.free_prisoner(g.selected_id): g._after_action(); g._refresh()
+			elif g.action in ["shoot", "strike", "push"]:
+				for target in valid_targets(g.mission, g.mission.unit_by_id(g.selected_id), g.action):
+					if Shot.pos(target) == p:
+						g.target_id = int(target.id)
+						g._attack(g.target_id, g.action)
+						return
+	elif event is InputEventMouseMotion:
+		if g.drag_button == MOUSE_BUTTON_MIDDLE:
+			if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
+			g.yaw -= event.relative.x * 0.008; g.pitch += event.relative.y * 0.008; g._update_camera()
+		elif g.drag_button == MOUSE_BUTTON_RIGHT:
+			if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
+			var right: Vector3 = g.camera.global_basis.x
+			var forward: Vector3 = -g.camera.global_basis.z; forward.y = 0; forward = forward.normalized()
+			g.pivot += (-right * event.relative.x + forward * event.relative.y) * g.zoom * 0.0015
+			g._update_camera()
+		else:
+			var p: Vector2i = g._screen_tile(event.position)
+			if p != g.hovered: g.hovered = p; g._refresh_highlights(); g._show_shot()
+	elif event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_SPACE: g._skip_activity()
+		elif event.keycode == KEY_ESCAPE: g._cancel_order()
+		elif event.keycode == KEY_TAB:
+			if g.action in ["shoot", "strike", "push"]: g._cycle_target(-1 if event.shift_pressed else 1)
+			else:
+				var id: int = next_squad(g.mission, g.selected_id, -1 if event.shift_pressed else 1)
+				if id >= 0: g._select(id)
+		elif event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
+			if g.action in ["shoot", "strike", "push"]:
+				if g.target_id >= 0: g._attack(g.target_id, g.action)
+			elif g.action == "move" and g.preview_tile.x >= 0: g._move_selected(g.preview_tile)
+			else: g._request_end_turn()
+		elif event.keycode == KEY_Q: g._rotate_camera(-PI / 2.0)
+		elif event.keycode == KEY_E: g._rotate_camera(PI / 2.0)
+		elif event.keycode == KEY_R: g.get_tree().reload_current_scene()
+		elif event.keycode >= KEY_1 and event.keycode <= KEY_6:
+			g._choose_action(["move", "shoot", "strike", "push", "free", "overwatch"][event.keycode - KEY_1])
