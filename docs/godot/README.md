@@ -1,41 +1,50 @@
 # Temple Watch desktop rescue mission
 
-Godot 4.7.2, milestones 1–3 complete with parts of milestone 4. Open a desktop window from the repository root:
+Open with Godot 4.7.2 from the repository root:
 
 ```bash
 ./godot/run.sh
 ```
 
-`run.sh` uses `GODOT_BIN` when set; otherwise it uses the installed Godot binary at `/home/jess/projects/.tools/godot/godot`. To use a different Godot installation, set `GODOT_BIN` to its executable path. The game itself uses only `res://` paths and works with a Windows Godot build after opening/importing the project.
+`GODOT_BIN` can point to another Godot 4.7 build. The project uses `res://` assets and can be opened on Windows. Forward+ rendering enables SSAO and glow. The web game in `public/` remains untouched.
 
 ## Play
 
-- Click a squad member or their name to select them. Choose **Move**, then click a blue tile for a 1 AP move or amber tile for a 2 AP dash.
-- Choose **Shoot**, **Strike**, or **Push**, then click a spotted enemy. Hover over an enemy to see hit, crit, graze, line of sight, and the aim breakdown. Strike and Push belong to the Jedi. Push costs 1 AP and 2 Focus; it can break cover on collision.
-- When next to the prisoner, choose **Free** and click her marker. Escort her back to the blue evac tiles. She follows her rescuer and advances toward evac while the escort stays close. A nearby squadmate can take over if the escort falls.
-- **Overwatch** spends the selected unit's remaining AP and fires at the first enemy that moves into sight. **End Turn** runs the enemy turn. Reach evac before the end of turn 10. **Restart** starts a fresh mission.
-- Middle mouse drag orbits, right mouse drag pans, and the wheel zooms. Enter ends the turn; R restarts.
+- Click a squad member or their name to select them. Press **1–6** or use the bottom bar for **Move**, **Shoot**, **Strike**, **Push**, **Free**, and **Overwatch**. Click a reachable tile or target to act. A blue path costs 1 AP; an amber dash costs 2 AP.
+- Hover a tile to see the route, AP cost, and cover from its north, east, south, and west sides. Hover a spotted enemy for hit, crit, graze, cover, line of sight, range, and the aim breakdown.
+- Rescue Aide Mira Tal with **Free** while adjacent, then escort her to the cyan evacuation tiles by turn 10. **Enter** ends the turn; **R** restarts.
+- Right mouse drag pans, middle mouse drag orbits, and the wheel zooms. Click or press **Space** to skip an action camera. The bottom bar has an action camera toggle, sound mute, and volume slider.
 
-## What is implemented
+## Presentation
 
-The 26×26 mission has two routes around a central barricade, low and high ground, directional half/full cover, corner peeks, three staged enemy groups, a prisoner beyond first contact, an announced east-side reinforcement, a clock, and win/lose screens. Squad stats and class names, enemy stats, AP costs, Force Push, saber strike, cover values, range and height aim modifiers, flank crit, and graze were ported from the web game. The web game stays untouched. Mission, units, and ability costs are in `godot/data/*.json`. `godot/scripts/shot.gd` is the single calculation path for previews, execution, reaction fire, and AI.
+Rigged GLB models now keep their view nodes between state updates and play idle, run, shoot, swing, cast, hit, and death clips. Player movement follows the calculated tile route at about four tiles per second; the rules still resolve immediately so headless bot turns remain fast. Attackers turn toward their target. Enemy moves animate and the camera follows their turn. Revealed enemies receive an alert callout.
 
-The first desktop mission has simplified enemy tactics, square-by-square movement, no animation/cinematic camera, no campaign layer, no audio, and no Windows export preset yet. Armor pips, destructible cover through Push, and overwatch cover part of milestone 4. The Godot build does not yet port every web class skill or weapon kit.
+Shots have side colored bolts, a tracer, muzzle sparks, impact debris, miss fly past, and floating damage, MISS, GRAZE, CRIT, and armor text. Saber strikes have a glowing trail. Force Push has a shockwave, target slide, and cover chunks. The camera glides to selected units and blends to a skippable shoulder view for actions over 0.6 seconds. Critical hits and deaths add a small shake.
 
-## Test
+Forward+ lighting adds a warm key, cool fill, shadows, ambient occlusion, fog, and glow. The board has varied floor colors, high ground lips, rubble, modeled crates and terminals, barricades, and dust motes. The HUD adds a model portrait, HP and AP pips, the turn clock, objective, ability hotkeys, path preview, directional cover cues, enemy activity banner, and outcome screen. Sound effects are synthesized locally in GDScript as PCM streams; no external audio is used.
+
+Mission rules and aim calculations remain in `godot/scripts/mission.gd` and `shot.gd`. Presentation lives in `game.gd`, `unit_view.gd`, `fx.gd`, and `audio.gd`. The map and units are defined in `godot/data/*.json`.
+
+## Verification
 
 ```bash
 ./godot/test.sh
 ```
 
-Actual run on Godot 4.7.2: **60 checks, 0 failures**. This includes **12 aim cases** generated directly from frozen `public/js/rules.js` using `node godot/tests/generate_aim_cases.cjs`, directional cover and line-of-sight cases, move/shoot AP, clock loss, evac win, two map routes, reinforcement timing, Force Push cover damage, and **20 seeded bot rescue missions** with **0 script errors**. The bot won **8/20 (40%)**. The bot is a simple greedy rescuer; this rate is a reproducible test result, not a balance target.
+Actual Godot 4.7.2 run: **65 checks, 0 failures, 0 script errors**. The checks include 12 aim fixtures generated from frozen web rules, mission geometry and abilities, 20 seeded rescue bot missions, and a headless scene test that loads the presentation, moves, shoots, and advances three enemy turns. The bot won **8/20 (40%)**; that is a regression result, not a balance target. Screenshots were rendered by software Vulkan under `xvfb-run`; RTX frame rate was not measured in this environment.
 
-## Screenshot
+## Screenshots
 
-![Rescue mission at deployment](shots/rescue-mission.png)
+![Squad at deployment](shots/rescue-mission.png)
 
-Captured under `xvfb-run` with the Godot viewport capture hook:
+![Blaster shot and action camera](shots/rescue-shot.png)
+
+![Force Push and cover break](shots/rescue-push.png)
+
+Capture the same frames from the repository root:
 
 ```bash
 xvfb-run -a -s '-screen 0 1366x768x24' ./godot/run.sh -- --capture="$PWD/docs/godot/shots/rescue-mission.png"
+xvfb-run -a -s '-screen 0 1366x768x24' ./godot/run.sh -- --demo=shot --capture="$PWD/docs/godot/shots/rescue-shot.png"
+xvfb-run -a -s '-screen 0 1366x768x24' ./godot/run.sh -- --demo=push --capture="$PWD/docs/godot/shots/rescue-push.png"
 ```
