@@ -1,0 +1,7051 @@
+{
+  "source": "public/js/data-story.js",
+  "sha256": "1b7f65977abb80d0e514bf24dc217a08cba261cba22515f45920fee0f00ee54b",
+  "lines": 295,
+  "counts": {
+    "FOES": 3,
+    "MISSIONS": 13,
+    "CRISES": 7,
+    "EVENTS": 23,
+    "PLAN": 14,
+    "COUNCIL_SEATS": 3,
+    "STORY_RECRUITS": 3,
+    "FLAG_LINES": 18,
+    "EPI": 18,
+    "MISSION_LORE": 22,
+    "EVENT_LORE": 9,
+    "ERA1": 4,
+    "SHADOW": 2,
+    "YEARS": 7,
+    "ACTS": 2,
+    "SHARDS": 2,
+    "STORY_TEXT": 8,
+    "QUOTES": 6,
+    "BRIEF_IF": 5,
+    "DEBRIEF_IF": 4,
+    "BARKS": 7,
+    "HERO_BARKS": 3,
+    "EPILOGUE": 12,
+    "BASE_MISSIONS": 7,
+    "BASE_CRISES": 5,
+    "SOURCE_LITERALS": 683
+  },
+  "records": {
+    "FOES": {
+      "malgus": {
+        "n": "Darth Malgus",
+        "ic": "e_acolyte",
+        "hp": 14,
+        "aim": 80,
+        "mob": 5,
+        "dmg": [
+          4,
+          6
+        ],
+        "range": 1.5,
+        "deflect": 30,
+        "guardDef": 30,
+        "force": 1,
+        "lightning": [
+          3,
+          4
+        ],
+        "armor": 1,
+        "noCap": 1,
+        "boss": 1,
+        "init": 15
+      },
+      "mando": {
+        "n": "Mandalorian Merc",
+        "ic": "e_trooper",
+        "hp": 6,
+        "aim": 70,
+        "mob": 6,
+        "dmg": [
+          3,
+          5
+        ],
+        "range": 8,
+        "armor": 1,
+        "init": 12
+      },
+      "adraas": {
+        "n": "Lord Adraas",
+        "ic": "e_acolyte",
+        "hp": 11,
+        "aim": 75,
+        "mob": 5,
+        "dmg": [
+          4,
+          5
+        ],
+        "range": 1.5,
+        "deflect": 25,
+        "guardDef": 20,
+        "force": 1,
+        "lightning": [
+          3,
+          4
+        ],
+        "noCap": 1,
+        "boss": 1,
+        "init": 14
+      }
+    },
+    "MISSIONS": {
+      "relay": {
+        "n": "Relay Aurek-7",
+        "where": "Outpost Aurek-7 · Sith frontier",
+        "type": "defend",
+        "story": 1,
+        "theme": "plains",
+        "turns": 8,
+        "obj": 20,
+        "objName": "Relay",
+        "lastWave": 5,
+        "map": [
+          "^^......^^",
+          "..#....#..",
+          ".c..cc..c.",
+          "....##....",
+          ".c......c.",
+          "##.c..c.##",
+          "....cc....",
+          ".#......#.",
+          ".c.c..c.c.",
+          "^^c.##..^^",
+          "M^.cOOc.^M",
+          ".........."
+        ],
+        "waves": {
+          "1": [
+            "trooper",
+            "trooper",
+            "trooper"
+          ],
+          "3": [
+            "trooper",
+            "trooper",
+            "heavy"
+          ],
+          "5": [
+            "acolyte",
+            "trooper",
+            "trooper"
+          ]
+        },
+        "start": [
+          [
+            2,
+            11
+          ],
+          [
+            6,
+            9
+          ],
+          [
+            2,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            8
+          ]
+        ],
+        "brief": "Imperial Sith troopers are closing on a frontier hyperspace relay. Hold it for 8 turns until the fleet arrives. Three waves are expected.",
+        "goal": "Hold the relay for 8 turns. The fleet is coming.",
+        "win": "The Republic fleet drops out of hyperspace. The relay held.",
+        "lose": "The relay fell. The Sith now hold the hyperlane toward the Core.",
+        "reward": {
+          "credits": 80
+        },
+        "bonus": {
+          "credits": 40
+        },
+        "bonusTxt": "Relay above 75%",
+        "quote": "“Hold the relay. The fleet needs the lane open.” — Grand Master Zym"
+      },
+      "envoy": {
+        "n": "The Envoy's Trail",
+        "where": "Lower city · Coruscant",
+        "type": "investigate",
+        "story": 1,
+        "theme": "city",
+        "par": 6,
+        "map": [
+          "q.c.#..c.q",
+          "....#.....",
+          ".c..d..x..",
+          ".#.##..##.",
+          "^..c...c.^",
+          ".x...q....",
+          "..c##..c..",
+          "....#....x",
+          ".c..d..c..",
+          "..........",
+          ".c..cc..c.",
+          "EE......EE"
+        ],
+        "foes": [
+          [
+            "trooper",
+            2,
+            1
+          ],
+          [
+            "trooper",
+            7,
+            1
+          ],
+          [
+            "heavy",
+            6,
+            0
+          ],
+          [
+            "agent",
+            8,
+            4
+          ],
+          [
+            "envoy",
+            5,
+            1
+          ]
+        ],
+        "reinforce": [
+          "trooper",
+          "trooper"
+        ],
+        "start": [
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            7,
+            10
+          ]
+        ],
+        "brief": "A Republic envoy is leaking the peace-talk schedule. Scan his data terminals (Jedi or Medic, adjacent). Once 2 are copied, anyone who reaches an evac zone gets the data out. Capture him if you can.",
+        "goal": "Scan 2 of 3 terminals, then get anyone to an evac zone. Threat rises after turn 6: terminals get wiped, and at Threat 6 the trail goes cold.",
+        "win": "The data is out. The Council reads it that night.",
+        "lose": "The trail goes cold.",
+        "reward": {
+          "credits": 70
+        },
+        "bonus": {
+          "intel": 2
+        },
+        "bonusTxt": "All 3 terminals",
+        "quote": "“Somebody is selling the peace. Find out who.” — Kao Cen Darach"
+      },
+      "blockade": {
+        "n": "Supply Lane Hydian",
+        "where": "Convoy depot · Hydian Way",
+        "type": "defend",
+        "story": 0,
+        "theme": "plains",
+        "turns": 8,
+        "obj": 20,
+        "objName": "Convoy",
+        "lastWave": 5,
+        "map": [
+          "^^......^^",
+          "..#....#..",
+          ".c..cc..c.",
+          "....##....",
+          ".c......c.",
+          "##.c..c.##",
+          "....cc....",
+          ".#......#.",
+          ".c.c..c.c.",
+          "^^..##.c^^",
+          "M^.cOOc.^M",
+          ".........."
+        ],
+        "waves": {
+          "1": [
+            "mando",
+            "trooper",
+            "trooper"
+          ],
+          "3": [
+            "mando",
+            "trooper",
+            "heavy"
+          ],
+          "5": [
+            "mando",
+            "mando",
+            "trooper"
+          ]
+        },
+        "start": [
+          [
+            7,
+            11
+          ],
+          [
+            3,
+            9
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            0,
+            9
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            4,
+            8
+          ]
+        ],
+        "brief": "Mandalorian clans in Imperial pay are hitting a Republic supply convoy. Hold the depot for 8 turns until the Navy escort arrives.",
+        "goal": "Hold the convoy for 8 turns. Mandalorians are armored and hit hard.",
+        "win": "The escort arrives. The convoy gets through.",
+        "lose": "The convoy burns. The lane stays closed.",
+        "reward": {
+          "credits": 90,
+          "favor": 3
+        },
+        "bonus": {
+          "credits": 30
+        },
+        "bonusTxt": "Convoy above 75%"
+      },
+      "cache": {
+        "n": "Listening Post Besh",
+        "where": "Abandoned listening post · Inner Rim",
+        "type": "investigate",
+        "story": 0,
+        "theme": "ruins",
+        "par": 6,
+        "map": [
+          "q.c..#.c.q",
+          ".....#....",
+          "..x..d..c.",
+          ".##..##.#.",
+          "^.c...c..^",
+          "....q...x.",
+          "..c..##c..",
+          "x....#....",
+          "..c..d..c.",
+          "..........",
+          ".c..cc..c.",
+          "EE......EE"
+        ],
+        "foes": [
+          [
+            "trooper",
+            7,
+            1
+          ],
+          [
+            "trooper",
+            2,
+            1
+          ],
+          [
+            "heavy",
+            3,
+            0
+          ],
+          [
+            "agent",
+            1,
+            4
+          ]
+        ],
+        "reinforce": [
+          "trooper",
+          "trooper"
+        ],
+        "start": [
+          [
+            6,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            2,
+            10
+          ]
+        ],
+        "brief": "An Imperial listening post is tracking Republic fleet moves. Scan its terminals (Jedi or Medic, adjacent), then get anyone to an evac zone.",
+        "goal": "Scan 2 of 3 terminals, then get anyone to an evac zone. Threat rises after turn 6.",
+        "win": "The intercepts are out. The Navy changes course.",
+        "lose": "The post wipes itself. The trail goes cold.",
+        "reward": {
+          "credits": 60,
+          "intel": 1
+        },
+        "bonus": {
+          "intel": 2
+        },
+        "bonusTxt": "All 3 terminals"
+      },
+      "hutt": {
+        "n": "Spice Ledger",
+        "where": "Hutt warehouse · Nar Shaddaa",
+        "type": "investigate",
+        "story": 0,
+        "theme": "city",
+        "par": 6,
+        "map": [
+          "q.c..#.c.q",
+          ".....#....",
+          "..x..d..c.",
+          ".##..##.#.",
+          "^.c...c..^",
+          "....q...x.",
+          "..c..##c..",
+          "x....#....",
+          "..c..d..c.",
+          "..........",
+          ".c..cc..c.",
+          "EE......EE"
+        ],
+        "foes": [
+          [
+            "trooper",
+            7,
+            1
+          ],
+          [
+            "mando",
+            2,
+            1
+          ],
+          [
+            "trooper",
+            3,
+            0
+          ],
+          [
+            "agent",
+            1,
+            4
+          ]
+        ],
+        "reinforce": [
+          "trooper",
+          "trooper"
+        ],
+        "start": [
+          [
+            6,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            2,
+            10
+          ]
+        ],
+        "brief": "The Hutt broker keeps his kyber deals on warehouse terminals. Copy the ledgers and get out. His Mandalorian guards will not make it easy.",
+        "goal": "Scan 2 of 3 terminals, then get anyone to an evac zone. Threat rises after turn 6.",
+        "win": "The ledgers are out, and so are his crystals.",
+        "lose": "The warehouse locks down.",
+        "reward": {
+          "credits": 50,
+          "kyber": 2
+        },
+        "bonus": {
+          "intel": 1
+        },
+        "bonusTxt": "All 3 terminals"
+      },
+      "dock": {
+        "n": "Docking Ring Nine",
+        "where": "Docking Ring Nine · Coruscant",
+        "type": "assault",
+        "story": 1,
+        "boss": "malgus",
+        "eraBoss": 1,
+        "theme": "dock",
+        "escape": "Malgus reaches the Temple lifts.",
+        "near": "Malgus is at the lift doors. Next turn he is inside.",
+        "push": "Malgus pushes toward the Temple lifts.",
+        "par": 6,
+        "map": [
+          "###....###",
+          "..#....#..",
+          ".c..cc..c.",
+          "...x..x...",
+          "##.c..c.##",
+          "..........",
+          ".c.#..#.c.",
+          "...c..c...",
+          ".x......x.",
+          "..c.##.c..",
+          "..........",
+          "..c....c.."
+        ],
+        "foes": [
+          [
+            "malgus",
+            4,
+            1
+          ],
+          [
+            "heavy",
+            5,
+            0
+          ],
+          [
+            "trooper",
+            2,
+            2
+          ],
+          [
+            "trooper",
+            7,
+            2
+          ]
+        ],
+        "reinforce": [
+          "trooper",
+          "trooper"
+        ],
+        "start": [
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            10
+          ],
+          [
+            5,
+            10
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            1,
+            10
+          ],
+          [
+            8,
+            10
+          ]
+        ],
+        "brief": "While the treaty is signed on Alderaan, Darth Malgus lands at Docking Ring Nine with a strike team. His target is the Temple. Stop him here.",
+        "goal": "Defeat Darth Malgus. Threat rises after the par turn; at Threat 6 he reaches the Temple lifts. Barrels (x) explode when shot.",
+        "win": "Malgus falls on the docking ring. The Temple never sees him.",
+        "lose": "Malgus breaks through to the Temple.",
+        "reward": {
+          "credits": 120,
+          "kyber": 1
+        },
+        "bonus": {
+          "favor": 5
+        },
+        "bonusTxt": "Done by the par turn",
+        "quote": "“This is the vision. Change it.” — Grand Master Zym"
+      },
+      "vault": {
+        "n": "Gnost-Dural's Vault",
+        "where": "Archive ruins · Ossus",
+        "type": "investigate",
+        "story": 1,
+        "par": 6,
+        "theme": "ruins",
+        "map": [
+          "..q.h..#q.",
+          ".h.._.._..",
+          "..c....c..",
+          "h.#.hh.#.h",
+          "...r..r...",
+          ".c..q...c.",
+          "..B....B..",
+          ".r..cc..r.",
+          "...h..h...",
+          ".c......c.",
+          "..c.r..c..",
+          "EE......EE"
+        ],
+        "stealth": 1,
+        "foes": [
+          [
+            "trooper",
+            1,
+            2,
+            1
+          ],
+          [
+            "trooper",
+            8,
+            2,
+            2
+          ],
+          [
+            "agent",
+            5,
+            1
+          ],
+          [
+            "heavy",
+            5,
+            4,
+            2
+          ],
+          [
+            "acolyte",
+            3,
+            1,
+            1
+          ]
+        ],
+        "patrol": {
+          "2": [
+            [
+              8,
+              2
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              2
+            ]
+          ]
+        },
+        "reinforce": [
+          "trooper",
+          "trooper"
+        ],
+        "start": [
+          [
+            2,
+            11
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            7,
+            11
+          ]
+        ],
+        "brief": "You start concealed: pods patrol the ruins. Master Gnost-Dural found a sealed vault in the Ossus ruins: records from the last time the Sith struck at the Jedi. Imperial agents found it too. Scan the terminals (Jedi or Medic, adjacent), then reach evac.",
+        "goal": "Scan 2 of 3 terminals, then get anyone to an evac zone. A Sith Acolyte guards the vault. Threat rises after turn 6.",
+        "win": "The records come home. Gnost-Dural reads all night.",
+        "lose": "The vault burns. Whatever it knew is ash.",
+        "reward": {
+          "credits": 60,
+          "intel": 2,
+          "kyber": 1
+        },
+        "bonus": {
+          "intel": 2
+        },
+        "bonusTxt": "All 3 terminals",
+        "winFlag": "e1_vault_read",
+        "quote": "“The last time the Sith struck at a Temple, they did it while we talked.” — Gnost-Dural"
+      },
+      "ilum": {
+        "n": "The Cave Mouth",
+        "where": "Crystal caves · Ilum",
+        "type": "defend",
+        "story": 1,
+        "turns": 8,
+        "obj": 18,
+        "objName": "Cave mouth",
+        "lastWave": 5,
+        "theme": "snow",
+        "map": [
+          "..........",
+          "..B....B..",
+          ".c..h...c.",
+          "...c..c...",
+          "#..r..r..#",
+          ".c.B..B.c.",
+          "....cc....",
+          ".h......h.",
+          "..c.##.c..",
+          ".r.c..c.r.",
+          "...#OO#...",
+          "....OO...."
+        ],
+        "waves": {
+          "1": [
+            "trooper",
+            "trooper",
+            "trooper"
+          ],
+          "3": [
+            "mando",
+            "trooper",
+            "heavy"
+          ],
+          "5": [
+            "acolyte",
+            "trooper",
+            "trooper"
+          ]
+        },
+        "start": [
+          [
+            2,
+            10
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            4,
+            9
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            1,
+            11
+          ],
+          [
+            8,
+            11
+          ]
+        ],
+        "brief": "Sith raiders want the Ilum crystal caves. Sgt. Jace Malcom’s platoon is all that holds the mouth, and it is thin. Hold for 8 turns until his relief lands.",
+        "goal": "Hold the cave mouth for 8 turns. Three waves; the last brings a Sith Acolyte.",
+        "win": "Relief lands in the snow. The caves stay quiet.",
+        "lose": "The raiders reach the crystals. Ilum goes dark for a generation.",
+        "reward": {
+          "credits": 70,
+          "kyber": 2
+        },
+        "bonus": {
+          "favor": 4
+        },
+        "bonusTxt": "Cave mouth above 75%",
+        "winRecruit": "jace_malcom",
+        "winFlag": "jace_joined",
+        "quote": "“No Jedi blade without Ilum. Hold it.” — Grand Master Zym"
+      },
+      "adraasHunt": {
+        "n": "Shadow of Adraas",
+        "where": "Embassy hangar · Alderaan",
+        "type": "assault",
+        "story": 1,
+        "boss": "adraas",
+        "par": 6,
+        "theme": "city",
+        "escape": "Adraas reaches his shuttle and is gone.",
+        "near": "Adraas is at his shuttle ramp.",
+        "push": "Adraas falls back toward his shuttle.",
+        "map": [
+          "##..##..##",
+          "...c..c...",
+          ".B......B.",
+          "...h..h...",
+          ".c..xx..c.",
+          "...B..B...",
+          ".h......h.",
+          "..c.##.c..",
+          ".x......x.",
+          "...c..c...",
+          ".B......B.",
+          ".........."
+        ],
+        "stealth": 1,
+        "foes": [
+          [
+            "adraas",
+            4,
+            1,
+            1
+          ],
+          [
+            "trooper",
+            2,
+            2,
+            1
+          ],
+          [
+            "trooper",
+            7,
+            2,
+            2
+          ],
+          [
+            "agent",
+            9,
+            3
+          ],
+          [
+            "mando",
+            5,
+            3,
+            2
+          ]
+        ],
+        "patrol": {
+          "2": [
+            [
+              7,
+              2
+            ],
+            [
+              7,
+              5
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              2
+            ]
+          ]
+        },
+        "reinforce": [
+          "trooper",
+          "mando"
+        ],
+        "start": [
+          [
+            2,
+            11
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            7,
+            11
+          ]
+        ],
+        "brief": "You start concealed. While the delegates talk, Lord Adraas waits in an embassy hangar for a signal. Satele Shan wants him taken off the board before it comes. Defeat him before he reaches his shuttle.",
+        "goal": "Defeat Lord Adraas. Threat rises after turn 6; at Threat 6 he escapes. Barrels (x) explode when shot.",
+        "win": "Adraas falls in the hangar. One blade fewer for the strike.",
+        "lose": "Adraas gets away. He will be at Malgus’s side.",
+        "reward": {
+          "credits": 90,
+          "intel": 2
+        },
+        "bonus": {
+          "favor": 4
+        },
+        "bonusTxt": "Done by the par turn",
+        "winFlag": "e1_adraas_down",
+        "loseFlag": "e1_adraas_free",
+        "quote": "“Two of them will come. Let us make it one.” — Satele Shan"
+      },
+      "taris": {
+        "n": "Reclamation Camp",
+        "where": "Refugee camp · Taris",
+        "type": "rescue",
+        "par": 5,
+        "theme": "ruins",
+        "patrol": {
+          "1": [
+            [
+              2,
+              4
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              2,
+              7
+            ]
+          ]
+        },
+        "map": [
+          "..c....c..",
+          "...####...",
+          "..k#..#.c.",
+          "...##D#...",
+          ".c......x.",
+          "..x.cc.c..",
+          "#.c....^^#",
+          ".c..##.^c.",
+          "^^..cc....",
+          ".c......c.",
+          "...c.c....",
+          "EE......EE"
+        ],
+        "hostage": [
+          4,
+          2
+        ],
+        "foes": [
+          [
+            "trooper",
+            7,
+            4
+          ],
+          [
+            "trooper",
+            3,
+            4
+          ],
+          [
+            "heavy",
+            4,
+            0
+          ],
+          [
+            "agent",
+            1,
+            1
+          ]
+        ],
+        "reinforce": [
+          "trooper",
+          "trooper"
+        ],
+        "start": [
+          [
+            6,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            2,
+            10
+          ]
+        ],
+        "brief": "Sith raiders grabbed a Republic relief officer from a Taris refugee camp. Open the cell (Hack or console), then walk her to an evac zone (E).",
+        "goal": "Open the cell (Hack or console), then get the prisoner to an evac zone. Threat rises after turn 5; at Threat 6 they fly the prisoner out.",
+        "win": "The officer is out. The camp gets its medicine.",
+        "lose": "The officer is gone. The camp goes hungry.",
+        "reward": {
+          "credits": 70,
+          "favor": 4
+        },
+        "bonus": {
+          "recruits": 1
+        },
+        "bonusTxt": "Done by turn 5",
+        "alts": [
+          {
+            "where": "Cliffside cell block · Ord Mantell",
+            "map": [
+              "^^......^^",
+              ".c..cc..c.",
+              "...####...",
+              ".k.#..#.x.",
+              "...##D#...",
+              ".B......B.",
+              "...c..c...",
+              ".h..x...h.",
+              "...B..B...",
+              ".c..cc..c.",
+              "..........",
+              "EE..c...EE"
+            ],
+            "hostage": [
+              4,
+              3
+            ],
+            "theme": "ruins",
+            "foes": [
+              [
+                "trooper",
+                2,
+                1,
+                1
+              ],
+              [
+                "trooper",
+                7,
+                1,
+                1
+              ],
+              [
+                "trooper",
+                2,
+                4,
+                2
+              ],
+              [
+                "heavy",
+                5,
+                6,
+                2
+              ],
+              [
+                "agent",
+                8,
+                6
+              ]
+            ],
+            "patrol": {
+              "2": [
+                [
+                  2,
+                  6
+                ],
+                [
+                  7,
+                  6
+                ],
+                [
+                  7,
+                  8
+                ],
+                [
+                  2,
+                  8
+                ]
+              ]
+            },
+            "start": [
+              [
+                3,
+                11
+              ],
+              [
+                5,
+                11
+              ],
+              [
+                6,
+                11
+              ],
+              [
+                7,
+                11
+              ],
+              [
+                2,
+                10
+              ],
+              [
+                7,
+                10
+              ]
+            ]
+          }
+        ],
+        "story": 0
+      },
+      "thul": {
+        "n": "The Thul Heir",
+        "where": "Estate grounds · Alderaan",
+        "type": "escort",
+        "theme": "plains",
+        "par": 6,
+        "vip": "senator",
+        "map": [
+          "EEE....c..",
+          ".....B....",
+          "^^b..x..h.",
+          "...h..B...",
+          ".c.B....c.",
+          ".....cc...",
+          "..h.....B.",
+          "....c.x...",
+          ".c.B....c.",
+          "......h...",
+          "^^......^^",
+          ".c..cc..c."
+        ],
+        "hostage": [
+          5,
+          10
+        ],
+        "foes": [
+          [
+            "trooper",
+            7,
+            1
+          ],
+          [
+            "trooper",
+            3,
+            1
+          ],
+          [
+            "heavy",
+            4,
+            3
+          ],
+          [
+            "agent",
+            0,
+            3
+          ],
+          [
+            "trooper",
+            1,
+            6
+          ],
+          [
+            "trooper",
+            9,
+            6
+          ]
+        ],
+        "reinforce": [
+          "trooper",
+          "trooper"
+        ],
+        "start": [
+          [
+            7,
+            10
+          ],
+          [
+            6,
+            10
+          ],
+          [
+            4,
+            10
+          ],
+          [
+            3,
+            10
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            2,
+            9
+          ]
+        ],
+        "alts": [
+          {
+            "where": "Ravine crossing · Ord Mantell",
+            "vip": "defector",
+            "theme": "caves",
+            "map": [
+              "EE..c.....",
+              "E...B..c..",
+              "..h...x...",
+              "###d##..##",
+              "^^......^^",
+              ".c.B..c.B.",
+              "....x.....",
+              ".h..##..h.",
+              "..........",
+              "##..B.###.",
+              "..........",
+              ".c..cc..c."
+            ],
+            "hostage": [
+              5,
+              10
+            ],
+            "foes": [
+              [
+                "trooper",
+                6,
+                0
+              ],
+              [
+                "trooper",
+                9,
+                2
+              ],
+              [
+                "heavy",
+                2,
+                4
+              ],
+              [
+                "agent",
+                8,
+                4
+              ],
+              [
+                "trooper",
+                5,
+                6
+              ]
+            ],
+            "start": [
+              [
+                2,
+                10
+              ],
+              [
+                3,
+                10
+              ],
+              [
+                6,
+                10
+              ],
+              [
+                7,
+                10
+              ],
+              [
+                0,
+                11
+              ],
+              [
+                9,
+                10
+              ]
+            ]
+          }
+        ],
+        "brief": "Imperial agents want a young heir of House Thul dead before the talks. Walk her to the shuttle at the far evac zone.",
+        "goal": "Walk the VIP to an evac zone. Threat rises after turn 6: more hunters arrive and they shoot the VIP on sight.",
+        "win": "The heir reaches the talks. House Thul owes the Order.",
+        "lose": "The heir dies on her own lawn. Alderaan blames the Jedi.",
+        "reward": {
+          "credits": 80,
+          "favor": 6
+        },
+        "bonus": {
+          "recruits": 1
+        },
+        "bonusTxt": "Done by turn 6",
+        "story": 0
+      },
+      "depot": {
+        "n": "Forward Depot Cresh",
+        "where": "Imperial forward depot · Mid Rim",
+        "type": "sabotage",
+        "par": 7,
+        "need": 2,
+        "field": [
+          "plant"
+        ],
+        "theme": "plains",
+        "stealth": 1,
+        "patrol": {
+          "2": [
+            [
+              6,
+              5
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              8,
+              8
+            ]
+          ]
+        },
+        "map": [
+          "EE.#..#.EE",
+          "E..#..#..E",
+          "...h..h...",
+          ".c..xx..c.",
+          ".C..##..C.",
+          ".h..^^..h.",
+          "...b..c...",
+          ".B..cc..B.",
+          "^^......^^",
+          ".c.h..h.c.",
+          "..........",
+          "..c....c.."
+        ],
+        "foes": [
+          [
+            "trooper",
+            7,
+            2
+          ],
+          [
+            "trooper",
+            2,
+            2
+          ],
+          [
+            "heavy",
+            5,
+            1
+          ],
+          [
+            "trooper",
+            3,
+            5
+          ],
+          [
+            "agent",
+            0,
+            6
+          ],
+          [
+            "trooper",
+            1,
+            8
+          ],
+          [
+            "trooper",
+            6,
+            8
+          ]
+        ],
+        "reinforce": [
+          "trooper",
+          "heavy"
+        ],
+        "start": [
+          [
+            6,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            2,
+            10
+          ]
+        ],
+        "alts": [
+          {
+            "where": "Ion cannon battery · Balmorra",
+            "map": [
+              "EE......EE",
+              "E..c..c..E",
+              ".B.#..#.B.",
+              ".C.#..#.C.",
+              ".x......x.",
+              "..h.C..h..",
+              ".c..BB..c.",
+              "^^......^^",
+              ".B.c..c.B.",
+              "..........",
+              ".c..x...c.",
+              ".........."
+            ],
+            "theme": "plains",
+            "foes": [
+              [
+                "trooper",
+                4,
+                1,
+                1
+              ],
+              [
+                "trooper",
+                7,
+                1,
+                1
+              ],
+              [
+                "trooper",
+                5,
+                4,
+                2
+              ],
+              [
+                "agent",
+                0,
+                5
+              ],
+              [
+                "trooper",
+                2,
+                7,
+                2
+              ]
+            ],
+            "patrol": {
+              "2": [
+                [
+                  2,
+                  7
+                ],
+                [
+                  7,
+                  7
+                ],
+                [
+                  5,
+                  4
+                ]
+              ]
+            },
+            "start": [
+              [
+                3,
+                11
+              ],
+              [
+                4,
+                11
+              ],
+              [
+                5,
+                11
+              ],
+              [
+                6,
+                11
+              ],
+              [
+                2,
+                10
+              ],
+              [
+                7,
+                10
+              ]
+            ]
+          }
+        ],
+        "brief": "The Empire fuels its Balmorra fleet from this depot. Plant charges on 2 sites (anyone, adjacent, 1 action), then get every standing squad member onto the far evac zone. The charges blow when you are clear.",
+        "goal": "Plant 2 charges (adjacent, 1 action), then get everyone still standing onto the north evac zone. Threat rises after turn 7: techs defuse an armed charge each step.",
+        "win": "The depot burns. The Imperial push stalls a month.",
+        "lose": "The depot holds. The push comes on time.",
+        "reward": {
+          "credits": 80,
+          "favor": 3
+        },
+        "bonus": {
+          "credits": 40
+        },
+        "bonusTxt": "Done by turn 7",
+        "story": 0
+      },
+      "fort": {
+        "n": "Fort Garnik",
+        "where": "Hill fort · Ord Mantell",
+        "type": "defend",
+        "theme": "plains",
+        "turns": 6,
+        "obj": 16,
+        "objName": "Fort",
+        "lastWave": 4,
+        "map": [
+          "..........",
+          ".c^^##^^c.",
+          "....cc....",
+          "#..c..c..#",
+          ".c......c.",
+          "...#..#...",
+          ".c..cc..c.",
+          "..........",
+          ".c.c..c.c.",
+          "...#OO#...",
+          "....OO....",
+          ".........."
+        ],
+        "waves": {
+          "1": [
+            "trooper",
+            "trooper"
+          ],
+          "2": [
+            "mando"
+          ],
+          "4": [
+            "trooper",
+            "heavy"
+          ]
+        },
+        "start": [
+          [
+            7,
+            10
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            1,
+            9
+          ]
+        ],
+        "brief": "A Republic hill fort on Ord Mantell is under Mandalorian and Sith attack. Hold it for 6 turns until the garrison regroups.",
+        "goal": "Hold the fort for 6 turns. Mandalorians are armored and hit hard.",
+        "win": "The garrison regroups. The hill stays Republic.",
+        "lose": "The fort falls. Ord Mantell burns again.",
+        "reward": {
+          "credits": 70,
+          "favor": 3
+        },
+        "bonus": {
+          "credits": 30
+        },
+        "bonusTxt": "Shrine above 75%",
+        "alts": [
+          {
+            "where": "Grove terraces · Dantooine",
+            "theme": "jungle",
+            "map": [
+              "..........",
+              ".c^^B^^c..",
+              "....c.....",
+              ".B.x...B..",
+              "......c...",
+              ".c.B..B.c.",
+              "..........",
+              ".h..cc..h.",
+              "..c....c..",
+              "...#OO#...",
+              "...cOOc...",
+              ".........."
+            ],
+            "start": [
+              [
+                2,
+                10
+              ],
+              [
+                7,
+                10
+              ],
+              [
+                2,
+                11
+              ],
+              [
+                7,
+                11
+              ],
+              [
+                1,
+                9
+              ],
+              [
+                8,
+                9
+              ]
+            ]
+          }
+        ],
+        "story": 0
+      }
+    },
+    "CRISES": {
+      "blockade": {
+        "n": "Mandalorians on the Hydian Way",
+        "kind": "Defend",
+        "src": "Senate request",
+        "mission": "blockade",
+        "text": "Clans in Imperial pay are choking a Republic supply lane. The Navy asks for Jedi.",
+        "ignore": {
+          "favor": -8
+        }
+      },
+      "cache": {
+        "n": "Imperial listening post",
+        "kind": "Investigate",
+        "src": "Jedi",
+        "mission": "cache",
+        "text": "A Sentinel sensed Imperial slicers in an old Republic post. Something is tracking the fleet.",
+        "ignore": {
+          "orderDark": 4
+        }
+      },
+      "hutt": {
+        "n": "Hutt kyber broker",
+        "kind": "Investigate",
+        "src": "Jedi",
+        "mission": "hutt",
+        "text": "A Hutt is selling Ilum-grade crystals to anyone. His ledgers name the buyers.",
+        "ignore": {}
+      },
+      "taris": {
+        "n": "Taken at the Taris camp",
+        "kind": "Rescue",
+        "src": "Civilian",
+        "mission": "taris",
+        "text": "Raiders took the relief officer who keeps a refugee camp alive.",
+        "ignore": {
+          "favor": -3,
+          "orderDark": 4
+        }
+      },
+      "thul": {
+        "n": "The Thul heir",
+        "kind": "Escort",
+        "src": "Senate request",
+        "mission": "thul",
+        "text": "An Alderaanian heir is marked for death before the peace talks.",
+        "ignore": {
+          "favor": -8
+        }
+      },
+      "depot": {
+        "n": "Forward depot",
+        "kind": "Sabotage",
+        "src": "Navy request",
+        "mission": "depot",
+        "text": "An Imperial depot feeds the next push. Blow it and get out.",
+        "ignore": {
+          "favor": -5
+        }
+      },
+      "fort": {
+        "n": "Fort Garnik under siege",
+        "kind": "Defend",
+        "src": "Navy request",
+        "mission": "fort",
+        "text": "Mandalorians and Sith troopers are storming a Republic hill fort.",
+        "ignore": {
+          "favor": -5
+        }
+      }
+    },
+    "EVENTS": [
+      {
+        "id": "e1_gnost_archive",
+        "trigger": {
+          "type": "era_start"
+        },
+        "text": "Master Gnost-Dural asks to copy the Archives to a hidden colony, in case the Temple falls.",
+        "choices": [
+          {
+            "label": "Approve the copy",
+            "effects": {
+              "credits": -40,
+              "flag": "archive_backup"
+            }
+          },
+          {
+            "label": "The Temple won't fall",
+            "effects": {
+              "loyalty": {
+                "seat": "gnost",
+                "n": -10
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_kyber_trade",
+        "trigger": {
+          "type": "month",
+          "min": 1
+        },
+        "text": "A Hutt broker has Ilum-grade crystals. His price: look away from his spice run.",
+        "choices": [
+          {
+            "label": "Buy, look away",
+            "effects": {
+              "kyber": 2,
+              "orderDark": 4,
+              "flag": "e1_hutt_deal"
+            }
+          },
+          {
+            "label": "Refuse",
+            "effects": {}
+          },
+          {
+            "label": "Seize them",
+            "effects": {
+              "mission": "hutt",
+              "favor": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_mando_blockade",
+        "trigger": {
+          "type": "month",
+          "min": 2
+        },
+        "text": "Mandalorians in Imperial pay are choking a supply lane. The Navy asks for Jedi. The Senate asks you to stay out.",
+        "choices": [
+          {
+            "label": "Send a squad",
+            "effects": {
+              "mission": "blockade",
+              "favor": -1
+            }
+          },
+          {
+            "label": "Pay the clans off",
+            "effects": {
+              "credits": -60,
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ignore it",
+            "effects": {
+              "favor": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_treaty_vote",
+        "trigger": {
+          "type": "flag",
+          "flag": "e1_strike_known"
+        },
+        "text": "You know the strike is coming. Warn the Senate, and maybe the Empire's spies, or keep it inside the Order?",
+        "choices": [
+          {
+            "label": "Warn the Senate",
+            "effects": {
+              "favor": 2,
+              "intel": -1
+            }
+          },
+          {
+            "label": "Keep it secret",
+            "effects": {
+              "flag": "e1_ambush_ready",
+              "favor": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_satele",
+        "trigger": {
+          "type": "after_mission",
+          "min": 3
+        },
+        "text": "A young Knight, Satele Shan, asks to join your strike teams. Her master, Kao Cen Darach, disagrees.",
+        "choices": [
+          {
+            "label": "Take her",
+            "effects": {
+              "recruit": "satele_shan",
+              "flag": "satele_joined",
+              "loyalty": {
+                "seat": "darach",
+                "n": -10
+              }
+            }
+          },
+          {
+            "label": "Respect her master",
+            "effects": {
+              "loyalty": {
+                "seat": "darach",
+                "n": 10
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_prisoner_offer",
+        "trigger": {
+          "type": "stat",
+          "key": "intel",
+          "op": ">=",
+          "val": 3
+        },
+        "text": "A captured Imperial officer offers names of Republic traitors in exchange for a ship.",
+        "choices": [
+          {
+            "label": "Deal",
+            "effects": {
+              "intel": 2,
+              "favor": -1,
+              "flag": "e1_traitors"
+            }
+          },
+          {
+            "label": "Hand him to the Navy",
+            "effects": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Make him talk",
+            "effects": {
+              "intel": 3,
+              "unitDark": {
+                "who": "jedi_random",
+                "n": 2
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_refugees",
+        "trigger": {
+          "type": "month",
+          "min": 2
+        },
+        "text": "Refugees from Taris ask to camp in the Temple gardens. The Senate says it sets a bad example.",
+        "choices": [
+          {
+            "label": "Take them in",
+            "effects": {
+              "credits": -40,
+              "favor": -2,
+              "recruits": 1,
+              "flag": "e1_refugees_in"
+            }
+          },
+          {
+            "label": "Send them to the Senate",
+            "effects": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Turn them away",
+            "effects": {
+              "orderDark": 4
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_senate_audit",
+        "trigger": {
+          "type": "after_mission",
+          "min": 2
+        },
+        "text": "A Senate committee wants an account of every credit the Order spends on the war.",
+        "choices": [
+          {
+            "label": "Open the books",
+            "effects": {
+              "credits": -30,
+              "favor": 4
+            }
+          },
+          {
+            "label": "Refuse",
+            "effects": {
+              "favor": -4
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_ilum_call",
+        "trigger": {
+          "type": "act",
+          "min": 2
+        },
+        "text": "A Republic sergeant, Jace Malcom, sends a blunt signal from Ilum: Sith scouts are circling the crystal caves.",
+        "choices": [
+          {
+            "label": "Send kyber money",
+            "effects": {
+              "credits": -30,
+              "kyber": 1
+            }
+          },
+          {
+            "label": "Tell him help is coming",
+            "effects": {
+              "favor": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_defector",
+        "trigger": {
+          "type": "after_mission",
+          "min": 4
+        },
+        "text": "An Imperial agent wants to defect. She says she knows how the Empire talks to its strike teams.",
+        "choices": [
+          {
+            "label": "Bring her in",
+            "effects": {
+              "chance": 0.6,
+              "intel": 3,
+              "flag": "e1_defector",
+              "fail": {
+                "wound": {
+                  "who": "squad_leader",
+                  "turns": 2
+                },
+                "intel": 1
+              }
+            }
+          },
+          {
+            "label": "Hand her to the SIS",
+            "effects": {
+              "favor": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_gnost_warning",
+        "trigger": {
+          "type": "flag",
+          "flag": "e1_vault_read"
+        },
+        "text": "Gnost-Dural’s records show the old Sith struck at a Temple during peace talks. He thinks it will happen again.",
+        "choices": [
+          {
+            "label": "Tell the whole Council",
+            "effects": {
+              "flag": "e1_strike_known",
+              "loyalty": {
+                "seat": "gnost",
+                "n": 10
+              }
+            }
+          },
+          {
+            "label": "Seal the records",
+            "effects": {
+              "intel": 2,
+              "loyalty": {
+                "seat": "gnost",
+                "n": -10
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_mando_duel",
+        "trigger": {
+          "type": "month",
+          "min": 4
+        },
+        "text": "A Mandalorian champion holds a Republic pilot. He will trade her for a duel with your best Jedi.",
+        "choices": [
+          {
+            "label": "Accept the duel",
+            "effects": {
+              "chance": 0.5,
+              "favor": 4,
+              "flag": "e1_mando_honor",
+              "fail": {
+                "wound": {
+                  "who": "jedi_highestDark",
+                  "turns": 2
+                }
+              }
+            }
+          },
+          {
+            "label": "Decline",
+            "effects": {
+              "favor": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_revenge",
+        "trigger": {
+          "type": "after_mission",
+          "min": 6
+        },
+        "text": "A young Jedi lost friends in the last fight. They want the next mission to be about payback.",
+        "choices": [
+          {
+            "label": "Counsel patience",
+            "effects": {
+              "unitDark": {
+                "who": "jedi_highestDark",
+                "n": -2
+              }
+            }
+          },
+          {
+            "label": "Let them burn",
+            "effects": {
+              "unitDark": {
+                "who": "jedi_highestDark",
+                "n": 2
+              },
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_jace_satele",
+        "trigger": {
+          "type": "all",
+          "all": [
+            {
+              "type": "flag",
+              "flag": "satele_joined"
+            },
+            {
+              "type": "flag",
+              "flag": "jace_joined"
+            }
+          ]
+        },
+        "text": "Satele Shan and Jace Malcom are seen together more than the Code would like. Darach asks you to step in.",
+        "choices": [
+          {
+            "label": "Look away",
+            "effects": {
+              "favor": 1,
+              "loyalty": {
+                "seat": "darach",
+                "n": -10
+              }
+            }
+          },
+          {
+            "label": "Remind her of the Code",
+            "effects": {
+              "loyalty": {
+                "seat": "darach",
+                "n": 10
+              },
+              "orderDark": -4
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_zym_treaty",
+        "trigger": {
+          "type": "act",
+          "min": 3
+        },
+        "text": "Grand Master Zym will back the treaty, even its terms that pull Jedi off Imperial-claimed worlds.",
+        "choices": [
+          {
+            "label": "Back Zym",
+            "effects": {
+              "favor": 4,
+              "orderDark": -4,
+              "loyalty": {
+                "seat": "zym",
+                "n": 10
+              }
+            }
+          },
+          {
+            "label": "Oppose the terms",
+            "effects": {
+              "favor": -3,
+              "flag": "e1_opposed_treaty",
+              "loyalty": {
+                "seat": "zym",
+                "n": -10
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_eleena",
+        "trigger": {
+          "type": "act",
+          "min": 3
+        },
+        "text": "Scouts saw a Twi’lek, Eleena Daru, buying shuttle codes for Coruscant. She travels with Darth Malgus.",
+        "choices": [
+          {
+            "label": "Track her",
+            "effects": {
+              "intel": -1,
+              "flag": "e1_eleena_tracked"
+            }
+          },
+          {
+            "label": "Let her go",
+            "effects": {}
+          }
+        ]
+      },
+      {
+        "id": "e1_docks",
+        "trigger": {
+          "type": "after_mission",
+          "min": 9
+        },
+        "text": "The Temple Guard captain asks for credits to post guards at the Coruscant docking rings.",
+        "choices": [
+          {
+            "label": "Pay for the posts",
+            "effects": {
+              "credits": -60,
+              "flag": "e1_docks_guarded"
+            }
+          },
+          {
+            "label": "The Temple comes first",
+            "effects": {}
+          }
+        ]
+      },
+      {
+        "id": "e1_padawan_doubt",
+        "trigger": {
+          "type": "act",
+          "min": 3
+        },
+        "text": "A Padawan asks why the Order makes peace with the people who burned their homeworld.",
+        "choices": [
+          {
+            "label": "Answer honestly",
+            "effects": {
+              "unitDark": {
+                "who": "jedi_random",
+                "n": -1
+              }
+            }
+          },
+          {
+            "label": "Tell them to obey",
+            "effects": {
+              "unitDark": {
+                "who": "jedi_random",
+                "n": 1
+              },
+              "favor": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_hutt_collects",
+        "trigger": {
+          "type": "all",
+          "all": [
+            {
+              "type": "act",
+              "min": 3
+            },
+            {
+              "type": "flag",
+              "flag": "e1_hutt_deal"
+            }
+          ]
+        },
+        "text": "The Hutt from Act I is back. He wants your help with a Senate hearing, or he sells what he knows about the docking rings to the Empire.",
+        "choices": [
+          {
+            "label": "Help him",
+            "effects": {
+              "favor": -6,
+              "orderDark": 4
+            }
+          },
+          {
+            "label": "Pay him off",
+            "effects": {
+              "credits": -80
+            }
+          },
+          {
+            "label": "Let him sell",
+            "effects": {
+              "flag": "e1_hutt_sold"
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_archive_copy",
+        "trigger": {
+          "type": "all",
+          "all": [
+            {
+              "type": "act",
+              "min": 3
+            },
+            {
+              "type": "flag",
+              "flag": "archive_backup"
+            }
+          ]
+        },
+        "text": "The hidden Archive copy sends word: the keepers found a holocron the Temple thought was lost.",
+        "choices": [
+          {
+            "label": "Bring it home",
+            "effects": {
+              "intel": 2,
+              "kyber": 1
+            }
+          },
+          {
+            "label": "Leave it hidden",
+            "effects": {
+              "shadow": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_traitor_purge",
+        "trigger": {
+          "type": "all",
+          "all": [
+            {
+              "type": "act",
+              "min": 3
+            },
+            {
+              "type": "flag",
+              "flag": "e1_traitors"
+            }
+          ]
+        },
+        "text": "One name from the Imperial officer’s list now runs docking control on Coruscant.",
+        "choices": [
+          {
+            "label": "Arrest him quietly",
+            "effects": {
+              "favor": 2,
+              "flag": "e1_docks_guarded"
+            }
+          },
+          {
+            "label": "Feed him false schedules",
+            "effects": {
+              "intel": 2,
+              "flag": "e1_strike_known"
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_refugee_pilot",
+        "trigger": {
+          "type": "all",
+          "all": [
+            {
+              "type": "act",
+              "min": 3
+            },
+            {
+              "type": "flag",
+              "flag": "e1_refugees_in"
+            }
+          ]
+        },
+        "text": "A Taris refugee you sheltered years ago is now a freighter pilot. She saw a Sith shuttle filing false papers for Coruscant.",
+        "choices": [
+          {
+            "label": "Thank her and listen",
+            "effects": {
+              "flag": "e1_strike_known",
+              "intel": 1
+            }
+          },
+          {
+            "label": "Offer her a place",
+            "effects": {
+              "recruits": 1,
+              "favor": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "e1_mando_debt",
+        "trigger": {
+          "type": "all",
+          "all": [
+            {
+              "type": "act",
+              "min": 3
+            },
+            {
+              "type": "flag",
+              "flag": "e1_mando_honor"
+            }
+          ]
+        },
+        "text": "The Mandalorian champion you dueled sends a fighter. \"You beat him clean. Clan Ordo pays its debts.\"",
+        "choices": [
+          {
+            "label": "Accept the fighter",
+            "effects": {
+              "recruit": "varra_ordo"
+            }
+          },
+          {
+            "label": "Release the debt",
+            "effects": {
+              "favor": 2
+            }
+          }
+        ]
+      }
+    ],
+    "PLAN": [
+      {
+        "story": "relay"
+      },
+      {
+        "crises": [
+          "rescue",
+          "shrine",
+          "archive"
+        ]
+      },
+      {
+        "story": "envoy"
+      },
+      {
+        "crises": [
+          "hutt",
+          "blockade"
+        ]
+      },
+      {
+        "years": 3,
+        "act": 2
+      },
+      {
+        "crises": [
+          "sabotage",
+          "cache"
+        ]
+      },
+      {
+        "story": "vault"
+      },
+      {
+        "crises": [
+          "escort",
+          "fort"
+        ]
+      },
+      {
+        "story": "ilum"
+      },
+      {
+        "years": 4,
+        "act": 3
+      },
+      {
+        "crises": [
+          "taris",
+          "depot"
+        ]
+      },
+      {
+        "story": "adraasHunt"
+      },
+      {
+        "crises": [
+          "thul",
+          "blockade",
+          "archive"
+        ]
+      },
+      {
+        "story": "dock"
+      }
+    ],
+    "COUNCIL_SEATS": {
+      "gnost": {
+        "n": "Gnost-Dural",
+        "loyalty": 60
+      },
+      "darach": {
+        "n": "Kao Cen Darach",
+        "loyalty": 60
+      },
+      "zym": {
+        "n": "Grand Master Zym",
+        "loyalty": 60
+      }
+    },
+    "STORY_RECRUITS": {
+      "satele_shan": {
+        "n": "Satele Shan",
+        "cls": "Guardian",
+        "title": "Knight",
+        "rank": 2,
+        "xp": 30,
+        "picks": [
+          "reflectM"
+        ],
+        "col": "#9fd4ff",
+        "age": 24
+      },
+      "jace_malcom": {
+        "n": "Jace Malcom",
+        "cls": "Soldier",
+        "rank": 2,
+        "xp": 30,
+        "picks": [
+          "rapidFire"
+        ],
+        "col": "#e0bd78",
+        "age": 31
+      },
+      "varra_ordo": {
+        "n": "Varra Ordo",
+        "cls": "Heavy",
+        "rank": 2,
+        "xp": 30,
+        "col": "#c9d27a",
+        "age": 34
+      }
+    },
+    "FLAG_LINES": {
+      "e1_strike_known": "The envoy talked: you knew the strike was coming.",
+      "e1_ambush_ready": "You kept the warning inside the Order and set an ambush.",
+      "archive_backup": "A copy of the Archives sleeps on a hidden colony.",
+      "e1_traitors": "Names of Republic traitors sit in your files.",
+      "boss_or_won": "Darth Malgus fell at Docking Ring Nine.",
+      "temple_scarred": "The Temple was scarred. In canon it was sacked.",
+      "e1_vault_read": "Gnost-Dural recovered the Ossus records.",
+      "jace_joined": "Jace Malcom fought for the Order.",
+      "satele_joined": "Satele Shan fought under your command.",
+      "e1_adraas_down": "Lord Adraas fell on Alderaan.",
+      "e1_adraas_free": "Lord Adraas escaped to join the strike.",
+      "e1_defector": "An Imperial agent changed sides.",
+      "e1_opposed_treaty": "You spoke against the treaty’s terms.",
+      "e1_eleena_tracked": "You tracked Eleena Daru to Malgus’s shuttle.",
+      "e1_docks_guarded": "Temple Guards watched the docking rings.",
+      "e1_hutt_sold": "A Hutt sold the docking schedule to the Empire.",
+      "e1_refugees_in": "You sheltered Taris refugees in the Temple gardens.",
+      "e1_mando_honor": "A Jedi beat a Mandalorian champion in a fair duel."
+    },
+    "EPI": {
+      "relay": {
+        "win": "Three of them didn’t come home to the frontier.",
+        "lose": "The fleet arrived to a burned-out relay."
+      },
+      "envoy": {
+        "win": "Saresh will never serve the Senate again. Nobody thanks you for it.",
+        "lose": "Somewhere, the schedule still leaks."
+      },
+      "rescue": {
+        "win": "The depot burns behind you. So does the trust of the local militia.",
+        "lose": "An empty cell, still warm."
+      },
+      "shrine": {
+        "win": "The pilgrims light candles for the Jedi. And for the troopers who held the line.",
+        "lose": "The crystals are gone. The shrine will sing no more."
+      },
+      "archive": {
+        "win": "The Navy got its codes. Imperial Intelligence will want to know who took them."
+      },
+      "sabotage": {
+        "win": "The sky over Balmorra burns orange for a week."
+      },
+      "escort": {
+        "win": "The senator will vote for peace. He will not thank you either."
+      },
+      "blockade": {
+        "win": "The convoy is through. The clans will remember the Jedi who stopped them."
+      },
+      "cache": {
+        "win": "The intercepts are good. The Empire is moving more ships than it admits."
+      },
+      "hutt": {
+        "win": "The Hutt will remember this. Hutts always remember."
+      },
+      "vault": {
+        "win": "Gnost-Dural reads the records twice, then asks to see the Grand Master alone.",
+        "lose": "Gnost-Dural says nothing on the flight home. He does not need to."
+      },
+      "ilum": {
+        "win": "Jace Malcom buries four of his platoon in the snow, then asks how he can serve.",
+        "lose": "The caves are silent. Malcom’s platoon held to the last."
+      },
+      "adraasHunt": {
+        "win": "Satele says nothing about the treaty. She is thinking about the one Sith left.",
+        "lose": "The hangar smells of ozone. Adraas has gone to join Malgus."
+      },
+      "taris": {
+        "win": "The camp eats tonight."
+      },
+      "thul": {
+        "win": "House Thul will speak for the Jedi at the talks.",
+        "lose": "Alderaan’s nobles close their doors to the Order."
+      },
+      "depot": {
+        "win": "The push stalls. Somewhere, an Imperial officer is shot for it."
+      },
+      "fort": {
+        "win": "The hill is Republic. For now."
+      },
+      "dock": {
+        "win": "The treaty was still signed in smoke.",
+        "lose": "The Temple stands, scarred. Grand Master Zym walks the burned halls alone."
+      }
+    },
+    "MISSION_LORE": {
+      "shrine": [
+        "dantooine"
+      ],
+      "rescue": [
+        "ordMantell",
+        [
+          "mira"
+        ]
+      ],
+      "envoy": [
+        "coruscant",
+        [
+          "saresh"
+        ]
+      ],
+      "archive": [
+        "balmorra"
+      ],
+      "sabotage": [
+        "balmorra"
+      ],
+      "escort": [
+        "coruscant",
+        [
+          "ondo"
+        ]
+      ],
+      "blockade": [
+        "hydianWay"
+      ],
+      "hutt": [
+        "narShaddaa"
+      ],
+      "dock": [
+        "coruscant",
+        [
+          "malgus"
+        ]
+      ],
+      "vault": [
+        "ossus",
+        [
+          "gnost"
+        ]
+      ],
+      "ilum": [
+        "ilum",
+        [
+          "jace"
+        ]
+      ],
+      "adraasHunt": [
+        "alderaan",
+        [
+          "adraas",
+          "satele"
+        ]
+      ],
+      "taris": [
+        "taris"
+      ],
+      "thul": [
+        "alderaan",
+        [
+          "thulHeir"
+        ]
+      ],
+      "fort": [
+        "ordMantell"
+      ],
+      "r_ravine": [
+        "ruusan"
+      ],
+      "r_caves": [
+        "ruusan"
+      ],
+      "r_bomb": [
+        "ruusan"
+      ],
+      "r_hospital": [
+        "ruusan"
+      ],
+      "r_nexus": [
+        "ruusan"
+      ],
+      "r_snipers": [
+        "ruusan"
+      ],
+      "r_dump": [
+        "ruusan"
+      ]
+    },
+    "EVENT_LORE": {
+      "e1_gnost_archive": [
+        "gnost"
+      ],
+      "e1_satele": [
+        "satele",
+        "darach"
+      ],
+      "e1_ilum_call": [
+        "jace"
+      ],
+      "e1_gnost_warning": [
+        "gnost"
+      ],
+      "e1_jace_satele": [
+        "satele",
+        "jace",
+        "darach"
+      ],
+      "e1_zym_treaty": [
+        "zym"
+      ],
+      "e1_eleena": [
+        "eleena",
+        "malgus"
+      ],
+      "e1_hutt_collects": [
+        "narShaddaa"
+      ],
+      "e1_refugee_pilot": [
+        "taris"
+      ]
+    },
+    "ERA1": {
+      "n": "Old Republic",
+      "bby": 3660,
+      "next": "Ruusan · ~1,000 BBY",
+      "shard": {
+        "t": "A shard of the vision",
+        "text": "Meditating again, the Council sees more: fire on the Temple steps, a red blade in a scarred hand, a treaty signed in smoke."
+      }
+    },
+    "SHADOW": {
+      "start": 6,
+      "word": {
+        "$js": "v=>v<=3?'faint':v<=6?'clear':'certain'"
+      }
+    },
+    "YEARS": {
+      "jump": 5,
+      "recruits": 3,
+      "retire": {
+        "$js": "retire(r,jedi){const a=r.age;if(jedi)return a>=85?100:a>=75?50:a>=65?20:0;return a>=55?100:a>=50?60:a>=40?25:0}"
+      },
+      "trialsFail": {
+        "dark": 7,
+        "chance": 50
+      },
+      "ages": {
+        "Kira Venn": 29,
+        "Tor Saalen": 17,
+        "Sgt. Rhal Dax": 47,
+        "Ilsa Myr": 26,
+        "Doc Bren": 38,
+        "Grak Ordo": 33
+      },
+      "range": {
+        "Padawan": [
+          14,
+          19
+        ],
+        "Knight": [
+          22,
+          40
+        ],
+        "troop": [
+          20,
+          35
+        ]
+      },
+      "roles": {
+        "staff": "Staff a wing",
+        "teach": "Teach the next recruit",
+        "relic": "Leave a relic to the Archive"
+      }
+    },
+    "ACTS": {
+      "2": {
+        "t": "Years pass",
+        "text": "Three years go by. The war cools into a cold peace that no one trusts. Wounds heal. Padawans face the Trials. Some veterans hang up their gear."
+      },
+      "3": {
+        "t": "The year of the treaty",
+        "text": "Four more years. Envoys gather on Alderaan to sign a peace. The Council’s vision has never been clearer. Whatever is coming, it comes this year."
+      }
+    },
+    "SHARDS": {
+      "2": "The vision returns: Jedi bodies on the Temple steps, and a treaty table on a green world.",
+      "3": "The vision is clear now: a shuttle at a docking ring, a scarred Sith Lord, and the Temple doors open."
+    },
+    "STORY_TEXT": {
+      "bossWin": "You stopped the shuttle. The treaty was still signed in smoke.",
+      "bossLose": "Malgus reached the Temple steps before the Guard drove him off. The Temple is scarred: a wing lost a level.",
+      "ambush": "Your ambush was ready: Malgus lands already wounded.",
+      "adraas": "Adraas fell on Alderaan: one fewer squad came with Malgus.",
+      "guards": "Temple Guards hold the docking ring: no reinforcements reach Malgus.",
+      "eraWin": "The Temple stands. The Empire got its treaty, but not its lesson.",
+      "eraLose": "The Temple stands, scarred. The Senate wonders what the Jedi are for.",
+      "darkWarn": "The Order is drifting. Some Masters speak of a Dark Council."
+    },
+    "QUOTES": {
+      "relay": "“Hold the relay. The fleet needs the lane open.” — Grand Master Zym",
+      "envoy": "“Somebody is selling the peace. Find out who.” — Kao Cen Darach",
+      "vault": "“The last time the Sith struck at a Temple, they did it while we talked.” — Gnost-Dural",
+      "ilum": "“No Jedi blade without Ilum. Hold it.” — Grand Master Zym",
+      "adraasHunt": "“Two of them will come. Let us make it one.” — Satele Shan",
+      "dock": "“This is the vision. Change it.” — Grand Master Zym"
+    },
+    "BRIEF_IF": {
+      "dock": [
+        [
+          "e1_eleena_tracked",
+          "Eleena Daru’s shuttle codes tell you exactly where he lands. You have an extra turn."
+        ],
+        [
+          "e1_strike_known",
+          "You knew this was coming. Your squad is in place early."
+        ],
+        [
+          "e1_hutt_sold",
+          "The Hutt sold Malgus the ring’s patrol schedule. He knows where you are."
+        ]
+      ],
+      "adraasHunt": [
+        [
+          "e1_vault_read",
+          "Gnost-Dural’s records name the signal Adraas is waiting for. Strike before it comes."
+        ]
+      ],
+      "vault": [
+        [
+          "archive_backup",
+          "Gnost-Dural is calm. A copy of the Archives already sleeps somewhere safe."
+        ]
+      ],
+      "ilum": [
+        [
+          "e1_hutt_deal",
+          "Some of the raiders carry Hutt-sold Ilum crystals. Your deal paid for their sabers."
+        ]
+      ],
+      "envoy": [
+        [
+          "e1_traitors",
+          "The traitor names from the Imperial officer point here too."
+        ]
+      ]
+    },
+    "DEBRIEF_IF": {
+      "dock": [
+        [
+          "temple_scarred",
+          null,
+          "The Temple stands, scarred. The Archive copy you approved means the records survive."
+        ],
+        [
+          "e1_adraas_down",
+          "Malgus fought alone at the end. Adraas never came.",
+          null
+        ]
+      ],
+      "ilum": [
+        [
+          "satele_joined",
+          "Satele Shan stays behind to help Malcom bury his dead. Darach notices.",
+          null
+        ]
+      ],
+      "adraasHunt": [
+        [
+          "e1_eleena_tracked",
+          "Adraas is gone. Eleena’s trail still leads to Coruscant.",
+          null
+        ]
+      ],
+      "vault": [
+        [
+          "e1_strike_known",
+          "The records match the envoy’s confession. Gnost-Dural stops sleeping.",
+          null
+        ]
+      ]
+    },
+    "BARKS": {
+      "jedi": {
+        "kill": [
+          "It’s done.",
+          "Rest now.",
+          "Forgive me."
+        ],
+        "down": [
+          "Keep... going...",
+          "I can still feel you."
+        ],
+        "crit": [
+          "There.",
+          "Opening."
+        ],
+        "panic": [
+          "I can’t... the dark is loud.",
+          "Not like this."
+        ]
+      },
+      "troop": {
+        "kill": [
+          "Target down.",
+          "One less.",
+          "Got him."
+        ],
+        "down": [
+          "Medic!",
+          "I’m hit, I’m hit!"
+        ],
+        "crit": [
+          "Right through the plate.",
+          "Clean hit."
+        ],
+        "panic": [
+          "I’m done, I’m done!",
+          "Where’s the evac?"
+        ]
+      },
+      "steady": {
+        "kill": [
+          "Next.",
+          "Target down. Moving."
+        ],
+        "down": [
+          "Still here. Barely."
+        ],
+        "crit": [
+          "Breathe. Squeeze."
+        ],
+        "panic": [
+          "Hold it together... I can’t."
+        ]
+      },
+      "reckless": {
+        "kill": [
+          "Who’s next?",
+          "Too easy!"
+        ],
+        "down": [
+          "Worth it."
+        ],
+        "crit": [
+          "Did you see that?"
+        ],
+        "panic": [
+          "Get me out of here!"
+        ]
+      },
+      "compassionate": {
+        "kill": [
+          "I’m sorry.",
+          "He had a family. They all do."
+        ],
+        "down": [
+          "Help the others first."
+        ],
+        "crit": [
+          "End it quick."
+        ],
+        "panic": [
+          "Too many of us are hurt."
+        ]
+      },
+      "ambitious": {
+        "kill": [
+          "Write that one down.",
+          "Count it."
+        ],
+        "down": [
+          "This isn’t how my story ends."
+        ],
+        "crit": [
+          "Watch and learn."
+        ],
+        "panic": [
+          "This wasn’t the plan!"
+        ]
+      },
+      "curious": {
+        "kill": [
+          "Interesting armor. Was."
+        ],
+        "down": [
+          "Huh. That’s a lot of blood."
+        ],
+        "crit": [
+          "Found the weak seam."
+        ],
+        "panic": [
+          "What is that thing?"
+        ]
+      }
+    },
+    "HERO_BARKS": {
+      "Jace Malcom": {
+        "kill": [
+          "Stay down.",
+          "That’s for Ilum."
+        ],
+        "down": [
+          "Not today."
+        ],
+        "crit": [
+          "Bullseye."
+        ],
+        "panic": [
+          "Pull back! Pull back!"
+        ]
+      },
+      "Satele Shan": {
+        "kill": [
+          "Go to the Force."
+        ],
+        "down": [
+          "I’m all right. Move!"
+        ],
+        "crit": [
+          "Now."
+        ],
+        "panic": [
+          "Steady... steady."
+        ]
+      },
+      "Kira Venn": {
+        "kill": [
+          "Hold the line."
+        ],
+        "down": [
+          "Don’t wait for me."
+        ],
+        "crit": [
+          "Opening!"
+        ],
+        "panic": [
+          "I see the Temple burning..."
+        ]
+      }
+    },
+    "EPILOGUE": [
+      [
+        {
+          "$js": "r=>r.status==='retired'&&r.relic"
+        },
+        {
+          "$js": "r=>`Left a relic to the Archive. Padawans still argue about what it means.`"
+        }
+      ],
+      [
+        {
+          "$js": "r=>r.status==='retired'"
+        },
+        {
+          "$js": "r=>`Retired at ${r.age}. ${r.role||'Lives quietly'}.`"
+        }
+      ],
+      [
+        {
+          "$js": "r=>CLASS[r.cls]&&CLASS[r.cls].jedi&&(r.dark||0)>=7"
+        },
+        {
+          "$js": "r=>`Walks close to the dark. The Council watches ${r.n} and says nothing.`"
+        }
+      ],
+      [
+        {
+          "$js": "r=>r.n==='Satele Shan'"
+        },
+        {
+          "$js": "r=>`Follows the treaty to Tython. Some say she will lead the Order one day.`"
+        }
+      ],
+      [
+        {
+          "$js": "r=>r.n==='Jace Malcom'"
+        },
+        {
+          "$js": "r=>`Goes back to the front. The Republic will need soldiers like him for a long time.`"
+        }
+      ],
+      [
+        {
+          "$js": "r=>(r.scars||[]).length>0"
+        },
+        {
+          "$js": "r=>`Carries the war home in ${(r.scars||[]).length>1?'more than one scar':'a scar'}, and serves anyway.`"
+        }
+      ],
+      [
+        {
+          "$js": "r=>(r.kills||0)>=12"
+        },
+        {
+          "$js": "r=>`${r.kills} enemies fell to ${r.n}. The Senate gives a medal. ${r.n} gives it to the Archive.`"
+        }
+      ],
+      [
+        {
+          "$js": "r=>CLASS[r.cls]&&CLASS[r.cls].jedi&&r.title==='Master'"
+        },
+        {
+          "$js": "r=>`Takes a seat on the Council, and a Padawan of their own.`"
+        }
+      ],
+      [
+        {
+          "$js": "r=>CLASS[r.cls]&&CLASS[r.cls].jedi&&r.title==='Knight'"
+        },
+        {
+          "$js": "r=>`A Knight now. Teaches the younglings what the war cost.`"
+        }
+      ],
+      [
+        {
+          "$js": "r=>CLASS[r.cls]&&CLASS[r.cls].jedi"
+        },
+        {
+          "$js": "r=>`Still a Padawan, still learning. Some lessons only peace can teach.`"
+        }
+      ],
+      [
+        {
+          "$js": "r=>(r.missions||0)>=8"
+        },
+        {
+          "$js": "r=>`${r.missions} missions. The Temple Guard asks for ${r.n} by name.`"
+        }
+      ],
+      [
+        {
+          "$js": "r=>true"
+        },
+        {
+          "$js": "r=>`Survived the war. Goes home to a planet that never knew how close it came.`"
+        }
+      ]
+    ],
+    "BASE_MISSIONS": {
+      "relay": {
+        "n": "Relay Aurek-7",
+        "where": "Outpost Aurek-7 · Sith frontier",
+        "type": "defend",
+        "story": 1,
+        "theme": "plains",
+        "turns": 8,
+        "obj": 20,
+        "objName": "Relay",
+        "lastWave": 5,
+        "map": [
+          "^^......^^",
+          "..#....#..",
+          ".c..cc..c.",
+          "....##....",
+          ".c......c.",
+          "##.c..c.##",
+          "....cc....",
+          ".#......#.",
+          ".c.c..c.c.",
+          "^^c.##..^^",
+          "M^.cOOc.^M",
+          ".........."
+        ],
+        "waves": {
+          "1": [
+            "trooper",
+            "trooper",
+            "trooper"
+          ],
+          "3": [
+            "trooper",
+            "trooper",
+            "heavy"
+          ],
+          "5": [
+            "acolyte",
+            "trooper",
+            "trooper"
+          ]
+        },
+        "start": [
+          [
+            2,
+            11
+          ],
+          [
+            6,
+            9
+          ],
+          [
+            2,
+            8
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            8
+          ]
+        ],
+        "brief": "Imperial Sith troopers are closing on a frontier hyperspace relay. Hold it for 8 turns until the fleet arrives. Three waves are expected.",
+        "goal": "Hold the relay for 8 turns. The fleet is coming.",
+        "win": "The Republic fleet drops out of hyperspace. The relay held.",
+        "lose": "The relay fell. The Sith now hold the hyperlane toward the Core.",
+        "reward": {
+          "credits": 80
+        },
+        "bonus": {
+          "credits": 40
+        },
+        "bonusTxt": "Relay above 75%"
+      },
+      "shrine": {
+        "n": "Dantooine Shrine",
+        "where": "Pilgrim shrine · Dantooine",
+        "type": "defend",
+        "theme": "plains",
+        "turns": 6,
+        "obj": 16,
+        "objName": "Shrine",
+        "lastWave": 4,
+        "map": [
+          "..........",
+          ".c^^##^^c.",
+          "....cc....",
+          "#..c..c..#",
+          ".c......c.",
+          "...#..#...",
+          ".c..cc..c.",
+          "..........",
+          ".c.c..c.c.",
+          "...#OO#...",
+          "....OO....",
+          ".........."
+        ],
+        "waves": {
+          "1": [
+            "trooper",
+            "trooper",
+            "heavy"
+          ],
+          "2": [
+            "terentatek",
+            "trooper"
+          ],
+          "4": [
+            "trooper",
+            "heavy",
+            "trooper"
+          ]
+        },
+        "start": [
+          [
+            2,
+            10
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            8,
+            9
+          ]
+        ],
+        "brief": "Sith troopers are raiding a kyber shrine. Pilgrims swear something else came with them: a beast that hunts Jedi. Hold for 6 turns.",
+        "goal": "Hold the shrine for 6 turns. The Terentatek can only hurt Jedi, and it devours a downed Jedi left unstabilized for a turn. Troops are your shield.",
+        "win": "The pilgrims come out of hiding. The shrine stands.",
+        "lose": "The shrine is looted. The pilgrims scatter.",
+        "reward": {
+          "kyber": 1,
+          "credits": 60
+        },
+        "bonus": {
+          "credits": 30
+        },
+        "bonusTxt": "Shrine above 75%",
+        "alts": [
+          {
+            "where": "Grove terraces · Dantooine",
+            "theme": "jungle",
+            "map": [
+              "..........",
+              ".c^^B^^c..",
+              "....c.....",
+              ".B.x...B..",
+              "......c...",
+              ".c.B..B.c.",
+              "..........",
+              ".h..cc..h.",
+              "..c....c..",
+              "...#OO#...",
+              "...cOOc...",
+              ".........."
+            ],
+            "start": [
+              [
+                2,
+                10
+              ],
+              [
+                7,
+                10
+              ],
+              [
+                2,
+                11
+              ],
+              [
+                7,
+                11
+              ],
+              [
+                1,
+                9
+              ],
+              [
+                8,
+                9
+              ]
+            ]
+          }
+        ]
+      },
+      "rescue": {
+        "n": "Ord Mantell Depot",
+        "where": "Supply depot · Ord Mantell",
+        "type": "rescue",
+        "par": 5,
+        "theme": "dock",
+        "patrol": {
+          "1": [
+            [
+              2,
+              4
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              2,
+              7
+            ]
+          ]
+        },
+        "map": [
+          "..c....c..",
+          "...####...",
+          ".c.#..#k..",
+          "...#D##...",
+          ".x......c.",
+          "..c.cc.x..",
+          "#^^....c.#",
+          ".c^.##..c.",
+          "....cc..^^",
+          ".c......c.",
+          "....c.c...",
+          "EE......EE"
+        ],
+        "hostage": [
+          5,
+          2
+        ],
+        "foes": [
+          [
+            "trooper",
+            2,
+            4,
+            1
+          ],
+          [
+            "trooper",
+            6,
+            4,
+            1
+          ],
+          [
+            "heavy",
+            5,
+            0,
+            2
+          ],
+          [
+            "agent",
+            8,
+            1
+          ]
+        ],
+        "reinforce": [
+          "trooper",
+          "trooper"
+        ],
+        "start": [
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            7,
+            10
+          ]
+        ],
+        "brief": "Sith raiders hold a prisoner in a locked cell. A Medic can Hack the door from 4 tiles; a Jedi can try the console. Then walk the prisoner to an evac zone (E).",
+        "goal": "Open the cell (Hack or console), then get the prisoner to an evac zone. Threat rises after turn 5; at Threat 6 they fly the prisoner out.",
+        "win": "The prisoner is out. The shuttle lifts off under fire.",
+        "lose": "The prisoner is lost.",
+        "reward": {
+          "credits": 90,
+          "favor": 5
+        },
+        "bonus": {
+          "recruits": 1
+        },
+        "bonusTxt": "Done by turn 5",
+        "alts": [
+          {
+            "where": "Cliffside cell block · Ord Mantell",
+            "map": [
+              "^^......^^",
+              ".c..cc..c.",
+              "...####...",
+              ".k.#..#.x.",
+              "...##D#...",
+              ".B......B.",
+              "...c..c...",
+              ".h..x...h.",
+              "...B..B...",
+              ".c..cc..c.",
+              "..........",
+              "EE..c...EE"
+            ],
+            "hostage": [
+              4,
+              3
+            ],
+            "theme": "ruins",
+            "foes": [
+              [
+                "trooper",
+                2,
+                1,
+                1
+              ],
+              [
+                "trooper",
+                7,
+                1,
+                1
+              ],
+              [
+                "trooper",
+                2,
+                4,
+                2
+              ],
+              [
+                "heavy",
+                5,
+                6,
+                2
+              ],
+              [
+                "agent",
+                8,
+                6
+              ]
+            ],
+            "patrol": {
+              "2": [
+                [
+                  2,
+                  6
+                ],
+                [
+                  7,
+                  6
+                ],
+                [
+                  7,
+                  8
+                ],
+                [
+                  2,
+                  8
+                ]
+              ]
+            },
+            "start": [
+              [
+                3,
+                11
+              ],
+              [
+                5,
+                11
+              ],
+              [
+                6,
+                11
+              ],
+              [
+                7,
+                11
+              ],
+              [
+                2,
+                10
+              ],
+              [
+                7,
+                10
+              ]
+            ]
+          }
+        ]
+      },
+      "envoy": {
+        "n": "The Envoy's Trail",
+        "where": "Lower city · Coruscant",
+        "type": "investigate",
+        "story": 1,
+        "theme": "city",
+        "par": 6,
+        "map": [
+          "q.c.#..c.q",
+          "....#.....",
+          ".c..d..x..",
+          ".#.##..##.",
+          "^..c...c.^",
+          ".x...q....",
+          "..c##..c..",
+          "....#....x",
+          ".c..d..c..",
+          "..........",
+          ".c..cc..c.",
+          "EE......EE"
+        ],
+        "foes": [
+          [
+            "trooper",
+            2,
+            1
+          ],
+          [
+            "trooper",
+            7,
+            1
+          ],
+          [
+            "heavy",
+            6,
+            0
+          ],
+          [
+            "agent",
+            8,
+            4
+          ],
+          [
+            "envoy",
+            5,
+            1
+          ]
+        ],
+        "reinforce": [
+          "trooper",
+          "trooper"
+        ],
+        "start": [
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            7,
+            10
+          ]
+        ],
+        "brief": "A Republic envoy is leaking the peace-talk schedule. Scan his data terminals (Jedi or Medic, adjacent). Once 2 are copied, anyone who reaches an evac zone gets the data out. Capture him if you can.",
+        "goal": "Scan 2 of 3 terminals, then get anyone to an evac zone. Threat rises after turn 6: terminals get wiped, and at Threat 6 the trail goes cold.",
+        "win": "The data is out. The Council reads it that night.",
+        "lose": "The trail goes cold.",
+        "reward": {
+          "credits": 70
+        },
+        "bonus": {
+          "intel": 2
+        },
+        "bonusTxt": "All 3 terminals"
+      },
+      "archive": {
+        "n": "The Listening Post",
+        "where": "Imperial listening post · Balmorra",
+        "type": "investigate",
+        "par": 6,
+        "theme": "ruins",
+        "stealth": 1,
+        "patrol": {
+          "2": [
+            [
+              8,
+              3
+            ],
+            [
+              8,
+              7
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              3
+            ]
+          ]
+        },
+        "map": [
+          "..q#......",
+          "...#.c..#q",
+          ".c.B....h.",
+          "....x..^^.",
+          ".h..##..h.",
+          "....q.....",
+          ".c.B..B.c.",
+          "^^......^^",
+          ".x..cc..c.",
+          "..........",
+          ".c..h..c..",
+          "EE......EE"
+        ],
+        "foes": [
+          [
+            "trooper",
+            1,
+            1,
+            1
+          ],
+          [
+            "trooper",
+            6,
+            1,
+            2
+          ],
+          [
+            "heavy",
+            5,
+            3,
+            3
+          ],
+          [
+            "agent",
+            7,
+            6
+          ],
+          [
+            "trooper",
+            8,
+            3,
+            2
+          ]
+        ],
+        "reinforce": [
+          "trooper",
+          "trooper"
+        ],
+        "start": [
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            8,
+            10
+          ]
+        ],
+        "alts": [
+          {
+            "where": "Data vault · Nar Shaddaa",
+            "map": [
+              "...c..c...",
+              ".q..##..q.",
+              "##d#..#d##",
+              "^^......^^",
+              ".B.x..b.B.",
+              "...h..h...",
+              ".c..q...c.",
+              "...h..B...",
+              ".h.^..^.h.",
+              "..c.cc.c..",
+              "..........",
+              "EE......EE"
+            ],
+            "theme": "city",
+            "foes": [
+              [
+                "trooper",
+                2,
+                0,
+                1
+              ],
+              [
+                "trooper",
+                7,
+                0,
+                1
+              ],
+              [
+                "heavy",
+                5,
+                3,
+                2
+              ],
+              [
+                "agent",
+                9,
+                5
+              ]
+            ],
+            "patrol": {
+              "1": [
+                [
+                  2,
+                  3
+                ],
+                [
+                  7,
+                  3
+                ]
+              ]
+            },
+            "start": [
+              [
+                3,
+                11
+              ],
+              [
+                4,
+                11
+              ],
+              [
+                5,
+                11
+              ],
+              [
+                6,
+                11
+              ],
+              [
+                2,
+                10
+              ],
+              [
+                7,
+                10
+              ]
+            ]
+          }
+        ],
+        "brief": "An Imperial post is reading Republic fleet traffic. Copy its data terminals (Jedi or Medic, adjacent), then get anyone to an evac zone. Blast walls crack under explosions.",
+        "goal": "Scan 2 of 3 terminals, then reach an evac zone. Threat rises after turn 6: terminals get wiped. Shoot alarm beacons before they call help.",
+        "win": "The fleet codes are ours. Navy Intelligence owes the Order a favor.",
+        "lose": "The post burns its data. The trail goes cold.",
+        "reward": {
+          "credits": 60,
+          "intel": 1
+        },
+        "bonus": {
+          "intel": 2
+        },
+        "bonusTxt": "All 3 terminals"
+      },
+      "sabotage": {
+        "n": "Fuel Depot Strike",
+        "where": "Imperial fuel depot · Balmorra",
+        "type": "sabotage",
+        "par": 7,
+        "need": 2,
+        "field": [
+          "plant"
+        ],
+        "theme": "dock",
+        "stealth": 1,
+        "patrol": {
+          "2": [
+            [
+              6,
+              5
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              8,
+              8
+            ]
+          ]
+        },
+        "map": [
+          "EE.#..#.EE",
+          "E..#..#..E",
+          "...h..h...",
+          ".c..xx..c.",
+          ".C..##..C.",
+          ".h..^^..h.",
+          "...c..b...",
+          ".B..cc..B.",
+          "^^......^^",
+          ".c.h..h.c.",
+          "..........",
+          "..c....c.."
+        ],
+        "foes": [
+          [
+            "trooper",
+            2,
+            2,
+            1
+          ],
+          [
+            "trooper",
+            7,
+            2,
+            1
+          ],
+          [
+            "heavy",
+            4,
+            1,
+            1
+          ],
+          [
+            "trooper",
+            6,
+            5,
+            2
+          ],
+          [
+            "agent",
+            9,
+            6
+          ],
+          [
+            "trooper",
+            8,
+            8,
+            2
+          ],
+          [
+            "trooper",
+            3,
+            8,
+            2
+          ]
+        ],
+        "reinforce": [
+          "trooper",
+          "heavy"
+        ],
+        "start": [
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            7,
+            10
+          ]
+        ],
+        "alts": [
+          {
+            "where": "Ion cannon battery · Balmorra",
+            "map": [
+              "EE......EE",
+              "E..c..c..E",
+              ".B.#..#.B.",
+              ".C.#..#.C.",
+              ".x......x.",
+              "..h.C..h..",
+              ".c..BB..c.",
+              "^^......^^",
+              ".B.c..c.B.",
+              "..........",
+              ".c..x...c.",
+              ".........."
+            ],
+            "theme": "plains",
+            "foes": [
+              [
+                "trooper",
+                4,
+                1,
+                1
+              ],
+              [
+                "trooper",
+                7,
+                1,
+                1
+              ],
+              [
+                "trooper",
+                5,
+                4,
+                2
+              ],
+              [
+                "agent",
+                0,
+                5
+              ],
+              [
+                "trooper",
+                2,
+                7,
+                2
+              ]
+            ],
+            "patrol": {
+              "2": [
+                [
+                  2,
+                  7
+                ],
+                [
+                  7,
+                  7
+                ],
+                [
+                  5,
+                  4
+                ]
+              ]
+            },
+            "start": [
+              [
+                3,
+                11
+              ],
+              [
+                4,
+                11
+              ],
+              [
+                5,
+                11
+              ],
+              [
+                6,
+                11
+              ],
+              [
+                2,
+                10
+              ],
+              [
+                7,
+                10
+              ]
+            ]
+          }
+        ],
+        "brief": "The Empire fuels its Balmorra fleet from this depot. Plant charges on 2 sites (anyone, adjacent, 1 action), then get every standing squad member onto the far evac zone. The charges blow when you are clear.",
+        "goal": "Plant 2 charges (adjacent, 1 action), then get everyone still standing onto the north evac zone. Threat rises after turn 7: techs defuse an armed charge each step.",
+        "win": "The depot goes up behind you. The Balmorra fleet sits dry for a month.",
+        "lose": "The depot holds. The fleet sails on schedule.",
+        "reward": {
+          "credits": 80,
+          "favor": 3
+        },
+        "bonus": {
+          "credits": 40
+        },
+        "bonusTxt": "Done by turn 7"
+      },
+      "escort": {
+        "n": "The Senator's Walk",
+        "where": "Lower city · Coruscant",
+        "type": "escort",
+        "theme": "city",
+        "par": 6,
+        "vip": "senator",
+        "map": [
+          "..c....EEE",
+          "....B.....",
+          ".h..x..b^^",
+          "...B..h...",
+          ".c....B.c.",
+          "...cc.....",
+          ".B.....h..",
+          "...x.c....",
+          ".c....B.c.",
+          "...h......",
+          "^^......^^",
+          ".c..cc..c."
+        ],
+        "hostage": [
+          4,
+          10
+        ],
+        "foes": [
+          [
+            "trooper",
+            2,
+            1
+          ],
+          [
+            "trooper",
+            6,
+            1
+          ],
+          [
+            "heavy",
+            5,
+            3
+          ],
+          [
+            "agent",
+            9,
+            3
+          ],
+          [
+            "trooper",
+            8,
+            6
+          ],
+          [
+            "trooper",
+            0,
+            6
+          ]
+        ],
+        "reinforce": [
+          "trooper",
+          "trooper"
+        ],
+        "start": [
+          [
+            2,
+            10
+          ],
+          [
+            3,
+            10
+          ],
+          [
+            5,
+            10
+          ],
+          [
+            6,
+            10
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            7,
+            9
+          ]
+        ],
+        "alts": [
+          {
+            "where": "Ravine crossing · Ord Mantell",
+            "vip": "defector",
+            "theme": "caves",
+            "map": [
+              "EE..c.....",
+              "E...B..c..",
+              "..h...x...",
+              "###d##..##",
+              "^^......^^",
+              ".c.B..c.B.",
+              "....x.....",
+              ".h..##..h.",
+              "..........",
+              "##..B.###.",
+              "..........",
+              ".c..cc..c."
+            ],
+            "hostage": [
+              5,
+              10
+            ],
+            "foes": [
+              [
+                "trooper",
+                6,
+                0
+              ],
+              [
+                "trooper",
+                9,
+                2
+              ],
+              [
+                "heavy",
+                2,
+                4
+              ],
+              [
+                "agent",
+                8,
+                4
+              ],
+              [
+                "trooper",
+                5,
+                6
+              ]
+            ],
+            "start": [
+              [
+                2,
+                10
+              ],
+              [
+                3,
+                10
+              ],
+              [
+                6,
+                10
+              ],
+              [
+                7,
+                10
+              ],
+              [
+                0,
+                11
+              ],
+              [
+                9,
+                10
+              ]
+            ]
+          }
+        ],
+        "brief": "Someone the Empire wants dead must reach a shuttle at the far evac zone. They take one move a turn on your phase. Keep them alive.",
+        "goal": "Walk the VIP to an evac zone. Threat rises after turn 6: more hunters arrive and they shoot the VIP on sight.",
+        "win": "The shuttle lifts off with its passenger.",
+        "lose": "The Empire gets its kill.",
+        "reward": {
+          "credits": 70,
+          "favor": 6
+        },
+        "bonus": {
+          "recruits": 1
+        },
+        "bonusTxt": "Done by turn 6"
+      }
+    },
+    "BASE_CRISES": {
+      "archive": {
+        "n": "Imperial listening post",
+        "kind": "Investigate",
+        "src": "Navy request",
+        "mission": "archive",
+        "text": "An Imperial post is reading our fleet traffic. Copy its data and get out.",
+        "ignore": {
+          "favor": -5
+        }
+      },
+      "sabotage": {
+        "n": "Strike the fuel depot",
+        "kind": "Sabotage",
+        "src": "Senate request",
+        "mission": "sabotage",
+        "text": "Blow the depot fuelling the Balmorra fleet. Plant 2 charges, then extract.",
+        "ignore": {
+          "favor": -8
+        }
+      },
+      "escort": {
+        "n": "Get the senator out",
+        "kind": "Escort",
+        "src": "Senate request",
+        "mission": "escort",
+        "text": "A senator marked for death must reach a shuttle across hostile ground.",
+        "ignore": {
+          "favor": -8
+        }
+      },
+      "rescue": {
+        "n": "Hostages at Ord Mantell",
+        "kind": "Rescue",
+        "src": "Senate request",
+        "mission": "rescue",
+        "text": "Sith raiders seized a Senate aide at a supply depot. The Senate wants her back.",
+        "ignore": {
+          "favor": -8
+        }
+      },
+      "shrine": {
+        "n": "Beast at the Dantooine shrine",
+        "kind": "Defend",
+        "src": "Civilian",
+        "mission": "shrine",
+        "text": "Pilgrims report Sith troopers, and something that hunts Jedi, closing on a kyber shrine.",
+        "ignore": {
+          "favor": -3,
+          "orderDark": 4
+        }
+      }
+    },
+    "SOURCE_LITERALS": [
+      {
+        "line": 3,
+        "raw": "'Old Republic'"
+      },
+      {
+        "line": 3,
+        "raw": "'Ruusan · ~1,000 BBY'"
+      },
+      {
+        "line": 5,
+        "raw": "'A shard of the vision'"
+      },
+      {
+        "line": 5,
+        "raw": "'Meditating again, the Council sees more: fire on the Temple steps, a red blade in a scarred hand, a treaty signed in smoke.'"
+      },
+      {
+        "line": 7,
+        "raw": "'faint'"
+      },
+      {
+        "line": 7,
+        "raw": "'clear'"
+      },
+      {
+        "line": 7,
+        "raw": "'certain'"
+      },
+      {
+        "line": 11,
+        "raw": "'Darth Malgus'"
+      },
+      {
+        "line": 11,
+        "raw": "'e_acolyte'"
+      },
+      {
+        "line": 13,
+        "raw": "'Mandalorian Merc'"
+      },
+      {
+        "line": 13,
+        "raw": "'e_trooper'"
+      },
+      {
+        "line": 16,
+        "raw": "'string'"
+      },
+      {
+        "line": 17,
+        "raw": "''"
+      },
+      {
+        "line": 17,
+        "raw": "''"
+      },
+      {
+        "line": 20,
+        "raw": "'Supply Lane Hydian'"
+      },
+      {
+        "line": 20,
+        "raw": "'plains'"
+      },
+      {
+        "line": 20,
+        "raw": "'Convoy depot · Hydian Way'"
+      },
+      {
+        "line": 20,
+        "raw": "'Convoy'"
+      },
+      {
+        "line": 21,
+        "raw": "'mando'"
+      },
+      {
+        "line": 21,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 21,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 21,
+        "raw": "'mando'"
+      },
+      {
+        "line": 21,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 21,
+        "raw": "'heavy'"
+      },
+      {
+        "line": 21,
+        "raw": "'mando'"
+      },
+      {
+        "line": 21,
+        "raw": "'mando'"
+      },
+      {
+        "line": 21,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 22,
+        "raw": "'Mandalorian clans in Imperial pay are hitting a Republic supply convoy. Hold the depot for 8 turns until the Navy escort arrives.'"
+      },
+      {
+        "line": 23,
+        "raw": "'Hold the convoy for 8 turns. Mandalorians are armored and hit hard.'"
+      },
+      {
+        "line": 24,
+        "raw": "'The escort arrives. The convoy gets through.'"
+      },
+      {
+        "line": 24,
+        "raw": "'The convoy burns. The lane stays closed.'"
+      },
+      {
+        "line": 25,
+        "raw": "'Convoy above 75%'"
+      },
+      {
+        "line": 26,
+        "raw": "'Listening Post Besh'"
+      },
+      {
+        "line": 26,
+        "raw": "'ruins'"
+      },
+      {
+        "line": 26,
+        "raw": "'Abandoned listening post · Inner Rim'"
+      },
+      {
+        "line": 26,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 26,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 26,
+        "raw": "'heavy'"
+      },
+      {
+        "line": 26,
+        "raw": "'agent'"
+      },
+      {
+        "line": 27,
+        "raw": "'An Imperial listening post is tracking Republic fleet moves. Scan its terminals (Jedi or Medic, adjacent), then get anyone to an evac zone.'"
+      },
+      {
+        "line": 28,
+        "raw": "'Scan 2 of 3 terminals, then get anyone to an evac zone. Threat rises after turn 6.'"
+      },
+      {
+        "line": 29,
+        "raw": "'The intercepts are out. The Navy changes course.'"
+      },
+      {
+        "line": 29,
+        "raw": "'The post wipes itself. The trail goes cold.'"
+      },
+      {
+        "line": 30,
+        "raw": "'All 3 terminals'"
+      },
+      {
+        "line": 31,
+        "raw": "'Spice Ledger'"
+      },
+      {
+        "line": 31,
+        "raw": "'city'"
+      },
+      {
+        "line": 31,
+        "raw": "'Hutt warehouse · Nar Shaddaa'"
+      },
+      {
+        "line": 31,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 31,
+        "raw": "'mando'"
+      },
+      {
+        "line": 31,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 31,
+        "raw": "'agent'"
+      },
+      {
+        "line": 32,
+        "raw": "'The Hutt broker keeps his kyber deals on warehouse terminals. Copy the ledgers and get out. His Mandalorian guards will not make it easy.'"
+      },
+      {
+        "line": 33,
+        "raw": "'Scan 2 of 3 terminals, then get anyone to an evac zone. Threat rises after turn 6.'"
+      },
+      {
+        "line": 34,
+        "raw": "'The ledgers are out, and so are his crystals.'"
+      },
+      {
+        "line": 34,
+        "raw": "'The warehouse locks down.'"
+      },
+      {
+        "line": 35,
+        "raw": "'All 3 terminals'"
+      },
+      {
+        "line": 37,
+        "raw": "'Docking Ring Nine'"
+      },
+      {
+        "line": 37,
+        "raw": "'Docking Ring Nine · Coruscant'"
+      },
+      {
+        "line": 37,
+        "raw": "'assault'"
+      },
+      {
+        "line": 37,
+        "raw": "'malgus'"
+      },
+      {
+        "line": 37,
+        "raw": "'dock'"
+      },
+      {
+        "line": 38,
+        "raw": "'Malgus reaches the Temple lifts.'"
+      },
+      {
+        "line": 38,
+        "raw": "'Malgus is at the lift doors. Next turn he is inside.'"
+      },
+      {
+        "line": 38,
+        "raw": "'Malgus pushes toward the Temple lifts.'"
+      },
+      {
+        "line": 39,
+        "raw": "'undefined'"
+      },
+      {
+        "line": 40,
+        "raw": "\"###....###\""
+      },
+      {
+        "line": 40,
+        "raw": "\"..#....#..\""
+      },
+      {
+        "line": 40,
+        "raw": "\".c..cc..c.\""
+      },
+      {
+        "line": 40,
+        "raw": "\"...x..x...\""
+      },
+      {
+        "line": 40,
+        "raw": "\"##.c..c.##\""
+      },
+      {
+        "line": 40,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 40,
+        "raw": "\".c.#..#.c.\""
+      },
+      {
+        "line": 40,
+        "raw": "\"...c..c...\""
+      },
+      {
+        "line": 40,
+        "raw": "\".x......x.\""
+      },
+      {
+        "line": 40,
+        "raw": "\"..c.##.c..\""
+      },
+      {
+        "line": 40,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 40,
+        "raw": "\"..c....c..\""
+      },
+      {
+        "line": 41,
+        "raw": "'malgus'"
+      },
+      {
+        "line": 41,
+        "raw": "'heavy'"
+      },
+      {
+        "line": 41,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 41,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 41,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 41,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 43,
+        "raw": "'While the treaty is signed on Alderaan, Darth Malgus lands at Docking Ring Nine with a strike team. His target is the Temple. Stop him here.'"
+      },
+      {
+        "line": 44,
+        "raw": "'Defeat Darth Malgus. Threat rises after the par turn; at Threat 6 he reaches the Temple lifts. Barrels (x) explode when shot.'"
+      },
+      {
+        "line": 45,
+        "raw": "'Malgus falls on the docking ring. The Temple never sees him.'"
+      },
+      {
+        "line": 45,
+        "raw": "'Malgus breaks through to the Temple.'"
+      },
+      {
+        "line": 46,
+        "raw": "'Done by the par turn'"
+      },
+      {
+        "line": 49,
+        "raw": "'Mandalorians on the Hydian Way'"
+      },
+      {
+        "line": 49,
+        "raw": "'Defend'"
+      },
+      {
+        "line": 49,
+        "raw": "'Senate request'"
+      },
+      {
+        "line": 49,
+        "raw": "'blockade'"
+      },
+      {
+        "line": 50,
+        "raw": "'Clans in Imperial pay are choking a Republic supply lane. The Navy asks for Jedi.'"
+      },
+      {
+        "line": 51,
+        "raw": "'Imperial listening post'"
+      },
+      {
+        "line": 51,
+        "raw": "'Investigate'"
+      },
+      {
+        "line": 51,
+        "raw": "'Jedi'"
+      },
+      {
+        "line": 51,
+        "raw": "'cache'"
+      },
+      {
+        "line": 52,
+        "raw": "'A Sentinel sensed Imperial slicers in an old Republic post. Something is tracking the fleet.'"
+      },
+      {
+        "line": 53,
+        "raw": "'Hutt kyber broker'"
+      },
+      {
+        "line": 53,
+        "raw": "'Investigate'"
+      },
+      {
+        "line": 53,
+        "raw": "'Jedi'"
+      },
+      {
+        "line": 53,
+        "raw": "'hutt'"
+      },
+      {
+        "line": 54,
+        "raw": "'A Hutt is selling Ilum-grade crystals to anyone. His ledgers name the buyers.'"
+      },
+      {
+        "line": 64,
+        "raw": "'Kira Venn'"
+      },
+      {
+        "line": 64,
+        "raw": "'Tor Saalen'"
+      },
+      {
+        "line": 64,
+        "raw": "'Sgt. Rhal Dax'"
+      },
+      {
+        "line": 64,
+        "raw": "'Ilsa Myr'"
+      },
+      {
+        "line": 64,
+        "raw": "'Doc Bren'"
+      },
+      {
+        "line": 64,
+        "raw": "'Grak Ordo'"
+      },
+      {
+        "line": 66,
+        "raw": "'Staff a wing'"
+      },
+      {
+        "line": 66,
+        "raw": "'Teach the next recruit'"
+      },
+      {
+        "line": 66,
+        "raw": "'Leave a relic to the Archive'"
+      },
+      {
+        "line": 70,
+        "raw": "'Satele Shan'"
+      },
+      {
+        "line": 70,
+        "raw": "'Guardian'"
+      },
+      {
+        "line": 70,
+        "raw": "'Knight'"
+      },
+      {
+        "line": 70,
+        "raw": "'reflectM'"
+      },
+      {
+        "line": 70,
+        "raw": "'#9fd4ff'"
+      },
+      {
+        "line": 76,
+        "raw": "'e1_gnost_archive'"
+      },
+      {
+        "line": 76,
+        "raw": "'era_start'"
+      },
+      {
+        "line": 76,
+        "raw": "'Master Gnost-Dural asks to copy the Archives to a hidden colony, in case the Temple falls.'"
+      },
+      {
+        "line": 77,
+        "raw": "'Approve the copy'"
+      },
+      {
+        "line": 77,
+        "raw": "'archive_backup'"
+      },
+      {
+        "line": 77,
+        "raw": "\"The Temple won't fall\""
+      },
+      {
+        "line": 77,
+        "raw": "'gnost'"
+      },
+      {
+        "line": 78,
+        "raw": "'e1_kyber_trade'"
+      },
+      {
+        "line": 78,
+        "raw": "'month'"
+      },
+      {
+        "line": 78,
+        "raw": "'A Hutt broker has Ilum-grade crystals. His price: look away from his spice run.'"
+      },
+      {
+        "line": 79,
+        "raw": "'Buy, look away'"
+      },
+      {
+        "line": 79,
+        "raw": "'e1_hutt_deal'"
+      },
+      {
+        "line": 79,
+        "raw": "'Refuse'"
+      },
+      {
+        "line": 79,
+        "raw": "'Seize them'"
+      },
+      {
+        "line": 79,
+        "raw": "'hutt'"
+      },
+      {
+        "line": 80,
+        "raw": "'e1_mando_blockade'"
+      },
+      {
+        "line": 80,
+        "raw": "'month'"
+      },
+      {
+        "line": 80,
+        "raw": "'Mandalorians in Imperial pay are choking a supply lane. The Navy asks for Jedi. The Senate asks you to stay out.'"
+      },
+      {
+        "line": 81,
+        "raw": "'Send a squad'"
+      },
+      {
+        "line": 81,
+        "raw": "'blockade'"
+      },
+      {
+        "line": 81,
+        "raw": "'Pay the clans off'"
+      },
+      {
+        "line": 81,
+        "raw": "'Ignore it'"
+      },
+      {
+        "line": 82,
+        "raw": "'e1_treaty_vote'"
+      },
+      {
+        "line": 82,
+        "raw": "'flag'"
+      },
+      {
+        "line": 82,
+        "raw": "'e1_strike_known'"
+      },
+      {
+        "line": 82,
+        "raw": "'You know the strike is coming. Warn the Senate, and maybe the Empire\\'s spies, or keep it inside the Order?'"
+      },
+      {
+        "line": 83,
+        "raw": "'Warn the Senate'"
+      },
+      {
+        "line": 83,
+        "raw": "'Keep it secret'"
+      },
+      {
+        "line": 83,
+        "raw": "'e1_ambush_ready'"
+      },
+      {
+        "line": 84,
+        "raw": "'e1_satele'"
+      },
+      {
+        "line": 84,
+        "raw": "'after_mission'"
+      },
+      {
+        "line": 84,
+        "raw": "'A young Knight, Satele Shan, asks to join your strike teams. Her master, Kao Cen Darach, disagrees.'"
+      },
+      {
+        "line": 85,
+        "raw": "'Take her'"
+      },
+      {
+        "line": 85,
+        "raw": "'satele_shan'"
+      },
+      {
+        "line": 85,
+        "raw": "'satele_joined'"
+      },
+      {
+        "line": 85,
+        "raw": "'darach'"
+      },
+      {
+        "line": 85,
+        "raw": "'Respect her master'"
+      },
+      {
+        "line": 85,
+        "raw": "'darach'"
+      },
+      {
+        "line": 86,
+        "raw": "'e1_prisoner_offer'"
+      },
+      {
+        "line": 86,
+        "raw": "'stat'"
+      },
+      {
+        "line": 86,
+        "raw": "'intel'"
+      },
+      {
+        "line": 86,
+        "raw": "'>='"
+      },
+      {
+        "line": 86,
+        "raw": "'A captured Imperial officer offers names of Republic traitors in exchange for a ship.'"
+      },
+      {
+        "line": 87,
+        "raw": "'Deal'"
+      },
+      {
+        "line": 87,
+        "raw": "'e1_traitors'"
+      },
+      {
+        "line": 87,
+        "raw": "'Hand him to the Navy'"
+      },
+      {
+        "line": 87,
+        "raw": "'Make him talk'"
+      },
+      {
+        "line": 87,
+        "raw": "'jedi_random'"
+      },
+      {
+        "line": 88,
+        "raw": "'Gnost-Dural'"
+      },
+      {
+        "line": 88,
+        "raw": "'Kao Cen Darach'"
+      },
+      {
+        "line": 88,
+        "raw": "'Grand Master Zym'"
+      },
+      {
+        "line": 92,
+        "raw": "'You stopped the shuttle. The treaty was still signed in smoke.'"
+      },
+      {
+        "line": 93,
+        "raw": "'Malgus reached the Temple steps before the Guard drove him off. The Temple is scarred: a wing lost a level.'"
+      },
+      {
+        "line": 94,
+        "raw": "'Your ambush was ready: Malgus lands already wounded.'"
+      },
+      {
+        "line": 95,
+        "raw": "'Adraas fell on Alderaan: one fewer squad came with Malgus.'"
+      },
+      {
+        "line": 95,
+        "raw": "'Temple Guards hold the docking ring: no reinforcements reach Malgus.'"
+      },
+      {
+        "line": 96,
+        "raw": "'The Temple stands. The Empire got its treaty, but not its lesson.'"
+      },
+      {
+        "line": 97,
+        "raw": "'The Temple stands, scarred. The Senate wonders what the Jedi are for.'"
+      },
+      {
+        "line": 98,
+        "raw": "'The Order is drifting. Some Masters speak of a Dark Council.'"
+      },
+      {
+        "line": 100,
+        "raw": "'The envoy talked: you knew the strike was coming.'"
+      },
+      {
+        "line": 100,
+        "raw": "'You kept the warning inside the Order and set an ambush.'"
+      },
+      {
+        "line": 101,
+        "raw": "'A copy of the Archives sleeps on a hidden colony.'"
+      },
+      {
+        "line": 101,
+        "raw": "'Names of Republic traitors sit in your files.'"
+      },
+      {
+        "line": 102,
+        "raw": "'Darth Malgus fell at Docking Ring Nine.'"
+      },
+      {
+        "line": 102,
+        "raw": "'The Temple was scarred. In canon it was sacked.'"
+      },
+      {
+        "line": 107,
+        "raw": "'Lord Adraas'"
+      },
+      {
+        "line": 107,
+        "raw": "'e_acolyte'"
+      },
+      {
+        "line": 111,
+        "raw": "\"Gnost-Dural's Vault\""
+      },
+      {
+        "line": 111,
+        "raw": "'Archive ruins · Ossus'"
+      },
+      {
+        "line": 111,
+        "raw": "'investigate'"
+      },
+      {
+        "line": 111,
+        "raw": "'ruins'"
+      },
+      {
+        "line": 112,
+        "raw": "\"..q.h..#q.\""
+      },
+      {
+        "line": 112,
+        "raw": "\".h.._.._..\""
+      },
+      {
+        "line": 112,
+        "raw": "\"..c....c..\""
+      },
+      {
+        "line": 112,
+        "raw": "\"h.#.hh.#.h\""
+      },
+      {
+        "line": 112,
+        "raw": "\"...r..r...\""
+      },
+      {
+        "line": 112,
+        "raw": "\".c..q...c.\""
+      },
+      {
+        "line": 112,
+        "raw": "\"..B....B..\""
+      },
+      {
+        "line": 112,
+        "raw": "\".r..cc..r.\""
+      },
+      {
+        "line": 112,
+        "raw": "\"...h..h...\""
+      },
+      {
+        "line": 112,
+        "raw": "\".c......c.\""
+      },
+      {
+        "line": 112,
+        "raw": "\"..c.r..c..\""
+      },
+      {
+        "line": 112,
+        "raw": "\"EE......EE\""
+      },
+      {
+        "line": 113,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 113,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 113,
+        "raw": "'agent'"
+      },
+      {
+        "line": 113,
+        "raw": "'heavy'"
+      },
+      {
+        "line": 113,
+        "raw": "'acolyte'"
+      },
+      {
+        "line": 113,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 113,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 115,
+        "raw": "'You start concealed: pods patrol the ruins. Master Gnost-Dural found a sealed vault in the Ossus ruins: records from the last time the Sith struck at the Jedi. Imperial agents found it too. Scan the terminals (Jedi or Medic, adjacent), then reach evac.'"
+      },
+      {
+        "line": 116,
+        "raw": "'Scan 2 of 3 terminals, then get anyone to an evac zone. A Sith Acolyte guards the vault. Threat rises after turn 6.'"
+      },
+      {
+        "line": 117,
+        "raw": "'The records come home. Gnost-Dural reads all night.'"
+      },
+      {
+        "line": 117,
+        "raw": "'The vault burns. Whatever it knew is ash.'"
+      },
+      {
+        "line": 118,
+        "raw": "'All 3 terminals'"
+      },
+      {
+        "line": 118,
+        "raw": "'e1_vault_read'"
+      },
+      {
+        "line": 120,
+        "raw": "'The Cave Mouth'"
+      },
+      {
+        "line": 120,
+        "raw": "'Crystal caves · Ilum'"
+      },
+      {
+        "line": 120,
+        "raw": "'defend'"
+      },
+      {
+        "line": 120,
+        "raw": "'Cave mouth'"
+      },
+      {
+        "line": 120,
+        "raw": "'snow'"
+      },
+      {
+        "line": 121,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 121,
+        "raw": "\"..B....B..\""
+      },
+      {
+        "line": 121,
+        "raw": "\".c..h...c.\""
+      },
+      {
+        "line": 121,
+        "raw": "\"...c..c...\""
+      },
+      {
+        "line": 121,
+        "raw": "\"#..r..r..#\""
+      },
+      {
+        "line": 121,
+        "raw": "\".c.B..B.c.\""
+      },
+      {
+        "line": 121,
+        "raw": "\"....cc....\""
+      },
+      {
+        "line": 121,
+        "raw": "\".h......h.\""
+      },
+      {
+        "line": 121,
+        "raw": "\"..c.##.c..\""
+      },
+      {
+        "line": 121,
+        "raw": "\".r.c..c.r.\""
+      },
+      {
+        "line": 121,
+        "raw": "\"...#OO#...\""
+      },
+      {
+        "line": 121,
+        "raw": "\"....OO....\""
+      },
+      {
+        "line": 122,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 122,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 122,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 122,
+        "raw": "'mando'"
+      },
+      {
+        "line": 122,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 122,
+        "raw": "'heavy'"
+      },
+      {
+        "line": 122,
+        "raw": "'acolyte'"
+      },
+      {
+        "line": 122,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 122,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 124,
+        "raw": "'Sith raiders want the Ilum crystal caves. Sgt. Jace Malcom’s platoon is all that holds the mouth, and it is thin. Hold for 8 turns until his relief lands.'"
+      },
+      {
+        "line": 125,
+        "raw": "'Hold the cave mouth for 8 turns. Three waves; the last brings a Sith Acolyte.'"
+      },
+      {
+        "line": 126,
+        "raw": "'Relief lands in the snow. The caves stay quiet.'"
+      },
+      {
+        "line": 126,
+        "raw": "'The raiders reach the crystals. Ilum goes dark for a generation.'"
+      },
+      {
+        "line": 127,
+        "raw": "'Cave mouth above 75%'"
+      },
+      {
+        "line": 127,
+        "raw": "'jace_malcom'"
+      },
+      {
+        "line": 127,
+        "raw": "'jace_joined'"
+      },
+      {
+        "line": 129,
+        "raw": "'Shadow of Adraas'"
+      },
+      {
+        "line": 129,
+        "raw": "'Embassy hangar · Alderaan'"
+      },
+      {
+        "line": 129,
+        "raw": "'assault'"
+      },
+      {
+        "line": 129,
+        "raw": "'adraas'"
+      },
+      {
+        "line": 129,
+        "raw": "'city'"
+      },
+      {
+        "line": 130,
+        "raw": "'Adraas reaches his shuttle and is gone.'"
+      },
+      {
+        "line": 130,
+        "raw": "'Adraas is at his shuttle ramp.'"
+      },
+      {
+        "line": 130,
+        "raw": "'Adraas falls back toward his shuttle.'"
+      },
+      {
+        "line": 131,
+        "raw": "\"##..##..##\""
+      },
+      {
+        "line": 131,
+        "raw": "\"...c..c...\""
+      },
+      {
+        "line": 131,
+        "raw": "\".B......B.\""
+      },
+      {
+        "line": 131,
+        "raw": "\"...h..h...\""
+      },
+      {
+        "line": 131,
+        "raw": "\".c..xx..c.\""
+      },
+      {
+        "line": 131,
+        "raw": "\"...B..B...\""
+      },
+      {
+        "line": 131,
+        "raw": "\".h......h.\""
+      },
+      {
+        "line": 131,
+        "raw": "\"..c.##.c..\""
+      },
+      {
+        "line": 131,
+        "raw": "\".x......x.\""
+      },
+      {
+        "line": 131,
+        "raw": "\"...c..c...\""
+      },
+      {
+        "line": 131,
+        "raw": "\".B......B.\""
+      },
+      {
+        "line": 131,
+        "raw": "\"..........\""
+      },
+      {
+        "line": 132,
+        "raw": "'adraas'"
+      },
+      {
+        "line": 132,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 132,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 132,
+        "raw": "'agent'"
+      },
+      {
+        "line": 132,
+        "raw": "'mando'"
+      },
+      {
+        "line": 132,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 132,
+        "raw": "'mando'"
+      },
+      {
+        "line": 134,
+        "raw": "'You start concealed. While the delegates talk, Lord Adraas waits in an embassy hangar for a signal. Satele Shan wants him taken off the board before it comes. Defeat him before he reaches his shuttle.'"
+      },
+      {
+        "line": 135,
+        "raw": "'Defeat Lord Adraas. Threat rises after turn 6; at Threat 6 he escapes. Barrels (x) explode when shot.'"
+      },
+      {
+        "line": 136,
+        "raw": "'Adraas falls in the hangar. One blade fewer for the strike.'"
+      },
+      {
+        "line": 136,
+        "raw": "'Adraas gets away. He will be at Malgus’s side.'"
+      },
+      {
+        "line": 137,
+        "raw": "'Done by the par turn'"
+      },
+      {
+        "line": 137,
+        "raw": "'e1_adraas_down'"
+      },
+      {
+        "line": 137,
+        "raw": "'e1_adraas_free'"
+      },
+      {
+        "line": 139,
+        "raw": "'Reclamation Camp'"
+      },
+      {
+        "line": 139,
+        "raw": "'Refugee camp · Taris'"
+      },
+      {
+        "line": 139,
+        "raw": "'ruins'"
+      },
+      {
+        "line": 140,
+        "raw": "'Sith raiders grabbed a Republic relief officer from a Taris refugee camp. Open the cell (Hack or console), then walk her to an evac zone (E).'"
+      },
+      {
+        "line": 141,
+        "raw": "'The officer is out. The camp gets its medicine.'"
+      },
+      {
+        "line": 141,
+        "raw": "'The officer is gone. The camp goes hungry.'"
+      },
+      {
+        "line": 142,
+        "raw": "'The Thul Heir'"
+      },
+      {
+        "line": 142,
+        "raw": "'Estate grounds · Alderaan'"
+      },
+      {
+        "line": 142,
+        "raw": "'plains'"
+      },
+      {
+        "line": 143,
+        "raw": "'Imperial agents want a young heir of House Thul dead before the talks. Walk her to the shuttle at the far evac zone.'"
+      },
+      {
+        "line": 144,
+        "raw": "'The heir reaches the talks. House Thul owes the Order.'"
+      },
+      {
+        "line": 144,
+        "raw": "'The heir dies on her own lawn. Alderaan blames the Jedi.'"
+      },
+      {
+        "line": 145,
+        "raw": "'Forward Depot Cresh'"
+      },
+      {
+        "line": 145,
+        "raw": "'Imperial forward depot · Mid Rim'"
+      },
+      {
+        "line": 145,
+        "raw": "'plains'"
+      },
+      {
+        "line": 146,
+        "raw": "'The depot burns. The Imperial push stalls a month.'"
+      },
+      {
+        "line": 146,
+        "raw": "'The depot holds. The push comes on time.'"
+      },
+      {
+        "line": 147,
+        "raw": "'Fort Garnik'"
+      },
+      {
+        "line": 147,
+        "raw": "'Hill fort · Ord Mantell'"
+      },
+      {
+        "line": 147,
+        "raw": "'Fort'"
+      },
+      {
+        "line": 147,
+        "raw": "'plains'"
+      },
+      {
+        "line": 148,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 148,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 148,
+        "raw": "'mando'"
+      },
+      {
+        "line": 148,
+        "raw": "'trooper'"
+      },
+      {
+        "line": 148,
+        "raw": "'heavy'"
+      },
+      {
+        "line": 149,
+        "raw": "'A Republic hill fort on Ord Mantell is under Mandalorian and Sith attack. Hold it for 6 turns until the garrison regroups.'"
+      },
+      {
+        "line": 150,
+        "raw": "'Hold the fort for 6 turns. Mandalorians are armored and hit hard.'"
+      },
+      {
+        "line": 151,
+        "raw": "'The garrison regroups. The hill stays Republic.'"
+      },
+      {
+        "line": 151,
+        "raw": "'The fort falls. Ord Mantell burns again.'"
+      },
+      {
+        "line": 154,
+        "raw": "'Taken at the Taris camp'"
+      },
+      {
+        "line": 154,
+        "raw": "'Rescue'"
+      },
+      {
+        "line": 154,
+        "raw": "'Civilian'"
+      },
+      {
+        "line": 154,
+        "raw": "'taris'"
+      },
+      {
+        "line": 154,
+        "raw": "'Raiders took the relief officer who keeps a refugee camp alive.'"
+      },
+      {
+        "line": 155,
+        "raw": "'The Thul heir'"
+      },
+      {
+        "line": 155,
+        "raw": "'Escort'"
+      },
+      {
+        "line": 155,
+        "raw": "'Senate request'"
+      },
+      {
+        "line": 155,
+        "raw": "'thul'"
+      },
+      {
+        "line": 155,
+        "raw": "'An Alderaanian heir is marked for death before the peace talks.'"
+      },
+      {
+        "line": 156,
+        "raw": "'Forward depot'"
+      },
+      {
+        "line": 156,
+        "raw": "'Sabotage'"
+      },
+      {
+        "line": 156,
+        "raw": "'Navy request'"
+      },
+      {
+        "line": 156,
+        "raw": "'depot'"
+      },
+      {
+        "line": 156,
+        "raw": "'An Imperial depot feeds the next push. Blow it and get out.'"
+      },
+      {
+        "line": 157,
+        "raw": "'Fort Garnik under siege'"
+      },
+      {
+        "line": 157,
+        "raw": "'Defend'"
+      },
+      {
+        "line": 157,
+        "raw": "'Navy request'"
+      },
+      {
+        "line": 157,
+        "raw": "'fort'"
+      },
+      {
+        "line": 157,
+        "raw": "'Mandalorians and Sith troopers are storming a Republic hill fort.'"
+      },
+      {
+        "line": 161,
+        "raw": "'relay'"
+      },
+      {
+        "line": 161,
+        "raw": "'rescue'"
+      },
+      {
+        "line": 161,
+        "raw": "'shrine'"
+      },
+      {
+        "line": 161,
+        "raw": "'archive'"
+      },
+      {
+        "line": 161,
+        "raw": "'envoy'"
+      },
+      {
+        "line": 161,
+        "raw": "'hutt'"
+      },
+      {
+        "line": 161,
+        "raw": "'blockade'"
+      },
+      {
+        "line": 163,
+        "raw": "'sabotage'"
+      },
+      {
+        "line": 163,
+        "raw": "'cache'"
+      },
+      {
+        "line": 163,
+        "raw": "'vault'"
+      },
+      {
+        "line": 163,
+        "raw": "'escort'"
+      },
+      {
+        "line": 163,
+        "raw": "'fort'"
+      },
+      {
+        "line": 163,
+        "raw": "'ilum'"
+      },
+      {
+        "line": 165,
+        "raw": "'taris'"
+      },
+      {
+        "line": 165,
+        "raw": "'depot'"
+      },
+      {
+        "line": 165,
+        "raw": "'adraasHunt'"
+      },
+      {
+        "line": 165,
+        "raw": "'thul'"
+      },
+      {
+        "line": 165,
+        "raw": "'blockade'"
+      },
+      {
+        "line": 165,
+        "raw": "'archive'"
+      },
+      {
+        "line": 165,
+        "raw": "'dock'"
+      },
+      {
+        "line": 167,
+        "raw": "'Years pass'"
+      },
+      {
+        "line": 167,
+        "raw": "'Three years go by. The war cools into a cold peace that no one trusts. Wounds heal. Padawans face the Trials. Some veterans hang up their gear.'"
+      },
+      {
+        "line": 168,
+        "raw": "'The year of the treaty'"
+      },
+      {
+        "line": 168,
+        "raw": "'Four more years. Envoys gather on Alderaan to sign a peace. The Council’s vision has never been clearer. Whatever is coming, it comes this year.'"
+      },
+      {
+        "line": 170,
+        "raw": "'The vision returns: Jedi bodies on the Temple steps, and a treaty table on a green world.'"
+      },
+      {
+        "line": 171,
+        "raw": "'The vision is clear now: a shuttle at a docking ring, a scarred Sith Lord, and the Temple doors open.'"
+      },
+      {
+        "line": 174,
+        "raw": "'Jace Malcom'"
+      },
+      {
+        "line": 174,
+        "raw": "'Soldier'"
+      },
+      {
+        "line": 174,
+        "raw": "'rapidFire'"
+      },
+      {
+        "line": 174,
+        "raw": "'#e0bd78'"
+      },
+      {
+        "line": 178,
+        "raw": "'Three of them didn’t come home to the frontier.'"
+      },
+      {
+        "line": 178,
+        "raw": "'The fleet arrived to a burned-out relay.'"
+      },
+      {
+        "line": 179,
+        "raw": "'Saresh will never serve the Senate again. Nobody thanks you for it.'"
+      },
+      {
+        "line": 179,
+        "raw": "'Somewhere, the schedule still leaks.'"
+      },
+      {
+        "line": 180,
+        "raw": "'The depot burns behind you. So does the trust of the local militia.'"
+      },
+      {
+        "line": 180,
+        "raw": "'An empty cell, still warm.'"
+      },
+      {
+        "line": 181,
+        "raw": "'The pilgrims light candles for the Jedi. And for the troopers who held the line.'"
+      },
+      {
+        "line": 181,
+        "raw": "'The crystals are gone. The shrine will sing no more.'"
+      },
+      {
+        "line": 182,
+        "raw": "'The Navy got its codes. Imperial Intelligence will want to know who took them.'"
+      },
+      {
+        "line": 183,
+        "raw": "'The sky over Balmorra burns orange for a week.'"
+      },
+      {
+        "line": 183,
+        "raw": "'The senator will vote for peace. He will not thank you either.'"
+      },
+      {
+        "line": 184,
+        "raw": "'The convoy is through. The clans will remember the Jedi who stopped them.'"
+      },
+      {
+        "line": 185,
+        "raw": "'The intercepts are good. The Empire is moving more ships than it admits.'"
+      },
+      {
+        "line": 185,
+        "raw": "'The Hutt will remember this. Hutts always remember.'"
+      },
+      {
+        "line": 186,
+        "raw": "'Gnost-Dural reads the records twice, then asks to see the Grand Master alone.'"
+      },
+      {
+        "line": 186,
+        "raw": "'Gnost-Dural says nothing on the flight home. He does not need to.'"
+      },
+      {
+        "line": 187,
+        "raw": "'Jace Malcom buries four of his platoon in the snow, then asks how he can serve.'"
+      },
+      {
+        "line": 187,
+        "raw": "'The caves are silent. Malcom’s platoon held to the last.'"
+      },
+      {
+        "line": 188,
+        "raw": "'Satele says nothing about the treaty. She is thinking about the one Sith left.'"
+      },
+      {
+        "line": 188,
+        "raw": "'The hangar smells of ozone. Adraas has gone to join Malgus.'"
+      },
+      {
+        "line": 189,
+        "raw": "'The camp eats tonight.'"
+      },
+      {
+        "line": 189,
+        "raw": "'House Thul will speak for the Jedi at the talks.'"
+      },
+      {
+        "line": 189,
+        "raw": "'Alderaan’s nobles close their doors to the Order.'"
+      },
+      {
+        "line": 190,
+        "raw": "'The push stalls. Somewhere, an Imperial officer is shot for it.'"
+      },
+      {
+        "line": 190,
+        "raw": "'The hill is Republic. For now.'"
+      },
+      {
+        "line": 191,
+        "raw": "'The treaty was still signed in smoke.'"
+      },
+      {
+        "line": 191,
+        "raw": "'The Temple stands, scarred. Grand Master Zym walks the burned halls alone.'"
+      },
+      {
+        "line": 193,
+        "raw": "'“Hold the relay. The fleet needs the lane open.” — Grand Master Zym'"
+      },
+      {
+        "line": 193,
+        "raw": "'“Somebody is selling the peace. Find out who.” — Kao Cen Darach'"
+      },
+      {
+        "line": 194,
+        "raw": "'“The last time the Sith struck at a Temple, they did it while we talked.” — Gnost-Dural'"
+      },
+      {
+        "line": 194,
+        "raw": "'“No Jedi blade without Ilum. Hold it.” — Grand Master Zym'"
+      },
+      {
+        "line": 195,
+        "raw": "'“Two of them will come. Let us make it one.” — Satele Shan'"
+      },
+      {
+        "line": 195,
+        "raw": "'“This is the vision. Change it.” — Grand Master Zym'"
+      },
+      {
+        "line": 200,
+        "raw": "'e1_refugees'"
+      },
+      {
+        "line": 200,
+        "raw": "'month'"
+      },
+      {
+        "line": 200,
+        "raw": "'Refugees from Taris ask to camp in the Temple gardens. The Senate says it sets a bad example.'"
+      },
+      {
+        "line": 201,
+        "raw": "'Take them in'"
+      },
+      {
+        "line": 201,
+        "raw": "'e1_refugees_in'"
+      },
+      {
+        "line": 201,
+        "raw": "'Send them to the Senate'"
+      },
+      {
+        "line": 201,
+        "raw": "'Turn them away'"
+      },
+      {
+        "line": 202,
+        "raw": "'e1_senate_audit'"
+      },
+      {
+        "line": 202,
+        "raw": "'after_mission'"
+      },
+      {
+        "line": 202,
+        "raw": "'A Senate committee wants an account of every credit the Order spends on the war.'"
+      },
+      {
+        "line": 203,
+        "raw": "'Open the books'"
+      },
+      {
+        "line": 203,
+        "raw": "'Refuse'"
+      },
+      {
+        "line": 204,
+        "raw": "'e1_ilum_call'"
+      },
+      {
+        "line": 204,
+        "raw": "'act'"
+      },
+      {
+        "line": 204,
+        "raw": "'A Republic sergeant, Jace Malcom, sends a blunt signal from Ilum: Sith scouts are circling the crystal caves.'"
+      },
+      {
+        "line": 205,
+        "raw": "'Send kyber money'"
+      },
+      {
+        "line": 205,
+        "raw": "'Tell him help is coming'"
+      },
+      {
+        "line": 206,
+        "raw": "'e1_defector'"
+      },
+      {
+        "line": 206,
+        "raw": "'after_mission'"
+      },
+      {
+        "line": 206,
+        "raw": "'An Imperial agent wants to defect. She says she knows how the Empire talks to its strike teams.'"
+      },
+      {
+        "line": 207,
+        "raw": "'Bring her in'"
+      },
+      {
+        "line": 207,
+        "raw": "'e1_defector'"
+      },
+      {
+        "line": 207,
+        "raw": "'squad_leader'"
+      },
+      {
+        "line": 207,
+        "raw": "'Hand her to the SIS'"
+      },
+      {
+        "line": 208,
+        "raw": "'e1_gnost_warning'"
+      },
+      {
+        "line": 208,
+        "raw": "'flag'"
+      },
+      {
+        "line": 208,
+        "raw": "'e1_vault_read'"
+      },
+      {
+        "line": 208,
+        "raw": "'Gnost-Dural’s records show the old Sith struck at a Temple during peace talks. He thinks it will happen again.'"
+      },
+      {
+        "line": 209,
+        "raw": "'Tell the whole Council'"
+      },
+      {
+        "line": 209,
+        "raw": "'e1_strike_known'"
+      },
+      {
+        "line": 209,
+        "raw": "'gnost'"
+      },
+      {
+        "line": 209,
+        "raw": "'Seal the records'"
+      },
+      {
+        "line": 209,
+        "raw": "'gnost'"
+      },
+      {
+        "line": 210,
+        "raw": "'e1_mando_duel'"
+      },
+      {
+        "line": 210,
+        "raw": "'month'"
+      },
+      {
+        "line": 210,
+        "raw": "'A Mandalorian champion holds a Republic pilot. He will trade her for a duel with your best Jedi.'"
+      },
+      {
+        "line": 211,
+        "raw": "'Accept the duel'"
+      },
+      {
+        "line": 211,
+        "raw": "'e1_mando_honor'"
+      },
+      {
+        "line": 211,
+        "raw": "'jedi_highestDark'"
+      },
+      {
+        "line": 211,
+        "raw": "'Decline'"
+      },
+      {
+        "line": 212,
+        "raw": "'e1_revenge'"
+      },
+      {
+        "line": 212,
+        "raw": "'after_mission'"
+      },
+      {
+        "line": 212,
+        "raw": "'A young Jedi lost friends in the last fight. They want the next mission to be about payback.'"
+      },
+      {
+        "line": 213,
+        "raw": "'Counsel patience'"
+      },
+      {
+        "line": 213,
+        "raw": "'jedi_highestDark'"
+      },
+      {
+        "line": 213,
+        "raw": "'Let them burn'"
+      },
+      {
+        "line": 213,
+        "raw": "'jedi_highestDark'"
+      },
+      {
+        "line": 214,
+        "raw": "'e1_jace_satele'"
+      },
+      {
+        "line": 214,
+        "raw": "'all'"
+      },
+      {
+        "line": 214,
+        "raw": "'flag'"
+      },
+      {
+        "line": 214,
+        "raw": "'satele_joined'"
+      },
+      {
+        "line": 214,
+        "raw": "'flag'"
+      },
+      {
+        "line": 214,
+        "raw": "'jace_joined'"
+      },
+      {
+        "line": 214,
+        "raw": "'Satele Shan and Jace Malcom are seen together more than the Code would like. Darach asks you to step in.'"
+      },
+      {
+        "line": 215,
+        "raw": "'Look away'"
+      },
+      {
+        "line": 215,
+        "raw": "'darach'"
+      },
+      {
+        "line": 215,
+        "raw": "'Remind her of the Code'"
+      },
+      {
+        "line": 215,
+        "raw": "'darach'"
+      },
+      {
+        "line": 216,
+        "raw": "'e1_zym_treaty'"
+      },
+      {
+        "line": 216,
+        "raw": "'act'"
+      },
+      {
+        "line": 216,
+        "raw": "'Grand Master Zym will back the treaty, even its terms that pull Jedi off Imperial-claimed worlds.'"
+      },
+      {
+        "line": 217,
+        "raw": "'Back Zym'"
+      },
+      {
+        "line": 217,
+        "raw": "'zym'"
+      },
+      {
+        "line": 217,
+        "raw": "'Oppose the terms'"
+      },
+      {
+        "line": 217,
+        "raw": "'e1_opposed_treaty'"
+      },
+      {
+        "line": 217,
+        "raw": "'zym'"
+      },
+      {
+        "line": 218,
+        "raw": "'e1_eleena'"
+      },
+      {
+        "line": 218,
+        "raw": "'act'"
+      },
+      {
+        "line": 218,
+        "raw": "'Scouts saw a Twi’lek, Eleena Daru, buying shuttle codes for Coruscant. She travels with Darth Malgus.'"
+      },
+      {
+        "line": 219,
+        "raw": "'Track her'"
+      },
+      {
+        "line": 219,
+        "raw": "'e1_eleena_tracked'"
+      },
+      {
+        "line": 219,
+        "raw": "'Let her go'"
+      },
+      {
+        "line": 220,
+        "raw": "'e1_docks'"
+      },
+      {
+        "line": 220,
+        "raw": "'after_mission'"
+      },
+      {
+        "line": 220,
+        "raw": "'The Temple Guard captain asks for credits to post guards at the Coruscant docking rings.'"
+      },
+      {
+        "line": 221,
+        "raw": "'Pay for the posts'"
+      },
+      {
+        "line": 221,
+        "raw": "'e1_docks_guarded'"
+      },
+      {
+        "line": 221,
+        "raw": "'The Temple comes first'"
+      },
+      {
+        "line": 222,
+        "raw": "'e1_padawan_doubt'"
+      },
+      {
+        "line": 222,
+        "raw": "'act'"
+      },
+      {
+        "line": 222,
+        "raw": "'A Padawan asks why the Order makes peace with the people who burned their homeworld.'"
+      },
+      {
+        "line": 223,
+        "raw": "'Answer honestly'"
+      },
+      {
+        "line": 223,
+        "raw": "'jedi_random'"
+      },
+      {
+        "line": 223,
+        "raw": "'Tell them to obey'"
+      },
+      {
+        "line": 223,
+        "raw": "'jedi_random'"
+      },
+      {
+        "line": 224,
+        "raw": "'Gnost-Dural recovered the Ossus records.'"
+      },
+      {
+        "line": 224,
+        "raw": "'Jace Malcom fought for the Order.'"
+      },
+      {
+        "line": 224,
+        "raw": "'Satele Shan fought under your command.'"
+      },
+      {
+        "line": 225,
+        "raw": "'Lord Adraas fell on Alderaan.'"
+      },
+      {
+        "line": 225,
+        "raw": "'Lord Adraas escaped to join the strike.'"
+      },
+      {
+        "line": 225,
+        "raw": "'An Imperial agent changed sides.'"
+      },
+      {
+        "line": 226,
+        "raw": "'You spoke against the treaty’s terms.'"
+      },
+      {
+        "line": 226,
+        "raw": "'You tracked Eleena Daru to Malgus’s shuttle.'"
+      },
+      {
+        "line": 226,
+        "raw": "'Temple Guards watched the docking rings.'"
+      },
+      {
+        "line": 230,
+        "raw": "'dantooine'"
+      },
+      {
+        "line": 230,
+        "raw": "'ordMantell'"
+      },
+      {
+        "line": 230,
+        "raw": "'mira'"
+      },
+      {
+        "line": 230,
+        "raw": "'coruscant'"
+      },
+      {
+        "line": 230,
+        "raw": "'saresh'"
+      },
+      {
+        "line": 230,
+        "raw": "'balmorra'"
+      },
+      {
+        "line": 230,
+        "raw": "'balmorra'"
+      },
+      {
+        "line": 231,
+        "raw": "'coruscant'"
+      },
+      {
+        "line": 231,
+        "raw": "'ondo'"
+      },
+      {
+        "line": 231,
+        "raw": "'hydianWay'"
+      },
+      {
+        "line": 231,
+        "raw": "'narShaddaa'"
+      },
+      {
+        "line": 231,
+        "raw": "'coruscant'"
+      },
+      {
+        "line": 231,
+        "raw": "'malgus'"
+      },
+      {
+        "line": 231,
+        "raw": "'ossus'"
+      },
+      {
+        "line": 231,
+        "raw": "'gnost'"
+      },
+      {
+        "line": 231,
+        "raw": "'ilum'"
+      },
+      {
+        "line": 231,
+        "raw": "'jace'"
+      },
+      {
+        "line": 232,
+        "raw": "'alderaan'"
+      },
+      {
+        "line": 232,
+        "raw": "'adraas'"
+      },
+      {
+        "line": 232,
+        "raw": "'satele'"
+      },
+      {
+        "line": 232,
+        "raw": "'taris'"
+      },
+      {
+        "line": 232,
+        "raw": "'alderaan'"
+      },
+      {
+        "line": 232,
+        "raw": "'thulHeir'"
+      },
+      {
+        "line": 232,
+        "raw": "'ordMantell'"
+      },
+      {
+        "line": 233,
+        "raw": "'ruusan'"
+      },
+      {
+        "line": 233,
+        "raw": "'ruusan'"
+      },
+      {
+        "line": 233,
+        "raw": "'ruusan'"
+      },
+      {
+        "line": 233,
+        "raw": "'ruusan'"
+      },
+      {
+        "line": 233,
+        "raw": "'ruusan'"
+      },
+      {
+        "line": 233,
+        "raw": "'ruusan'"
+      },
+      {
+        "line": 233,
+        "raw": "'ruusan'"
+      },
+      {
+        "line": 235,
+        "raw": "'gnost'"
+      },
+      {
+        "line": 235,
+        "raw": "'satele'"
+      },
+      {
+        "line": 235,
+        "raw": "'darach'"
+      },
+      {
+        "line": 235,
+        "raw": "'jace'"
+      },
+      {
+        "line": 235,
+        "raw": "'gnost'"
+      },
+      {
+        "line": 235,
+        "raw": "'satele'"
+      },
+      {
+        "line": 235,
+        "raw": "'jace'"
+      },
+      {
+        "line": 235,
+        "raw": "'darach'"
+      },
+      {
+        "line": 236,
+        "raw": "'zym'"
+      },
+      {
+        "line": 236,
+        "raw": "'eleena'"
+      },
+      {
+        "line": 236,
+        "raw": "'malgus'"
+      },
+      {
+        "line": 236,
+        "raw": "'narShaddaa'"
+      },
+      {
+        "line": 236,
+        "raw": "'taris'"
+      },
+      {
+        "line": 240,
+        "raw": "'e1_eleena_tracked'"
+      },
+      {
+        "line": 240,
+        "raw": "'Eleena Daru’s shuttle codes tell you exactly where he lands. You have an extra turn.'"
+      },
+      {
+        "line": 240,
+        "raw": "'e1_strike_known'"
+      },
+      {
+        "line": 240,
+        "raw": "'You knew this was coming. Your squad is in place early.'"
+      },
+      {
+        "line": 240,
+        "raw": "'e1_hutt_sold'"
+      },
+      {
+        "line": 240,
+        "raw": "'The Hutt sold Malgus the ring’s patrol schedule. He knows where you are.'"
+      },
+      {
+        "line": 241,
+        "raw": "'e1_vault_read'"
+      },
+      {
+        "line": 241,
+        "raw": "'Gnost-Dural’s records name the signal Adraas is waiting for. Strike before it comes.'"
+      },
+      {
+        "line": 242,
+        "raw": "'archive_backup'"
+      },
+      {
+        "line": 242,
+        "raw": "'Gnost-Dural is calm. A copy of the Archives already sleeps somewhere safe.'"
+      },
+      {
+        "line": 243,
+        "raw": "'e1_hutt_deal'"
+      },
+      {
+        "line": 243,
+        "raw": "'Some of the raiders carry Hutt-sold Ilum crystals. Your deal paid for their sabers.'"
+      },
+      {
+        "line": 244,
+        "raw": "'e1_traitors'"
+      },
+      {
+        "line": 244,
+        "raw": "'The traitor names from the Imperial officer point here too.'"
+      },
+      {
+        "line": 247,
+        "raw": "'temple_scarred'"
+      },
+      {
+        "line": 247,
+        "raw": "'The Temple stands, scarred. The Archive copy you approved means the records survive.'"
+      },
+      {
+        "line": 247,
+        "raw": "'e1_adraas_down'"
+      },
+      {
+        "line": 247,
+        "raw": "'Malgus fought alone at the end. Adraas never came.'"
+      },
+      {
+        "line": 248,
+        "raw": "'satele_joined'"
+      },
+      {
+        "line": 248,
+        "raw": "'Satele Shan stays behind to help Malcom bury his dead. Darach notices.'"
+      },
+      {
+        "line": 249,
+        "raw": "'e1_eleena_tracked'"
+      },
+      {
+        "line": 249,
+        "raw": "'Adraas is gone. Eleena’s trail still leads to Coruscant.'"
+      },
+      {
+        "line": 250,
+        "raw": "'e1_strike_known'"
+      },
+      {
+        "line": 250,
+        "raw": "'The records match the envoy’s confession. Gnost-Dural stops sleeping.'"
+      },
+      {
+        "line": 254,
+        "raw": "'e1_hutt_collects'"
+      },
+      {
+        "line": 254,
+        "raw": "'all'"
+      },
+      {
+        "line": 254,
+        "raw": "'act'"
+      },
+      {
+        "line": 254,
+        "raw": "'flag'"
+      },
+      {
+        "line": 254,
+        "raw": "'e1_hutt_deal'"
+      },
+      {
+        "line": 254,
+        "raw": "'The Hutt from Act I is back. He wants your help with a Senate hearing, or he sells what he knows about the docking rings to the Empire.'"
+      },
+      {
+        "line": 255,
+        "raw": "'Help him'"
+      },
+      {
+        "line": 255,
+        "raw": "'Pay him off'"
+      },
+      {
+        "line": 255,
+        "raw": "'Let him sell'"
+      },
+      {
+        "line": 255,
+        "raw": "'e1_hutt_sold'"
+      },
+      {
+        "line": 256,
+        "raw": "'e1_archive_copy'"
+      },
+      {
+        "line": 256,
+        "raw": "'all'"
+      },
+      {
+        "line": 256,
+        "raw": "'act'"
+      },
+      {
+        "line": 256,
+        "raw": "'flag'"
+      },
+      {
+        "line": 256,
+        "raw": "'archive_backup'"
+      },
+      {
+        "line": 256,
+        "raw": "'The hidden Archive copy sends word: the keepers found a holocron the Temple thought was lost.'"
+      },
+      {
+        "line": 257,
+        "raw": "'Bring it home'"
+      },
+      {
+        "line": 257,
+        "raw": "'Leave it hidden'"
+      },
+      {
+        "line": 258,
+        "raw": "'e1_traitor_purge'"
+      },
+      {
+        "line": 258,
+        "raw": "'all'"
+      },
+      {
+        "line": 258,
+        "raw": "'act'"
+      },
+      {
+        "line": 258,
+        "raw": "'flag'"
+      },
+      {
+        "line": 258,
+        "raw": "'e1_traitors'"
+      },
+      {
+        "line": 258,
+        "raw": "'One name from the Imperial officer’s list now runs docking control on Coruscant.'"
+      },
+      {
+        "line": 259,
+        "raw": "'Arrest him quietly'"
+      },
+      {
+        "line": 259,
+        "raw": "'e1_docks_guarded'"
+      },
+      {
+        "line": 259,
+        "raw": "'Feed him false schedules'"
+      },
+      {
+        "line": 259,
+        "raw": "'e1_strike_known'"
+      },
+      {
+        "line": 260,
+        "raw": "'e1_refugee_pilot'"
+      },
+      {
+        "line": 260,
+        "raw": "'all'"
+      },
+      {
+        "line": 260,
+        "raw": "'act'"
+      },
+      {
+        "line": 260,
+        "raw": "'flag'"
+      },
+      {
+        "line": 260,
+        "raw": "'e1_refugees_in'"
+      },
+      {
+        "line": 260,
+        "raw": "'A Taris refugee you sheltered years ago is now a freighter pilot. She saw a Sith shuttle filing false papers for Coruscant.'"
+      },
+      {
+        "line": 261,
+        "raw": "'Thank her and listen'"
+      },
+      {
+        "line": 261,
+        "raw": "'e1_strike_known'"
+      },
+      {
+        "line": 261,
+        "raw": "'Offer her a place'"
+      },
+      {
+        "line": 262,
+        "raw": "'e1_mando_debt'"
+      },
+      {
+        "line": 262,
+        "raw": "'all'"
+      },
+      {
+        "line": 262,
+        "raw": "'act'"
+      },
+      {
+        "line": 262,
+        "raw": "'flag'"
+      },
+      {
+        "line": 262,
+        "raw": "'e1_mando_honor'"
+      },
+      {
+        "line": 262,
+        "raw": "'The Mandalorian champion you dueled sends a fighter. \"You beat him clean. Clan Ordo pays its debts.\"'"
+      },
+      {
+        "line": 263,
+        "raw": "'Accept the fighter'"
+      },
+      {
+        "line": 263,
+        "raw": "'varra_ordo'"
+      },
+      {
+        "line": 263,
+        "raw": "'Release the debt'"
+      },
+      {
+        "line": 264,
+        "raw": "'Varra Ordo'"
+      },
+      {
+        "line": 264,
+        "raw": "'Heavy'"
+      },
+      {
+        "line": 264,
+        "raw": "'#c9d27a'"
+      },
+      {
+        "line": 265,
+        "raw": "'A Hutt sold the docking schedule to the Empire.'"
+      },
+      {
+        "line": 265,
+        "raw": "'You sheltered Taris refugees in the Temple gardens.'"
+      },
+      {
+        "line": 266,
+        "raw": "'A Jedi beat a Mandalorian champion in a fair duel.'"
+      },
+      {
+        "line": 270,
+        "raw": "'It’s done.'"
+      },
+      {
+        "line": 270,
+        "raw": "'Rest now.'"
+      },
+      {
+        "line": 270,
+        "raw": "'Forgive me.'"
+      },
+      {
+        "line": 270,
+        "raw": "'Keep... going...'"
+      },
+      {
+        "line": 270,
+        "raw": "'I can still feel you.'"
+      },
+      {
+        "line": 270,
+        "raw": "'There.'"
+      },
+      {
+        "line": 270,
+        "raw": "'Opening.'"
+      },
+      {
+        "line": 270,
+        "raw": "'I can’t... the dark is loud.'"
+      },
+      {
+        "line": 270,
+        "raw": "'Not like this.'"
+      },
+      {
+        "line": 271,
+        "raw": "'Target down.'"
+      },
+      {
+        "line": 271,
+        "raw": "'One less.'"
+      },
+      {
+        "line": 271,
+        "raw": "'Got him.'"
+      },
+      {
+        "line": 271,
+        "raw": "'Medic!'"
+      },
+      {
+        "line": 271,
+        "raw": "'I’m hit, I’m hit!'"
+      },
+      {
+        "line": 271,
+        "raw": "'Right through the plate.'"
+      },
+      {
+        "line": 271,
+        "raw": "'Clean hit.'"
+      },
+      {
+        "line": 271,
+        "raw": "'I’m done, I’m done!'"
+      },
+      {
+        "line": 271,
+        "raw": "'Where’s the evac?'"
+      },
+      {
+        "line": 272,
+        "raw": "'Next.'"
+      },
+      {
+        "line": 272,
+        "raw": "'Target down. Moving.'"
+      },
+      {
+        "line": 272,
+        "raw": "'Still here. Barely.'"
+      },
+      {
+        "line": 272,
+        "raw": "'Breathe. Squeeze.'"
+      },
+      {
+        "line": 272,
+        "raw": "'Hold it together... I can’t.'"
+      },
+      {
+        "line": 273,
+        "raw": "'Who’s next?'"
+      },
+      {
+        "line": 273,
+        "raw": "'Too easy!'"
+      },
+      {
+        "line": 273,
+        "raw": "'Worth it.'"
+      },
+      {
+        "line": 273,
+        "raw": "'Did you see that?'"
+      },
+      {
+        "line": 273,
+        "raw": "'Get me out of here!'"
+      },
+      {
+        "line": 274,
+        "raw": "'I’m sorry.'"
+      },
+      {
+        "line": 274,
+        "raw": "'He had a family. They all do.'"
+      },
+      {
+        "line": 274,
+        "raw": "'Help the others first.'"
+      },
+      {
+        "line": 274,
+        "raw": "'End it quick.'"
+      },
+      {
+        "line": 274,
+        "raw": "'Too many of us are hurt.'"
+      },
+      {
+        "line": 275,
+        "raw": "'Write that one down.'"
+      },
+      {
+        "line": 275,
+        "raw": "'Count it.'"
+      },
+      {
+        "line": 275,
+        "raw": "'This isn’t how my story ends.'"
+      },
+      {
+        "line": 275,
+        "raw": "'Watch and learn.'"
+      },
+      {
+        "line": 275,
+        "raw": "'This wasn’t the plan!'"
+      },
+      {
+        "line": 276,
+        "raw": "'Interesting armor. Was.'"
+      },
+      {
+        "line": 276,
+        "raw": "'Huh. That’s a lot of blood.'"
+      },
+      {
+        "line": 276,
+        "raw": "'Found the weak seam.'"
+      },
+      {
+        "line": 276,
+        "raw": "'What is that thing?'"
+      },
+      {
+        "line": 278,
+        "raw": "'Jace Malcom'"
+      },
+      {
+        "line": 278,
+        "raw": "'Stay down.'"
+      },
+      {
+        "line": 278,
+        "raw": "'That’s for Ilum.'"
+      },
+      {
+        "line": 278,
+        "raw": "'Not today.'"
+      },
+      {
+        "line": 278,
+        "raw": "'Bullseye.'"
+      },
+      {
+        "line": 278,
+        "raw": "'Pull back! Pull back!'"
+      },
+      {
+        "line": 279,
+        "raw": "'Satele Shan'"
+      },
+      {
+        "line": 279,
+        "raw": "'Go to the Force.'"
+      },
+      {
+        "line": 279,
+        "raw": "'I’m all right. Move!'"
+      },
+      {
+        "line": 279,
+        "raw": "'Now.'"
+      },
+      {
+        "line": 279,
+        "raw": "'Steady... steady.'"
+      },
+      {
+        "line": 280,
+        "raw": "'Kira Venn'"
+      },
+      {
+        "line": 280,
+        "raw": "'Hold the line.'"
+      },
+      {
+        "line": 280,
+        "raw": "'Don’t wait for me.'"
+      },
+      {
+        "line": 280,
+        "raw": "'Opening!'"
+      },
+      {
+        "line": 280,
+        "raw": "'I see the Temple burning...'"
+      },
+      {
+        "line": 284,
+        "raw": "'retired'"
+      },
+      {
+        "line": 284,
+        "raw": "`Left a relic to the Archive. Padawans still argue about what it means.`"
+      },
+      {
+        "line": 285,
+        "raw": "'retired'"
+      },
+      {
+        "line": 285,
+        "raw": "`Retired at ${r.age}. ${r.role||'Lives quietly'}.`"
+      },
+      {
+        "line": 286,
+        "raw": "`Walks close to the dark. The Council watches ${r.n} and says nothing.`"
+      },
+      {
+        "line": 287,
+        "raw": "'Satele Shan'"
+      },
+      {
+        "line": 287,
+        "raw": "`Follows the treaty to Tython. Some say she will lead the Order one day.`"
+      },
+      {
+        "line": 288,
+        "raw": "'Jace Malcom'"
+      },
+      {
+        "line": 288,
+        "raw": "`Goes back to the front. The Republic will need soldiers like him for a long time.`"
+      },
+      {
+        "line": 289,
+        "raw": "`Carries the war home in ${(r.scars||[]).length>1?'more than one scar':'a scar'}, and serves anyway.`"
+      },
+      {
+        "line": 290,
+        "raw": "`${r.kills} enemies fell to ${r.n}. The Senate gives a medal. ${r.n} gives it to the Archive.`"
+      },
+      {
+        "line": 291,
+        "raw": "'Master'"
+      },
+      {
+        "line": 291,
+        "raw": "`Takes a seat on the Council, and a Padawan of their own.`"
+      },
+      {
+        "line": 292,
+        "raw": "'Knight'"
+      },
+      {
+        "line": 292,
+        "raw": "`A Knight now. Teaches the younglings what the war cost.`"
+      },
+      {
+        "line": 293,
+        "raw": "`Still a Padawan, still learning. Some lessons only peace can teach.`"
+      },
+      {
+        "line": 294,
+        "raw": "`${r.missions} missions. The Temple Guard asks for ${r.n} by name.`"
+      },
+      {
+        "line": 295,
+        "raw": "`Survived the war. Goes home to a planet that never knew how close it came.`"
+      }
+    ]
+  },
+  "text": "/* Story data (Era 1, ~3,660 BBY): vision shard, events, Years pass rules, Darth Malgus boss map, era-end text. Spec: docs/specs/story.md\n   Loads after data.js and data-campaign.js; adds to their tables (FOES, MISSIONS, CRISES, PLAN) at load time. Logic lives in story.js. */\nconst ERA1={n:'Old Republic',bby:3660,next:'Ruusan · ~1,000 BBY',\n // Vision shard shown at era start (spec C §1). Lore: Legends, Temple sacked ~3,653 BBY (Med-High).\n shard:{t:'A shard of the vision',text:'Meditating again, the Council sees more: fire on the Temple steps, a red blade in a scarred hand, a treaty signed in smoke.'}};\n// The Vision meter (`shadow`, 0–10, start 6): how strongly the vision is coming true. Lower is better.\nconst SHADOW={start:6,word:v=>v<=3?'faint':v<=6?'clear':'certain'};\n\n// Enemies added for the story. Lore: Darth Malgus led the strike on the Temple (Legends, High).\nObject.assign(FOES,{\n malgus:{n:'Darth Malgus',ic:'e_acolyte',hp:14,aim:80,mob:5,dmg:[4,6],range:1.5,deflect:30,guardDef:30,force:1,lightning:[3,4],armor:1,noCap:1,boss:1,init:15},\n // Mandalorian clans fought for the Empire in the Great War (Legends, Med).\n mando:{n:'Mandalorian Merc',ic:'e_trooper',hp:6,aim:70,mob:6,dmg:[3,5],range:8,armor:1,init:12}});\n\n// Mirror a map left↔right so reused layouts feel new.\nfunction mirrorMission(M,extra){const flip=a=>a&&a.map(p=>typeof p[0]==='string'?[p[0],W-1-p[1],p[2]]:[W-1-p[0],p[1]]);\n return{...M,map:M.map.map(r=>r.split('').reverse().join('')),start:flip(M.start),foes:flip(M.foes),hostage:M.hostage&&[W-1-M.hostage[0],M.hostage[1]],story:0,...extra}}\n\nObject.assign(MISSIONS,{\n blockade:mirrorMission(MISSIONS.relay,{n:'Supply Lane Hydian',theme:'plains',where:'Convoy depot · Hydian Way',objName:'Convoy',\n  waves:{1:['mando','trooper','trooper'],3:['mando','trooper','heavy'],5:['mando','mando','trooper']},\n  brief:'Mandalorian clans in Imperial pay are hitting a Republic supply convoy. Hold the depot for 8 turns until the Navy escort arrives.',\n  goal:'Hold the convoy for 8 turns. Mandalorians are armored and hit hard.',\n  win:'The escort arrives. The convoy gets through.',lose:'The convoy burns. The lane stays closed.',\n  reward:{credits:90,favor:3},bonus:{credits:30},bonusTxt:'Convoy above 75%'}),\n cache:mirrorMission(MISSIONS.envoy,{n:'Listening Post Besh',theme:'ruins',where:'Abandoned listening post · Inner Rim',foes:[['trooper',7,1],['trooper',2,1],['heavy',3,0],['agent',1,4]],\n  brief:'An Imperial listening post is tracking Republic fleet moves. Scan its terminals (Jedi or Medic, adjacent), then get anyone to an evac zone.',\n  goal:'Scan 2 of 3 terminals, then get anyone to an evac zone. Threat rises after turn 6.',\n  win:'The intercepts are out. The Navy changes course.',lose:'The post wipes itself. The trail goes cold.',\n  reward:{credits:60,intel:1},bonus:{intel:2},bonusTxt:'All 3 terminals'}),\n hutt:mirrorMission(MISSIONS.envoy,{n:'Spice Ledger',theme:'city',where:'Hutt warehouse · Nar Shaddaa',foes:[['trooper',7,1],['mando',2,1],['trooper',3,0],['agent',1,4]],\n  brief:'The Hutt broker keeps his kyber deals on warehouse terminals. Copy the ledgers and get out. His Mandalorian guards will not make it easy.',\n  goal:'Scan 2 of 3 terminals, then get anyone to an evac zone. Threat rises after turn 6.',\n  win:'The ledgers are out, and so are his crystals.',lose:'The warehouse locks down.',\n  reward:{credits:50,kyber:2},bonus:{intel:1},bonusTxt:'All 3 terminals'}),\n // Era 1 boss (spec C §2, S3). Assault: defeat Malgus before Threat 6, when he reaches the Temple lifts.\n dock:{n:'Docking Ring Nine',where:'Docking Ring Nine · Coruscant',type:'assault',story:1,boss:'malgus',eraBoss:1,theme:'dock',\n  escape:'Malgus reaches the Temple lifts.',near:'Malgus is at the lift doors. Next turn he is inside.',push:'Malgus pushes toward the Temple lifts.',\n  get par(){const f=typeof C!=='undefined'&&C?C.flags:{};return 6+(f.e1_strike_known?2:0)+(f.e1_eleena_tracked?1:0)},\n  map:[\"###....###\",\"..#....#..\",\".c..cc..c.\",\"...x..x...\",\"##.c..c.##\",\"..........\",\".c.#..#.c.\",\"...c..c...\",\".x......x.\",\"..c.##.c..\",\"..........\",\"..c....c..\"],\n  foes:[['malgus',4,1],['heavy',5,0],['trooper',2,2],['trooper',7,2]],reinforce:['trooper','trooper'],\n  start:[[3,11],[4,10],[5,10],[6,11],[1,10],[8,10]],\n  brief:'While the treaty is signed on Alderaan, Darth Malgus lands at Docking Ring Nine with a strike team. His target is the Temple. Stop him here.',\n  goal:'Defeat Darth Malgus. Threat rises after the par turn; at Threat 6 he reaches the Temple lifts. Barrels (x) explode when shot.',\n  win:'Malgus falls on the docking ring. The Temple never sees him.',lose:'Malgus breaks through to the Temple.',\n  reward:{credits:120,kyber:1},bonus:{favor:5},bonusTxt:'Done by the par turn'}});\n\nObject.assign(CRISES,{\n blockade:{n:'Mandalorians on the Hydian Way',kind:'Defend',src:'Senate request',mission:'blockade',\n  text:'Clans in Imperial pay are choking a Republic supply lane. The Navy asks for Jedi.',ignore:{favor:-8}},\n cache:{n:'Imperial listening post',kind:'Investigate',src:'Jedi',mission:'cache',\n  text:'A Sentinel sensed Imperial slicers in an old Republic post. Something is tracking the fleet.',ignore:{orderDark:4}},\n hutt:{n:'Hutt kyber broker',kind:'Investigate',src:'Jedi',mission:'hutt',\n  text:'A Hutt is selling Ilum-grade crystals to anyone. His ledgers name the buyers.',ignore:{}}});\n\n// v0.2b flow (spec B §8.1): … envoy → YEARS PASS → crisis → crisis → Malgus.\n\n// Years pass (+5 years) rules (spec B §1.5). Retire chances are percent per jump.\nconst YEARS={jump:5,  // default; each {years:n} plan step sets its own jump\nrecruits:3,\n retire(r,jedi){const a=r.age;if(jedi)return a>=85?100:a>=75?50:a>=65?20:0;return a>=55?100:a>=50?60:a>=40?25:0},\n trialsFail:{dark:7,chance:50},\n // Start ages for the opening roster; anyone else gets a class range.\n ages:{'Kira Venn':29,'Tor Saalen':17,'Sgt. Rhal Dax':47,'Ilsa Myr':26,'Doc Bren':38,'Grak Ordo':33},\n range:{Padawan:[14,19],Knight:[22,40],troop:[20,35]},\n roles:{staff:'Staff a wing',teach:'Teach the next recruit',relic:'Leave a relic to the Archive'}};\n\n// Recruitable canon characters from events. Satele Shan: young Knight here, Grand Master by ~3,645 BBY (Legends, Med on her age).\nconst STORY_RECRUITS={\n satele_shan:{n:'Satele Shan',cls:'Guardian',title:'Knight',rank:2,xp:30,picks:['reflectM'],col:'#9fd4ff',age:24}};\n\n// Random events, Era 1 (spec C §3). Order Darkness is 0–100 here, so spec C's +1 becomes +4.\n// Effect keys: credits intel kyber favor recruits orderDark shadow unitDark{who,n} loyalty{seat,n} flag recruit wound{who,turns} mission chance fail\n// Triggers: era_start · month{min} · after_mission{min} · stat{key,op,val} · flag{flag}\nconst EVENTS=[\n {id:'e1_gnost_archive',trigger:{type:'era_start'},text:'Master Gnost-Dural asks to copy the Archives to a hidden colony, in case the Temple falls.',\n  choices:[{label:'Approve the copy',effects:{credits:-40,flag:'archive_backup'}},{label:\"The Temple won't fall\",effects:{loyalty:{seat:'gnost',n:-10}}}]},\n {id:'e1_kyber_trade',trigger:{type:'month',min:1},text:'A Hutt broker has Ilum-grade crystals. His price: look away from his spice run.',\n  choices:[{label:'Buy, look away',effects:{kyber:2,orderDark:4,flag:'e1_hutt_deal'}},{label:'Refuse',effects:{}},{label:'Seize them',effects:{mission:'hutt',favor:-1}}]},\n {id:'e1_mando_blockade',trigger:{type:'month',min:2},text:'Mandalorians in Imperial pay are choking a supply lane. The Navy asks for Jedi. The Senate asks you to stay out.',\n  choices:[{label:'Send a squad',effects:{mission:'blockade',favor:-1}},{label:'Pay the clans off',effects:{credits:-60,favor:1}},{label:'Ignore it',effects:{favor:-2}}]},\n {id:'e1_treaty_vote',trigger:{type:'flag',flag:'e1_strike_known'},text:'You know the strike is coming. Warn the Senate, and maybe the Empire\\'s spies, or keep it inside the Order?',\n  choices:[{label:'Warn the Senate',effects:{favor:2,intel:-1}},{label:'Keep it secret',effects:{flag:'e1_ambush_ready',favor:-1}}]},\n {id:'e1_satele',trigger:{type:'after_mission',min:3},text:'A young Knight, Satele Shan, asks to join your strike teams. Her master, Kao Cen Darach, disagrees.',\n  choices:[{label:'Take her',effects:{recruit:'satele_shan',flag:'satele_joined',loyalty:{seat:'darach',n:-10}}},{label:'Respect her master',effects:{loyalty:{seat:'darach',n:10}}}]},\n {id:'e1_prisoner_offer',trigger:{type:'stat',key:'intel',op:'>=',val:3},text:'A captured Imperial officer offers names of Republic traitors in exchange for a ship.',\n  choices:[{label:'Deal',effects:{intel:2,favor:-1,flag:'e1_traitors'}},{label:'Hand him to the Navy',effects:{favor:1}},{label:'Make him talk',effects:{intel:3,unitDark:{who:'jedi_random',n:2}}}]}];\nconst COUNCIL_SEATS={gnost:{n:'Gnost-Dural',loyalty:60},darach:{n:'Kao Cen Darach',loyalty:60},zym:{n:'Grand Master Zym',loyalty:60}};\n\n// Debrief / era-end lines (spec C §9: one line of result, one of cost).\nconst STORY_TEXT={\n bossWin:'You stopped the shuttle. The treaty was still signed in smoke.',\n bossLose:'Malgus reached the Temple steps before the Guard drove him off. The Temple is scarred: a wing lost a level.',\n ambush:'Your ambush was ready: Malgus lands already wounded.',\n adraas:'Adraas fell on Alderaan: one fewer squad came with Malgus.',guards:'Temple Guards hold the docking ring: no reinforcements reach Malgus.',\n eraWin:'The Temple stands. The Empire got its treaty, but not its lesson.',\n eraLose:'The Temple stands, scarred. The Senate wonders what the Jedi are for.',\n darkWarn:'The Order is drifting. Some Masters speak of a Dark Council.'};\n// \"What history changed\" recap: flag → line.\nconst FLAG_LINES={e1_strike_known:'The envoy talked: you knew the strike was coming.',e1_ambush_ready:'You kept the warning inside the Order and set an ambush.',\n archive_backup:'A copy of the Archives sleeps on a hidden colony.',e1_traitors:'Names of Republic traitors sit in your files.',\n boss_or_won:'Darth Malgus fell at Docking Ring Nine.',temple_scarred:'The Temple was scarred. In canon it was sacked.'};\n\n// ═══ Wave 3 (Chat L): Era 1 becomes a full era. 3 Acts, 12 missions, 3,660 → 3,653 BBY. ═══\n// Lore: Treaty of Coruscant signed on Alderaan as Malgus and Adraas sack the Temple, 3,653 BBY (Legends, Med-High).\n// Satele Shan and Jace Malcom fight Malgus at Alderaan in the same war (Legends, High). Their missions here are [N] invented.\nFOES.adraas={n:'Lord Adraas',ic:'e_acolyte',hp:11,aim:75,mob:5,dmg:[4,5],range:1.5,deflect:25,guardDef:20,force:1,lightning:[3,4],noCap:1,boss:1,init:14}; // [L H] Malgus's co-commander\n\nObject.assign(MISSIONS,{\n // Act II story: Gnost-Dural's arc. Ossus is a ruined Jedi archive world (Legends, High); this expedition is [N].\n vault:{n:\"Gnost-Dural's Vault\",where:'Archive ruins · Ossus',type:'investigate',story:1,par:6,theme:'ruins',\n  map:[\"..q.h..#q.\",\".h.._.._..\",\"..c....c..\",\"h.#.hh.#.h\",\"...r..r...\",\".c..q...c.\",\"..B....B..\",\".r..cc..r.\",\"...h..h...\",\".c......c.\",\"..c.r..c..\",\"EE......EE\"],\n  stealth:1,foes:[['trooper',1,2,1],['trooper',8,2,2],['agent',5,1],['heavy',5,4,2],['acolyte',3,1,1]],patrol:{2:[[8,2],[8,4],[6,4],[6,2]]},reinforce:['trooper','trooper'],\n  start:[[2,11],[3,11],[4,11],[5,11],[6,11],[7,11]],\n  brief:'You start concealed: pods patrol the ruins. Master Gnost-Dural found a sealed vault in the Ossus ruins: records from the last time the Sith struck at the Jedi. Imperial agents found it too. Scan the terminals (Jedi or Medic, adjacent), then reach evac.',\n  goal:'Scan 2 of 3 terminals, then get anyone to an evac zone. A Sith Acolyte guards the vault. Threat rises after turn 6.',\n  win:'The records come home. Gnost-Dural reads all night.',lose:'The vault burns. Whatever it knew is ash.',\n  reward:{credits:60,intel:2,kyber:1},bonus:{intel:2},bonusTxt:'All 3 terminals',winFlag:'e1_vault_read'},\n // Act II story: Jace Malcom's arc. Ilum = kyber world (Legends/Canon, High); this battle is [N].\n ilum:{n:'The Cave Mouth',where:'Crystal caves · Ilum',type:'defend',story:1,turns:8,obj:18,objName:'Cave mouth',lastWave:5,theme:'snow',\n  map:[\"..........\",\"..B....B..\",\".c..h...c.\",\"...c..c...\",\"#..r..r..#\",\".c.B..B.c.\",\"....cc....\",\".h......h.\",\"..c.##.c..\",\".r.c..c.r.\",\"...#OO#...\",\"....OO....\"],\n  waves:{1:['trooper','trooper','trooper'],3:['mando','trooper','heavy'],5:['acolyte','trooper','trooper']},\n  start:[[2,10],[7,10],[4,9],[5,9],[1,11],[8,11]],\n  brief:'Sith raiders want the Ilum crystal caves. Sgt. Jace Malcom’s platoon is all that holds the mouth, and it is thin. Hold for 8 turns until his relief lands.',\n  goal:'Hold the cave mouth for 8 turns. Three waves; the last brings a Sith Acolyte.',\n  win:'Relief lands in the snow. The caves stay quiet.',lose:'The raiders reach the crystals. Ilum goes dark for a generation.',\n  reward:{credits:70,kyber:2},bonus:{favor:4},bonusTxt:'Cave mouth above 75%',winRecruit:'jace_malcom',winFlag:'jace_joined'},\n // Act III story: Satele Shan's arc. Adraas and Malgus led the sack together (Legends, High); this strike is [N].\n adraasHunt:{n:'Shadow of Adraas',where:'Embassy hangar · Alderaan',type:'assault',story:1,boss:'adraas',par:6,theme:'city',\n  escape:'Adraas reaches his shuttle and is gone.',near:'Adraas is at his shuttle ramp.',push:'Adraas falls back toward his shuttle.',\n  map:[\"##..##..##\",\"...c..c...\",\".B......B.\",\"...h..h...\",\".c..xx..c.\",\"...B..B...\",\".h......h.\",\"..c.##.c..\",\".x......x.\",\"...c..c...\",\".B......B.\",\"..........\"],\n  stealth:1,foes:[['adraas',4,1,1],['trooper',2,2,1],['trooper',7,2,2],['agent',9,3],['mando',5,3,2]],patrol:{2:[[7,2],[7,5],[4,5],[4,2]]},reinforce:['trooper','mando'],\n  start:[[2,11],[3,11],[4,11],[5,11],[6,11],[7,11]],\n  brief:'You start concealed. While the delegates talk, Lord Adraas waits in an embassy hangar for a signal. Satele Shan wants him taken off the board before it comes. Defeat him before he reaches his shuttle.',\n  goal:'Defeat Lord Adraas. Threat rises after turn 6; at Threat 6 he escapes. Barrels (x) explode when shot.',\n  win:'Adraas falls in the hangar. One blade fewer for the strike.',lose:'Adraas gets away. He will be at Malgus’s side.',\n  reward:{credits:90,intel:2},bonus:{favor:4},bonusTxt:'Done by the par turn',winFlag:'e1_adraas_down',loseFlag:'e1_adraas_free'},\n // Crisis variants (mirrored layouts, new places). All [N].\n taris:mirrorMission(MISSIONS.rescue,{n:'Reclamation Camp',where:'Refugee camp · Taris',theme:'ruins',\n  brief:'Sith raiders grabbed a Republic relief officer from a Taris refugee camp. Open the cell (Hack or console), then walk her to an evac zone (E).',\n  win:'The officer is out. The camp gets its medicine.',lose:'The officer is gone. The camp goes hungry.',reward:{credits:70,favor:4}}),\n thul:mirrorMission(MISSIONS.escort,{n:'The Thul Heir',where:'Estate grounds · Alderaan',theme:'plains',\n  brief:'Imperial agents want a young heir of House Thul dead before the talks. Walk her to the shuttle at the far evac zone.',\n  win:'The heir reaches the talks. House Thul owes the Order.',lose:'The heir dies on her own lawn. Alderaan blames the Jedi.',reward:{credits:80,favor:6}}),\n depot:mirrorMission(MISSIONS.sabotage,{n:'Forward Depot Cresh',where:'Imperial forward depot · Mid Rim',theme:'plains',\n  win:'The depot burns. The Imperial push stalls a month.',lose:'The depot holds. The push comes on time.'}),\n fort:mirrorMission(MISSIONS.shrine,{n:'Fort Garnik',where:'Hill fort · Ord Mantell',objName:'Fort',theme:'plains',\n  waves:{1:['trooper','trooper'],2:['mando'],4:['trooper','heavy']},\n  brief:'A Republic hill fort on Ord Mantell is under Mandalorian and Sith attack. Hold it for 6 turns until the garrison regroups.',\n  goal:'Hold the fort for 6 turns. Mandalorians are armored and hit hard.',\n  win:'The garrison regroups. The hill stays Republic.',lose:'The fort falls. Ord Mantell burns again.',reward:{credits:70,favor:3}})});\n\nObject.assign(CRISES,{\n taris:{n:'Taken at the Taris camp',kind:'Rescue',src:'Civilian',mission:'taris',text:'Raiders took the relief officer who keeps a refugee camp alive.',ignore:{favor:-3,orderDark:4}},\n thul:{n:'The Thul heir',kind:'Escort',src:'Senate request',mission:'thul',text:'An Alderaanian heir is marked for death before the peace talks.',ignore:{favor:-8}},\n depot:{n:'Forward depot',kind:'Sabotage',src:'Navy request',mission:'depot',text:'An Imperial depot feeds the next push. Blow it and get out.',ignore:{favor:-5}},\n fort:{n:'Fort Garnik under siege',kind:'Defend',src:'Navy request',mission:'fort',text:'Mandalorians and Sith troopers are storming a Republic hill fort.',ignore:{favor:-5}}});\n\n// The plan: Act I (3,660) · Years pass +3 · Act II (3,657) · Years pass +4 · Act III (3,653, the year of the treaty).\nPLAN.length=0;PLAN.push(\n {story:'relay'},{crises:['rescue','shrine','archive']},{story:'envoy'},{crises:['hutt','blockade']},\n {years:3,act:2},\n {crises:['sabotage','cache']},{story:'vault'},{crises:['escort','fort']},{story:'ilum'},\n {years:4,act:3},\n {crises:['taris','depot']},{story:'adraasHunt'},{crises:['thul','blockade','archive']},{story:'dock'});\n// Text for each Years pass jump, by the Act it opens.\nconst ACTS={2:{t:'Years pass',text:'Three years go by. The war cools into a cold peace that no one trusts. Wounds heal. Padawans face the Trials. Some veterans hang up their gear.'},\n 3:{t:'The year of the treaty',text:'Four more years. Envoys gather on Alderaan to sign a peace. The Council’s vision has never been clearer. Whatever is coming, it comes this year.'}};\n// Shard shown at the start of each Act (spec C §1 style). The Act I shard is ERA1.shard.\nconst SHARDS={2:'The vision returns: Jedi bodies on the Temple steps, and a treaty table on a green world.',\n 3:'The vision is clear now: a shuttle at a docking ring, a scarred Sith Lord, and the Temple doors open.'};\n\nObject.assign(STORY_RECRUITS,{\n jace_malcom:{n:'Jace Malcom',cls:'Soldier',rank:2,xp:30,picks:['rapidFire'],col:'#e0bd78',age:31}}); // age [N], Low\n\n// Debrief epilogue: one line of cost, after the result (spec C §9).\nconst EPI={\n relay:{win:'Three of them didn’t come home to the frontier.',lose:'The fleet arrived to a burned-out relay.'},\n envoy:{win:'Saresh will never serve the Senate again. Nobody thanks you for it.',lose:'Somewhere, the schedule still leaks.'},\n rescue:{win:'The depot burns behind you. So does the trust of the local militia.',lose:'An empty cell, still warm.'},\n shrine:{win:'The pilgrims light candles for the Jedi. And for the troopers who held the line.',lose:'The crystals are gone. The shrine will sing no more.'},\n archive:{win:'The Navy got its codes. Imperial Intelligence will want to know who took them.'},\n sabotage:{win:'The sky over Balmorra burns orange for a week.'},escort:{win:'The senator will vote for peace. He will not thank you either.'},\n blockade:{win:'The convoy is through. The clans will remember the Jedi who stopped them.'},\n cache:{win:'The intercepts are good. The Empire is moving more ships than it admits.'},hutt:{win:'The Hutt will remember this. Hutts always remember.'},\n vault:{win:'Gnost-Dural reads the records twice, then asks to see the Grand Master alone.',lose:'Gnost-Dural says nothing on the flight home. He does not need to.'},\n ilum:{win:'Jace Malcom buries four of his platoon in the snow, then asks how he can serve.',lose:'The caves are silent. Malcom’s platoon held to the last.'},\n adraasHunt:{win:'Satele says nothing about the treaty. She is thinking about the one Sith left.',lose:'The hangar smells of ozone. Adraas has gone to join Malgus.'},\n taris:{win:'The camp eats tonight.'},thul:{win:'House Thul will speak for the Jedi at the talks.',lose:'Alderaan’s nobles close their doors to the Order.'},\n depot:{win:'The push stalls. Somewhere, an Imperial officer is shot for it.'},fort:{win:'The hill is Republic. For now.'},\n dock:{win:'The treaty was still signed in smoke.',lose:'The Temple stands, scarred. Grand Master Zym walks the burned halls alone.'}};\n// Briefing line from the Council, shown with the mission brief (spec C §9 voice). [N]\nconst QUOTES={relay:'“Hold the relay. The fleet needs the lane open.” — Grand Master Zym',envoy:'“Somebody is selling the peace. Find out who.” — Kao Cen Darach',\n vault:'“The last time the Sith struck at a Temple, they did it while we talked.” — Gnost-Dural',ilum:'“No Jedi blade without Ilum. Hold it.” — Grand Master Zym',\n adraasHunt:'“Two of them will come. Let us make it one.” — Satele Shan',dock:'“This is the vision. Change it.” — Grand Master Zym'};\nfor(const k in QUOTES)if(MISSIONS[k])MISSIONS[k].quote=QUOTES[k];\n\n// Era 1 events, wave 3. Extra trigger types: act{min} · all:[triggers] · notFlag{flag}. Order Darkness is 0–100 (spec C ×4).\nEVENTS.push(\n {id:'e1_refugees',trigger:{type:'month',min:2},text:'Refugees from Taris ask to camp in the Temple gardens. The Senate says it sets a bad example.',\n  choices:[{label:'Take them in',effects:{credits:-40,favor:-2,recruits:1,flag:'e1_refugees_in'}},{label:'Send them to the Senate',effects:{favor:1}},{label:'Turn them away',effects:{orderDark:4}}]},\n {id:'e1_senate_audit',trigger:{type:'after_mission',min:2},text:'A Senate committee wants an account of every credit the Order spends on the war.',\n  choices:[{label:'Open the books',effects:{credits:-30,favor:4}},{label:'Refuse',effects:{favor:-4}}]},\n {id:'e1_ilum_call',trigger:{type:'act',min:2},text:'A Republic sergeant, Jace Malcom, sends a blunt signal from Ilum: Sith scouts are circling the crystal caves.',\n  choices:[{label:'Send kyber money',effects:{credits:-30,kyber:1}},{label:'Tell him help is coming',effects:{favor:1}}]},\n {id:'e1_defector',trigger:{type:'after_mission',min:4},text:'An Imperial agent wants to defect. She says she knows how the Empire talks to its strike teams.',\n  choices:[{label:'Bring her in',effects:{chance:0.6,intel:3,flag:'e1_defector',fail:{wound:{who:'squad_leader',turns:2},intel:1}}},{label:'Hand her to the SIS',effects:{favor:2}}]},\n {id:'e1_gnost_warning',trigger:{type:'flag',flag:'e1_vault_read'},text:'Gnost-Dural’s records show the old Sith struck at a Temple during peace talks. He thinks it will happen again.',\n  choices:[{label:'Tell the whole Council',effects:{flag:'e1_strike_known',loyalty:{seat:'gnost',n:10}}},{label:'Seal the records',effects:{intel:2,loyalty:{seat:'gnost',n:-10}}}]},\n {id:'e1_mando_duel',trigger:{type:'month',min:4},text:'A Mandalorian champion holds a Republic pilot. He will trade her for a duel with your best Jedi.',\n  choices:[{label:'Accept the duel',effects:{chance:0.5,favor:4,flag:'e1_mando_honor',fail:{wound:{who:'jedi_highestDark',turns:2}}}},{label:'Decline',effects:{favor:-2}}]},\n {id:'e1_revenge',trigger:{type:'after_mission',min:6},text:'A young Jedi lost friends in the last fight. They want the next mission to be about payback.',\n  choices:[{label:'Counsel patience',effects:{unitDark:{who:'jedi_highestDark',n:-2}}},{label:'Let them burn',effects:{unitDark:{who:'jedi_highestDark',n:2},intel:1}}]},\n {id:'e1_jace_satele',trigger:{type:'all',all:[{type:'flag',flag:'satele_joined'},{type:'flag',flag:'jace_joined'}]},text:'Satele Shan and Jace Malcom are seen together more than the Code would like. Darach asks you to step in.',\n  choices:[{label:'Look away',effects:{favor:1,loyalty:{seat:'darach',n:-10}}},{label:'Remind her of the Code',effects:{loyalty:{seat:'darach',n:10},orderDark:-4}}]},\n {id:'e1_zym_treaty',trigger:{type:'act',min:3},text:'Grand Master Zym will back the treaty, even its terms that pull Jedi off Imperial-claimed worlds.',\n  choices:[{label:'Back Zym',effects:{favor:4,orderDark:-4,loyalty:{seat:'zym',n:10}}},{label:'Oppose the terms',effects:{favor:-3,flag:'e1_opposed_treaty',loyalty:{seat:'zym',n:-10}}}]},\n {id:'e1_eleena',trigger:{type:'act',min:3},text:'Scouts saw a Twi’lek, Eleena Daru, buying shuttle codes for Coruscant. She travels with Darth Malgus.',\n  choices:[{label:'Track her',effects:{intel:-1,flag:'e1_eleena_tracked'}},{label:'Let her go',effects:{}}]},\n {id:'e1_docks',trigger:{type:'after_mission',min:9},text:'The Temple Guard captain asks for credits to post guards at the Coruscant docking rings.',\n  choices:[{label:'Pay for the posts',effects:{credits:-60,flag:'e1_docks_guarded'}},{label:'The Temple comes first',effects:{}}]},\n {id:'e1_padawan_doubt',trigger:{type:'act',min:3},text:'A Padawan asks why the Order makes peace with the people who burned their homeworld.',\n  choices:[{label:'Answer honestly',effects:{unitDark:{who:'jedi_random',n:-1}}},{label:'Tell them to obey',effects:{unitDark:{who:'jedi_random',n:1},favor:1}}]});\nObject.assign(FLAG_LINES,{e1_vault_read:'Gnost-Dural recovered the Ossus records.',jace_joined:'Jace Malcom fought for the Order.',satele_joined:'Satele Shan fought under your command.',\n e1_adraas_down:'Lord Adraas fell on Alderaan.',e1_adraas_free:'Lord Adraas escaped to join the strike.',e1_defector:'An Imperial agent changed sides.',\n e1_opposed_treaty:'You spoke against the treaty’s terms.',e1_eleena_tracked:'You tracked Eleena Daru to Malgus’s shuttle.',e1_docks_guarded:'Temple Guards watched the docking rings.'});\n\n// ═══ Wave 3 follow-up (Chat L): planets & characters for the Codex, flag-aware briefs/debriefs, event chains, barks, epilogues ═══\n// Codex: which planet and characters each mission reveals (codexSee). Ids match CODEX.planet / CODEX.character.\nconst MISSION_LORE={shrine:['dantooine'],rescue:['ordMantell',['mira']],envoy:['coruscant',['saresh']],archive:['balmorra'],sabotage:['balmorra'],\n escort:['coruscant',['ondo']],blockade:['hydianWay'],hutt:['narShaddaa'],dock:['coruscant',['malgus']],vault:['ossus',['gnost']],ilum:['ilum',['jace']],\n adraasHunt:['alderaan',['adraas','satele']],taris:['taris'],thul:['alderaan',['thulHeir']],fort:['ordMantell'],\n r_ravine:['ruusan'],r_caves:['ruusan'],r_bomb:['ruusan'],r_hospital:['ruusan'],r_nexus:['ruusan'],r_snipers:['ruusan'],r_dump:['ruusan']};\n// Characters met in Council events.\nconst EVENT_LORE={e1_gnost_archive:['gnost'],e1_satele:['satele','darach'],e1_ilum_call:['jace'],e1_gnost_warning:['gnost'],e1_jace_satele:['satele','jace','darach'],\n e1_zym_treaty:['zym'],e1_eleena:['eleena','malgus'],e1_hutt_collects:['narShaddaa'],e1_refugee_pilot:['taris']};\n\n// Brief additions: first matching flag wins, appended to the mission brief. [N]\nconst BRIEF_IF={\n dock:[['e1_eleena_tracked','Eleena Daru’s shuttle codes tell you exactly where he lands. You have an extra turn.'],['e1_strike_known','You knew this was coming. Your squad is in place early.'],['e1_hutt_sold','The Hutt sold Malgus the ring’s patrol schedule. He knows where you are.']],\n adraasHunt:[['e1_vault_read','Gnost-Dural’s records name the signal Adraas is waiting for. Strike before it comes.']],\n vault:[['archive_backup','Gnost-Dural is calm. A copy of the Archives already sleeps somewhere safe.']],\n ilum:[['e1_hutt_deal','Some of the raiders carry Hutt-sold Ilum crystals. Your deal paid for their sabers.']],\n envoy:[['e1_traitors','The traitor names from the Imperial officer point here too.']]};\n// Debrief variants: checked before EPI; [flag, win line, lose line]. [N]\nconst DEBRIEF_IF={\n dock:[['temple_scarred',null,'The Temple stands, scarred. The Archive copy you approved means the records survive.'],['e1_adraas_down','Malgus fought alone at the end. Adraas never came.',null]],\n ilum:[['satele_joined','Satele Shan stays behind to help Malcom bury his dead. Darach notices.',null]],\n adraasHunt:[['e1_eleena_tracked','Adraas is gone. Eleena’s trail still leads to Coruscant.',null]],\n vault:[['e1_strike_known','The records match the envoy’s confession. Gnost-Dural stops sleeping.',null]]};\n\n// Delayed consequences: Act I choices pay off in Act III.\nEVENTS.push(\n {id:'e1_hutt_collects',trigger:{type:'all',all:[{type:'act',min:3},{type:'flag',flag:'e1_hutt_deal'}]},text:'The Hutt from Act I is back. He wants your help with a Senate hearing, or he sells what he knows about the docking rings to the Empire.',\n  choices:[{label:'Help him',effects:{favor:-6,orderDark:4}},{label:'Pay him off',effects:{credits:-80}},{label:'Let him sell',effects:{flag:'e1_hutt_sold'}}]},\n {id:'e1_archive_copy',trigger:{type:'all',all:[{type:'act',min:3},{type:'flag',flag:'archive_backup'}]},text:'The hidden Archive copy sends word: the keepers found a holocron the Temple thought was lost.',\n  choices:[{label:'Bring it home',effects:{intel:2,kyber:1}},{label:'Leave it hidden',effects:{shadow:-1}}]},\n {id:'e1_traitor_purge',trigger:{type:'all',all:[{type:'act',min:3},{type:'flag',flag:'e1_traitors'}]},text:'One name from the Imperial officer’s list now runs docking control on Coruscant.',\n  choices:[{label:'Arrest him quietly',effects:{favor:2,flag:'e1_docks_guarded'}},{label:'Feed him false schedules',effects:{intel:2,flag:'e1_strike_known'}}]},\n {id:'e1_refugee_pilot',trigger:{type:'all',all:[{type:'act',min:3},{type:'flag',flag:'e1_refugees_in'}]},text:'A Taris refugee you sheltered years ago is now a freighter pilot. She saw a Sith shuttle filing false papers for Coruscant.',\n  choices:[{label:'Thank her and listen',effects:{flag:'e1_strike_known',intel:1}},{label:'Offer her a place',effects:{recruits:1,favor:1}}]},\n {id:'e1_mando_debt',trigger:{type:'all',all:[{type:'act',min:3},{type:'flag',flag:'e1_mando_honor'}]},text:'The Mandalorian champion you dueled sends a fighter. \"You beat him clean. Clan Ordo pays its debts.\"',\n  choices:[{label:'Accept the fighter',effects:{recruit:'varra_ordo'}},{label:'Release the debt',effects:{favor:2}}]});\nSTORY_RECRUITS.varra_ordo={n:'Varra Ordo',cls:'Heavy',rank:2,xp:30,col:'#c9d27a',age:34}; // Clan Ordo is Legends (High); Varra is [N]\nObject.assign(FLAG_LINES,{e1_hutt_sold:'A Hutt sold the docking schedule to the Empire.',e1_refugees_in:'You sheltered Taris refugees in the Temple gardens.',\n e1_mando_honor:'A Jedi beat a Mandalorian champion in a fair duel.'});\n\n// In-battle barks (spec C §9: one line, no speeches). Keyed by recruit trait; 'jedi' and 'troop' are the fallbacks. [N]\nconst BARKS={\n jedi:{kill:['It’s done.','Rest now.','Forgive me.'],down:['Keep... going...','I can still feel you.'],crit:['There.','Opening.'],panic:['I can’t... the dark is loud.','Not like this.']},\n troop:{kill:['Target down.','One less.','Got him.'],down:['Medic!','I’m hit, I’m hit!'],crit:['Right through the plate.','Clean hit.'],panic:['I’m done, I’m done!','Where’s the evac?']},\n steady:{kill:['Next.','Target down. Moving.'],down:['Still here. Barely.'],crit:['Breathe. Squeeze.'],panic:['Hold it together... I can’t.']},\n reckless:{kill:['Who’s next?','Too easy!'],down:['Worth it.'],crit:['Did you see that?'],panic:['Get me out of here!']},\n compassionate:{kill:['I’m sorry.','He had a family. They all do.'],down:['Help the others first.'],crit:['End it quick.'],panic:['Too many of us are hurt.']},\n ambitious:{kill:['Write that one down.','Count it.'],down:['This isn’t how my story ends.'],crit:['Watch and learn.'],panic:['This wasn’t the plan!']},\n curious:{kill:['Interesting armor. Was.'],down:['Huh. That’s a lot of blood.'],crit:['Found the weak seam.'],panic:['What is that thing?']}};\n// Named heroes speak their own lines. [N] characterization\nconst HERO_BARKS={'Jace Malcom':{kill:['Stay down.','That’s for Ilum.'],down:['Not today.'],crit:['Bullseye.'],panic:['Pull back! Pull back!']},\n 'Satele Shan':{kill:['Go to the Force.'],down:['I’m all right. Move!'],crit:['Now.'],panic:['Steady... steady.']},\n 'Kira Venn':{kill:['Hold the line.'],down:['Don’t wait for me.'],crit:['Opening!'],panic:['I see the Temple burning...']}};\n\n// Era-end epilogue card per surviving unit: first matching rule writes the line. [N]\nconst EPILOGUE=[\n [r=>r.status==='retired'&&r.relic,r=>`Left a relic to the Archive. Padawans still argue about what it means.`],\n [r=>r.status==='retired',r=>`Retired at ${r.age}. ${r.role||'Lives quietly'}.`],\n [r=>CLASS[r.cls]&&CLASS[r.cls].jedi&&(r.dark||0)>=7,r=>`Walks close to the dark. The Council watches ${r.n} and says nothing.`],\n [r=>r.n==='Satele Shan',r=>`Follows the treaty to Tython. Some say she will lead the Order one day.`],   // [L H] Satele becomes Grand Master\n [r=>r.n==='Jace Malcom',r=>`Goes back to the front. The Republic will need soldiers like him for a long time.`],   // [L H] Malcom becomes Supreme Commander\n [r=>(r.scars||[]).length>0,r=>`Carries the war home in ${(r.scars||[]).length>1?'more than one scar':'a scar'}, and serves anyway.`],\n [r=>(r.kills||0)>=12,r=>`${r.kills} enemies fell to ${r.n}. The Senate gives a medal. ${r.n} gives it to the Archive.`],\n [r=>CLASS[r.cls]&&CLASS[r.cls].jedi&&r.title==='Master',r=>`Takes a seat on the Council, and a Padawan of their own.`],\n [r=>CLASS[r.cls]&&CLASS[r.cls].jedi&&r.title==='Knight',r=>`A Knight now. Teaches the younglings what the war cost.`],\n [r=>CLASS[r.cls]&&CLASS[r.cls].jedi,r=>`Still a Padawan, still learning. Some lessons only peace can teach.`],\n [r=>(r.missions||0)>=8,r=>`${r.missions} missions. The Temple Guard asks for ${r.n} by name.`],\n [r=>true,r=>`Survived the war. Goes home to a planet that never knew how close it came.`]];\n"
+}

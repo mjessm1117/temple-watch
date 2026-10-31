@@ -1,0 +1,136 @@
+{
+  "source": "public/js/tutorial.js",
+  "sha256": "a8c1efeba54a64e1a4445bd0c8ac6a18a3300dd5174326e76bf5ecd0de38625b",
+  "lines": 25,
+  "counts": {
+    "TUT_CARD": 7,
+    "SOURCE_LITERALS": 23
+  },
+  "records": {
+    "TUT_CARD": [
+      [
+        "Select",
+        "Click a squad member (or press Tab). Lit tiles show where it can move."
+      ],
+      [
+        "Action points",
+        "Each unit gets 3 AP a turn. Each AP is one full move. Pistols and sabers cost 1 AP to attack, rifles 2. Shooting does not end your turn."
+      ],
+      [
+        "Cover",
+        "Shield icons mark cover: solid = full, outline = half. End moves next to it. Hit enemies from the side to flank."
+      ],
+      [
+        "Shoot",
+        "Pick an ability, click a target to see the hit %, then Confirm. Space aims at the best target; Space again fires."
+      ],
+      [
+        "The Force",
+        "Jedi spend Focus on powers; Meditate refills it. Choke works but adds Darkness."
+      ],
+      [
+        "Wounded",
+        "A downed ally bleeds out in a few turns. Stand next to them and Stabilize, or use a medkit."
+      ],
+      [
+        "Done?",
+        "Press End turn. Click any enemy to see its plan. Codex (C) explains everything; ? lists all keys."
+      ]
+    ],
+    "SOURCE_LITERALS": [
+      {
+        "line": 4,
+        "raw": "'Select'"
+      },
+      {
+        "line": 4,
+        "raw": "'Click a squad member (or press Tab). Lit tiles show where it can move.'"
+      },
+      {
+        "line": 5,
+        "raw": "'Action points'"
+      },
+      {
+        "line": 5,
+        "raw": "'Each unit gets 3 AP a turn. Each AP is one full move. Pistols and sabers cost 1 AP to attack, rifles 2. Shooting does not end your turn.'"
+      },
+      {
+        "line": 6,
+        "raw": "'Cover'"
+      },
+      {
+        "line": 6,
+        "raw": "'Shield icons mark cover: solid = full, outline = half. End moves next to it. Hit enemies from the side to flank.'"
+      },
+      {
+        "line": 7,
+        "raw": "'Shoot'"
+      },
+      {
+        "line": 7,
+        "raw": "'Pick an ability, click a target to see the hit %, then Confirm. Space aims at the best target; Space again fires.'"
+      },
+      {
+        "line": 8,
+        "raw": "'The Force'"
+      },
+      {
+        "line": 8,
+        "raw": "'Jedi spend Focus on powers; Meditate refills it. Choke works but adds Darkness.'"
+      },
+      {
+        "line": 9,
+        "raw": "'Wounded'"
+      },
+      {
+        "line": 9,
+        "raw": "'A downed ally bleeds out in a few turns. Stand next to them and Stabilize, or use a medkit.'"
+      },
+      {
+        "line": 10,
+        "raw": "'Done?'"
+      },
+      {
+        "line": 10,
+        "raw": "'Press End turn. Click any enemy to see its plan. Codex (C) explains everything; ? lists all keys.'"
+      },
+      {
+        "line": 13,
+        "raw": "`<div class=\"setrow\" id=\"tutRow\"><div><b>Show tips?</b><small>A short controls card before your first mission, plus hints the first time you do things.</small></div><div class=\"seg\"><button type=\"button\" data-tut=\"1\" class=\"${on?'on':''}\">Yes</button><button type=\"button\" data-tut=\"0\" class=\"${on?'':'on'}\">No</button></div></div>`"
+      },
+      {
+        "line": 14,
+        "raw": "'[data-tut]'"
+      },
+      {
+        "line": 14,
+        "raw": "'1'"
+      },
+      {
+        "line": 15,
+        "raw": "'[data-tut]'"
+      },
+      {
+        "line": 15,
+        "raw": "'on'"
+      },
+      {
+        "line": 16,
+        "raw": "'tut'"
+      },
+      {
+        "line": 17,
+        "raw": "`<div class=\"ui-card\" role=\"dialog\" aria-label=\"How to play\"><div class=\"ui-head\"><h2>How to play</h2><button type=\"button\" data-ui=\"close\" aria-label=\"Close\">✕</button></div>\n ${TUT_CARD.map(([h,t])=>`"
+      },
+      {
+        "line": 18,
+        "raw": "`).join('')}\n <div class=\"endrow\"><button type=\"button\" id=\"tutOff\">Turn off tips</button><button type=\"button\" class=\"primary\" data-ui=\"close\">Got it</button></div></div>`"
+      },
+      {
+        "line": 20,
+        "raw": "'#tutOff'"
+      }
+    ]
+  },
+  "text": "/* Onboarding (A2): the new-campaign screen asks \"Show tips?\"; if yes, the first mission opens with one controls card.\n   Jess 2026-10-22: minimal hand-holding, asked at start, skippable. The in-mission hints live in ui-hud.js (TIPS) and share SETTINGS.tips. */\nconst TUT_CARD=[\n ['Select','Click a squad member (or press Tab). Lit tiles show where it can move.'],\n ['Action points','Each unit gets 3 AP a turn. Each AP is one full move. Pistols and sabers cost 1 AP to attack, rifles 2. Shooting does not end your turn.'],\n ['Cover','Shield icons mark cover: solid = full, outline = half. End moves next to it. Hit enemies from the side to flank.'],\n ['Shoot','Pick an ability, click a target to see the hit %, then Confirm. Space aims at the best target; Space again fires.'],\n ['The Force','Jedi spend Focus on powers; Meditate refills it. Choke works but adds Darkness.'],\n ['Wounded','A downed ally bleeds out in a few turns. Stand next to them and Stabilize, or use a medkit.'],\n ['Done?','Press End turn. Click any enemy to see its plan. Codex (C) explains everything; ? lists all keys.']];\n// Row for the new-campaign screen (screens.js). Default follows the Tips setting (on unless turned off).\nfunction tutRow(){const on=SETTINGS.tips!==false;\n return `<div class=\"setrow\" id=\"tutRow\"><div><b>Show tips?</b><small>A short controls card before your first mission, plus hints the first time you do things.</small></div><div class=\"seg\"><button type=\"button\" data-tut=\"1\" class=\"${on?'on':''}\">Yes</button><button type=\"button\" data-tut=\"0\" class=\"${on?'':'on'}\">No</button></div></div>`}\nfunction tutWire(m){m.querySelectorAll('[data-tut]').forEach(b=>b.onclick=()=>{SETTINGS.tips=b.dataset.tut==='1';saveSettings();\n m.querySelectorAll('[data-tut]').forEach(x=>x.classList.toggle('on',x===b))})}\nfunction tutCard(){const o=uiLayer('tut');\n o.innerHTML=`<div class=\"ui-card\" role=\"dialog\" aria-label=\"How to play\"><div class=\"ui-head\"><h2>How to play</h2><button type=\"button\" data-ui=\"close\" aria-label=\"Close\">✕</button></div>\n ${TUT_CARD.map(([h,t])=>`<p><b>${h}.</b> ${t}</p>`).join('')}\n <div class=\"endrow\"><button type=\"button\" id=\"tutOff\">Turn off tips</button><button type=\"button\" class=\"primary\" data-ui=\"close\">Got it</button></div></div>`;\n o.querySelector('#tutOff').onclick=()=>{SETTINGS.tips=false;saveSettings();if(window.tipsReset)tipsReset(false);uiClose()}}\n// New campaign: remember the choice on C, reset the hints so they show again.\nconst _tutNew=newCampaign;newCampaign=function(d){_tutNew(d);if(!C)return;C.tut=SETTINGS.tips!==false?1:0;if(window.tipsReset)tipsReset(!!C.tut);saveGame()};\n// First mission of a campaign that said yes: show the card once, then never again.\nconst _tutStart=startMission;startMission=function(){const r=_tutStart.apply(this,arguments);\n if(C&&C.tut&&S){delete C.tut;tutCard()}return r};\n"
+}
