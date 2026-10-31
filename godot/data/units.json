@@ -1,0 +1,112 @@
+{
+  "guardian": {
+    "name": "Kira Venn",
+    "class_name": "Guardian",
+    "side": "player",
+    "hp": 6,
+    "aim": 75,
+    "mob": 5,
+    "damage": [
+      4,
+      6
+    ],
+    "range": 1.5,
+    "focus": 4,
+    "armor": 0,
+    "model": "jedi"
+  },
+  "consular": {
+    "name": "Tor Saalen",
+    "class_name": "Consular",
+    "side": "player",
+    "hp": 5,
+    "aim": 75,
+    "mob": 5,
+    "damage": [
+      3,
+      4
+    ],
+    "range": 1.5,
+    "focus": 4,
+    "armor": 0,
+    "model": "jedi"
+  },
+  "soldier": {
+    "name": "Republic Soldier",
+    "class_name": "Soldier",
+    "side": "player",
+    "hp": 8,
+    "aim": 70,
+    "mob": 5,
+    "damage": [
+      3,
+      6
+    ],
+    "range": 8,
+    "focus": 0,
+    "armor": 1,
+    "model": "trooper"
+  },
+  "scout": {
+    "name": "Republic Scout",
+    "class_name": "Scout",
+    "side": "player",
+    "hp": 6,
+    "aim": 80,
+    "mob": 6,
+    "damage": [
+      4,
+      7
+    ],
+    "range": 11,
+    "focus": 0,
+    "armor": 0,
+    "crit": 15,
+    "model": "scout"
+  },
+  "trooper": {
+    "name": "Sith Trooper",
+    "class_name": "Trooper",
+    "side": "enemy",
+    "hp": 4,
+    "aim": 65,
+    "mob": 5,
+    "damage": [
+      2,
+      4
+    ],
+    "range": 8,
+    "armor": 0,
+    "model": "trooper"
+  },
+  "heavy": {
+    "name": "Sith Heavy",
+    "class_name": "Heavy",
+    "side": "enemy",
+    "hp": 6,
+    "aim": 60,
+    "mob": 4,
+    "damage": [
+      3,
+      4
+    ],
+    "range": 7,
+    "armor": 1,
+    "model": "sithHeavy"
+  },
+  "agent": {
+    "name": "Imperial Agent",
+    "class_name": "Agent",
+    "side": "enemy",
+    "hp": 5,
+    "aim": 80,
+    "mob": 5,
+    "damage": [
+      4,
+      5
+    ],
+    "range": 11,
+    "armor": 0,
+    "model": "agent"
+  }
+}

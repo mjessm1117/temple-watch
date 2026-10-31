@@ -1,0 +1,26 @@
+{
+  "move": {
+    "ap": 1
+  },
+  "shoot": {
+    "ap": 2
+  },
+  "strike": {
+    "ap": 1,
+    "aim_bonus": 10
+  },
+  "push": {
+    "ap": 1,
+    "focus": 2,
+    "range": 4,
+    "distance": 2,
+    "collision_damage": 3
+  },
+  "free": {
+    "ap": 1
+  },
+  "overwatch": {
+    "ap": "remaining",
+    "aim_modifier": -15
+  }
+}
