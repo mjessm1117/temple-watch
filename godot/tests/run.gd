@@ -309,6 +309,36 @@ func _test_bot_medical() -> void:
 	_bot_turn(heal)
 	check(int(heal.ability_uses.get("forceHeal", 0)) >= 1 and int(heal.units[1].hp) == int(heal.units[1].max_hp), "bot heals injured ally")
 
+	var advance = _blank()
+	advance.prisoner = {"x": 10, "y": 2, "freed": false}
+	advance._spawn("consular", 2, 2, -1)
+	advance._spawn("soldier", 2, 3, -1)
+	advance._spawn("soldier", 3, 3, -1)
+	for ally in advance.units.slice(1):
+		ally.hp -= 4
+		ally.ap = 0
+	_bot_turn(advance)
+	check(int(advance.ability_uses.get("forceHeal", 0)) == 1, "bot limits treatment to one per actor per turn")
+	check(int(advance.units[0].x) > 2, "bot advances after treatment with multiple injured allies")
+	var escort = Mission.new(1)
+	escort.units.clear()
+	escort.prisoner = {"x": 5, "y": 18, "freed": false}
+	escort._spawn("soldier", 5, 19, -1)
+	_bot_turn(escort)
+	check(bool(escort.prisoner.freed) and int(escort.units[0].y) > 19, "bot frees prisoner and heads toward evac in the same turn")
+
+	var takeover = Mission.new(1)
+	takeover.units.clear()
+	takeover.prisoner = {"x": 5, "y": 18, "freed": true}
+	takeover._spawn("soldier", 5, 19, -1)
+	takeover._spawn("soldier", 5, 14, -1)
+	takeover.prisoner.escort_id = takeover.units[0].id
+	takeover.apply_damage(takeover.units[0], 99)
+	for i in 3:
+		if takeover.result == "": _bot_turn(takeover)
+	check(int(takeover.prisoner.escort_id) == int(takeover.units[1].id), "bot takes over when the civilian's escort is down")
+	check(takeover.result == "win", "replacement escort brings abandoned civilian to evac")
+
 func _test_bot() -> int:
 	var normal_wins := 0
 	var requested := ""

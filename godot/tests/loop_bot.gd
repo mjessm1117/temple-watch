@@ -27,17 +27,34 @@ static func _bot_move_toward(m: RefCounted, u: Dictionary, goal: Vector2i) -> bo
 	if best != Shot.pos(u): return m.move(int(u.id), best)
 	return false
 
+static func _objective(m: RefCounted, u: Dictionary) -> Vector2i:
+	var prisoner := Vector2i(int(m.prisoner.x), int(m.prisoner.y))
+	if not bool(m.prisoner.freed): return prisoner
+	var escort: Dictionary = m.unit_by_id(int(m.prisoner.get("escort_id", -1)))
+	# Regroup to pick up an abandoned civilian instead of waiting at evac forever.
+	if escort.is_empty() or int(escort.hp) <= 0:
+		if Shot.distance(Shot.pos(u), prisoner) > 3.0: return prisoner
+	elif int(escort.id) == int(u.id) and Shot.distance(Shot.pos(u), prisoner) > 6.0:
+		return prisoner
+	return Vector2i(5, 23)
+
 static func _bot_turn(m: RefCounted) -> void:
-	var objective := Vector2i(int(m.prisoner.x), int(m.prisoner.y)) if not bool(m.prisoner.freed) else Vector2i(5, 23)
 	var squad: Array[Dictionary] = m.living("player")
 	for u in squad:
 		if m.result != "": return
 		if int(u.hp) <= 0: continue
+		var medical_used := false
 		var cycles := 0
 		while int(u.ap) > 0 and cycles < 4 and m.result == "":
 			cycles += 1
+			# Re-evaluate after freeing the prisoner; escort toward evac immediately.
+			var objective := _objective(m, u)
+			if not bool(m.prisoner.freed) and max(abs(int(u.x) - int(m.prisoner.x)), abs(int(u.y) - int(m.prisoner.y))) <= 1:
+				if m.free_prisoner(int(u.id)): continue
 			var treated := false
 			for ally in m.units:
+				# One treatment per actor per turn, with AP left to advance.
+				if medical_used or int(u.ap) < 2: break
 				if str(ally.side) != "player" or int(ally.id) == int(u.id): continue
 				if int(ally.get("treated_turn", 0)) == m.turn: continue
 				if str(ally.get("status", "ok")) == "down":
@@ -47,9 +64,10 @@ static func _bot_turn(m: RefCounted) -> void:
 					for skill in ["forceHeal", "heal", "medpac"]:
 						if m.ability_reason(int(u.id), skill) == "" and m.use_ability(int(u.id), skill, int(ally.id)): treated = true; break
 				if treated: ally.treated_turn = m.turn; break
-			if treated: continue
-			if not bool(m.prisoner.freed) and max(abs(int(u.x) - int(m.prisoner.x)), abs(int(u.y) - int(m.prisoner.y))) <= 1:
-				if m.free_prisoner(int(u.id)): continue
+			if treated:
+				medical_used = true
+				_bot_move_toward(m, u, objective)
+				continue
 			var target: Dictionary = {}
 			for e in m.living("enemy"):
 				if not bool(e.awake): continue

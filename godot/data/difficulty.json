@@ -21,8 +21,8 @@
   "normal": {
     "name": "Normal",
     "description": "A measured rescue under pressure",
-    "enemy_aim": 5,
-    "enemy_hp": 0,
+    "enemy_aim": 15,
+    "enemy_hp": 3,
     "extra_per_group": 1,
     "active_cap": 6,
     "turn_clock": 13,
