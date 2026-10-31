@@ -6,6 +6,7 @@ const AI = preload("res://scripts/ai.gd")
 const Settings = preload("res://scripts/settings.gd")
 const ControlsTest = preload("res://tests/controls_test.gd")
 const FxTest = preload("res://tests/fx_test.gd")
+const SkillsTest = preload("res://tests/skills_test.gd")
 var checks := 0
 var failures := 0
 
@@ -26,6 +27,8 @@ func run() -> void:
 	_test_ai()
 	_test_difficulty()
 	_test_wave4_rules()
+	SkillsTest.run_checks(self, check)
+	_test_bot_medical()
 	await ControlsTest.run_checks(self, check)
 	await FxTest.run_checks(self, check)
 	if "--quick" in OS.get_cmdline_user_args():
@@ -57,7 +60,15 @@ func _test_presentation_scene() -> void:
 	var game: Node3D = packed.instantiate()
 	root.add_child(game)
 	await process_frame
-	check(game.views.size() == 4, "four rigged squad views created")
+	check(game.views.size() == game.mission.living("player").size(), "rigged views created for the squad")
+	var patient: Dictionary = game.mission.living("player")[3]
+	var healer: Dictionary = game.mission.living("player")[1]
+	game.mission.apply_damage(patient, 99)
+	game._refresh()
+	check(game.views.has(int(patient.id)) and bool(game.views[int(patient.id)].downed), "downed soldier remains visible on the floor")
+	check(game.mission.use_ability(int(healer.id), "forceHeal", int(patient.id)), "scene can revive a downed soldier")
+	game._refresh()
+	check(not bool(game.views[int(patient.id)].downed) and bool(patient.wounded), "revived view gets up and remains Wounded")
 	game._move_selected(Vector2i(4, 21))
 	check(game.views[int(game.selected_id)].motion != null, "move starts visual path")
 	check(game.views[int(game.selected_id)].position.z > 21.5, "rules move resolves before visual travel")
@@ -65,6 +76,10 @@ func _test_presentation_scene() -> void:
 	for i in range(3): game._end_turn()
 	await process_frame
 	check(game.mission.turn == 4, "three turns advance with presentation enabled")
+	game.mission.units[0].wounded = true
+	game.mission.result = "win"
+	game._refresh()
+	check(game.result_label.text.contains("Wounded:") and game.result_label.text.contains(str(game.mission.units[0].name)), "result panel names Wounded soldiers")
 	game.sound.player.stop()
 	game.sound.player.stream = null
 	await create_timer(0.2).timeout
@@ -187,14 +202,24 @@ func _test_ai() -> void:
 	spread._spawn("soldier", 8, 4, -1)
 	spread._spawn("soldier", 8, 6, -1)
 	check(int(AI.choose_target(spread, spread.units[0], {int(spread.units[1].id): 2}).id) == int(spread.units[2].id), "AI spreads fire across equal targets")
+	var healers = _blank()
+	healers._spawn("trooper", 5, 5, -1)
+	healers._spawn("soldier", 8, 4, -1)
+	healers._spawn("medic", 8, 6, -1)
+	check(int(AI.choose_target(healers, healers.units[0]).id) == int(healers.units[2].id), "AI may prioritize a healer")
+	healers.units[2].hp = 0; healers.units[2].status = "down"
+	check(int(AI.choose_target(healers, healers.units[0]).id) == int(healers.units[1].id), "AI ignores downed healer")
 	var throttle = Mission.new(3)
-	throttle.difficulty.active_cap = 2
+	var first_group_size := 0
+	for foe in throttle.living("enemy"):
+		if int(foe.group) == 0: first_group_size += 1
+	throttle.difficulty.active_cap = first_group_size
 	for foe in throttle.living("enemy"): foe.spotted = true
 	throttle._wake_groups()
 	var active := 0
 	for foe in throttle.living("enemy"):
 		if bool(foe.awake): active += 1
-	check(active == 2, "throttle holds later groups")
+	check(active == first_group_size, "throttle holds later groups")
 	var reveal = _blank()
 	reveal._spawn("trooper", 4, 5, 0)
 	reveal._spawn("soldier", 8, 5, -1)
@@ -301,6 +326,18 @@ func _bot_turn(m: RefCounted) -> void:
 		var cycles := 0
 		while int(u.ap) > 0 and cycles < 4 and m.result == "":
 			cycles += 1
+			var treated := false
+			for ally in m.units:
+				if str(ally.side) != "player" or int(ally.id) == int(u.id): continue
+				if int(ally.get("treated_turn", 0)) == m.turn: continue
+				if str(ally.get("status", "ok")) == "down":
+					for skill in ["forceHeal", "reviveStim", "revive", "medpac"]:
+						if m.ability_reason(int(u.id), skill) == "" and m.use_ability(int(u.id), skill, int(ally.id)): treated = true; break
+				elif int(ally.hp) <= int(ally.max_hp) - 3:
+					for skill in ["forceHeal", "heal", "medpac"]:
+						if m.ability_reason(int(u.id), skill) == "" and m.use_ability(int(u.id), skill, int(ally.id)): treated = true; break
+				if treated: ally.treated_turn = m.turn; break
+			if treated: continue
 			if not bool(m.prisoner.freed) and max(abs(int(u.x) - int(m.prisoner.x)), abs(int(u.y) - int(m.prisoner.y))) <= 1:
 				if m.free_prisoner(int(u.id)): continue
 			var target: Dictionary = {}
@@ -315,13 +352,32 @@ func _bot_turn(m: RefCounted) -> void:
 			if not _bot_move_toward(m, u, objective): break
 	m.end_turn()
 
+func _test_bot_medical() -> void:
+	var m = _blank()
+	m._spawn("soldier", 2, 2, -1)
+	m._spawn("soldier", 2, 3, -1)
+	m.apply_damage(m.units[1], 99)
+	_bot_turn(m)
+	check(int(m.units[1].hp) > 0 and int(m.ability_uses.get("revive", 0)) >= 1, "bot revives adjacent downed ally")
+	var heal = _blank()
+	heal._spawn("consular", 2, 2, -1)
+	heal._spawn("soldier", 2, 3, -1)
+	heal.units[1].hp -= 4
+	_bot_turn(heal)
+	check(int(heal.ability_uses.get("forceHeal", 0)) >= 1 and int(heal.units[1].hp) == int(heal.units[1].max_hp), "bot heals injured ally")
+
 func _test_bot() -> int:
 	var normal_wins := 0
+	var requested := ""
+	for arg in OS.get_cmdline_user_args():
+		if str(arg).begins_with("--difficulty="): requested = str(arg).trim_prefix("--difficulty=")
 	for id in ["story", "normal", "hard", "legend"]:
+		if requested != "" and id != requested: continue
 		Settings.difficulty = id
 		var wins := 0
 		var losses_by_clock := 0
 		var freed := 0
+		var medical_uses := 0
 		for seed_value in range(1, 21):
 			var m = Mission.new(seed_value)
 			var guard := 0
@@ -330,9 +386,10 @@ func _test_bot() -> int:
 				guard += 1
 			if m.result == "win": wins += 1
 			if bool(m.prisoner.freed): freed += 1
+			for medical_id in ["forceHeal", "heal", "medpac", "revive", "reviveStim", "forceRevive"]: medical_uses += int(m.ability_uses.get(medical_id, 0))
 			if m.turn > int(m.spec.turn_limit): losses_by_clock += 1
 			check(m.result != "", "%s bot %d terminates" % [id, seed_value])
-		print("rescue bot %s: %d/20 wins (%.0f%%), %d freed, %d clock losses" % [id, wins, wins * 5.0, freed, losses_by_clock])
+		print("rescue bot %s: %d/20 wins (%.0f%%), %d freed, %d clock losses, %d medical uses" % [id, wins, wins * 5.0, freed, losses_by_clock, medical_uses])
 		var minimum: int = {"story": 14, "normal": 9, "hard": 4, "legend": 1}[id]
 		var maximum: int = {"story": 20, "normal": 12, "hard": 7, "legend": 3}[id]
 		check(wins >= minimum and wins <= maximum, "%s bot win band %d-%d, got %d" % [id, minimum, maximum, wins])

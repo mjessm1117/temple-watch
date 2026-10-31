@@ -9,6 +9,7 @@ static func is_melee(e: Dictionary) -> bool:
 static func visible(m: RefCounted, e: Dictionary) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for p in m.living("player"):
+		if bool(p.get("concealed", false)) and Shot.distance(Shot.pos(e), Shot.pos(p)) > 2.0: continue
 		if Shot.los(m, Shot.pos(e), Shot.pos(p)): out.append(p)
 	return out
 
@@ -24,6 +25,7 @@ static func choose_target(m: RefCounted, e: Dictionary, fired: Dictionary = {}) 
 		if int(p.hp) <= int(e.damage[1]): score += 18.0
 		if bool(info.flanked): score += 12.0
 		if melee and str(p.class_name) in ["Guardian", "Consular"]: score += 30.0
+		if str(p.class_name) in ["Medic", "Consular"] and int(p.get("medpacs", 0)) > 0: score += 8.0
 		# A recent target is still appealing, but spread fire when alternatives are sound.
 		score -= min(30.0, float(fired.get(int(p.id), 0)) * 18.0)
 		if score > best_score: best_score = score; best = p
@@ -96,6 +98,18 @@ static func scamper(m: RefCounted, e: Dictionary) -> void:
 
 static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> void:
 	if int(e.hp) <= 0 or not bool(e.awake): return
+	if bool(e.get("stunned", false)):
+		e.stunned = false
+		m.message("%s is stunned and loses a turn." % e.name)
+		return
+	if bool(e.get("tricked", false)):
+		e.tricked = false
+		for foe in m.living("enemy"):
+			if int(foe.id) != int(e.id) and Shot.distance(Shot.pos(e), Shot.pos(foe)) <= float(e.range):
+				m.apply_damage(foe, int(e.damage[0]), e)
+				m.message("%s attacks an ally under Mind Trick." % e.name)
+				return
+		return
 	if bool(e.get("skip_turn", false)):
 		e.skip_turn = false
 		return
@@ -110,7 +124,7 @@ static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> void:
 					e.pushed = true
 					return
 	var target := choose_target(m, e, fired)
-	if not target.is_empty():
+	if not target.is_empty() and not bool(e.get("disarmed", false)):
 		var mode := "strike" if is_melee(e) else "shoot"
 		var info: Dictionary = Shot.calculate(m, e, target, is_melee(e))
 		if (is_melee(e) or int(info.hit) >= 55) and m.shot(int(e.id), int(target.id), mode):
@@ -120,7 +134,7 @@ static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> void:
 		var dest := choose_destination(m, e, int(e.mob))
 		if dest != Shot.pos(e): m.move(int(e.id), dest)
 	if int(e.hp) <= 0: return
-	if int(e.ap) >= (1 if is_melee(e) else 2):
+	if int(e.ap) >= (1 if is_melee(e) else 2) and not bool(e.get("disarmed", false)):
 		target = choose_target(m, e, fired)
 		if not target.is_empty():
 			var mode := "strike" if is_melee(e) else "shoot"

@@ -2,6 +2,7 @@ extends RefCounted
 
 const Shot = preload("res://scripts/shot.gd")
 const InputControls = preload("res://scripts/input_controls.gd")
+const Ability = preload("res://scripts/abilities_engine.gd")
 var g
 
 func _border(parent: Node3D, p: Vector2i, color: Color, height: float = 0.12) -> void:
@@ -18,7 +19,7 @@ func _refresh_highlights(force: bool = false) -> void:
 	if u.is_empty() or g.mission.result != "" or g.mission.phase != "player": return
 	if g.target_id >= 0:
 		var target: Dictionary = g.mission.unit_by_id(g.target_id)
-		if not target.is_empty(): _border(g.hover_highlights, Shot.pos(target), Color("ff746b"), 0.23)
+		if not target.is_empty(): _border(g.hover_highlights, Shot.pos(target), Color("71ed9a") if str(target.side) == "player" else Color("ff746b"), 0.23)
 	if force and g.action == "move" and int(u.ap) > 0:
 		var reach: Dictionary = g.mission.paths(u, int(u.mob) * 2)
 		for p in reach.costs:
@@ -26,6 +27,12 @@ func _refresh_highlights(force: bool = false) -> void:
 			var cost: int = int(reach.costs[p])
 			if cost > int(u.mob) and int(u.ap) < 2: continue
 			_border(g.range_highlights, p, Color("399ef2") if cost <= int(u.mob) else Color("f2ba47"))
+	elif force and g.action not in ["move", "free", "overwatch", "hunker"] and g.mission.abilities.has(g.action):
+		var target_kind := str(g.mission.abilities[g.action].target)
+		if target_kind.begins_with("tile"):
+			for p in Ability.tiles(g.mission, u, g.action): _border(g.range_highlights, p, Color("7bc7ff"))
+		elif target_kind.begins_with("ally") or target_kind.begins_with("enemy"):
+			for t in InputControls.valid_targets(g.mission, u, g.action): _border(g.range_highlights, Shot.pos(t), Color("62d992") if str(t.side) == "player" else Color("f3a570"))
 	if g.preview_tile.x >= 0 and g.mission.in_bounds(g.preview_tile):
 		_border(g.hover_highlights, g.preview_tile, Color("f8f3c5"), 0.21)
 	var shown: Vector2i = g.hovered if g.hovered.x >= 0 else g.preview_tile
@@ -66,7 +73,7 @@ func _button(text_value: String, callback: Callable) -> Button:
 	var button := Button.new()
 	button.text = text_value
 	button.focus_mode = Control.FOCUS_NONE
-	button.custom_minimum_size = Vector2(78, 52)
+	button.custom_minimum_size = Vector2(72, 44)
 	button.add_theme_color_override("font_color", Color("dceaf1"))
 	button.add_theme_font_size_override("font_size", 14)
 	button.pressed.connect(callback)
@@ -109,17 +116,21 @@ func _build_ui() -> void:
 	g.shot_label = _label("Hover over a target", 15); g.shot_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.shot_label)
 	right_box.add_child(_label("COMBAT LOG", 17))
 	g.log_label = _label("", 14); g.log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.log_label)
-	var bottom := PanelContainer.new(); bottom.anchor_top = 1.0; bottom.anchor_right = 1.0; bottom.anchor_bottom = 1.0; bottom.offset_top = -145; root.add_child(bottom); _style_panel(bottom)
+	var bottom := PanelContainer.new(); bottom.anchor_top = 1.0; bottom.anchor_right = 1.0; bottom.anchor_bottom = 1.0; bottom.offset_top = -230; root.add_child(bottom); _style_panel(bottom)
 	var bottom_box := VBoxContainer.new(); bottom.add_child(bottom_box)
 	var info_row := HBoxContainer.new(); bottom_box.add_child(info_row)
 	g.path_label = _label("", 15); g.path_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; info_row.add_child(g.path_label)
 	info_row.add_child(_label("LMB PREVIEW/CONFIRM  •  RMB CANCEL/PAN  •  TAB CYCLE  •  Q/E ROTATE  •  WASD PAN  •  SPACE SKIP", 12))
 	g.warning_label = _label("", 15); g.warning_label.add_theme_color_override("font_color", Color("ffd37a")); bottom_box.add_child(g.warning_label)
-	var row := HBoxContainer.new(); bottom_box.add_child(row)
+	var row := HFlowContainer.new(); bottom_box.add_child(row)
 	var keys := {"move": "1", "shoot": "2", "strike": "3", "push": "4", "free": "5", "overwatch": "6", "hunker": "7"}
 	var icons := {"move": "➜", "shoot": "◎", "strike": "✦", "push": "◈", "free": "◇", "overwatch": "◉", "hunker": "⬟"}
 	for mode in keys:
 		var b := _button("%s %s\n%s" % [keys[mode], icons[mode], mode.to_upper()], func() -> void: g._choose_action(mode))
+		row.add_child(b); g.action_buttons[mode] = b
+	for mode in g.mission.abilities:
+		if mode in keys or mode == "move": continue
+		var b := _button(str(g.mission.abilities[mode].name), func() -> void: g._choose_action(mode))
 		row.add_child(b); g.action_buttons[mode] = b
 	var spacer := Control.new(); spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(spacer)
 	var cine_button := _button("ACTION CAM\nON", func() -> void: g.action_camera = not g.action_camera; _refresh())
@@ -144,7 +155,7 @@ func _refresh() -> void:
 			g.selected_id = int(survivors[0].id)
 			u = survivors[0]
 	g.objective_label.text = "TURN %d/%d  •  %s  •  %s" % [g.mission.turn, int(g.mission.spec.turn_limit), "ESCORT MIRA" if bool(g.mission.prisoner.freed) else "FREE MIRA", "EVAC" if bool(g.mission.prisoner.freed) else "CELL"]
-	g.selected_label.text = "%s\n%s\nHP %s\nAP %s\nFOCUS %d%s" % [u.get("name", ""), u.get("class_name", ""), "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, 3 - int(u.get("ap", 0)))), int(u.get("focus_left", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
+	g.selected_label.text = "%s\n%s%s\nHP %s\nAP %s\nFOCUS %d  •  MEDPACS %d%s" % [u.get("name", ""), u.get("class_name", ""), "  WOUNDED" if bool(u.get("wounded", false)) else "", "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, 3 - int(u.get("ap", 0)))), int(u.get("focus_left", 0)), int(u.get("medpacs", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
 	var kind := str(u.get("model", ""))
 	if kind != g.portrait_kind and g.model_cache.has(kind):
 		if g.portrait_model != null: g.portrait_model.queue_free()
@@ -153,18 +164,56 @@ func _refresh() -> void:
 		g.portrait_viewport.add_child(g.portrait_model)
 		g.portrait_kind = kind
 	g.log_label.text = "\n".join(g.mission.log_lines.slice(max(0, g.mission.log_lines.size() - 8)))
+	var extras: Array = []
+	var shared: Array = ["revive"] if str(u.get("class_name", "")) == "Medic" else ["medpac", "revive"]
+	for id in shared + u.get("kit", []):
+		if id not in ["move", "shoot", "strike", "push", "free", "overwatch", "hunker"] and id not in extras: extras.append(id)
 	for mode in g.action_buttons:
-		var needed_ap: int = 1 if mode in ["overwatch", "hunker"] else int(g.mission.abilities[mode].ap)
-		g.action_buttons[mode].disabled = g.mission.result != "" or int(u.get("ap", 0)) < needed_ap or (mode == "free" and bool(g.mission.prisoner.freed)) or (mode in ["strike", "push"] and str(u.get("class_name", "")) not in ["Guardian", "Consular"]) or (mode == "push" and int(u.get("focus_left", 0)) < int(g.mission.abilities.push.focus))
+		var button: Button = g.action_buttons[mode]
+		var core: bool = mode in ["move", "shoot", "strike", "push", "free", "overwatch", "hunker"]
+		button.visible = core or mode in extras
+		if not button.visible: continue
+		var def: Dictionary = g.mission.abilities[mode]
+		var reason: String = "" if mode == "move" else g.mission.ability_reason(g.selected_id, mode)
+		if mode == "move" and int(u.get("ap", 0)) <= 0: reason = "Need AP"
+		button.disabled = reason != ""
+		var key := str(["move", "shoot", "strike", "push", "free", "overwatch", "hunker"].find(mode) + 1) if core else "F%d" % (extras.find(mode) + 1)
+		var ap := "all" if str(def.get("ap")) == "remaining" else str(def.get("ap", 1))
+		var charges := str(def.get("charges", ""))
+		var detail := " • %d left" % int(u.get(charges, 0)) if charges != "" else ""
+		var cd: Dictionary = u.get("cooldowns", {})
+		if int(cd.get(mode, 0)) > g.mission.turn: detail += " • CD %d" % (int(cd[mode]) - g.mission.turn)
+		button.text = "%s %s\n%s AP%s%s" % [key, str(def.name), ap, detail, " • " + reason.replace("No valid target", "No target") if reason != "" else ""]
+		button.tooltip_text = reason if reason != "" else "%s • %s AP%s" % [def.name, ap, detail]
 	g.result_panel.visible = g.mission.result != ""
 	var cine_button: Button = g.overlay.find_child("CineButton", true, false)
 	if cine_button != null: cine_button.text = "ACTION CAM\n%s" % ("ON" if g.action_camera else "OFF")
-	if g.mission.result != "": g.result_label.text = "MISSION COMPLETE" if g.mission.result == "win" else "MISSION FAILED"
+	if g.mission.result != "":
+		var wounded: Array[String] = []
+		for member in g.mission.units:
+			if str(member.side) == "player" and bool(member.get("wounded", false)): wounded.append(str(member.name))
+		g.result_label.text = ("MISSION COMPLETE" if g.mission.result == "win" else "MISSION FAILED") + "\nWounded: " + (", ".join(wounded) if not wounded.is_empty() else "None")
 	g._refresh_figures(); _refresh_highlights(true); _show_shot()
 
 
 func _show_shot() -> void:
 	var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
+	if g.action not in ["shoot", "strike", "push", "move"]:
+		var def: Dictionary = g.mission.abilities.get(g.action, {})
+		var target: Dictionary = g.mission.unit_by_id(g.target_id)
+		g.hit_big_label.text = str(def.get("name", "ABILITY")).to_upper()
+		var lines: Array[String] = []
+		if not target.is_empty(): lines.append("Target: %s • HP %d/%d" % [target.name, int(target.hp), int(target.max_hp)])
+		elif g.preview_tile.x >= 0: lines.append("Tile: %d, %d" % [g.preview_tile.x, g.preview_tile.y])
+		lines.append("Range %s • %s AP • %d Focus" % [str(def.get("range", "self")), str(def.get("ap", 1)), int(def.get("focus", 0))])
+		if def.has("heal"): lines.append("Heal %d HP (capped at max)" % int(def.heal))
+		if def.has("revive"): lines.append("Revive at %d HP" % int(def.revive))
+		if def.has("damage"): lines.append("Damage %s" % str(def.damage))
+		if def.has("status"): lines.append("Applies %s" % str(def.status))
+		if def.has("chance"): lines.append("Chance %d%%" % int(def.chance))
+		lines.append("Click again or Enter to confirm.")
+		g.shot_label.text = "\n".join(lines)
+		return
 	var target: Dictionary = {}
 	for u in g.mission.living("enemy"):
 		if (int(u.id) == g.target_id or (g.target_id < 0 and Shot.pos(u) == g.hovered)) and bool(u.awake): target = u; break
@@ -179,7 +228,7 @@ func _show_shot() -> void:
 		g.hit_big_label.text = "PUSH" if legal else "NO PUSH"
 		g.shot_label.text = "%s  HP %d\n%s\nNo hit or crit roll.\nCosts %d AP and %d Focus." % [target.name, int(target.hp), "Guaranteed knockback if confirmed." if legal else "Move into range with clear line of sight.", int(g.mission.abilities.push.ap), int(g.mission.abilities.push.focus)]
 		return
-	var info: Dictionary = Shot.calculate(g.mission, actor, target, g.action == "strike")
+	var info: Dictionary = Shot.calculate(g.mission, actor, target, g.action == "strike", int(actor.get("leap_aim", 0)) if g.action == "strike" else 0)
 	g.hit_big_label.text = "%d%% HIT" % int(info.hit)
 	var breakdown := ""
 	for item in info.lines: breakdown += "%s  %+d\n" % [item[0], int(item[1])]

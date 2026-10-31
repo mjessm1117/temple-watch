@@ -1,26 +1,375 @@
 {
   "move": {
-    "ap": 1
+    "name": "Move",
+    "ap": 1,
+    "target": "tile",
+    "effect": "move"
   },
   "shoot": {
-    "ap": 2
+    "name": "Shoot",
+    "ap": 2,
+    "target": "enemy",
+    "effect": "attack",
+    "weapon": true,
+    "range": "weapon"
   },
   "strike": {
+    "name": "Strike",
     "ap": 1,
-    "aim_bonus": 10
+    "target": "enemy",
+    "effect": "attack",
+    "melee": true,
+    "weapon": true,
+    "range": 1.5
   },
   "push": {
+    "name": "Push",
     "ap": 1,
     "focus": 2,
     "range": 4,
+    "target": "enemy",
+    "effect": "displace",
     "distance": 2,
     "collision_damage": 3
   },
   "free": {
-    "ap": 1
+    "name": "Free Mira",
+    "ap": 1,
+    "target": "prisoner",
+    "effect": "free"
   },
   "overwatch": {
+    "name": "Overwatch",
     "ap": "remaining",
-    "aim_modifier": -15
+    "target": "self",
+    "effect": "overwatch"
+  },
+  "hunker": {
+    "name": "Hunker Down",
+    "ap": "remaining",
+    "target": "self",
+    "effect": "hunker",
+    "defense": 30
+  },
+  "medpac": {
+    "name": "Medpac",
+    "ap": 1,
+    "range": 1.5,
+    "target": "ally_injured",
+    "effect": "heal",
+    "heal": 4,
+    "revive": 2,
+    "charges": "medpacs"
+  },
+  "revive": {
+    "name": "Revive",
+    "ap": 1,
+    "range": 1.5,
+    "target": "ally_down",
+    "effect": "heal",
+    "revive": 2
+  },
+  "guard": {
+    "name": "Guard",
+    "ap": "remaining",
+    "target": "self",
+    "effect": "guard",
+    "defense": 25
+  },
+  "meditate": {
+    "name": "Meditate",
+    "ap": 2,
+    "target": "self",
+    "effect": "focus",
+    "amount": 2
+  },
+  "saberThrow": {
+    "name": "Saber Throw",
+    "ap": "remaining",
+    "focus": 2,
+    "range": 5,
+    "target": "enemy",
+    "effect": "attack",
+    "damage": [
+      4,
+      5
+    ],
+    "chance": 85,
+    "ignore_cover": true,
+    "pierce": true
+  },
+  "leap": {
+    "name": "Force Leap",
+    "ap": 1,
+    "focus": 1,
+    "range": 6,
+    "target": "tile",
+    "effect": "leap",
+    "next_strike_aim": 15
+  },
+  "sweep": {
+    "name": "Saber Sweep",
+    "ap": "remaining",
+    "focus": 2,
+    "range": 1.5,
+    "target": "self",
+    "effect": "area_attack",
+    "damage": "weapon",
+    "aim_mod": -10,
+    "melee": true
+  },
+  "stun": {
+    "name": "Stun",
+    "ap": "remaining",
+    "focus": 2,
+    "range": 5,
+    "target": "enemy",
+    "effect": "status",
+    "status": "stunned",
+    "chance": 85
+  },
+  "forceHeal": {
+    "name": "Force Heal",
+    "ap": 1,
+    "focus": 2,
+    "range": 3,
+    "cooldown": 1,
+    "target": "ally_injured",
+    "effect": "heal",
+    "heal": 4,
+    "revive": 2
+  },
+  "barrier": {
+    "name": "Force Barrier",
+    "ap": 1,
+    "focus": 2,
+    "range": 4,
+    "target": "ally",
+    "effect": "buff",
+    "defense": 40,
+    "duration": 1
+  },
+  "battleMed": {
+    "name": "Battle Meditation",
+    "ap": "remaining",
+    "focus": 3,
+    "range": 6,
+    "target": "self",
+    "effect": "aura",
+    "aim": 10,
+    "enemy_aim": -10,
+    "duration": 1
+  },
+  "mindTrick": {
+    "name": "Mind Trick",
+    "ap": "remaining",
+    "focus": 3,
+    "range": 5,
+    "target": "enemy",
+    "effect": "status",
+    "status": "tricked",
+    "chance": 70
+  },
+  "forceRevive": {
+    "name": "Force Revive",
+    "ap": "remaining",
+    "focus": 4,
+    "range": 1.5,
+    "target": "ally_down",
+    "effect": "heal",
+    "revive": 4,
+    "charges": "force_revive"
+  },
+  "suppress": {
+    "name": "Suppress",
+    "ap": "remaining",
+    "range": "weapon",
+    "target": "enemy",
+    "effect": "status",
+    "status": "suppressed",
+    "aim": -30,
+    "reaction": true
+  },
+  "rapidFire": {
+    "name": "Rapid Fire",
+    "ap": "remaining",
+    "range": "weapon",
+    "target": "enemy",
+    "effect": "attack",
+    "damage": "weapon",
+    "shots": 2,
+    "aim_mod": -15,
+    "cooldown": 1
+  },
+  "rally": {
+    "name": "Rally",
+    "ap": 1,
+    "range": 4,
+    "target": "self",
+    "effect": "aura",
+    "clear_status": true
+  },
+  "mark": {
+    "name": "Mark",
+    "ap": 1,
+    "range": 11,
+    "target": "enemy",
+    "effect": "status",
+    "status": "marked",
+    "ally_aim": 15
+  },
+  "runGun": {
+    "name": "Run & Gun",
+    "ap": 0,
+    "target": "self",
+    "effect": "ap",
+    "amount": 1,
+    "cooldown": 1
+  },
+  "deadeye": {
+    "name": "Deadeye",
+    "ap": "remaining",
+    "range": "weapon",
+    "target": "enemy",
+    "effect": "attack",
+    "damage": "weapon",
+    "damage_mod": 3,
+    "aim_mod": -20
+  },
+  "heal": {
+    "name": "Medkit",
+    "ap": 1,
+    "range": 1.5,
+    "target": "ally_injured",
+    "effect": "heal",
+    "heal": 4,
+    "revive": 2,
+    "charges": "medpacs"
+  },
+  "smoke": {
+    "name": "Smoke",
+    "ap": 1,
+    "range": 6,
+    "target": "tile",
+    "effect": "area_buff",
+    "radius": 1,
+    "defense": 20,
+    "duration": 2,
+    "charges": "smoke"
+  },
+  "hack": {
+    "name": "Hack",
+    "ap": "remaining",
+    "range": 4,
+    "target": "tile_console",
+    "effect": "hack"
+  },
+  "reviveStim": {
+    "name": "Revive Stim",
+    "ap": 1,
+    "range": 2,
+    "target": "ally_down",
+    "effect": "heal",
+    "revive": 2,
+    "charges": "medpacs"
+  },
+  "protocol": {
+    "name": "Combat Protocol",
+    "ap": "remaining",
+    "range": 8,
+    "target": "enemy_droid",
+    "effect": "attack",
+    "damage": [
+      3,
+      3
+    ],
+    "chance": 100,
+    "no_los": true,
+    "ignore_cover": true
+  },
+  "shieldDrone": {
+    "name": "Shield Drone",
+    "ap": 1,
+    "range": 1.5,
+    "target": "ally",
+    "effect": "buff",
+    "shield": 4,
+    "charges": "shield_drone"
+  },
+  "choke": {
+    "name": "Choke",
+    "ap": "remaining",
+    "focus": 2,
+    "range": 5,
+    "target": "enemy",
+    "effect": "attack",
+    "damage": [
+      5,
+      6
+    ],
+    "chance": 90,
+    "ignore_cover": true,
+    "darkness": 2
+  },
+  "subdue": {
+    "name": "Subdue",
+    "ap": "remaining",
+    "range": 1.5,
+    "target": "enemy_subdue",
+    "effect": "capture",
+    "chance": 60,
+    "stunned_chance": 85
+  },
+  "collapse": {
+    "name": "Collapse",
+    "ap": "remaining",
+    "focus": 3,
+    "range": 5,
+    "target": "tile_wall",
+    "effect": "collapse",
+    "damage": [
+      4,
+      4
+    ]
+  },
+  "defLine": {
+    "name": "Defensive Line",
+    "passive": true,
+    "effect": "adjacent_defense",
+    "defense": 15
+  },
+  "reflectM": {
+    "name": "Reflect Mastery",
+    "passive": true,
+    "effect": "reflect",
+    "chance": 65
+  },
+  "spotter": {
+    "name": "Spotter",
+    "passive": true,
+    "effect": "squadsight",
+    "range": 11
+  },
+  "ghost": {
+    "name": "Ghost",
+    "passive": true,
+    "effect": "reconceal",
+    "charges": 1
+  },
+  "hackDroid": {
+    "name": "Hack Droid",
+    "ap": "remaining",
+    "range": 4,
+    "target": "enemy_droid",
+    "effect": "status",
+    "status": "stunned",
+    "chance": 60
+  },
+  "scan": {
+    "name": "Scan Clue",
+    "ap": 1,
+    "range": 1.5,
+    "target": "tile_scan",
+    "effect": "scan"
   }
 }

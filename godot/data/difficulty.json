@@ -6,7 +6,7 @@
     "enemy_hp": -1,
     "extra_per_group": 0,
     "active_cap": 4,
-    "turn_clock": 18,
+    "turn_clock": 20,
     "reinforcement_size": 0,
     "player_aim": 10,
     "web_diff": {
@@ -23,9 +23,9 @@
     "description": "A measured rescue under pressure",
     "enemy_aim": 5,
     "enemy_hp": 0,
-    "extra_per_group": 0,
+    "extra_per_group": 1,
     "active_cap": 6,
-    "turn_clock": 17,
+    "turn_clock": 13,
     "reinforcement_size": 1,
     "player_aim": 10,
     "web_diff": {
@@ -34,7 +34,7 @@
       "extra_per_group": 0,
       "player_aim": 10
     },
-    "player_hp": 2,
+    "player_hp": 1,
     "enemy_damage": -1
   },
   "hard": {
@@ -59,7 +59,7 @@
       "agent"
     ],
     "player_hp": 1,
-    "enemy_damage": 0
+    "enemy_damage": 1
   },
   "legend": {
     "name": "Legend",
@@ -68,7 +68,7 @@
     "enemy_hp": 1,
     "extra_per_group": 1,
     "active_cap": 99,
-    "turn_clock": 16,
+    "turn_clock": 14,
     "reinforcement_size": 1,
     "player_aim": 0,
     "web_diff": {
@@ -82,7 +82,7 @@
       "heavy",
       "agent"
     ],
-    "player_hp": 4,
-    "enemy_damage": 0
+    "player_hp": 2,
+    "enemy_damage": 1
   }
 }

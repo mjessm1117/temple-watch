@@ -1,6 +1,7 @@
 extends RefCounted
 
 const Shot = preload("res://scripts/shot.gd")
+const Ability = preload("res://scripts/abilities_engine.gd")
 
 static func move_preview(m: RefCounted, unit: Dictionary, dest: Vector2i) -> Dictionary:
 	if unit.is_empty() or int(unit.get("ap", 0)) <= 0: return {}
@@ -23,7 +24,11 @@ static func move_preview(m: RefCounted, unit: Dictionary, dest: Vector2i) -> Dic
 
 static func valid_targets(m: RefCounted, unit: Dictionary, mode: String) -> Array[Dictionary]:
 	var targets: Array[Dictionary] = []
+	if mode not in ["shoot", "strike", "push"]:
+		if Ability.reason(m, unit, mode) != "": return targets
+		return Ability.targets(m, unit, mode)
 	if unit.is_empty() or mode not in ["shoot", "strike", "push"] or m.phase != "player" or m.result != "": return targets
+	if mode not in unit.get("kit", []): return targets
 	if int(unit.ap) < int(m.abilities[mode].ap): return targets
 	if mode == "push" and int(unit.get("focus_left", 0)) < int(m.abilities.push.focus): return targets
 	if mode in ["strike", "push"] and str(unit.get("class_name", "")) not in ["Guardian", "Consular"]: return targets
@@ -59,12 +64,24 @@ func handle_event(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_MIDDLE:
 			g.drag_button = MOUSE_BUTTON_MIDDLE if event.pressed else 0
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
-			if event.pressed and (g.action in ["shoot", "strike", "push"] or g.preview_tile.x >= 0): g._cancel_order(); return
+			if event.pressed and (g.action != "move" or g.preview_tile.x >= 0): g._cancel_order(); return
 			g.drag_button = MOUSE_BUTTON_RIGHT if event.pressed else 0
 		elif event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			if g.cinematic: g._skip_cinematic()
 			var p: Vector2i = g._screen_tile(event.position)
 			if p.x < 0: return
+			if g.action not in ["move", "shoot", "strike", "push", "free", "overwatch", "hunker"]:
+				var def: Dictionary = g.mission.abilities.get(g.action, {})
+				if str(def.get("target", "")).begins_with("ally") or str(def.get("target", "")).begins_with("enemy"):
+					for target in valid_targets(g.mission, g.mission.unit_by_id(g.selected_id), g.action):
+						if Shot.pos(target) == p:
+							if g.target_id == int(target.id): g._use_ability(int(target.id))
+							else: g.target_id = int(target.id); g._refresh_highlights(); g._show_shot()
+							return
+				elif p in Ability.tiles(g.mission, g.mission.unit_by_id(g.selected_id), g.action):
+					if g.preview_tile == p: g._use_ability(-1, p)
+					else: g.preview_tile = p; g._refresh_highlights(); g._show_shot()
+					return
 			for u in g.mission.living("player"):
 				if Shot.pos(u) == p: g._select(int(u.id)); return
 			if g.action == "move":
@@ -99,13 +116,16 @@ func handle_event(event: InputEvent) -> void:
 		if event.keycode == KEY_SPACE: g._skip_activity()
 		elif event.keycode == KEY_ESCAPE: g._cancel_order()
 		elif event.keycode == KEY_TAB:
-			if g.action in ["shoot", "strike", "push"]: g._cycle_target(-1 if event.shift_pressed else 1)
+			if g.action != "move" and g.action != "free": g._cycle_target(-1 if event.shift_pressed else 1)
 			else:
 				var id: int = next_squad(g.mission, g.selected_id, -1 if event.shift_pressed else 1)
 				if id >= 0: g._select(id)
 		elif event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
 			if g.action in ["shoot", "strike", "push"]:
 				if g.target_id >= 0: g._attack(g.target_id, g.action)
+			elif g.action != "move" and g.action != "free":
+				if g.target_id >= 0: g._use_ability(g.target_id)
+				elif g.preview_tile.x >= 0: g._use_ability(-1, g.preview_tile)
 			elif g.action == "move" and g.preview_tile.x >= 0: g._move_selected(g.preview_tile)
 			else: g._request_end_turn()
 		elif event.keycode == KEY_Q: g._rotate_camera(-PI / 2.0)
@@ -113,3 +133,11 @@ func handle_event(event: InputEvent) -> void:
 		elif event.keycode == KEY_R: g.get_tree().reload_current_scene()
 		elif event.keycode >= KEY_1 and event.keycode <= KEY_7:
 			g._choose_action(["move", "shoot", "strike", "push", "free", "overwatch", "hunker"][event.keycode - KEY_1])
+		elif event.keycode >= KEY_F1 and event.keycode <= KEY_F12:
+			var extra: Array = []
+			var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
+			var shared: Array = ["revive"] if str(unit.get("class_name", "")) == "Medic" else ["medpac", "revive"]
+			for id in shared + unit.get("kit", []):
+				if id not in ["move", "shoot", "strike", "push", "free", "overwatch", "hunker"] and id not in extra: extra.append(id)
+			var index: int = event.keycode - KEY_F1
+			if index < extra.size(): g._choose_action(str(extra[index]))

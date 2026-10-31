@@ -13,7 +13,26 @@
     "range": 1.5,
     "focus": 4,
     "armor": 0,
-    "model": "jedi"
+    "model": "jedi",
+    "kit": [
+      "strike",
+      "guard",
+      "push",
+      "meditate",
+      "saberThrow",
+      "leap",
+      "sweep",
+      "choke",
+      "subdue",
+      "collapse"
+    ],
+    "medpacs": 2,
+    "passives": [
+      "defLine",
+      "reflectM"
+    ],
+    "deflect": 35,
+    "guard_deflect": 70
   },
   "consular": {
     "name": "Tor Saalen",
@@ -29,7 +48,23 @@
     "range": 1.5,
     "focus": 4,
     "armor": 0,
-    "model": "jedi"
+    "model": "jedi",
+    "kit": [
+      "strike",
+      "push",
+      "meditate",
+      "stun",
+      "forceHeal",
+      "barrier",
+      "battleMed",
+      "mindTrick",
+      "forceRevive",
+      "choke",
+      "subdue"
+    ],
+    "medpacs": 2,
+    "deflect": 25,
+    "guard_deflect": 50
   },
   "soldier": {
     "name": "Republic Soldier",
@@ -45,7 +80,16 @@
     "range": 8,
     "focus": 0,
     "armor": 1,
-    "model": "trooper"
+    "model": "trooper",
+    "kit": [
+      "shoot",
+      "overwatch",
+      "hunker",
+      "suppress",
+      "rapidFire",
+      "rally"
+    ],
+    "medpacs": 2
   },
   "scout": {
     "name": "Republic Scout",
@@ -62,7 +106,19 @@
     "focus": 0,
     "armor": 0,
     "crit": 15,
-    "model": "scout"
+    "model": "scout",
+    "kit": [
+      "shoot",
+      "overwatch",
+      "mark",
+      "runGun",
+      "deadeye"
+    ],
+    "medpacs": 2,
+    "passives": [
+      "spotter",
+      "ghost"
+    ]
   },
   "trooper": {
     "name": "Sith Trooper",
@@ -116,10 +172,42 @@
     "hp": 8,
     "aim": 75,
     "mob": 6,
-    "damage": [4, 5],
+    "damage": [
+      4,
+      5
+    ],
     "range": 1.5,
     "focus": 2,
     "armor": 0,
     "model": "sithHeavy"
+  },
+  "medic": {
+    "name": "Republic Medic",
+    "class_name": "Medic",
+    "side": "player",
+    "hp": 7,
+    "aim": 65,
+    "mob": 5,
+    "damage": [
+      2,
+      4
+    ],
+    "range": 6,
+    "focus": 0,
+    "armor": 0,
+    "model": "trooper",
+    "medpacs": 2,
+    "kit": [
+      "shoot",
+      "overwatch",
+      "heal",
+      "smoke",
+      "hack",
+      "reviveStim",
+      "protocol",
+      "shieldDrone",
+      "hackDroid",
+      "scan"
+    ]
   }
 }
