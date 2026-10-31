@@ -1,0 +1,17 @@
+# Wave 5 lane: bring the web game's classes, skills, healing and revive into Godot
+Rules: docs/godot/wave4/WAVE4.md (web game in public/ is FROZEN and READ-ONLY reference; files <600 lines; tests; local commits on your branch only; no push/merge; no subagents).
+Branch wave5/skills (git worktree). Another lane is editing the rescue map on main at the same time.
+
+FILE LEASE: godot/data/units.json, godot/data/abilities.json, godot/data/difficulty.json, godot/scripts/mission.gd, godot/scripts/shot.gd, godot/scripts/ai.gd, godot/scripts/game.gd, godot/scripts/hud*.gd, godot/scripts/input*.gd, godot/scripts/unit_view.gd, godot/scripts/fx.gd, godot/scripts/audio.gd, new files godot/scripts/abilities*.gd / skills*.gd / medical*.gd, godot/tests/** EXCEPT do not add a map test, docs/godot/wave5/skills-REPORT.md, docs/godot/shots/wave5-skills-*.png.
+NOT YOURS: godot/data/rescue.json (the map lane owns it). If the squad roster or a unit's class there must change, put the exact JSON change under "Integration requests".
+
+Jess's playtest: "we need to heal and revive people, more skills for each soldier", turns "feel flat: not enough choices". He said the web game had skills "pretty good". His picks: healing = BOTH (limited medpacs anyone can use + Jedi Force Heal and a medic trooper); downed = ALWAYS revivable during the mission, and a revived/downed soldier ends the mission Wounded (flag in the result screen; no campaign yet).
+
+Goal: every soldier has 3-4 meaningful choices every turn, like the web game.
+1. Read the web game as the design source: public/js/abilities.js (AB table), public/js/data-campaign.js (classes, kits, ability trees), public/js/rules.js, docs/specs/combat.md. Port each class in the Godot squad (and the web game's medic/support troop if Godot lacks one) with its web abilities: same names, costs, cooldowns/charges, ranges and effects, adapted to Godot's AP/cover rules. Data-driven: abilities and kits in godot/data/abilities.json + units.json; one generic executor, not per-ability branches in game.gd.
+2. Healing: Medpac item (2 charges per squad member, adjacent or self, 1 AP), Force Heal (Jedi, ranged, cooldown), medic heal per web values. Show heal amounts as green floating text and a heal FX.
+3. Downed/revive: at 0 HP a soldier is Downed (not dead): lies on the floor, can't act, enemies ignore them unless nothing else. Adjacent ally Revive (1 AP, or medic/Force Heal from range) brings them back at low HP. Mission is lost only if all squad are down at once or the clock runs out. Downed and revived units marked Wounded on the result panel.
+4. Ability bar: shows every ability with hotkey, AP cost, cooldown/charges left, greyed with a reason when unusable. Target preview works for each (use the controls flow already in game.gd: select → preview → confirm).
+5. Enemy AI must handle the new rules (doesn't waste shots on downed units; may target healers).
+6. Tests: each ported ability resolves correctly; heal caps at max HP; medpac charges run out; downed/revive/wounded; loss only on full squad down. Re-tune difficulty.json if needed; keep bot bands over 20 games: Story >=14, Normal 9-12, Hard 4-7, Legend 1-3, and make the bot use heal/revive. Report actual numbers.
+Done = ./godot/test.sh 0 failures, no script errors; 3 screenshots launching res://scenes/rescue.tscn directly (ability bar, a heal, a downed+revive); skills-REPORT.md listing every ported ability vs its web source; committed on wave5/skills.
