@@ -2,6 +2,8 @@ extends SceneTree
 
 const Mission = preload("res://scripts/mission.gd")
 const Shot = preload("res://scripts/shot.gd")
+const AI = preload("res://scripts/ai.gd")
+const Settings = preload("res://scripts/settings.gd")
 var checks := 0
 var failures := 0
 
@@ -19,9 +21,15 @@ func run() -> void:
 	_test_geometry()
 	_test_actions()
 	_test_mission_layout()
+	_test_ai()
+	_test_difficulty()
+	if "--quick" in OS.get_cmdline_user_args():
+		print("TEST RESULTS: %d checks, %d failures" % [checks, failures])
+		quit(1 if failures > 0 else 0)
+		return
 	var wins := _test_bot()
 	await _test_presentation_scene()
-	print("TEST RESULTS: %d checks, %d failures; rescue bot %d/20 wins (%.0f%%)" % [checks, failures, wins, wins * 5.0])
+	print("TEST RESULTS: %d checks, %d failures; Normal rescue bot %d/20 wins (%.0f%%)" % [checks, failures, wins, wins * 5.0])
 	quit(1 if failures > 0 else 0)
 
 func _blank() -> RefCounted:
@@ -97,6 +105,7 @@ func _test_actions() -> void:
 	check(m.move(int(u.id), Vector2i(4, 12)), "dash legal")
 	check(int(u.ap) == 0, "dash costs 2 AP")
 	check(not m.move(int(u.id), Vector2i(4, 11)), "zero AP blocks move")
+	m.units = m.living("player")
 	m.end_turn()
 	check(int(u.ap) == 3, "turn restores 3 AP")
 	var small = _blank()
@@ -108,7 +117,7 @@ func _test_actions() -> void:
 	check(int(shooter.ap) == 1, "rifle shot costs 2 AP")
 	check(not small.shot(int(shooter.id), int(target.id)), "second shot blocked at 1 AP")
 	var fail = Mission.new(1)
-	for i in range(10): fail.end_turn()
+	for i in range(int(fail.spec.turn_limit)): fail.end_turn()
 	check(fail.result == "loss", "clock loss path")
 	var win = Mission.new(1)
 	win.prisoner.freed = true
@@ -140,6 +149,67 @@ func _test_mission_layout() -> void:
 	check(push.tile(Vector2i(5, 2)) == "r", "Force Push destroys cover")
 	check(int(push.units[0].ap) == 2 and int(push.units[0].focus_left) == 2, "Force Push AP and Focus")
 	print("mission: 26x26, two routes, staged groups, announced drop, cover break")
+
+func _test_ai() -> void:
+	var cover = _blank()
+	cover._spawn("trooper", 4, 5, -1)
+	cover._spawn("soldier", 8, 5, -1)
+	cover.set_tile(Vector2i(6, 5), "c")
+	var e: Dictionary = cover.units[0]
+	var protected := Vector2i(5, 5)
+	check(AI.destination_score(cover, e, protected) > AI.destination_score(cover, e, Vector2i(5, 4)), "AI favors directional cover")
+	check(AI.choose_destination(cover, e, 1) == protected, "AI picks cover over open ground")
+	var flank = _blank()
+	flank._spawn("agent", 5, 5, -1)
+	flank._spawn("soldier", 8, 5, -1)
+	flank.set_tile(Vector2i(7, 5), "c")
+	var sniper: Dictionary = flank.units[0]
+	var open_score: float = AI.destination_score(flank, sniper, Vector2i(6, 5))
+	var flank_score: float = AI.destination_score(flank, sniper, Vector2i(8, 7))
+	check(flank_score > open_score, "AI values a flank")
+	var sith = _blank()
+	sith._spawn("acolyte", 4, 5, -1)
+	sith._spawn("soldier", 5, 5, -1)
+	sith._spawn("guardian", 4, 6, -1)
+	check(str(AI.choose_target(sith, sith.units[0]).class_name) == "Guardian", "Sith targets Jedi")
+	var throttle = Mission.new(3)
+	throttle.difficulty.active_cap = 2
+	for foe in throttle.living("enemy"): foe.spotted = true
+	throttle._wake_groups()
+	var active := 0
+	for foe in throttle.living("enemy"):
+		if bool(foe.awake): active += 1
+	check(active == 2, "throttle holds later groups")
+	var reveal = _blank()
+	reveal._spawn("trooper", 4, 5, 0)
+	reveal._spawn("soldier", 8, 5, -1)
+	reveal.difficulty.active_cap = 4
+	reveal.phase = "enemy"
+	reveal._wake_groups()
+	var hp_before: int = int(reveal.units[1].hp)
+	AI.act(reveal, reveal.units[0], {})
+	check(int(reveal.units[1].hp) == hp_before, "enemy turn reveal has no shot")
+	print("AI: cover, flank, Jedi priority, engagement throttle")
+
+func _test_difficulty() -> void:
+	var choices := Settings.all()
+	check(choices.size() == 4, "four difficulty settings")
+	var menu_scene: PackedScene = load("res://scenes/menu.tscn")
+	check(menu_scene != null, "menu scene loads")
+	if menu_scene != null:
+		var menu: Control = menu_scene.instantiate()
+		root.add_child(menu)
+		check(menu.buttons.size() == 4, "menu shows four choices")
+		menu._pick("hard")
+		check(menu.picked == "hard" and menu.buttons.hard.button_pressed, "menu selects difficulty")
+		menu.queue_free()
+	for id in ["story", "normal", "hard", "legend"]:
+		Settings.difficulty = id
+		var m = Mission.new(1)
+		check(not m.difficulty.is_empty() and int(m.spec.turn_limit) == int(choices[id].turn_clock), "%s difficulty loads" % id)
+	Settings.difficulty = "legend"
+	check(int(Mission.new(4).difficulty.active_cap) == 99, "difficulty survives mission recreation")
+	Settings.difficulty = "normal"
 
 func _distance_field(m: RefCounted, goal: Vector2i) -> Dictionary:
 	var field: Dictionary = {goal: 0}
@@ -191,14 +261,21 @@ func _bot_turn(m: RefCounted) -> void:
 	m.end_turn()
 
 func _test_bot() -> int:
-	var wins := 0
-	for seed_value in range(1, 21):
-		var m = Mission.new(seed_value)
-		var guard := 0
-		while m.result == "" and guard < 20:
-			_bot_turn(m)
-			guard += 1
-		if m.result == "win": wins += 1
-		check(m.result != "", "bot %d terminates" % seed_value)
-	print("rescue bot: %d/20 wins" % wins)
-	return wins
+	var normal_wins := 0
+	for id in ["story", "normal", "hard", "legend"]:
+		Settings.difficulty = id
+		var wins := 0
+		var losses_by_clock := 0
+		for seed_value in range(1, 21):
+			var m = Mission.new(seed_value)
+			var guard := 0
+			while m.result == "" and guard < 24:
+				_bot_turn(m)
+				guard += 1
+			if m.result == "win": wins += 1
+			if m.turn > int(m.spec.turn_limit): losses_by_clock += 1
+			check(m.result != "", "%s bot %d terminates" % [id, seed_value])
+		print("rescue bot %s: %d/20 wins (%.0f%%), %d clock losses" % [id, wins, wins * 5.0, losses_by_clock])
+		if id == "normal": normal_wins = wins
+	Settings.difficulty = "normal"
+	return normal_wins

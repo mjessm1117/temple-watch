@@ -2,6 +2,8 @@ extends RefCounted
 class_name RescueMission
 
 const Shot = preload("res://scripts/shot.gd")
+const AI = preload("res://scripts/ai.gd")
+const Settings = preload("res://scripts/settings.gd")
 var spec: Dictionary
 var catalog: Dictionary
 var abilities: Dictionary
@@ -16,19 +18,25 @@ var rng := RandomNumberGenerator.new()
 var reinforcement_announced := false
 var reinforcement_dropped := false
 var next_id := 0
+var difficulty: Dictionary = {}
 
 func _init(seed_value: int = 1) -> void:
 	rng.seed = seed_value
 	spec = _json("res://data/rescue.json")
+	difficulty = Settings.selected()
+	spec.turn_limit = int(difficulty.get("turn_clock", spec.turn_limit))
 	catalog = _json("res://data/units.json")
 	abilities = _json("res://data/abilities.json")
 	for row in spec.rows: board.append(str(row))
+	prisoner = spec.prisoner.duplicate(true)
+	prisoner["freed"] = false
 	for entry in spec.squad: _spawn(str(entry[0]), int(entry[1]), int(entry[2]), -1)
 	for group_index in range(spec.groups.size()):
 		for entry in spec.groups[group_index]: _spawn(str(entry[0]), int(entry[1]), int(entry[2]), group_index)
-	prisoner = spec.prisoner.duplicate(true)
-	prisoner["freed"] = false
-	message("Rescue Aide Mira Tal, then escort her to the blue evac tiles before turn 10.")
+		for extra in range(int(difficulty.get("extra_per_group", 0))):
+			var anchor: Array = spec.groups[group_index][extra % spec.groups[group_index].size()]
+			_spawn_near("trooper", Vector2i(int(anchor[1]), int(anchor[2])), group_index)
+	message("Rescue Aide Mira Tal, then escort her to the blue evac tiles before turn %d." % int(spec.turn_limit))
 
 static func _json(path: String) -> Dictionary:
 	var file := FileAccess.open(path, FileAccess.READ)
@@ -44,12 +52,27 @@ func _spawn(kind: String, x: int, y: int, group: int) -> void:
 	u["x"] = x
 	u["y"] = y
 	u["max_hp"] = int(u.hp)
+	if str(u.side) == "enemy":
+		u.hp = maxi(1, int(u.hp) + int(difficulty.get("enemy_hp", 0)))
+		u.max_hp = int(u.hp)
+		u.aim = int(u.aim) + int(difficulty.get("enemy_aim", 0))
+	else: u.aim = int(u.aim) + int(difficulty.get("player_aim", 0))
 	u["ap"] = 3 if str(u.side) == "player" else 0
 	u["focus_left"] = int(u.get("focus", 0))
 	u["group"] = group
 	u["awake"] = group < 0
+	u["spotted"] = group < 0
 	u["overwatch"] = false
 	units.append(u)
+
+func _spawn_near(kind: String, anchor: Vector2i, group: int) -> void:
+	for radius in range(1, 5):
+		for y in range(anchor.y - radius, anchor.y + radius + 1):
+			for x in range(anchor.x - radius, anchor.x + radius + 1):
+				var q := Vector2i(x, y)
+				if passable(q) and not occupied(q):
+					_spawn(kind, x, y, group)
+					return
 
 func in_bounds(p: Vector2i) -> bool:
 	return p.x >= 0 and p.y >= 0 and p.x < int(spec.width) and p.y < int(spec.height)
@@ -130,6 +153,7 @@ func move(id: int, dest: Vector2i) -> bool:
 					message("%s takes over the escort." % u.name)
 			if int(prisoner.get("escort_id", -1)) == id: _follow_prisoner(old, dest)
 		_wake_groups()
+		_enemy_reaction_fire(u)
 		_check_win()
 	else: _reaction_fire(u)
 	return true
@@ -162,7 +186,7 @@ func shot(id: int, target_id: int, mode: String = "shoot") -> bool:
 	var melee := mode == "strike"
 	var ap_cost := int(abilities[mode].ap)
 	if int(a.ap) < ap_cost: return false
-	if melee and str(a.get("class_name", "")) not in ["Guardian", "Consular"]: return false
+	if melee and str(a.get("class_name", "")) not in ["Guardian", "Consular", "Sith Warrior"]: return false
 	if melee and max(abs(int(a.x) - int(t.x)), abs(int(a.y) - int(t.y))) > 1: return false
 	var info: Dictionary = Shot.calculate(self, a, t, melee)
 	if not bool(info.los) or not bool(info.range_ok): return false
@@ -195,7 +219,7 @@ func push(id: int, target_id: int) -> bool:
 	var a := unit_by_id(id)
 	var t := unit_by_id(target_id)
 	if a.is_empty() or t.is_empty() or result != "" or phase != str(a.side) or a.side == t.side: return false
-	if str(a.get("class_name", "")) not in ["Guardian", "Consular"]: return false
+	if str(a.get("class_name", "")) not in ["Guardian", "Consular", "Sith Warrior"]: return false
 	if int(a.ap) < int(abilities.push.ap) or int(a.focus_left) < int(abilities.push.focus): return false
 	if Shot.distance(Shot.pos(a), Shot.pos(t)) > float(abilities.push.range) or not Shot.los(self, Shot.pos(a), Shot.pos(t)): return false
 	a.ap = int(a.ap) - int(abilities.push.ap)
@@ -227,14 +251,27 @@ func free_prisoner(id: int) -> bool:
 	return true
 
 func _wake_groups() -> void:
+	var groups: Dictionary = {}
 	for u in living("enemy"):
-		if bool(u.awake): continue
+		if int(u.group) < 0 or bool(u.awake): continue
+		if not groups.has(int(u.group)): groups[int(u.group)] = []
+		groups[int(u.group)].append(u)
 		for p in living("player"):
 			if Shot.distance(Shot.pos(p), Shot.pos(u)) <= 8.0 and Shot.los(self, Shot.pos(p), Shot.pos(u)):
-				for member in units:
-					if int(member.group) == int(u.group): member.awake = true
-				message("Enemy group %d spotted and activated!" % (int(u.group) + 1))
-				break
+				u.spotted = true
+	for group in groups:
+		var members: Array = groups[group]
+		var seen := false
+		for u in members:
+			if bool(u.spotted): seen = true
+		if not seen: continue
+		var active := 0
+		for u in living("enemy"):
+			if bool(u.awake): active += 1
+		if active + members.size() > int(difficulty.get("active_cap", 6)): continue
+		message("Enemy group %d spotted and activated!" % (int(group) + 1))
+		for u in members: u.awake = true
+		for u in members: AI.scamper(self, u)
 
 func _reaction_fire(mover: Dictionary) -> void:
 	for p in living("player"):
@@ -243,6 +280,14 @@ func _reaction_fire(mover: Dictionary) -> void:
 		if bool(info.los) and bool(info.range_ok):
 			p.overwatch = false
 			_apply_attack(p, mover, info, "shoot")
+
+func _enemy_reaction_fire(mover: Dictionary) -> void:
+	for e in living("enemy"):
+		if not bool(e.awake) or not bool(e.overwatch): continue
+		var info: Dictionary = Shot.calculate(self, e, mover, false, -15)
+		if bool(info.los) and bool(info.range_ok):
+			e.overwatch = false
+			_apply_attack(e, mover, info, "shoot")
 
 func overwatch(id: int) -> bool:
 	var u := unit_by_id(id)
@@ -258,9 +303,11 @@ func end_turn() -> void:
 	_check_win()
 	if result != "": return
 	phase = "enemy"
-	for u in living("enemy"): u.ap = 3
+	_wake_groups()
+	for u in living("enemy"): u.ap = 3; u.overwatch = false
+	var fired: Dictionary = {}
 	for e in living("enemy"):
-		if bool(e.awake): _enemy_action(e)
+		if bool(e.awake): AI.act(self, e, fired)
 	_check_lose()
 	if result != "": return
 	turn += 1
@@ -270,12 +317,15 @@ func end_turn() -> void:
 		return
 	phase = "player"
 	for p in living("player"): p.ap = 3; p.overwatch = false
-	if turn == int(spec.reinforcement.announce_turn):
+	if turn == int(spec.reinforcement.announce_turn) and int(difficulty.get("reinforcement_size", 2)) > 0:
 		reinforcement_announced = true
 		message("INBOUND: Sith reinforcements approaching from the east next turn!")
-	if turn == int(spec.reinforcement.drop_turn):
+	if turn == int(spec.reinforcement.drop_turn) and int(difficulty.get("reinforcement_size", 2)) > 0:
 		reinforcement_dropped = true
-		for entry in spec.reinforcement.units: _spawn(str(entry[0]), int(entry[1]), int(entry[2]), -1)
+		for i in range(int(difficulty.get("reinforcement_size", 2))):
+			var entry: Array = spec.reinforcement.units[i % spec.reinforcement.units.size()]
+			_spawn_near(str(entry[0]), Vector2i(int(entry[1]), int(entry[2])), 99)
+			units.back().spotted = true
 		message("Sith reinforcements land on the eastern road.")
 	_wake_groups()
 
@@ -293,31 +343,6 @@ func _civilian_advance() -> void:
 	if best != p:
 		prisoner.x = best.x; prisoner.y = best.y
 		message("Mira follows the squad toward evac.")
-
-func _enemy_action(e: Dictionary) -> void:
-	if int(e.hp) <= 0: return
-	var targets := living("player")
-	if targets.is_empty(): return
-	var best_target: Dictionary = {}
-	var best_info: Dictionary = {}
-	for p in targets:
-		var info: Dictionary = Shot.calculate(self, e, p)
-		if bool(info.los) and bool(info.range_ok) and (best_target.is_empty() or int(info.hit) > int(best_info.hit)):
-			best_target = p; best_info = info
-	if not best_target.is_empty() and int(e.ap) >= 2:
-		e.ap = int(e.ap) - 2
-		_apply_attack(e, best_target, best_info, "shoot")
-		return
-	var goal: Dictionary = targets[0]
-	for p in targets:
-		if Shot.distance(Shot.pos(e), Shot.pos(p)) < Shot.distance(Shot.pos(e), Shot.pos(goal)): goal = p
-	var reach := paths(e, int(e.mob))
-	var best: Vector2i = Shot.pos(e)
-	var score := Shot.distance(best, Shot.pos(goal))
-	for q in reach.costs:
-		var candidate: float = Shot.distance(q, Shot.pos(goal)) - (0.5 if Shot.cover(self, q, Shot.pos(goal)) > 0 else 0.0)
-		if candidate < score: score = candidate; best = q
-	if best != Shot.pos(e): move(int(e.id), best)
 
 func _check_win() -> void:
 	if not bool(prisoner.freed): return

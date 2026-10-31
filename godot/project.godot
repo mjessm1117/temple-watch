@@ -2,7 +2,7 @@ config_version=5
 
 [application]
 config/name="Temple Watch — Rescue"
-run/main_scene="res://scenes/rescue.tscn"
+run/main_scene="res://scenes/menu.tscn"
 config/features=PackedStringArray("4.4", "Forward Plus")
 
 [display]

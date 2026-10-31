@@ -108,5 +108,18 @@
     "range": 11,
     "armor": 0,
     "model": "agent"
+  },
+  "acolyte": {
+    "name": "Sith Acolyte",
+    "class_name": "Sith Warrior",
+    "side": "enemy",
+    "hp": 8,
+    "aim": 75,
+    "mob": 6,
+    "damage": [4, 5],
+    "range": 1.5,
+    "focus": 2,
+    "armor": 0,
+    "model": "sithHeavy"
   }
 }
