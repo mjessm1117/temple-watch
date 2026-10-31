@@ -146,39 +146,10 @@ func _instance_model(parent: Node3D, key: String, at: Vector3, scale_value: floa
 	return true
 
 func _build_terrain() -> void:
-	for child in terrain.get_children(): child.queue_free()
-	for y in range(int(mission.spec.height)):
-		for x in range(int(mission.spec.width)):
-			var p := Vector2i(x, y)
-			var c: String = mission.tile(p)
-			var elev: int = Shot.elevation(mission, p)
-			var grain := ((x * 37 + y * 19 + x * y * 11) % 17) / 120.0
-			var floor_color := Color("293943").lightened(grain) if (x + y) % 2 == 0 else Color("324652").lightened(grain)
-			if c == "^": floor_color = Color("596877").lightened(grain)
-			if c == "M": floor_color = Color("657584").lightened(grain)
-			if c == "E": floor_color = Color("137a91")
-			if c == "r": floor_color = Color("5f5c59")
-			_box(terrain, Vector3(x, elev * 0.7 - 0.08, y), Vector3(0.98, max(0.15, elev * 1.4 + 0.15), 0.98), floor_color)
-			if elev > 0:
-				_box(terrain, Vector3(x, elev * 0.7 - 0.07, y + 0.47), Vector3(0.96, 0.14, 0.06), Color("a1aebb"))
-				_box(terrain, Vector3(x + 0.47, elev * 0.7 - 0.07, y), Vector3(0.06, 0.14, 0.96), Color("8b9eac"))
-			if c == "#":
-				var edge: bool = x == 0 or y == 0 or x == int(mission.spec.width) - 1 or y == int(mission.spec.height) - 1
-				var wall_height := 0.3 if edge else 1.6
-				_box(terrain, Vector3(x, elev * 0.7 + wall_height * 0.5, y), Vector3(0.85, wall_height, 0.85), Color("68717a"))
-				if not edge: _box(terrain, Vector3(x, elev * 0.7 + wall_height, y), Vector3(0.94, 0.1, 0.94), Color("92a0a8"))
-			elif c in ["c", "h", "k"]:
-				var key := "terminal" if c == "k" else "crate"
-				if c == "h":
-					_box(terrain, Vector3(x, elev * 0.7 + 0.48, y), Vector3(0.92, 0.92, 0.44), Color("546572"))
-					_box(terrain, Vector3(x, elev * 0.7 + 0.95, y), Vector3(1.0, 0.1, 0.52), Color("a7b1af"))
-				elif not _instance_model(terrain, key, Vector3(x, elev * 0.7 + 0.1, y), 0.55):
-					_box(terrain, Vector3(x, elev * 0.7 + (0.65 if c == "h" else 0.35), y), Vector3(0.7, 1.3 if c == "h" else 0.7, 0.7), Color("a77c54"))
-			elif c == "r":
-				for i in range(3):
-					_box(terrain, Vector3(x + (i - 1) * 0.2, elev * 0.7 + 0.05, y + (i % 2) * 0.16), Vector3(0.24, 0.14, 0.32), Color("77838a"))
-	# Prison cell marker and visible evacuation beacon.
-	_box(terrain, Vector3(int(mission.prisoner.x), 0.02, int(mission.prisoner.y)), Vector3(0.85, 0.07, 0.85), Color("e5ae61"))
+	if terrain.get_child_count() == 0:
+		var art := preload("res://scripts/env_art.gd").new()
+		terrain.add_child(art)
+	terrain.get_child(0).build(mission, model_cache)
 
 func _clear(node: Node) -> void:
 	for child in node.get_children(): child.queue_free()
