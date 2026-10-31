@@ -20,6 +20,7 @@ func run() -> void:
 	_test_actions()
 	_test_mission_layout()
 	var wins := _test_bot()
+	await _test_presentation_scene()
 	print("TEST RESULTS: %d checks, %d failures; rescue bot %d/20 wins (%.0f%%)" % [checks, failures, wins, wins * 5.0])
 	quit(1 if failures > 0 else 0)
 
@@ -30,6 +31,28 @@ func _blank() -> RefCounted:
 	for y in range(12): m.board.append("............")
 	m.units.clear()
 	return m
+
+func _test_presentation_scene() -> void:
+	var packed: PackedScene = load("res://scenes/rescue.tscn")
+	check(packed != null, "presentation scene loads")
+	if packed == null: return
+	var game: Node3D = packed.instantiate()
+	root.add_child(game)
+	await process_frame
+	check(game.views.size() == 4, "four rigged squad views created")
+	game._move_selected(Vector2i(4, 21))
+	check(game.views[int(game.selected_id)].motion != null, "move starts visual path")
+	check(game.views[int(game.selected_id)].position.z > 21.5, "rules move resolves before visual travel")
+	game._demo("shot")
+	for i in range(3): game._end_turn()
+	await process_frame
+	check(game.mission.turn == 4, "three turns advance with presentation enabled")
+	game.sound.player.stop()
+	game.sound.player.stream = null
+	await create_timer(0.2).timeout
+	game.queue_free()
+	for i in range(3): await process_frame
+	print("presentation: scene loaded, movement, shot and three enemy turns")
 
 func _test_aim() -> void:
 	var cases: Array = JSON.parse_string(FileAccess.get_file_as_string("res://tests/aim_cases.json"))
