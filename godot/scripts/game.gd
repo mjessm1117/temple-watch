@@ -7,6 +7,8 @@ const Effects = preload("res://scripts/fx.gd")
 const Audio = preload("res://scripts/audio.gd")
 const HudControls = preload("res://scripts/hud_controls.gd")
 const InputControls = preload("res://scripts/input_controls.gd")
+const EnemyPresentation = preload("res://scripts/enemy_presentation.gd")
+const AttackPresentation = preload("res://scripts/attack_presentation.gd")
 var mission: RefCounted
 var camera: Camera3D
 var pivot: Vector3 = Vector3(9, 0, 17)
@@ -55,6 +57,11 @@ var target_id := -1
 var end_turn_armed := false
 var warning_label: Label
 var enemy_frame_sequence := 0
+var playing_enemy_events := false
+var player_attack_pending := false
+var terrain_seen_revision := 0
+var terrain_seen_board: Array[String] = []
+var reinforcement_view: Node3D
 
 func _ready() -> void:
 	mission = Mission.new(7)
@@ -65,6 +72,8 @@ func _ready() -> void:
 	_setup_scene()
 	_load_models()
 	_build_terrain()
+	terrain_seen_revision = mission.terrain_revision
+	terrain_seen_board = mission.board.duplicate()
 	_build_ui()
 	selected_id = int(mission.living("player")[0].id)
 	_update_camera()
@@ -91,6 +100,7 @@ func _setup_scene() -> void:
 	range_highlights = Node3D.new(); highlights.add_child(range_highlights)
 	hover_highlights = Node3D.new(); highlights.add_child(hover_highlights)
 	fx = Effects.new(); fx.name = "CombatEffects"; add_child(fx)
+	reinforcement_view = preload("res://scripts/reinforcement_marker.gd").new(); add_child(reinforcement_view)
 	sound = Audio.new(); add_child(sound)
 	camera = Camera3D.new(); camera.current = true; camera.fov = 45; add_child(camera)
 	var world := WorldEnvironment.new()
@@ -162,6 +172,17 @@ func _build_terrain() -> void:
 		terrain.add_child(art)
 	terrain.get_child(0).build(mission, model_cache)
 
+func _sync_terrain() -> void:
+	if mission.terrain_revision == terrain_seen_revision: return
+	_build_terrain()
+	for y in range(mini(terrain_seen_board.size(), mission.board.size())):
+		for x in range(mini(terrain_seen_board[y].length(), mission.board[y].length())):
+			if terrain_seen_board[y][x] != mission.board[y][x]:
+				var tile := Vector2i(x, y)
+				fx.cover_chunks(Vector3(x, Shot.elevation(mission, tile) * 0.7 + 0.5, y))
+	terrain_seen_board = mission.board.duplicate()
+	terrain_seen_revision = mission.terrain_revision
+
 func _clear(node: Node) -> void:
 	for child in node.get_children(): child.queue_free()
 
@@ -170,6 +191,7 @@ func _refresh_figures() -> void:
 	for u in mission.units:
 		var id := int(u.id)
 		if int(u.hp) <= 0 or (str(u.side) == "enemy" and not bool(u.awake)):
+			if playing_enemy_events and views.has(id): continue
 			if views.has(id):
 				var fallen: Node3D = views[id]
 				views.erase(id)
@@ -187,9 +209,20 @@ func _refresh_figures() -> void:
 			if str(u.side) == "enemy" and not demo_mode:
 				fx.float_text(at + Vector3.UP * 1.9, "ALERT!", Color("ff786d"), true)
 				sound.play("turn")
-		elif views.has(id) and views[id].position.distance_to(at) > 0.05 and (views[id].motion == null or not views[id].motion.is_running()):
+		elif views.has(id) and not playing_enemy_events and views[id].position.distance_to(at) > 0.05 and (views[id].motion == null or not views[id].motion.is_running()):
 			views[id].travel([at])
-		if views.has(id): views[id].set_selected(id == selected_id, str(u.side) == "enemy")
+		if views.has(id):
+			views[id].set_selected(id == selected_id, str(u.side) == "enemy")
+			var cover_level := 0
+			var threat := -1
+			for other in mission.living("player" if str(u.side) == "enemy" else "enemy"):
+				if str(other.side) == "enemy" and not bool(other.awake): continue
+				var shot_info: Dictionary = Shot.calculate(mission, other, u)
+				if bool(shot_info.los) and bool(shot_info.range_ok) and int(shot_info.hit) > threat:
+					threat = int(shot_info.hit)
+					cover_level = 2 if int(shot_info.cover) == 40 else 1 if int(shot_info.cover) == 20 else 0
+			if threat < 0 and Shot.in_cover(mission, p): cover_level = 1
+			views[id].set_cover(cover_level)
 	if not bool(mission.prisoner.freed) or mission.result != "win":
 		var p := Vector2i(int(mission.prisoner.x), int(mission.prisoner.y))
 		var at := Vector3(p.x, Shot.elevation(mission, p) * 0.7 + 0.5, p.y)
@@ -205,7 +238,7 @@ func _build_ui() -> void:
 	hud_controls._build_ui()
 
 func _choose_action(mode: String) -> void:
-	if mission.phase != "player" or mission.result != "": return
+	if player_attack_pending or playing_enemy_events or mission.phase != "player" or mission.result != "": return
 	if cinematic: _skip_cinematic()
 	preview_tile = Vector2i(-1, -1)
 	target_id = -1
@@ -214,12 +247,15 @@ func _choose_action(mode: String) -> void:
 	action = mode
 	if mode == "overwatch":
 		if mission.overwatch(selected_id): _after_action()
+	elif mode == "hunker":
+		if mission.hunker(selected_id): _after_action()
 	elif mode in ["shoot", "strike", "push"]:
 		_cycle_target(1)
 	sound.play("click")
 	_refresh()
 
 func _select(id: int) -> void:
+	if player_attack_pending or playing_enemy_events: return
 	if selected_id == id and target_id < 0: return
 	if cinematic: _skip_cinematic()
 	selected_id = id
@@ -314,7 +350,7 @@ func _action_cam(actor: Node3D, target: Node3D) -> void:
 	action_tween = create_tween().set_parallel(true)
 	action_tween.tween_property(camera, "position", shoulder, 0.6).set_trans(Tween.TRANS_SINE)
 	action_tween.tween_method(func(value: Vector3) -> void: camera.look_at(value, Vector3.UP), pivot, look, 0.6)
-	get_tree().create_timer(0.65).timeout.connect(_skip_cinematic)
+	get_tree().create_timer(0.95).timeout.connect(_skip_cinematic)
 
 func _skip_cinematic() -> void:
 	if not cinematic: return
@@ -348,6 +384,7 @@ func _move_selected(dest: Vector2i) -> void:
 		_refresh()
 
 func _attack(target_id: int, mode: String) -> void:
+	if player_attack_pending or playing_enemy_events: return
 	var actor: Dictionary = mission.unit_by_id(selected_id)
 	var target: Dictionary = mission.unit_by_id(target_id)
 	if actor.is_empty() or target.is_empty(): return
@@ -355,42 +392,22 @@ func _attack(target_id: int, mode: String) -> void:
 	var before_armor := int(target.get("armor", 0))
 	var old_target := Shot.pos(target)
 	var old_log: int = mission.log_lines.size()
-	var terrain_before: String = mission.tile(old_target + Vector2i(signi(int(target.x) - int(actor.x)), signi(int(target.y) - int(actor.y))))
 	var success: bool = mission.push(selected_id, target_id) if mode == "push" else mission.shot(selected_id, target_id, mode)
 	if not success: return
 	var from := Vector3(int(actor.x), Shot.elevation(mission, Shot.pos(actor)) * 0.7 + 1.15, int(actor.y))
 	var to := Vector3(old_target.x, Shot.elevation(mission, old_target) * 0.7 + 1.1, old_target.y)
-	if views.has(selected_id):
-		views[selected_id].face(to)
-		views[selected_id].act("cast" if mode == "push" else "swing" if mode == "strike" else "shoot")
-	if views.has(target_id):
-		views[target_id].face(from)
-		if int(target.hp) > 0 and int(target.hp) < before_hp: views[target_id].act("hit")
-		if mode == "push" and Shot.pos(target) != old_target:
-			views[target_id].travel([Vector3(int(target.x), Shot.elevation(mission, Shot.pos(target)) * 0.7, int(target.y))])
 	_action_cam(views.get(selected_id), views.get(target_id))
 	var outcome := str(mission.log_lines[old_log]) if mission.log_lines.size() > old_log else ""
 	var damage := before_hp - int(target.hp)
-	if mode == "push":
-		fx.shockwave(from, to); sound.play("push")
-	elif mode == "strike":
-		fx.saber(from, to); sound.play("saber")
-	else:
-		fx.bolt(from, to, str(actor.side) == "enemy", damage == 0); sound.play("shot")
-	var word := "MISS" if damage == 0 and mode != "push" else "CRIT %d" % damage if "crits" in outcome else "GRAZE %d" % damage if "grazes" in outcome else "-%d" % damage if damage > 0 else "PUSH"
-	fx.float_text(to + Vector3.UP * 0.6, word, Color("ffca70") if "CRIT" in word else Color("a8eaff") if "GRAZE" in word else Color("ffffff"), "CRIT" in word)
-	if int(target.get("armor", 0)) < before_armor: fx.float_text(to + Vector3.UP * 0.15, "ARMOR -1", Color("f0c68b"))
-	if int(target.hp) <= 0: _shake(0.16); sound.play("death")
-	elif "crits" in outcome: _shake(0.12)
-	if mode == "push" and terrain_before != mission.tile(old_target + Vector2i(signi(int(target.x) - int(actor.x)), signi(int(target.y) - int(actor.y)))):
-		_build_terrain()
-		fx.cover_chunks(to)
-		_shake(0.1)
-	_after_action()
-	_refresh()
+	player_attack_pending = true
+	var event := {"actor": selected_id, "target": target_id, "mode": mode, "from": from, "to": to, "destination": Vector3(int(target.x), Shot.elevation(mission, Shot.pos(target)) * 0.7, int(target.y)), "moved": Shot.pos(target) != old_target, "damage": damage, "outcome": outcome, "armor_lost": int(target.get("armor", 0)) < before_armor, "killed": int(target.hp) <= 0}
+	if action_camera and not demo_mode:
+		get_tree().create_timer(0.42).timeout.connect(func() -> void:
+			if is_instance_valid(self): AttackPresentation.play(self, event))
+	else: AttackPresentation.play(self, event)
 
 func _request_end_turn() -> void:
-	if mission.result != "" or mission.phase != "player": return
+	if player_attack_pending or playing_enemy_events or mission.result != "" or mission.phase != "player": return
 	var ready := 0
 	for u in mission.living("player"):
 		if int(u.ap) > 0: ready += 1
@@ -406,45 +423,14 @@ func _end_turn() -> void:
 	enemy_frame_sequence += 1
 	phase_banner.visible = true
 	sound.play("turn")
-	var before: Dictionary = {}
-	for u in mission.units: before[int(u.id)] = {"position": Shot.pos(u), "hp": int(u.hp), "prev": mission.paths(u, int(u.mob)).prev if str(u.side) == "enemy" and bool(u.awake) else {}}
 	mission.end_turn()
-	for u in mission.units:
-		var id := int(u.id)
-		if not before.has(id): continue
-		if str(u.side) == "enemy" and before[id].position != Shot.pos(u) and views.has(id):
-			var cursor: Vector2i = Shot.pos(u)
-			var route: Array[Vector3] = []
-			while before[id].prev.has(cursor):
-				route.push_front(Vector3(cursor.x, Shot.elevation(mission, cursor) * 0.7, cursor.y))
-				cursor = before[id].prev[cursor]
-			if route.is_empty(): route.append(Vector3(int(u.x), Shot.elevation(mission, Shot.pos(u)) * 0.7, int(u.y)))
-			views[id].travel(route)
-		if int(u.hp) < int(before[id].hp) and views.has(id):
-			views[id].act("hit")
-			fx.float_text(views[id].position + Vector3.UP * 1.7, "-%d" % (int(before[id].hp) - int(u.hp)), Color("ffad8d"))
-			var shooter: Dictionary = {}
-			for enemy in mission.living("enemy"):
-				if bool(enemy.awake) and (shooter.is_empty() or Shot.distance(Shot.pos(enemy), Shot.pos(u)) < Shot.distance(Shot.pos(shooter), Shot.pos(u))): shooter = enemy
-			if not shooter.is_empty():
-				fx.bolt(Vector3(int(shooter.x), 1.1, int(shooter.y)), views[id].position + Vector3.UP, true, false)
-				sound.play("shot")
-				_shake(0.07)
-	var actors: Array[Dictionary] = []
-	for enemy in mission.living("enemy"):
-		if bool(enemy.awake) and before.has(int(enemy.id)) and (before[int(enemy.id)].position != Shot.pos(enemy) or int(enemy.ap) < 3): actors.append(enemy)
-	if not actors.is_empty(): _frame_enemies(actors, enemy_frame_sequence)
+	var events: Array[Dictionary] = mission.action_events.duplicate(true)
+	playing_enemy_events = not events.is_empty()
 	_refresh()
-	get_tree().create_timer(0.5).timeout.connect(func() -> void: phase_banner.visible = false)
-
-func _frame_enemies(actors: Array[Dictionary], sequence: int) -> void:
-	for enemy in actors:
-		if sequence != enemy_frame_sequence: return
-		_glide_to(Vector3(int(enemy.x), 0, int(enemy.y)), 0.22)
-		await get_tree().create_timer(0.28).timeout
-	if sequence == enemy_frame_sequence:
-		var active: Dictionary = mission.unit_by_id(selected_id)
-		if not active.is_empty(): _glide_to(Vector3(int(active.x), 0, int(active.y)), 0.3)
+	if events.is_empty():
+		phase_banner.visible = false
+	else:
+		EnemyPresentation.play(self, events, enemy_frame_sequence)
 
 func _demo(kind: String) -> void:
 	demo_mode = true
@@ -473,6 +459,8 @@ func _demo(kind: String) -> void:
 		_capture(path, 1)
 
 func _refresh() -> void:
+	_sync_terrain()
+	reinforcement_view.show_tile(mission.reinforcement_marker, mission)
 	hud_controls._refresh()
 
 func _show_shot() -> void:
@@ -504,12 +492,17 @@ func _rotate_camera(amount: float) -> void:
 
 func _skip_activity() -> void:
 	enemy_frame_sequence += 1
+	playing_enemy_events = false
 	if camera_tween != null and camera_tween.is_running(): camera_tween.kill()
 	_skip_cinematic()
 	phase_banner.visible = false
+	_refresh()
 	var unit: Dictionary = mission.unit_by_id(selected_id)
 	if not unit.is_empty(): pivot = Vector3(int(unit.x), 0, int(unit.y))
 	_update_camera()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if player_attack_pending:
+		if event is InputEventKey and event.pressed and event.keycode == KEY_SPACE: _skip_cinematic()
+		return
 	input_controls.handle_event(event)

@@ -90,6 +90,7 @@ static func scamper(m: RefCounted, e: Dictionary) -> void:
 		if score > best_score: best_score = score; best = q
 	if best != old:
 		e.x = best.x; e.y = best.y
+		if m.phase == "enemy": m.action_events.append({"kind": "move", "actor": int(e.id), "from": old, "to": best})
 		m.message("%s scrambles for cover." % e.name)
 		m._reaction_fire(e)
 
@@ -128,4 +129,5 @@ static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> void:
 				return
 	if not is_melee(e) and int(e.ap) > 0:
 		e.ap = 0; e.overwatch = true
+		m.action_events.append({"kind": "overwatch", "actor": int(e.id), "at": Shot.pos(e)})
 		m.message("%s watches a firing lane." % e.name)

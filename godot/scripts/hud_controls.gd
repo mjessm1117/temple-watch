@@ -44,7 +44,7 @@ func _refresh_highlights(force: bool = false) -> void:
 					var line: MeshInstance3D = g._box(g.hover_highlights, (here + next_at) * 0.5, Vector3(0.08, 0.04, here.distance_to(next_at)), Color("70dfff"))
 					line.look_at(next_at, Vector3.UP)
 					cursor = next
-				g.path_label.text = "%d AP  •  %d tiles" % [int(preview.ap), int(preview.tiles)]
+				g.path_label.text = "%d AP  •  %d tiles%s" % [int(preview.ap), int(preview.tiles), "  •  FLANK %d" % preview.flanks.size() if not preview.flanks.is_empty() else ""]
 			else: g.path_label.text = ""
 		else: g.path_label.text = ""
 		var shields := "  •  COVER "
@@ -116,8 +116,8 @@ func _build_ui() -> void:
 	info_row.add_child(_label("LMB PREVIEW/CONFIRM  •  RMB CANCEL/PAN  •  TAB CYCLE  •  Q/E ROTATE  •  WASD PAN  •  SPACE SKIP", 12))
 	g.warning_label = _label("", 15); g.warning_label.add_theme_color_override("font_color", Color("ffd37a")); bottom_box.add_child(g.warning_label)
 	var row := HBoxContainer.new(); bottom_box.add_child(row)
-	var keys := {"move": "1", "shoot": "2", "strike": "3", "push": "4", "free": "5", "overwatch": "6"}
-	var icons := {"move": "➜", "shoot": "◎", "strike": "✦", "push": "◈", "free": "◇", "overwatch": "◉"}
+	var keys := {"move": "1", "shoot": "2", "strike": "3", "push": "4", "free": "5", "overwatch": "6", "hunker": "7"}
+	var icons := {"move": "➜", "shoot": "◎", "strike": "✦", "push": "◈", "free": "◇", "overwatch": "◉", "hunker": "⬟"}
 	for mode in keys:
 		var b := _button("%s %s\n%s" % [keys[mode], icons[mode], mode.to_upper()], func() -> void: g._choose_action(mode))
 		row.add_child(b); g.action_buttons[mode] = b
@@ -144,7 +144,7 @@ func _refresh() -> void:
 			g.selected_id = int(survivors[0].id)
 			u = survivors[0]
 	g.objective_label.text = "TURN %d/%d  •  %s  •  %s" % [g.mission.turn, int(g.mission.spec.turn_limit), "ESCORT MIRA" if bool(g.mission.prisoner.freed) else "FREE MIRA", "EVAC" if bool(g.mission.prisoner.freed) else "CELL"]
-	g.selected_label.text = "%s\n%s\nHP %s\nAP %s\nFOCUS %d" % [u.get("name", ""), u.get("class_name", ""), "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, 3 - int(u.get("ap", 0)))), int(u.get("focus_left", 0))]
+	g.selected_label.text = "%s\n%s\nHP %s\nAP %s\nFOCUS %d%s" % [u.get("name", ""), u.get("class_name", ""), "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, 3 - int(u.get("ap", 0)))), int(u.get("focus_left", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
 	var kind := str(u.get("model", ""))
 	if kind != g.portrait_kind and g.model_cache.has(kind):
 		if g.portrait_model != null: g.portrait_model.queue_free()
@@ -154,7 +154,7 @@ func _refresh() -> void:
 		g.portrait_kind = kind
 	g.log_label.text = "\n".join(g.mission.log_lines.slice(max(0, g.mission.log_lines.size() - 8)))
 	for mode in g.action_buttons:
-		var needed_ap: int = 1 if mode == "overwatch" else int(g.mission.abilities[mode].ap)
+		var needed_ap: int = 1 if mode in ["overwatch", "hunker"] else int(g.mission.abilities[mode].ap)
 		g.action_buttons[mode].disabled = g.mission.result != "" or int(u.get("ap", 0)) < needed_ap or (mode == "free" and bool(g.mission.prisoner.freed)) or (mode in ["strike", "push"] and str(u.get("class_name", "")) not in ["Guardian", "Consular"]) or (mode == "push" and int(u.get("focus_left", 0)) < int(g.mission.abilities.push.focus))
 	g.result_panel.visible = g.mission.result != ""
 	var cine_button: Button = g.overlay.find_child("CineButton", true, false)
@@ -173,12 +173,20 @@ func _show_shot() -> void:
 		g.shot_label.text = "Choose Shoot, Strike or Push.\nTab cycles valid targets.\nEnter confirms; Esc cancels."
 		return
 	if g.action == "push":
-		g.hit_big_label.text = "PUSH"
-		g.shot_label.text = "%s  HP %d\nForce Push: guaranteed if in range and line of sight.\nNo hit or crit roll.\nCosts %d AP and %d Focus." % [target.name, int(target.hp), int(g.mission.abilities.push.ap), int(g.mission.abilities.push.focus)]
+		var legal := false
+		for option in InputControls.valid_targets(g.mission, actor, "push"):
+			if int(option.id) == int(target.id): legal = true
+		g.hit_big_label.text = "PUSH" if legal else "NO PUSH"
+		g.shot_label.text = "%s  HP %d\n%s\nNo hit or crit roll.\nCosts %d AP and %d Focus." % [target.name, int(target.hp), "Guaranteed knockback if confirmed." if legal else "Move into range with clear line of sight.", int(g.mission.abilities.push.ap), int(g.mission.abilities.push.focus)]
 		return
 	var info: Dictionary = Shot.calculate(g.mission, actor, target, g.action == "strike")
 	g.hit_big_label.text = "%d%% HIT" % int(info.hit)
 	var breakdown := ""
 	for item in info.lines: breakdown += "%s  %+d\n" % [item[0], int(item[1])]
-	g.shot_label.text = "%s  HP %d\nCRIT %d%%  •  GRAZE %d%%\nCOVER %s\n%s\n%s\n%s" % [target.name, int(target.hp), int(info.crit), int(info.graze), "⬟ FULL" if int(info.cover) == 40 else "◐ HALF" if int(info.cover) == 20 else "○ NONE", breakdown, "LOS CLEAR" if bool(info.los) else "LOS BLOCKED", "IN RANGE" if bool(info.range_ok) else "OUT OF RANGE"]
+	var armor := int(target.get("armor", 0))
+	var low := maxi(1, int(actor.damage[0]) - armor)
+	var high := maxi(1, int(actor.damage[1]) - armor)
+	var crit_high := maxi(1, int(actor.damage[1]) + 2 - armor)
+	var lethal := "  •  LETHAL" if high >= int(target.hp) or (int(info.crit) > 0 and crit_high >= int(target.hp)) else ""
+	g.shot_label.text = "%s  HP %d%s\nCRIT %d%%  •  GRAZE %d%%\nDMG %d–%d  •  CRIT ≤%d%s\nCOVER %s\n%s\n%s\n%s" % [target.name, int(target.hp), "  •  FLANKED" if bool(info.flanked) else "", int(info.crit), int(info.graze), low, high, crit_high, lethal, "⬟ FULL" if int(info.cover) == 40 else "◐ HALF" if int(info.cover) == 20 else "○ NONE", breakdown, "LOS CLEAR" if bool(info.los) else "LOS BLOCKED", "IN RANGE" if bool(info.range_ok) else "OUT OF RANGE"]
 

@@ -35,7 +35,7 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 	assertion.call(blue.x >= 0 and dash.x >= 0, "one action and dash destinations exist")
 	if blue.x >= 0:
 		var info: Dictionary = Controls.move_preview(m, actor, blue)
-		assertion.call(int(info.ap) == 1 and info.shields.size() == 4, "blue preview includes AP and four cover faces")
+		assertion.call(int(info.ap) == 1 and info.shields.size() == 4 and info.has("flanks"), "blue preview includes AP, cover faces, and flank opportunities")
 	if dash.x >= 0:
 		assertion.call(int(Controls.move_preview(m, actor, dash).ap) == 2, "dash preview costs two AP")
 		actor.ap = 1
@@ -51,6 +51,17 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 	assertion.call(Controls.valid_targets(m, actor, "shoot").is_empty(), "shot unavailable without AP")
 	actor.ap = 3
 	assertion.call(Controls.next_squad(m, int(actor.id), 1) == int(squad[1].id), "Tab advances squad")
+	var tracked: RefCounted = Mission.new(7)
+	var mover: Dictionary = tracked.living("enemy")[0]
+	mover.awake = true
+	mover.ap = 3
+	tracked.phase = "enemy"
+	var from: Vector2i = Shot.pos(mover)
+	var destination := Vector2i(-1, -1)
+	for tile in tracked.paths(mover, int(mover.mob)).costs:
+		if tile != from: destination = tile; break
+	if destination.x >= 0: tracked.move(int(mover.id), destination)
+	assertion.call(not tracked.action_events.is_empty() and tracked.action_events[0].kind == "move" and tracked.action_events[0].from == from, "enemy action trail preserves actor and origin")
 	squad[1].ap = 0
 	assertion.call(Controls.next_squad(m, int(actor.id), 1, true) == int(squad[2].id), "spent squad member skipped")
 	var packed: PackedScene = load("res://scenes/rescue.tscn")
@@ -64,9 +75,13 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 		var game_enemy: Dictionary = game.mission.living("enemy")[0]
 		game_enemy.awake = true
 		game_enemy.x = int(game_actor.x) + 1; game_enemy.y = int(game_actor.y)
+		game.mission.set_tile(Shot.pos(game_enemy) + Vector2i.RIGHT, "c")
 		game._choose_action("shoot")
 		assertion.call(game.target_id == int(game_enemy.id), "shoot mode selects a legal target")
 		assertion.call(game.hit_big_label.text.contains("HIT") and game.shot_label.text.contains("Base aim"), "shot panel shows odds and modifiers")
+		assertion.call(game.shot_label.text.contains("FLANKED") and game.shot_label.text.contains("Flanking critical chance"), "flank critical is shown before confirmation")
+		game._choose_action("push")
+		assertion.call(game.hit_big_label.text == "PUSH" and game.shot_label.text.contains("No hit or crit roll"), "Push presents no roll")
 		var cancel := InputEventKey.new()
 		cancel.keycode = KEY_ESCAPE
 		cancel.pressed = true
@@ -89,6 +104,23 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 		assertion.call(game.end_turn_armed and game.mission.turn == 1, "end turn warns while actions remain")
 		game._request_end_turn()
 		assertion.call(game.mission.turn == 2, "second confirmation advances turn")
+		game._skip_activity()
+		assertion.call(not game.playing_enemy_events, "Space skips queued enemy presentation")
+		game.mission.reinforcement_marker = Vector2i(12, 12)
+		game._refresh()
+		assertion.call(game.reinforcement_view.visible and game.reinforcement_view.shown_tile == Vector2i(12, 12), "reinforcement tile gets warm map marker")
+		game.mission.reinforcement_marker = Vector2i(-1, -1)
+		game._refresh()
+		assertion.call(not game.reinforcement_view.visible, "marker clears after arrival")
+		var cover_tile: Vector2i = game.mission.cover_hp.keys()[0]
+		game.mission.damage_cover(cover_tile, 99)
+		game._refresh()
+		assertion.call(game.terrain_seen_revision == game.mission.terrain_revision, "changed cover rebuilds during refresh")
+		var hunker_id: int = game.selected_id
+		game._choose_action("hunker")
+		assertion.call(bool(game.mission.unit_by_id(hunker_id).hunkered), "Hunker ability applies defense")
+		game._select(hunker_id)
+		assertion.call(game.selected_label.text.contains("HUNKERED"), "unit panel displays Hunker")
 		game.sound.player.stop()
 		game.sound.player.stream = null
 		game._skip_activity()

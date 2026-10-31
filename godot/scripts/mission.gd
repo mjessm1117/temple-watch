@@ -22,6 +22,7 @@ var difficulty: Dictionary = {}
 var cover_hp: Dictionary = {}
 var reinforcement_marker: Vector2i = Vector2i(-1, -1)
 var terrain_revision := 0
+var action_events: Array[Dictionary] = []
 
 func _init(seed_value: int = 1) -> void:
 	rng.seed = seed_value
@@ -185,6 +186,7 @@ func move(id: int, dest: Vector2i) -> bool:
 	var old: Vector2i = Shot.pos(u)
 	u.x = dest.x
 	u.y = dest.y
+	if phase == "enemy": action_events.append({"kind": "move", "actor": id, "from": old, "to": dest})
 	message("%s moves %d tiles (%d AP)." % [u.name, cost, ap_cost])
 	if str(u.side) == "player":
 		if bool(prisoner.freed):
@@ -239,6 +241,7 @@ func shot(id: int, target_id: int, mode: String = "shoot") -> bool:
 	return true
 
 func _apply_attack(a: Dictionary, t: Dictionary, info: Dictionary, mode: String) -> void:
+	var before_hp := int(t.hp)
 	var roll := rng.randf_range(0.0, 100.0)
 	var damage := 0
 	var outcome := "misses"
@@ -258,6 +261,7 @@ func _apply_attack(a: Dictionary, t: Dictionary, info: Dictionary, mode: String)
 			var direction := Vector2i(signi(int(a.x) - int(t.x)), signi(int(a.y) - int(t.y)))
 			for q in [Shot.pos(t) + Vector2i(direction.x, 0), Shot.pos(t) + Vector2i(0, direction.y)]: damage_cover(q, 3)
 	message("%s %s %s%s" % [a.name, outcome, t.name, " for %d." % damage if damage > 0 else "."])
+	if phase == "enemy": action_events.append({"kind": "attack", "actor": int(a.id), "target": int(t.id), "from": Shot.pos(a), "to": Shot.pos(t), "mode": mode, "enemy": str(a.side) == "enemy", "outcome": outcome, "damage": before_hp - int(t.hp), "killed": int(t.hp) <= 0})
 	if int(t.hp) <= 0: message("%s is down." % t.name)
 
 func push(id: int, target_id: int) -> bool:
@@ -269,6 +273,8 @@ func push(id: int, target_id: int) -> bool:
 	if Shot.distance(Shot.pos(a), Shot.pos(t)) > float(abilities.push.range) or not Shot.los(self, Shot.pos(a), Shot.pos(t)): return false
 	a.ap = int(a.ap) - int(abilities.push.ap)
 	a.focus_left = int(a.focus_left) - int(abilities.push.focus)
+	var old_target := Shot.pos(t)
+	var before_hp := int(t.hp)
 	var delta := Shot.pos(t) - Shot.pos(a)
 	var step := Vector2i(signi(delta.x), signi(delta.y))
 	for i in range(int(abilities.push.distance)):
@@ -280,6 +286,7 @@ func push(id: int, target_id: int) -> bool:
 			break
 		t.x = q.x; t.y = q.y
 	message("%s pushes %s out of position." % [a.name, t.name])
+	if phase == "enemy": action_events.append({"kind": "push", "actor": id, "target": target_id, "from": Shot.pos(a), "to": old_target, "destination": Shot.pos(t), "damage": before_hp - int(t.hp), "killed": int(t.hp) <= 0})
 	_check_lose()
 	return true
 
@@ -313,6 +320,7 @@ func _wake_groups() -> void:
 			if bool(u.awake): active += 1
 		if active + members.size() > int(difficulty.get("active_cap", 6)): continue
 		message("Enemy group %d spotted and activated!" % (int(group) + 1))
+		if phase == "enemy": action_events.append({"kind": "activation", "actor": int(members[0].id), "at": Shot.pos(members[0])})
 		for u in members: u.awake = true
 		for u in members: AI.scamper(self, u)
 
@@ -351,6 +359,7 @@ func hunker(id: int) -> bool:
 
 func end_turn() -> void:
 	if result != "" or phase != "player": return
+	action_events.clear()
 	if bool(prisoner.freed): _civilian_advance()
 	_check_win()
 	if result != "": return

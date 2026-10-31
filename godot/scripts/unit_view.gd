@@ -61,7 +61,9 @@ func set_selected(value: bool, enemy: bool) -> void:
 	ring.scale = Vector3.ONE * (1.15 if value else 1.0)
 
 func set_cover(level: int) -> void:
-	_cover_level = clampi(level, 0, 2)
+	level = clampi(level, 0, 2)
+	if level == _cover_level: return
+	_cover_level = level
 	if model == null or not alive: return
 	var target_y := -0.24 if _cover_level == 2 else -0.12 if _cover_level == 1 else 0.0
 	var tween := create_tween()

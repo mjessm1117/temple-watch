@@ -4,6 +4,8 @@ const Mission = preload("res://scripts/mission.gd")
 const Shot = preload("res://scripts/shot.gd")
 const AI = preload("res://scripts/ai.gd")
 const Settings = preload("res://scripts/settings.gd")
+const ControlsTest = preload("res://tests/controls_test.gd")
+const FxTest = preload("res://tests/fx_test.gd")
 var checks := 0
 var failures := 0
 
@@ -24,6 +26,8 @@ func run() -> void:
 	_test_ai()
 	_test_difficulty()
 	_test_wave4_rules()
+	await ControlsTest.run_checks(self, check)
+	await FxTest.run_checks(self, check)
 	if "--quick" in OS.get_cmdline_user_args():
 		print("TEST RESULTS: %d checks, %d failures" % [checks, failures])
 		quit(1 if failures > 0 else 0)

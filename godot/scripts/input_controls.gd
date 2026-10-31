@@ -12,7 +12,14 @@ static func move_preview(m: RefCounted, unit: Dictionary, dest: Vector2i) -> Dic
 	var shields: Dictionary = {}
 	for entry in [["N", Vector2i.UP], ["E", Vector2i.RIGHT], ["S", Vector2i.DOWN], ["W", Vector2i.LEFT]]:
 		shields[entry[0]] = Shot.cover(m, dest, dest + entry[1] * 2)
-	return {"ap": ap_cost, "tiles": cost, "prev": route.prev, "shields": shields}
+	var flanks: Array[String] = []
+	var probe: Dictionary = unit.duplicate()
+	probe.x = dest.x; probe.y = dest.y
+	for enemy in m.living("enemy"):
+		if not bool(enemy.awake): continue
+		var shot_info: Dictionary = Shot.calculate(m, probe, enemy)
+		if bool(shot_info.flanked) and bool(shot_info.los) and bool(shot_info.range_ok): flanks.append(str(enemy.name))
+	return {"ap": ap_cost, "tiles": cost, "prev": route.prev, "shields": shields, "flanks": flanks}
 
 static func valid_targets(m: RefCounted, unit: Dictionary, mode: String) -> Array[Dictionary]:
 	var targets: Array[Dictionary] = []
@@ -104,5 +111,5 @@ func handle_event(event: InputEvent) -> void:
 		elif event.keycode == KEY_Q: g._rotate_camera(-PI / 2.0)
 		elif event.keycode == KEY_E: g._rotate_camera(PI / 2.0)
 		elif event.keycode == KEY_R: g.get_tree().reload_current_scene()
-		elif event.keycode >= KEY_1 and event.keycode <= KEY_6:
-			g._choose_action(["move", "shoot", "strike", "push", "free", "overwatch"][event.keycode - KEY_1])
+		elif event.keycode >= KEY_1 and event.keycode <= KEY_7:
+			g._choose_action(["move", "shoot", "strike", "push", "free", "overwatch", "hunker"][event.keycode - KEY_1])
