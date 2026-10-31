@@ -1,0 +1,395 @@
+[
+  {
+    "name": "clear near",
+    "attacker": {
+      "x": 2,
+      "y": 2,
+      "aim": 70,
+      "range": 8,
+      "side": "neutral"
+    },
+    "target": {
+      "x": 5,
+      "y": 2,
+      "side": "neutral",
+      "buffDef": 0
+    },
+    "melee": false,
+    "defense": 0,
+    "tiles": [],
+    "expected": 70,
+    "lines": [
+      [
+        "Aim",
+        70
+      ]
+    ]
+  },
+  {
+    "name": "clear far",
+    "attacker": {
+      "x": 1,
+      "y": 1,
+      "aim": 70,
+      "range": 8,
+      "side": "neutral"
+    },
+    "target": {
+      "x": 9,
+      "y": 1,
+      "side": "neutral",
+      "buffDef": 0
+    },
+    "melee": false,
+    "defense": 0,
+    "tiles": [],
+    "expected": 60,
+    "lines": [
+      [
+        "Aim",
+        70
+      ],
+      [
+        "Range",
+        -10
+      ]
+    ]
+  },
+  {
+    "name": "half front",
+    "attacker": {
+      "x": 2,
+      "y": 2,
+      "aim": 70,
+      "range": 8,
+      "side": "neutral"
+    },
+    "target": {
+      "x": 5,
+      "y": 2,
+      "side": "neutral",
+      "buffDef": 0
+    },
+    "melee": false,
+    "defense": 0,
+    "tiles": [
+      [
+        4,
+        2,
+        "c"
+      ]
+    ],
+    "expected": 50,
+    "lines": [
+      [
+        "Aim",
+        70
+      ],
+      [
+        "Half cover",
+        -20
+      ]
+    ]
+  },
+  {
+    "name": "full front",
+    "attacker": {
+      "x": 2,
+      "y": 2,
+      "aim": 70,
+      "range": 8,
+      "side": "neutral"
+    },
+    "target": {
+      "x": 5,
+      "y": 2,
+      "side": "neutral",
+      "buffDef": 0
+    },
+    "melee": false,
+    "defense": 0,
+    "tiles": [
+      [
+        4,
+        2,
+        "#"
+      ]
+    ],
+    "expected": 30,
+    "lines": [
+      [
+        "Aim",
+        70
+      ],
+      [
+        "Full cover",
+        -40
+      ]
+    ]
+  },
+  {
+    "name": "flank half",
+    "attacker": {
+      "x": 5,
+      "y": 5,
+      "aim": 70,
+      "range": 8,
+      "side": "neutral"
+    },
+    "target": {
+      "x": 5,
+      "y": 8,
+      "side": "neutral",
+      "buffDef": 0
+    },
+    "melee": false,
+    "defense": 0,
+    "tiles": [
+      [
+        4,
+        8,
+        "c"
+      ]
+    ],
+    "expected": 70,
+    "lines": [
+      [
+        "Aim",
+        70
+      ]
+    ]
+  },
+  {
+    "name": "higher shooter",
+    "attacker": {
+      "x": 2,
+      "y": 2,
+      "aim": 70,
+      "range": 8,
+      "side": "neutral"
+    },
+    "target": {
+      "x": 5,
+      "y": 2,
+      "side": "neutral",
+      "buffDef": 0
+    },
+    "melee": false,
+    "defense": 0,
+    "tiles": [
+      [
+        2,
+        2,
+        "^"
+      ]
+    ],
+    "expected": 85,
+    "lines": [
+      [
+        "Aim",
+        70
+      ],
+      [
+        "High ground",
+        15
+      ]
+    ]
+  },
+  {
+    "name": "higher target",
+    "attacker": {
+      "x": 2,
+      "y": 2,
+      "aim": 70,
+      "range": 8,
+      "side": "neutral"
+    },
+    "target": {
+      "x": 5,
+      "y": 2,
+      "side": "neutral",
+      "buffDef": 0
+    },
+    "melee": false,
+    "defense": 0,
+    "tiles": [
+      [
+        5,
+        2,
+        "^"
+      ]
+    ],
+    "expected": 70,
+    "lines": [
+      [
+        "Aim",
+        70
+      ]
+    ]
+  },
+  {
+    "name": "high above cover",
+    "attacker": {
+      "x": 2,
+      "y": 2,
+      "aim": 70,
+      "range": 8,
+      "side": "neutral"
+    },
+    "target": {
+      "x": 5,
+      "y": 2,
+      "side": "neutral",
+      "buffDef": 0
+    },
+    "melee": false,
+    "defense": 0,
+    "tiles": [
+      [
+        2,
+        2,
+        "M"
+      ],
+      [
+        4,
+        2,
+        "c"
+      ]
+    ],
+    "expected": 75,
+    "lines": [
+      [
+        "Aim",
+        70
+      ],
+      [
+        "Half cover",
+        -20
+      ],
+      [
+        "Cover seen from above",
+        10
+      ],
+      [
+        "High ground",
+        15
+      ]
+    ]
+  },
+  {
+    "name": "long range clamp",
+    "attacker": {
+      "x": 1,
+      "y": 1,
+      "aim": 5,
+      "range": 4,
+      "side": "neutral"
+    },
+    "target": {
+      "x": 10,
+      "y": 10,
+      "side": "neutral",
+      "buffDef": 0
+    },
+    "melee": false,
+    "defense": 0,
+    "tiles": [],
+    "expected": 5,
+    "lines": [
+      [
+        "Aim",
+        5
+      ],
+      [
+        "Range",
+        -31
+      ]
+    ]
+  },
+  {
+    "name": "high aim clamp",
+    "attacker": {
+      "x": 2,
+      "y": 2,
+      "aim": 120,
+      "range": 8,
+      "side": "neutral"
+    },
+    "target": {
+      "x": 3,
+      "y": 2,
+      "side": "neutral",
+      "buffDef": 0
+    },
+    "melee": false,
+    "defense": 0,
+    "tiles": [],
+    "expected": 95,
+    "lines": [
+      [
+        "Aim",
+        120
+      ]
+    ]
+  },
+  {
+    "name": "melee",
+    "attacker": {
+      "x": 2,
+      "y": 2,
+      "aim": 75,
+      "range": 1.5,
+      "side": "neutral"
+    },
+    "target": {
+      "x": 3,
+      "y": 2,
+      "side": "neutral",
+      "buffDef": 0
+    },
+    "melee": true,
+    "defense": 0,
+    "tiles": [],
+    "expected": 85,
+    "lines": [
+      [
+        "Aim",
+        75
+      ],
+      [
+        "Close quarters",
+        10
+      ]
+    ]
+  },
+  {
+    "name": "defense",
+    "attacker": {
+      "x": 2,
+      "y": 2,
+      "aim": 70,
+      "range": 8,
+      "side": "neutral"
+    },
+    "target": {
+      "x": 5,
+      "y": 2,
+      "side": "neutral",
+      "buffDef": 15
+    },
+    "melee": false,
+    "defense": 15,
+    "tiles": [],
+    "expected": 55,
+    "lines": [
+      [
+        "Aim",
+        70
+      ],
+      [
+        "Target shielded",
+        -15
+      ]
+    ]
+  }
+]
