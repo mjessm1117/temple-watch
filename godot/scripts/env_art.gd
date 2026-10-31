@@ -62,13 +62,16 @@ func _setup_resources() -> void:
 	materials.floor_dark = _stone(Color("554a3d"), 0.16, 0.12)
 	materials.marble = _stone(Color("88908c"), 0.05, 0.18)
 	materials.marble_light = _stone(Color("a7aaa0"), 0.04, 0.19)
+	materials.inlay = _stone(Color("393f46"), 0.01, 0.10)
 	materials.wall = _stone(Color("a18b6b"), 0.13, 0.29)
 	materials.wall_dark = _stone(Color("685946"), 0.18, 0.14)
 	materials.trim = _stone(Color("d3b786"), 0.02, 0.33)
 	materials.rubble = _stone(Color("766655"), 0.23, 0.25)
 	materials.moss = _stone(Color("3b5134"), 0.55, 0.08)
-	materials.metal = _plain(Color("4b504d"), 0.55)
-	materials.bronze = _plain(Color("a88a57"), 0.48)
+	materials.metal = _plain(Color("3c484d"), 0.30)
+	materials.bronze = _plain(Color("9c7543"), 0.34)
+	materials.fabric = _fabric(Color("233b55"))
+	materials.fabric_gold = _fabric(Color("b49055"))
 	materials.holo = _glow(Color("5dc9da"), 2.0)
 	materials.fire = _glow(Color("ff9c3c"), 3.2)
 	materials.evac = _glow(Color("4fd4da"), 1.4)
@@ -88,6 +91,13 @@ func _plain(color: Color, roughness: float) -> StandardMaterial3D:
 	mat.albedo_color = color
 	mat.roughness = roughness
 	mat.metallic = 0.35 if roughness < 0.7 else 0.0
+	return mat
+
+func _fabric(color: Color) -> StandardMaterial3D:
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = color
+	mat.roughness = 0.96
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	return mat
 
 func _glow(color: Color, energy: float) -> StandardMaterial3D:
@@ -125,6 +135,10 @@ func _floor(x: int, y: int, tile: String, level: float, elevation: int) -> void:
 	if tile == "r": material = "rubble"
 	_put("box", "floor_dark", Vector3(x, level * 0.5 - 0.07, y), Vector3(0.995, level + 0.14, 0.995))
 	_put("box", material, Vector3(x, level + 0.015, y), Vector3(0.92, 0.035, 0.92))
+	if tile in ["^", "M"]:
+		var inlay := "bronze" if tile == "M" else "inlay"
+		_put("box", inlay, Vector3(x, level + 0.037, y - 0.38), Vector3(0.72, 0.008, 0.013))
+		_put("box", inlay, Vector3(x - 0.38, level + 0.037, y), Vector3(0.013, 0.008, 0.72))
 	if (x + y) % 5 == 0 and tile not in ["#", "r", "E"]:
 		_put("box", "trim", Vector3(x, level + 0.035, y + 0.37), Vector3(0.83, 0.006, 0.012))
 	if tile == "E":
@@ -141,6 +155,7 @@ func _terrace_edges(mission: RefCounted, x: int, y: int, level: float, elevation
 		var sideways: bool = dir.x != 0
 		var size := Vector3(0.08, 0.11, 0.92) if sideways else Vector3(0.92, 0.11, 0.08)
 		_put("box", "trim", Vector3(x, level - 0.06, y) + side * 0.46, size)
+		_put("box", "bronze", Vector3(x, level - 0.13, y) + side * 0.488, Vector3(0.015, 0.035, 0.84) if sideways else Vector3(0.84, 0.035, 0.015))
 		_put("box", "wall", Vector3(x, level * 0.5, y) + side * 0.46, Vector3(0.045, level - 0.12, 0.88) if sideways else Vector3(0.88, level - 0.12, 0.045))
 		for step in range(elevation * 2):
 			var band_y := 0.18 + step * 0.31
@@ -179,6 +194,7 @@ func _low_wall(x: int, y: int, level: float, reinforced: bool) -> void:
 	_put("box", "wall", Vector3(x, level + height * 0.5, y), Vector3(0.86, height - 0.08, 0.51), angle)
 	_put("box", "trim", Vector3(x, level + height - 0.01, y), Vector3(0.98, 0.09, 0.61), angle)
 	if reinforced:
+		_put("box", "metal", Vector3(x, level + height + 0.046, y), Vector3(0.93, 0.035, 0.55), angle)
 		for offset in [-0.35, 0.35]:
 			var local := Vector3(offset, level + height * 0.45, 0).rotated(Vector3.UP, angle)
 			_put("box", "bronze", Vector3(x, 0, y) + local, Vector3(0.035, height * 0.7, 0.54), angle)
@@ -212,9 +228,9 @@ func _ambient_detail(x: int, y: int, level: float, tile: String) -> void:
 func _backdrop(width: int, height: int) -> void:
 	# Perimeter architecture and a distant Coruscant skyline sit outside the rule grid.
 	_temple_gate(width)
+	_arcade(width)
 	for x in range(-3, width + 4):
 		if x % 4 == 0:
-			_ruined_pillar(Vector3(x, 0, -2.6), 2.4 + float(x % 3) * 0.4)
 			_ruined_pillar(Vector3(x, 0, height + 1.8), 1.8 + float(x % 4) * 0.33)
 	for y in range(-2, height + 3):
 		if y % 5 == 0:
@@ -237,6 +253,32 @@ func _backdrop(width: int, height: int) -> void:
 		_brazier(p)
 	for p in [Vector3(12, 1.62, 7), Vector3(12, 1.62, 16)]:
 		_brazier(p)
+
+func _arcade(width: int) -> void:
+	# Windows and arches stay behind the playable north edge; no scenery crosses a tile.
+	for x in range(0, width + 1, 4):
+		var base := Vector3(x, 0, -2.7)
+		_ruined_pillar(base, 2.2)
+		_put("box", "bronze", base + Vector3(0, 2.43, 0.57), Vector3(0.75, 0.035, 0.035))
+	for x in range(2, width, 4):
+		for i in range(9):
+			var angle := PI * float(i) / 8.0
+			var pos := Vector3(x + cos(angle) * 1.78, 2.0 + sin(angle) * 1.60, -2.7)
+			_put("box", "wall", pos, Vector3(0.48, 0.32, 0.48), -angle)
+		_put("box", "trim", Vector3(x, 3.70, -2.7), Vector3(4.0, 0.16, 0.72))
+		_put("box", "bronze", Vector3(x, 3.79, -2.34), Vector3(3.82, 0.035, 0.025))
+		if x % 8 == 2:
+			_banner(Vector3(x, 3.56, -2.34))
+		else:
+			# An open window catches the sun through the arcade.
+			_put("box", "trim", Vector3(x, 0.50, -2.78), Vector3(1.75, 0.12, 0.36))
+
+func _banner(at: Vector3) -> void:
+	_put("box", "bronze", at + Vector3(0, 0.06, 0), Vector3(1.22, 0.08, 0.10))
+	_put("box", "fabric", at + Vector3(0, -0.83, 0.02), Vector3(1.02, 1.72, 0.035))
+	_put("box", "fabric_gold", at + Vector3(0, -0.53, 0.045), Vector3(0.075, 0.88, 0.008))
+	_put("box", "fabric_gold", at + Vector3(0, -0.27, 0.05), Vector3(0.58, 0.055, 0.009))
+	_put("box", "fabric_gold", at + Vector3(0, -1.56, 0.04), Vector3(0.83, 0.05, 0.01))
 
 func _temple_gate(width: int) -> void:
 	var center := float(width - 1) * 0.5
@@ -321,21 +363,36 @@ func _configure_lighting() -> void:
 			env.background_mode = Environment.BG_SKY
 			var sky := Sky.new()
 			var sky_material := ProceduralSkyMaterial.new()
-			sky_material.sky_top_color = Color("343a57")
-			sky_material.sky_horizon_color = Color("cf9a78")
+			sky_material.sky_top_color = Color("303d59")
+			sky_material.sky_horizon_color = Color("c99671")
 			sky_material.ground_bottom_color = Color("39302a")
 			sky_material.ground_horizon_color = Color("9e7862")
 			sky.sky_material = sky_material
 			env.sky = sky
-			env.ambient_light_color = Color("c3b5a3")
-			env.ambient_light_energy = 0.72
-			env.fog_light_color = Color("8f7b7b")
-			env.fog_density = 0.009
+			env.ambient_light_color = Color("aebfd0")
+			env.ambient_light_energy = 0.42
+			env.tonemap_mode = Environment.TONE_MAPPER_ACES
+			env.adjustment_enabled = true
+			env.adjustment_contrast = 1.12
+			env.adjustment_saturation = 0.94
+			env.glow_enabled = true
+			env.glow_intensity = 0.22
+			env.ssao_enabled = true
+			env.ssao_intensity = 0.75
+			env.ssao_radius = 1.3
+			env.fog_light_color = Color("aa8d79")
+			env.fog_density = 0.002
+			env.volumetric_fog_enabled = true
+			env.volumetric_fog_density = 0.003
+			env.volumetric_fog_albedo = Color("d3bba0")
+			env.volumetric_fog_length = 40.0
 		elif node is DirectionalLight3D:
 			if node.shadow_enabled:
-				node.rotation_degrees = Vector3(-37, -44, 0)
+				node.rotation_degrees = Vector3(-35, -48, 0)
 				node.light_color = Color("ffd09a")
-				node.light_energy = 1.9
+				node.light_energy = 1.75
+				node.light_angular_distance = 1.4
+				node.light_volumetric_fog_energy = 1.2
 			else:
-				node.light_color = Color("8fa9cf")
-				node.light_energy = 0.65
+				node.light_color = Color("88acd2")
+				node.light_energy = 0.44

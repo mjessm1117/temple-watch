@@ -31,6 +31,8 @@ void fragment() {
 	float moss = smoothstep(0.64, 0.80, hash31(floor(world_pos * 2.6 + vec3(3.0, 8.0, 5.0)))) * moss_amount;
 	moss *= 0.45 + 0.55 * clamp(world_normal.y + 0.3, 0.0, 1.0);
 	ALBEDO = mix(stone_color.rgb * age, moss_color.rgb, moss);
-	ROUGHNESS = 0.9;
+	ROUGHNESS = clamp(0.72 + grain * 0.22 + moss * 0.12, 0.62, 0.96);
 	METALLIC = 0.015;
+	NORMAL_MAP = normalize(vec3((grain - 0.5) * 0.18, (veins - 0.5) * 0.10, 1.0));
+	NORMAL_MAP_DEPTH = 0.22;
 }
