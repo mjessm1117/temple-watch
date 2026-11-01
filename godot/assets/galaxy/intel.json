@@ -1,0 +1,948 @@
+{
+  "foes": {
+    "trooper": {
+      "desc": "Standard rifleman: 4 HP, range 8. Seeks cover and flanks.",
+      "n": "Sith Trooper",
+      "ic": "e_trooper",
+      "hp": 4,
+      "aim": 65,
+      "mob": 5,
+      "dmg": [
+        2,
+        4
+      ],
+      "range": 8,
+      "init": 8
+    },
+    "heavy": {
+      "desc": "6 HP, 1 armor, one grenade. Its hits strip cover and armor.",
+      "n": "Sith Heavy",
+      "ic": "e_heavy",
+      "hp": 6,
+      "aim": 60,
+      "mob": 4,
+      "dmg": [
+        3,
+        4
+      ],
+      "range": 7,
+      "armor": 1,
+      "nades": 1,
+      "shredder": 1,
+      "init": 6
+    },
+    "agent": {
+      "desc": "Sniper (range 11) who starts hidden and gets +20 aim on targets out of cover. Spotted within 4 tiles, or when it fires.",
+      "n": "Imperial Agent",
+      "ic": "e_agent",
+      "hp": 5,
+      "aim": 80,
+      "mob": 5,
+      "dmg": [
+        4,
+        5
+      ],
+      "range": 11,
+      "hid": 1,
+      "snipe": 20,
+      "init": 14
+    },
+    "acolyte": {
+      "desc": "Dark-side melee fighter: deflects bolts and throws Force lightning (range 5). Hunts Jedi. Can’t be captured.",
+      "n": "Sith Acolyte",
+      "ic": "e_acolyte",
+      "hp": 8,
+      "aim": 75,
+      "mob": 6,
+      "dmg": [
+        4,
+        5
+      ],
+      "range": 1.5,
+      "deflect": 20,
+      "guardDef": 20,
+      "force": 1,
+      "lightning": [
+        3,
+        4
+      ],
+      "noCap": 1,
+      "init": 13
+    },
+    "terentatek": {
+      "tags": [
+        "creature"
+      ],
+      "desc": "Force horror, 14 HP. Only hurts Jedi; troops are immune. Devours a Jedi left down and unstabilized beside it.",
+      "n": "Terentatek",
+      "ic": "e_horror",
+      "hp": 14,
+      "aim": 80,
+      "mob": 6,
+      "dmg": [
+        5,
+        7
+      ],
+      "range": 1.5,
+      "horror": 1,
+      "noCap": 1,
+      "init": 12
+    },
+    "envoy": {
+      "desc": "The traitor envoy. Weak; surrenders easily. Capture him for intel.",
+      "n": "Envoy Saresh",
+      "ic": "e_envoy",
+      "hp": 4,
+      "aim": 50,
+      "mob": 5,
+      "dmg": [
+        1,
+        2
+      ],
+      "range": 6,
+      "envoy": 1,
+      "init": 9
+    },
+    "malgus": {
+      "n": "Darth Malgus",
+      "ic": "e_acolyte",
+      "hp": 14,
+      "aim": 80,
+      "mob": 5,
+      "dmg": [
+        4,
+        6
+      ],
+      "range": 1.5,
+      "deflect": 30,
+      "guardDef": 30,
+      "force": 1,
+      "lightning": [
+        3,
+        4
+      ],
+      "armor": 1,
+      "noCap": 1,
+      "boss": 1,
+      "init": 15
+    },
+    "mando": {
+      "n": "Mandalorian Merc",
+      "ic": "e_trooper",
+      "hp": 6,
+      "aim": 70,
+      "mob": 6,
+      "dmg": [
+        3,
+        5
+      ],
+      "range": 8,
+      "armor": 1,
+      "init": 12
+    },
+    "adraas": {
+      "n": "Lord Adraas",
+      "ic": "e_acolyte",
+      "hp": 11,
+      "aim": 75,
+      "mob": 5,
+      "dmg": [
+        4,
+        5
+      ],
+      "range": 1.5,
+      "deflect": 25,
+      "guardDef": 20,
+      "force": 1,
+      "lightning": [
+        3,
+        4
+      ],
+      "noCap": 1,
+      "boss": 1,
+      "init": 14
+    },
+    "bh_trooper": {
+      "n": "Brotherhood Trooper",
+      "ic": "e_trooper",
+      "hp": 5,
+      "aim": 65,
+      "mob": 5,
+      "dmg": [
+        2,
+        4
+      ],
+      "range": 8,
+      "fanatic": 1,
+      "lordAura": 10,
+      "init": 8,
+      "desc": "Fanatic: never surrenders. +10 aim within 4 tiles of a Sith Lord."
+    },
+    "bh_marauder": {
+      "n": "Sith Marauder",
+      "ic": "e_acolyte",
+      "hp": 9,
+      "aim": 75,
+      "mob": 6,
+      "dmg": [
+        4,
+        6
+      ],
+      "range": 1.5,
+      "deflect": 25,
+      "guardDef": 25,
+      "force": 1,
+      "rage": 1,
+      "noCap": 1,
+      "init": 14,
+      "desc": "Melee duelist. Rage: +1 damage each time it is hit (max +3)."
+    },
+    "sith_lord": {
+      "n": "Sith Lord",
+      "ic": "e_acolyte",
+      "hp": 12,
+      "aim": 80,
+      "mob": 5,
+      "dmg": [
+        4,
+        6
+      ],
+      "range": 1.5,
+      "deflect": 30,
+      "guardDef": 30,
+      "force": 1,
+      "lightning": [
+        3,
+        5
+      ],
+      "sithLord": 1,
+      "noCap": 1,
+      "init": 15,
+      "desc": "Elite duelist with Force lightning. Brotherhood troopers near it aim better."
+    },
+    "bh_sniper": {
+      "n": "Mercenary Sniper",
+      "ic": "e_agent",
+      "hp": 5,
+      "aim": 75,
+      "mob": 4,
+      "dmg": [
+        4,
+        5
+      ],
+      "range": 11,
+      "autoOW": 1,
+      "init": 10,
+      "desc": "Long range. Goes on overwatch every turn it does not shoot."
+    },
+    "sith_spawn": {
+      "n": "Sith Spawn",
+      "ic": "e_horror",
+      "hp": 10,
+      "aim": 75,
+      "mob": 5,
+      "dmg": [
+        4,
+        6
+      ],
+      "range": 1.5,
+      "horror": 1,
+      "noCap": 1,
+      "init": 11,
+      "desc": "Force horror: only hurts Jedi. Troops are immune and are the counter."
+    },
+    "nexus": {
+      "n": "Dark Nexus",
+      "ic": "darkness",
+      "hp": 8,
+      "aim": 0,
+      "mob": 0,
+      "dmg": [
+        0,
+        0
+      ],
+      "range": 0,
+      "armor": 1,
+      "force": 1,
+      "noCap": 1,
+      "nexus": 3,
+      "init": 1,
+      "desc": "A wound in the Force. Does not move or attack; spawns a Sith Spawn beside it every 3 turns until destroyed."
+    },
+    "nexus_core": {
+      "n": "Heart of the Nexus",
+      "ic": "darkness",
+      "hp": 14,
+      "aim": 0,
+      "mob": 0,
+      "dmg": [
+        0,
+        0
+      ],
+      "range": 0,
+      "armor": 1,
+      "force": 1,
+      "noCap": 1,
+      "nexus": 3,
+      "boss": 1,
+      "init": 1,
+      "desc": "The cave's dark heart. Spawns a Sith Spawn every 3 turns. Destroy it to win."
+    },
+    "vorr": {
+      "n": "Lord Vorr",
+      "ic": "e_acolyte",
+      "hp": 12,
+      "aim": 80,
+      "mob": 5,
+      "dmg": [
+        4,
+        6
+      ],
+      "range": 1.5,
+      "deflect": 30,
+      "guardDef": 30,
+      "force": 1,
+      "lightning": [
+        3,
+        4
+      ],
+      "armor": 1,
+      "sithLord": 1,
+      "noCap": 1,
+      "boss": 1,
+      "init": 15,
+      "desc": "Kaan's field commander. Lightning and a hard saber, armor 1. Defeat him to break the line."
+    },
+    "kaan": {
+      "n": "Lord Kaan",
+      "ic": "e_acolyte",
+      "hp": 14,
+      "aim": 80,
+      "mob": 5,
+      "dmg": [
+        4,
+        6
+      ],
+      "range": 1.5,
+      "deflect": 30,
+      "guardDef": 30,
+      "force": 1,
+      "lightning": [
+        3,
+        5
+      ],
+      "armor": 1,
+      "sithLord": 1,
+      "noCap": 1,
+      "boss": 1,
+      "init": 16,
+      "desc": "Dark Lord of the Brotherhood. Lightning, a hard saber, armor 1. Defeat him to break the ritual."
+    },
+    "bane": {
+      "n": "Darth Bane",
+      "ic": "e_acolyte",
+      "hp": 12,
+      "aim": 80,
+      "mob": 5,
+      "dmg": [
+        5,
+        6
+      ],
+      "range": 1.5,
+      "deflect": 35,
+      "guardDef": 35,
+      "force": 1,
+      "lightning": [
+        3,
+        4
+      ],
+      "armor": 2,
+      "sithLord": 1,
+      "bane": 1,
+      "init": 15,
+      "desc": "Hidden target. Armor 2. Can be captured if stunned or beaten down. Watches from the ridge and fights only units next to him. Walks away on turn 4."
+    },
+    "nihil_raider": {
+      "n": "Nihil Raider",
+      "ic": "e_raider",
+      "hp": 4,
+      "aim": 62,
+      "mob": 6,
+      "dmg": [
+        2,
+        4
+      ],
+      "range": 7,
+      "hitRun": 1,
+      "init": 11,
+      "desc": "Hit and run: after it shoots, it dashes back toward cover."
+    },
+    "nihil_storm": {
+      "n": "Nihil Storm",
+      "ic": "e_heavy",
+      "hp": 8,
+      "aim": 70,
+      "mob": 5,
+      "dmg": [
+        3,
+        5
+      ],
+      "range": 8,
+      "nades": 1,
+      "gas": 1,
+      "elite": 1,
+      "init": 12,
+      "desc": "Nihil officer. One gas grenade: anyone it catches chokes (−15 aim for 2 turns)."
+    },
+    "path_runner": {
+      "n": "Nihil Path-Runner",
+      "ic": "e_agent",
+      "hp": 5,
+      "aim": 65,
+      "mob": 7,
+      "dmg": [
+        2,
+        3
+      ],
+      "range": 6,
+      "pathJump": 2,
+      "init": 16,
+      "desc": "Rides a secret hyperspace Path. Not here on turn 1; drops in behind your squad on turn 2."
+    },
+    "drengir": {
+      "n": "Drengir",
+      "ic": "e_horror",
+      "hp": 10,
+      "aim": 70,
+      "mob": 3,
+      "dmg": [
+        3,
+        5
+      ],
+      "range": 1.5,
+      "root": 1,
+      "noCap": 1,
+      "init": 5,
+      "desc": "Carnivorous plant. Hurts everyone. A vine hit roots the target: it cannot move next turn."
+    },
+    "nameless": {
+      "n": "Nameless",
+      "ic": "e_horror",
+      "hp": 12,
+      "aim": 80,
+      "mob": 6,
+      "dmg": [
+        5,
+        7
+      ],
+      "range": 1.5,
+      "horror": 1,
+      "dread": 1,
+      "noCap": 1,
+      "init": 13,
+      "desc": "Force horror: only hurts Jedi; troops are immune. Dread: Jedi within 3 tiles aim −15 and lose 1 Focus each enemy turn."
+    },
+    "great_progenitor": {
+      "n": "The Great Progenitor",
+      "ic": "e_horror",
+      "hp": 16,
+      "aim": 70,
+      "mob": 2,
+      "dmg": [
+        4,
+        6
+      ],
+      "range": 1.5,
+      "armor": 1,
+      "root": 1,
+      "seed": 3,
+      "boss": 1,
+      "noCap": 1,
+      "init": 6,
+      "desc": "Drengir hive mother. Armor 1, roots what it hits, and a new Drengir sprouts beside it every 3 turns. Defeat it to win."
+    },
+    "lourna_dee": {
+      "n": "Lourna Dee",
+      "ic": "e_agent",
+      "hp": 13,
+      "aim": 80,
+      "mob": 6,
+      "dmg": [
+        4,
+        5
+      ],
+      "range": 6,
+      "armor": 1,
+      "pathEscape": 3,
+      "boss": 1,
+      "noCap": 1,
+      "init": 15,
+      "desc": "Tempest Runner of the Nihil. Armor 1. The first time she drops to half HP she Path-jumps across the field and heals 3. Defeat her to win."
+    },
+    "lourna_ret": {
+      "n": "Lourna Dee",
+      "ic": "e_agent",
+      "hp": 10,
+      "aim": 80,
+      "mob": 6,
+      "dmg": [
+        4,
+        5
+      ],
+      "range": 6,
+      "armor": 1,
+      "noCap": 1,
+      "elite": 1,
+      "init": 15,
+      "desc": "She got away from you once. She came back for the Eye's big night."
+    },
+    "marchion_ro": {
+      "n": "Marchion Ro",
+      "ic": "e_heavy",
+      "hp": 14,
+      "aim": 78,
+      "mob": 5,
+      "dmg": [
+        4,
+        5
+      ],
+      "range": 8,
+      "armor": 2,
+      "eyeMark": 15,
+      "boss": 1,
+      "noCap": 1,
+      "init": 14,
+      "desc": "The Eye of the Nihil. Armor 2. Whoever he shoots is Marked: every Nihil gets +15 aim against them until his next turn. Defeat him to win."
+    },
+    "leveler": {
+      "n": "The Leveler",
+      "ic": "e_horror",
+      "hp": 16,
+      "aim": 85,
+      "mob": 6,
+      "dmg": [
+        6,
+        8
+      ],
+      "range": 1.5,
+      "armor": 1,
+      "horror": 1,
+      "dread": 1,
+      "noCap": 1,
+      "init": 13,
+      "desc": "Ro's Nameless. Only hurts Jedi; troops are immune and must carry this fight. Dread aura (3 tiles): Jedi aim −15, lose 1 Focus a turn."
+    },
+    "root_mother": {
+      "n": "Drengir Root-Mother",
+      "ic": "e_horror",
+      "hp": 14,
+      "aim": 0,
+      "mob": 0,
+      "dmg": [
+        0,
+        0
+      ],
+      "range": 0,
+      "armor": 1,
+      "seed": 3,
+      "boss": 1,
+      "noCap": 1,
+      "init": 1,
+      "desc": "A Drengir bloom anchored in the soil. Does not move or attack; a Drengir sprouts beside it every 3 turns. Destroy it to win."
+    },
+    "wardroid": {
+      "n": "War droid",
+      "ic": "e_droid",
+      "tags": [
+        "droid"
+      ],
+      "droid": 1,
+      "hp": 5,
+      "aim": 60,
+      "mob": 4,
+      "dmg": [
+        2,
+        4
+      ],
+      "range": 7,
+      "armor": 1,
+      "noCap": 1,
+      "init": 5,
+      "desc": "A heavy battle droid: 5 HP, 1 armor, range 7. Ion storms and ion grenades short it out."
+    },
+    "courier": {
+      "n": "Imperial Courier",
+      "ic": "e_trooper",
+      "hp": 5,
+      "aim": 60,
+      "mob": 6,
+      "dmg": [
+        2,
+        3
+      ],
+      "range": 6,
+      "init": 16,
+      "desc": "Carries the stolen codes and runs for the exit marked in red. Drop, stun or capture him before he gets there."
+    },
+    "husk": {
+      "n": "Dark Husk",
+      "ic": "e_horror",
+      "hp": 3,
+      "aim": 70,
+      "mob": 6,
+      "dmg": [
+        2,
+        3
+      ],
+      "range": 1.5,
+      "horror": 1,
+      "swarm": 1,
+      "noCap": 1,
+      "init": 9,
+      "tags": [
+        "creature"
+      ],
+      "desc": "Swarm horror, 3 HP. Only hurts Jedi. Comes in packs around a big horror; killing a horror makes the nearest Husk lunge."
+    }
+  },
+  "tune": {
+    "relay:0": {
+      "aim": 5
+    },
+    "rescue:0": {
+      "aim": 19
+    },
+    "envoy:0": {
+      "aim": 0,
+      "hp": 1,
+      "extra": 2
+    },
+    "archive:0": {
+      "aim": 12,
+      "hp": 2
+    },
+    "archive:1": {
+      "aim": 10
+    },
+    "sabotage:1": {
+      "aim": 8,
+      "hp": 1,
+      "extra": 1
+    },
+    "escort:0": {
+      "aim": 28
+    },
+    "escort:1": {
+      "aim": 5,
+      "hp": 1
+    },
+    "blockade:0": {
+      "aim": -4,
+      "hp": -1
+    },
+    "cache:0": {
+      "aim": 12,
+      "hp": 2,
+      "extra": 1
+    },
+    "hutt:0": {
+      "aim": 15,
+      "hp": 2
+    },
+    "dock:0": {
+      "aim": -19
+    },
+    "vault:0": {
+      "aim": -19
+    },
+    "ilum:0": {
+      "aim": 6
+    },
+    "adraasHunt:0": {
+      "aim": -22
+    },
+    "taris:0": {
+      "aim": 2,
+      "hp": 1,
+      "extra": 3
+    },
+    "thul:0": {
+      "aim": 13,
+      "hp": 1
+    },
+    "thul:1": {
+      "aim": 13
+    },
+    "depot:1": {
+      "aim": 10,
+      "hp": 2,
+      "extra": 1
+    },
+    "fort:0": {
+      "aim": 23,
+      "hp": 1,
+      "extra": 2
+    },
+    "fort:1": {
+      "aim": 14,
+      "hp": 1,
+      "extra": 2
+    },
+    "r_ravine:0": {
+      "aim": 22,
+      "hp": 3,
+      "extra": 1
+    },
+    "r_caves:0": {
+      "aim": -8,
+      "hp": 1
+    },
+    "r_bomb:0": {
+      "aim": 9
+    },
+    "r_hospital:0": {
+      "aim": 9
+    },
+    "r_snipers:0": {
+      "aim": 0,
+      "hp": 1,
+      "extra": 3
+    },
+    "r_dump:0": {
+      "aim": 12,
+      "hp": 1
+    },
+    "depot:0": {
+      "aim": 9
+    },
+    "shrine:0": {
+      "aim": 7
+    },
+    "r_nexus:0": {
+      "aim": 6
+    },
+    "shrine:1": {
+      "aim": 0
+    },
+    "shrine:5": {
+      "aim": -25
+    },
+    "fort:5": {
+      "aim": -15
+    },
+    "rescue:3": {
+      "aim": -4,
+      "hp": 1,
+      "extra": 1
+    },
+    "taris:3": {
+      "aim": 10,
+      "hp": 1,
+      "extra": 1
+    },
+    "archive:5": {
+      "aim": 10,
+      "hp": 1,
+      "extra": 1
+    },
+    "r_muster:0": {
+      "aim": -5,
+      "hp": -1
+    },
+    "r_sixth:0": {
+      "aim": 21,
+      "extra": 1
+    },
+    "r_seventh:0": {
+      "aim": 2
+    },
+    "r_prisoners:0": {
+      "aim": 7
+    },
+    "r_codes:0": {
+      "aim": 12,
+      "hp": 1
+    },
+    "r_supply:0": {
+      "aim": 2
+    },
+    "h_hetzal:0": {
+      "aim": 3,
+      "hp": 2,
+      "extra": 2
+    },
+    "h_grove:0": {
+      "aim": 11,
+      "hp": 2,
+      "extra": 1
+    },
+    "h_valo:0": {
+      "aim": 11,
+      "hp": 1,
+      "extra": 1
+    },
+    "h_tempest:0": {
+      "aim": 15,
+      "hp": 2,
+      "extra": 1
+    },
+    "h_husks:0": {
+      "aim": 12,
+      "hp": 2,
+      "extra": 1
+    },
+    "h_beacon:0": {
+      "aim": -12,
+      "hp": 1
+    },
+    "h_roots:0": {
+      "aim": 17,
+      "hp": 3,
+      "extra": 1
+    },
+    "h_salvage:0": {
+      "aim": 9,
+      "hp": 1,
+      "extra": 1
+    },
+    "h_scouts:0": {
+      "aim": 11,
+      "hp": 2,
+      "extra": 1
+    },
+    "h_cache:0": {
+      "aim": 20,
+      "hp": 3,
+      "extra": 1
+    },
+    "h_prisoners:0": {
+      "aim": 24,
+      "hp": 2,
+      "extra": 1
+    },
+    "h_buoy:0": {
+      "aim": 36,
+      "hp": 2,
+      "extra": 1
+    },
+    "h_outpost:0": {
+      "aim": 16,
+      "hp": 1,
+      "extra": 1
+    },
+    "rescue:1": {
+      "aim": 8
+    },
+    "shrine:4": {
+      "aim": -8
+    },
+    "archive:2": {
+      "aim": 4
+    },
+    "archive:3": {
+      "aim": -11
+    },
+    "archive:4": {
+      "aim": 15
+    },
+    "sabotage:0": {
+      "aim": 4
+    },
+    "sabotage:2": {
+      "aim": -8
+    },
+    "sabotage:3": {
+      "aim": 15
+    },
+    "escort:2": {
+      "aim": -4
+    },
+    "escort:3": {
+      "aim": -16
+    },
+    "taris:1": {
+      "aim": 11
+    },
+    "thul:3": {
+      "aim": -8
+    },
+    "depot:3": {
+      "aim": 11
+    },
+    "fort:2": {
+      "aim": 4
+    },
+    "fort:4": {
+      "aim": -16
+    },
+    "brenClinic:0": {
+      "aim": 12
+    },
+    "brenClinic:1": {
+      "aim": 15
+    },
+    "brenClinic:3": {
+      "aim": -12
+    },
+    "ilsaDrop:0": {
+      "aim": 11
+    },
+    "ilsaDrop:3": {
+      "aim": -22
+    },
+    "ilsaDrop:4": {
+      "aim": 11
+    },
+    "ilsaDrop:5": {
+      "aim": 8
+    },
+    "grakClan:0": {
+      "aim": 15
+    },
+    "grakClan:1": {
+      "aim": 15
+    },
+    "grakClan:3": {
+      "aim": -12
+    },
+    "grakClan:5": {
+      "aim": -22
+    },
+    "grakClan:4": {
+      "aim": -4
+    },
+    "r_hospital:2": {
+      "aim": -15,
+      "hp": -1
+    },
+    "r_supply:2": {
+      "aim": -8
+    },
+    "r_prisoners:2": {
+      "aim": -5
+    },
+    "r_codes:1": {
+      "aim": 4
+    },
+    "r_codes:2": {
+      "aim": 15
+    },
+    "r_codes:3": {
+      "aim": 10,
+      "hp": 1,
+      "extra": 1
+    },
+    "r_dump:1": {
+      "aim": -8
+    },
+    "r_dump:2": {
+      "aim": 15
+    },
+    "r_snipers:1": {
+      "aim": -4
+    },
+    "r_snipers:2": {
+      "aim": -16
+    }
+  }
+}
