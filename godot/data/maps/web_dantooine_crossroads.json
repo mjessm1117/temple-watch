@@ -1,0 +1,262 @@
+{
+  "id": "web_dantooine_crossroads",
+  "name": "Dantooine Crossroads",
+  "family": "defend",
+  "theme": "plains",
+  "plot": {
+    "width": 32,
+    "height": 28,
+    "placements": [],
+    "source_rows": [
+      "....##.......c....",
+      ".c......^^.....#..",
+      "...h....^^...c....",
+      "##....c......h..^^",
+      "...c.....##.....^^",
+      ".......h....c.....",
+      "..^^.c...OO...c...",
+      "..^^.....OO.......",
+      ".....c.h....h.c...",
+      "...........c......",
+      "#..c...##.....c..#",
+      "....h........h....",
+      ".c.....^^.c.......",
+      "......c^^.....##.."
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      16,
+      27
+    ],
+    "crossings": [
+      4,
+      14,
+      23,
+      13
+    ]
+  },
+  "turn_limit": 0,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        16,
+        13
+      ]
+    ],
+    "hp": 18,
+    "waves": 5,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      14,
+      23
+    ],
+    [
+      "consular",
+      15,
+      23
+    ],
+    [
+      "soldier",
+      16,
+      23
+    ],
+    [
+      "scout",
+      17,
+      23
+    ],
+    [
+      "medic",
+      18,
+      23
+    ],
+    [
+      "soldier",
+      19,
+      23
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        4,
+        17
+      ],
+      [
+        "trooper",
+        8,
+        18
+      ]
+    ],
+    [
+      [
+        "heavy",
+        26,
+        14
+      ],
+      [
+        "trooper",
+        24,
+        12
+      ]
+    ],
+    [
+      [
+        "agent",
+        13,
+        5
+      ],
+      [
+        "trooper",
+        19,
+        5
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 16,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      13,
+      25
+    ],
+    [
+      14,
+      25
+    ],
+    [
+      15,
+      25
+    ],
+    [
+      16,
+      25
+    ],
+    [
+      17,
+      25
+    ],
+    [
+      18,
+      25
+    ]
+  ],
+  "entries": [
+    [
+      16,
+      7,
+      "north road"
+    ],
+    [
+      7,
+      13,
+      "west fields"
+    ],
+    [
+      24,
+      15,
+      "east ridge"
+    ],
+    [
+      10,
+      20,
+      "southern farms"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      16,
+      23
+    ],
+    "goal": [
+      16,
+      13
+    ],
+    "via": [
+      [
+        4,
+        14
+      ],
+      [
+        27,
+        14
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": true,
+  "web_source": {
+    "base": "shrine",
+    "name": "Dantooine Crossroads",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  },
+  "wave_roster": [
+    [
+      "trooper",
+      "trooper",
+      "trooper"
+    ],
+    [
+      "brood"
+    ],
+    [
+      "trooper",
+      "trooper"
+    ],
+    [
+      "trooper",
+      "heavy",
+      "trooper"
+    ],
+    [
+      "acolyte"
+    ]
+  ]
+}

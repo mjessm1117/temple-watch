@@ -1,0 +1,240 @@
+{
+  "id": "web_overgrown_relay",
+  "name": "Overgrown Relay",
+  "family": "hack_terminal",
+  "theme": "jungle",
+  "plot": {
+    "width": 30,
+    "height": 28,
+    "placements": [],
+    "source_rows": [
+      "..q...B....c....",
+      ".^^^..B..x.....q",
+      ".^M^.....##.....",
+      ".^^^..c..#..c...",
+      "......h.....^^..",
+      "..c.B...q...^^.c",
+      "....B..ccc......",
+      "h..............h",
+      "...c..##..##..c.",
+      ".x....#....#..x.",
+      "....^^..cc..^^..",
+      ".c..^^......^^c.",
+      "................",
+      "EE....c..c....EE"
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      15,
+      25
+    ],
+    "crossings": [
+      4,
+      14,
+      23,
+      7,
+      8,
+      12
+    ]
+  },
+  "turn_limit": 9,
+  "clock_trigger": "start",
+  "concealed": true,
+  "objective": {
+    "required": 2,
+    "points": [
+      [
+        9,
+        7
+      ],
+      [
+        22,
+        8
+      ],
+      [
+        15,
+        12
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      13,
+      23
+    ],
+    [
+      "consular",
+      14,
+      23
+    ],
+    [
+      "soldier",
+      15,
+      23
+    ],
+    [
+      "scout",
+      16,
+      23
+    ],
+    [
+      "medic",
+      17,
+      23
+    ],
+    [
+      "soldier",
+      18,
+      23
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "agent",
+        9,
+        9
+      ],
+      [
+        "trooper",
+        18,
+        8
+      ]
+    ],
+    [
+      [
+        "heavy",
+        15,
+        11
+      ],
+      [
+        "trooper",
+        20,
+        12
+      ]
+    ],
+    [
+      [
+        "trooper",
+        12,
+        16
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 15,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      12,
+      25
+    ],
+    [
+      13,
+      25
+    ],
+    [
+      14,
+      25
+    ],
+    [
+      15,
+      25
+    ],
+    [
+      16,
+      25
+    ],
+    [
+      17,
+      25
+    ]
+  ],
+  "entries": [
+    [
+      8,
+      14,
+      "west jungle"
+    ],
+    [
+      21,
+      14,
+      "east jungle"
+    ],
+    [
+      15,
+      7,
+      "temple steps"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      15,
+      23
+    ],
+    "goal": [
+      9,
+      7
+    ],
+    "via": [
+      [
+        4,
+        14
+      ],
+      [
+        25,
+        14
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false,
+  "web_source": {
+    "base": "archive",
+    "name": "Overgrown Relay",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  }
+}

@@ -1,0 +1,290 @@
+{
+  "id": "h_hetzal",
+  "name": "Hetzal Fragments",
+  "family": "vip_extract",
+  "theme": "plains",
+  "plot": {
+    "width": 30,
+    "height": 30,
+    "placements": [
+      {
+        "parcel": "barricade",
+        "at": [
+          6,
+          6
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "crater",
+        "at": [
+          12,
+          6
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "cargo",
+        "at": [
+          18,
+          6
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "crater",
+        "at": [
+          6,
+          12
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "cargo",
+        "at": [
+          12,
+          12
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          18,
+          12
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "cargo",
+        "at": [
+          6,
+          18
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          12,
+          18
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          18,
+          18
+        ],
+        "rotate": 3
+      }
+    ],
+    "lanes": [
+      4,
+      15,
+      25
+    ],
+    "crossings": [
+      4,
+      15,
+      25
+    ]
+  },
+  "turn_limit": 12,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        15,
+        4
+      ],
+      [
+        25,
+        5
+      ],
+      [
+        4,
+        5
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        15,
+        4
+      ],
+      [
+        25,
+        5
+      ],
+      [
+        4,
+        15
+      ],
+      [
+        25,
+        15
+      ],
+      [
+        15,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      13,
+      25
+    ],
+    [
+      "consular",
+      14,
+      25
+    ],
+    [
+      "soldier",
+      15,
+      25
+    ],
+    [
+      "scout",
+      16,
+      25
+    ],
+    [
+      "medic",
+      17,
+      25
+    ],
+    [
+      "soldier",
+      18,
+      25
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        4,
+        19
+      ],
+      [
+        "trooper",
+        8,
+        20
+      ]
+    ],
+    [
+      [
+        "heavy",
+        24,
+        15
+      ],
+      [
+        "trooper",
+        22,
+        13
+      ]
+    ],
+    [
+      [
+        "agent",
+        12,
+        5
+      ],
+      [
+        "trooper",
+        18,
+        5
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 12,
+    "y": 25,
+    "active": true,
+    "hp": 8
+  },
+  "evac": [
+    [
+      12,
+      2
+    ],
+    [
+      13,
+      2
+    ],
+    [
+      14,
+      2
+    ],
+    [
+      15,
+      2
+    ],
+    [
+      16,
+      2
+    ],
+    [
+      17,
+      2
+    ]
+  ],
+  "entries": [
+    [
+      2,
+      15,
+      "west approach"
+    ],
+    [
+      27,
+      15,
+      "east approach"
+    ],
+    [
+      15,
+      2,
+      "north approach"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      15,
+      25
+    ],
+    "goal": [
+      15,
+      4
+    ],
+    "via": [
+      [
+        4,
+        15
+      ],
+      [
+        25,
+        15
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false
+}

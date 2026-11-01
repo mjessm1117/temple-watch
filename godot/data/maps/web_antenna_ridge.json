@@ -1,0 +1,279 @@
+{
+  "id": "web_antenna_ridge",
+  "name": "Antenna Ridge",
+  "family": "operation",
+  "theme": "snow",
+  "plot": {
+    "width": 31,
+    "height": 34,
+    "placements": [],
+    "source_rows": [
+      "..c.....MM.....c.",
+      "........MM.......",
+      ".h...^^^^^^^...h.",
+      "....^^c^^^h^^....",
+      "..c.^^^^k^^^^.c..",
+      "....^^h^^^c^^....",
+      ".....^^^^^^^.....",
+      "#.#.............c",
+      "#.#..c.....h.....",
+      "#.#..............",
+      "#.#.c...##.......",
+      "#.#.....##...c...",
+      "#.#..h...........",
+      "#.#..........h...",
+      "#.#...c..........",
+      "#.###....##......",
+      "#...#..........h.",
+      "#................",
+      ".................",
+      "EEE.......c...EEE"
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      15,
+      26
+    ],
+    "crossings": [
+      4,
+      17,
+      29,
+      10
+    ]
+  },
+  "turn_limit": 16,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        15,
+        10
+      ],
+      [
+        15,
+        10
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      13,
+      29
+    ],
+    [
+      "consular",
+      14,
+      29
+    ],
+    [
+      "soldier",
+      15,
+      29
+    ],
+    [
+      "scout",
+      16,
+      29
+    ],
+    [
+      "medic",
+      17,
+      29
+    ],
+    [
+      "soldier",
+      18,
+      29
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        12,
+        10
+      ],
+      [
+        "trooper",
+        18,
+        11
+      ]
+    ],
+    [
+      [
+        "agent",
+        16,
+        7
+      ],
+      [
+        "trooper",
+        19,
+        16
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 15,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      12,
+      31
+    ],
+    [
+      13,
+      31
+    ],
+    [
+      14,
+      31
+    ],
+    [
+      15,
+      31
+    ],
+    [
+      16,
+      31
+    ],
+    [
+      17,
+      31
+    ]
+  ],
+  "entries": [
+    [
+      7,
+      8,
+      "west slope"
+    ],
+    [
+      23,
+      8,
+      "east slope"
+    ],
+    [
+      23,
+      19,
+      "east gully"
+    ],
+    [
+      8,
+      15,
+      "west gully"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      15,
+      29
+    ],
+    "goal": [
+      15,
+      10
+    ],
+    "via": [
+      [
+        4,
+        17
+      ],
+      [
+        26,
+        17
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false,
+  "web_source": {
+    "base": "archive",
+    "name": "Antenna Ridge",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  },
+  "operation": [
+    {
+      "kind": "reach",
+      "name": "Take the antenna ridge",
+      "at": [
+        15,
+        10
+      ],
+      "radius": 1,
+      "turns": 2,
+      "wave": []
+    },
+    {
+      "kind": "hold",
+      "name": "Hold the uplink while it copies the codes",
+      "at": [
+        15,
+        10
+      ],
+      "radius": 2,
+      "turns": 2,
+      "wave": [
+        "trooper",
+        "trooper"
+      ]
+    },
+    {
+      "kind": "extract",
+      "name": "Get everyone down to an evac zone",
+      "at": [
+        15,
+        4
+      ],
+      "radius": 1,
+      "turns": 2,
+      "wave": [
+        "trooper",
+        "acolyte"
+      ]
+    }
+  ]
+}

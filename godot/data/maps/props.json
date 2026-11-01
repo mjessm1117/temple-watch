@@ -1,0 +1,21 @@
+{
+  "source": "public/js/view3d/props.js; public/models/props (see public/models/CREDITS.md)",
+  "tile_props": {
+    "c": "crate",
+    "h": "crate",
+    "x": "barrel",
+    "k": "console",
+    "q": "terminal",
+    "Q": "terminal",
+    "C": "terminal",
+    "X": "terminal",
+    "r": "rubble",
+    "O": "relay"
+  },
+  "wall_of": {
+    "temple": "ruins",
+    "dock": "metal",
+    "city": "metal"
+  },
+  "asset_root": "res://assets/maps/"
+}

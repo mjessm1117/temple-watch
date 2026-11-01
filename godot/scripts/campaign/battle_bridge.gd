@@ -5,16 +5,16 @@ const Settings = preload("res://scripts/settings.gd")
 const Story = preload("res://scripts/story/story_engine.gd")
 
 static func map_path(id: String) -> String:
-	var path := "res://data/%s.json" % id
-	if FileAccess.file_exists(path):
-		var data = JSON.parse_string(FileAccess.get_file_as_string(path))
-		if data is Dictionary and data.has("rows") and data.has("squad"): return path
-	return "res://data/rescue.json"
+	return preload("res://scripts/map_catalog.gd").resolve(id)
 
 static func create(campaign, seed_value: int) -> RefCounted:
 	Settings.difficulty = str(campaign.state.diff)
 	var pending: Dictionary = campaign.state.pending_mission
-	var m = Mission.new(seed_value, map_path(str(pending.mission_id)))
+	var path := preload("res://scripts/map_catalog.gd").select_layout(str(pending.mission_id),seed_value,int(pending.get("map_variant",-1)))
+	if path == "":
+		push_error("No map registered for campaign mission " + str(pending.mission_id))
+		return null
+	var m = Mission.new(seed_value, path)
 	var spawns: Array = m.spec.squad
 	m.units = m.units.filter(func(u): return u.side != "player")
 	var players: Array[Dictionary] = []
@@ -37,7 +37,10 @@ static func create(campaign, seed_value: int) -> RefCounted:
 		u.focus = int(stats.get("maxF", 0)); u.focus_left = u.focus
 		u.guard_deflect = int(stats.get("guardDef", 0))
 		players.append(u)
+	if int(pending.get("fewer",0)) > 0:
+		for enemy in m.living("enemy").filter(func(u): return u.kind == "trooper").slice(0,int(pending.fewer)): m.units.erase(enemy)
 	m.units = players + m.units
+	if bool(m.prisoner.get("freed",false)) and not players.is_empty(): m.prisoner.escort_id = players[0].id
 	effects(m, campaign, campaign.state.get("approach", {}))
 	for fx in campaign.state.get("finale_effects", []): effects(m, campaign, fx)
 	effects(m, campaign, campaign.state.get("battle_buffs", {}))
@@ -87,7 +90,10 @@ static func result(campaign, m) -> Dictionary:
 			"captures":int(u.get("captures", 0)), "dark":int(u.get("dark", 0)) + int(u.get("darkness", 0))})
 	var pending: Dictionary = campaign.state.pending_mission
 	return {"mission_id":pending.mission_id, "win":m.result == "win", "units":rows,
-		"story":bool(pending.get("story", false)), "bonds_recorded":true}
+		"story":bool(pending.get("story", false)), "bonds_recorded":true,
+		"family":m.spec.get("family","rescue"), "map_id":m.spec.get("id","rescue"),
+		"objectives_completed":m.objective_state.get("done",{}).size(), "civilians_saved":int(m.objective_state.get("saved",0)),
+		"metrics":preload("res://scripts/mission_metrics.gd").report(m) if m.modern else {}, "hack_intel":int(m.hack_state.get("intel",0))}
 
 static func casualties(campaign, result: Dictionary) -> String:
 	var rows := []

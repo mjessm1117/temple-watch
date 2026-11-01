@@ -1,0 +1,259 @@
+{
+  "id": "web_rooftop_chase",
+  "name": "Rooftop Chase",
+  "family": "operation",
+  "theme": "city",
+  "plot": {
+    "width": 34,
+    "height": 28,
+    "placements": [],
+    "source_rows": [
+      "....######....######",
+      "....#..c.#....#....#",
+      ".c..h...._..c._....#",
+      "....#....#....#..c.#",
+      "....##_h##....##_###",
+      "..h.................",
+      "......c.....^^^.....",
+      "#_##########^^^####_",
+      "......#.....^^^.....",
+      "..c...#..c........c.",
+      "......_.............",
+      "......#.....##...h..",
+      "h_#####.....##......",
+      "...........c.....EEE"
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      17,
+      29
+    ],
+    "crossings": [
+      4,
+      14,
+      23,
+      17
+    ]
+  },
+  "turn_limit": 16,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        14,
+        17
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      15,
+      23
+    ],
+    [
+      "consular",
+      16,
+      23
+    ],
+    [
+      "soldier",
+      17,
+      23
+    ],
+    [
+      "scout",
+      18,
+      23
+    ],
+    [
+      "medic",
+      19,
+      23
+    ],
+    [
+      "soldier",
+      20,
+      23
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        9,
+        9
+      ],
+      [
+        "trooper",
+        23,
+        10
+      ]
+    ],
+    [
+      [
+        "heavy",
+        17,
+        16
+      ],
+      [
+        "agent",
+        24,
+        16
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 17,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      14,
+      25
+    ],
+    [
+      15,
+      25
+    ],
+    [
+      16,
+      25
+    ],
+    [
+      17,
+      25
+    ],
+    [
+      18,
+      25
+    ],
+    [
+      19,
+      25
+    ]
+  ],
+  "entries": [
+    [
+      26,
+      12,
+      "east skybridge"
+    ],
+    [
+      7,
+      16,
+      "west ledge"
+    ],
+    [
+      26,
+      17,
+      "speeder pad"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      17,
+      23
+    ],
+    "goal": [
+      14,
+      17
+    ],
+    "via": [
+      [
+        4,
+        14
+      ],
+      [
+        29,
+        14
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false,
+  "web_source": {
+    "base": "archive",
+    "name": "Rooftop Chase",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  },
+  "operation": [
+    {
+      "kind": "chase",
+      "name": "Stop the courier before he reaches the speeder",
+      "at": [
+        17,
+        4
+      ],
+      "radius": 1,
+      "turns": 2,
+      "wave": [],
+      "runner": [
+        14,
+        17
+      ],
+      "exit": [
+        7,
+        7
+      ],
+      "runner_mob": 3
+    },
+    {
+      "kind": "extract",
+      "name": "Get everyone to the evac pad",
+      "at": [
+        17,
+        4
+      ],
+      "radius": 1,
+      "turns": 2,
+      "wave": [
+        "trooper",
+        "trooper"
+      ]
+    }
+  ]
+}

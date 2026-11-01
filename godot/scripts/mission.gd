@@ -1,6 +1,16 @@
 extends RefCounted
 class_name RescueMission
 
+const Maps = preload("res://scripts/map_catalog.gd")
+const Objectives = preload("res://scripts/mission_objectives.gd")
+const Pressure = preload("res://scripts/mission_pressure.gd")
+const Hack = preload("res://scripts/mission_hack.gd")
+const Telemetry = preload("res://scripts/mission_metrics.gd")
+var objective_state: Dictionary = {}
+var pressure_state: Dictionary = {}
+var hack_state: Dictionary = {}
+var metrics: Dictionary = {}
+var modern := false
 const Shot = preload("res://scripts/shot.gd")
 const AI = preload("res://scripts/ai.gd")
 const Settings = preload("res://scripts/settings.gd")
@@ -30,11 +40,14 @@ var saved_by: Dictionary = {}
 
 func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") -> void:
 	rng.seed = seed_value
-	spec = _json(data_path)
+	spec = Maps.load_map(data_path)
+	assert(not spec.is_empty(), "Mission map missing: " + data_path)
+	modern = spec.has("family")
 	difficulty = Settings.selected()
-	spec.turn_limit = int(difficulty.get("turn_clock", spec.turn_limit))
+	if not modern: spec.turn_limit = int(difficulty.get("turn_clock", spec.turn_limit))
 	catalog = _json("res://data/units.json")
 	abilities = _json("res://data/abilities.json")
+	if modern: Pressure.setup(self)
 	for row in spec.rows: board.append(str(row))
 	for y in range(board.size()):
 		for x in range(board[y].length()):
@@ -49,6 +62,10 @@ func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") ->
 			var anchor: Array = spec.groups[group_index][extra % spec.groups[group_index].size()]
 			var kinds: Array = difficulty.get("extra_kinds", ["trooper", "trooper", "trooper"])
 			_spawn_near(str(kinds[group_index % kinds.size()]), Vector2i(int(anchor[1]), int(anchor[2])), group_index)
+	if modern:
+		Telemetry.setup(self)
+		Objectives.setup(self)
+		return
 	message("Rescue Aide Mira Tal, then escort her to the blue evac tiles before turn %d." % int(spec.turn_limit))
 
 static func _json(path: String) -> Dictionary:
@@ -89,10 +106,11 @@ func _spawn(kind: String, x: int, y: int, group: int) -> void:
 	u["force_revive"] = 1 if kind == "consular" else 0
 	u["smoke"] = 1 if kind == "medic" else 0
 	u["shield_drone"] = 1 if kind == "medic" else 0
+	if modern and str(u.side) == "player": u.concealed = bool(spec.get("concealed",false))
 	units.append(u)
 
-func _spawn_near(kind: String, anchor: Vector2i, group: int) -> void:
-	for radius in range(1, 5):
+func _spawn_near(kind: String, anchor: Vector2i, group: int, max_radius: int = 4) -> void:
+	for radius in range(1, max_radius+1):
 		for y in range(anchor.y - radius, anchor.y + radius + 1):
 			for x in range(anchor.x - radius, anchor.x + radius + 1):
 				var q := Vector2i(x, y)
@@ -140,7 +158,7 @@ func explode(center: Vector2i, damage: int, radius: int = 1) -> void:
 			if center.distance_to(p) <= float(radius): damage_cover(p, damage)
 
 func passable(p: Vector2i) -> bool:
-	return in_bounds(p) and tile(p) not in ["#", "c", "h", "k"]
+	return in_bounds(p) and tile(p) not in ["#", "c", "h", "k"] and (not modern or tile(p) != "w")
 
 func occupied(p: Vector2i, except_id: int = -1) -> bool:
 	for u in units:
@@ -163,13 +181,19 @@ func message(value: String) -> void:
 	if log_lines.size() > 12: log_lines.pop_front()
 
 func use_ability(id: int, ability_id: String, target_id: int = -1, target_tile: Vector2i = Vector2i(-1, -1)) -> bool:
-	return Ability.use(self, id, ability_id, target_id, target_tile)
+	var ok: bool = Ability.use(self, id, ability_id, target_id, target_tile)
+	if modern and ok:
+		if ability_id not in ["hide", "ghost", "meditate"]: break_concealment("Ability used")
+		if ability_id == "beastCalm" and bool(unit_by_id(target_id).get("stunned",false)): pressure_state.calm_turn = turn
+		_check_win()
+	return ok
 
 func ability_reason(id: int, ability_id: String) -> String:
 	return Ability.reason(self, unit_by_id(id), ability_id)
 
 func apply_damage(target: Dictionary, amount: int, _source: Dictionary = {}) -> int:
 	if int(target.hp) <= 0: return 0
+	if modern and bool(_source.get("horror",false)) and str(target.side) == "player" and str(target.class_name) not in ["Guardian","Consular"]: return 0
 	var shield: int = int(target.get("shield", 0))
 	var absorbed: int = mini(shield, amount)
 	target.shield = shield - absorbed
@@ -185,7 +209,9 @@ func apply_damage(target: Dictionary, amount: int, _source: Dictionary = {}) -> 
 		for member in units:
 			if int(member.get("battle_med_source", -1)) == int(target.id): member.erase("buff_aim"); member.erase("battle_med_source")
 			if str(member.get("side", "")) == "enemy": member.erase("debuff_aim")
+	if modern and int(target.hp) <= 0: Pressure.on_kill(self,target,_source)
 	_check_lose()
+	if modern: _check_win()
 	return actual
 
 func _neighbors(p: Vector2i, ignore_id: int) -> Array[Vector2i]:
@@ -221,6 +247,7 @@ func move(id: int, dest: Vector2i) -> bool:
 	if int(u.ap) < ap_cost: return false
 	u.ap = int(u.ap) - ap_cost
 	var old: Vector2i = Shot.pos(u)
+	if modern: Telemetry.travel(self,u,dest,reach.prev)
 	u.x = dest.x
 	u.y = dest.y
 	if phase == "enemy": action_events.append({"kind": "move", "actor": id, "from": old, "to": dest})
@@ -280,6 +307,7 @@ func shot(id: int, target_id: int, mode: String = "shoot") -> bool:
 	return true
 
 func _apply_attack(a: Dictionary, t: Dictionary, info: Dictionary, mode: String) -> void:
+	if modern and str(a.side) == "player": break_concealment("Attack")
 	var before_hp := int(t.hp)
 	var roll := rng.randf_range(0.0, 100.0)
 	var damage := 0
@@ -323,6 +351,7 @@ func push(id: int, target_id: int) -> bool:
 	if Shot.distance(Shot.pos(a), Shot.pos(t)) > float(abilities.push.range) or not Shot.los(self, Shot.pos(a), Shot.pos(t)): return false
 	a.ap = int(a.ap) - int(abilities.push.ap)
 	a.focus_left = int(a.focus_left) - int(abilities.push.focus)
+	if modern and str(a.side) == "player": break_concealment("Force push")
 	var old_target := Shot.pos(t)
 	var before_hp := int(t.hp)
 	var delta := Shot.pos(t) - Shot.pos(a)
@@ -342,6 +371,7 @@ func push(id: int, target_id: int) -> bool:
 
 func free_prisoner(id: int) -> bool:
 	var u := unit_by_id(id)
+	if modern: return bool(interact(u,Shot.pos(prisoner)).get("ok",false))
 	if u.is_empty() or u.side != "player" or phase != "player" or result != "" or bool(prisoner.freed) or int(u.ap) < 1: return false
 	if max(abs(int(u.x) - int(prisoner.x)), abs(int(u.y) - int(prisoner.y))) > 1: return false
 	u.ap = int(u.ap) - 1
@@ -359,16 +389,18 @@ func _wake_groups() -> void:
 		for p in living("player"):
 			if Shot.distance(Shot.pos(p), Shot.pos(u)) <= 8.0 and Shot.los(self, Shot.pos(p), Shot.pos(u)):
 				u.spotted = true
+				if modern and (not bool(p.get("concealed",false)) or Shot.distance(Shot.pos(p),Shot.pos(u)) <= 2.0): u.detected = true
 	for group in groups:
 		var members: Array = groups[group]
 		var seen := false
 		for u in members:
-			if bool(u.spotted): seen = true
+			if bool(u.spotted) and (not modern or bool(u.get("detected",false))): seen = true
 		if not seen: continue
 		var active := 0
 		for u in living("enemy"):
 			if bool(u.awake): active += 1
 		if active + members.size() > int(difficulty.get("active_cap", 6)): continue
+		if modern: break_concealment("Enemy contact"); Telemetry.contact(self)
 		message("Enemy group %d spotted and activated!" % (int(group) + 1))
 		if phase == "enemy": action_events.append({"kind": "activation", "actor": int(members[0].id), "at": Shot.pos(members[0])})
 		for u in members: u.awake = true
@@ -384,6 +416,7 @@ func _reaction_fire(mover: Dictionary) -> void:
 		var info: Dictionary = Shot.calculate(self, p, mover, false, -15)
 		if bool(info.los) and bool(info.range_ok):
 			p.overwatch = false
+			if modern: message("OVERWATCH: %s fires." % p.name)
 			_apply_attack(p, mover, info, "shoot")
 
 func _enemy_reaction_fire(mover: Dictionary) -> void:
@@ -392,6 +425,7 @@ func _enemy_reaction_fire(mover: Dictionary) -> void:
 		var info: Dictionary = Shot.calculate(self, e, mover, false, -15)
 		if bool(info.los) and bool(info.range_ok):
 			e.overwatch = false
+			if modern: message("OVERWATCH: %s fires." % e.name)
 			_apply_attack(e, mover, info, "shoot")
 
 func overwatch(id: int) -> bool:
@@ -423,18 +457,27 @@ func end_turn() -> void:
 	_wake_groups()
 	for u in living("enemy"): u.ap = 3; u.overwatch = false
 	var fired: Dictionary = {}
+	if modern: Pressure.brood(self)
 	for e in living("enemy"):
+		if result != "": break
+		if modern and Objectives.runner_turn(self,e): continue
+		if modern and Hack.controlled_turn(self,e): continue
+		if modern and bool(e.awake) and Pressure.horror_turn(self,e): continue
+		if modern and bool(e.awake) and Objectives.defense_turn(self,e): continue
 		if bool(e.awake): AI.act(self, e, fired)
 		if result != "": break
 	_check_lose()
 	if result != "": return
+	if modern: Objectives.enemy_end(self)
+	if result != "": return
 	turn += 1
-	if turn > int(spec.turn_limit):
+	if not modern and turn > int(spec.turn_limit):
 		result = "loss"
 		message("The evacuation window closes. Mission failed.")
 		return
 	phase = "player"
 	for p in living("player"):
+		if modern and bool(p.overwatch): message("Overwatch held: nothing crossed %s's sight." % p.name)
 		p.ap = 3; p.overwatch = false; p.hunkered = false
 		if int(p.get("buff_until", 0)) <= turn: p.erase("buff_defense"); p.erase("buff_aim")
 		if int(p.get("guard_until", 0)) <= turn: p.erase("guard")
@@ -443,6 +486,11 @@ func end_turn() -> void:
 		if int(e.get("stunned_until", 0)) < turn: e.erase("stunned")
 		if int(e.get("marked_until", 0)) <= turn: e.erase("marked_aim"); e.erase("marked")
 		if int(e.get("suppressed_until", 0)) <= turn: e.erase("suppressed_by"); e.erase("suppressed")
+	if modern:
+		Objectives.player_start(self)
+		if result != "": return
+		Pressure.player_start(self); Hack.player_start(self); Telemetry.sample(self); _wake_groups()
+		return
 	if turn == int(spec.reinforcement.announce_turn) and int(difficulty.get("reinforcement_size", 2)) > 0:
 		reinforcement_announced = true
 		reinforcement_marker = Vector2i(int(spec.reinforcement.units[0][1]), int(spec.reinforcement.units[0][2]))
@@ -464,15 +512,18 @@ func _civilian_advance() -> void:
 	if Shot.distance(Shot.pos(escort), p) > 6.0: return
 	var proxy: Dictionary = {"id": -99, "x": p.x, "y": p.y, "mob": 5}
 	var reach := paths(proxy, 5)
-	var evac := Vector2i(5, 23)
+	var evac := Maps.point(spec.evac[0]) if modern else Vector2i(5, 23)
 	var best := p
 	for q in reach.costs:
 		if Shot.distance(q, evac) < Shot.distance(best, evac): best = q
 	if best != p:
 		prisoner.x = best.x; prisoner.y = best.y
-		message("Mira follows the squad toward evac.")
+		message("%s follows the squad toward evac." % str(prisoner.get("name","Mira")))
 
 func _check_win() -> void:
+	if modern:
+		Telemetry.sample(self); Objectives.check(self)
+		return
 	if not bool(prisoner.freed): return
 	var p := Vector2i(int(prisoner.x), int(prisoner.y))
 	if tile(p) == "E" or (abs(p.x - 5) + abs(p.y - 23) <= 2 and living("player").any(func(u: Dictionary) -> bool: return Shot.distance(Shot.pos(u), p) <= 2.0)):
@@ -483,3 +534,34 @@ func _check_lose() -> void:
 	if living("player").is_empty():
 		result = "loss"
 		message("The squad is lost. Mission failed.")
+
+func interact(unit: Dictionary, at: Vector2i) -> Dictionary:
+	if modern: return Objectives.interact(self,unit,at)
+	return {"ok":free_prisoner(int(unit.get("id",-1))) if at == Shot.pos(prisoner) else false}
+
+func interactables() -> Array[Vector2i]:
+	if modern: return Objectives.targets(self)
+	var out: Array[Vector2i] = []
+	if not bool(prisoner.freed) and result == "": out.append(Shot.pos(prisoner))
+	return out
+
+func objective_status() -> Dictionary:
+	return Objectives.status(self) if modern else {"label":"Rescue Mira and escort to evac","turns_left":int(spec.turn_limit)-turn+1,"phase":"evac" if prisoner.freed else "primary"}
+
+func break_concealment(reason: String) -> void:
+	if not modern: return
+	var hidden := false
+	for u in living("player"):
+		hidden = hidden or bool(u.get("concealed",false)); u.concealed = false
+	if int(objective_state.get("clock_start",0)) == 0: objective_state.clock_start = turn
+	if hidden: message("Concealment broken: " + reason)
+
+func queue_reinforcement(kinds: Array, delay: int = 1, reason: String = "Reinforcements") -> void:
+	if modern: Pressure.queue(self,kinds,delay,reason)
+
+func hack(unit: Dictionary, at: Vector2i, mode: String = "safe") -> Dictionary:
+	return Hack.use(self,unit,at,mode) if modern else {"ok":false,"reason":"Use the existing Hack ability"}
+
+func damage_objective(amount: int) -> void:
+	if modern and amount > 0 and spec.family == "destroy_relay": break_concealment("Relay damaged")
+	if modern: Objectives.damage_relay(self,amount)

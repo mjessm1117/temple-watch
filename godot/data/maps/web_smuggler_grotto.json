@@ -1,0 +1,232 @@
+{
+  "id": "web_smuggler_grotto",
+  "name": "Smuggler Grotto",
+  "family": "rescue",
+  "theme": "caves",
+  "plot": {
+    "width": 28,
+    "height": 30,
+    "placements": [],
+    "source_rows": [
+      "##############",
+      "#..c.#..#.x..#",
+      "#....#..#....#",
+      "#^^..##D#..^^#",
+      "#M^........^M#",
+      "#^^..c..c..^^#",
+      "#....r..r....#",
+      "##.##..k.##.##",
+      "#...#....#...#",
+      "#.c.#.cc.#.c.#",
+      "#...h....h...#",
+      "#.x....c....x#",
+      "#............#",
+      "#..c..^^..c..#",
+      "#EE........EE#",
+      "##############"
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      14,
+      23
+    ],
+    "crossings": [
+      4,
+      15,
+      25,
+      9
+    ]
+  },
+  "turn_limit": 12,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        13,
+        9
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      12,
+      25
+    ],
+    [
+      "consular",
+      13,
+      25
+    ],
+    [
+      "soldier",
+      14,
+      25
+    ],
+    [
+      "scout",
+      15,
+      25
+    ],
+    [
+      "medic",
+      16,
+      25
+    ],
+    [
+      "soldier",
+      17,
+      25
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        10,
+        9
+      ],
+      [
+        "trooper",
+        17,
+        9
+      ]
+    ],
+    [
+      [
+        "heavy",
+        13,
+        12
+      ],
+      [
+        "agent",
+        19,
+        11
+      ]
+    ],
+    [
+      [
+        "trooper",
+        9,
+        15
+      ],
+      [
+        "trooper",
+        18,
+        15
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 13,
+    "y": 9,
+    "active": true,
+    "hp": 8
+  },
+  "evac": [
+    [
+      11,
+      27
+    ],
+    [
+      12,
+      27
+    ],
+    [
+      13,
+      27
+    ],
+    [
+      14,
+      27
+    ],
+    [
+      15,
+      27
+    ],
+    [
+      16,
+      27
+    ]
+  ],
+  "entries": [
+    [
+      8,
+      8,
+      "smuggler tunnel"
+    ],
+    [
+      19,
+      8,
+      "upper vent"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      14,
+      25
+    ],
+    "goal": [
+      13,
+      9
+    ],
+    "via": [
+      [
+        4,
+        15
+      ],
+      [
+        23,
+        15
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false,
+  "web_source": {
+    "base": "rescue",
+    "name": "Smuggler Grotto",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  }
+}

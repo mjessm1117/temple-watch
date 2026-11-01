@@ -1,0 +1,314 @@
+{
+  "id": "h_valo",
+  "name": "The Fair at Valo",
+  "family": "retaliation",
+  "theme": "city",
+  "plot": {
+    "width": 26,
+    "height": 34,
+    "placements": [
+      {
+        "parcel": "cargo",
+        "at": [
+          6,
+          6
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          12,
+          6
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          18,
+          6
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          6,
+          12
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          12,
+          12
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          18,
+          12
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          6,
+          18
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          12,
+          18
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "console",
+        "at": [
+          18,
+          18
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          6,
+          24
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "console",
+        "at": [
+          12,
+          24
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "barricade",
+        "at": [
+          18,
+          24
+        ],
+        "rotate": 3
+      }
+    ],
+    "lanes": [
+      4,
+      13,
+      21
+    ],
+    "crossings": [
+      4,
+      17,
+      29
+    ]
+  },
+  "turn_limit": 0,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        5
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        17
+      ],
+      [
+        21,
+        17
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      11,
+      29
+    ],
+    [
+      "consular",
+      12,
+      29
+    ],
+    [
+      "soldier",
+      13,
+      29
+    ],
+    [
+      "scout",
+      14,
+      29
+    ],
+    [
+      "medic",
+      15,
+      29
+    ],
+    [
+      "soldier",
+      16,
+      29
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        4,
+        23
+      ],
+      [
+        "trooper",
+        8,
+        24
+      ]
+    ],
+    [
+      [
+        "heavy",
+        20,
+        17
+      ],
+      [
+        "trooper",
+        18,
+        15
+      ]
+    ],
+    [
+      [
+        "agent",
+        10,
+        5
+      ],
+      [
+        "trooper",
+        16,
+        5
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 13,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      10,
+      31
+    ],
+    [
+      11,
+      31
+    ],
+    [
+      12,
+      31
+    ],
+    [
+      13,
+      31
+    ],
+    [
+      14,
+      31
+    ],
+    [
+      15,
+      31
+    ]
+  ],
+  "entries": [
+    [
+      2,
+      17,
+      "west approach"
+    ],
+    [
+      23,
+      17,
+      "east approach"
+    ],
+    [
+      13,
+      2,
+      "north approach"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      13,
+      29
+    ],
+    "goal": [
+      13,
+      4
+    ],
+    "via": [
+      [
+        4,
+        17
+      ],
+      [
+        21,
+        17
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false
+}

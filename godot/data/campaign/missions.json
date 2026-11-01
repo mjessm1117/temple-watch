@@ -56,7 +56,10 @@
         "credits": 40
       },
       "bonusTxt": "Relay above 75%",
-      "story": 1
+      "story": 1,
+      "map": "res://data/maps/relay.json",
+      "family": "defend",
+      "theme": "plains"
     },
     "shrine": {
       "n": "Dantooine Shrine",
@@ -70,7 +73,10 @@
       "bonus": {
         "credits": 30
       },
-      "bonusTxt": "Shrine above 75%"
+      "bonusTxt": "Shrine above 75%",
+      "map": "res://data/maps/shrine.json",
+      "family": "defend",
+      "theme": "plains"
     },
     "rescue": {
       "n": "Ord Mantell Depot",
@@ -84,7 +90,10 @@
       "bonus": {
         "recruits": 1
       },
-      "bonusTxt": "Done by turn 5"
+      "bonusTxt": "Done by turn 5",
+      "map": "res://data/maps/rescue.json",
+      "family": "rescue",
+      "theme": "dock"
     },
     "envoy": {
       "n": "The Envoy's Trail",
@@ -98,7 +107,10 @@
         "intel": 2
       },
       "bonusTxt": "All 3 terminals",
-      "story": 1
+      "story": 1,
+      "map": "res://data/maps/envoy.json",
+      "family": "hack_terminal",
+      "theme": "city"
     },
     "archive": {
       "n": "The Listening Post",
@@ -112,7 +124,10 @@
       "bonus": {
         "intel": 2
       },
-      "bonusTxt": "All 3 terminals"
+      "bonusTxt": "All 3 terminals",
+      "map": "res://data/maps/archive.json",
+      "family": "hack_terminal",
+      "theme": "ruins"
     },
     "sabotage": {
       "n": "Fuel Depot Strike",
@@ -126,7 +141,10 @@
       "bonus": {
         "credits": 40
       },
-      "bonusTxt": "Done by turn 7"
+      "bonusTxt": "Done by turn 7",
+      "map": "res://data/maps/sabotage.json",
+      "family": "sabotage",
+      "theme": "dock"
     },
     "escort": {
       "n": "The Senator's Walk",
@@ -140,7 +158,726 @@
       "bonus": {
         "recruits": 1
       },
-      "bonusTxt": "Done by turn 6"
+      "bonusTxt": "Done by turn 6",
+      "map": "res://data/maps/escort.json",
+      "family": "vip_extract",
+      "theme": "city"
+    },
+    "blockade": {
+      "n": "Supply Lane Hydian",
+      "where": "Convoy depot · Hydian Way",
+      "type": "defend",
+      "story": 0,
+      "brief": "Mandalorian clans in Imperial pay are hitting a Republic supply convoy. Hold the depot for 8 turns until the Navy escort arrives.",
+      "reward": {
+        "credits": 90,
+        "favor": 3
+      },
+      "bonus": {
+        "credits": 30
+      },
+      "bonusTxt": "Convoy above 75%",
+      "map": "res://data/maps/blockade.json",
+      "family": "defend",
+      "theme": "plains"
+    },
+    "cache": {
+      "n": "Listening Post Besh",
+      "where": "Abandoned listening post · Inner Rim",
+      "type": "investigate",
+      "story": 0,
+      "brief": "An Imperial listening post is tracking Republic fleet moves. Scan its terminals (Jedi or Medic, adjacent), then get anyone to an evac zone.",
+      "reward": {
+        "credits": 60,
+        "intel": 1
+      },
+      "bonus": {
+        "intel": 2
+      },
+      "bonusTxt": "All 3 terminals",
+      "map": "res://data/maps/cache.json",
+      "family": "hack_terminal",
+      "theme": "ruins"
+    },
+    "hutt": {
+      "n": "Spice Ledger",
+      "where": "Hutt warehouse · Nar Shaddaa",
+      "type": "investigate",
+      "story": 0,
+      "brief": "The Hutt broker keeps his kyber deals on warehouse terminals. Copy the ledgers and get out. His Mandalorian guards will not make it easy.",
+      "reward": {
+        "credits": 50,
+        "kyber": 2
+      },
+      "bonus": {
+        "intel": 1
+      },
+      "bonusTxt": "All 3 terminals",
+      "map": "res://data/maps/hutt.json",
+      "family": "hack_terminal",
+      "theme": "city"
+    },
+    "dock": {
+      "n": "Docking Ring Nine",
+      "where": "Docking Ring Nine · Coruscant",
+      "type": "assault",
+      "story": 1,
+      "brief": "While the treaty is signed on Alderaan, Darth Malgus lands at Docking Ring Nine with a strike team. His target is the Temple. Stop him here.",
+      "reward": {
+        "credits": 120,
+        "kyber": 1
+      },
+      "bonus": {
+        "favor": 5
+      },
+      "bonusTxt": "Done by the par turn",
+      "map": "res://data/maps/dock.json",
+      "family": "destroy_relay",
+      "theme": "dock"
+    },
+    "vault": {
+      "n": "Gnost-Dural's Vault",
+      "where": "Archive ruins · Ossus",
+      "type": "investigate",
+      "story": 1,
+      "brief": "You start concealed: pods patrol the ruins. Master Gnost-Dural found a sealed vault in the Ossus ruins: records from the last time the Sith struck at the Jedi. Imperial agents found it too. Scan the terminals (Jedi or Medic, adjacent), then reach evac.",
+      "reward": {
+        "credits": 60,
+        "intel": 2,
+        "kyber": 1
+      },
+      "bonus": {
+        "intel": 2
+      },
+      "bonusTxt": "All 3 terminals",
+      "map": "res://data/maps/vault.json",
+      "family": "hack_terminal",
+      "theme": "ruins"
+    },
+    "ilum": {
+      "n": "The Cave Mouth",
+      "where": "Crystal caves · Ilum",
+      "type": "defend",
+      "story": 1,
+      "brief": "Sith raiders want the Ilum crystal caves. Sgt. Jace Malcom’s platoon is all that holds the mouth, and it is thin. Hold for 8 turns until his relief lands.",
+      "reward": {
+        "credits": 70,
+        "kyber": 2
+      },
+      "bonus": {
+        "favor": 4
+      },
+      "bonusTxt": "Cave mouth above 75%",
+      "map": "res://data/maps/ilum.json",
+      "family": "defend",
+      "theme": "snow"
+    },
+    "adraasHunt": {
+      "n": "Shadow of Adraas",
+      "where": "Embassy hangar · Alderaan",
+      "type": "assault",
+      "story": 1,
+      "brief": "You start concealed. While the delegates talk, Lord Adraas waits in an embassy hangar for a signal. Satele Shan wants him taken off the board before it comes. Defeat him before he reaches his shuttle.",
+      "reward": {
+        "credits": 90,
+        "intel": 2
+      },
+      "bonus": {
+        "favor": 4
+      },
+      "bonusTxt": "Done by the par turn",
+      "map": "res://data/maps/adraasHunt.json",
+      "family": "ambush",
+      "theme": "city"
+    },
+    "taris": {
+      "n": "Reclamation Camp",
+      "where": "Refugee camp · Taris",
+      "type": "rescue",
+      "brief": "Sith raiders grabbed a Republic relief officer from a Taris refugee camp. Open the cell (Hack or console), then walk her to an evac zone (E).",
+      "reward": {
+        "credits": 70,
+        "favor": 4
+      },
+      "bonus": {
+        "recruits": 1
+      },
+      "bonusTxt": "Done by turn 5",
+      "story": 0,
+      "map": "res://data/maps/taris.json",
+      "family": "rescue",
+      "theme": "ruins"
+    },
+    "thul": {
+      "n": "The Thul Heir",
+      "where": "Estate grounds · Alderaan",
+      "type": "escort",
+      "brief": "Imperial agents want a young heir of House Thul dead before the talks. Walk her to the shuttle at the far evac zone.",
+      "reward": {
+        "credits": 80,
+        "favor": 6
+      },
+      "bonus": {
+        "recruits": 1
+      },
+      "bonusTxt": "Done by turn 6",
+      "story": 0,
+      "map": "res://data/maps/thul.json",
+      "family": "vip_extract",
+      "theme": "plains"
+    },
+    "depot": {
+      "n": "Forward Depot Cresh",
+      "where": "Imperial forward depot · Mid Rim",
+      "type": "sabotage",
+      "brief": "The Empire fuels its Balmorra fleet from this depot. Plant charges on 2 sites (anyone, adjacent, 1 action), then get every standing squad member onto the far evac zone. The charges blow when you are clear.",
+      "reward": {
+        "credits": 80,
+        "favor": 3
+      },
+      "bonus": {
+        "credits": 40
+      },
+      "bonusTxt": "Done by turn 7",
+      "story": 0,
+      "map": "res://data/maps/depot.json",
+      "family": "sabotage",
+      "theme": "plains"
+    },
+    "fort": {
+      "n": "Fort Garnik",
+      "where": "Hill fort · Ord Mantell",
+      "type": "defend",
+      "brief": "A Republic hill fort on Ord Mantell is under Mandalorian and Sith attack. Hold it for 6 turns until the garrison regroups.",
+      "reward": {
+        "credits": 70,
+        "favor": 3
+      },
+      "bonus": {
+        "credits": 30
+      },
+      "bonusTxt": "Shrine above 75%",
+      "story": 0,
+      "map": "res://data/maps/fort.json",
+      "family": "defend",
+      "theme": "plains"
+    },
+    "r_muster": {
+      "n": "The Muster",
+      "where": "Army of Light landing field · Ruusan",
+      "type": "defend",
+      "story": 1,
+      "brief": "Lord Hoth is landing his army on Ruusan, and the Brotherhood knows it. Hold the landing beacon for 7 turns so the transports can find the field.",
+      "reward": {
+        "credits": 80
+      },
+      "bonus": {
+        "credits": 30
+      },
+      "bonusTxt": "Beacon above 75%",
+      "map": "res://data/maps/r_muster.json",
+      "family": "defend",
+      "theme": "plains"
+    },
+    "r_ravine": {
+      "n": "Ravine of the Wounded",
+      "where": "Field hospital ravine · Ruusan",
+      "type": "escort",
+      "story": 1,
+      "brief": "A Brotherhood sweep is coming down the ravine. Lord Hoth's wounded are still in it, and one of them is his student, Johun Othone. Walk him to the evac at the north end.",
+      "reward": {
+        "credits": 70,
+        "recruits": 1
+      },
+      "bonus": {
+        "favor": 4
+      },
+      "bonusTxt": "Done by turn 6",
+      "map": "res://data/maps/r_ravine.json",
+      "family": "vip_extract",
+      "theme": "plains"
+    },
+    "r_caves": {
+      "n": "Kaan's Caves",
+      "where": "Cave network · Ruusan",
+      "type": "investigate",
+      "story": 1,
+      "brief": "A prisoner says the Brotherhood is gathering in the caves. Copy the ritual tablets (Jedi or Medic, adjacent), then get anyone to an evac zone. Something in the dark only hunts Jedi.",
+      "reward": {
+        "credits": 60,
+        "intel": 2
+      },
+      "bonus": {
+        "intel": 1
+      },
+      "bonusTxt": "All 3 tablets",
+      "map": "res://data/maps/r_caves.json",
+      "family": "hack_terminal",
+      "theme": "caves"
+    },
+    "r_sixth": {
+      "n": "The Sixth Battle",
+      "where": "Brotherhood stockade · Ruusan",
+      "type": "rescue",
+      "story": 1,
+      "brief": "The sixth battle went badly. Kaan's men dragged an Army of Light Lord, Tarsus Vell, into a stockade. A Medic can Hack the cell door from 4 tiles; a Jedi can try the console. Then get him to an evac zone (E).",
+      "reward": {
+        "credits": 90,
+        "favor": 5
+      },
+      "bonus": {
+        "recruits": 1
+      },
+      "bonusTxt": "Done by turn 5",
+      "map": "res://data/maps/r_sixth.json",
+      "family": "rescue",
+      "theme": "plains"
+    },
+    "r_seventh": {
+      "n": "The Seventh Battle",
+      "where": "Kaan's line · Ruusan",
+      "type": "assault",
+      "story": 1,
+      "brief": "The seventh battle of Ruusan. Lord Vorr holds the high ground over Kaan's line. Break him and the Army of Light can push through.",
+      "reward": {
+        "credits": 100,
+        "kyber": 1
+      },
+      "bonus": {
+        "favor": 4
+      },
+      "bonusTxt": "Done by turn 6",
+      "map": "res://data/maps/r_seventh.json",
+      "family": "destroy_relay",
+      "theme": "plains"
+    },
+    "r_bomb": {
+      "n": "The Thought Bomb",
+      "where": "Kaan's ritual ground · Ruusan",
+      "type": "assault",
+      "story": 1,
+      "brief": "Kaan has gathered his Lords to unleash a thought bomb, a ritual that could wipe out Jedi and Sith alike. Lord Hoth is walking into the caves to stop him. Break the ritual first: defeat Kaan.",
+      "reward": {
+        "credits": 120,
+        "kyber": 1
+      },
+      "bonus": {
+        "favor": 5
+      },
+      "bonusTxt": "Done by the par turn",
+      "map": "res://data/maps/r_bomb.json",
+      "family": "destroy_relay",
+      "theme": "plains"
+    },
+    "r_hospital": {
+      "n": "The Field Hospital",
+      "where": "Army of Light field hospital · Ruusan",
+      "type": "defend",
+      "brief": "Brotherhood raiders are coming for an Army of Light field hospital. Hold it for 6 turns while the healers move the wounded.",
+      "reward": {
+        "credits": 60,
+        "recruits": 1
+      },
+      "bonus": {
+        "favor": 3
+      },
+      "bonusTxt": "Hospital above 75%",
+      "story": 0,
+      "map": "res://data/maps/r_hospital.json",
+      "family": "retaliation",
+      "theme": "plains"
+    },
+    "r_nexus": {
+      "n": "The Spawn Pit",
+      "where": "Dark-side cave · Ruusan",
+      "type": "assault",
+      "brief": "A dark-side nexus is breeding Sith Spawn in the caves. Spawn only hurt Jedi. Send troops in front and destroy the nexus heart.",
+      "reward": {
+        "credits": 50,
+        "kyber": 1
+      },
+      "bonus": {
+        "intel": 1
+      },
+      "bonusTxt": "Done by turn 7",
+      "map": "res://data/maps/r_nexus.json",
+      "family": "destroy_relay",
+      "theme": "caves"
+    },
+    "r_snipers": {
+      "n": "Run the Gauntlet",
+      "where": "Ridge trail · Ruusan",
+      "type": "escort",
+      "brief": "Lord Farfalla's courier carries the Army's battle plans. Mercenary snipers hold the ridge. Get the courier to the shuttle.",
+      "reward": {
+        "credits": 70,
+        "favor": 4
+      },
+      "bonus": {
+        "recruits": 1
+      },
+      "bonusTxt": "Done by turn 6",
+      "story": 0,
+      "map": "res://data/maps/r_snipers.json",
+      "family": "ambush",
+      "theme": "plains"
+    },
+    "r_dump": {
+      "n": "The Munitions Dump",
+      "where": "Brotherhood munitions dump · Ruusan",
+      "type": "sabotage",
+      "brief": "Kaan's army runs on this dump. Plant charges on 2 sites (anyone, adjacent, 1 action), then get every standing squad member onto the evac zone.",
+      "reward": {
+        "credits": 80,
+        "favor": 3
+      },
+      "bonus": {
+        "credits": 40
+      },
+      "bonusTxt": "Done by turn 7",
+      "story": 0,
+      "map": "res://data/maps/r_dump.json",
+      "family": "sabotage",
+      "theme": "plains"
+    },
+    "r_prisoners": {
+      "n": "The Prison Hulk",
+      "where": "Brotherhood prison camp · Ruusan",
+      "type": "rescue",
+      "brief": "The Brotherhood holds Army of Light prisoners in a locked cell. A Medic can Hack the door from 4 tiles; a Jedi can try the console. Then walk the prisoner to an evac zone (E).",
+      "reward": {
+        "credits": 80,
+        "favor": 4
+      },
+      "bonus": {
+        "recruits": 1
+      },
+      "bonusTxt": "Done by turn 5",
+      "story": 0,
+      "map": "res://data/maps/r_prisoners.json",
+      "family": "rescue",
+      "theme": "plains"
+    },
+    "r_codes": {
+      "n": "Brotherhood Codes",
+      "where": "Brotherhood signal camp · Ruusan",
+      "type": "investigate",
+      "brief": "A Brotherhood signal camp runs Kaan's orders to his Lords. Copy its terminals (Jedi or Medic, adjacent), then get anyone to an evac zone.",
+      "reward": {
+        "credits": 60,
+        "intel": 2
+      },
+      "bonus": {
+        "intel": 1
+      },
+      "bonusTxt": "All 3 terminals",
+      "story": 0,
+      "map": "res://data/maps/r_codes.json",
+      "family": "hack_terminal",
+      "theme": "plains"
+    },
+    "r_supply": {
+      "n": "The Supply Line",
+      "where": "Army of Light supply post · Ruusan",
+      "type": "defend",
+      "story": 0,
+      "brief": "Brotherhood raiders want the supply post that feeds Hoth's front. Hold it for 8 turns until the convoy rolls out.",
+      "reward": {
+        "credits": 80
+      },
+      "bonus": {
+        "credits": 30
+      },
+      "bonusTxt": "Post above 75%",
+      "map": "res://data/maps/r_supply.json",
+      "family": "defend",
+      "theme": "plains"
+    },
+    "h_hetzal": {
+      "n": "Hetzal Fragments",
+      "where": "Impact fields · Hetzal",
+      "type": "escort",
+      "story": 1,
+      "brief": "A starship broke apart in hyperspace. Its pieces are still falling on Hetzal at lightspeed. Masked raiders are already looting the wreck fields. Walk a survivor to the evac at the north end.",
+      "reward": {
+        "credits": 70,
+        "recruits": 1
+      },
+      "bonus": {
+        "favor": 4
+      },
+      "bonusTxt": "Done by turn 6",
+      "map": "res://data/maps/h_hetzal.json",
+      "family": "vip_extract",
+      "theme": "plains"
+    },
+    "h_grove": {
+      "n": "The Progenitor's Grove",
+      "where": "Drengir grove · Wild Space",
+      "type": "assault",
+      "story": 1,
+      "brief": "The Drengir are waking: plants that think, hunt, and eat. Their hive mother, the Great Progenitor, has rooted in a valley of farms. Cut her out before the grove spreads.",
+      "reward": {
+        "credits": 100,
+        "kyber": 1
+      },
+      "bonus": {
+        "favor": 4
+      },
+      "bonusTxt": "Done by turn 7",
+      "map": "res://data/maps/h_grove.json",
+      "family": "destroy_relay",
+      "theme": "jungle"
+    },
+    "h_valo": {
+      "n": "The Fair at Valo",
+      "where": "Republic Fair grounds · Valo",
+      "type": "defend",
+      "story": 1,
+      "brief": "The Republic Fair: a whole world dressed up to show the frontier what the Republic can be. The Nihil came to burn it. Hold the Chancellor's pavilion for 7 turns while the crowds get out.",
+      "reward": {
+        "credits": 90,
+        "favor": 6
+      },
+      "bonus": {
+        "credits": 30
+      },
+      "bonusTxt": "Pavilion above 75%",
+      "map": "res://data/maps/h_valo.json",
+      "family": "retaliation",
+      "theme": "city"
+    },
+    "h_tempest": {
+      "n": "The Tempest Runner",
+      "where": "Nihil hideout · Wild Space",
+      "type": "assault",
+      "story": 1,
+      "brief": "Intel from Valo points to a Nihil hideout at the edge of Wild Space and one of the three Tempest Runners: Lourna Dee. Take her down before her ship jumps.",
+      "reward": {
+        "credits": 110,
+        "intel": 2
+      },
+      "bonus": {
+        "favor": 4
+      },
+      "bonusTxt": "Done by turn 6",
+      "map": "res://data/maps/h_tempest.json",
+      "family": "ambush",
+      "theme": "dock"
+    },
+    "h_husks": {
+      "n": "The Hollow Jedi",
+      "where": "Abandoned outpost · Wild Space",
+      "type": "investigate",
+      "story": 1,
+      "brief": "Three Jedi went into this outpost. Their comlinks still answer. They are standing in the corridors, gray as stone, and they crumble when touched. Copy the outpost logs and find out what did this.",
+      "reward": {
+        "credits": 70,
+        "intel": 2
+      },
+      "bonus": {
+        "intel": 1
+      },
+      "bonusTxt": "All 3 terminals",
+      "map": "res://data/maps/h_husks.json",
+      "family": "hack_terminal",
+      "theme": "caves"
+    },
+    "h_beacon": {
+      "n": "The Fall of Starlight",
+      "where": "Starlight Beacon · Outer Rim",
+      "type": "assault",
+      "story": 1,
+      "brief": "The Nihil are inside Starlight Beacon. The station is failing, and something on board is turning Jedi to dust. Marchion Ro is here to watch it fall. Stop him while Starlight can still be saved.",
+      "reward": {
+        "credits": 120,
+        "kyber": 1
+      },
+      "bonus": {
+        "favor": 5
+      },
+      "bonusTxt": "Done by the par turn",
+      "map": "res://data/maps/h_beacon.json",
+      "family": "destroy_relay",
+      "theme": "dock"
+    },
+    "h_roots": {
+      "n": "The Root-Mother",
+      "where": "Overgrown farmland · Hetzal",
+      "type": "assault",
+      "brief": "A Drengir bloom has rooted in farmland. It grows a new Drengir every few turns. Nihil scavengers are picking through what is left. Destroy the Root-Mother.",
+      "reward": {
+        "credits": 60,
+        "kyber": 1
+      },
+      "bonus": {
+        "intel": 1
+      },
+      "bonusTxt": "Done by turn 7",
+      "map": "res://data/maps/h_roots.json",
+      "family": "destroy_relay",
+      "theme": "jungle"
+    },
+    "h_salvage": {
+      "n": "Emergence Salvage",
+      "where": "Wreck site · Hetzal",
+      "type": "defend",
+      "brief": "Republic crews are pulling a fallen hull out of a field before it can kill anyone else. The Nihil want what is inside. Hold the crane for 6 turns.",
+      "reward": {
+        "credits": 60,
+        "recruits": 1
+      },
+      "bonus": {
+        "favor": 3
+      },
+      "bonusTxt": "Crane above 75%",
+      "story": 0,
+      "map": "res://data/maps/h_salvage.json",
+      "family": "retaliation",
+      "theme": "plains"
+    },
+    "h_scouts": {
+      "n": "The Lost Pathfinder",
+      "where": "Survey camp · Valo",
+      "type": "escort",
+      "brief": "A Republic pathfinder mapped a Nihil Path and lived. The Nihil know it. Get him to the shuttle.",
+      "reward": {
+        "credits": 70,
+        "intel": 1
+      },
+      "bonus": {
+        "recruits": 1
+      },
+      "bonusTxt": "Done by turn 6",
+      "story": 0,
+      "map": "res://data/maps/h_scouts.json",
+      "family": "vip_extract",
+      "theme": "jungle"
+    },
+    "h_cache": {
+      "n": "Path Engine Cache",
+      "where": "Nihil depot · Wild Space",
+      "type": "sabotage",
+      "brief": "The Nihil hide their Path engines here, the secret that lets them strike anywhere. Plant charges on 2 sites, then get every standing squad member onto the evac zone.",
+      "reward": {
+        "credits": 80,
+        "favor": 3
+      },
+      "bonus": {
+        "credits": 40
+      },
+      "bonusTxt": "Done by turn 7",
+      "story": 0,
+      "map": "res://data/maps/h_cache.json",
+      "family": "sabotage",
+      "theme": "dock"
+    },
+    "h_prisoners": {
+      "n": "Nihil Prison Barge",
+      "where": "Prison barge · Outer Rim",
+      "type": "rescue",
+      "brief": "The Nihil hold a prisoner on a barge. A Medic can Hack the cell door from 4 tiles; a Jedi can try the console. Then walk the prisoner to an evac zone (E).",
+      "reward": {
+        "credits": 80,
+        "favor": 4
+      },
+      "bonus": {
+        "recruits": 1
+      },
+      "bonusTxt": "Done by turn 5",
+      "story": 0,
+      "map": "res://data/maps/h_prisoners.json",
+      "family": "rescue",
+      "theme": "dock"
+    },
+    "h_buoy": {
+      "n": "Nihil Comm Buoy",
+      "where": "Relay station · Outer Rim",
+      "type": "investigate",
+      "brief": "A relay is passing Nihil orders between Storms. Copy its terminals (Jedi or Medic, adjacent), then get anyone to an evac zone.",
+      "reward": {
+        "credits": 60,
+        "intel": 2
+      },
+      "bonus": {
+        "intel": 1
+      },
+      "bonusTxt": "All 3 terminals",
+      "story": 0,
+      "map": "res://data/maps/h_buoy.json",
+      "family": "hack_terminal",
+      "theme": "dock"
+    },
+    "h_outpost": {
+      "n": "Frontier Outpost",
+      "where": "Republic outpost · Valo",
+      "type": "defend",
+      "story": 0,
+      "brief": "A Republic outpost is the only beacon for twenty systems of settlers. Nihil raiders want it dark. Hold it for 8 turns.",
+      "reward": {
+        "credits": 80
+      },
+      "bonus": {
+        "credits": 30
+      },
+      "bonusTxt": "Outpost above 75%",
+      "map": "res://data/maps/h_outpost.json",
+      "family": "defend",
+      "theme": "plains"
+    },
+    "ilsaDrop": {
+      "n": "The Dead Drop",
+      "where": "SIS dead drop · Nar Shaddaa",
+      "type": "investigate",
+      "brief": "Ilsa’s SIS contact left a data drop in a Nar Shaddaa listening post. Imperial agents are working the same building. Scan the terminals, then reach evac.",
+      "reward": {
+        "credits": 40,
+        "intel": 3
+      },
+      "bonus": {
+        "intel": 2
+      },
+      "bonusTxt": "All 3 terminals",
+      "story": 0,
+      "map": "res://data/maps/ilsaDrop.json",
+      "family": "hack_terminal",
+      "theme": "city"
+    },
+    "brenClinic": {
+      "n": "The Clinic Raid",
+      "where": "Lower-city clinic · Coruscant",
+      "type": "rescue",
+      "brief": "Swoop gangers in Imperial pay grabbed a volunteer from Doc Bren’s clinic. Open the cell (Hack or console), then walk her to an evac zone (E).",
+      "reward": {
+        "credits": 40,
+        "favor": 4
+      },
+      "bonus": {
+        "recruits": 1
+      },
+      "bonusTxt": "Done by turn 5",
+      "story": 0,
+      "map": "res://data/maps/brenClinic.json",
+      "family": "retaliation",
+      "theme": "city"
+    },
+    "grakClan": {
+      "n": "Clan Ordo’s Proving Ground",
+      "where": "Proving ground · Ord Mantell",
+      "type": "defend",
+      "brief": "Clan Ordo will hear Grak only if his allies hold their proving ground against the clan’s best. Six turns. They are not playing.",
+      "reward": {
+        "credits": 50,
+        "favor": 2
+      },
+      "bonus": {
+        "credits": 30
+      },
+      "bonusTxt": "Shrine above 75%",
+      "story": 0,
+      "map": "res://data/maps/grakClan.json",
+      "family": "defend",
+      "theme": "plains"
     }
   }
 }

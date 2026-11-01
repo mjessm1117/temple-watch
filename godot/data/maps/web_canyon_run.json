@@ -1,0 +1,250 @@
+{
+  "id": "web_canyon_run",
+  "name": "Canyon Run",
+  "family": "vip_extract",
+  "theme": "plains",
+  "plot": {
+    "width": 26,
+    "height": 31,
+    "placements": [],
+    "source_rows": [
+      "EEEE........",
+      "..........#.",
+      "..c..^^^^...",
+      ".....^^^^...",
+      "#.h..^^.....",
+      "#....^^..c..",
+      "##.c.^^.....",
+      "#...........",
+      "#..c..##..h.",
+      "#.....##....",
+      "#.h.........",
+      "##....c.....",
+      "#.....^^^...",
+      "#..c..^^^.c.",
+      "#.....^^^...",
+      "#h.h..^.....",
+      "#..........."
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      13,
+      21
+    ],
+    "crossings": [
+      4,
+      15,
+      26,
+      23
+    ]
+  },
+  "turn_limit": 12,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        10,
+        23
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      11,
+      26
+    ],
+    [
+      "consular",
+      12,
+      26
+    ],
+    [
+      "soldier",
+      13,
+      26
+    ],
+    [
+      "scout",
+      14,
+      26
+    ],
+    [
+      "medic",
+      15,
+      26
+    ],
+    [
+      "soldier",
+      16,
+      26
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        13,
+        10
+      ],
+      [
+        "trooper",
+        8,
+        14
+      ]
+    ],
+    [
+      [
+        "heavy",
+        17,
+        17
+      ],
+      [
+        "agent",
+        14,
+        9
+      ]
+    ],
+    [
+      [
+        "trooper",
+        10,
+        17
+      ],
+      [
+        "trooper",
+        16,
+        13
+      ]
+    ],
+    [
+      [
+        "heavy",
+        11,
+        12
+      ],
+      [
+        "trooper",
+        15,
+        15
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 10,
+    "y": 23,
+    "active": true,
+    "hp": 8
+  },
+  "evac": [
+    [
+      10,
+      2
+    ],
+    [
+      11,
+      2
+    ],
+    [
+      12,
+      2
+    ],
+    [
+      13,
+      2
+    ],
+    [
+      14,
+      2
+    ],
+    [
+      15,
+      2
+    ]
+  ],
+  "entries": [
+    [
+      18,
+      16,
+      "side canyon"
+    ],
+    [
+      18,
+      8,
+      "north rim"
+    ],
+    [
+      18,
+      23,
+      "rear trail"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      13,
+      26
+    ],
+    "goal": [
+      10,
+      23
+    ],
+    "via": [
+      [
+        4,
+        15
+      ],
+      [
+        21,
+        15
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false,
+  "web_source": {
+    "base": "escort",
+    "name": "Canyon Run",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  }
+}

@@ -1,0 +1,314 @@
+{
+  "id": "sabotage",
+  "name": "Fuel Depot Strike",
+  "family": "sabotage",
+  "theme": "dock",
+  "plot": {
+    "width": 34,
+    "height": 30,
+    "placements": [
+      {
+        "parcel": "cargo",
+        "at": [
+          6,
+          6
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          12,
+          6
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          18,
+          6
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          24,
+          6
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          6,
+          12
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          12,
+          12
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          18,
+          12
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "console",
+        "at": [
+          24,
+          12
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          6,
+          18
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          12,
+          18
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "console",
+        "at": [
+          18,
+          18
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "barricade",
+        "at": [
+          24,
+          18
+        ],
+        "rotate": 3
+      }
+    ],
+    "lanes": [
+      4,
+      17,
+      29
+    ],
+    "crossings": [
+      4,
+      15,
+      25
+    ]
+  },
+  "turn_limit": 10,
+  "clock_trigger": "concealment",
+  "concealed": true,
+  "objective": {
+    "required": 2,
+    "points": [
+      [
+        17,
+        4
+      ],
+      [
+        29,
+        5
+      ],
+      [
+        4,
+        5
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        17,
+        4
+      ],
+      [
+        29,
+        5
+      ],
+      [
+        4,
+        15
+      ],
+      [
+        29,
+        15
+      ],
+      [
+        17,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      15,
+      25
+    ],
+    [
+      "consular",
+      16,
+      25
+    ],
+    [
+      "soldier",
+      17,
+      25
+    ],
+    [
+      "scout",
+      18,
+      25
+    ],
+    [
+      "medic",
+      19,
+      25
+    ],
+    [
+      "soldier",
+      20,
+      25
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        4,
+        19
+      ],
+      [
+        "trooper",
+        8,
+        20
+      ]
+    ],
+    [
+      [
+        "heavy",
+        28,
+        15
+      ],
+      [
+        "trooper",
+        26,
+        13
+      ]
+    ],
+    [
+      [
+        "agent",
+        14,
+        5
+      ],
+      [
+        "trooper",
+        20,
+        5
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 17,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      14,
+      27
+    ],
+    [
+      15,
+      27
+    ],
+    [
+      16,
+      27
+    ],
+    [
+      17,
+      27
+    ],
+    [
+      18,
+      27
+    ],
+    [
+      19,
+      27
+    ]
+  ],
+  "entries": [
+    [
+      2,
+      15,
+      "west approach"
+    ],
+    [
+      31,
+      15,
+      "east approach"
+    ],
+    [
+      17,
+      2,
+      "north approach"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      17,
+      25
+    ],
+    "goal": [
+      17,
+      4
+    ],
+    "via": [
+      [
+        4,
+        15
+      ],
+      [
+        29,
+        15
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false
+}

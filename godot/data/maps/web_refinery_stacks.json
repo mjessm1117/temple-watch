@@ -1,0 +1,246 @@
+{
+  "id": "web_refinery_stacks",
+  "name": "Refinery Stacks",
+  "family": "sabotage",
+  "theme": "dock",
+  "plot": {
+    "width": 32,
+    "height": 29,
+    "placements": [],
+    "source_rows": [
+      "..MM....C....MM...",
+      "..^^.........^^...",
+      "....#..##..#....c.",
+      "..c.#.......#.....",
+      ".^^^........^^^..C",
+      ".MM^...cc...^MM...",
+      ".^^^..#..#..^^^...",
+      "......#..#........",
+      "C.c..........c..h.",
+      "....##......##....",
+      ".^^.....^^.....^^.",
+      ".MM.....MM.....MM.",
+      ".^^.c...^^...c.^^.",
+      "..................",
+      "EE......cc......EE"
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      16,
+      27
+    ],
+    "crossings": [
+      4,
+      14,
+      24,
+      7,
+      11,
+      15
+    ]
+  },
+  "turn_limit": 10,
+  "clock_trigger": "concealment",
+  "concealed": true,
+  "objective": {
+    "required": 2,
+    "points": [
+      [
+        15,
+        7
+      ],
+      [
+        24,
+        11
+      ],
+      [
+        7,
+        15
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      14,
+      24
+    ],
+    [
+      "consular",
+      15,
+      24
+    ],
+    [
+      "soldier",
+      16,
+      24
+    ],
+    [
+      "scout",
+      17,
+      24
+    ],
+    [
+      "medic",
+      18,
+      24
+    ],
+    [
+      "soldier",
+      19,
+      24
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        9,
+        8
+      ],
+      [
+        "agent",
+        21,
+        7
+      ]
+    ],
+    [
+      [
+        "trooper",
+        20,
+        12
+      ],
+      [
+        "heavy",
+        17,
+        12
+      ]
+    ],
+    [
+      [
+        "trooper",
+        9,
+        12
+      ],
+      [
+        "trooper",
+        16,
+        17
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 16,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      13,
+      26
+    ],
+    [
+      14,
+      26
+    ],
+    [
+      15,
+      26
+    ],
+    [
+      16,
+      26
+    ],
+    [
+      17,
+      26
+    ],
+    [
+      18,
+      26
+    ]
+  ],
+  "entries": [
+    [
+      24,
+      15,
+      "east pipeway"
+    ],
+    [
+      7,
+      9,
+      "west catwalk"
+    ],
+    [
+      24,
+      20,
+      "loading dock"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      16,
+      24
+    ],
+    "goal": [
+      15,
+      7
+    ],
+    "via": [
+      [
+        4,
+        14
+      ],
+      [
+        27,
+        14
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false,
+  "web_source": {
+    "base": "sabotage",
+    "name": "Refinery Stacks",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  }
+}

@@ -1,0 +1,231 @@
+{
+  "id": "web_deepway_tunnels",
+  "name": "Deepway Tunnels",
+  "family": "vip_extract",
+  "theme": "caves",
+  "plot": {
+    "width": 28,
+    "height": 29,
+    "placements": [],
+    "source_rows": [
+      "#...c..##...EE",
+      "#.^^...##.x..E",
+      "#.M^.c........",
+      "#.^^..##_##..#",
+      "#.....#...#c.#",
+      "##.c..#...#..#",
+      "#.....##.##..#",
+      "#..h.......h.#",
+      "#.c..##r##..c#",
+      "#....#...#...#",
+      "#.x..#.c.#.^^#",
+      "#....h...h.^M#",
+      "#..c.......^^#",
+      "#............#",
+      "##############"
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      14,
+      23
+    ],
+    "crossings": [
+      4,
+      14,
+      24,
+      18
+    ]
+  },
+  "turn_limit": 12,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        10,
+        18
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      12,
+      24
+    ],
+    [
+      "consular",
+      13,
+      24
+    ],
+    [
+      "soldier",
+      14,
+      24
+    ],
+    [
+      "scout",
+      15,
+      24
+    ],
+    [
+      "medic",
+      16,
+      24
+    ],
+    [
+      "soldier",
+      17,
+      24
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "agent",
+        9,
+        9
+      ],
+      [
+        "trooper",
+        18,
+        8
+      ]
+    ],
+    [
+      [
+        "heavy",
+        15,
+        11
+      ],
+      [
+        "trooper",
+        9,
+        12
+      ]
+    ],
+    [
+      [
+        "trooper",
+        17,
+        14
+      ],
+      [
+        "trooper",
+        14,
+        16
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 10,
+    "y": 18,
+    "active": true,
+    "hp": 8
+  },
+  "evac": [
+    [
+      11,
+      2
+    ],
+    [
+      12,
+      2
+    ],
+    [
+      13,
+      2
+    ],
+    [
+      14,
+      2
+    ],
+    [
+      15,
+      2
+    ],
+    [
+      16,
+      2
+    ]
+  ],
+  "entries": [
+    [
+      19,
+      14,
+      "side shaft"
+    ],
+    [
+      8,
+      7,
+      "upper vent"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      14,
+      24
+    ],
+    "goal": [
+      10,
+      18
+    ],
+    "via": [
+      [
+        4,
+        14
+      ],
+      [
+        23,
+        14
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false,
+  "web_source": {
+    "base": "escort",
+    "name": "Deepway Tunnels",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  }
+}

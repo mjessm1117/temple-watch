@@ -1,0 +1,265 @@
+{
+  "id": "web_shrine_terraces",
+  "name": "Shrine Terraces",
+  "family": "defend",
+  "theme": "plains",
+  "plot": {
+    "width": 30,
+    "height": 30,
+    "placements": [],
+    "source_rows": [
+      "..c.....#......c",
+      "........#.......",
+      ".h...c.....c..h.",
+      "^^^^........^^^^",
+      "^^^^..c..c..^^^^",
+      "..........h.....",
+      ".c..h.MM.......c",
+      "......MM..c.....",
+      "^^^.........^^^^",
+      "^^^.c..OO.c.^^^^",
+      "^^^....OO...^^^^",
+      "..c...^^^^...c..",
+      "......^^^^......",
+      "#..h.........h.#",
+      "....c......c....",
+      "................"
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      15,
+      25
+    ],
+    "crossings": [
+      4,
+      15,
+      25,
+      16
+    ]
+  },
+  "turn_limit": 0,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        14,
+        16
+      ]
+    ],
+    "hp": 18,
+    "waves": 5,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      13,
+      25
+    ],
+    [
+      "consular",
+      14,
+      25
+    ],
+    [
+      "soldier",
+      15,
+      25
+    ],
+    [
+      "scout",
+      16,
+      25
+    ],
+    [
+      "medic",
+      17,
+      25
+    ],
+    [
+      "soldier",
+      18,
+      25
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        4,
+        19
+      ],
+      [
+        "trooper",
+        8,
+        20
+      ]
+    ],
+    [
+      [
+        "heavy",
+        24,
+        15
+      ],
+      [
+        "trooper",
+        22,
+        13
+      ]
+    ],
+    [
+      [
+        "agent",
+        12,
+        5
+      ],
+      [
+        "trooper",
+        18,
+        5
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 15,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      12,
+      27
+    ],
+    [
+      13,
+      27
+    ],
+    [
+      14,
+      27
+    ],
+    [
+      15,
+      27
+    ],
+    [
+      16,
+      27
+    ],
+    [
+      17,
+      27
+    ]
+  ],
+  "entries": [
+    [
+      10,
+      7,
+      "upper path"
+    ],
+    [
+      19,
+      7,
+      "pilgrim stair"
+    ],
+    [
+      7,
+      21,
+      "lower west"
+    ],
+    [
+      21,
+      20,
+      "lower east"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      15,
+      25
+    ],
+    "goal": [
+      14,
+      16
+    ],
+    "via": [
+      [
+        4,
+        15
+      ],
+      [
+        25,
+        15
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": true,
+  "web_source": {
+    "base": "shrine",
+    "name": "Shrine Terraces",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  },
+  "wave_roster": [
+    [
+      "trooper",
+      "trooper",
+      "heavy"
+    ],
+    [
+      "trooper",
+      "agent"
+    ],
+    [
+      "brood",
+      "trooper"
+    ],
+    [
+      "trooper",
+      "heavy"
+    ],
+    [
+      "acolyte",
+      "trooper"
+    ]
+  ]
+}

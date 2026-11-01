@@ -1,0 +1,270 @@
+{
+  "id": "web_hold_the_ford",
+  "name": "Hold the Ford",
+  "family": "operation",
+  "theme": "jungle",
+  "plot": {
+    "width": 30,
+    "height": 29,
+    "placements": [],
+    "source_rows": [
+      "....c.....h.....",
+      "..h.....c....c..",
+      "...........h....",
+      "c....^^.........",
+      ".....^^...c..^^.",
+      "..c.......c..^^.",
+      "wwrwwww..wwwwrww",
+      "wwrwwww..wwwwrww",
+      ".........c......",
+      ".h..c.......h...",
+      "......^^.....c..",
+      "..c...^^.......c",
+      "..........h.....",
+      ".....c..........",
+      "EE..........c.EE"
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      15,
+      25
+    ],
+    "crossings": [
+      4,
+      14,
+      24,
+      11,
+      10
+    ]
+  },
+  "turn_limit": 16,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        15,
+        11
+      ],
+      [
+        15,
+        10
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      13,
+      24
+    ],
+    [
+      "consular",
+      14,
+      24
+    ],
+    [
+      "soldier",
+      15,
+      24
+    ],
+    [
+      "scout",
+      16,
+      24
+    ],
+    [
+      "medic",
+      17,
+      24
+    ],
+    [
+      "soldier",
+      18,
+      24
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        10,
+        9
+      ],
+      [
+        "trooper",
+        19,
+        8
+      ]
+    ],
+    [
+      [
+        "trooper",
+        13,
+        11
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 15,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      12,
+      26
+    ],
+    [
+      13,
+      26
+    ],
+    [
+      14,
+      26
+    ],
+    [
+      15,
+      26
+    ],
+    [
+      16,
+      26
+    ],
+    [
+      17,
+      26
+    ]
+  ],
+  "entries": [
+    [
+      7,
+      8,
+      "west bank"
+    ],
+    [
+      22,
+      9,
+      "east bank"
+    ],
+    [
+      7,
+      16,
+      "downriver"
+    ],
+    [
+      22,
+      17,
+      "upriver"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      15,
+      24
+    ],
+    "goal": [
+      15,
+      11
+    ],
+    "via": [
+      [
+        4,
+        14
+      ],
+      [
+        25,
+        14
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false,
+  "web_source": {
+    "base": "shrine",
+    "name": "Hold the Ford",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  },
+  "operation": [
+    {
+      "kind": "reach",
+      "name": "Cross and take the far bank",
+      "at": [
+        15,
+        11
+      ],
+      "radius": 1,
+      "turns": 2,
+      "wave": []
+    },
+    {
+      "kind": "hold",
+      "name": "Hold the far bank while the pilgrims cross",
+      "at": [
+        15,
+        10
+      ],
+      "radius": 2,
+      "turns": 2,
+      "wave": [
+        "trooper",
+        "trooper"
+      ]
+    },
+    {
+      "kind": "extract",
+      "name": "Fall back across the ford to the evac",
+      "at": [
+        15,
+        4
+      ],
+      "radius": 1,
+      "turns": 2,
+      "wave": [
+        "trooper",
+        "terentatek"
+      ]
+    }
+  ]
+}

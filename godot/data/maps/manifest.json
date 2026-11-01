@@ -1,0 +1,255 @@
+{
+  "missions": {
+    "relay": {
+      "path": "res://data/maps/relay.json",
+      "family": "defend",
+      "theme": "plains"
+    },
+    "shrine": {
+      "path": "res://data/maps/shrine.json",
+      "family": "defend",
+      "theme": "plains"
+    },
+    "rescue": {
+      "path": "res://data/maps/rescue.json",
+      "family": "rescue",
+      "theme": "dock"
+    },
+    "envoy": {
+      "path": "res://data/maps/envoy.json",
+      "family": "hack_terminal",
+      "theme": "city"
+    },
+    "archive": {
+      "path": "res://data/maps/archive.json",
+      "family": "hack_terminal",
+      "theme": "ruins"
+    },
+    "sabotage": {
+      "path": "res://data/maps/sabotage.json",
+      "family": "sabotage",
+      "theme": "dock"
+    },
+    "escort": {
+      "path": "res://data/maps/escort.json",
+      "family": "vip_extract",
+      "theme": "city"
+    },
+    "blockade": {
+      "path": "res://data/maps/blockade.json",
+      "family": "defend",
+      "theme": "plains"
+    },
+    "cache": {
+      "path": "res://data/maps/cache.json",
+      "family": "hack_terminal",
+      "theme": "ruins"
+    },
+    "hutt": {
+      "path": "res://data/maps/hutt.json",
+      "family": "hack_terminal",
+      "theme": "city"
+    },
+    "dock": {
+      "path": "res://data/maps/dock.json",
+      "family": "destroy_relay",
+      "theme": "dock"
+    },
+    "vault": {
+      "path": "res://data/maps/vault.json",
+      "family": "hack_terminal",
+      "theme": "ruins"
+    },
+    "ilum": {
+      "path": "res://data/maps/ilum.json",
+      "family": "defend",
+      "theme": "snow"
+    },
+    "adraasHunt": {
+      "path": "res://data/maps/adraasHunt.json",
+      "family": "ambush",
+      "theme": "city"
+    },
+    "taris": {
+      "path": "res://data/maps/taris.json",
+      "family": "rescue",
+      "theme": "ruins"
+    },
+    "thul": {
+      "path": "res://data/maps/thul.json",
+      "family": "vip_extract",
+      "theme": "plains"
+    },
+    "depot": {
+      "path": "res://data/maps/depot.json",
+      "family": "sabotage",
+      "theme": "plains"
+    },
+    "fort": {
+      "path": "res://data/maps/fort.json",
+      "family": "defend",
+      "theme": "plains"
+    },
+    "r_muster": {
+      "path": "res://data/maps/r_muster.json",
+      "family": "defend",
+      "theme": "plains"
+    },
+    "r_ravine": {
+      "path": "res://data/maps/r_ravine.json",
+      "family": "vip_extract",
+      "theme": "plains"
+    },
+    "r_caves": {
+      "path": "res://data/maps/r_caves.json",
+      "family": "hack_terminal",
+      "theme": "caves"
+    },
+    "r_sixth": {
+      "path": "res://data/maps/r_sixth.json",
+      "family": "rescue",
+      "theme": "plains"
+    },
+    "r_seventh": {
+      "path": "res://data/maps/r_seventh.json",
+      "family": "destroy_relay",
+      "theme": "plains"
+    },
+    "r_bomb": {
+      "path": "res://data/maps/r_bomb.json",
+      "family": "destroy_relay",
+      "theme": "plains"
+    },
+    "r_hospital": {
+      "path": "res://data/maps/r_hospital.json",
+      "family": "retaliation",
+      "theme": "plains"
+    },
+    "r_nexus": {
+      "path": "res://data/maps/r_nexus.json",
+      "family": "destroy_relay",
+      "theme": "caves"
+    },
+    "r_snipers": {
+      "path": "res://data/maps/r_snipers.json",
+      "family": "ambush",
+      "theme": "plains"
+    },
+    "r_dump": {
+      "path": "res://data/maps/r_dump.json",
+      "family": "sabotage",
+      "theme": "plains"
+    },
+    "r_prisoners": {
+      "path": "res://data/maps/r_prisoners.json",
+      "family": "rescue",
+      "theme": "plains"
+    },
+    "r_codes": {
+      "path": "res://data/maps/r_codes.json",
+      "family": "hack_terminal",
+      "theme": "plains"
+    },
+    "r_supply": {
+      "path": "res://data/maps/r_supply.json",
+      "family": "defend",
+      "theme": "plains"
+    },
+    "h_hetzal": {
+      "path": "res://data/maps/h_hetzal.json",
+      "family": "vip_extract",
+      "theme": "plains"
+    },
+    "h_grove": {
+      "path": "res://data/maps/h_grove.json",
+      "family": "destroy_relay",
+      "theme": "jungle"
+    },
+    "h_valo": {
+      "path": "res://data/maps/h_valo.json",
+      "family": "retaliation",
+      "theme": "city"
+    },
+    "h_tempest": {
+      "path": "res://data/maps/h_tempest.json",
+      "family": "ambush",
+      "theme": "dock"
+    },
+    "h_husks": {
+      "path": "res://data/maps/h_husks.json",
+      "family": "hack_terminal",
+      "theme": "caves"
+    },
+    "h_beacon": {
+      "path": "res://data/maps/h_beacon.json",
+      "family": "destroy_relay",
+      "theme": "dock"
+    },
+    "h_roots": {
+      "path": "res://data/maps/h_roots.json",
+      "family": "destroy_relay",
+      "theme": "jungle"
+    },
+    "h_salvage": {
+      "path": "res://data/maps/h_salvage.json",
+      "family": "retaliation",
+      "theme": "plains"
+    },
+    "h_scouts": {
+      "path": "res://data/maps/h_scouts.json",
+      "family": "vip_extract",
+      "theme": "jungle"
+    },
+    "h_cache": {
+      "path": "res://data/maps/h_cache.json",
+      "family": "sabotage",
+      "theme": "dock"
+    },
+    "h_prisoners": {
+      "path": "res://data/maps/h_prisoners.json",
+      "family": "rescue",
+      "theme": "dock"
+    },
+    "h_buoy": {
+      "path": "res://data/maps/h_buoy.json",
+      "family": "hack_terminal",
+      "theme": "dock"
+    },
+    "h_outpost": {
+      "path": "res://data/maps/h_outpost.json",
+      "family": "defend",
+      "theme": "plains"
+    },
+    "ilsaDrop": {
+      "path": "res://data/maps/ilsaDrop.json",
+      "family": "hack_terminal",
+      "theme": "city"
+    },
+    "brenClinic": {
+      "path": "res://data/maps/brenClinic.json",
+      "family": "retaliation",
+      "theme": "city"
+    },
+    "grakClan": {
+      "path": "res://data/maps/grakClan.json",
+      "family": "defend",
+      "theme": "plains"
+    }
+  },
+  "web_variants": [
+    "res://data/maps/web_dantooine_crossroads.json",
+    "res://data/maps/web_shrine_terraces.json",
+    "res://data/maps/web_hold_the_ford.json",
+    "res://data/maps/web_frozen_watchpost.json",
+    "res://data/maps/web_detention_level_5.json",
+    "res://data/maps/web_smuggler_grotto.json",
+    "res://data/maps/web_antenna_ridge.json",
+    "res://data/maps/web_rooftop_chase.json",
+    "res://data/maps/web_listening_post_interior.json",
+    "res://data/maps/web_overgrown_relay.json",
+    "res://data/maps/web_balmorra_fuel_farm.json",
+    "res://data/maps/web_refinery_stacks.json",
+    "res://data/maps/web_canyon_run.json",
+    "res://data/maps/web_deepway_tunnels.json"
+  ]
+}

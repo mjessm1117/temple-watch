@@ -1,0 +1,264 @@
+{
+  "id": "web_frozen_watchpost",
+  "name": "Frozen Watchpost",
+  "family": "defend",
+  "theme": "snow",
+  "plot": {
+    "width": 28,
+    "height": 28,
+    "placements": [],
+    "source_rows": [
+      "..c...MM...c..",
+      ".B....^^....B.",
+      "....c....c....",
+      "^^.h......h.^^",
+      "M^...#..#...^M",
+      "....c.OO.c....",
+      ".x....OO....x.",
+      "....c....c....",
+      "M^...#..#...^M",
+      "^^.h......h.^^",
+      "....c....c....",
+      ".B....^^....B.",
+      "..c...MM...c..",
+      ".............."
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      14,
+      23
+    ],
+    "crossings": [
+      4,
+      14,
+      23,
+      12
+    ]
+  },
+  "turn_limit": 0,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        13,
+        12
+      ]
+    ],
+    "hp": 18,
+    "waves": 5,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      12,
+      23
+    ],
+    [
+      "consular",
+      13,
+      23
+    ],
+    [
+      "soldier",
+      14,
+      23
+    ],
+    [
+      "scout",
+      15,
+      23
+    ],
+    [
+      "medic",
+      16,
+      23
+    ],
+    [
+      "soldier",
+      17,
+      23
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        4,
+        17
+      ],
+      [
+        "trooper",
+        8,
+        18
+      ]
+    ],
+    [
+      [
+        "heavy",
+        22,
+        14
+      ],
+      [
+        "trooper",
+        20,
+        12
+      ]
+    ],
+    [
+      [
+        "agent",
+        11,
+        5
+      ],
+      [
+        "trooper",
+        17,
+        5
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 14,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      11,
+      25
+    ],
+    [
+      12,
+      25
+    ],
+    [
+      13,
+      25
+    ],
+    [
+      14,
+      25
+    ],
+    [
+      15,
+      25
+    ],
+    [
+      16,
+      25
+    ]
+  ],
+  "entries": [
+    [
+      7,
+      7,
+      "west pass"
+    ],
+    [
+      20,
+      7,
+      "north ridge"
+    ],
+    [
+      7,
+      20,
+      "south slope"
+    ],
+    [
+      20,
+      20,
+      "east pass"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      14,
+      23
+    ],
+    "goal": [
+      13,
+      12
+    ],
+    "via": [
+      [
+        4,
+        14
+      ],
+      [
+        23,
+        14
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false,
+  "web_source": {
+    "base": "shrine",
+    "name": "Frozen Watchpost",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  },
+  "wave_roster": [
+    [
+      "trooper",
+      "trooper",
+      "trooper"
+    ],
+    [
+      "heavy",
+      "trooper"
+    ],
+    [
+      "agent",
+      "trooper"
+    ],
+    [
+      "trooper",
+      "heavy",
+      "trooper"
+    ],
+    [
+      "acolyte",
+      "trooper"
+    ]
+  ]
+}

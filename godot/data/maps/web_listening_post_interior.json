@@ -1,0 +1,245 @@
+{
+  "id": "web_listening_post_interior",
+  "name": "Listening Post Interior",
+  "family": "hack_terminal",
+  "theme": "dock",
+  "plot": {
+    "width": 33,
+    "height": 29,
+    "placements": [],
+    "source_rows": [
+      "#########...#######",
+      "#.q....#.....#..q.#",
+      "#......_.....#....#",
+      "#..c...#..c.._..c.#",
+      "##_#####.....####_#",
+      "#......#.....#....#",
+      "#.c....#..k..#.c..#",
+      "#......_.....#....#",
+      "####_###.....##_###",
+      "#.........q.......#",
+      "#..c.....c....c...#",
+      "#.................#",
+      "#_###__#####__###_#",
+      "...................",
+      "EE...............EE"
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      16,
+      28
+    ],
+    "crossings": [
+      4,
+      14,
+      24,
+      8,
+      16
+    ]
+  },
+  "turn_limit": 9,
+  "clock_trigger": "start",
+  "concealed": true,
+  "objective": {
+    "required": 2,
+    "points": [
+      [
+        9,
+        8
+      ],
+      [
+        23,
+        8
+      ],
+      [
+        17,
+        16
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      14,
+      24
+    ],
+    [
+      "consular",
+      15,
+      24
+    ],
+    [
+      "soldier",
+      16,
+      24
+    ],
+    [
+      "scout",
+      17,
+      24
+    ],
+    [
+      "medic",
+      18,
+      24
+    ],
+    [
+      "soldier",
+      19,
+      24
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        10,
+        9
+      ],
+      [
+        "trooper",
+        22,
+        9
+      ]
+    ],
+    [
+      [
+        "trooper",
+        18,
+        14
+      ],
+      [
+        "heavy",
+        17,
+        9
+      ]
+    ],
+    [
+      [
+        "agent",
+        10,
+        13
+      ],
+      [
+        "trooper",
+        23,
+        13
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 16,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      13,
+      26
+    ],
+    [
+      14,
+      26
+    ],
+    [
+      15,
+      26
+    ],
+    [
+      16,
+      26
+    ],
+    [
+      17,
+      26
+    ],
+    [
+      18,
+      26
+    ]
+  ],
+  "entries": [
+    [
+      16,
+      7,
+      "north hatch"
+    ],
+    [
+      7,
+      20,
+      "west alley"
+    ],
+    [
+      25,
+      20,
+      "east alley"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      16,
+      24
+    ],
+    "goal": [
+      9,
+      8
+    ],
+    "via": [
+      [
+        4,
+        14
+      ],
+      [
+        28,
+        14
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false,
+  "web_source": {
+    "base": "archive",
+    "name": "Listening Post Interior",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  }
+}

@@ -1,0 +1,256 @@
+{
+  "id": "web_balmorra_fuel_farm",
+  "name": "Balmorra Fuel Farm",
+  "family": "sabotage",
+  "theme": "dock",
+  "plot": {
+    "width": 34,
+    "height": 28,
+    "placements": [],
+    "source_rows": [
+      "##...c...C....c...##",
+      "#.........h.......C#",
+      "..c..x...###..x.....",
+      "....^^^^^^^^^^^^....",
+      "....^^^^^^^^^^^^....",
+      ".c..................",
+      "...##....c.....##...",
+      "...#C.........x.#...",
+      "......wwwwwwww......",
+      "..c...wwwwwwww...c..",
+      "......wwwwwwww......",
+      ".h.....c....c.....h.",
+      "....................",
+      "EE......c..c......EE"
+    ],
+    "source_at": [
+      7,
+      7
+    ],
+    "lanes": [
+      4,
+      17,
+      29
+    ],
+    "crossings": [
+      4,
+      14,
+      23,
+      7,
+      8
+    ]
+  },
+  "turn_limit": 10,
+  "clock_trigger": "concealment",
+  "concealed": true,
+  "objective": {
+    "required": 2,
+    "points": [
+      [
+        16,
+        7
+      ],
+      [
+        25,
+        8
+      ],
+      [
+        11,
+        14
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        13,
+        4
+      ],
+      [
+        21,
+        5
+      ],
+      [
+        4,
+        13
+      ],
+      [
+        21,
+        13
+      ],
+      [
+        13,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      15,
+      23
+    ],
+    [
+      "consular",
+      16,
+      23
+    ],
+    [
+      "soldier",
+      17,
+      23
+    ],
+    [
+      "scout",
+      18,
+      23
+    ],
+    [
+      "medic",
+      19,
+      23
+    ],
+    [
+      "soldier",
+      20,
+      23
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        10,
+        8
+      ],
+      [
+        "trooper",
+        23,
+        8
+      ]
+    ],
+    [
+      [
+        "heavy",
+        17,
+        11
+      ],
+      [
+        "agent",
+        15,
+        10
+      ]
+    ],
+    [
+      [
+        "trooper",
+        12,
+        14
+      ],
+      [
+        "trooper",
+        20,
+        13
+      ]
+    ],
+    [
+      [
+        "heavy",
+        15,
+        8
+      ],
+      [
+        "trooper",
+        24,
+        10
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 17,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      14,
+      25
+    ],
+    [
+      15,
+      25
+    ],
+    [
+      16,
+      25
+    ],
+    [
+      17,
+      25
+    ],
+    [
+      18,
+      25
+    ],
+    [
+      19,
+      25
+    ]
+  ],
+  "entries": [
+    [
+      7,
+      9,
+      "west fence"
+    ],
+    [
+      26,
+      9,
+      "east fence"
+    ],
+    [
+      17,
+      7,
+      "depot gate"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      17,
+      23
+    ],
+    "goal": [
+      16,
+      7
+    ],
+    "via": [
+      [
+        4,
+        14
+      ],
+      [
+        29,
+        14
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false,
+  "web_source": {
+    "base": "sabotage",
+    "name": "Balmorra Fuel Farm",
+    "adaptation": "Source geometry, objective coordinates, pod positions, operation steps and named entries retained inside a broad bypass apron. Narrow doors opened; three-wide routes and evac plazas added."
+  }
+}

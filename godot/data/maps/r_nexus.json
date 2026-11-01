@@ -1,0 +1,306 @@
+{
+  "id": "r_nexus",
+  "name": "The Spawn Pit",
+  "family": "destroy_relay",
+  "theme": "caves",
+  "plot": {
+    "width": 30,
+    "height": 34,
+    "placements": [
+      {
+        "parcel": "crater",
+        "at": [
+          6,
+          6
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "cargo",
+        "at": [
+          12,
+          6
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          18,
+          6
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "cargo",
+        "at": [
+          6,
+          12
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          12,
+          12
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          18,
+          12
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          6,
+          18
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          12,
+          18
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          18,
+          18
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          6,
+          24
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          12,
+          24
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "console",
+        "at": [
+          18,
+          24
+        ],
+        "rotate": 3
+      }
+    ],
+    "lanes": [
+      4,
+      15,
+      25
+    ],
+    "crossings": [
+      4,
+      17,
+      29
+    ]
+  },
+  "turn_limit": 10,
+  "clock_trigger": "concealment",
+  "concealed": true,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        15,
+        4
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        15,
+        4
+      ],
+      [
+        25,
+        5
+      ],
+      [
+        4,
+        17
+      ],
+      [
+        25,
+        17
+      ],
+      [
+        15,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      13,
+      29
+    ],
+    [
+      "consular",
+      14,
+      29
+    ],
+    [
+      "soldier",
+      15,
+      29
+    ],
+    [
+      "scout",
+      16,
+      29
+    ],
+    [
+      "medic",
+      17,
+      29
+    ],
+    [
+      "soldier",
+      18,
+      29
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        4,
+        23
+      ],
+      [
+        "trooper",
+        8,
+        24
+      ]
+    ],
+    [
+      [
+        "heavy",
+        24,
+        17
+      ],
+      [
+        "trooper",
+        22,
+        15
+      ]
+    ],
+    [
+      [
+        "brood",
+        12,
+        5
+      ],
+      [
+        "trooper",
+        18,
+        5
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 15,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      12,
+      31
+    ],
+    [
+      13,
+      31
+    ],
+    [
+      14,
+      31
+    ],
+    [
+      15,
+      31
+    ],
+    [
+      16,
+      31
+    ],
+    [
+      17,
+      31
+    ]
+  ],
+  "entries": [
+    [
+      2,
+      17,
+      "west approach"
+    ],
+    [
+      27,
+      17,
+      "east approach"
+    ],
+    [
+      15,
+      2,
+      "north approach"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      15,
+      29
+    ],
+    "goal": [
+      15,
+      4
+    ],
+    "via": [
+      [
+        4,
+        17
+      ],
+      [
+        25,
+        17
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": true
+}

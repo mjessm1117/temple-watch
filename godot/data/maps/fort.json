@@ -1,0 +1,338 @@
+{
+  "id": "fort",
+  "name": "Fort Garnik",
+  "family": "defend",
+  "theme": "plains",
+  "plot": {
+    "width": 34,
+    "height": 34,
+    "placements": [
+      {
+        "parcel": "barricade",
+        "at": [
+          6,
+          6
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "crater",
+        "at": [
+          12,
+          6
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "cargo",
+        "at": [
+          18,
+          6
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          24,
+          6
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "crater",
+        "at": [
+          6,
+          12
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "cargo",
+        "at": [
+          12,
+          12
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          18,
+          12
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          24,
+          12
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "cargo",
+        "at": [
+          6,
+          18
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          12,
+          18
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          18,
+          18
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          24,
+          18
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "terrace",
+        "at": [
+          6,
+          24
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          12,
+          24
+        ],
+        "rotate": 1
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          18,
+          24
+        ],
+        "rotate": 3
+      },
+      {
+        "parcel": "console",
+        "at": [
+          24,
+          24
+        ],
+        "rotate": 1
+      }
+    ],
+    "lanes": [
+      4,
+      17,
+      29
+    ],
+    "crossings": [
+      4,
+      17,
+      29
+    ]
+  },
+  "turn_limit": 0,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        17,
+        17
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        17,
+        4
+      ],
+      [
+        29,
+        5
+      ],
+      [
+        4,
+        17
+      ],
+      [
+        29,
+        17
+      ],
+      [
+        17,
+        7
+      ]
+    ],
+    "save": 4
+  },
+  "squad": [
+    [
+      "guardian",
+      15,
+      29
+    ],
+    [
+      "consular",
+      16,
+      29
+    ],
+    [
+      "soldier",
+      17,
+      29
+    ],
+    [
+      "scout",
+      18,
+      29
+    ],
+    [
+      "medic",
+      19,
+      29
+    ],
+    [
+      "soldier",
+      20,
+      29
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        4,
+        23
+      ],
+      [
+        "trooper",
+        8,
+        24
+      ]
+    ],
+    [
+      [
+        "heavy",
+        28,
+        17
+      ],
+      [
+        "trooper",
+        26,
+        15
+      ]
+    ],
+    [
+      [
+        "agent",
+        14,
+        5
+      ],
+      [
+        "trooper",
+        20,
+        5
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 17,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      14,
+      31
+    ],
+    [
+      15,
+      31
+    ],
+    [
+      16,
+      31
+    ],
+    [
+      17,
+      31
+    ],
+    [
+      18,
+      31
+    ],
+    [
+      19,
+      31
+    ]
+  ],
+  "entries": [
+    [
+      2,
+      17,
+      "west approach"
+    ],
+    [
+      31,
+      17,
+      "east approach"
+    ],
+    [
+      17,
+      2,
+      "north approach"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      17,
+      29
+    ],
+    "goal": [
+      17,
+      4
+    ],
+    "via": [
+      [
+        4,
+        17
+      ],
+      [
+        29,
+        17
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false
+}

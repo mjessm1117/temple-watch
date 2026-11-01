@@ -1,0 +1,323 @@
+{
+  "id": "h_tempest",
+  "name": "The Tempest Runner",
+  "family": "ambush",
+  "theme": "dock",
+  "plot": {
+    "width": 30,
+    "height": 34,
+    "placements": [
+      {
+        "parcel": "terrace",
+        "at": [
+          6,
+          6
+        ],
+        "rotate": 2
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          12,
+          6
+        ],
+        "rotate": 0
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          18,
+          6
+        ],
+        "rotate": 2
+      },
+      {
+        "parcel": "ruin",
+        "at": [
+          6,
+          12
+        ],
+        "rotate": 0
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          12,
+          12
+        ],
+        "rotate": 2
+      },
+      {
+        "parcel": "console",
+        "at": [
+          18,
+          12
+        ],
+        "rotate": 0
+      },
+      {
+        "parcel": "grove",
+        "at": [
+          6,
+          18
+        ],
+        "rotate": 2
+      },
+      {
+        "parcel": "console",
+        "at": [
+          12,
+          18
+        ],
+        "rotate": 0
+      },
+      {
+        "parcel": "barricade",
+        "at": [
+          18,
+          18
+        ],
+        "rotate": 2
+      },
+      {
+        "parcel": "console",
+        "at": [
+          6,
+          24
+        ],
+        "rotate": 0
+      },
+      {
+        "parcel": "barricade",
+        "at": [
+          12,
+          24
+        ],
+        "rotate": 2
+      },
+      {
+        "parcel": "crater",
+        "at": [
+          18,
+          24
+        ],
+        "rotate": 0
+      }
+    ],
+    "lanes": [
+      4,
+      15,
+      25
+    ],
+    "crossings": [
+      4,
+      17,
+      29
+    ]
+  },
+  "turn_limit": 8,
+  "clock_trigger": "start",
+  "concealed": false,
+  "objective": {
+    "required": 1,
+    "points": [
+      [
+        15,
+        4
+      ],
+      [
+        25,
+        5
+      ],
+      [
+        4,
+        5
+      ]
+    ],
+    "hp": 18,
+    "waves": 4,
+    "civilians": [
+      [
+        4,
+        5
+      ],
+      [
+        15,
+        4
+      ],
+      [
+        25,
+        5
+      ],
+      [
+        4,
+        17
+      ],
+      [
+        25,
+        17
+      ],
+      [
+        15,
+        7
+      ]
+    ],
+    "save": 4,
+    "runner": [
+      15,
+      17
+    ],
+    "exit": [
+      15,
+      2
+    ],
+    "runner_mob": 3
+  },
+  "squad": [
+    [
+      "guardian",
+      13,
+      29
+    ],
+    [
+      "consular",
+      14,
+      29
+    ],
+    [
+      "soldier",
+      15,
+      29
+    ],
+    [
+      "scout",
+      16,
+      29
+    ],
+    [
+      "medic",
+      17,
+      29
+    ],
+    [
+      "soldier",
+      18,
+      29
+    ]
+  ],
+  "groups": [
+    [
+      [
+        "trooper",
+        4,
+        23
+      ],
+      [
+        "trooper",
+        8,
+        24
+      ]
+    ],
+    [
+      [
+        "heavy",
+        24,
+        17
+      ],
+      [
+        "trooper",
+        22,
+        15
+      ]
+    ],
+    [
+      [
+        "agent",
+        12,
+        5
+      ],
+      [
+        "trooper",
+        18,
+        5
+      ]
+    ]
+  ],
+  "prisoner": {
+    "name": "Republic evacuee",
+    "x": 15,
+    "y": 4,
+    "active": false,
+    "hp": 8
+  },
+  "evac": [
+    [
+      12,
+      31
+    ],
+    [
+      13,
+      31
+    ],
+    [
+      14,
+      31
+    ],
+    [
+      15,
+      31
+    ],
+    [
+      16,
+      31
+    ],
+    [
+      17,
+      31
+    ]
+  ],
+  "entries": [
+    [
+      2,
+      17,
+      "west approach"
+    ],
+    [
+      27,
+      17,
+      "east approach"
+    ],
+    [
+      15,
+      2,
+      "north approach"
+    ]
+  ],
+  "reinforcement": {
+    "announce_turn": -1,
+    "drop_turn": -1,
+    "units": []
+  },
+  "route_validation": {
+    "start": [
+      15,
+      29
+    ],
+    "goal": [
+      15,
+      4
+    ],
+    "via": [
+      [
+        4,
+        17
+      ],
+      [
+        25,
+        17
+      ]
+    ],
+    "minimum_width": 3
+  },
+  "swarm": false
+}
