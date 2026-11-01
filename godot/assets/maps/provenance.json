@@ -8,5 +8,18 @@
     "@gltf-transform/extensions": "^4.5.1",
     "@gltf-transform/functions": "^4.5.1",
     "meshoptimizer": "^1.3.0"
+  },
+  "wave8_original_art": {
+    "creator": "Original procedural art authored for Temple Watch, Wave 8 (2026-11-01).",
+    "source": "Repository-native GDScript geometry and Godot shaders; no downloaded or XCOM assets.",
+    "files": [
+      "res://assets/env/terrain.gdshader",
+      "res://scripts/map_art_batch.gd",
+      "res://scripts/map_art_geometry.gd",
+      "res://scripts/map_art_grid.gd",
+      "res://scripts/map_presentation.gd"
+    ],
+    "adapted": "res://assets/env/stone.gdshader and the repository\u2019s Wave 3/4 env_art.gd materials, arcade, terrace edges and lamp construction. Existing GLB source/credits above unchanged.",
+    "geometry": "Instanced original faceted rocks, low walls, sandbags, platforms, stairs, ramps, trees, facade panels, skyline, gate, glowing markers and objective figures. Original procedural crack/scorch decal texture."
   }
 }

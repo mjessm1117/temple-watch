@@ -33,6 +33,6 @@ void fragment() {
 	ALBEDO = mix(stone_color.rgb * age, moss_color.rgb, moss);
 	ROUGHNESS = clamp(0.72 + grain * 0.22 + moss * 0.12, 0.62, 0.96);
 	METALLIC = 0.015;
-	NORMAL_MAP = normalize(vec3((grain - 0.5) * 0.18, (veins - 0.5) * 0.10, 1.0));
+	NORMAL_MAP = vec3(0.5 + (grain - 0.5) * 0.10, 0.5 + (veins - 0.5) * 0.06, 1.0);
 	NORMAL_MAP_DEPTH = 0.22;
 }

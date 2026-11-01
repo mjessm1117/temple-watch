@@ -1,113 +1,227 @@
 extends Node3D
-## Drop-in map renderer: build(mission, model_cache). Geometry remains mission-owned.
+## One read-only art renderer for the rescue fixture and all campaign biomes.
 const Maps = preload("res://scripts/map_catalog.gd")
 const Shot = preload("res://scripts/shot.gd")
+const Batch = preload("res://scripts/map_art_batch.gd")
+const Geometry = preload("res://scripts/map_art_geometry.gd")
+const STONE = preload("res://assets/env/stone.gdshader")
+const TERRAIN = preload("res://assets/env/terrain.gdshader")
 var themes: Dictionary = Maps.read("res://data/maps/themes.json")
 var props: Dictionary = Maps.read("res://data/maps/props.json")
-var cache: Dictionary = {}
 var palette: Dictionary = {}
+var batch = Batch.new()
+var theme := "temple"
+var mission: RefCounted
+var floor_bounds: Dictionary = {}
 var marker_root: Node3D
+var damage_root: Node3D
+var damage_hash := 0
+var marker_hash := 0
+var tick := 0.0
+var game: Node
+var scar_texture: ImageTexture
 
-func material(color: Color, glow: float = 0.0) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new(); m.albedo_color = color; m.roughness = 0.85
-	if glow > 0.0: m.emission_enabled = true; m.emission = color; m.emission_energy_multiplier = glow
-	return m
+func material(value: Color, glow: float = 0.0) -> StandardMaterial3D:
+	var mat := StandardMaterial3D.new(); mat.albedo_color = value; mat.roughness = 0.85
+	if glow > 0:
+		mat.emission_enabled = true; mat.emission = value; mat.emission_energy_multiplier = glow
+	return mat
+
+func stone(value: Color, moss := 0.08) -> ShaderMaterial:
+	var mat := ShaderMaterial.new(); mat.shader = STONE
+	mat.set_shader_parameter("stone_color",value); mat.set_shader_parameter("moss_amount",moss)
+	mat.set_shader_parameter("wear",0.22)
+	return mat
+
+func color(value: int) -> Color:
+	return Color(float((value>>16)&255)/255.0,float((value>>8)&255)/255.0,float(value&255)/255.0)
 
 func box(at: Vector3, size: Vector3, mat: Material, parent: Node3D = self) -> MeshInstance3D:
 	var mesh := BoxMesh.new(); mesh.size = size
 	var node := MeshInstance3D.new(); node.mesh = mesh; node.material_override = mat; node.position = at; parent.add_child(node)
 	return node
 
-func color(value: int) -> Color:
-	return Color(float((value>>16)&255)/255.0,float((value>>8)&255)/255.0,float(value&255)/255.0)
-
 func apply_environment(world: WorldEnvironment, key: DirectionalLight3D, theme_name: String) -> void:
-	var t: Dictionary = themes.get(theme_name,themes.dock)
+	var t: Dictionary = themes.get(theme_name,themes.temple)
 	var env := Environment.new(); env.background_mode = Environment.BG_SKY
 	var sky := Sky.new(); var sky_material := ProceduralSkyMaterial.new()
 	sky_material.sky_top_color = color(int(t.sky[0])); sky_material.sky_horizon_color = color(int(t.sky[1]))
 	sky_material.ground_bottom_color = color(int(t.ground)); sky_material.ground_horizon_color = color(int(t.fog[0]))
 	sky.sky_material = sky_material; env.sky = sky
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color = color(int(t.hemi[0])); env.ambient_light_energy = float(t.hemi[2])*0.4
-	env.ssao_enabled = true; env.ssao_intensity = 0.75; env.ssao_radius = 1.3
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color = color(int(t.hemi[0])); env.ambient_light_energy = float(t.hemi[2])*0.43
+	env.ssao_enabled = true; env.ssao_intensity = 1.0; env.ssao_radius = 0.9
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES; env.tonemap_exposure = float(t.exp)
-	env.fog_enabled = true; env.fog_light_color = color(int(t.fog[0])); env.fog_density = 0.002
-	world.environment = env; key.light_color = color(int(t.key[0])); key.light_energy = float(t.key[1])*0.55; key.shadow_enabled = true
-	key.rotation_degrees = Vector3(-55,-32,0)
+	env.glow_enabled = true; env.glow_intensity = 0.24
+	env.fog_enabled = true; env.fog_light_color = color(int(t.fog[0])); env.fog_density = 0.0015
+	env.fog_aerial_perspective = 0.25
+	world.environment = env; key.light_color = color(int(t.key[0])); key.light_energy = float(t.key[1])*0.65; key.shadow_enabled = true
+	key.directional_shadow_max_distance = 100; key.light_angular_distance = 1.2
+	key.rotation_degrees = Vector3(-48,-38,0)
+
+func setup_palette(t: Dictionary) -> void:
+	var surface: Dictionary = t.surface
+	var floor_mat := ShaderMaterial.new(); floor_mat.shader = TERRAIN
+	floor_mat.set_shader_parameter("base_color",Color(surface.base)); floor_mat.set_shader_parameter("secondary_color",Color(surface.secondary))
+	floor_mat.set_shader_parameter("biome",int(surface.biome))
+	palette = {"floor":floor_mat,"wall":stone(color(int(t.wall)).lightened(0.18)),"dark":stone(color(int(t.wall)).darkened(0.24)),
+		"ledge":stone(color(int(t.wallTop)).lightened(0.15),0.02),"trim":material(color(int(t.trim))),
+		"metal":material(color(int(t.metal))),"ground":stone(color(int(t.ground)).lightened(0.09)),
+		"bags":stone(Color("8c8970") if theme != "snow" else Color("a6b6b9"),0.03),
+		"bark":stone(Color("524435")),"leaves":stone(Color("354e35") if theme != "plains" else Color("58683e"),0.1),
+		"snow":stone(Color("d3e1e4"),0),"water":material(Color("365e69")),
+		"banner":material(Color("294558")),"window":material(Color("b6cbd1"),0.6),
+		"glow":material(Color("73dce7"),1.6),"evac":material(Color("51cce0"),1.3),
+		"fire":material(Color("ffad59"),2.6),"objective":material(Color("edbf64"),1.5),
+		"crystal":material(Color("779fc6"),0.8),"scorch":material(Color("211e1b")),"danger":material(Color("e76858"),0.6)}
+	palette.metal.metallic = 0.65; palette.metal.roughness = 0.4
+	palette.water.metallic = 0.3; palette.water.roughness = 0.18
+	palette.ground = floor_mat.duplicate()
+	palette.ground.set_shader_parameter("base_color",Color(surface.base).darkened(0.18))
+	palette.ground.set_shader_parameter("secondary_color",Color(surface.secondary).darkened(0.12))
 
 func build(m: RefCounted, _models: Dictionary = {}) -> void:
-	for child in get_children(): remove_child(child); child.queue_free()
-	var t: Dictionary = themes.get(str(m.spec.get("theme","dock")),themes.dock)
-	palette = {"floor":material(Color(t.floor[0])),"alt":material(Color(t.floor[1])),"wall":material(color(int(t.wall))),"cover":material(color(int(t.crate))),"high":material(color(int(t.wallTop))),"evac":material(Color("51cce0"),1.3),"objective":material(Color("e3bd73"),0.4),"ground":material(color(int(t.ground))),"water":material(Color("234e69"))}
-	box(Vector3(float(m.spec.width)/2,-0.6,float(m.spec.height)/2),Vector3(m.spec.width+16,0.3,m.spec.height+16),palette.ground)
-	var tile_props: Dictionary = props.tile_props
-	var wall_name := "wall_" + str(props.wall_of.get(m.spec.get("theme","dock"),m.spec.get("theme","dock")))
-	var buckets: Dictionary = {}
+	clear_children(self)
+	mission = m; theme = str(m.spec.get("theme","temple"))
+	batch.records.clear(); batch.buckets.clear(); floor_bounds.clear()
+	var t: Dictionary = themes.get(theme,themes.temple); setup_palette(t)
+	var geo := Geometry.new(self)
 	for y in int(m.spec.height):
 		for x in int(m.spec.width):
-			var p := Vector2i(x,y); var c: String = m.tile(p); var level := Shot.elevation(m,p)*0.7
-			var key := "water" if c == "w" else "evac" if c == "E" else "high" if level > 0 else "floor" if (x+y)%2 == 0 else "alt"
-			if not buckets.has(key): buckets[key] = []
-			buckets[key].append(Transform3D(Basis.from_scale(Vector3(0.98,0.2+level,0.98)),Vector3(x,level/2.0-0.12,y)))
-			if c == "#":
-				# Lower boundary blocks keep an overview readable.
-				var height := 0.55 if x in [0,int(m.spec.width)-1] or y in [0,int(m.spec.height)-1] else 2.1
-				if not prop(wall_name,Vector3(x,level,y),0.95,height): box(Vector3(x,level+height/2,y),Vector3(0.95,height,0.95),palette.wall)
-			elif tile_props.has(c):
-				var height := 0.8 if c in ["c","h","r"] else 1.0
-				var kind := str(m.spec.get("prop_overrides",{}).get(p,tile_props[c]))
-				if not prop(kind,Vector3(x,level,y),0.85,height): box(Vector3(x,level+height/2,y),Vector3(0.8,height,0.8),palette.cover)
-	for key in buckets:
-		var mm := MultiMesh.new(); mm.transform_format = MultiMesh.TRANSFORM_3D; mm.mesh = BoxMesh.new(); mm.instance_count = buckets[key].size()
-		for i in mm.instance_count: mm.set_instance_transform(i,buckets[key][i])
-		var node := MultiMeshInstance3D.new(); node.multimesh = mm; node.material_override = palette[key]; add_child(node)
-	# Objective props are markers, never invisible collision.
-	if m.modern:
-		for at in m.spec.objective.points:
-			var p := Maps.point(at)
-			var kind := "relay" if m.spec.family in ["destroy_relay","defend"] else "terminal"
-			if m.spec.family not in ["rescue","vip_extract","retaliation","operation"]: prop(kind,Vector3(p.x,0,p.y),0.7,1.15)
-	var random := RandomNumberGenerator.new(); random.seed = str(m.spec.get("id","rescue")).hash()
-	for kind in t.props:
-		for i in mini(6,int(t.props[kind])):
-			var at := Vector3(random.randf_range(-5,float(m.spec.width)+4),0,-3-random.randf_range(0,4))
-			if i%2: at = Vector3(-3-random.randf_range(0,3),0,random.randf_range(0,m.spec.height))
-			if not prop(str(kind),at,1.4,3.0): scenery(str(kind),at,t,random)
+			geo.floor_tile(m,Vector2i(x,y)); geo.cover(m,Vector2i(x,y))
+	geo.backdrop(int(m.spec.width),int(m.spec.height))
+	batch.flush(self)
 	var rim := DirectionalLight3D.new(); rim.light_color = color(int(t.rim[0])); rim.light_energy = float(t.rim[1])*0.4
 	rim.rotation_degrees = Vector3(-30,135,0); add_child(rim)
 	weather(t.part,int(m.spec.width),int(m.spec.height))
-	marker_root = Node3D.new(); add_child(marker_root); refresh_markers(m)
+	marker_root = Node3D.new(); marker_root.name = "Objectives"; add_child(marker_root)
+	damage_root = Node3D.new(); damage_root.name = "CoverDamage"; add_child(damage_root)
+	damage_hash = -1; marker_hash = -1
+	refresh_markers(m); refresh_damage()
 
-func prop(kind: String, at: Vector3, width: float, height: float) -> bool:
-	var path := "res://assets/maps/%s.glb" % kind
-	if not ResourceLoader.exists(path): return false
-	if not cache.has(kind): cache[kind] = load(path)
-	var instance: Node3D = cache[kind].instantiate()
-	var bounds := bounds_of(instance,Transform3D.IDENTITY)
-	if bounds.size.length() <= 0.001: instance.free(); return false
-	var factor := width/maxf(bounds.size.x,bounds.size.z)
-	var scale_y := height/bounds.size.y
-	instance.scale = Vector3(factor,scale_y,factor)
-	instance.position = at-Vector3(bounds.get_center().x*factor,bounds.position.y*scale_y,bounds.get_center().z*factor)
-	add_child(instance)
-	return true
+func clear_children(parent: Node) -> void:
+	for child in parent.get_children(): parent.remove_child(child); child.queue_free()
+
+func prop(kind: String, at: Vector3, width: float, height: float, angle := 0.0) -> bool:
+	return batch.model("res://assets/maps/%s.glb" % kind,at,width,height,angle).size.length() > 0.001
 
 func bounds_of(node: Node3D, transform: Transform3D) -> AABB:
-	transform = transform*node.transform
+	var parts: Array = []; batch.collect(node,transform,parts)
 	var out := AABB(); var first := true
-	if node is MeshInstance3D and node.mesh != null: out = transform*node.mesh.get_aabb(); first = false
-	for child in node.get_children():
-		if not child is Node3D: continue
-		var bounds := bounds_of(child,transform)
-		if bounds.size.length() == 0: continue
+	for part in parts:
+		var bounds: AABB = part.transform*part.mesh.get_aabb()
 		out = bounds if first else out.merge(bounds); first = false
 	return out
 
-func scenery(kind: String, at: Vector3, t: Dictionary, random: RandomNumberGenerator) -> void:
-	var mesh := CylinderMesh.new(); mesh.top_radius = 0; mesh.bottom_radius = 0.6
-	mesh.height = random.randf_range(0.6,3.0) if kind in ["tree","pine","stalag","tower"] else 0.6
-	var node := MeshInstance3D.new(); node.mesh = mesh; node.position = at+Vector3.UP*mesh.height/2
-	node.material_override = material(color(int(t.wallTop)) if kind not in ["tree","fern","grass"] else Color("3f6a2e")); add_child(node)
+func light(at: Vector3, tint: Color, energy: float, radius: float, parent: Node = self) -> void:
+	var lamp := OmniLight3D.new(); lamp.position = at; lamp.light_color = tint
+	lamp.light_energy = energy; lamp.omni_range = radius; lamp.shadow_enabled = false; parent.add_child(lamp)
+
+func _process(delta: float) -> void:
+	if not mission: return
+	if is_instance_valid(game):
+		var hovered: Vector2i = game.hovered
+		palette.floor.set_shader_parameter("hover_tile",Vector2(hovered))
+		palette.floor.set_shader_parameter("grid_strength",0.8 if mission.in_bounds(hovered) and not game.cinematic else 0.0)
+	tick += delta
+	if tick < 0.18: return
+	tick = 0.0; refresh_damage(); refresh_markers(mission)
+
+func refresh_damage() -> void:
+	var signature := hash(mission.cover_hp)
+	if damage_hash == signature: return
+	damage_hash = signature; clear_children(damage_root)
+	if scar_texture == null:
+		var picture := Image.create(64,64,false,Image.FORMAT_RGBA8)
+		for y in 64:
+			for x in 64:
+				var u := Vector2(x-32,y-32)/32.0
+				var crack := absf(u.x-sin(u.y*14.0)*0.13) < 0.035 or absf(u.y+u.x*0.5-sin(u.x*20.0)*0.08) < 0.025
+				var alpha := (0.8 if crack else 0.28)*maxf(0,1.0-u.length())
+				picture.set_pixel(x,y,Color(0.04,0.035,0.03,alpha))
+		scar_texture = ImageTexture.create_from_image(picture)
+	for tile in mission.cover_hp:
+		var c: String = mission.tile(tile)
+		var maximum := 8 if c == "#" else 4
+		if int(mission.cover_hp[tile]) >= maximum: continue
+		var h := 1.92 if c == "#" else 0.82
+		# Project onto the actual mesh surface; no floating damage-card geometry.
+		var scar := Decal.new(); scar.texture_albedo = scar_texture
+		scar.size = Vector3(0.92,h+0.08,0.92)
+		scar.position = Vector3(tile.x,Shot.elevation(mission,tile)*0.7+h*0.5,tile.y)
+		scar.normal_fade = 0.0; scar.upper_fade = 0.03; scar.lower_fade = 0.03
+		damage_root.add_child(scar)
+
+func ring(b, at: Vector3, mat: Material, radius := 0.43) -> void:
+	for i in 24:
+		var angle := TAU*float(i)/24.0
+		b.put("box",mat,at+Vector3(sin(angle)*radius,0.012,cos(angle)*radius),Vector3(0.10,0.024,0.025),angle)
+
+func person(b, at: Vector3, freed: bool) -> void:
+	var cloth: Material = palette.banner if freed else palette.bags
+	for side in [-1,1]:
+		b.put("box",palette.dark,at+Vector3(side*0.12,0.21,0),Vector3(0.13,0.42,0.19))
+		b.put("cylinder",cloth,at+Vector3(side*0.26,0.75,0),Vector3(0.13,0.5,0.13))
+	b.put("cylinder",cloth,at+Vector3.UP*0.72,Vector3(0.42,0.62,0.34))
+	b.put("rock",palette.bags,at+Vector3.UP*1.16,Vector3(0.28,0.32,0.27))
+	if not freed: b.put("box",palette.glow,at+Vector3(0,0.58,0.22),Vector3(0.36,0.035,0.04))
+
+func refresh_markers(m: RefCounted) -> void:
+	if not is_instance_valid(marker_root): return
+	var signature := hash([m.objective_state,m.pressure_state,m.prisoner,m.turn,m.units.map(func(u): return [u.hp,u.overwatch,u.spotted,u.x,u.y])])
+	if signature == marker_hash: return
+	marker_hash = signature; clear_children(marker_root)
+	var markers = Batch.new(); markers.models = batch.models
+	# Records are replaced when escort/civilian positions change.
+	batch.records = batch.records.filter(func(record): return record.role != "objective")
+	for point in m.spec.evac:
+		var tile := Maps.point(point); var at := Vector3(tile.x,Shot.elevation(m,tile)*0.7,tile.y)
+		markers.begin_record({"tile":tile,"floor":at.y,"kind":"evac","role":"objective"})
+		ring(markers,at,palette.evac); markers.end_record()
+	if bool(m.prisoner.get("active",true)) and m.in_bounds(Shot.pos(m.prisoner)) and m.result != "win":
+		var tile := Shot.pos(m.prisoner); var at := Vector3(tile.x,Shot.elevation(m,tile)*0.7,tile.y)
+		markers.begin_record({"tile":tile,"floor":at.y,"kind":"prisoner","role":"objective"})
+		person(markers,at,bool(m.prisoner.freed)); ring(markers,at,palette.objective); markers.end_record()
+	if m.modern:
+		for civilian in m.objective_state.get("civilians",[]):
+			if civilian.state != "waiting": continue
+			var tile := Maps.point(civilian.at); var at := Vector3(tile.x,Shot.elevation(m,tile)*0.7,tile.y)
+			markers.begin_record({"tile":tile,"floor":at.y,"kind":"civilian","role":"objective"})
+			person(markers,at,true); ring(markers,at,palette.evac); markers.end_record()
+		if m.spec.family not in ["rescue","vip_extract","retaliation","ambush","operation"]:
+			for point in m.spec.objective.points: objective(markers,m,Maps.point(point),str(m.spec.family))
+		if m.spec.family == "operation":
+			var step: Dictionary = preload("res://scripts/mission_objectives.gd").current_step(m)
+			if step.has("at"): objective(markers,m,Maps.point(step.at),"operation")
+	for zone in overwatch_zones(m):
+		var tile: Vector2i = zone.at
+		ring(markers,Vector3(tile.x,Shot.elevation(m,tile)*0.7+0.01,tile.y),palette.objective if zone.side == "player" else palette.danger,0.34)
+	if m.modern:
+		for wave in m.pressure_state.pending:
+			var tile := Maps.point(wave.at)
+			ring(markers,Vector3(tile.x,Shot.elevation(m,tile)*0.7+0.02,tile.y),palette.danger)
+		if m.spec.family == "operation" and m.objective_state.phase == "primary":
+			var step: Dictionary = preload("res://scripts/mission_objectives.gd").current_step(m)
+			if step.has("at"):
+				var tile := Maps.point(step.at); var radius := int(step.get("radius",1))
+				for y in range(tile.y-radius,tile.y+radius+1):
+					for x in range(tile.x-radius,tile.x+radius+1):
+						if m.passable(Vector2i(x,y)): ring(markers,Vector3(x,Shot.elevation(m,Vector2i(x,y))*0.7+0.02,y),palette.objective,0.36)
+	batch.records.append_array(markers.records); markers.flush(marker_root)
+
+func objective(b, m: RefCounted, tile: Vector2i, family: String) -> void:
+	if not m.in_bounds(tile): return
+	var at := Vector3(tile.x,Shot.elevation(m,tile)*0.7,tile.y)
+	var done: bool = m.objective_state.get("done",{}).has(tile)
+	b.begin_record({"tile":tile,"floor":at.y,"kind":family,"role":"objective"})
+	if family == "sabotage":
+		b.model("res://assets/maps/barrel.glb",at,0.65,0.75)
+		b.put("box",palette.metal,at+Vector3(0,0.22,0.31),Vector3(0.38,0.28,0.16))
+		b.put("box",palette.fire if done else palette.glow,at+Vector3(0,0.25,0.397),Vector3(0.22,0.07,0.012))
+	else:
+		b.model("res://assets/maps/%s.glb" % ("relay" if family in ["destroy_relay","defend"] else "terminal"),at,0.72,1.18)
+		b.put("box",palette.glow,at+Vector3(0,0.92,0.30),Vector3(0.30,0.17,0.025))
+	ring(b,at,palette.evac if done else palette.objective)
+	b.end_record(); light(at+Vector3.UP*1.3,Color("74d4e4"),0.6,2.0,marker_root)
 
 func overwatch_zones(m: RefCounted) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
@@ -119,26 +233,6 @@ func overwatch_zones(m: RefCounted) -> Array[Dictionary]:
 				if p != Shot.pos(u) and m.passable(p) and Shot.distance(Shot.pos(u),p) <= float(u.range) and Shot.los(m,Shot.pos(u),p): out.append({"at":p,"side":u.side,"unit":u.id})
 	return out
 
-func refresh_markers(m: RefCounted) -> void:
-	if marker_root == null: return
-	for child in marker_root.get_children(): marker_root.remove_child(child); child.queue_free()
-	var amber := material(Color("dfae53"),0.5); var red := material(Color("e76858"),0.5)
-	for zone in overwatch_zones(m):
-		var p: Vector2i = zone.at
-		box(Vector3(p.x,Shot.elevation(m,p)*0.7+0.02,p.y),Vector3(0.72,0.03,0.72),amber if zone.side == "player" else red,marker_root)
-	for p in m.interactables(): box(Vector3(p.x,0.07,p.y),Vector3(0.9,0.05,0.9),palette.objective,marker_root)
-	if m.modern:
-		if m.spec.family == "operation" and m.objective_state.phase == "primary":
-			var step: Dictionary = preload("res://scripts/mission_objectives.gd").current_step(m)
-			if step.has("at"):
-				var at := Maps.point(step.at); var radius := int(step.get("radius",1))
-				for y in range(at.y-radius,at.y+radius+1):
-					for x in range(at.x-radius,at.x+radius+1):
-						var p := Vector2i(x,y)
-						if m.passable(p): box(Vector3(x,Shot.elevation(m,p)*0.7+0.05,y),Vector3(0.8,0.04,0.8),palette.objective,marker_root)
-		for wave in m.pressure_state.pending:
-			var p := Maps.point(wave.at)
-			box(Vector3(p.x,0.12,p.y),Vector3(2.6,0.06,2.6),red,marker_root)
 
 func weather(settings: Dictionary, width: int, height: int) -> void:
 	var node := GPUParticles3D.new(); node.amount = int(settings.n); node.lifetime = 12.0

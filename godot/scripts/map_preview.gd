@@ -1,69 +1,84 @@
 extends SceneTree
-## Real-window mission inspection. Run -s scripts/map_preview.gd -- archive [--capture].
+## Real battle/HUD inspection: -s scripts/map_preview.gd -- sabotage --capture --fps
+## --all captures all biomes plus a real action-camera frame. No save is loaded/written.
 const Mission = preload("res://scripts/mission.gd")
+const Combat = preload("res://scripts/combat_mission.gd")
 const Maps = preload("res://scripts/map_catalog.gd")
-const Presentation = preload("res://scripts/map_presentation.gd")
-const Settings = preload("res://scripts/settings.gd")
 const Shot = preload("res://scripts/shot.gd")
-var m: RefCounted
-var renderer: Node3D
-var camera: Camera3D
-var status: Label
-var unit_root: Node3D
+const Settings = preload("res://scripts/settings.gd")
+var game
+var failures := 0
 
-func _initialize() -> void:
-	call_deferred("show_map")
+func _initialize() -> void: run.call_deferred()
 
-func show_map() -> void:
+func run() -> void:
 	Settings.difficulty = "normal"
-	var args := OS.get_cmdline_user_args(); var id := args[0] if not args.is_empty() else "archive"
-	m = Mission.new(17,Maps.resolve(id) if not id.begins_with("web_") else "res://data/maps/%s.json" % id)
-	if "--inbound" in args: m.queue_reinforcement(["trooper","heavy"],1,"Patrol support")
-	var world := Node3D.new(); root.add_child(world)
-	renderer = Presentation.new(); world.add_child(renderer); renderer.build(m)
-	var environment := WorldEnvironment.new(); world.add_child(environment)
-	var sun := DirectionalLight3D.new(); world.add_child(sun)
-	renderer.apply_environment(environment,sun,str(m.spec.theme))
-	camera = Camera3D.new(); world.add_child(camera); camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = maxf(float(m.spec.width),float(m.spec.height))*1.12
-	var center := Vector3(float(m.spec.width)/2.0,0,float(m.spec.height)/2.0)
-	camera.position = center+Vector3(22,42,32); camera.look_at(center+Vector3(3,0,0)); camera.current = true
-	unit_root = Node3D.new(); world.add_child(unit_root); draw_units()
-	var hud := CanvasLayer.new(); root.add_child(hud)
-	var panel := PanelContainer.new(); panel.position = Vector2(24,22); panel.size = Vector2(360,0); hud.add_child(panel)
-	var style := StyleBoxFlat.new(); style.bg_color = Color(0.035,0.06,0.08,0.94); style.set_content_margin_all(18); panel.add_theme_stylebox_override("panel",style)
-	var column := VBoxContainer.new(); column.add_theme_constant_override("separation",12); panel.add_child(column)
-	label(column,"T E M P L E   W A T C H",15,Color("7ccedd"))
-	label(column,str(m.spec.name),25,Color("f1e9d9"))
-	label(column,"%s  /  %s" % [str(m.spec.theme).to_upper(),str(m.spec.family).replace("_"," ").to_upper()],13,Color("b7c8d0"))
-	status = label(column,"",16,Color("e3bd73")); refresh()
-	label(column,"BLUE  Squad / evacuation\nGOLD  Objective tiles\nRED  Hostile pods / inbound lanes",14,Color("b7c8d0"))
-	var end := Button.new(); end.text = "End turn"; end.pressed.connect(end_turn); column.add_child(end)
-	label(column,"Mission inspection view\nMovement and Interact UI: combat integration",12,Color("849ba5"))
-	if "--capture" in args:
-		for i in 12: await process_frame
-		await RenderingServer.frame_post_draw
-		var path := ProjectSettings.globalize_path("res://../docs/godot/shots/wave7-missions-%s.png" % id)
-		var error := root.get_texture().get_image().save_png(path)
-		print("MISSION SCREENSHOT: ",path," ",error); quit(0 if error == OK else 1)
+	root.borderless = true; root.unresizable = true
+	root.size = Vector2i(1920,1080); root.position = Vector2i(0,50)
+	root.content_scale_size = Vector2i(1920,1080)
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	var args := OS.get_cmdline_user_args()
+	var ids: Array = ["sabotage","envoy","h_grove","ilum","fixture","archive","relay","h_husks"] if "--all" in args else [args[0] if not args.is_empty() else "sabotage"]
+	for id in ids:
+		await show_battle(str(id))
+		await create_timer(2.0).timeout
+		if "--fps" in args: await fps_sample(str(id))
+		if "--capture" in args or "--all" in args:
+			await capture(str(game.mission.spec.get("theme","temple")))
+		if ("--all" in args or "--action" in args) and id == "fixture": await action_shot()
+		if ids.size() > 1:
+			game.queue_free(); await process_frame
+	if "--capture" in args or "--all" in args or "--benchmark" in args:
+		quit(1 if failures else 0)
 
-func label(parent: Node, text: String, size: int, color: Color) -> Label:
-	var node := Label.new(); node.text = text; node.add_theme_font_size_override("font_size",size); node.add_theme_color_override("font_color",color)
-	node.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; node.custom_minimum_size.x = 320; parent.add_child(node); return node
+func show_battle(id: String) -> void:
+	var source = Mission.new(17) if id == "fixture" else Mission.new(17,"res://data/maps/%s.json" % id if id.begins_with("web_") else Maps.resolve(id))
+	game = load("res://scenes/rescue.tscn").instantiate(); root.add_child(game)
+	game.mission = Combat.adopt(source)
+	for view in game.figures.get_children():
+		if view.name != "Prisoner": game.figures.remove_child(view); view.queue_free()
+	game.views.clear(); game.selected_id = int(game.mission.living("player")[0].id)
+	game.hud.queue_free(); game.portrait_viewport.queue_free(); game.portrait_kind = ""; game.action_buttons.clear(); game._build_ui()
+	game._build_terrain(); game.terrain_seen_board = game.mission.board.duplicate(); game.terrain_seen_revision = game.mission.terrain_revision
+	game.pivot = Vector3(float(game.mission.spec.width-1)*0.5,0,float(game.mission.spec.height-1)*0.52)
+	game.zoom = maxf(float(game.mission.spec.width),float(game.mission.spec.height))*1.48
+	game.pitch = 0.91; game.yaw = 0.16; game.action_camera = true
+	game._update_camera(); game._refresh(); game.scene_view.arrange_labels()
+	Input.warp_mouse(Vector2(960,60))
+	await process_frame
+	print("ART WINDOW: ",DisplayServer.window_get_size()," viewport ",root.get_visible_rect().size)
 
-func draw_units() -> void:
-	for child in unit_root.get_children(): unit_root.remove_child(child); child.queue_free()
-	for u in m.units:
-		if int(u.hp) <= 0: continue
-		var node := MeshInstance3D.new(); var mesh := CapsuleMesh.new(); mesh.radius = 0.25; mesh.height = 1.2; node.mesh = mesh
-		node.material_override = renderer.material(Color("66c5ff") if u.side == "player" else Color("ef7563"),0.6)
-		node.position = Vector3(int(u.x),Shot.elevation(m,Shot.pos(u))*0.7+0.6,int(u.y)); unit_root.add_child(node)
-	if bool(m.prisoner.get("active",false)):
-		renderer.box(Vector3(int(m.prisoner.x),0.5,int(m.prisoner.y)),Vector3(0.4,1,0.4),renderer.material(Color("e9c875"),0.5),unit_root)
+func capture(theme: String) -> void:
+	game.scene_view.arrange_labels()
+	await RenderingServer.frame_post_draw
+	var path := ProjectSettings.globalize_path("res://../docs/godot/shots/wave8-art-%s.png" % theme)
+	var picture := root.get_texture().get_image()
+	if picture.get_size() != Vector2i(1920,1080): failures += 1; push_error("Capture must be 1920x1080")
+	var error := picture.save_png(path)
+	if error != OK: failures += 1
+	print("ART CAPTURE: %s (%s)" % [path,error_string(error)])
 
-func refresh() -> void:
-	var state: Dictionary = m.objective_status()
-	status.text = "%s\nTurn %d · %s\n%s" % [state.label,m.turn,"No deadline" if int(state.turns_left)<0 else "%d turns left" % int(state.turns_left),"\n".join(m.log_lines.slice(maxi(0,m.log_lines.size()-2)))]
+func action_shot() -> void:
+	# The real camera owner frames two existing units, at their unchanged rule positions.
+	var actor: Dictionary = game.mission.living("player")[2]
+	var target: Dictionary = game.mission.living("enemy")[0]
+	var from := Vector3(actor.x,Shot.elevation(game.mission,Shot.pos(actor))*0.7,actor.y)
+	var to := Vector3(target.x,Shot.elevation(game.mission,Shot.pos(target))*0.7,target.y)
+	await game.cam.frame(from,to,"shoot")
+	await create_timer(0.5).timeout
+	await capture("action-cam")
+	game.cam.finish()
 
-func end_turn() -> void:
-	m.end_turn(); renderer.refresh_markers(m); draw_units(); refresh()
+func fps_sample(id: String) -> void:
+	# Allow imported character pipelines and shadow caches to finish warming.
+	await create_timer(8.0).timeout
+	var times: Array[float] = []; var previous := Time.get_ticks_usec()
+	for i in 1200:
+		await process_frame
+		var now := Time.get_ticks_usec(); times.append(float(now-previous)/1000.0); previous = now
+	var sum := 0.0
+	for ms in times: sum += ms
+	times.sort()
+	var mean := 1000.0/(sum/times.size()); var p95 := times[int(times.size()*0.95)]; var p99 := times[int(times.size()*0.99)]
+	print("BATTLE FPS: %s (%dx%d), %s, 1920x1080 Forward+, 1200 frames: mean %.1f, p95 %.2f ms, p99 %.2f ms; draw calls %d" % [id,game.mission.spec.width,game.mission.spec.height,RenderingServer.get_video_adapter_name(),mean,p95,p99,Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)])
+	if mean < 60 or p95 > 16.667: failures += 1; push_error("Battle did not sustain 60 fps")

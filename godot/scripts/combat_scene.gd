@@ -7,8 +7,11 @@ var sun: DirectionalLight3D
 func _setup_scene() -> void:
 	g.terrain = Node3D.new(); g.terrain.name = "Terrain"; g.add_child(g.terrain)
 	g.figures = Node3D.new(); g.figures.name = "Units"; g.add_child(g.figures)
+	# Position anchor for the shared renderer’s escort model; prevents the legacy cube.
+	var prisoner_anchor := Node3D.new(); prisoner_anchor.name = "Prisoner"; g.figures.add_child(prisoner_anchor)
 	g.highlights = Node3D.new(); g.highlights.name = "RangePreview"; g.add_child(g.highlights)
 	g.range_highlights = Node3D.new(); g.highlights.add_child(g.range_highlights)
+	var grid := preload("res://scripts/map_art_grid.gd").new(); g.highlights.add_child(grid); grid.bind(g.range_highlights,g)
 	g.hover_highlights = Node3D.new(); g.highlights.add_child(g.hover_highlights)
 	g.fx = g.Effects.new(); g.fx.name = "CombatEffects"; g.add_child(g.fx)
 	g.reinforcement_view = preload("res://scripts/reinforcement_marker.gd").new(); g.add_child(g.reinforcement_view)
@@ -31,18 +34,6 @@ func _setup_scene() -> void:
 	env.fog_density = 0.008
 	world.environment = env; g.add_child(world)
 	sun = DirectionalLight3D.new(); sun.rotation_degrees = Vector3(-55, -35, 0); sun.light_energy = 1.65; sun.light_color = Color("ffe1ae"); sun.shadow_enabled = true; sun.light_angular_distance = 2.5; g.add_child(sun)
-	var fill := DirectionalLight3D.new(); fill.rotation_degrees = Vector3(-30, 140, 0); fill.light_energy = 0.55; fill.light_color = Color("78bde5"); g.add_child(fill)
-	if g.mission.modern: return
-	var dust := MultiMeshInstance3D.new()
-	var multimesh := MultiMesh.new()
-	multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	multimesh.instance_count = 85
-	var speck := SphereMesh.new(); speck.radius = 0.018; speck.height = 0.036
-	multimesh.mesh = speck
-	var random := RandomNumberGenerator.new(); random.seed = 4719
-	for i in range(multimesh.instance_count):
-		multimesh.set_instance_transform(i, Transform3D(Basis.IDENTITY, Vector3(random.randf_range(0, 26), random.randf_range(0.3, 4.2), random.randf_range(0, 26))))
-	dust.multimesh = multimesh; dust.material_override = g._mat(Color("e3d1ad")); g.add_child(dust)
 
 func _load_models() -> void:
 	for name in ["jedi", "trooper", "scout", "sithHeavy", "agent"]:
@@ -80,10 +71,11 @@ func _instance_model(parent: Node3D, key: String, at: Vector3, scale_value: floa
 
 func _build_terrain() -> void:
 	if g.terrain.get_child_count() == 0:
-		var art = preload("res://scripts/map_presentation.gd").new() if g.mission.modern else preload("res://scripts/env_art.gd").new()
+		var art = preload("res://scripts/map_presentation.gd").new()
+		art.game = g
 		g.terrain.add_child(art)
 	g.terrain.get_child(0).build(g.mission, g.model_cache)
-	if g.mission.modern: g.terrain.get_child(0).apply_environment(world,sun,str(g.mission.spec.theme))
+	g.terrain.get_child(0).apply_environment(world,sun,str(g.mission.spec.get("theme","temple")))
 
 func _sync_terrain() -> void:
 	if g.mission.terrain_revision == g.terrain_seen_revision: return

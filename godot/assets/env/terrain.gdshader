@@ -1,0 +1,58 @@
+shader_type spatial;
+render_mode diffuse_burley, specular_schlick_ggx;
+uniform vec4 base_color : source_color = vec4(0.35,0.3,0.23,1.0);
+uniform vec4 secondary_color : source_color = vec4(0.19,0.25,0.12,1.0);
+// 0 stone, 1 deck, 2 earth/grass, 3 snow, 4 sand, 5 cave
+uniform int biome = 0;
+uniform vec2 hover_tile = vec2(-100.0);
+uniform float grid_strength = 0.0;
+varying vec3 world_pos;
+varying vec3 world_normal;
+float hash(vec2 p) { return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+float noise(vec2 p) {
+	vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
+	return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1)),f.x),f.y);
+}
+void vertex() {
+	world_pos=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;
+	world_normal=normalize(MODEL_NORMAL_MATRIX*NORMAL);
+}
+void fragment() {
+	vec2 p=world_pos.xz;
+	float broad=noise(p*0.22), grain=noise(p*32.0);
+	float detail=noise(p*4.0)*0.23+grain*0.08;
+	float tile=hash(floor(p+0.5));
+	vec3 col=base_color.rgb*(0.85+broad*0.24+detail+tile*0.035);
+	float rough=0.9, metal=0.015;
+	if(biome==0) {
+		vec2 slab=abs(fract((p+0.5)/vec2(2.0,1.0))-0.5);
+		float joint=smoothstep(0.484,0.498,max(slab.x,slab.y));
+		float vein=sin(p.x*7.0+p.y*3.0+noise(p)*8.0)*0.025;
+		col*=1.0-joint*0.23+vein;
+	} else if(biome==1) {
+		vec2 plate=abs(fract((p+0.5)/vec2(2.0,3.0))-0.5);
+		float seam=smoothstep(0.485,0.499,max(plate.x,plate.y));
+		float tread=step(0.85,sin((p.x+p.y)*55.0))*step(0.6,sin((p.x-p.y)*32.0));
+		col*=1.0-seam*0.5+tread*0.09;
+		rough=0.50+grain*0.15; metal=0.65;
+	} else if(biome==2) {
+		col=mix(col,secondary_color.rgb*(0.9+detail),smoothstep(0.25,0.78,broad)*0.65);
+	} else if(biome==3) {
+		col=mix(secondary_color.rgb, col,0.75+0.25*sin(p.x*2.0+noise(p*0.7)*6.0));
+		rough=0.83;
+	} else if(biome==4) {
+		col*=0.96+sin(p.y*18.0+noise(p)*5.0)*0.035;
+	} else {
+		col=mix(col,secondary_color.rgb,noise(p*1.9)*0.23);
+		col*=0.9+abs(sin(p.x*3.0+p.y*2.0+noise(p)*6.0))*0.15;
+	}
+	// Tactical grid is local to the hovered destination; never a permanent checkerboard.
+	vec2 edge=abs(fract(p+0.5)-0.5);
+	float line=smoothstep(0.48,0.495,max(edge.x,edge.y));
+	float grid=line*(1.0-smoothstep(1.0,4.5,distance(p,hover_tile)))*grid_strength*step(0.7,world_normal.y);
+	ALBEDO=mix(col,vec3(0.28,0.62,0.68),grid*0.4);
+	EMISSION=vec3(0.15,0.45,0.53)*grid*0.15;
+	ROUGHNESS=rough; METALLIC=metal;
+	NORMAL_MAP=vec3(0.5+(grain-0.5)*0.08,0.5+(noise(p*25.0)-0.5)*0.08,1.0);
+	NORMAL_MAP_DEPTH=0.3;
+}
