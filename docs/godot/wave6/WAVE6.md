@@ -1,0 +1,12 @@
+# Wave 6: make the campaign screens look and feel like the web game — with life
+Jess (10-31): "make the campaign look a lot more like the other game we have. Make the loadout screen so we can see each character. Give the screens graphics and life. Give the Temple real shape above a galaxy map."
+"The other game" = the web Temple Watch (public/). Its campaign screens are the look target; XCOM 2's Avenger cross-section over the geoscape is the shape target.
+
+Common rules (every lane):
+- Web game public/, functions/, tests/, worker.js are FROZEN, read-only reference. Godot 4.7.2 at /home/jess/projects/.tools/godot/godot. GDScript files <600 lines. Local commit on your own branch only; no push; no subagents.
+- Reference first: build the web game (`node tools/inline.js` → dist/temple-watch.html) and screenshot its matching screens with Playwright (require /home/jess/hive/node_modules/playwright-core; executablePath = $HOME/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell) at 1366x768. Save as docs/godot/wave6/ref-<lane>-*.png. Match its colors, fonts, iconography, layout and information density; improve on it, never show less.
+- Reuse existing 3D assets: public/models/*.glb (human, beast, units/, props/) and godot/assets/**. Copy what you need into godot/assets/<lane>/ (new folder). No downloads needing accounts; CC0 only, credit in CREDITS.md in your folder.
+- "Life" = motion that never stops: idle animations, drifting particles/dust, flickering holo panels, slow camera drift, hover glow + sound on buttons, animated transitions between tabs. 60fps at 1920x1080 on this RTX 4090; readable at 1366x768.
+- Never break existing behavior: every button/tab/flow from wave 5 still works; ./godot/test.sh must exit 0 (0 failures, no SCRIPT ERROR), including loop_test and campaign_test. Add headless tests for what you can (scene loads, every room/tab reachable, every roster soldier gets a model).
+- Shared theme lives in godot/scripts/campaign/ui.gd, owned by the screens lane. Other lanes may only ADD new files there-abouts; theme changes go under "Integration requests".
+- Deliver: docs/godot/wave6/<lane>-REPORT.md (player-visible changes, screenshots next to the web reference, integration requests); screenshots docs/godot/shots/wave6-<lane>-*.png captured by running the real scene with a window (not a headless dummy). Commit.

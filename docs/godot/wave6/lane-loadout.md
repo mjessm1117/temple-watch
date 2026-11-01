@@ -1,0 +1,7 @@
+# Wave 6 lane: loadout screen where you see each character (read docs/godot/wave6/WAVE6.md first)
+Branch wave6/loadout. LEASE: godot/scripts/campaign/squad.gd, godot/scenes/squad.tscn, new godot/scripts/campaign/loadout_*.gd, new godot/scenes/loadout*.tscn, new godot/assets/loadout/**, new godot/tests/loadout_test.gd, docs/godot/wave6/loadout-REPORT.md, docs/godot/wave6/ref-loadout-*, docs/godot/shots/wave6-loadout-*.png. Read-only: arsenal/gear/state scripts (request changes under Integration requests).
+Goal: XCOM-style squad lineup. The 4 chosen soldiers stand side by side as 3D models in a lit Temple hangar (human.glb / units/*.glb; Jedi with a lit saber in their color, clones in armor, the Medic with a medkit), idle-animating. Under each: name, nickname, class icon, rank, HP/aim/will bars, Wounded state, equipped gear Mk tier, skill kit icons.
+- Click a soldier → camera steps in; a side panel lets you swap the soldier (roster list with portraits) and change gear from the Arsenal (same rules as web public/js/arsenal.js, temple-kits.js). Changes update the model (weapon/armor tint) and stats live.
+- Wounded or assigned soldiers appear greyed with days remaining. Launch stays where the current flow expects.
+- Life: idle sway, saber glow hum, dust in light shafts, slow camera dolly, hover highlight.
+- Test: every roster soldier gets a model + card, swapping updates the squad sent to battle, gear change applies, loop test still passes.
