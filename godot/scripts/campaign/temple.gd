@@ -6,6 +6,12 @@ const Gear = preload("res://scripts/campaign/gear.gd")
 const Modules = preload("res://scripts/campaign/modules.gd")
 const Legacy = preload("res://scripts/campaign/legacy.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
+const StrategyUI = preload("res://scripts/campaign/strat_ui.gd")
+const Base = preload("res://scripts/campaign/strat_base.gd")
+const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
+var build_slot := "b0"
+var field_team: Array = []
+var edict_draft: Array = []
 var campaign: Campaign = Campaign.new()
 var page := "Command"
 var selected_id := "u1"
@@ -24,6 +30,7 @@ func _ready() -> void:
 	campaign = get_node("/root/CampaignFlow").session()
 	get_node("/root/CampaignFlow").active = true
 	if campaign.soldier(selected_id).is_empty() and not campaign.state.roster.is_empty(): selected_id = str(campaign.state.roster[0].id)
+	edict_draft = campaign.state.strategy.edict.duplicate()
 	_build_shell()
 	_show_page()
 	if get_tree().current_scene == self: get_node("/root/CampaignFlow").temple_story.call_deferred()
@@ -82,6 +89,8 @@ func _build_shell() -> void:
 	for level in campaign.state.wings.values():
 		if int(level) > 0: built += 1
 	readout.add_child(UI.label("%d active · %d wounded\n%d / 8 wings online\n%d missions waiting" % [active, wounded, built, campaign.state.options.size()], 13, UI.MUTED))
+	var power := Base.power(campaign.state)
+	readout.add_child(UI.label("POWER %d / %d\n%d staff · squad %d\nDarkness %d / 12" % [power.used, power.capacity, campaign.state.facility.workers.size(), campaign.squad_capacity(), campaign.darkness_segments()], 13, UI.ACCENT))
 	readout.add_child(UI.label("1–7 stations\nG galaxy · Esc close", 12, Color("627d87")))
 	station_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.97)); add_child(station_panel)
 	station_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -102,6 +111,8 @@ func _open_room(id: String, target: String) -> void:
 func _close_station() -> void:
 	panel_open = false
 	if panel_tween != null: panel_tween.kill()
+	if Prefs.get_value("motion"):
+		station_panel.hide(); return
 	panel_tween = create_tween()
 	panel_tween.tween_property(station_panel, "modulate:a", 0.0, 0.16)
 	panel_tween.tween_callback(func(): station_panel.hide())
@@ -109,7 +120,10 @@ func _close_station() -> void:
 func _slide_station() -> void:
 	if not panel_open: return
 	if panel_tween != null: panel_tween.kill()
-	station_panel.show(); station_panel.modulate.a = 0.0
+	station_panel.show()
+	if Prefs.get_value("motion"):
+		station_panel.modulate.a = 1.0; return
+	station_panel.modulate.a = 0.0
 	station_panel.offset_left = 50; station_panel.offset_right = 30
 	panel_tween = create_tween().set_parallel(true)
 	panel_tween.tween_property(station_panel, "modulate:a", 1.0, 0.22)
@@ -137,20 +151,25 @@ func _show_page() -> void:
 	if selected_room != "" and temple_view.rooms.has(selected_room):
 		var room: Dictionary = temple_view.rooms[selected_room]
 		var context := _card(str(room.name), str(room.status))
+		if room.wing != "":
+			context.add_child(UI.label(Base.summary(campaign.state, room.wing), 14, UI.ACCENT))
+			context.add_child(UI.label(Base.production(campaign.state, room.wing), 14, UI.GOLD))
 		if room.built and room.wing != "":
 			var action: Dictionary = Data.get_table("temple", "MOD_ACTS")[room.wing]
 			context.add_child(UI.label(str(action.desc), 15, UI.MUTED))
 			context.add_child(UI.button(str(action.n), _module_action.bind(str(room.wing)), Modules.ready(campaign, str(room.wing)) and campaign.can_afford(action.cost)))
 		elif room.kind in ["spire", "vault", "annex"] and not room.built:
-			context.add_child(UI.label("Expansion reserved. Tower and vault projects are not available in this campaign yet. Manage the eight Temple wings in Build.", 14, UI.MUTED))
+			context.add_child(UI.label("Open Temple Works to excavate bays, construct spires and place new wings.", 14, UI.MUTED))
 	match page:
 		"Command": _command()
 		"Roster": _roster()
 		"Research": _research()
-		"Build": _build()
+		"Build": StrategyUI.build(self)
 		"Arsenal": _arsenal()
 		"Teams": _teams()
 		"Legacy": _legacy()
+		"Council": StrategyUI.council(self)
+		"Settings": StrategyUI.settings(self)
 
 func _card(title: String, description: String = "") -> VBoxContainer:
 	var panel := UI.panel(UI.PANEL_ALT); page_content.add_child(panel)
@@ -160,7 +179,17 @@ func _card(title: String, description: String = "") -> VBoxContainer:
 	return box
 
 func _command() -> void:
-	_card("THE ORDER ENDURES", "Guide the roster, tend the wounded, fund research and decide where the next squad deploys.")
+	var command := _card("THE ORDER ENDURES", "Guide the roster, tend the wounded, fund research and decide where the next squad deploys.")
+	var row := HFlowContainer.new(); command.add_child(row)
+	row.add_child(UI.button("Council & edicts", _change_page.bind("Council")))
+	row.add_child(UI.button("Presentation settings", _change_page.bind("Settings")))
+	var ready := 0; var tired := 0; var away := 0
+	for r in campaign.state.roster:
+		if preload("res://scripts/campaign/strat_roster.gd").ready(r): ready += 1
+		if int(r.fatigue) >= 34: tired += 1
+		if str(r.assign).begins_with("field:"): away += 1
+	command.add_child(UI.label("%d ready · %d tired or exhausted · %d away" % [ready, tired, away], 15, UI.GOLD))
+	command.add_child(UI.label("Edicts: %s" % ", ".join(campaign.state.strategy.edict), 14, UI.MUTED))
 	var next := "A story mission awaits." if int(campaign.state.step) in [0, 2] else "%d crises await your decision." % campaign.state.options.size()
 	var box := _card("NEXT DEPLOYMENT", next)
 	box.add_child(UI.button("OPEN GALAXY  →", _open_galaxy))
@@ -171,7 +200,7 @@ func _command() -> void:
 	if era < 3 and (campaign.state.flags.get("boss_or_won" if era == 1 else "boss_ru_won", false) or campaign.state.flags.get("temple_scarred" if era == 1 else "e2_bomb_fired", false)):
 		box.add_child(UI.button("Begin the next era →", flow.advance_era))
 	if campaign.state.options.is_empty(): _card("CHAPTER COMPLETE", "The Order’s record endures. Tend your roster, explore the Codex, or begin a new campaign from the main menu.")
-	if str(campaign.state.build) != "": _card("CONSTRUCTION", "%s completes after the next mission." % Data.get_table("core", "WINGS")[str(campaign.state.build)].n)
+	if str(campaign.state.build) != "": _card("CONSTRUCTION", "%s · %.1f work days remaining." % [Data.get_table("core", "WINGS")[str(campaign.state.build)].n, campaign.state.facility.build_left])
 	if str(campaign.state.research.cur) != "":
 		var project: Dictionary = Data.get_table("research", "RESEARCH")[str(campaign.state.research.cur)]
 		_card("RESEARCH IN PROGRESS", "%s  ·  %.0f / %d days" % [project.n, float(campaign.state.research.prog), int(project.days)])
@@ -181,11 +210,13 @@ func _command() -> void:
 		for entry in campaign.state.news.slice(-5): news_box.add_child(UI.label(str(entry), 15))
 
 func _roster() -> void:
+	StrategyUI.roster(self)
 	page_content.add_child(UI.label("Assign soldiers to train or recover. Wounded soldiers cannot deploy.", 15, UI.MUTED))
 	for r in campaign.state.roster:
 		var status := "DEAD" if str(r.status) == "dead" else "WOUNDED · %d DAYS" % int(r.wound) if int(r.wound) > 0 else str(r.status).to_upper()
 		var box := _card("%s  ·  %s  ·  RANK %d" % [r.n, r.cls, int(r.rank)], "%s   •   %d XP   •   %d KILLS   •   %d MISSIONS" % [status, int(r.xp), int(r.kills), int(r.missions)])
-		var stats: Dictionary = Progression.battle_stats(r)
+		StrategyUI.soldier(self, box, r)
+		var stats: Dictionary = Gear.battle_stats(campaign, str(r.id))
 		box.add_child(UI.label("HP %d   AIM %d   WILL %d   MOVE %d" % [int(stats.get("hp", 0)), int(stats.get("aim", 0)), int(stats.get("will", 0)), int(stats.get("mob", 0))], 15))
 		if int(r.get("pick", 0)) > 0:
 			var row := HBoxContainer.new(); box.add_child(row)
@@ -200,6 +231,7 @@ func _roster() -> void:
 			row.add_child(UI.button("Train", _assign.bind(str(r.id), "train"), int(campaign.state.wings.training) > 0 and str(r.assign) != "train"))
 
 func _research() -> void:
+	StrategyUI.projects(self)
 	if int(campaign.state.wings.archives) == 0:
 		_card("ARCHIVES REQUIRED", "Build Archives to start one research project at a time.")
 		return
@@ -221,31 +253,6 @@ func _research() -> void:
 			var row := HBoxContainer.new(); box.add_child(row)
 			var label := UI.label(line, 15); label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(label)
 			row.add_child(UI.button("Research", _start_research.bind(str(id)), not done and current == "" and requirements.is_empty() and int(p.get("era", 1)) <= int(campaign.state.era) and campaign.can_afford(cost)))
-
-func _build() -> void:
-	page_content.add_child(UI.label("One wing upgrade at a time. Construction finishes after the next mission.", 15, UI.MUTED))
-	for key in Data.get_table("core", "WINGS"):
-		var wing: Dictionary = Data.get_table("core", "WINGS")[key]
-		var level := int(campaign.state.wings[key]); var next := level + 1
-		var description := str(wing.desc) + "  •  upkeep %d Cr/month" % int(wing.up[level])
-		var box := _card("%s  ·  LEVEL %d" % [wing.n, level], description)
-		box.add_child(UI.label(str(wing.eff[level]), 15))
-		if next < wing.cost.size():
-			var cost := int(wing.cost[next]); var req := ""
-			if wing.has("req") and next < wing.req.size(): req = str(wing.req[next])
-			box.add_child(UI.button("Build level %d  ·  %d Cr%s" % [next, cost, "  ·  needs " + req if not campaign.researched(req) else ""], _build_wing.bind(str(key)), str(campaign.state.build) == "" and campaign.researched(req) and campaign.can_afford({"credits": cost})))
-		if level > 0:
-			var action: Dictionary = Data.get_table("temple", "MOD_ACTS").get(str(key), {})
-			if not action.is_empty():
-				Modules.ensure(campaign)
-				box.add_child(UI.button("%s  ·  %s" % [action.n, "ready" if Modules.ready(campaign, str(key)) else "cooldown %d missions" % int(campaign.state.modules.cd.get(str(key), 0))], _module_action.bind(str(key)), Modules.ready(campaign, str(key)) and campaign.can_afford(action.cost)))
-			var staffer := str(campaign.state.staff.get(str(key), ""))
-			if staffer == "":
-				for r in campaign.state.roster:
-					if str(r.status) == "active" and str(r.assign) == "":
-						box.add_child(UI.button("Staff with %s  ·  %s" % [r.n, wing.staff], _assign.bind(str(r.id), "staff:" + str(key))))
-						break
-			else: box.add_child(UI.label("Staffed by %s" % campaign.soldier(staffer).n, 15, UI.ACCENT))
 
 func _arsenal() -> void:
 	var row := HFlowContainer.new(); page_content.add_child(row)
@@ -298,19 +305,26 @@ func _arsenal() -> void:
 			form_row.add_child(UI.button(str(form.n), _set_form.bind(selected_id, str(key)), campaign.researched(str(form.get("res", "")))))
 
 func _teams() -> void:
+	StrategyUI.field(self)
 	page_content.add_child(UI.label("Two strike teams at the start. Barracks levels 2 and 3 add one each.", 15, UI.MUTED))
 	for team in campaign.state.teams:
 		var names := []
 		for id in [team.lead] + team.mem:
 			var r: Dictionary = campaign.soldier(str(id))
 			if not r.is_empty(): names.append(str(r.n))
-		_card(str(team.n), "Leader and members: %s" % ", ".join(names))
+		var box := _card(str(team.n), "Leader and members: %s" % ", ".join(names))
+		for option in campaign.state.options:
+			if not option.has("crisis"): continue
+			var risk := preload("res://scripts/campaign/strat_ops.gd").team_risk(campaign, team, option)
+			box.add_child(UI.label("%s · %d%% success · %s" % [option.get("n", option.mission), risk.success, " · ".join(risk.why)], 13))
+		box.add_child(UI.label("Victory: 25% light wound per soldier. Defeat: serious wound; 30% capture or 7% death.", 13, UI.MUTED))
 
 func _legacy() -> void:
 	_card("THE ORDER REMEMBERS", "Soldier deeds, bonds, identities and fallen legends persist in campaign saves. Retire a veteran at rank 4.")
 	for r in campaign.state.roster:
 		var identity := "%s%s  ·  %s  ·  %d kills  ·  %d missions" % [r.n, " “%s”" % r.nick if str(r.get("nick", "")) != "" else "", r.cls, int(r.kills), int(r.missions)]
 		var box := _card(identity, "Rank %d  ·  %s" % [int(r.rank), str(r.status)])
+		StrategyUI.identity(self, box, r)
 		var nick := LineEdit.new(); nick.placeholder_text = "Enter a nickname and press Enter"; nick.max_length = int(Data.get_table("legacy", "NICK_MAX")); nick.text_submitted.connect(_set_nick.bind(str(r.id))); box.add_child(nick)
 		if str(r.status) == "active" and int(r.rank) >= 4: box.add_child(UI.button("Retire to the Order", _retire.bind(str(r.id))))
 	var bonds := _card("BONDS", "Comrades gain bond points when they survive missions together.")

@@ -188,7 +188,8 @@
     "effect": "status",
     "status": "suppressed",
     "aim": -30,
-    "reaction": true
+    "reaction": true,
+    "ammo_cost": 1
   },
   "rapidFire": {
     "name": "Rapid Fire",
@@ -199,7 +200,8 @@
     "damage": "weapon",
     "shots": 2,
     "aim_mod": -15,
-    "cooldown": 1
+    "cooldown": 1,
+    "ammo_cost": 2
   },
   "rally": {
     "name": "Rally",
@@ -234,7 +236,8 @@
     "effect": "attack",
     "damage": "weapon",
     "damage_mod": 3,
-    "aim_mod": -20
+    "aim_mod": -20,
+    "ammo_cost": 1
   },
   "heal": {
     "name": "Medkit",
@@ -371,5 +374,392 @@
     "range": 1.5,
     "target": "tile_scan",
     "effect": "scan"
+  },
+  "reload": {
+    "name": "Reload",
+    "ap": 1,
+    "target": "self",
+    "effect": "reload"
+  },
+  "interact": {
+    "name": "Interact",
+    "ap": 1,
+    "target": "tile_interact",
+    "effect": "interact",
+    "range": 1.5
+  },
+  "pull": {
+    "name": "Force Pull",
+    "ap": 1,
+    "target": "enemy",
+    "effect": "displace",
+    "focus": 1,
+    "range": 6,
+    "distance": 3,
+    "collision_damage": 2,
+    "pull": true,
+    "chance": 90
+  },
+  "breach": {
+    "name": "Saber Breach",
+    "ap": 1,
+    "target": "tile_wall",
+    "effect": "breach",
+    "range": 1.5,
+    "cover_damage": 8
+  },
+  "grenade": {
+    "name": "Grenade",
+    "ap": 2,
+    "target": "tile_area",
+    "effect": "blast",
+    "range": 6,
+    "damage": [
+      3,
+      3
+    ],
+    "charges": "grenades",
+    "friendly_fire": true,
+    "cover_damage": 4
+  },
+  "ionNade": {
+    "name": "Ion Grenade",
+    "ap": 2,
+    "target": "tile_area",
+    "effect": "blast",
+    "range": 6,
+    "damage": [
+      1,
+      1
+    ],
+    "droid_damage": 4,
+    "charges": "grenades",
+    "friendly_fire": true,
+    "status": "stunned"
+  },
+  "stabilize": {
+    "name": "Stabilize",
+    "ap": 1,
+    "target": "ally_down",
+    "effect": "stabilize",
+    "range": 1.5
+  },
+  "liftUp": {
+    "name": "Pick Up",
+    "ap": 1,
+    "target": "ally_down",
+    "effect": "heal",
+    "range": 1.5,
+    "revive": 2
+  },
+  "door": {
+    "name": "Open Door",
+    "ap": 1,
+    "target": "tile_interact",
+    "effect": "interact",
+    "range": 1.5
+  },
+  "console": {
+    "name": "Use Console",
+    "ap": 1,
+    "target": "tile_interact",
+    "effect": "interact",
+    "range": 1.5
+  },
+  "plant": {
+    "name": "Plant Charge",
+    "ap": 1,
+    "target": "tile_interact",
+    "effect": "interact",
+    "range": 1.5
+  },
+  "shadowStep": {
+    "name": "Shadow Step",
+    "ap": 1,
+    "target": "tile",
+    "effect": "shadow",
+    "focus": 1,
+    "range": 5,
+    "next_strike_aim": 20
+  },
+  "beastCalm": {
+    "name": "Beast Calm",
+    "ap": "remaining",
+    "target": "enemy_creature",
+    "effect": "status",
+    "focus": 2,
+    "range": 5,
+    "chance": 75,
+    "status": "stunned"
+  },
+  "holdLine": {
+    "name": "Hold the Line",
+    "ap": "remaining",
+    "target": "self",
+    "effect": "hold_line"
+  },
+  "disarm": {
+    "name": "Disarm",
+    "ap": "remaining",
+    "target": "enemy",
+    "effect": "status",
+    "focus": 2,
+    "range": 5,
+    "chance": 80,
+    "status": "disarmed"
+  },
+  "root": {
+    "name": "Force Bind",
+    "ap": "remaining",
+    "target": "enemy",
+    "effect": "status",
+    "focus": 2,
+    "range": 5,
+    "chance": 80,
+    "status": "rooted"
+  },
+  "flurry": {
+    "name": "Flurry",
+    "ap": "remaining",
+    "target": "enemy",
+    "effect": "attack",
+    "range": 1.5,
+    "melee": true,
+    "shots": 2,
+    "aim_mod": -10,
+    "focus": 1
+  },
+  "mightyBlow": {
+    "name": "Mighty Blow",
+    "ap": "remaining",
+    "target": "enemy",
+    "effect": "attack",
+    "range": 1.5,
+    "melee": true,
+    "damage_mod": 2,
+    "focus": 2
+  },
+  "precisionStrike": {
+    "name": "Precision Strike",
+    "ap": "remaining",
+    "target": "enemy",
+    "effect": "attack",
+    "range": 1.5,
+    "melee": true,
+    "damage_mod": 1,
+    "aim_mod": 20,
+    "focus": 2
+  },
+  "massHeal": {
+    "name": "Mass Heal",
+    "ap": 1,
+    "target": "self",
+    "effect": "mass_heal",
+    "focus": 3,
+    "range": 4,
+    "heal": 2
+  },
+  "medBeacon": {
+    "name": "Med Beacon",
+    "ap": 1,
+    "target": "self",
+    "effect": "mass_heal",
+    "range": 3,
+    "heal": 2,
+    "charges": "med_beacon"
+  },
+  "forceWave": {
+    "name": "Force Wave",
+    "ap": "remaining",
+    "target": "self",
+    "effect": "wave",
+    "focus": 3,
+    "range": 2.9,
+    "damage": [
+      2,
+      2
+    ],
+    "chance": 40,
+    "status": "stunned"
+  },
+  "stasisField": {
+    "name": "Stasis Field",
+    "ap": "remaining",
+    "target": "self",
+    "effect": "wave",
+    "focus": 4,
+    "range": 3.2,
+    "chance": 60,
+    "status": "stunned"
+  },
+  "tremor": {
+    "name": "Tremor",
+    "ap": "remaining",
+    "target": "tile_area",
+    "effect": "blast",
+    "focus": 3,
+    "range": 5,
+    "damage": [
+      2,
+      2
+    ],
+    "cover_damage": 4,
+    "clear_overwatch": true
+  },
+  "chainShot": {
+    "name": "Chain Shot",
+    "ap": "remaining",
+    "target": "enemy",
+    "effect": "attack",
+    "range": "weapon",
+    "shots": 2,
+    "follow_hit": true,
+    "aim_mod": -10,
+    "ammo_cost": 2
+  },
+  "coverFire": {
+    "name": "Covering Fire",
+    "ap": 1,
+    "target": "enemy",
+    "effect": "status",
+    "range": "weapon",
+    "status": "suppressed",
+    "aim": -30,
+    "ammo_cost": 1
+  },
+  "handoff": {
+    "name": "Hand Off",
+    "ap": 1,
+    "target": "ally_other",
+    "effect": "handoff",
+    "range": 4,
+    "once_turn": true
+  },
+  "backup": {
+    "name": "Call Backup",
+    "ap": 0,
+    "target": "enemy",
+    "effect": "backup",
+    "range": "weapon",
+    "squad_once": true
+  },
+  "moSurge": {
+    "name": "Momentum Surge",
+    "ap": 0,
+    "target": "self",
+    "effect": "surge",
+    "momentum": 3,
+    "once_turn": true
+  },
+  "moRally": {
+    "name": "Momentum Rally",
+    "ap": 0,
+    "target": "self",
+    "effect": "momentum_rally",
+    "momentum": 5,
+    "squad_once": true
+  },
+  "moStrike": {
+    "name": "Fire Support",
+    "ap": 0,
+    "target": "tile_area",
+    "effect": "blast",
+    "range": 8,
+    "momentum": 8,
+    "damage": [
+      3,
+      5
+    ],
+    "cover_damage": 4
+  },
+  "snipe": {
+    "name": "Snipe",
+    "ap": 3,
+    "target": "enemy",
+    "effect": "attack",
+    "range": "weapon",
+    "damage_mod": 2,
+    "aim_mod": 15,
+    "crit_mod": 20,
+    "ammo_cost": 1
+  },
+  "barrage": {
+    "name": "Barrage",
+    "ap": 3,
+    "target": "tile_area",
+    "effect": "blast",
+    "range": "weapon",
+    "damage": [
+      3,
+      5
+    ],
+    "cover_damage": 4,
+    "cooldown": 1,
+    "ammo_cost": 2
+  },
+  "shieldWall": {
+    "name": "Shield Wall",
+    "ap": 1,
+    "target": "self",
+    "effect": "aura",
+    "range": 1.5,
+    "defense": 20,
+    "duration": 1
+  },
+  "taunt": {
+    "name": "Draw Fire",
+    "ap": 1,
+    "target": "self",
+    "effect": "taunt"
+  },
+  "fanFire": {
+    "name": "Fan the Hammer",
+    "ap": 2,
+    "target": "enemy",
+    "effect": "attack",
+    "range": "weapon",
+    "shots": 3,
+    "aim_mod": -15,
+    "damage_mod": -1,
+    "ammo_cost": 3
+  },
+  "bondAid": {
+    "name": "Bond: Teamwork",
+    "ap": 1,
+    "target": "ally_bond",
+    "effect": "bond_aid",
+    "range": 8
+  },
+  "bondStrike": {
+    "name": "Bond: Crossfire",
+    "ap": 1,
+    "target": "enemy",
+    "effect": "bond_strike",
+    "range": "weapon"
+  },
+  "shredder": {
+    "name": "Shredder",
+    "passive": true,
+    "effect": "shred"
+  },
+  "sense": {
+    "name": "Sense",
+    "passive": true,
+    "effect": "detection"
+  },
+  "executioner": {
+    "name": "Executioner",
+    "passive": true,
+    "effect": "wounded_aim"
+  },
+  "pathfinder": {
+    "name": "Pathfinder",
+    "passive": true,
+    "effect": "mobility"
+  },
+  "wildBond": {
+    "name": "Wild Bond",
+    "passive": true,
+    "effect": "focus_bonus"
   }
 }

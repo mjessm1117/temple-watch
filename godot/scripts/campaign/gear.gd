@@ -1,11 +1,12 @@
 extends RefCounted
 const Data = preload("res://scripts/campaign/data.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
+const Base = preload("res://scripts/campaign/strat_base.gd")
 const MOD_KEY = {"w": "mods", "a": "amods", "s": "smods"}
 const POOL_KEY = {"w": "W_MODS", "a": "AMODS", "s": "SMODS"}
 
 static func price(campaign, cost: int) -> int:
-	return roundi(cost * (0.8 if campaign.state.staff.has("armory") else 1.0) * (0.85 if campaign.researched("supply") else 1.0))
+	return roundi(cost * (0.8 if Base.staff_count(campaign.state, "armory") > 0 else 1.0) * (0.85 if campaign.researched("supply") else 1.0))
 
 static func unlocked(campaign, item: Dictionary) -> bool:
 	if not campaign.researched(str(item.get("res", ""))): return false
@@ -41,7 +42,7 @@ static func craft_saber(campaign, id: String) -> bool:
 	var next := int(r.gear.saber) + 1
 	if next >= sabers.size(): return false
 	var item: Dictionary = sabers[next]
-	var kyber := maxi(1, int(item.get("kyber", 0)) - (1 if campaign.state.staff.has("forge") else 0) - (1 if campaign.researched("kyberLore") else 0))
+	var kyber := maxi(1, int(item.get("kyber", 0)) - (1 if Base.staff_count(campaign.state, "forge") > 0 else 0) - (1 if campaign.researched("kyberLore") else 0))
 	if not unlocked(campaign, item) or not campaign.spend({"credits": int(item.get("cost", 0)), "kyber": kyber}): return false
 	r.gear.saber = next
 	return true
@@ -114,4 +115,9 @@ static func battle_stats(campaign, id: String) -> Dictionary:
 			var lv := int(g.mk.get("%s.%s" % [kind, key], 1))
 			if item.has("mk"): Progression._add_mod(stats, item.mk[lv - 1])
 	if bool(r.get("evo", false)): Progression._add_mod(stats, Data.get_table("gear", "EVO").get(str(r.cls), {}).get("mod", {}))
+	Progression._add_mod(stats, r.get("bonus", {}))
+	if int(r.get("fatigue", 0)) >= 34: Progression._add_mod(stats, {"aim":-5, "will":-10})
+	if "weave" in campaign.state.get("strategy", {}).get("projects", []): Progression._add_mod(stats, {"armor":1})
+	if "focus" in campaign.state.get("strategy", {}).get("projects", []) and Progression.is_jedi(r): Progression._add_mod(stats, {"maxF":1})
+	Progression._add_mod(stats, {"will":int(Base.effects(campaign.state).get("will", 0)) + int(campaign.state.get("battle_buffs", {}).get("will", 0))})
 	return stats

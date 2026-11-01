@@ -5,7 +5,7 @@ const Progression = preload("res://scripts/campaign/progression.gd")
 const S = preload("res://scripts/campaign/loadout_style.gd")
 
 static func fit(r: Dictionary) -> bool:
-	return not r.is_empty() and r.get("status", "active") == "active" and int(r.get("wound", 0)) == 0 and str(r.get("assign", "")) == ""
+	return preload("res://scripts/campaign/strat_roster.gd").ready(r)
 
 static func status(c, r: Dictionary) -> String:
 	if int(r.get("wound", 0)) > 0:
@@ -17,7 +17,7 @@ static func status(c, r: Dictionary) -> String:
 		for op in c.state.get("field", {}).get("list", []):
 			if r.id in op.get("team", []) and op.get("st") == "team": return "ASSIGNED · %d days" % int(op.left)
 		return "ASSIGNED · %s · until released" % str(r.assign).trim_prefix("staff:").capitalize()
-	return "READY"
+	return "%s · fatigue %d/100" % [preload("res://scripts/campaign/strat_roster.gd").fatigue_status(r), int(r.get("fatigue", 0))]
 
 static func nickname(r: Dictionary) -> String:
 	var nick := str(r.get("nick", r.get("nickname", "")))

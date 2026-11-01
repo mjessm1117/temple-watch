@@ -1,6 +1,7 @@
 extends RefCounted
 ## Web room identities and WING_HOME arrangement; presentation only, never mutates a save.
 const Data = preload("res://scripts/campaign/data.gd")
+const Base = preload("res://scripts/campaign/strat_base.gd")
 const ROOMS = [
 	["council", "Council Chamber", "Command", "", 0.0, 11.0, "council"],
 	["war", "War Room", "Galaxy", "", -2.6, 7.5, "holo"],
@@ -60,6 +61,15 @@ static func describe(row: Array, state: Dictionary) -> Dictionary:
 	if row[6] == "vault":
 		built = bool(state.get("mods", {}).get("dug", {}).get(id, false))
 		status = "Vault open" if built else "Sealed · %d Cr" % {"u0":60, "u1":100, "u2":140}[id]
+	var at := Vector3(float(row[4]), float(row[5]), 0.0)
+	var staff := 0
+	var detail := status
+	if wing != "":
+		var slot := Base.slot_data(Base.slot_of(state, wing))
+		if not slot.is_empty(): at = Vector3(-7.8 + float(slot.x) * 5.2, 1.7 + (2 - int(slot.row)) * 2.9, 0)
+		staff = Base.staff_count(state, wing)
+		detail = status + " · " + Base.summary(state, wing)
+	if id == "works": detail = "Power %d / %d · staff & excavation" % [Base.power(state).used, Base.power(state).capacity]
 	return {"id":id, "name":row[1], "tab":target, "wing":wing, "built":built,
 		"level":level, "status":status, "module":module, "color":color, "kind":row[6],
-		"position":Vector3(float(row[4]), float(row[5]), 0.0)}
+		"position":at, "staff":staff, "detail":detail}

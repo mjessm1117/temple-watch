@@ -35,7 +35,8 @@
       "player_aim": 10
     },
     "player_hp": 1,
-    "enemy_damage": -1
+    "enemy_damage": -1,
+    "combat_enemy_aim": -10
   },
   "hard": {
     "name": "Hard",
@@ -59,7 +60,8 @@
       "agent"
     ],
     "player_hp": 1,
-    "enemy_damage": 1
+    "enemy_damage": 1,
+    "combat_enemy_aim": -10
   },
   "legend": {
     "name": "Legend",
@@ -83,6 +85,7 @@
       "agent"
     ],
     "player_hp": 2,
-    "enemy_damage": 1
+    "enemy_damage": 1,
+    "combat_enemy_aim": -5
   }
 }

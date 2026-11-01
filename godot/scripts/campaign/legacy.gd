@@ -33,7 +33,7 @@ static func choose_drill(campaign, pair: String, drill: String) -> bool:
 static func retire(campaign, id: String, role: String = "veteran", region: String = "") -> bool:
 	var r: Dictionary = campaign.soldier(id)
 	var rules: Dictionary = Data.get_table("legacy", "LEGACY")
-	if r.is_empty() or str(r.status) != "active" or int(r.rank) < int(rules.retireRank): return false
+	if r.is_empty() or str(r.status) != "active" or int(r.rank) < int(rules.retireRank) or str(r.get("assign", "")) != "" or campaign.state.pending_mission.get("squad", []).has(id): return false
 	if role == "council" and (not Progression.is_jedi(r) or int(r.rank) < int(rules.councilRank)): return false
 	if role == "general" and region == "": return false
 	r.status = "retired"; r.role = role; r.assign = ""

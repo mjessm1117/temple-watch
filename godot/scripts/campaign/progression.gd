@@ -49,7 +49,10 @@ static func battle_stats(r: Dictionary) -> Dictionary:
 		var special: Dictionary = gain.get("jedi" if is_jedi(r) else "troop", {})
 		for key in special:
 			if base.has(key): base[key] = int(base[key]) + int(special[key])
-	for pick in r.get("picks", []):
+	var applied := []
+	for pick in r.get("picks", []) + r.get("extra_picks", []):
+		if pick in applied: continue
+		applied.append(pick)
 		var perk: Dictionary = Data.get_table("temple", "PERKS").get(str(pick), {})
 		_add_mod(base, perk.get("mod", {}))
 	return base
@@ -60,3 +63,11 @@ static func _add_mod(stats: Dictionary, mod: Dictionary) -> void:
 			stats.dmg = [int(stats.dmg[0]) + int(mod[key]), int(stats.dmg[1]) + int(mod[key])]
 		elif key == "dmgHi": stats.dmg[1] = int(stats.dmg[1]) + int(mod[key])
 		else: stats[key] = int(stats.get(key, 0)) + int(mod[key])
+
+static func battle_abilities(r: Dictionary) -> Array:
+	## Merge this into the tactical kit at spawn; passive picks are handled by battle_stats.
+	var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/abilities.json"))
+	var out := []
+	for pick in r.get("picks", []) + r.get("extra_picks", []):
+		if catalog.has(pick) and pick not in out: out.append(pick)
+	return out

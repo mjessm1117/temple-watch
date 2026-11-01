@@ -1,0 +1,307 @@
+{
+  "version": 1,
+  "rules": {
+    "month_days": 30,
+    "segments": 12,
+    "escalation_days": 30,
+    "collapse_days": 14,
+    "knowledge_month": 4,
+    "retaliation_pressure": 3,
+    "team_base": 50,
+    "team_per_rank": 6,
+    "team_max": 95,
+    "team_xp": 15,
+    "team_fail_stress": 20
+  },
+  "rivals": [
+    {
+      "id": "veyra",
+      "n": "Darth Veyra",
+      "title": "The Glass Knife",
+      "domain": "Intelligence / infiltration",
+      "color": "e77787",
+      "strengths": [
+        "Veiled approach",
+        "Disrupting strikes"
+      ],
+      "weaknesses": [
+        "Vulnerable after a missed strike",
+        "Cannot hide from a marked target"
+      ],
+      "spawn": {
+        "archetype": "sith",
+        "hp": 16,
+        "aim": 72,
+        "armor": 1
+      },
+      "countermeasures": [
+        {
+          "n": "Expose the veil",
+          "text": "Mark Veyra before she closes; her evasion falls by 10.",
+          "mod": {
+            "marked_evasion": -10
+          }
+        },
+        {
+          "n": "Break her cadence",
+          "text": "Suppress Veyra to reduce her aim by 10.",
+          "mod": {
+            "suppressed_aim": -10
+          }
+        },
+        {
+          "n": "Shatter the mask",
+          "text": "Stronghold records reveal an armor bypass of 1.",
+          "mod": {
+            "armor": -1
+          }
+        },
+        {
+          "n": "No more shadows",
+          "text": "The escape routes are sealed. Her network falls silent.",
+          "mod": {}
+        }
+      ]
+    },
+    {
+      "id": "korr",
+      "n": "Lord Korr Vash",
+      "title": "The Iron Cantor",
+      "domain": "Occupation / retaliation",
+      "color": "e5b06c",
+      "strengths": [
+        "Armored advance",
+        "Rallying command"
+      ],
+      "weaknesses": [
+        "Slow to change elevation",
+        "Exposed to armor shred"
+      ],
+      "spawn": {
+        "archetype": "sith",
+        "hp": 22,
+        "aim": 65,
+        "armor": 3
+      },
+      "countermeasures": [
+        {
+          "n": "Crack the plate",
+          "text": "Explosive hits shred one additional armor.",
+          "mod": {
+            "explosive_shred": 1
+          }
+        },
+        {
+          "n": "Silence the command",
+          "text": "Disorient Korr to cancel his rally.",
+          "mod": {
+            "disorient_cancels_rally": true
+          }
+        },
+        {
+          "n": "Open the seams",
+          "text": "Stronghold schematics reduce his armor by 1.",
+          "mod": {
+            "armor": -1
+          }
+        },
+        {
+          "n": "The last refrain",
+          "text": "His occupation commands can never be renewed.",
+          "mod": {}
+        }
+      ]
+    },
+    {
+      "id": "nyss",
+      "n": "Darth Nyss",
+      "title": "The Hollow Seer",
+      "domain": "Rituals / abduction",
+      "color": "b39be8",
+      "strengths": [
+        "Mind snare",
+        "Life siphon"
+      ],
+      "weaknesses": [
+        "Poor defense at close range",
+        "Loses focus when interrupted"
+      ],
+      "spawn": {
+        "archetype": "sith",
+        "hp": 18,
+        "aim": 70,
+        "armor": 0
+      },
+      "countermeasures": [
+        {
+          "n": "Ground the current",
+          "text": "A guarded Jedi gains 20 will against her mind snare.",
+          "mod": {
+            "guarded_will": 20
+          }
+        },
+        {
+          "n": "Sever the tether",
+          "text": "A melee hit interrupts her life siphon.",
+          "mod": {
+            "melee_interrupts_siphon": true
+          }
+        },
+        {
+          "n": "Read the echo",
+          "text": "Stronghold records reveal her destination. Aim against her +10.",
+          "mod": {
+            "attacker_aim": 10
+          }
+        },
+        {
+          "n": "End the whisper",
+          "text": "Her final ritual is broken. The captives are free.",
+          "mod": {}
+        }
+      ]
+    }
+  ],
+  "operations": {
+    "fortify": {
+      "n": "Fortified garrisons",
+      "intel": 2,
+      "mod": {
+        "enemyHp": 1
+      },
+      "missions": 2,
+      "desc": "If ignored: enemies get +1 HP for 2 missions.",
+      "mission": "sabotage"
+    },
+    "snipers": {
+      "n": "Sharpshooter cadre",
+      "intel": 2,
+      "mod": {
+        "enemyAim": 5
+      },
+      "missions": 2,
+      "desc": "If ignored: enemies get +5 aim for 2 missions.",
+      "mission": "archive"
+    },
+    "surge": {
+      "n": "Troop surge",
+      "intel": 3,
+      "mod": {
+        "extraEnemies": 1
+      },
+      "missions": 2,
+      "desc": "If ignored: +1 enemy per wave for 2 missions.",
+      "mission": "rescue"
+    },
+    "spies": {
+      "n": "Spy ring",
+      "intel": 2,
+      "mod": {
+        "squadAim": -5
+      },
+      "missions": 2,
+      "desc": "If ignored: your squads get \u22125 aim for 2 missions.",
+      "mission": "archive"
+    },
+    "propaganda": {
+      "n": "Holonet propaganda",
+      "intel": 1,
+      "res": {
+        "favor": -6
+      },
+      "desc": "If ignored: Senate Favor \u22126.",
+      "mission": "escort"
+    },
+    "supply": {
+      "n": "Supply raids",
+      "intel": 1,
+      "res": {
+        "credits": -80
+      },
+      "desc": "If ignored: Credits \u221280.",
+      "mission": "sabotage"
+    },
+    "kyberRaid": {
+      "n": "Kyber raid",
+      "intel": 2,
+      "res": {
+        "kyber": -1
+      },
+      "desc": "If ignored: Kyber \u22121.",
+      "mission": "shrine"
+    },
+    "bounty": {
+      "n": "Bounty on the Order",
+      "intel": 2,
+      "hurt": 1,
+      "desc": "If ignored: an assassin wounds a random unit (10 days, +20 stress).",
+      "mission": "rescue"
+    },
+    "saboteurs": {
+      "n": "Temple saboteurs",
+      "intel": 2,
+      "jam": 2,
+      "desc": "If ignored: saboteurs jam 2 wing actions for 3 missions.",
+      "mission": "sabotage"
+    },
+    "ritual": {
+      "n": "Dark ritual",
+      "intel": 3,
+      "res": {
+        "orderDark": 5
+      },
+      "desc": "If ignored: Order Darkness +5.",
+      "mission": "shrine"
+    },
+    "hunter": {
+      "n": "Sith hunter",
+      "intel": 3,
+      "hunt": 1,
+      "desc": "If ignored: a hunter stalks your best unit (wounded 14 days, +30 stress).",
+      "mission": "rescue"
+    }
+  },
+  "crises": {
+    "archive": {
+      "n": "Imperial listening post",
+      "kind": "Investigate",
+      "mission": "archive",
+      "ignore": {
+        "favor": -5
+      }
+    },
+    "sabotage": {
+      "n": "Strike the fuel depot",
+      "kind": "Sabotage",
+      "mission": "sabotage",
+      "ignore": {
+        "favor": -8
+      }
+    },
+    "escort": {
+      "n": "Get the senator out",
+      "kind": "Escort",
+      "mission": "escort",
+      "ignore": {
+        "favor": -8
+      }
+    },
+    "rescue": {
+      "n": "Hostages at Ord Mantell",
+      "kind": "Rescue",
+      "mission": "rescue",
+      "ignore": {
+        "favor": -8
+      }
+    },
+    "shrine": {
+      "n": "Beast at the Dantooine shrine",
+      "kind": "Defend",
+      "mission": "shrine",
+      "ignore": {
+        "favor": -3,
+        "orderDark": 4
+      }
+    }
+  }
+}

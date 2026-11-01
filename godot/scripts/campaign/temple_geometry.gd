@@ -91,6 +91,10 @@ func room(parent: Node3D, info: Dictionary) -> Node3D:
 	if info.kind != "vault":
 		person(cell, Vector3(-1.1, 0.1, 0.6), color, true)
 		person(cell, Vector3(1.05, 0.1, -0.45), Color("e1d6b4"), false)
+	for i in int(info.get("staff", 0)):
+		person(cell, Vector3(-0.7 + i * 1.3, 0.1, 1.05), Color("80dfd4"), false)
+	if info.kind == "vault":
+		cylinder(cell, Vector3(0, 0.5, 0), 0.65, 0.9, Color("75d4df"), 0.3, 1.0)
 	return cell
 
 func furnish(cell: Node3D, kind: String, color: Color) -> void:

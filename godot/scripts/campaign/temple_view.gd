@@ -2,6 +2,7 @@ extends Control
 ## A persistent 3D viewport with projected, keyboard-accessible room hit targets.
 signal room_selected(id: String, tab: String)
 signal room_hovered(description: String)
+const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 const Rooms = preload("res://scripts/campaign/temple_rooms.gd")
 const Geometry = preload("res://scripts/campaign/temple_geometry.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
@@ -48,7 +49,14 @@ func setup(save_state: Dictionary) -> void:
 	temple = Node3D.new(); temple.name = "TempleCutaway"; world.add_child(temple)
 	art.architecture(temple)
 	for row in Rooms.ROOMS:
+		if row[0] == "war" and state.get("slots", {}).has("t0"): continue
+		if row[3] != "" and preload("res://scripts/campaign/strat_base.gd").slot_of(state, row[3]) == "":
+			var home: String = preload("res://scripts/campaign/data.gd").get_table("temple", "WING_HOME")[row[3]]
+			if state.get("slots", {}).has(home) and state.slots[home] != row[3]: continue
 		var info: Dictionary = Rooms.describe(row, state); rooms[info.id] = info
+		if info.id in ["a0", "a1"] and state.get("slots", {}).has(info.id):
+			rooms.erase(info.id); continue
+		if Prefs.get_value("cb"): info.color = Color("70baff") if info.built else Color("eeac65")
 		cell_nodes[info.id] = art.room(temple, info)
 		_make_button(info)
 	art.batch_static(temple)
@@ -60,7 +68,8 @@ func setup(save_state: Dictionary) -> void:
 
 func _make_button(info: Dictionary) -> void:
 	var b := Button.new(); b.name = "Room_" + str(info.id); b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	b.tooltip_text = "%s\n%s%s\nOpen %s" % [info.name, info.status, " · " + str(info.module) if info.module != "" else "", info.tab]
+	b.tooltip_text = "%s\n%s%s\nOpen %s" % [info.name, info.detail, " · " + str(info.module) if info.module != "" else "", info.tab]
+	if not Prefs.get_value("tips"): b.tooltip_text = ""
 	for style_name in ["normal", "hover", "pressed", "focus"]:
 		var style := StyleBoxFlat.new(); style.bg_color = Color(0.1, 0.4, 0.46, 0.16 if style_name != "normal" else 0)
 		style.border_color = Color("7bdce4") if style_name != "normal" else Color(0.2, 0.4, 0.43, 0.15)
@@ -74,7 +83,7 @@ func _make_button(info: Dictionary) -> void:
 	name_label.offset_top = 3; name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
 	var line := Label.new()
 	line.text = str(info.status)
-	if info.built and info.module != "": line.text = str(info.module) + "\n" + str(info.status)
+	if info.built and info.module != "": line.text = str(info.status) + "\nStaff %d · Power %d" % [info.staff, preload("res://scripts/campaign/strat_base.gd").POWER[info.wing]]
 	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	line.add_theme_font_size_override("font_size", 11)
 	line.add_theme_color_override("font_color", Color("e3c384") if info.built else Color("b3a182"))
@@ -96,7 +105,7 @@ func activate_room(id: String) -> void:
 func _hover(id: String) -> void:
 	hovered = id
 	var info: Dictionary = rooms[id]
-	room_hovered.emit("%s  /  %s%s  →  %s" % [info.name, info.status, " · " + str(info.module) if info.built and info.module != "" else "", info.tab])
+	room_hovered.emit("%s  /  %s%s  →  %s" % [info.name, info.detail, " · " + str(info.module) if info.built and info.module != "" else "", info.tab])
 	if sound != null: sound.play()
 
 func _unhover(id: String) -> void:
@@ -105,7 +114,9 @@ func _unhover(id: String) -> void:
 
 func _process(delta: float) -> void:
 	if camera == null: return
-	time += delta
+	if Prefs.get_value("motion"):
+		_project_rooms(); return
+	time += delta * float(Prefs.get_value("speed"))
 	galaxy.rotation.y = time * 0.012
 	art.animate(time)
 	camera.position = Vector3(sin(time * 0.12) * 0.3, 17.3 + sin(time * 0.16) * 0.12, 42)

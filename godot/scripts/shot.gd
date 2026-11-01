@@ -33,10 +33,10 @@ static func line(a: Vector2i, b: Vector2i) -> Array[Vector2i]:
 		if out.is_empty() or out.back() != p: out.append(p)
 	return out
 
-static func _direct(m: RefCounted, a: Vector2i, b: Vector2i, peek: bool) -> bool:
+static func _blocker(m: RefCounted, a: Vector2i, b: Vector2i, peek: bool) -> Vector2i:
 	var points := line(a, b)
 	var n: int = points.size() - 1
-	if n < 1: return true
+	if n < 1: return Vector2i(-1, -1)
 	var ea: float = elevation(m, a) + 1.2
 	var eb: float = elevation(m, b) + 1.2
 	for i in range(1, n):
@@ -45,8 +45,11 @@ static func _direct(m: RefCounted, a: Vector2i, b: Vector2i, peek: bool) -> bool
 		if not peek and max(abs(p.x - a.x), abs(p.y - a.y)) <= 1 and not full(m.tile(p)): continue
 		var c: String = m.tile(p)
 		var top: float = float(elevation(m, p)) + (2.0 if full(c) else 0.0)
-		if top > 0.0 and top >= ea + (eb - ea) * float(i) / n: return false
-	return true
+		if top > 0.0 and top >= ea + (eb - ea) * float(i) / n: return p
+	return Vector2i(-1, -1)
+
+static func _direct(m: RefCounted, a: Vector2i, b: Vector2i, peek: bool) -> bool:
+	return _blocker(m, a, b, peek).x < 0
 
 static func los(m: RefCounted, a: Vector2i, b: Vector2i) -> bool:
 	if _direct(m, a, b, false): return true
@@ -87,17 +90,24 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 	var a := pos(attacker)
 	var t := pos(target)
 	var lines: Array = [["Base aim", int(attacker.aim) + int(attacker.get("buff_aim", 0)) + int(attacker.get("debuff_aim", 0)) + int(target.get("marked_aim", 0))]]
+	if "executioner" in attacker.get("passives", []) and int(target.hp) * 2 <= int(target.max_hp): lines.append(["Executioner", 25])
+	var bond_bonus := 0
+	for ally in m.units:
+		if int(ally.get("id", -1)) not in attacker.get("bondmates", {}) or int(ally.get("hp",0)) <= 0 or distance(pos(ally), a) > 3.0: continue
+		var pair_key: String = attacker.bondmates[int(ally.id)]
+		bond_bonus = maxi(bond_bonus, 10 if int(m.bond_pairs[pair_key].get("lvl",0)) >= 8 else 5)
+	if bond_bonus > 0: lines.append(["Bond proximity", bond_bonus])
 	var cv := 0
 	if melee: lines.append(["Close quarters", 10])
 	else:
 		cv = cover(m, t, a)
 		# A two-level vantage sees over one tier of nearby cover.
 		if elevation(m, a) - elevation(m, t) >= 2: cv = maxi(0, cv - 20)
-		if cv > 0: lines.append(["Full cover" if cv == 40 else "Half cover", -cv])
+		lines.append(["Full cover" if cv == 40 else "Half cover" if cv == 20 else "No cover", -cv])
 		var d := distance(a, t)
 		var r := float(attacker.range)
-		if d > r * 0.6: lines.append(["Range", -roundi((d - r * 0.6) * 3)])
-	if elevation(m, a) > elevation(m, t): lines.append(["High ground", 20])
+		lines.append(["Range", -roundi((d - r * 0.6) * 3) if d > r * 0.6 else 0])
+	lines.append(["High ground", 20 if elevation(m, a) > elevation(m, t) else 0])
 	var defense := int(target.get("defense", 0))
 	if bool(target.get("hunkered", false)): defense += 30
 	defense += int(target.get("buff_defense", 0))
@@ -121,3 +131,19 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 		for ally in m.units:
 			if int(ally.get("hp", 0)) > 0 and "spotter" in ally.get("passives", []) and distance(pos(ally), t) <= 11.0 and los(m, pos(ally), t): sight = true; break
 	return {"lines": lines, "hit": hit, "crit": crit, "graze": 0 if melee else min(GRAZE, 100 - hit), "cover": cv, "flanked": flanked, "los": sight, "range_ok": melee or distance(a, t) <= float(attacker.range)}
+
+static func trace(m: RefCounted, a: Vector2i, b: Vector2i) -> Dictionary:
+	if _direct(m, a, b, false): return {"clear":true, "origin":a, "end":b, "blocker":Vector2i(-1,-1)}
+	var beside_wall := false
+	for d in DIRS:
+		if full(m.tile(a + d)): beside_wall = true
+	if beside_wall:
+		for d in DIRS:
+			var p := a + d
+			if m.in_bounds(p) and m.passable(p) and p != b and _direct(m, p, b, true): return {"clear":true, "origin":p, "end":b, "blocker":Vector2i(-1,-1)}
+	return {"clear":false, "origin":a, "end":b, "blocker":_blocker(m, a, b, false)}
+
+static func damage_preview(attacker: Dictionary, target: Dictionary) -> Dictionary:
+	var armor := int(target.get("armor", 0))
+	var low := int(attacker.damage[0]); var high := int(attacker.damage[1])
+	return {"normal":[maxi(1, low-armor), maxi(1, high-armor)], "critical":[maxi(1, low+2-armor), maxi(1, high+2-armor)], "graze":[maxi(1, ceili(low*0.5)-armor), maxi(1, ceili(high*0.5)-armor)], "armor":armor, "shred":mini(1, armor)}
