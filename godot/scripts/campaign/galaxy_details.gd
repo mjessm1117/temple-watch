@@ -81,20 +81,11 @@ static func region_panel(view) -> void:
 		if Data.get_table("galaxy","PLANETS")[offer.planet].reg == key:
 			count += 1; box.add_child(UI.button("↗ " + str(offer.name),view._select.bind(int(offer.index))))
 	if count == 0: box.add_child(UI.label("Nothing needs the Order here right now.",14,UI.MUTED))
-	# Older/imported saves may carry operations from the web campaign.
-	for op in c.state.get("ops",{}).get("list",[]):
-		if op.get("st","") not in ["open","team"]: continue
-		var destination := Intel.operation_planet(c,op)
-		if Data.get_table("galaxy","PLANETS")[destination].reg != key: continue
-		var def: Dictionary = Data.get_table("research","SITH_OPS").get(op.get("k",""),{})
-		fact(box,"Sith operation",str(def.get("n",op.get("k","Unknown")))+" · hits at month end",UI.DANGER)
-		box.add_child(UI.label(str(def.get("desc","")),14,UI.MUTED))
-		var cost := maxi(1,int(def.get("intel",1))-(1 if c.state.research.done.has("codebreak") else 0))
-		fact(box,"Counter","%d Intel, or a 2-unit team; resolves after next mission" % cost)
-		if op.get("st","") == "team":
-			var names := PackedStringArray()
-			for id in op.get("team",[]): names.append(str(c.soldier(str(id)).get("n",id)))
-			fact(box,"Team away",", ".join(names))
+	for op in c.sith.operations():
+		if op.status not in ["open","team"]: continue
+		fact(box,"Dark Event",str(op.n)+" · day %d" % int(op.deadline),UI.DANGER)
+		box.add_child(UI.label(str(op.desc),14,UI.MUTED))
+	box.add_child(UI.button("Counter a Dark Event →",func(): view.get_node("/root/CampaignFlow").open_intelligence()))
 	box.add_child(UI.button("Back to the briefing",view._tab.bind("Briefing")))
 
 static func teams_panel(view) -> void:

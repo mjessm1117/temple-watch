@@ -44,6 +44,15 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 	elif kind in ["attack", "push"] and not bool(event.get("framed", false)):
 		await game.cam.frame(_point(game.mission, event.from), _point(game.mission, event.to), str(event.get("mode", "push")))
 	match kind:
+		"objective_attack", "vip_attack":
+			var to := _point(game.mission,event.to,1.0)
+			if actor != null: game.fx.bolt(actor.position+Vector3.UP,to,true,false)
+			game.fx.float_text(to,"-%d" % int(event.damage),Color("ffad8d"))
+			await game.cam.wait(0.3)
+		"reinforcement":
+			game._refresh_figures()
+			game.fx.float_text(_point(game.mission,event.at,1.8),"REINFORCEMENTS",Color("ffad8d"))
+			await game.cam.wait(0.3)
 		"activation":
 			game.cam.finish()
 			game._refresh_figures()

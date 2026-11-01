@@ -16,9 +16,8 @@ static func play(game: Node3D) -> void:
 	var fired: Dictionary = {}
 	for enemy in game.mission.living("enemy"):
 		if game.mission.result != "": break
-		if not bool(enemy.awake): continue
 		game.cam.trace.append("actor_%d" % int(enemy.id))
-		AI.act(game.mission, enemy, fired)
+		game.mission.enemy_actor(enemy, fired)
 		await Presentation.drain(game)
 		# The next enemy does not decide until this enemy and its reactions finish.
 	game.mission.defer_resolution = false

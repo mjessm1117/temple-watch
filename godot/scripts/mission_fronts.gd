@@ -3,7 +3,7 @@ extends RefCounted
 const Progression = preload("res://scripts/campaign/progression.gd")
 
 static func fit(r: Dictionary) -> bool:
-	return r.get("status","active") == "active" and int(r.get("wound",0)) == 0 and str(r.get("assign","")) == ""
+	return r.get("status","active") == "active" and int(r.get("wound",0)) == 0 and str(r.get("assign","")) == "" and int(r.get("fatigue",0)) < 67
 
 static func free_roster(state: Dictionary) -> Array:
 	var used: Array = state.get("twin",{}).get("used",[])

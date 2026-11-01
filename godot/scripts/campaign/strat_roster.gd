@@ -47,7 +47,7 @@ static func hire(c, id: String) -> bool:
 		c.state.nid = next_id + 1
 		var r := {"id":"u%d" % next_id, "n":candidate.n, "cls":candidate.cls, "title":"Padawan" if jedi else "Recruit", "rank":1, "xp":0, "dark":0, "picks":[], "pick":1, "wound":0, "status":"active", "kills":0, "missions":0, "stress":0, "scars":[], "assign":"", "bonus":{}, "fatigue":0, "extra_picks":[], "ability_slots":0,
 			"col":"#72e0a4" if jedi else "#d9a05b", "gear":{"w":0 if jedi else 1,"armor":"robes" if jedi else "light","mods":[],"amods":[],"smods":[],"saber":1 if jedi else 0,"trait":"","util":"none","form":"shiiCho","mk":{"w":1,"a":1,"s":1}}}
-		c.state.roster.append(r); c.state.cands.erase(candidate); c.ensure_teams()
+		c.state.roster.append(r); c.state.cands.erase(candidate); c.ensure_teams(); c.Identity.ensure(c)
 		c.state.news.append("%s joined the Order." % r.n)
 		return true
 	return false

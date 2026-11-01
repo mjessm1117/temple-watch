@@ -15,7 +15,7 @@ static func reason(m: RefCounted, u: Dictionary, id: String) -> String:
 	if u.is_empty() or not m.abilities.has(id): return "Unavailable"
 	if str(u.get("side", "")) != "player" or str(u.get("status", "ok")) == "down" or int(u.get("hp", 0)) <= 0: return "Downed"
 	if m.result != "" or m.phase != "player": return "Mission inactive"
-	if id != "medpac" and id != "revive" and id != "free" and id != "move" and id not in u.get("kit", []): return "Not in kit"
+	if id != "medpac" and id != "revive" and id != "free" and id != "move" and id != "interact" and id not in u.get("kit", []): return "Not in kit"
 	var def: Dictionary = m.abilities[id]
 	var combat_reason := Combat.reason(m, u, id, def)
 	if combat_reason != "": return combat_reason
@@ -34,7 +34,7 @@ static func reason(m: RefCounted, u: Dictionary, id: String) -> String:
 			if Shot.distance(Shot.pos(u), Shot.pos(ally)) <= range_of(def, u) and (bool(ally.get("stunned", false)) or bool(ally.get("disarmed", false))): need = true
 		if not need: return "No ally needs Rally"
 	if str(def.get("target", "")) in ["ally_injured", "ally_down", "ally_bond", "ally_other", "enemy", "enemy_droid", "enemy_creature", "enemy_subdue"] and targets(m, u, id).is_empty(): return "No valid target"
-	if str(def.get("target", "")) in ["tile_console", "tile_scan", "tile_wall"] and tiles(m, u, id).is_empty(): return "No target tile"
+	if str(def.get("target", "")) in ["tile_console", "tile_scan", "tile_wall", "tile_relay", "tile_reward"] and tiles(m, u, id).is_empty(): return "No target tile"
 	return ""
 
 static func targets(m: RefCounted, u: Dictionary, id: String) -> Array[Dictionary]:
@@ -77,6 +77,17 @@ static func tiles(m: RefCounted, u: Dictionary, id: String) -> Array[Vector2i]:
 	var def: Dictionary = m.abilities[id]
 	var kind := str(def.get("target", ""))
 	if kind == "tile_interact": return Combat.interactables(m, u)
+	if kind == "tile_relay":
+		if m.modern and m.spec.family == "destroy_relay" and m.objective_state.phase == "primary":
+			for p in m.interactables():
+				if Shot.distance(Shot.pos(u),p) <= float(u.range) and Shot.los(m,Shot.pos(u),p): out.append(p)
+		return out
+	if kind == "tile_reward":
+		for y in range(int(u.y)-4,int(u.y)+5):
+			for x in range(int(u.x)-4,int(u.x)+5):
+				var p := Vector2i(x,y)
+				if not preload("res://scripts/mission_hack.gd").options(m,u,p).is_empty(): out.append(p)
+		return out
 	if kind not in ["tile", "tile_console", "tile_wall", "tile_scan", "tile_area"]: return out
 	for y in range(int(m.spec.height)):
 		for x in range(int(m.spec.width)):
@@ -96,6 +107,7 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 	var u: Dictionary = m.unit_by_id(actor_id)
 	if reason(m, u, id) != "": return false
 	var def: Dictionary = m.abilities[id]
+	if id in ["rewardSafe","rewardRisky"]: return bool(m.hack(u,tile,"safe" if id == "rewardSafe" else "risky").get("ok",false))
 	var target_kind := str(def.get("target", ""))
 	var t: Dictionary = {}
 	if target_kind.begins_with("ally") or target_kind.begins_with("enemy"):
@@ -195,7 +207,8 @@ static func _attack(m: RefCounted, u: Dictionary, t: Dictionary, def: Dictionary
 			continue
 		var damage: int = m.rng.randi_range(int(damage_range[0]), int(damage_range[1])) + int(def.get("damage_mod", 0))
 		if int(def.get("crit_mod", 0)) > 0 and m.rng.randi_range(1, 100) <= int(info.crit) + int(def.crit_mod): damage += 2
-		m.apply_damage(t, maxi(1, damage - int(t.get("armor", 0))), u)
+		var dealt: int = m.apply_damage(t, maxi(1, damage - int(t.get("armor", 0))), u)
+		if dealt > 0 and melee and bool(t.get("counter",{}).get("melee_interrupts_siphon",false)): t.siphon_stopped = m.turn+1
 	if bool(def.get("pierce", false)):
 		var direction := Shot.pos(t) - Shot.pos(u)
 		for other in m.living("enemy"):

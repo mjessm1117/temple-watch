@@ -7,7 +7,8 @@ static func options(m: RefCounted, u: Dictionary, tile: Vector2i) -> Dictionary:
 	var target := ""; var droid: Dictionary = {}
 	for e in m.living("enemy"):
 		if Shot.pos(e) == tile and bool(e.get("droid",false)): target = "droid"; droid = e
-	if target == "" and m.tile(tile) in ["k","q","Q"] and not m.hack_state.get("used",{}).has(tile): target = "console"
+	var terminal: bool = m.spec.family == "hack_terminal" and m.spec.objective.points.any(func(at): return Vector2i(int(at[0]),int(at[1])) == tile)
+	if target == "" and (terminal or m.tile(tile) in ["k","q","Q"]) and not m.hack_state.get("used",{}).has(tile): target = "console"
 	if target == "": return {}
 	var bonus := (10 if u.get("class_name","") == "Medic" else 0) + (10 if bool(u.get("tech",false)) else 0)
 	return {"target":target,"unit":droid,"safe":mini(95,(80 if target == "droid" else 85)+bonus),"risky":mini(95,(40 if target == "droid" else 45)+bonus)}

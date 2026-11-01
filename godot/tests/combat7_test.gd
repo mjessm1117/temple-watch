@@ -16,6 +16,7 @@ class ObjectiveMission extends "res://scripts/combat_mission.gd":
 	func interactables() -> Array[Vector2i]: return [] if used else [Vector2i(3, 2)]
 	func interact(_unit: Dictionary, tile_value: Vector2i) -> Dictionary:
 		if tile_value != Vector2i(3, 2): return {"ok":false}
+		_unit.ap = int(_unit.ap)-1
 		used = true
 		return {"ok":true}
 

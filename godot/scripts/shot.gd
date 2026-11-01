@@ -87,6 +87,8 @@ static func in_cover(m: RefCounted, target: Vector2i) -> bool:
 	return false
 
 static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, melee: bool = false, modifier: int = 0) -> Dictionary:
+	modifier += preload("res://scripts/campaign/battle_sith.gd").aim(attacker,target,melee)
+	if m.get("identity") != null: modifier += m.identity.aim(m,attacker)
 	var a := pos(attacker)
 	var t := pos(target)
 	var lines: Array = [["Base aim", int(attacker.aim) + int(attacker.get("buff_aim", 0)) + int(attacker.get("debuff_aim", 0)) + int(target.get("marked_aim", 0))]]

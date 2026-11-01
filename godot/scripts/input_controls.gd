@@ -133,7 +133,7 @@ func handle_event(event: InputEvent) -> void:
 		elif event.keycode == KEY_E: g._rotate_camera(PI / 2.0)
 		elif event.keycode == KEY_R: g.get_tree().reload_current_scene()
 		elif event.keycode >= KEY_1 and event.keycode <= KEY_7:
-			g._choose_action(["move", "shoot", "strike", "push", "free", "overwatch", "hunker"][event.keycode - KEY_1])
+			g._choose_action(["move", "shoot", "strike", "push", "interact" if g.mission.modern else "free", "overwatch", "hunker"][event.keycode - KEY_1])
 		elif event.keycode >= KEY_F1 and event.keycode <= KEY_F12:
 			var extra: Array = []
 			var unit: Dictionary = g.mission.unit_by_id(g.selected_id)

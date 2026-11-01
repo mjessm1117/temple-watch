@@ -12,6 +12,7 @@ var screen_return := "temple"
 var battle_game: Node
 var transitioning := false
 var save_path := Campaign.SAVE_PATH
+var intelligence: Control
 
 func session() -> RefCounted:
 	if campaign == null:
@@ -60,10 +61,12 @@ func prepare_briefing(index: int) -> void:
 	screen = story.start_briefing(str(option.mission))
 	# Every offered mission has story data, but old saves can include custom missions.
 	if screen.is_empty():
-		screen = {"kind":"briefing", "title":str(option.mission).capitalize(), "text":"Deploy to recover the Republic aide and reach evacuation.", "choices":[]}
+		screen = {"kind":"briefing", "title":str(option.mission).capitalize(), "text":"Complete the operation and reach evacuation.", "choices":[]}
 		campaign.state.pending = screen
-	if Battle.map_path(str(option.mission)).ends_with("rescue.json") and str(option.mission) != "rescue":
-		screen.goal = "Current deployment: free Aide Mira Tal and escort her to evacuation. This battle resolves the operation above."
+	var maps = preload("res://scripts/map_catalog.gd")
+	var map := maps.load_map(maps.select_layout(preload("res://scripts/campaign/battle_sith.gd").map_id(option),7,int(option.get("map_variant",0 if option.has("sith_offer_id") else -1))))
+	screen.goal = "%s · %s. Complete the objective, then reach evacuation." % [map.get("name",option.mission),str(map.get("family","rescue")).replace("_"," ")]
+	if option.has("sith_offer_id"): screen.goal = str(option.n) + " · " + str(option.get("risk",screen.goal))
 	screen_return = "squad"
 	save()
 	go("briefing")
@@ -74,6 +77,7 @@ func open_codex() -> void:
 
 func temple_story() -> void:
 	if not active: return
+	if show_sith_events(): return
 	var s: Dictionary = campaign.state
 	screen = s.get("pending", {})
 	if screen.get("kind", "") not in ["talk", "event", "vote"]: screen = story.next_story_event(s)
@@ -101,12 +105,10 @@ func story_finished() -> void:
 		_: go("temple")
 
 func launch_squad(ids: Array) -> bool:
-	if ids.size() != 4: return false
-	var seen := {}
-	for id in ids:
-		var r: Dictionary = campaign.soldier(str(id))
-		if seen.has(id) or r.is_empty() or r.status != "active" or int(r.wound) > 0 or r.assign != "": return false
-		seen[id] = true
+	if campaign.sith.project_status().defeated: return false
+	var option: Dictionary = campaign.state.pending_mission
+	if option.is_empty(): option = campaign.state.options[int(campaign.state.launch_index)]
+	if not preload("res://scripts/campaign/strat_deployment.gd").validate(campaign, ids, option): return false
 	if campaign.state.pending_mission.is_empty():
 		if campaign.select_mission(int(campaign.state.launch_index), ids).is_empty(): return false
 		campaign.state.battle_buffs = preload("res://scripts/campaign/modules.gd").take_next_battle_buffs(campaign)
@@ -153,6 +155,9 @@ func debrief(mission: RefCounted) -> void:
 	screen = story.start_debrief({"mission_id":result.mission_id, "won":result.win,
 		"squad":result.units.filter(func(u): return u.status != "dead").map(func(u): return u.id), "saved_by":mission.saved_by, "clues":mission.clues})
 	screen.text = str(screen.get("text", "")) + "\n\n" + Battle.casualties(campaign, result)
+	var front := str(campaign.state.get("twin",{}).get("stage",""))
+	if front == "a": screen.text += "\n\nFRONT B awaits: a fresh squad of two to four, at most two Jedi. The date stays fixed until both fronts are settled."
+	elif front == "b2": screen.text += "\n\nFRONT B complete. Both fronts now settle together."
 	campaign.state.pending = screen
 	campaign.state.flow_stage = "debrief"
 	screen_return = "result"
@@ -174,6 +179,39 @@ func advance_era() -> void:
 		campaign.state.teams = []; campaign.state.staff = {}; campaign.state.team_assignments = {}
 		campaign.state.field = {"list":[], "log":[]}
 		campaign.state.day = 1; campaign.state.elapsed_days = 0
+		campaign.state.erase("sith") # Each era starts a new, date-aligned strategic campaign.
 		campaign._migrate()
 		campaign.state.vote_month = 0
 		save(); go("temple")
+
+func open_intelligence(page: String = "operations") -> void:
+	if is_instance_valid(intelligence): intelligence.queue_free()
+	intelligence = load("res://scenes/sith_report.tscn").instantiate()
+	intelligence.bind_state(campaign.state)
+	intelligence.page = page
+	intelligence.state_changed.connect(func(): campaign.refresh_options(); save())
+	intelligence.close_requested.connect(func():
+		intelligence.queue_free(); campaign.refresh_options(); save()
+		if campaign.sith.project_status().defeated: active = false; go("menu")
+		else: go("galaxy" if get_tree().current_scene.scene_file_path.ends_with("galaxy.tscn") else "temple"))
+	intelligence.mission_requested.connect(func(offer: Dictionary):
+		campaign.refresh_options()
+		for i in campaign.state.options.size():
+			if campaign.state.options[i].get("sith_offer_id", "") == offer.id:
+				intelligence.queue_free(); prepare_briefing(i); return)
+	get_tree().current_scene.add_child(intelligence)
+
+func show_sith_events() -> bool:
+	if get_tree().current_scene == null: return false
+	var events: Array = campaign.sith.pending_events()
+	var report := events.any(func(event): return event.kind == "council_report")
+	if events.is_empty() and not campaign.sith.project_status().defeated: return false
+	open_intelligence("report" if report or campaign.sith.project_status().defeated else "operations")
+	var notices := PackedStringArray()
+	for event in events:
+		var text := str(event.get("n",event.kind))
+		campaign.state.news.append(text); notices.append(text)
+		campaign.sith.acknowledge(str(event.id))
+	intelligence.status_line.text = " · ".join(notices)
+	save()
+	return true

@@ -62,7 +62,7 @@ func _flash(at: Vector3, color: Color, energy: float, duration: float) -> void:
 	light.shadow_enabled = false
 	light.position = at
 	add_child(light)
-	var tween := create_tween()
+	var tween := _paced_tween()
 	tween.tween_property(light, "light_energy", 0.0, duration)
 	tween.tween_callback(light.queue_free)
 
@@ -71,7 +71,7 @@ func burst(at: Vector3, color: Color, count := 8) -> void:
 	for i in range(count):
 		var spark := _sphere(at, 0.025 if i % 3 else 0.04, color)
 		var vector := Vector3(rng.randf_range(-1, 1), rng.randf_range(0.15, 1.1), rng.randf_range(-1, 1))
-		var tween := create_tween().set_parallel(true)
+		var tween := _paced_tween().set_parallel(true)
 		tween.tween_property(spark, "position", at + vector * 0.65, 0.24)
 		tween.tween_property(spark, "scale", Vector3.ZERO, 0.24)
 		tween.chain().tween_callback(spark.queue_free)
@@ -106,7 +106,7 @@ func bolt(from: Vector3, to: Vector3, enemy: bool, miss: bool) -> void:
 	beam.position = (from + end) * 0.5
 	beam.quaternion = Quaternion(Vector3.UP, direction)
 	add_child(beam)
-	var beam_fade := create_tween()
+	var beam_fade := _paced_tween()
 	beam_fade.tween_interval(0.08)
 	beam_fade.tween_property(beam, "scale", Vector3.ZERO, 0.13)
 	beam_fade.tween_callback(beam.queue_free)
@@ -115,11 +115,11 @@ func bolt(from: Vector3, to: Vector3, enemy: bool, miss: bool) -> void:
 		streak.points = PackedVector2Array([view_camera.unproject_position(from), view_camera.unproject_position(end)])
 		streak.width = 3.0; streak.default_color = color
 		overlay.add_child(streak)
-		var fade := create_tween()
+		var fade := _paced_tween()
 		fade.tween_property(streak, "modulate:a", 0.0, 0.18).set_delay(0.04)
 		fade.tween_callback(streak.queue_free)
 	var duration := clampf(from.distance_to(end) / 38.0, 0.11, 0.31)
-	var tween := create_tween().set_parallel(true)
+	var tween := _paced_tween().set_parallel(true)
 	tween.tween_property(core, "position", end, duration)
 	tween.tween_property(glow, "position", end, duration)
 	tween.chain().tween_callback(func() -> void:
@@ -132,7 +132,7 @@ func shockwave(from: Vector3, to: Vector3) -> void:
 	var wave := _sphere(from, 0.22, Color("8beafa"))
 	wave.scale = Vector3(1.0, 0.25, 1.0)
 	_flash(from, Color("8beafa"), 1.1, 0.16)
-	var tween := create_tween().set_parallel(true)
+	var tween := _paced_tween().set_parallel(true)
 	tween.tween_property(wave, "position", to, 0.28)
 	tween.tween_property(wave, "scale", Vector3(6, 0.12, 6), 0.36)
 	tween.chain().tween_callback(func() -> void:
@@ -147,12 +147,12 @@ func saber(from: Vector3, to: Vector3) -> void:
 	trail.scale = Vector3(0.8, 0.8, 4.5)
 	trail.look_at(to, Vector3.UP)
 	_flash(mid, Color("80eaff"), 1.0, 0.18)
-	var tween := create_tween()
+	var tween := _paced_tween()
 	tween.tween_property(trail, "position", to, 0.15)
 	tween.tween_property(trail, "scale", Vector3.ZERO, 0.1)
 	tween.tween_callback(trail.queue_free)
 	burst(to, Color("f1fbff"), 12)
-	get_tree().create_timer(0.14).timeout.connect(func() -> void:
+	get_tree().create_timer(0.14/float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed"))).timeout.connect(func() -> void:
 		if is_instance_valid(self): _cue("clash"))
 
 func cover_chunks(at: Vector3) -> void:
@@ -163,7 +163,7 @@ func cover_chunks(at: Vector3) -> void:
 		chunk.material_override = _material(Color("9a9d98"), false)
 		chunk.position = at; add_child(chunk)
 		var offset := Vector3(rng.randf_range(-1, 1), rng.randf_range(0.2, 1), rng.randf_range(-1, 1))
-		var tween := create_tween().set_parallel(true)
+		var tween := _paced_tween().set_parallel(true)
 		tween.tween_property(chunk, "position", at + offset, 0.36)
 		tween.tween_property(chunk, "scale", Vector3.ZERO, 0.36).set_delay(0.1)
 		tween.chain().tween_callback(chunk.queue_free)
@@ -179,7 +179,7 @@ func float_text(at: Vector3, value: String, color: Color, large := false) -> voi
 	label.add_theme_constant_override("shadow_offset_y", 2)
 	overlay.add_child(label)
 	label.position = view_camera.unproject_position(at) - Vector2(35, 18)
-	var tween := create_tween().set_parallel(true)
+	var tween := _paced_tween().set_parallel(true)
 	float_anchors.append({"label":label, "at":at, "age":0.0})
 	tween.tween_property(label, "modulate:a", 0.0, 0.8).set_delay(0.2)
 	tween.chain().tween_callback(label.queue_free)
@@ -195,7 +195,7 @@ func ring(at: Vector3, color: Color, radius: float = 1.0) -> void:
 	var mesh := TorusMesh.new(); mesh.inner_radius = 0.88; mesh.outer_radius = 1.0
 	node.mesh = mesh; node.material_override = _material(color); node.position = at
 	node.scale = Vector3.ONE * 0.12; add_child(node)
-	var tween := create_tween().set_parallel(true)
+	var tween := _paced_tween().set_parallel(true)
 	tween.tween_property(node, "scale", Vector3(radius, 0.15, radius), 0.5)
 	tween.tween_property(node, "transparency", 1.0, 0.5)
 	tween.chain().tween_callback(node.queue_free)
@@ -214,7 +214,7 @@ func ability(id: String, from: Vector3, to: Vector3) -> void:
 		burst(to, Color("b294f5"), 22)
 	elif id in ["barrier", "shieldDrone", "shieldWall", "guard"]:
 		var dome := _sphere(to, 0.85, Color("7fd99a")); dome.transparency = 0.65
-		var tween := create_tween(); tween.tween_property(dome, "transparency", 1.0, 0.85); tween.tween_callback(dome.queue_free)
+		var tween := _paced_tween(); tween.tween_property(dome, "transparency", 1.0, 0.85); tween.tween_callback(dome.queue_free)
 	elif id in ["grenade", "ionNade", "barrage", "moStrike", "tremor", "collapse"]:
 		burst(to, Color("b294f5") if id == "ionNade" else Color("ffb050"), 32)
 		ring(to - Vector3.UP * 0.8, Color("ffb050"), 1.8)
@@ -233,3 +233,6 @@ func _process(delta: float) -> void:
 		entry.age = float(entry.age) + delta
 		entry.label.visible = not view_camera.is_position_behind(entry.at)
 		entry.label.position = view_camera.unproject_position(entry.at) - Vector2(35,18 + float(entry.age)*70)
+
+func _paced_tween() -> Tween:
+	return create_tween().set_speed_scale(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")))

@@ -71,10 +71,10 @@ func refresh_signals() -> void:
 		var option: Dictionary = campaign.state.options[i]; var m: Dictionary = campaign.story.mission(str(option.mission))
 		offers.append({"index":i, "planet":Intel.planet_for(m), "name":str(option.get("n",m.get("n",option.mission))), "risk":Intel.risk(campaign,m,option)})
 	operations.clear()
-	for op in campaign.state.get("ops",{}).get("list",[]):
-		if op.get("st","") in ["open","team"]:
-			var definition: Dictionary = Data.get_table("research","SITH_OPS").get(op.get("k",""),{})
-			operations.append({"planet":Intel.operation_planet(campaign,op),"name":definition.get("n",op.get("k","Sith op")),"id":op.get("id","")})
+	for op in campaign.sith.operations():
+		if op.status in ["open","team"]:
+			var offer: Dictionary = campaign.state.sith.missions.get(op.mission_id,{})
+			operations.append({"planet":Intel.planet_for(campaign.story.mission(str(offer.get("mission","archive")))),"name":op.n,"id":op.id})
 	for ship in ships: ship.queue_free()
 	ships.clear()
 	for op in campaign.state.field.list:
@@ -179,6 +179,7 @@ func _draw_labels(overlay: Control) -> void:
 		overlay.draw_arc(p,11*pulse,0,TAU,40,Color(color,0.7),1.2,true)
 		overlay.draw_circle(p,6,color)
 		overlay.draw_string(font,p+Vector2(-4,4),str(int(offer.index)+1),HORIZONTAL_ALIGNMENT_LEFT,-1,11,Color("081317"))
+		if offer.index != selected and hovered != offer.planet: continue
 		var text_width := font.get_string_size(offer.name,HORIZONTAL_ALIGNMENT_LEFT,-1,13).x
 		var label_pos := p+Vector2(18,4)
 		if label_pos.x+text_width > size.x-10: label_pos.x = p.x-18-text_width
@@ -189,6 +190,7 @@ func _draw_labels(overlay: Control) -> void:
 		if not bounds.has_point(p): continue
 		var diamond := PackedVector2Array([p+Vector2(0,-8),p+Vector2(8,0),p+Vector2(0,8),p+Vector2(-8,0),p+Vector2(0,-8)])
 		overlay.draw_colored_polygon(diamond,Color("ef6a5d"))
+		if hovered != op.planet: continue
 		overlay.draw_string_outline(font,p+Vector2(12,-4),str(op.name),HORIZONTAL_ALIGNMENT_LEFT,-1,12,4,Color("061017"))
 		overlay.draw_string(font,p+Vector2(12,-4),str(op.name),HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("ef6a5d"))
 	for ship in ships:

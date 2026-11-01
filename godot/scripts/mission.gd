@@ -45,6 +45,11 @@ func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") ->
 	modern = spec.has("family")
 	difficulty = Settings.selected()
 	if not modern: spec.turn_limit = int(difficulty.get("turn_clock", spec.turn_limit))
+	else:
+		var tuning: Dictionary = Maps.read("res://data/maps/balance.json").get(Settings.difficulty,{}).get(str(spec.family),{})
+		for key in tuning:
+			if key == "objective": spec.objective.merge(tuning.objective,true)
+			else: spec[key] = tuning[key]
 	catalog = _json("res://data/units.json")
 	abilities = _json("res://data/abilities.json")
 	if modern: Pressure.setup(self)
@@ -449,6 +454,15 @@ func hunker(id: int) -> bool:
 
 func end_turn() -> void:
 	if result != "" or phase != "player": return
+	begin_enemy_turn()
+	var fired: Dictionary = {}
+	for e in living("enemy"):
+		if result != "": break
+		enemy_actor(e, fired)
+	finish_enemy_turn()
+
+func begin_enemy_turn() -> void:
+	if result != "" or phase != "player": return
 	action_events.clear()
 	if bool(prisoner.freed): _civilian_advance()
 	_check_win()
@@ -456,16 +470,18 @@ func end_turn() -> void:
 	phase = "enemy"
 	_wake_groups()
 	for u in living("enemy"): u.ap = 3; u.overwatch = false
-	var fired: Dictionary = {}
 	if modern: Pressure.brood(self)
-	for e in living("enemy"):
-		if result != "": break
-		if modern and Objectives.runner_turn(self,e): continue
-		if modern and Hack.controlled_turn(self,e): continue
-		if modern and bool(e.awake) and Pressure.horror_turn(self,e): continue
-		if modern and bool(e.awake) and Objectives.defense_turn(self,e): continue
-		if bool(e.awake): AI.act(self, e, fired)
-		if result != "": break
+
+func enemy_actor(e: Dictionary, fired: Dictionary) -> void:
+	if result != "" or phase != "enemy": return
+	if modern and Objectives.runner_turn(self,e): return
+	if modern and Hack.controlled_turn(self,e): return
+	if modern and bool(e.awake) and Pressure.horror_turn(self,e): return
+	if modern and bool(e.awake) and Objectives.defense_turn(self,e): return
+	if bool(e.awake): AI.act(self,e,fired)
+
+func finish_enemy_turn() -> void:
+	if result != "" or phase != "enemy": return
 	_check_lose()
 	if result != "": return
 	if modern: Objectives.enemy_end(self)
@@ -515,7 +531,13 @@ func _civilian_advance() -> void:
 	var evac := Maps.point(spec.evac[0]) if modern else Vector2i(5, 23)
 	var best := p
 	for q in reach.costs:
-		if Shot.distance(q, evac) < Shot.distance(best, evac): best = q
+		if modern:
+			var distance := INF; var best_distance := INF
+			for at in spec.evac:
+				distance = minf(distance,Shot.distance(q,Maps.point(at)))
+				best_distance = minf(best_distance,Shot.distance(best,Maps.point(at)))
+			if distance < best_distance: best = q
+		elif Shot.distance(q, evac) < Shot.distance(best, evac): best = q
 	if best != p:
 		prisoner.x = best.x; prisoner.y = best.y
 		message("%s follows the squad toward evac." % str(prisoner.get("name","Mira")))

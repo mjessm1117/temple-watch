@@ -60,7 +60,7 @@ func _build_shell() -> void:
 	var res: Dictionary = campaign.state.res
 	for item in [["Cr", "credits"], ["In", "intel"], ["Ky", "kyber"], ["SF", "favor"], ["Rc", "recruits"]]:
 		resources.add_child(UI.label("● %s  %d" % [item[0], int(res[item[1]])], 14, Color("80cbd6")))
-	resources.add_child(UI.label("◈ Darkness  %d" % int(campaign.state.orderDark), 14, Color("b5a2d3")))
+	resources.add_child(UI.label("◈ Order Darkness  %d/100" % int(campaign.state.orderDark), 14, Color("b5a2d3")))
 	var era_label := UI.label("JEDI TEMPLE  /  %s" % {1:"OLD REPUBLIC", 2:"NEW SITH WARS", 3:"HIGH REPUBLIC"}.get(int(campaign.state.era), "REPUBLIC"), 13, UI.MUTED)
 	era_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; era_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; resources.add_child(era_label)
 	for row in [title, resources]:
@@ -90,7 +90,7 @@ func _build_shell() -> void:
 		if int(level) > 0: built += 1
 	readout.add_child(UI.label("%d active · %d wounded\n%d / 8 wings online\n%d missions waiting" % [active, wounded, built, campaign.state.options.size()], 13, UI.MUTED))
 	var power := Base.power(campaign.state)
-	readout.add_child(UI.label("POWER %d / %d\n%d staff · squad %d\nDarkness %d / 12" % [power.used, power.capacity, campaign.state.facility.workers.size(), campaign.squad_capacity(), campaign.darkness_segments()], 13, UI.ACCENT))
+	readout.add_child(UI.label("POWER %d / %d\n%d staff · squad %d\nSith Darkness %d / 12" % [power.used, power.capacity, campaign.state.facility.workers.size(), campaign.squad_capacity(), campaign.darkness_segments()], 13, UI.ACCENT))
 	readout.add_child(UI.label("1–7 stations\nG galaxy · Esc close", 12, Color("627d87")))
 	station_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.97)); add_child(station_panel)
 	station_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -216,6 +216,14 @@ func _roster() -> void:
 		var status := "DEAD" if str(r.status) == "dead" else "WOUNDED · %d DAYS" % int(r.wound) if int(r.wound) > 0 else str(r.status).to_upper()
 		var box := _card("%s  ·  %s  ·  RANK %d" % [r.n, r.cls, int(r.rank)], "%s   •   %d XP   •   %d KILLS   •   %d MISSIONS" % [status, int(r.xp), int(r.kills), int(r.missions)])
 		StrategyUI.soldier(self, box, r)
+		if Progression.is_jedi(r) and r.status == "active" and r.get("title","") != "Padawan":
+			var counsel := OptionButton.new(); counsel.add_item("Counsel: none")
+			var mentors: Array = campaign.state.roster.filter(func(m): return m.id != r.id and m.status == "active" and Progression.is_jedi(m) and int(m.rank) >= 4 and m.get("title","") in ["Knight","Master"])
+			for mentor in mentors: counsel.add_item(str(mentor.n))
+			counsel.item_selected.connect(func(i: int):
+				if campaign.sith.set_counsel(str(r.id),str(mentors[i-1].id) if i > 0 else ""):
+					get_node("/root/CampaignFlow").save(); notice_label.text = "Counsel assigned.")
+			box.add_child(counsel)
 		var stats: Dictionary = Gear.battle_stats(campaign, str(r.id))
 		box.add_child(UI.label("HP %d   AIM %d   WILL %d   MOVE %d" % [int(stats.get("hp", 0)), int(stats.get("aim", 0)), int(stats.get("will", 0)), int(stats.get("mob", 0))], 15))
 		if int(r.get("pick", 0)) > 0:
@@ -371,5 +379,6 @@ func _retire(id: String) -> void:
 
 func _rest() -> void:
 	campaign.advance_days(7)
+	get_node("/root/CampaignFlow").show_sith_events.call_deferred()
 	get_node("/root/CampaignFlow").save()
 	_refresh_shell()

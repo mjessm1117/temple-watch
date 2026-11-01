@@ -30,6 +30,7 @@ static func break_squad(m: RefCounted, actor: Dictionary) -> void:
 	var concealed: bool = was_squad or bool(actor.get("concealed", false))
 	actor.concealed = false
 	if not concealed: return
+	if m.modern and int(m.objective_state.get("clock_start",0)) == 0: m.objective_state.clock_start = m.turn
 	m.squad_concealed = false
 	if was_squad:
 		for p in m.living("player"): p.concealed = false

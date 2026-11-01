@@ -11,8 +11,12 @@ var squad_concealed := false
 var bond_pairs: Dictionary = {}
 var momentum := 0
 var squad_uses: Dictionary = {}
+var identity: RefCounted
+var mercy_events: Array = []
+var action_serial := 0
 
 static func adopt(source: RefCounted, campaign_state: Dictionary = {}) -> RefCounted:
+	if source.get("combat_initialized") == true: return source
 	var extended = load("res://scripts/combat_mission.gd").new()
 	for property in source.get_property_list():
 		if int(property.usage) & PROPERTY_USAGE_SCRIPT_VARIABLE:
@@ -21,6 +25,11 @@ static func adopt(source: RefCounted, campaign_state: Dictionary = {}) -> RefCou
 	return extended
 
 func setup_combat(campaign_state: Dictionary = {}) -> void:
+	if modern:
+		abilities.rewardSafe = {"name":"Safe hack", "target":"tile_reward", "effect":"reward_hack", "ap":1, "range":4}
+		abilities.rewardRisky = {"name":"Risky hack", "target":"tile_reward", "effect":"reward_hack", "ap":1, "range":4}
+		abilities.relayAttack = {"name":"Fire at relay", "target":"tile_relay", "effect":"relay_attack", "ap":2, "range":"weapon", "ammo_cost":1}
+	identity = preload("res://scripts/tactical_identity.gd").new(campaign_state)
 	squad_concealed = bool(spec.get("concealed", spec.get("concealment", false)))
 	for u in units:
 		if float(u.range) >= 2.0:
@@ -32,6 +41,9 @@ func setup_combat(campaign_state: Dictionary = {}) -> void:
 			if str(u.class_name) in ["Guardian", "Consular"]:
 				for skill in ["pull", "breach"]:
 					if skill not in u.kit: u.kit.append(skill)
+			if modern:
+				u.kit.append_array(["rewardSafe","rewardRisky"])
+				if u.has("ammo"): u.kit.append("relayAttack")
 			u.grenades = int(u.get("grenades", 1))
 			u.med_beacon = 1
 		if str(u.side) == "enemy":
@@ -41,11 +53,17 @@ func setup_combat(campaign_state: Dictionary = {}) -> void:
 	if squad_concealed: Concealment.observe(self)
 	combat_initialized = true
 
+func break_concealment(reason: String) -> void:
+	super.break_concealment(reason)
+	squad_concealed = false
+
 func _spawn(kind: String, x: int, y: int, group: int) -> void:
 	super._spawn(kind, x, y, group)
 	var u: Dictionary = units.back()
 	if float(u.range) >= 2.0: u.clip = int(u.get("clip",4)); u.ammo = int(u.clip)
-	if combat_initialized and str(u.side) == "enemy": u.aim = int(u.aim) + int(difficulty.get("combat_enemy_aim",0))
+	if combat_initialized and str(u.side) == "enemy":
+		u.aim = int(u.aim) + int(difficulty.get("combat_enemy_aim",0)) + int(spec.get("sith_mods",{}).get("enemyAim",0))
+		u.hp = int(u.hp) + int(spec.get("sith_mods",{}).get("enemyHp",0)); u.max_hp = u.hp
 
 func shot(id: int, target_id: int, mode: String = "shoot") -> bool:
 	var u := unit_by_id(id)
@@ -71,6 +89,8 @@ func _apply_attack(a: Dictionary, t: Dictionary, info: Dictionary, mode: String)
 	if not action_events.is_empty():
 		action_events.back().reaction = resolving_reaction
 		action_events.back().armor_lost = armor - int(t.get("armor", 0))
+	if int(t.hp) < before and mode == "strike" and bool(t.get("counter",{}).get("melee_interrupts_siphon",false)): t.siphon_stopped = turn+1
+	if a.get("rival","") == "veyra" and int(t.hp) == before: a.buff_defense = -10; a.buff_until = turn+2
 	if int(t.hp) < before and str(a.side) == "player" and str(t.side) == "enemy": momentum = mini(10, momentum + 1 + (1 if int(t.hp) <= 0 else 0))
 	if str(a.side) == "player":
 		var ghost_triggered := not ghost_used and bool(a.get("ghost_used", false))
@@ -185,13 +205,60 @@ func end_turn() -> void:
 	var fired: Dictionary = {}
 	for e in living("enemy"):
 		if result != "": break
-		AI.act(self, e, fired)
+		enemy_actor(e, fired)
 	Round.finish(self)
 
 func tick_combat_status() -> void:
 	for u in units:
+		if u.side == "enemy" and int(u.get("buff_until",0)) <= turn: u.erase("buff_aim"); u.erase("buff_defense")
 		for status in ["disarmed", "rooted", "tricked"]:
 			if int(u.get(status + "_until", 0)) <= turn: u.erase(status)
 		u.erase("hold_line"); u.erase("ow_hit")
 		if int(u.get("taunt_until", 0)) <= turn: u.erase("taunt")
 		if str(u.side) == "player" and "wildBond" in u.get("passives", []): u.focus_left = maxi(int(u.focus_left), 0)
+
+func enemy_actor(e: Dictionary, fired: Dictionary) -> void:
+	preload("res://scripts/campaign/battle_sith.gd").before_actor(self,e)
+	super.enemy_actor(e,fired)
+
+func apply_damage(target: Dictionary, amount: int, source: Dictionary = {}) -> int:
+	var alive := int(target.get("hp",0)) > 0
+	var actual := super.apply_damage(target,amount,source)
+	if actual > 0 and identity != null:
+		identity.voice(self,target,"down" if int(target.hp) <= 0 else "hit")
+		if alive and int(target.hp) <= 0 and not source.is_empty():
+			identity.kill(self,source); identity.voice(self,source,"kill")
+	return actual
+
+func use_ability(id: int, ability_id: String, target_id: int = -1, target_tile: Vector2i = Vector2i(-1,-1)) -> bool:
+	var before := {}
+	for u in units: before[u.id] = {"hp":u.hp,"status":u.status,"stable":u.get("stable",false),"surrendered":u.get("surrendered",false)}
+	var ok := super.use_ability(id,ability_id,target_id,target_tile)
+	if not ok: return false
+	action_serial += 1
+	var actor := unit_by_id(id)
+	if not actor.has("rid"): return true
+	var mercy := false
+	var points := 1
+	for u in units:
+		var old: Dictionary = before.get(u.id,{})
+		if old.is_empty(): continue
+		if u.side == "player" and (int(u.hp) > int(old.hp) or (not old.stable and u.get("stable",false))): mercy = true
+		if u.side == "enemy" and old.status != "captured" and u.status == "captured":
+			mercy = true
+			if old.surrendered: points = 2
+	if mercy: mercy_events.append({"unit_id":actor.rid,"action_id":"action_%d" % action_serial,"points":points})
+	return true
+
+func damage_cover(p: Vector2i, damage: int) -> String:
+	var barrel: bool = spec.get("prop_overrides",{}).get(p,"") == "barrel" and tile(p) != "r"
+	var after := super.damage_cover(p,damage)
+	if barrel and after == "r":
+		spec.prop_overrides.erase(p)
+		for u in units:
+			if int(u.hp) > 0 and maxi(absi(int(u.x)-p.x),absi(int(u.y)-p.y)) <= 1: apply_damage(u,3)
+		for y in range(p.y-1,p.y+2):
+			for x in range(p.x-1,p.x+2):
+				if Vector2i(x,y) != p: damage_cover(Vector2i(x,y),3)
+		message("Fuel barrel explodes: 3 damage in a 3×3 area.")
+	return after

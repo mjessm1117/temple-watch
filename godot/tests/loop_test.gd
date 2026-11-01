@@ -44,6 +44,9 @@ func choose_first() -> void:
 func reach_temple() -> void:
 	await frames()
 	for i in 12:
+		if is_instance_valid(flow.intelligence):
+			check(flow.intelligence.layer.state == flow.campaign.state, "hub intelligence uses live state")
+			flow.intelligence.close_requested.emit(); await frames(); continue
 		if current_scene.scene_file_path.ends_with("temple.tscn"): return
 		check(current_scene.scene_file_path.ends_with("dialogue.tscn"), "hub interrupt is a story scene")
 		if not current_scene.scene_file_path.ends_with("dialogue.tscn"): return
@@ -167,7 +170,7 @@ func _test_eras() -> void:
 	check(c.story.advance_era(c.state), "era two result permits era three")
 	c._migrate()
 	check(c.state.options[0].mission == "h_hetzal", "era three offers available")
-	check(Battle.map_path("h_hetzal") == "res://data/rescue.json", "missing mission map resolves to rescue")
+	check(Battle.map_path("h_hetzal") == "res://data/maps/h_hetzal.json", "missing mission map resolves to rescue")
 
 func _test_loss_and_modifiers() -> void:
 	var c = Campaign.new("normal")

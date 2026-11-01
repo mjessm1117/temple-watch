@@ -14,7 +14,9 @@ func check(ok: bool, message: String) -> void:
 		push_error(message)
 
 func fresh(seed_value: int = 731):
-	return Layer.new(Campaign.new().state, seed_value)
+	var state: Dictionary = Campaign.new().state
+	state.erase("sith") # This suite tests the standalone scheduler; host integration has its own gate.
+	return Layer.new(state, seed_value)
 
 func advance(layer, days: int) -> void:
 	for day in days: layer.advance_day()

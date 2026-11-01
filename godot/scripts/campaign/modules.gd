@@ -8,6 +8,7 @@ static func ensure(campaign) -> void:
 	if not campaign.state.has("modules"): campaign.state.modules = {"cd": {}, "next": {}, "log": []}
 
 static func ready(campaign, wing: String) -> bool:
+	if campaign.sith != null and campaign.sith.wing_jammed(wing): return false
 	ensure(campaign)
 	return Base.operational(campaign.state, wing) and int(campaign.state.modules.cd.get(wing, 0)) == 0
 

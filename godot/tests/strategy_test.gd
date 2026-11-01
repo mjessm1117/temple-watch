@@ -31,7 +31,7 @@ func run() -> void:
 	capture = "--capture-strategy" in OS.get_cmdline_user_args()
 	var c = fresh()
 	check(c.state.facility.workers.size() == 3 and c.state.cands.size() == 3, "three staff and monthly candidate pool")
-	check(c.squad_capacity() == 4 and c.darkness_segments() == 0, "initial capacity and darkness")
+	check(c.squad_capacity() == 4 and c.darkness_segments() == 2 and int(c.state.orderDark) == 0, "initial capacity and darkness")
 	check(Base.power(c.state) == {"used":3,"capacity":8}, "starting room power")
 	check(Base.adjacent("b1", "b2") and not Base.adjacent("b0", "b2"), "wall-sharing adjacency")
 	check(int(Base.effects(c.state).stress) == 8, "staff doubles Infirmary Bunks adjacency")
@@ -139,7 +139,7 @@ func run() -> void:
 	check(months == [[2,1],[3,1]], "one month signal per crossed boundary")
 	check(c.state.cands[0].id.begins_with("candidate-3"), "monthly recruit pool refresh")
 	c.gain("orderDark", 50)
-	check(dark == 6 and c.darkness_segments() == 6, "darkness hook exposes 12 segments")
+	check(dark == c.darkness_segments() and c.darkness_segments() == int(c.sith.project_status().segments) and int(c.state.orderDark) == 50, "darkness hook exposes live Sith segments separately from Order corruption")
 	c.state.step = 1; c.refresh_options()
 	var qi := -1
 	for i in c.state.options.size():

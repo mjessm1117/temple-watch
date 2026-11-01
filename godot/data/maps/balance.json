@@ -1,0 +1,35 @@
+{
+  "normal": {
+    "rescue": {
+      "turn_limit": 5
+    },
+    "hack_terminal": {
+      "turn_limit": 8
+    },
+    "destroy_relay": {
+      "turn_limit": 6,
+      "objective": {
+        "hp": 24
+      }
+    },
+    "defend": {
+      "objective": {
+        "hp": 36
+      }
+    },
+    "sabotage": {
+      "turn_limit": 6
+    },
+    "ambush": {
+      "objective": {
+        "runner_mob": 7,
+        "runner_hp": 12
+      }
+    },
+    "retaliation": {
+      "objective": {
+        "civilian_interval": 3
+      }
+    }
+  }
+}

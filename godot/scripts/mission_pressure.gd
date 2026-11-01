@@ -6,6 +6,9 @@ const AI = preload("res://scripts/ai.gd")
 static func setup(m: RefCounted) -> void:
 	m.pressure_state = {"pending":[],"last_entry":-1,"waves":0,"brood_turn":0,"chain_turn":0,"chain_count":0,"calm_turn":0,"serial":0}
 	# Local additions avoid changing the combat lane's unit catalog.
+	var droid: Dictionary = m.catalog.trooper.duplicate(true)
+	droid.name = "Security Droid"; droid.droid = true; droid.class_name = "Security Droid"
+	m.catalog.droid = droid
 	var courier: Dictionary = m.catalog.trooper.duplicate(true)
 	courier.name = "Imperial Courier"; courier.hp = 5; courier.mob = 3
 	m.catalog.courier = courier
@@ -28,6 +31,8 @@ static func choose_entry(m: RefCounted) -> int:
 
 static func queue(m: RefCounted, kinds: Array, delay: int = 1, reason: String = "Reinforcements") -> void:
 	if kinds.is_empty() or m.result != "" or m.spec.get("entries",[]).is_empty(): return
+	kinds = kinds.duplicate()
+	for extra in int(m.spec.get("sith_mods",{}).get("extraEnemies",0)): kinds.append("trooper")
 	var i := choose_entry(m); var entry: Array = m.spec.entries[i]
 	m.pressure_state.last_entry = i
 	m.pressure_state.serial += 1

@@ -1,6 +1,8 @@
 extends RefCounted
 ## Scene, terrain and figure synchronization extracted from game.gd.
 var g
+var world: WorldEnvironment
+var sun: DirectionalLight3D
 
 func _setup_scene() -> void:
 	g.terrain = Node3D.new(); g.terrain.name = "Terrain"; g.add_child(g.terrain)
@@ -12,7 +14,7 @@ func _setup_scene() -> void:
 	g.reinforcement_view = preload("res://scripts/reinforcement_marker.gd").new(); g.add_child(g.reinforcement_view)
 	g.sound = g.Audio.new(); g.add_child(g.sound)
 	g.camera = Camera3D.new(); g.camera.current = true; g.camera.fov = 45; g.add_child(g.camera)
-	var world := WorldEnvironment.new()
+	world = WorldEnvironment.new()
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
 	env.background_color = Color("101826")
@@ -28,8 +30,9 @@ func _setup_scene() -> void:
 	env.fog_light_color = Color("253c50")
 	env.fog_density = 0.008
 	world.environment = env; g.add_child(world)
-	var sun := DirectionalLight3D.new(); sun.rotation_degrees = Vector3(-55, -35, 0); sun.light_energy = 1.65; sun.light_color = Color("ffe1ae"); sun.shadow_enabled = true; sun.light_angular_distance = 2.5; g.add_child(sun)
+	sun = DirectionalLight3D.new(); sun.rotation_degrees = Vector3(-55, -35, 0); sun.light_energy = 1.65; sun.light_color = Color("ffe1ae"); sun.shadow_enabled = true; sun.light_angular_distance = 2.5; g.add_child(sun)
 	var fill := DirectionalLight3D.new(); fill.rotation_degrees = Vector3(-30, 140, 0); fill.light_energy = 0.55; fill.light_color = Color("78bde5"); g.add_child(fill)
+	if g.mission.modern: return
 	var dust := MultiMeshInstance3D.new()
 	var multimesh := MultiMesh.new()
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
@@ -77,9 +80,10 @@ func _instance_model(parent: Node3D, key: String, at: Vector3, scale_value: floa
 
 func _build_terrain() -> void:
 	if g.terrain.get_child_count() == 0:
-		var art := preload("res://scripts/env_art.gd").new()
+		var art = preload("res://scripts/map_presentation.gd").new() if g.mission.modern else preload("res://scripts/env_art.gd").new()
 		g.terrain.add_child(art)
 	g.terrain.get_child(0).build(g.mission, g.model_cache)
+	if g.mission.modern: g.terrain.get_child(0).apply_environment(world,sun,str(g.mission.spec.theme))
 
 func _sync_terrain() -> void:
 	if g.mission.terrain_revision == g.terrain_seen_revision: return
@@ -96,6 +100,7 @@ func _clear(node: Node) -> void:
 	for child in node.get_children(): child.queue_free()
 
 func _refresh_figures() -> void:
+	if g.mission.modern and g.terrain.get_child_count() > 0: g.terrain.get_child(0).refresh_markers(g.mission)
 	var seen: Dictionary = {}
 	for u in g.mission.units:
 		var id := int(u.id)
@@ -134,10 +139,26 @@ func _refresh_figures() -> void:
 					cover_level = 2 if int(shot_info.cover) == 40 else 1 if int(shot_info.cover) == 20 else 0
 			if threat < 0 and g.Shot.in_cover(g.mission, p): cover_level = 1
 			g.views[id].set_cover(cover_level)
-	if not bool(g.mission.prisoner.freed) or g.mission.result != "win":
+	if bool(g.mission.prisoner.get("active",true)) and (not bool(g.mission.prisoner.freed) or g.mission.result != "win"):
 		var p := Vector2i(int(g.mission.prisoner.x), int(g.mission.prisoner.y))
 		var at := Vector3(p.x, g.Shot.elevation(g.mission, p) * 0.7 + 0.5, p.y)
 		if not is_instance_valid(g.figures.get_node_or_null("Prisoner")):
 			var marker: MeshInstance3D = g._box(g.figures, at, Vector3(0.35, 1.0, 0.35), Color("f3d498"))
 			marker.name = "Prisoner"
 		else: g.figures.get_node("Prisoner").position = at
+
+func arrange_labels() -> void:
+	var placed: Array[Rect2] = []
+	var ids: Array = g.views.keys()
+	ids.sort_custom(func(a,b): return a != b and (a == g.selected_id or (b != g.selected_id and int(a)<int(b))))
+	for id in ids:
+		var view: Node3D = g.views[id]
+		if view.status_label == null: continue
+		var label: Label3D = view.status_label
+		var at: Vector2 = g.camera.unproject_position(view.global_position+Vector3.UP*2)
+		var rect := Rect2(at-Vector2(120,32),Vector2(240,64))
+		var overlap := false
+		for used in placed:
+			if used.intersects(rect): overlap = true; break
+		label.visible = not overlap # Selected unit is first; crowded target details remain in the HUD.
+		if label.visible: placed.append(rect)

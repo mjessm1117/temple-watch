@@ -33,10 +33,12 @@ var arsenal: VBoxContainer
 func _ready() -> void:
 	flow = get_node("/root/CampaignFlow")
 	var c = flow.session()
-	capacity = c.squad_capacity()
-	selected = c.state.pending_mission.get("squad", c.state.get("loadout_squad", c.default_squad().slice(0, capacity))).duplicate()
-	selected = selected.filter(func(id): return Details.fit(c.soldier(str(id)))).slice(0, capacity)
-	for id in c.default_squad():
+	var option: Dictionary = c.state.pending_mission if not c.state.pending_mission.is_empty() else c.state.get("launch_option",{})
+	capacity = mini(c.squad_capacity(),int(preload("res://scripts/mission_fronts.gd").squad_rule(c.state).max))
+	selected = c.state.pending_mission.get("squad", c.state.get("loadout_squad", c.default_squad(option).slice(0, capacity))).duplicate()
+	selected = selected.filter(func(id): return Details.fit(c.soldier(str(id))) and id not in preload("res://scripts/mission_fronts.gd").squad_rule(c.state).used).slice(0, capacity)
+	if not preload("res://scripts/campaign/strat_deployment.gd").validate(c,selected,option): selected = c.default_squad(option)
+	for id in c.default_squad(option):
 		if selected.size() < capacity and not selected.has(id): selected.append(id)
 	var bg := ColorRect.new(); bg.color = S.BG; bg.set_anchors_and_offsets_preset(PRESET_FULL_RECT); add_child(bg)
 	_build_stage(); _build_header(); _build_footer()
@@ -111,7 +113,7 @@ func _refresh() -> void:
 	var roster: Array = selected.map(func(id): return c.soldier(str(id)))
 	stage.show_squad(roster); stage.focus_slot(focus_index)
 	counter.text = "%d / %d READY FOR DEPLOYMENT" % [selected.size(), capacity]
-	deploy.disabled = selected.size() != capacity or not selected.all(func(id): return Details.fit(c.soldier(str(id))))
+	deploy.disabled = not preload("res://scripts/campaign/strat_deployment.gd").validate(c, selected, c.state.get("launch_option",{}))
 	resources.text = "%d Cr   /   %d Intel   /   %d Kyber" % [c.state.res.credits, c.state.res.intel, c.state.res.kyber]
 	if focus_index >= selected.size(): focus_index = -1
 	if focus_index >= 0: _build_drawer()

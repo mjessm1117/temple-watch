@@ -1,7 +1,7 @@
 extends RefCounted
 const Shot = preload("res://scripts/shot.gd")
 const Bonds = preload("res://scripts/combat_bonds.gd")
-const EFFECTS = ["reload", "breach", "blast", "stabilize", "shadow", "hold_line", "mass_heal", "wave", "handoff", "backup", "surge", "momentum_rally", "taunt", "bond_aid", "bond_strike"]
+const EFFECTS = ["relay_attack","reload", "breach", "blast", "stabilize", "shadow", "hold_line", "mass_heal", "wave", "handoff", "backup", "surge", "momentum_rally", "taunt", "bond_aid", "bond_strike"]
 
 static func reason(m: RefCounted, u: Dictionary, id: String, def: Dictionary) -> String:
 	if id in ["shoot", "overwatch", "holdLine"] or int(def.get("ammo_cost", 0)) > 0:
@@ -28,11 +28,9 @@ static func interactables(m: RefCounted, u: Dictionary) -> Array[Vector2i]:
 
 static func interact(m: RefCounted, u: Dictionary, tile: Vector2i) -> bool:
 	if tile not in interactables(m, u): return false
-	var before := int(u.ap)
 	var response: Dictionary = m.interact(u, tile)
 	if not bool(response.get("ok", response.get("success", false))): return false
-	# Mission owns objective mutation. Combat owns the contract's single AP cost.
-	u.ap = before - 1
+	# The mission owns objective mutation and the single AP charge.
 	return true
 
 static func effect(m: RefCounted, u: Dictionary, t: Dictionary, tile: Vector2i, id: String, def: Dictionary) -> void:
@@ -40,6 +38,8 @@ static func effect(m: RefCounted, u: Dictionary, t: Dictionary, tile: Vector2i, 
 	if m.get("squad_uses") != null and bool(def.get("squad_once", false)): m.squad_uses[id] = m.turn
 	if int(def.get("momentum", 0)) > 0: m.momentum -= int(def.momentum)
 	match str(def.effect):
+		"relay_attack":
+			m.damage_objective(m.rng.randi_range(int(u.damage[0]),int(u.damage[1])))
 		"reload": u.ammo = int(u.clip)
 		"breach": m.damage_cover(tile, int(def.get("cover_damage", 8)))
 		"stabilize": t.stable = true; _save(m, u, t)
@@ -91,6 +91,7 @@ static func _blast(m: RefCounted, u: Dictionary, tile: Vector2i, def: Dictionary
 		if int(target.hp) <= 0 or maxi(absi(int(target.x)-tile.x), absi(int(target.y)-tile.y)) > 1: continue
 		if not bool(def.get("friendly_fire", false)) and str(target.side) == str(u.side): continue
 		var damage: int = int(def.get("droid_damage", def.damage[0])) if bool(target.get("droid", false)) else m.rng.randi_range(int(def.damage[0]), int(def.damage[1]))
+		target.armor = maxi(0,int(target.get("armor",0))-int(target.get("counter",{}).get("explosive_shred",0)))
 		m.apply_damage(target, maxi(1, damage - int(target.get("armor", 0))), u)
 		if bool(target.get("droid", false)) and def.has("status"): target.stunned = true; target.stunned_until = m.turn + 1
 		if bool(def.get("clear_overwatch", false)) or bool(target.get("stunned", false)): target.overwatch = false

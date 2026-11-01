@@ -59,7 +59,7 @@ func run() -> void:
 	check(Progression.choose(unit, str(Progression.tree_options(unit, 1)[0])), "rank 1 tree choice")
 
 	game = Campaign.new()
-	check(game.state.options.size() == 1 and game.state.options[0].mission == "relay", "opening story mission offered")
+	check(game.state.options.filter(func(o): return o.get("story",false)).size() == 1 and game.state.options[0].mission == "relay", "opening story mission offered")
 	game.state.step = 1; game.refresh_options()
 	check(game.state.options.size() >= 3 and game.state.options[0].mission == "rescue" and game.state.options[1].mission == "shrine", "crisis plan offers web missions")
 	check(game.select_mission(0).mission_id == "rescue", "mission selection records chosen option")

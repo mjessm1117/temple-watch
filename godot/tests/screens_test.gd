@@ -76,7 +76,11 @@ func run() -> void:
 	flow.new_campaign("normal")
 	await process_frame
 	await process_frame
-	for i in 10:
+	for i in 20:
+		if is_instance_valid(flow.intelligence):
+			flow.intelligence.close_requested.emit()
+			for frame in 4: await process_frame
+			continue
 		if current_scene.scene_file_path.ends_with("temple.tscn"): break
 		if current_scene.scene_data.choices.is_empty(): current_scene._finish()
 		else: current_scene._choose(current_scene.scene_data.choices[0].id)

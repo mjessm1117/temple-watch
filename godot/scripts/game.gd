@@ -9,6 +9,7 @@ const HudControls = preload("res://scripts/hud_controls.gd")
 const InputControls = preload("res://scripts/input_controls.gd")
 const EnemyPresentation = preload("res://scripts/enemy_presentation.gd")
 const AttackPresentation = preload("res://scripts/attack_presentation.gd")
+const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 const Ability = preload("res://scripts/abilities_engine.gd")
 var animate_headless := false
 var cam = preload("res://scripts/cam_combat.gd").new()
@@ -74,6 +75,10 @@ func _ready() -> void:
 	add_child(cam)
 	var flow := get_node("/root/CampaignFlow")
 	mission = Mission.adopt(flow.create_battle(7), flow.campaign.state if flow.active and flow.campaign != null else {})
+	if mission.modern:
+		pivot = Vector3(float(mission.spec.width)*0.5,0,float(mission.spec.height)*0.5)
+		zoom = maxf(float(mission.spec.width),float(mission.spec.height))*1.3
+	action_camera = bool(Prefs.get_value("cine"))
 	hud_controls = HudControls.new()
 	hud_controls.g = self
 	input_controls = InputControls.new()
@@ -208,6 +213,7 @@ func _select(id: int) -> void:
 	warning_label.text = ""
 	sound.play("click")
 	var u: Dictionary = mission.unit_by_id(id)
+	if mission.identity != null: mission.identity.voice(mission,u,"select")
 	if not u.is_empty(): _glide_to(Vector3(int(u.x), 0, int(u.y)), 0.35)
 	_refresh()
 
@@ -253,6 +259,9 @@ func _cancel_order() -> void:
 	_refresh()
 
 func _glide_to(point: Vector3, seconds: float) -> void:
+	if Prefs.get_value("motion"):
+		pivot = point; _update_camera(); return
+	seconds /= float(Prefs.get_value("speed"))
 	if camera_tween != null and camera_tween.is_running(): camera_tween.kill()
 	camera_tween = create_tween()
 	camera_tween.tween_property(self, "pivot", point, seconds).set_trans(Tween.TRANS_SINE)
@@ -260,6 +269,7 @@ func _glide_to(point: Vector3, seconds: float) -> void:
 	set_process(true)
 
 func _process(_delta: float) -> void:
+	if mission != null: scene_view.arrange_labels()
 	if camera_tween != null and camera_tween.is_running(): _update_camera()
 	if cinematic or player_attack_pending or playing_enemy_events or mission == null: return
 	var direction := Vector2.ZERO
@@ -269,7 +279,7 @@ func _process(_delta: float) -> void:
 	if Input.is_key_pressed(KEY_S): direction.y -= 1
 	var mouse := get_viewport().get_mouse_position()
 	var size := get_viewport().get_visible_rect().size
-	if mouse.x >= 0 and mouse.y >= 0 and mouse.x <= size.x and mouse.y <= size.y:
+	if get_viewport().gui_get_hovered_control() == null and mouse.x >= 0 and mouse.y >= 0 and mouse.x <= size.x and mouse.y <= size.y:
 		if mouse.x < 14: direction.x -= 1
 		elif mouse.x > size.x - 14: direction.x += 1
 		if mouse.y < 14: direction.y += 1
@@ -290,6 +300,7 @@ func _skip_cinematic() -> void:
 
 
 func _shake(power: float) -> void:
+	if Prefs.get_value("motion"): return
 	var original := camera.position
 	var tween := create_tween()
 	for i in range(4):

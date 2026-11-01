@@ -4,6 +4,8 @@ const Shot = preload("res://scripts/shot.gd")
 const InputControls = preload("res://scripts/input_controls.gd")
 const Ability = preload("res://scripts/abilities_engine.gd")
 var g
+var techniques: HFlowContainer
+var techniques_open := false
 var targeting = preload("res://scripts/combat_targeting.gd").new()
 
 func _border(parent: Node3D, p: Vector2i, color: Color, height: float = 0.12) -> void:
@@ -99,8 +101,8 @@ func _build_ui() -> void:
 	g.fx.setup(g.camera, root)
 	var top := PanelContainer.new(); top.anchor_right = 1.0; top.offset_bottom = 64; root.add_child(top); _style_panel(top)
 	var top_row := HBoxContainer.new(); top.add_child(top_row)
-	g.title_label = _label("TEMPLE WATCH  /  RESCUE", 22); g.title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top_row.add_child(g.title_label)
-	g.objective_label = _label("", 18); top_row.add_child(g.objective_label)
+	g.title_label = _label("TEMPLE WATCH", 20); g.title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top_row.add_child(g.title_label)
+	g.objective_label = _label("", 16); top_row.add_child(g.objective_label)
 	var left := PanelContainer.new(); left.offset_top = 75; left.offset_left = 10; left.offset_right = 205; left.offset_bottom = 560; root.add_child(left); _style_panel(left)
 	var left_box := VBoxContainer.new(); left.add_child(left_box)
 	left_box.add_child(_label("SQUAD", 17))
@@ -119,25 +121,35 @@ func _build_ui() -> void:
 	g.shot_label = _label("Hover over a target", 15); g.shot_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.shot_label)
 	right_box.add_child(_label("COMBAT LOG", 17))
 	g.log_label = _label("", 14); g.log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.log_label)
-	var bottom := PanelContainer.new(); bottom.anchor_top = 1.0; bottom.anchor_right = 1.0; bottom.anchor_bottom = 1.0; bottom.offset_top = -230; root.add_child(bottom); _style_panel(bottom)
+	var bottom := PanelContainer.new(); bottom.anchor_top = 1.0; bottom.anchor_right = 1.0; bottom.anchor_bottom = 1.0; bottom.offset_top = -190; root.add_child(bottom); _style_panel(bottom)
 	var bottom_box := VBoxContainer.new(); bottom.add_child(bottom_box)
 	var info_row := HBoxContainer.new(); bottom_box.add_child(info_row)
+	info_row.visible = bool(g.Prefs.get_value("tips"))
 	g.path_label = _label("", 15); g.path_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; info_row.add_child(g.path_label)
 	info_row.add_child(_label("LMB PREVIEW/CONFIRM  •  RMB CANCEL/PAN  •  TAB CYCLE  •  Q/E ROTATE  •  WASD PAN  •  SPACE SKIP", 12))
 	g.warning_label = _label("", 15); g.warning_label.add_theme_color_override("font_color", Color("ffd37a")); bottom_box.add_child(g.warning_label)
-	var scroll := ScrollContainer.new(); scroll.custom_minimum_size.y = 98
+	var row := HFlowContainer.new(); row.size_flags_horizontal = Control.SIZE_EXPAND_FILL; bottom_box.add_child(row)
+	var scroll := ScrollContainer.new(); scroll.custom_minimum_size.y = 52; scroll.visible = false
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; bottom_box.add_child(scroll)
-	var row := HFlowContainer.new(); row.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(row)
+	techniques = HFlowContainer.new(); techniques.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(techniques)
 	var keys := {"move": "1", "shoot": "2", "strike": "3", "push": "4", "free": "5", "overwatch": "6", "hunker": "7"}
-	var icons := {"move": "➜", "shoot": "◎", "strike": "✦", "push": "◈", "free": "◇", "overwatch": "◉", "hunker": "⬟"}
+	if g.mission.modern: keys.erase("free"); keys.interact = "5"
+	var icons := {"move": "➜", "shoot": "◎", "strike": "✦", "push": "◈", "free": "◇", "interact":"◇", "overwatch": "◉", "hunker": "⬟"}
 	for mode in keys:
 		var b := _button("%s %s\n%s" % [keys[mode], icons[mode], mode.to_upper()], func() -> void: g._choose_action(mode))
 		row.add_child(b); g.action_buttons[mode] = b
+	row.add_child(_button("TECHNIQUES ▾",func():
+		techniques_open = not techniques_open; scroll.visible = techniques_open
+		bottom.offset_top = -246 if techniques_open else -190))
 	for mode in g.mission.abilities:
 		if mode in keys or mode == "move": continue
 		var b := _button(str(g.mission.abilities[mode].name), func() -> void: g._choose_action(mode))
-		row.add_child(b); g.action_buttons[mode] = b
+		if mode in ["interact", "reload"]: row.add_child(b)
+		else: techniques.add_child(b)
+		g.action_buttons[mode] = b
 	var command_row := HBoxContainer.new(); bottom_box.add_child(command_row)
+	command_row.add_child(_button("INFO",func():
+		g.Prefs.set_value("numbers",not bool(g.Prefs.get_value("numbers"))); _refresh()))
 	var spacer := Control.new(); spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL; command_row.add_child(spacer)
 	var cine_button := _button("ACTION CAM\nON", func() -> void: g.action_camera = not g.action_camera; _refresh())
 	cine_button.name = "CineButton"; command_row.add_child(cine_button)
@@ -161,7 +173,9 @@ func _refresh() -> void:
 		if not survivors.is_empty():
 			g.selected_id = int(survivors[0].id)
 			u = survivors[0]
-	g.objective_label.text = "TURN %d/%d  •  %s  •  %s" % [g.mission.turn, int(g.mission.spec.turn_limit), "ESCORT MIRA" if bool(g.mission.prisoner.freed) else "FREE MIRA", "EVAC" if bool(g.mission.prisoner.freed) else "CELL"]
+	var objective: Dictionary = g.mission.objective_status()
+	var clock_note := " · %d turns left" % int(objective.turns_left) if int(objective.turns_left) >= 0 else " · clock starts on reveal" if objective.get("clock_trigger", "") == "concealment" else ""
+	g.objective_label.text = "TURN %d · %s%s · %s" % [g.mission.turn,objective.label,clock_note,str(objective.phase).to_upper()]
 	g.selected_label.text = "%s\n%s%s\nHP %s\nAP %s\nFOCUS %d  •  MEDPACS %d%s" % [u.get("name", ""), u.get("class_name", ""), "  WOUNDED" if bool(u.get("wounded", false)) else "", "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, 3 - int(u.get("ap", 0)))), int(u.get("focus_left", 0)), int(u.get("medpacs", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
 	if u.has("ammo"): g.selected_label.text += "\nAMMO %d/%d" % [int(u.ammo), int(u.clip)]
 	if bool(u.get("concealed", false)): g.selected_label.text += "\nCONCEALED"
@@ -181,19 +195,21 @@ func _refresh() -> void:
 	for mode in g.action_buttons:
 		var button: Button = g.action_buttons[mode]
 		var core: bool = mode in ["move", "shoot", "strike", "push", "free", "overwatch", "hunker"]
-		button.visible = mode in ["move", "free"] or mode in u.get("kit", []) or mode in extras
+		button.visible = mode == "move" or mode in u.get("kit", []) or mode in extras
+		if mode == "free": button.visible = not g.mission.modern
 		if not button.visible: continue
 		var def: Dictionary = g.mission.abilities[mode]
 		var reason: String = "" if mode == "move" else g.mission.ability_reason(g.selected_id, mode)
 		if mode == "move" and int(u.get("ap", 0)) <= 0: reason = "Need AP"
 		button.disabled = reason != ""
 		var key := str(["move", "shoot", "strike", "push", "free", "overwatch", "hunker"].find(mode) + 1) if core else ("F%d" % (extras.find(mode) + 1) if extras.find(mode) < 12 else "")
+		if mode == "interact": key = "5"
 		var ap := "all" if str(def.get("ap")) == "remaining" else str(int(def.get("ap", 1)))
 		var charges := str(def.get("charges", ""))
 		var detail := " • %d left" % int(u.get(charges, 0)) if charges != "" else ""
 		var cd: Dictionary = u.get("cooldowns", {})
 		if int(cd.get(mode, 0)) > g.mission.turn: detail += " • CD %d" % (int(cd[mode]) - g.mission.turn)
-		button.text = "%s %s\n%s AP%s%s" % [key, str(def.name), ap, detail, " • " + reason.replace("No valid target", "No target") if reason != "" else ""]
+		button.text = "%s %s\n%s AP%s%s" % [key, str(def.name), ap, detail, ""]
 		button.tooltip_text = reason if reason != "" else "%s • %s AP%s" % [def.name, ap, detail]
 	g.result_panel.visible = g.mission.result != ""
 	var cine_button: Button = g.overlay.find_child("CineButton", true, false)
@@ -223,6 +239,9 @@ func _show_shot() -> void:
 		if def.has("damage"): lines.append("Damage %s" % str(def.damage))
 		if def.has("status"): lines.append("Applies %s" % str(def.status))
 		if def.has("chance"): lines.append("Chance %d%%" % int(def.chance))
+		if g.action in ["rewardSafe","rewardRisky"] and g.preview_tile.x >= 0:
+			var options: Dictionary = preload("res://scripts/mission_hack.gd").options(g.mission,actor,g.preview_tile)
+			if not options.is_empty(): lines.append("Safe %d%% · reveal / Intel or stun\nRisky %d%% · stun / control; failure alerts enemies" % [options.safe,options.risky])
 		lines.append("Click again or Enter to confirm.")
 		g.shot_label.text = "\n".join(lines)
 		return

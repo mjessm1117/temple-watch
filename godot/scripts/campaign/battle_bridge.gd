@@ -1,5 +1,6 @@
 extends RefCounted
 const Mission = preload("res://scripts/mission.gd")
+const Deployment = preload("res://scripts/campaign/strat_deployment.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
 const Settings = preload("res://scripts/settings.gd")
 const Story = preload("res://scripts/story/story_engine.gd")
@@ -10,21 +11,21 @@ static func map_path(id: String) -> String:
 static func create(campaign, seed_value: int) -> RefCounted:
 	Settings.difficulty = str(campaign.state.diff)
 	var pending: Dictionary = campaign.state.pending_mission
-	var path := preload("res://scripts/map_catalog.gd").select_layout(str(pending.mission_id),seed_value,int(pending.get("map_variant",-1)))
+	var path := preload("res://scripts/map_catalog.gd").select_layout(preload("res://scripts/campaign/battle_sith.gd").map_id(pending),seed_value,int(pending.get("map_variant",0 if pending.has("sith_offer_id") else -1)))
 	if path == "":
 		push_error("No map registered for campaign mission " + str(pending.mission_id))
 		return null
 	var m = Mission.new(seed_value, path)
-	var spawns: Array = m.spec.squad
 	m.units = m.units.filter(func(u): return u.side != "player")
+	var tiles := Deployment.spawn_tiles(m, pending.squad.size())
+	if tiles.size() != pending.squad.size(): return null
 	var players: Array[Dictionary] = []
 	for i in pending.squad.size():
 		var r: Dictionary = campaign.soldier(str(pending.squad[i]))
 		var kind := str(r.cls).to_lower()
 		if not m.catalog.has(kind) or m.catalog[kind].side != "player":
 			kind = "guardian" if Progression.is_jedi(r) else "soldier"
-		var spawn: Array = spawns[i % spawns.size()]
-		m._spawn(kind, int(spawn[1]), int(spawn[2]), -1)
+		m._spawn(kind, tiles[i].x, tiles[i].y, -1)
 		var u: Dictionary = m.units.pop_back()
 		u.rid = r.id; u.name = r.n; u.class_name = r.cls; u.rank = r.rank
 		u.dark = r.get("dark", 0)
@@ -36,6 +37,7 @@ static func create(campaign, seed_value: int) -> RefCounted:
 		u.damage = stats.get("dmg", u.damage).duplicate()
 		u.focus = int(stats.get("maxF", 0)); u.focus_left = u.focus
 		u.guard_deflect = int(stats.get("guardDef", 0))
+		Deployment.apply_identity(campaign, u, r)
 		players.append(u)
 	if int(pending.get("fewer",0)) > 0:
 		for enemy in m.living("enemy").filter(func(u): return u.kind == "trooper").slice(0,int(pending.fewer)): m.units.erase(enemy)
@@ -44,7 +46,8 @@ static func create(campaign, seed_value: int) -> RefCounted:
 	effects(m, campaign, campaign.state.get("approach", {}))
 	for fx in campaign.state.get("finale_effects", []): effects(m, campaign, fx)
 	effects(m, campaign, campaign.state.get("battle_buffs", {}))
-	return m
+	preload("res://scripts/campaign/battle_sith.gd").setup(campaign,m)
+	return preload("res://scripts/combat_mission.gd").adopt(m, campaign.state)
 
 static func effects(m, campaign, fx: Dictionary) -> void:
 	for u in m.living("player"):
@@ -87,13 +90,13 @@ static func result(campaign, m) -> Dictionary:
 		rows.append({"id":u.rid, "status":"dead" if u.get("status") == "dead" else "active", "hp":u.hp, "max_hp":u.max_hp,
 			"downed":bool(u.get("wounded", false)) or int(u.hp) <= 0,
 			"hurt":int(u.hp) < int(u.max_hp), "kills":int(u.get("kills", 0)),
-			"captures":int(u.get("captures", 0)), "dark":int(u.get("dark", 0)) + int(u.get("darkness", 0))})
+			"quote":u.get("quote", ""), "captures":int(u.get("captures", 0)), "dark":int(u.get("dark", 0)) + int(u.get("darkness", 0))})
 	var pending: Dictionary = campaign.state.pending_mission
 	return {"mission_id":pending.mission_id, "win":m.result == "win", "units":rows,
-		"story":bool(pending.get("story", false)), "bonds_recorded":true,
+		"mercy":m.get("mercy_events") if m.get("mercy_events") != null else [], "story":bool(pending.get("story", false)), "bonds_recorded":true,
 		"family":m.spec.get("family","rescue"), "map_id":m.spec.get("id","rescue"),
 		"objectives_completed":m.objective_state.get("done",{}).size(), "civilians_saved":int(m.objective_state.get("saved",0)),
-		"metrics":preload("res://scripts/mission_metrics.gd").report(m) if m.modern else {}, "hack_intel":int(m.hack_state.get("intel",0))}
+		"metrics":preload("res://scripts/mission_metrics.gd").report(m) if m.modern else {}, "hack_intel":int(m.hack_state.get("intel",0)) + (maxi(0,m.objective_state.get("done",{}).size()-int(m.spec.objective.required)) if m.modern and m.spec.family == "hack_terminal" else 0)}
 
 static func casualties(campaign, result: Dictionary) -> String:
 	var rows := []

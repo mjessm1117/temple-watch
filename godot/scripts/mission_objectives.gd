@@ -67,6 +67,10 @@ static func damage_relay(m: RefCounted, amount: int) -> void:
 
 static func primary_done(m: RefCounted) -> void:
 	if m.objective_state.phase == "evac": return
+	var rival: Dictionary = m.unit_by_id(int(m.spec.get("rival_required",-1)))
+	if not rival.is_empty() and int(rival.hp) > 0:
+		m.objective_state.objective_ready = true
+		return
 	m.objective_state.phase = "evac"; m.objective_state.evac_start = m.turn
 	m.metrics.objective_turn = m.turn
 	m.message("Main objective complete. Reach the blue evacuation zone.")
@@ -84,6 +88,7 @@ static func at_evac(m: RefCounted, p: Vector2i) -> bool:
 static func check(m: RefCounted) -> void:
 	if m.result != "": return
 	var f := str(m.spec.family)
+	if bool(m.objective_state.get("objective_ready",false)) or f == "pursuit": primary_done(m)
 	if f == "operation": check_step(m)
 	elif f in ["rescue","vip_extract"]:
 		if int(m.prisoner.get("hp",8)) <= 0: fail(m,"The evacuee is lost."); return
@@ -114,7 +119,7 @@ static func enemy_end(m: RefCounted) -> void:
 			break
 	if f == "defend" and m.objective_state.phase == "primary":
 		if int(m.pressure_state.get("waves",0)) >= int(m.spec.objective.waves) and m.pressure_state.pending.is_empty() and m.living("enemy").is_empty(): primary_done(m)
-	if f == "retaliation" and m.turn % 2 == 0 and m.objective_state.phase == "primary":
+	if f == "retaliation" and m.turn % int(m.spec.objective.get("civilian_interval",2)) == 0 and m.objective_state.phase == "primary":
 		for c in m.objective_state.civilians:
 			if c.state != "waiting": continue
 			var exposed := false
@@ -172,6 +177,7 @@ static func spawn_runner(m: RefCounted, step: Dictionary) -> void:
 	m._spawn_near("courier",p,90)
 	if m.units.size() == before: fail(m,"Courier insertion blocked."); return
 	var u: Dictionary = m.units[-1]
+	if step.has("runner_hp"): u.hp = int(step.runner_hp)+int(m.difficulty.get("enemy_hp",0)); u.max_hp = u.hp
 	u.runner_exit = step.exit; u.mob = int(step.get("runner_mob",3)); u.awake = true; u.spotted = true
 	m.objective_state.runner_id = int(u.id)
 
@@ -180,9 +186,11 @@ static func runner_turn(m: RefCounted, u: Dictionary) -> bool:
 	if runner_stopped(u): check(m); return true
 	var exit := Maps.point(u.runner_exit)
 	var route := preload("res://scripts/map_validator.gd").path(m.board,Shot.pos(u),exit)
+	var destination := Shot.pos(u)
 	for p in route.slice(1,int(u.mob)+1):
 		if m.occupied(p,int(u.id)): break
-		if not m.move(int(u.id),p) or int(u.hp) <= 0: break
+		destination = p
+	if destination != Shot.pos(u): m.move(int(u.id),destination)
 	if int(u.hp) > 0 and Shot.pos(u) == exit: fail(m,"The courier escaped with the codes.")
 	check(m)
 	return true
@@ -198,6 +206,7 @@ static func status(m: RefCounted) -> Dictionary:
 			"destroy_relay", "defend": label += " · Relay %d HP" % int(s.relay_hp)
 			"retaliation": label = "Save civilians %d/%d · %d lost" % [int(s.saved),int(m.spec.objective.save),int(s.lost)]
 			"operation": label = str(current_step(m).get("name","Extract"))
+	if m.spec.has("rival_required") and s.phase == "primary": label += " · Defeat the rival"
 	return {"label":label,"phase":s.phase,"clock_trigger":m.spec.clock_trigger,"turns_left":maxi(0,int(m.spec.turn_limit)-(m.turn-int(s.clock_start))) if int(s.clock_start)>0 and int(m.spec.turn_limit)>0 else -1,"held":s.held}
 
 static func defense_turn(m: RefCounted, u: Dictionary) -> bool:

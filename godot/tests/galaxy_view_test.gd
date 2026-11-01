@@ -81,7 +81,7 @@ func run() -> void:
 	# Independent offers on the same planet must preserve their original indexes.
 	var original: Array = flow.campaign.state.options.duplicate(true)
 	var second: Dictionary = original[0].duplicate(true); second.n = "Parallel relay signal"
-	flow.campaign.state.options.append(second); map.refresh_signals()
+	flow.campaign.state.options = [original[0], second]; map.refresh_signals()
 	check(map.marker_position(0).distance_to(map.marker_position(1)) > 30,"Co-located offers remain individually clickable")
 	flow.campaign.state.options = original; map.refresh_signals()
 	var mission_id := str(original[0].mission)
@@ -99,7 +99,7 @@ func run() -> void:
 
 	# A different offer, not just index zero, must retain its identity through launch.
 	second.mission = "rescue"; second.n = "Identity test rescue"
-	flow.campaign.state.options.append(second)
+	flow.campaign.state.options = [original[0], second]
 	change_scene_to_file("res://scenes/galaxy.tscn"); await frames()
 	view = current_scene; map = view.map_view
 	map._pick(map.marker_position(1)); await frames()

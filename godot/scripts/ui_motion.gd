@@ -10,6 +10,7 @@ func _ready() -> void:
 		target.focus_entered.connect(_hover)
 		target.pressed.connect(func(): _sound(true))
 	else:
+		if preload("res://scripts/campaign/strat_preferences.gd").get_value("motion"): return
 		target.modulate.a = 0.0
 		target.create_tween().tween_property(target, "modulate:a", 1.0, 0.28)
 		_enter.call_deferred()
@@ -27,6 +28,7 @@ func _trim() -> void:
 func _hover() -> void:
 	if target.disabled: return
 	_sound(false)
+	if preload("res://scripts/campaign/strat_preferences.gd").get_value("motion"): return
 	target.modulate = Color(1.18, 1.24, 1.26)
 	target.create_tween().tween_property(target, "modulate", Color.WHITE, 0.28)
 

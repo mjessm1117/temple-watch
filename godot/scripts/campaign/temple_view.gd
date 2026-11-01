@@ -93,6 +93,9 @@ func _make_button(info: Dictionary) -> void:
 	for label in [name_label, line]:
 		label.add_theme_color_override("font_shadow_color", Color("02090c"))
 		label.add_theme_constant_override("shadow_offset_x", 1); label.add_theme_constant_override("shadow_offset_y", 1)
+	name_label.name = "RoomName"; line.name = "RoomDetail"
+	name_label.visible = info.id in ["council", "medical", "barracks", "gardens"]
+	line.visible = false
 	b.mouse_entered.connect(_hover.bind(str(info.id)))
 	b.focus_entered.connect(_hover.bind(str(info.id)))
 	b.mouse_exited.connect(_unhover.bind(str(info.id)))
@@ -104,12 +107,16 @@ func activate_room(id: String) -> void:
 
 func _hover(id: String) -> void:
 	hovered = id
+	buttons[id].get_node("RoomName").visible = true
+	buttons[id].get_node("RoomDetail").visible = true
 	var info: Dictionary = rooms[id]
 	room_hovered.emit("%s  /  %s%s  →  %s" % [info.name, info.detail, " · " + str(info.module) if info.built and info.module != "" else "", info.tab])
 	if sound != null: sound.play()
 
 func _unhover(id: String) -> void:
 	if hovered == id:
+		buttons[id].get_node("RoomName").visible = id in ["council", "medical", "barracks", "gardens"]
+		buttons[id].get_node("RoomDetail").visible = false
 		hovered = ""; room_hovered.emit("Select a room to manage the Order.  •  Gold: module ready  •  Dark: awaiting construction")
 
 func _process(delta: float) -> void:

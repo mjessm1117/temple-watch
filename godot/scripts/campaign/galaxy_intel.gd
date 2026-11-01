@@ -15,11 +15,7 @@ static func resources(values: Dictionary) -> String:
 	return " · ".join(parts) if not parts.is_empty() else "None"
 
 static func darkness(campaign) -> int:
-	var value := int(campaign.state.get("orderDark", 0))
-	for r in campaign.state.roster:
-		if r.status == "active" and bool(Data.get_table("core", "CLASS").get(r.cls, {}).get("jedi", false)):
-			value += 4 * int(r.get("dark", 0))
-	return mini(100, value)
+	return int(campaign.state.get("orderDark",0))
 
 static func unrest(campaign, region: String) -> int:
 	var values: Dictionary = campaign.state.get("unrest", {})
@@ -54,9 +50,7 @@ static func risk(campaign, m: Dictionary, option: Dictionary) -> Dictionary:
 		power += hp * aim * (1.4 if f.get("horror", false) else 1.0) * (float(rules.boss) if key in [m.get("boss"),m.get("bossKey")] or f.get("boss", false) else 1.0)
 	power += (float(tune.get("extra", 0)) + float(diff.get("extra", 0)) * m.get("waves", {}).size()) * 4
 	if rules.clock.has(m.get("type", "")): power += float(rules.threat)
-	var modifiers := {"enemyAim":0.0,"enemyHp":0.0}
-	for active in campaign.state.get("ops",{}).get("mods",[]):
-		for key in modifiers: modifiers[key] += float(active.get("mod",{}).get(key,0))
+	var modifiers: Dictionary = campaign.sith.campaign_mods()
 	power *= 1.0+(float(modifiers.enemyAim)+float(modifiers.enemyHp)*8.0)/100.0
 	var squad: Array = campaign.default_squad(option); var squad_power := 0.0
 	for member in squad: squad_power += unit_power(campaign, str(member))

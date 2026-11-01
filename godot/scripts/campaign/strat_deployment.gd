@@ -4,11 +4,18 @@ const Roster = preload("res://scripts/campaign/strat_roster.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
 
 static func validate(c, ids: Array, option: Dictionary = {}) -> bool:
-	if ids.is_empty() or ids.size() > c.squad_capacity(): return false
+	if ids.size() < 2 or ids.size() > c.squad_capacity(): return false
+	var rule := preload("res://scripts/mission_fronts.gd").squad_rule(c.state)
+	if ids.size() > int(rule.max): return false
+	if option.get("kind", "") == "redemption" and option.get("unit_id", "") not in ids: return false
+	var jedi := 0
 	var seen := []
 	for id in ids:
 		if id in seen or not Roster.ready(c.soldier(str(id))): return false
+		if id in rule.used: return false
+		if Progression.is_jedi(c.soldier(str(id))): jedi += 1
 		seen.append(id)
+	if jedi > int(rule.jmax): return false
 	return not option.has("quest") or ids.has(option.quest)
 
 static func spawn_tiles(m, count: int) -> Array[Vector2i]:

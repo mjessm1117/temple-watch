@@ -6,6 +6,8 @@ const Modules = preload("res://scripts/campaign/modules.gd")
 const Legacy = preload("res://scripts/campaign/legacy.gd")
 const Story = preload("res://scripts/story/story_engine.gd")
 var story: RefCounted
+var sith: RefCounted
+const Integration = preload("res://scripts/campaign/integration.gd")
 const SAVE_PATH = "user://campaign.json"
 var state: Dictionary = {}
 const Base = preload("res://scripts/campaign/strat_base.gd")
@@ -21,7 +23,7 @@ func ensure_strategy() -> void:
 	Base.ensure(state); Roster.ensure(state); Identity.ensure(self); Ops.ensure(self)
 
 func darkness_segments() -> int:
-	return clampi(ceili(float(state.orderDark) * 12.0 / 100.0), 0, 12)
+	return int(sith.project_status().segments) if sith != null else 2
 
 func squad_capacity() -> int:
 	return Roster.squad_capacity(state)
@@ -60,6 +62,7 @@ func new_campaign(difficulty: String = "normal") -> void:
 	story = Story.new(state)
 	ensure_strategy()
 	ensure_teams()
+	Integration.bind(self)
 	refresh_options()
 
 func save(path: String = SAVE_PATH) -> bool:
@@ -100,6 +103,7 @@ func _migrate() -> void:
 	story = Story.new(state)
 	ensure_strategy()
 	ensure_teams()
+	Integration.bind(self)
 	refresh_options()
 
 func soldier(id: String) -> Dictionary:
@@ -176,6 +180,7 @@ func heal_multiplier() -> float:
 	return (2.5 if level >= 3 else 2.0 if level >= 2 else 1.5 if level >= 1 else 1.0) * (1.25 if state.staff.has("medical") else 1.0)
 
 func advance_days(days: int) -> void:
+	if sith.project_status().defeated: return
 	ensure_strategy()
 	for _day in maxi(0, days):
 		state.elapsed_days = int(state.elapsed_days) + 1; state.day = int(state.day) + 1
@@ -183,6 +188,9 @@ func advance_days(days: int) -> void:
 		if int(state.day) > 30:
 			state.day = 1; state.month = int(state.month) + 1
 			_month_tick()
+		sith.advance_day()
+		if sith.project_status().defeated: break
+	refresh_options()
 	Identity.reveal(self)
 
 func advance_mission() -> void:
@@ -190,7 +198,7 @@ func advance_mission() -> void:
 	Modules.advance_mission(self)
 	state.strategy.team_deployed = []
 	for r in state.roster:
-		if r.status == "captured" and not r.get("covert_captive", false):
+		if r.status == "captured" and not r.get("covert_captive", false) and not r.has("sith_captor"):
 			r.capT = int(r.get("capT", 1)) - 1
 			if int(r.capT) <= 0:
 				r.status = "active"; r.wound = ceili(float(Data.get_table("core", "WOUND").serious) / heal_multiplier())
@@ -292,25 +300,30 @@ func apply_mission_result(result: Dictionary) -> Dictionary:
 			if not a.is_empty() and not b.is_empty() and str(a.status) == "active" and str(b.status) == "active":
 				Legacy.bond_points(self, str(a.id), str(b.id), int(Data.get_table("temple", "BOND").together) + (int(Data.get_table("temple", "BOND").win) if win else 0))
 	change_unrest(region_for_mission(id), int(Data.get_table("galaxy", "UNREST").win if win else Data.get_table("galaxy", "UNREST").lose))
-	if win and not state.pending_mission.is_empty() and state.pending_mission.has("hostages"):
+	if win and not state.pending_mission.is_empty() and state.pending_mission.has("hostages") and not state.pending_mission.has("sith_offer_id"):
 		for captive_id in state.pending_mission.hostages:
 			var captive := soldier(str(captive_id))
 			if not captive.is_empty() and str(captive.status) == "captured":
-				captive.status = "active"; captive.capT = 0
+				captive.status = "active"; captive.capT = 0; captive.erase("covert_captive")
 				captive.wound = ceili(float(wound_data.serious) / heal_multiplier())
-	advance_mission()
+	var selected: Dictionary = state.pending_mission.duplicate(true)
+	Integration.settle_sith(self, result)
+	var receipt := preload("res://scripts/mission_fronts.gd").finish(state)
+	if receipt.advance:
+		Integration.ignored(self, receipt.ignored)
+		advance_mission()
 	Roster.after_mission(self, result); Identity.after_mission(self, result)
 	for row in summary.rows:
 		var r := soldier(str(row.id))
 		row.fatigue = int(r.fatigue); row.wound = int(r.wound); row.readiness = Roster.fatigue_status(r)
-	var selected: Dictionary = state.pending_mission
-	if not selected.is_empty() and bool(selected.get("adv", false)): state.step = int(state.step) + 1
+	if receipt.advance and not selected.is_empty() and bool(selected.get("adv", false)): state.step = int(state.step) + 1
 	state.pending_mission = {}; state.chosen = -1
-	refresh_options()
+	if receipt.advance: refresh_options()
 	mission_resolved.emit(result.duplicate(true), summary.duplicate(true))
 	return summary
 
 func refresh_options() -> Array:
+	if state.get("twin",{}).get("stage", "") == "b": return state.options
 	var era := int(state.era)
 	var plan: Array = story.data[["data-story", "data-era2", "data-era3"][era - 1]].get("PLAN" if era == 1 else "PLAN%d" % era, [])
 	while int(state.step) < plan.size() and plan[int(state.step)].has("years"):
@@ -328,7 +341,7 @@ func refresh_options() -> Array:
 			options.append(crisis)
 		var captives := []
 		for r in state.roster:
-			if str(r.status) == "captured": captives.append(r.id)
+			if str(r.status) == "captured" and not r.has("sith_captor"): captives.append(r.id)
 		if not captives.is_empty():
 			var rescue := false
 			for option in options:
@@ -336,20 +349,18 @@ func refresh_options() -> Array:
 					option.hostages = captives; rescue = true
 			if not rescue:
 				options.append({"mission": "rescue", "crisis": "rescue", "kind": "Rescue", "hostages": captives, "adv": false})
-		for r in state.roster:
-			if options.size() >= 6: break
-			if str(r.status) == "active" and Progression.is_jedi(r) and int(r.get("dark", 0)) >= 6 and not state.get("redeem", {}).has(str(r.id)):
-				options.append({"mission": "shrine", "kind": "Redemption", "redeem": r.id, "adv": false, "n": "The way back · %s" % r.n})
 	var stranded := []
 	for r in state.roster:
-		if r.status == "captured": stranded.append(r.id)
+		if r.status == "captured" and not r.has("sith_captor"): stranded.append(r.id)
 	if not stranded.is_empty() and not options.any(func(o): return o.has("hostages")):
 		options.append({"mission":"rescue","kind":"Rescue","hostages":stranded,"adv":false})
 	options.append_array(Identity.quest_options(self))
+	if sith != null: options.append_array(sith.mission_options())
 	state.options = options
 	return options
 
 func select_mission(index: int, squad: Array = []) -> Dictionary:
+	if sith.project_status().defeated: return {}
 	if index < 0 or index >= state.options.size() or not state.pending_mission.is_empty(): return {}
 	var option: Dictionary = state.options[index]
 	var selected := squad.duplicate()
@@ -363,11 +374,16 @@ func select_mission(index: int, squad: Array = []) -> Dictionary:
 	for id in selected:
 		var r := soldier(str(id))
 		if not Roster.ready(r): return {}
-	if bool(option.get("adv", false)):
+	if not preload("res://scripts/campaign/strat_deployment.gd").validate(self,selected,option): return {}
+	var front := preload("res://scripts/mission_fronts.gd").launch(state,option,selected,Integration.plan(self))
+	if not front.ok: return {}
+	if option.get("kind", "") == "counter" and not sith.counter(str(option.op_id),str(option.sith_offer_id)): return {}
+	if bool(option.get("adv", false)) and not front.defer_ignored:
 		for other in state.options:
 			if other != option and bool(other.get("adv", false)):
 				var assigned := str(state.team_assignments.get(str(other.get("crisis", "")), ""))
 				if assigned == "" or not _resolve_team(other, assigned, selected):
+					sith.retaliation_trigger("Unanswered crisis",1)
 					for key in other.get("ignore", {}): gain(str(key), int(other.ignore[key]))
 					change_unrest(region_for_mission(str(other.mission)), int(Data.get_table("galaxy", "UNREST").ignore))
 		state.team_assignments.clear()
@@ -375,6 +391,9 @@ func select_mission(index: int, squad: Array = []) -> Dictionary:
 	state.pending_mission = option.duplicate(true)
 	state.pending_mission.mission_id = str(option.mission)
 	state.pending_mission.squad = selected
+	state.pending_mission.fewer = int(front.fewer)
+	state.deployment_serial = int(state.get("deployment_serial",0)) + 1
+	state.pending_mission.result_id = "deployment_%d" % state.deployment_serial
 	return state.pending_mission
 
 func default_squad(option: Dictionary = {}) -> Array:
@@ -388,7 +407,7 @@ func default_squad(option: Dictionary = {}) -> Array:
 	for id in troops:
 		if out.size() >= squad_capacity(): break
 		out.append(id)
-	return out
+	return Integration.default_squad(self, option, out)
 
 func region_for_mission(id: String) -> String:
 	var mission: Dictionary = story.mission(id)

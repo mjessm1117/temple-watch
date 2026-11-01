@@ -50,6 +50,7 @@ func _build() -> void:
 	title.add_child(UI.label("J E D I   T E M P L E   /   W A R   R O O M",12,Color("79d3e2")))
 	title.add_child(UI.label("Galaxy command",30,Color("dbe7e4")))
 	back_button = UI.button("←  GALAXY", _overview); back_button.visible = false; head.add_child(back_button)
+	head.add_child(UI.button("SITH INTELLIGENCE",func(): get_node("/root/CampaignFlow").open_intelligence()))
 	head.add_child(UI.button("←  TEMPLE",_temple))
 	status = UI.label("",14,Color("8aa2a5")); outer.add_child(status)
 	var body := HBoxContainer.new(); body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -73,8 +74,8 @@ func _build() -> void:
 	var right := UI.panel(Color("15232a")); right.custom_minimum_size.x = 390; body.add_child(right)
 	var column := UI.column(10); column.custom_minimum_size.x = 360; right.add_child(column)
 	tabs = HBoxContainer.new(); column.add_child(tabs)
-	for tab in ["Briefing","Regions","Field ops","Teams"]:
-		var button := UI.button(tab,_tab.bind(tab)); button.add_theme_font_size_override("font_size",13)
+	for tab in ["Briefing","Regions","Field ops","Teams","Sith ops"]:
+		var button := UI.button(tab,_tab.bind(tab)); button.add_theme_font_size_override("font_size",11)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL; tabs.add_child(button)
 	scroll = ScrollContainer.new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
@@ -99,13 +100,20 @@ func _show_details() -> void:
 	launch_button.visible = page == "Briefing"
 	launch_button.disabled = campaign.state.options.is_empty() or not campaign.state.pending_mission.is_empty()
 	if not campaign.state.options.is_empty(): launch_button.disabled = launch_button.disabled or campaign.default_squad(campaign.state.options[selected]).is_empty()
-	status.text = "Cr %d    In %d    Ky %d    Senate Favor %d    Recruits %d      /      Darkness %d      /      Month %d · Day %d      /      %d mission signals" % [campaign.state.res.credits,campaign.state.res.intel,campaign.state.res.kyber,campaign.state.res.favor,campaign.state.res.recruits,Intel.darkness(campaign),campaign.state.month,campaign.state.day,campaign.state.options.size()]
+	var project: Dictionary = campaign.sith.project_status()
+	status.text = "Cr %d · Intel %d · Favor %d  |  Order Darkness %d/100  |  Sith Darkness %d/12 · next escalation day %d  |  M%d D%d" % [campaign.state.res.credits,campaign.state.res.intel,campaign.state.res.favor,campaign.state.orderDark,project.segments,project.next_escalation,campaign.state.month,campaign.state.day]
+	launch_button.disabled = launch_button.disabled or project.defeated
+	if campaign.state.get("twin",{}).get("stage", "") == "b":
+		detail.add_child(UI.label("FRONT B · fresh squad · up to 4, at most 2 Jedi",16,UI.GOLD))
+		detail.add_child(UI.button("Auto resolve (%d%%)" % preload("res://scripts/mission_fronts.gd").auto_odds(campaign.state,campaign.default_squad()),_front_auto))
+		detail.add_child(UI.button("Stand down Front B",_front_stand_down))
 	for b in tabs.get_children(): b.modulate = Color("79d3e2") if b.text == page else Color.WHITE
 	map_view.selected = selected; back_button.visible = not map_view.focused.is_empty()
 	match page:
 		"Regions": Details.region_panel(self)
 		"Field ops": _field_panel()
 		"Teams": Details.teams_panel(self)
+		"Sith ops": _sith_panel()
 		_: Details.mission_panel(self)
 	_wire_buttons(detail)
 
@@ -156,41 +164,7 @@ func _assign_team(crisis: String, team_id: String) -> void:
 		get_node("/root/CampaignFlow").save(); _show_details()
 
 func _field_panel() -> void:
-	detail.add_child(UI.label("FIELD OPERATIONS",19,Color("79d3e2")))
-	detail.add_child(UI.label("Send 2–3 fit soldiers. They are unavailable until their team returns; each mission advances 15 days.",14,UI.MUTED))
-	var definitions: Dictionary = Data.get_table("galaxy","FIELD_OPS")
-	var picker := OptionButton.new(); picker.custom_minimum_size.y = 38; detail.add_child(picker)
-	var keys := definitions.keys()
-	for key in keys: picker.add_item(str(definitions[key].n))
-	picker.select(keys.find(field_key)); picker.item_selected.connect(func(i: int): field_key = str(keys[i]); _show_details())
-	var op: Dictionary = definitions[field_key]
-	detail.add_child(UI.label(str(op.desc),15))
-	Details.fact(detail,"Duration / difficulty","%d days · %s" % [op.days,"★".repeat(int(op.stars))])
-	Details.fact(detail,"Preferred",", ".join(op.want))
-	Details.fact(detail,"If it fails","Stress +15 each. Nobody dies.",UI.DANGER)
-	var rewards: Dictionary = op.res.duplicate()
-	if rewards.has("credits"): rewards.credits = roundi(float(rewards.credits)*float(Data.get_table("galaxy","FIELD").cr)*float(Data.get_table("missions","DIFF")[campaign.state.diff].income))
-	Details.fact(detail,"Reward",Intel.resources(rewards)+" · 15 XP per soldier")
-	if op.has("fee"): Details.fact(detail,"Fee","%d Credits" % int(op.fee))
-	for r in campaign.state.roster:
-		if r.status != "active" or int(r.wound) > 0 or str(r.assign) != "": continue
-		var b := UI.button("%s %s · %s R%d" % ["✓" if field_team.has(r.id) else "+",r.n,r.cls,r.rank],_toggle_field.bind(str(r.id)))
-		b.add_theme_font_size_override("font_size",13); b.custom_minimum_size.y = 30; detail.add_child(b)
-	var odds: int = campaign.field_odds(field_key,field_team)
-	Details.fact(detail,"Success","%d%% · %d / 3 soldiers" % [odds,field_team.size()])
-	detail.add_child(UI.button("SEND TEAM  →",_send_field.bind(field_key),odds > 0 and int(campaign.state.res.credits) >= int(op.get("fee",0))))
-	detail.add_child(UI.label("TEAMS IN FLIGHT",16,Color("79d3e2")))
-	var flying := 0
-	for f in campaign.state.field.list:
-		if f.st != "team": continue
-		flying += 1; var names := PackedStringArray()
-		for id in f.team: names.append(str(campaign.soldier(str(id)).get("n",id)))
-		Details.fact(detail,str(definitions[f.k].n),"%s · %s\nBack in %d days · %d%% success" % [Intel.operation_planet(campaign,f),", ".join(names),f.left,f.ch])
-	if flying == 0: detail.add_child(UI.label("No teams away.",14,UI.MUTED))
-	detail.add_child(UI.label("FIELD LOG",16,Color("79d3e2")))
-	for entry in campaign.state.field.log:
-		detail.add_child(UI.label("M%d · %s · %s" % [entry.month,definitions[entry.k].n,"Success" if entry.win else "Failed"],13,UI.MUTED))
-	if campaign.state.field.log.is_empty(): detail.add_child(UI.label("No completed operations yet.",14,UI.MUTED))
+	Details.field_panel(self)
 
 func _toggle_field(id: String) -> void:
 	if field_team.has(id): field_team.erase(id)
@@ -200,7 +174,7 @@ func _toggle_field(id: String) -> void:
 func _send_field(key: String) -> void:
 	if campaign.send_field_op(key,field_team):
 		field_team.clear(); get_node("/root/CampaignFlow").save()
-		message.text = "%s team deployed. Track its shuttle on the map." % Data.get_table("galaxy","FIELD_OPS")[key].n
+		message.text = "%s team deployed. Track its shuttle on the map." % "Field operation"
 		map_view.refresh_signals(); _refresh_chips(); _show_details()
 	else: message.text = "Choose 2–3 available soldiers and check the operation fee."
 
@@ -212,3 +186,33 @@ func _wire_buttons(node: Node) -> void:
 
 func _field(key: String) -> void:
 	field_key = key; page = "Field ops"; _show_details(); _slide()
+
+func _front_auto() -> void:
+	var rng := RandomNumberGenerator.new(); rng.randomize()
+	var receipt := preload("res://scripts/mission_fronts.gd").auto_resolve(campaign.state,selected,campaign.default_squad(),rng)
+	if campaign.Integration.settle_front(campaign,receipt):
+		get_node("/root/CampaignFlow").save(); selected = 0; map_view.refresh_signals(); _refresh_chips(); _show_details()
+
+func _front_stand_down() -> void:
+	var receipt := preload("res://scripts/mission_fronts.gd").stand_down(campaign.state)
+	if campaign.Integration.settle_front(campaign,receipt):
+		get_node("/root/CampaignFlow").save(); selected = 0; map_view.refresh_signals(); _refresh_chips(); _show_details()
+
+func _sith_panel() -> void:
+	detail.add_child(UI.label("DARK EVENTS",20,UI.DANGER))
+	detail.add_child(UI.label("Choose one counter mission this month. Intel and covert teams offer other ways to intervene.",14,UI.MUTED))
+	for op in campaign.sith.operations():
+		Details.fact(detail,str(op.n),"Day %d · %s" % [int(op.deadline),str(op.status).capitalize()],UI.GOLD)
+		detail.add_child(UI.label(str(op.desc),14))
+		for i in campaign.state.options.size():
+			var option: Dictionary = campaign.state.options[i]
+			if option.get("sith_offer_id", "") == op.mission_id:
+				detail.add_child(UI.button("COUNTER MISSION →",get_node("/root/CampaignFlow").prepare_briefing.bind(i),op.status == "open"))
+	detail.add_child(UI.button("Intel, teams & rival dossiers",func(): get_node("/root/CampaignFlow").open_intelligence()))
+	detail.add_child(UI.label("RIVAL OPERATIONS",18,UI.DANGER))
+	for rival in campaign.sith.rivals():
+		detail.add_child(UI.label("%s · %s" % [rival.n,str(rival.phase).capitalize()],14,UI.GOLD))
+	for i in campaign.state.options.size():
+		var option: Dictionary = campaign.state.options[i]
+		if option.has("rival_id") or option.get("kind", "") in ["retaliation", "project"]:
+			detail.add_child(UI.button(str(option.n),get_node("/root/CampaignFlow").prepare_briefing.bind(i)))
