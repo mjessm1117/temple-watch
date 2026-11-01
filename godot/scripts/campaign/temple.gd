@@ -13,6 +13,12 @@ var page_content: VBoxContainer
 var status_label: Label
 var notice_label: Label
 var nav_buttons: Dictionary = {}
+var temple_view: Control
+var station_panel: PanelContainer
+var panel_open := false
+var panel_tween: Tween
+var selected_room := ""
+const TempleView = preload("res://scripts/campaign/temple_view.gd")
 
 func _ready() -> void:
 	campaign = get_node("/root/CampaignFlow").session()
@@ -26,69 +32,117 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		var names := ["Command", "Roster", "Research", "Build", "Arsenal", "Teams", "Legacy"]
 		if event.keycode >= KEY_1 and event.keycode <= KEY_7:
-			page = names[event.keycode - KEY_1]; _show_page(); get_viewport().set_input_as_handled()
+			_change_page(names[event.keycode - KEY_1]); get_viewport().set_input_as_handled()
+		elif event.keycode == KEY_ESCAPE and panel_open:
+			_close_station(); get_viewport().set_input_as_handled()
 		elif event.keycode == KEY_G:
 			_open_galaxy(); get_viewport().set_input_as_handled()
 
 func _build_shell() -> void:
-	var bg := ColorRect.new(); bg.color = UI.BG; bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); add_child(bg)
-	var outer := UI.column(14); outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	outer.offset_left = 28; outer.offset_top = 22; outer.offset_right = -28; outer.offset_bottom = -22; add_child(outer)
-	var head := HBoxContainer.new(); head.add_theme_constant_override("separation", 18); outer.add_child(head)
-	var brand := UI.column(1); brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL; head.add_child(brand)
-	brand.add_child(UI.label("TEMPLE WATCH", 38, UI.ACCENT))
-	brand.add_child(UI.label("JEDI TEMPLE  /  COMMAND CONSOLE", 15, UI.MUTED))
-	status_label = UI.label("", 18, UI.GOLD)
-	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	status_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-	status_label.custom_minimum_size.x = 390
-	head.add_child(status_label)
-	var body := HBoxContainer.new(); body.size_flags_vertical = Control.SIZE_EXPAND_FILL; body.add_theme_constant_override("separation", 14); outer.add_child(body)
-	var nav_panel := UI.panel(); nav_panel.custom_minimum_size.x = 238; body.add_child(nav_panel)
-	var nav := UI.column(8); nav_panel.add_child(nav)
-	nav.add_child(UI.label("STATIONS", 15, UI.MUTED))
-	for name in ["Command", "Roster", "Research", "Build", "Arsenal", "Teams", "Legacy"]:
-		var b := UI.button(name, _change_page.bind(name)); nav.add_child(b); nav_buttons[name] = b
-	nav.add_spacer(false)
-	nav.add_child(UI.button("CODEX", get_node("/root/CampaignFlow").open_codex))
-	nav.add_child(UI.button("GALAXY  →", _open_galaxy))
-	nav.add_child(UI.button("MAIN MENU", func(): get_node("/root/CampaignFlow").go("menu")))
-	nav.add_child(UI.label("1–7 stations  •  G galaxy", 13, UI.MUTED))
-	var content_panel := UI.panel(); content_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL; body.add_child(content_panel)
-	var scroll := ScrollContainer.new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL; scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; content_panel.add_child(scroll)
-	page_content = UI.column(13); page_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(page_content)
-	var side_panel := UI.panel(); side_panel.custom_minimum_size.x = 305; body.add_child(side_panel)
-	var side := UI.column(12); side_panel.add_child(side)
-	side.add_child(UI.label("TEMPLE STATUS", 16, UI.ACCENT))
+	temple_view = TempleView.new(); add_child(temple_view); temple_view.setup(campaign.state)
+	temple_view.room_selected.connect(_open_room)
+	temple_view.room_hovered.connect(func(message: String): notice_label.text = message)
+	var head := UI.panel(Color(0.035, 0.075, 0.09, 0.94)); add_child(head)
+	head.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	head.offset_left = 20; head.offset_right = -20; head.offset_top = 14; head.offset_bottom = 106
+	var rows := UI.column(5); head.add_child(rows)
+	var title := HBoxContainer.new(); rows.add_child(title)
+	var brand := UI.label("TEMPLE WATCH", 27, Color("78d2df")); brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL; title.add_child(brand)
+	status_label = UI.label("", 15, UI.GOLD); title.add_child(status_label)
+	var resources := HBoxContainer.new(); resources.add_theme_constant_override("separation", 20); rows.add_child(resources)
 	var res: Dictionary = campaign.state.res
-	side.add_child(UI.label("%d  CREDITS" % int(res.credits), 25, UI.GOLD))
-	side.add_child(UI.label("%d  INTEL     %d  KYBER" % [int(res.intel), int(res.kyber)], 18))
-	side.add_child(UI.label("%d  SENATE FAVOR" % int(res.favor), 18))
-	side.add_child(UI.label("%d  RECRUITS" % int(res.recruits), 18))
-	side.add_child(UI.label("ORDER DARKNESS  %d / 100" % int(campaign.state.orderDark), 15, UI.DANGER))
-	var active := 0; var wounded := 0
+	for item in [["Cr", "credits"], ["In", "intel"], ["Ky", "kyber"], ["SF", "favor"], ["Rc", "recruits"]]:
+		resources.add_child(UI.label("● %s  %d" % [item[0], int(res[item[1]])], 14, Color("80cbd6")))
+	resources.add_child(UI.label("◈ Darkness  %d" % int(campaign.state.orderDark), 14, Color("b5a2d3")))
+	var era_label := UI.label("JEDI TEMPLE  /  %s" % {1:"OLD REPUBLIC", 2:"NEW SITH WARS", 3:"HIGH REPUBLIC"}.get(int(campaign.state.era), "REPUBLIC"), 13, UI.MUTED)
+	era_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; era_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; resources.add_child(era_label)
+	for row in [title, resources]:
+		for child in row.get_children():
+			if child is Label: child.autowrap_mode = TextServer.AUTOWRAP_OFF
+	var foot_bg := ColorRect.new(); add_child(foot_bg); foot_bg.color = Color(0.02, 0.05, 0.065, 0.84)
+	foot_bg.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); foot_bg.offset_top = -97
+	foot_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var footer := UI.column(7); add_child(footer); footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	footer.offset_left = 20; footer.offset_right = -20; footer.offset_top = -88; footer.offset_bottom = -14
+	notice_label = UI.label("Select a room to manage the Order.  •  Gold: module ready  •  Dark: awaiting construction", 14, UI.MUTED)
+	notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; footer.add_child(notice_label)
+	var nav := HBoxContainer.new(); nav.add_theme_constant_override("separation", 7); footer.add_child(nav)
+	for name in ["Command", "Roster", "Research", "Build", "Arsenal", "Teams", "Legacy", "Codex", "Galaxy"]:
+		var button := UI.button(name, _change_page.bind(name)); button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.mouse_entered.connect(func(): temple_view.sound.play())
+		nav.add_child(button); nav_buttons[name] = button
+	nav.add_child(UI.button("Menu", func(): get_node("/root/CampaignFlow").go("menu")))
+	var readout := UI.column(6); add_child(readout); readout.position = Vector2(25, 125); readout.size.x = 180
+	readout.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	readout.add_child(UI.label("THE ORDER ENDURES", 13, UI.ACCENT))
+	var active := 0; var wounded := 0; var built := 0
 	for r in campaign.state.roster:
 		if str(r.status) == "active": active += 1
 		if int(r.wound) > 0: wounded += 1
-	side.add_child(UI.label("%d ACTIVE  /  %d WOUNDED" % [active, wounded], 15, UI.MUTED))
-	side.add_spacer(false)
-	notice_label = UI.label("Select a station to manage the Order.", 15, UI.MUTED); side.add_child(notice_label)
-	outer.add_child(UI.label("TEMPLE WATCH  •  REPUBLIC COMMAND", 13, UI.MUTED))
+	for level in campaign.state.wings.values():
+		if int(level) > 0: built += 1
+	readout.add_child(UI.label("%d active · %d wounded\n%d / 8 wings online\n%d missions waiting" % [active, wounded, built, campaign.state.options.size()], 13, UI.MUTED))
+	readout.add_child(UI.label("1–7 stations\nG galaxy · Esc close", 12, Color("627d87")))
+	station_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.97)); add_child(station_panel)
+	station_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	station_panel.anchor_left = 0.35; station_panel.offset_left = 0
+	station_panel.offset_top = 113; station_panel.offset_right = -20; station_panel.offset_bottom = -100
+	station_panel.visible = panel_open
+	var column := UI.column(8); station_panel.add_child(column)
+	var top := HBoxContainer.new(); column.add_child(top)
+	var heading := UI.label("TEMPLE STATION", 13, UI.MUTED); heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top.add_child(heading)
+	top.add_child(UI.button("← Temple view", _close_station))
+	var scroll := ScrollContainer.new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
+	page_content = UI.column(13); page_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(page_content)
+
+func _open_room(id: String, target: String) -> void:
+	_change_page(target, id)
+
+func _close_station() -> void:
+	panel_open = false
+	if panel_tween != null: panel_tween.kill()
+	panel_tween = create_tween()
+	panel_tween.tween_property(station_panel, "modulate:a", 0.0, 0.16)
+	panel_tween.tween_callback(func(): station_panel.hide())
+
+func _slide_station() -> void:
+	if not panel_open: return
+	if panel_tween != null: panel_tween.kill()
+	station_panel.show(); station_panel.modulate.a = 0.0
+	station_panel.offset_left = 50; station_panel.offset_right = 30
+	panel_tween = create_tween().set_parallel(true)
+	panel_tween.tween_property(station_panel, "modulate:a", 1.0, 0.22)
+	panel_tween.tween_property(station_panel, "offset_left", 0.0, 0.28).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	panel_tween.tween_property(station_panel, "offset_right", -20.0, 0.28).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 func _refresh_shell() -> void:
+	if panel_tween != null: panel_tween.kill()
 	UI.clear(self)
 	nav_buttons.clear()
 	_build_shell()
 	_show_page()
 
-func _change_page(name: String) -> void:
-	page = name; _show_page()
+func _change_page(name: String, room_id: String = "") -> void:
+	selected_room = room_id
+	if name == "Galaxy": _open_galaxy(); return
+	if name == "Codex": get_node("/root/CampaignFlow").open_codex(); return
+	page = name; panel_open = true; _show_page(); _slide_station()
 
 func _show_page() -> void:
 	UI.clear(page_content)
 	for name in nav_buttons: nav_buttons[name].button_pressed = name == page
 	status_label.text = "MONTH %d  ·  DAY %d  ·  WEEK %d" % [int(campaign.state.month), int(campaign.state.day), campaign.week()]
 	page_content.add_child(UI.label(page.to_upper(), 30, UI.ACCENT))
+	if selected_room != "" and temple_view.rooms.has(selected_room):
+		var room: Dictionary = temple_view.rooms[selected_room]
+		var context := _card(str(room.name), str(room.status))
+		if room.built and room.wing != "":
+			var action: Dictionary = Data.get_table("temple", "MOD_ACTS")[room.wing]
+			context.add_child(UI.label(str(action.desc), 15, UI.MUTED))
+			context.add_child(UI.button(str(action.n), _module_action.bind(str(room.wing)), Modules.ready(campaign, str(room.wing)) and campaign.can_afford(action.cost)))
+		elif room.kind in ["spire", "vault", "annex"] and not room.built:
+			context.add_child(UI.label("Expansion reserved. Tower and vault projects are not available in this campaign yet. Manage the eight Temple wings in Build.", 14, UI.MUTED))
 	match page:
 		"Command": _command()
 		"Roster": _roster()
