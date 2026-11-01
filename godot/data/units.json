@@ -89,7 +89,8 @@
       "rapidFire",
       "rally"
     ],
-    "medpacs": 2
+    "medpacs": 2,
+    "clip": 4
   },
   "scout": {
     "name": "Republic Scout",
@@ -118,7 +119,8 @@
     "passives": [
       "spotter",
       "ghost"
-    ]
+    ],
+    "clip": 4
   },
   "trooper": {
     "name": "Sith Trooper",
@@ -133,7 +135,9 @@
     ],
     "range": 8,
     "armor": 0,
-    "model": "trooper"
+    "model": "trooper",
+    "clip": 4,
+    "detection": 3
   },
   "heavy": {
     "name": "Sith Heavy",
@@ -148,7 +152,9 @@
     ],
     "range": 7,
     "armor": 1,
-    "model": "sithHeavy"
+    "model": "sithHeavy",
+    "clip": 4,
+    "detection": 3
   },
   "agent": {
     "name": "Imperial Agent",
@@ -163,7 +169,9 @@
     ],
     "range": 11,
     "armor": 0,
-    "model": "agent"
+    "model": "agent",
+    "clip": 4,
+    "detection": 3
   },
   "acolyte": {
     "name": "Sith Acolyte",
@@ -179,7 +187,8 @@
     "range": 1.5,
     "focus": 2,
     "armor": 0,
-    "model": "sithHeavy"
+    "model": "sithHeavy",
+    "detection": 3
   },
   "medic": {
     "name": "Republic Medic",
@@ -208,6 +217,72 @@
       "shieldDrone",
       "hackDroid",
       "scan"
-    ]
+    ],
+    "clip": 4
+  },
+  "sentinel": {
+    "name": "Republic Sentinel",
+    "class_name": "Sentinel",
+    "side": "player",
+    "hp": 5,
+    "aim": 75,
+    "mob": 6,
+    "damage": [
+      4,
+      5
+    ],
+    "range": 1.5,
+    "focus": 4,
+    "armor": 0,
+    "model": "jedi",
+    "kit": [
+      "strike",
+      "guard",
+      "meditate",
+      "shadowStep",
+      "disarm",
+      "pull",
+      "breach"
+    ],
+    "medpacs": 2,
+    "passives": [
+      "sense",
+      "executioner"
+    ],
+    "deflect": 35,
+    "guard_deflect": 70
+  },
+  "wayseeker": {
+    "name": "Republic Wayseeker",
+    "class_name": "Wayseeker",
+    "side": "player",
+    "hp": 5,
+    "aim": 75,
+    "mob": 6,
+    "damage": [
+      3,
+      5
+    ],
+    "range": 1.5,
+    "focus": 5,
+    "armor": 0,
+    "model": "jedi",
+    "kit": [
+      "strike",
+      "guard",
+      "meditate",
+      "beastCalm",
+      "pull",
+      "push",
+      "breach",
+      "tremor"
+    ],
+    "medpacs": 2,
+    "passives": [
+      "pathfinder",
+      "wildBond"
+    ],
+    "deflect": 35,
+    "guard_deflect": 70
   }
 }

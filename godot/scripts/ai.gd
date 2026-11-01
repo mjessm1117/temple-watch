@@ -22,6 +22,7 @@ static func choose_target(m: RefCounted, e: Dictionary, fired: Dictionary = {}) 
 		var info: Dictionary = Shot.calculate(m, e, p, melee)
 		if not bool(info.range_ok): continue
 		var score := float(info.hit)
+		if bool(p.get("taunt", false)) and Shot.distance(Shot.pos(e), Shot.pos(p)) <= 8.0: score += 60.0
 		if int(p.hp) <= int(e.damage[1]): score += 18.0
 		if bool(info.flanked): score += 12.0
 		if melee and str(p.class_name) in ["Guardian", "Consular"]: score += 30.0
@@ -92,7 +93,11 @@ static func scamper(m: RefCounted, e: Dictionary) -> void:
 		if score > best_score: best_score = score; best = q
 	if best != old:
 		e.x = best.x; e.y = best.y
-		if m.phase == "enemy": m.action_events.append({"kind": "move", "actor": int(e.id), "from": old, "to": best})
+		m.action_events.append({"kind": "activation", "actor": int(e.id), "at": old})
+		var route: Array[Vector2i] = []
+		var cursor := best
+		while cursor != old and reach.prev.has(cursor): route.push_front(cursor); cursor = reach.prev[cursor]
+		m.action_events.append({"kind": "move", "actor": int(e.id), "from": old, "to": best, "path": route})
 		m.message("%s scrambles for cover." % e.name)
 		m._reaction_fire(e)
 
@@ -106,13 +111,17 @@ static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> void:
 		e.tricked = false
 		for foe in m.living("enemy"):
 			if int(foe.id) != int(e.id) and Shot.distance(Shot.pos(e), Shot.pos(foe)) <= float(e.range):
-				m.apply_damage(foe, int(e.damage[0]), e)
+				var trick_shot := Shot.calculate(m, e, foe, is_melee(e))
+				m._apply_attack(e, foe, trick_shot, "strike" if is_melee(e) else "shoot")
 				m.message("%s attacks an ally under Mind Trick." % e.name)
 				return
 		return
 	if bool(e.get("skip_turn", false)):
 		e.skip_turn = false
 		return
+	if not is_melee(e) and int(e.get("ammo", 1)) == 0:
+		e.ammo = int(e.get("clip", 4)); e.ap = maxi(0, int(e.ap) - 1)
+		m.action_events.append({"kind":"reload", "actor":int(e.id)})
 	var retreat := int(e.hp) * 3 <= int(e.max_hp)
 	if retreat:
 		var safe := choose_destination(m, e, int(e.mob), true)

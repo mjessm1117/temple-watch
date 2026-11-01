@@ -4,6 +4,7 @@ const Shot = preload("res://scripts/shot.gd")
 const InputControls = preload("res://scripts/input_controls.gd")
 const Ability = preload("res://scripts/abilities_engine.gd")
 var g
+var targeting = preload("res://scripts/combat_targeting.gd").new()
 
 func _border(parent: Node3D, p: Vector2i, color: Color, height: float = 0.12) -> void:
 	var at := Vector3(p.x, Shot.elevation(g.mission, p) * 0.7 + height, p.y)
@@ -13,6 +14,8 @@ func _border(parent: Node3D, p: Vector2i, color: Color, height: float = 0.12) ->
 
 func _refresh_highlights(force: bool = false) -> void:
 	g._clear(g.hover_highlights)
+	targeting.g = g
+	if force: targeting.detection()
 	if force: g._clear(g.range_highlights)
 	if g.path_label != null: g.path_label.text = ""
 	var u: Dictionary = g.mission.unit_by_id(g.selected_id)
@@ -105,11 +108,11 @@ func _build_ui() -> void:
 		var id: int = int(u.id)
 		left_box.add_child(_button(str(u.name), func() -> void: g._select(id)))
 	g.portrait_viewport = SubViewport.new(); g.portrait_viewport.size = Vector2i(132, 100); g.portrait_viewport.transparent_bg = true; g.portrait_viewport.own_world_3d = true; g.portrait_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS; g.add_child(g.portrait_viewport)
-	var portrait_camera := Camera3D.new(); portrait_camera.position = Vector3(0, 1.7, 3.0); portrait_camera.fov = 30; g.portrait_viewport.add_child(portrait_camera); portrait_camera.look_at(Vector3(0, 1.0, 0)); portrait_camera.current = true
+	var portrait_camera := Camera3D.new(); portrait_camera.position = Vector3(0.12, 1.6, 1.15); portrait_camera.fov = 30; g.portrait_viewport.add_child(portrait_camera); portrait_camera.look_at(Vector3(0, 1.45, 0)); portrait_camera.current = true
 	var portrait_light := DirectionalLight3D.new(); portrait_light.rotation_degrees = Vector3(-30, -35, 0); portrait_light.light_energy = 2.0; g.portrait_viewport.add_child(portrait_light)
-	var portrait := TextureRect.new(); portrait.texture = g.portrait_viewport.get_texture(); portrait.custom_minimum_size = Vector2(140, 85); portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; left_box.add_child(portrait)
-	g.selected_label = _label("", 16); left_box.add_child(g.selected_label)
-	var right := PanelContainer.new(); right.anchor_left = 1.0; right.anchor_right = 1.0; right.offset_left = -265; right.offset_right = -10; right.offset_top = 75; right.offset_bottom = 475; root.add_child(right); _style_panel(right)
+	var portrait := TextureRect.new(); portrait.texture = g.portrait_viewport.get_texture(); portrait.custom_minimum_size = Vector2(140, 50); portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; left_box.add_child(portrait)
+	g.selected_label = _label("", 14); left_box.add_child(g.selected_label)
+	var right := PanelContainer.new(); right.anchor_left = 1.0; right.anchor_right = 1.0; right.offset_left = -265; right.offset_right = -10; right.offset_top = 75; right.offset_bottom = 530; root.add_child(right); _style_panel(right)
 	var right_box := VBoxContainer.new(); right.add_child(right_box)
 	right_box.add_child(_label("TARGETING", 17))
 	g.hit_big_label = _label("--%", 31); g.hit_big_label.add_theme_color_override("font_color", Color("e9ca83")); right_box.add_child(g.hit_big_label)
@@ -122,7 +125,9 @@ func _build_ui() -> void:
 	g.path_label = _label("", 15); g.path_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; info_row.add_child(g.path_label)
 	info_row.add_child(_label("LMB PREVIEW/CONFIRM  •  RMB CANCEL/PAN  •  TAB CYCLE  •  Q/E ROTATE  •  WASD PAN  •  SPACE SKIP", 12))
 	g.warning_label = _label("", 15); g.warning_label.add_theme_color_override("font_color", Color("ffd37a")); bottom_box.add_child(g.warning_label)
-	var row := HFlowContainer.new(); bottom_box.add_child(row)
+	var scroll := ScrollContainer.new(); scroll.custom_minimum_size.y = 98
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; bottom_box.add_child(scroll)
+	var row := HFlowContainer.new(); row.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(row)
 	var keys := {"move": "1", "shoot": "2", "strike": "3", "push": "4", "free": "5", "overwatch": "6", "hunker": "7"}
 	var icons := {"move": "➜", "shoot": "◎", "strike": "✦", "push": "◈", "free": "◇", "overwatch": "◉", "hunker": "⬟"}
 	for mode in keys:
@@ -132,14 +137,15 @@ func _build_ui() -> void:
 		if mode in keys or mode == "move": continue
 		var b := _button(str(g.mission.abilities[mode].name), func() -> void: g._choose_action(mode))
 		row.add_child(b); g.action_buttons[mode] = b
-	var spacer := Control.new(); spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(spacer)
+	var command_row := HBoxContainer.new(); bottom_box.add_child(command_row)
+	var spacer := Control.new(); spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL; command_row.add_child(spacer)
 	var cine_button := _button("ACTION CAM\nON", func() -> void: g.action_camera = not g.action_camera; _refresh())
-	cine_button.name = "CineButton"; row.add_child(cine_button)
+	cine_button.name = "CineButton"; command_row.add_child(cine_button)
 	var mute_button := _button("SOUND", func() -> void: g.sound.muted = not g.sound.muted)
-	row.add_child(mute_button)
-	g.audio_slider = HSlider.new(); g.audio_slider.custom_minimum_size = Vector2(75, 0); g.audio_slider.max_value = 100; g.audio_slider.value = 55; g.audio_slider.value_changed.connect(func(value: float) -> void: g.sound.volume = value / 100.0); row.add_child(g.audio_slider)
-	row.add_child(_button("END TURN\nENTER", g._request_end_turn))
-	row.add_child(_button("RESTART\nR", func() -> void: g.get_tree().reload_current_scene()))
+	command_row.add_child(mute_button)
+	g.audio_slider = HSlider.new(); g.audio_slider.custom_minimum_size = Vector2(75, 0); g.audio_slider.max_value = 100; g.audio_slider.value = 55; g.audio_slider.value_changed.connect(func(value: float) -> void: g.sound.volume = value / 100.0); command_row.add_child(g.audio_slider)
+	command_row.add_child(_button("END TURN\nENTER", g._request_end_turn))
+	command_row.add_child(_button("RESTART\nR", func() -> void: g.get_tree().reload_current_scene()))
 	g.phase_banner = _label("ENEMY ACTIVITY", 31); g.phase_banner.visible = false; g.phase_banner.anchor_left = 0.5; g.phase_banner.anchor_top = 0.18; g.phase_banner.position = Vector2(-150, 0); root.add_child(g.phase_banner)
 	g.result_panel = PanelContainer.new(); g.result_panel.visible = false; g.result_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER); g.result_panel.offset_left = -220; g.result_panel.offset_right = 220; g.result_panel.offset_top = -100; g.result_panel.offset_bottom = 100; root.add_child(g.result_panel)
 	var result_box := VBoxContainer.new(); g.result_panel.add_child(result_box)
@@ -157,6 +163,9 @@ func _refresh() -> void:
 			u = survivors[0]
 	g.objective_label.text = "TURN %d/%d  •  %s  •  %s" % [g.mission.turn, int(g.mission.spec.turn_limit), "ESCORT MIRA" if bool(g.mission.prisoner.freed) else "FREE MIRA", "EVAC" if bool(g.mission.prisoner.freed) else "CELL"]
 	g.selected_label.text = "%s\n%s%s\nHP %s\nAP %s\nFOCUS %d  •  MEDPACS %d%s" % [u.get("name", ""), u.get("class_name", ""), "  WOUNDED" if bool(u.get("wounded", false)) else "", "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, 3 - int(u.get("ap", 0)))), int(u.get("focus_left", 0)), int(u.get("medpacs", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
+	if u.has("ammo"): g.selected_label.text += "\nAMMO %d/%d" % [int(u.ammo), int(u.clip)]
+	if bool(u.get("concealed", false)): g.selected_label.text += "\nCONCEALED"
+	if g.mission.get("momentum") != null: g.selected_label.text += "\nMOMENTUM %d/10" % int(g.mission.momentum)
 	var kind := str(u.get("model", ""))
 	if kind != g.portrait_kind and g.model_cache.has(kind):
 		if g.portrait_model != null: g.portrait_model.queue_free()
@@ -164,7 +173,7 @@ func _refresh() -> void:
 		g.portrait_model.rotation.y = PI
 		g.portrait_viewport.add_child(g.portrait_model)
 		g.portrait_kind = kind
-	g.log_label.text = "\n".join(g.mission.log_lines.slice(max(0, g.mission.log_lines.size() - 8)))
+	g.log_label.text = "\n".join(g.mission.log_lines.slice(max(0, g.mission.log_lines.size() - 4)))
 	var extras: Array = []
 	var shared: Array = ["revive"] if str(u.get("class_name", "")) == "Medic" else ["medpac", "revive"]
 	for id in shared + u.get("kit", []):
@@ -178,8 +187,8 @@ func _refresh() -> void:
 		var reason: String = "" if mode == "move" else g.mission.ability_reason(g.selected_id, mode)
 		if mode == "move" and int(u.get("ap", 0)) <= 0: reason = "Need AP"
 		button.disabled = reason != ""
-		var key := str(["move", "shoot", "strike", "push", "free", "overwatch", "hunker"].find(mode) + 1) if core else "F%d" % (extras.find(mode) + 1)
-		var ap := "all" if str(def.get("ap")) == "remaining" else str(def.get("ap", 1))
+		var key := str(["move", "shoot", "strike", "push", "free", "overwatch", "hunker"].find(mode) + 1) if core else ("F%d" % (extras.find(mode) + 1) if extras.find(mode) < 12 else "")
+		var ap := "all" if str(def.get("ap")) == "remaining" else str(int(def.get("ap", 1)))
 		var charges := str(def.get("charges", ""))
 		var detail := " • %d left" % int(u.get(charges, 0)) if charges != "" else ""
 		var cd: Dictionary = u.get("cooldowns", {})
@@ -198,6 +207,8 @@ func _refresh() -> void:
 
 
 func _show_shot() -> void:
+	targeting.g = g
+	targeting.clear_trace()
 	var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
 	if g.action not in ["shoot", "strike", "push", "move"]:
 		var def: Dictionary = g.mission.abilities.get(g.action, {})
@@ -206,7 +217,7 @@ func _show_shot() -> void:
 		var lines: Array[String] = []
 		if not target.is_empty(): lines.append("Target: %s • HP %d/%d" % [target.name, int(target.hp), int(target.max_hp)])
 		elif g.preview_tile.x >= 0: lines.append("Tile: %d, %d" % [g.preview_tile.x, g.preview_tile.y])
-		lines.append("Range %s • %s AP • %d Focus" % [str(def.get("range", "self")), str(def.get("ap", 1)), int(def.get("focus", 0))])
+		lines.append("Range %s • %s AP • %d Focus" % [str(def.get("range", "self")), ("remaining" if str(def.get("ap")) == "remaining" else str(int(def.get("ap", 1)))), int(def.get("focus", 0))])
 		if def.has("heal"): lines.append("Heal %d HP (capped at max)" % int(def.heal))
 		if def.has("revive"): lines.append("Revive at %d HP" % int(def.revive))
 		if def.has("damage"): lines.append("Damage %s" % str(def.damage))
@@ -217,7 +228,7 @@ func _show_shot() -> void:
 		return
 	var target: Dictionary = {}
 	for u in g.mission.living("enemy"):
-		if (int(u.id) == g.target_id or (g.target_id < 0 and Shot.pos(u) == g.hovered)) and bool(u.awake): target = u; break
+		if (int(u.id) == g.target_id or (g.target_id < 0 and Shot.pos(u) == g.hovered)) and (bool(u.awake) or bool(u.get("spotted", false))): target = u; break
 	if actor.is_empty() or target.is_empty():
 		g.hit_big_label.text = "--%"
 		g.shot_label.text = "Choose Shoot, Strike or Push.\nTab cycles valid targets.\nEnter confirms; Esc cancels."
@@ -233,10 +244,8 @@ func _show_shot() -> void:
 	g.hit_big_label.text = "%d%% HIT" % int(info.hit)
 	var breakdown := ""
 	for item in info.lines: breakdown += "%s  %+d\n" % [item[0], int(item[1])]
-	var armor := int(target.get("armor", 0))
-	var low := maxi(1, int(actor.damage[0]) - armor)
-	var high := maxi(1, int(actor.damage[1]) - armor)
-	var crit_high := maxi(1, int(actor.damage[1]) + 2 - armor)
-	var lethal := "  •  LETHAL" if high >= int(target.hp) or (int(info.crit) > 0 and crit_high >= int(target.hp)) else ""
-	g.shot_label.text = "%s  HP %d%s\nCRIT %d%%  •  GRAZE %d%%\nDMG %d–%d  •  CRIT ≤%d%s\nCOVER %s\n%s\n%s\n%s" % [target.name, int(target.hp), "  •  FLANKED" if bool(info.flanked) else "", int(info.crit), int(info.graze), low, high, crit_high, lethal, "⬟ FULL" if int(info.cover) == 40 else "◐ HALF" if int(info.cover) == 20 else "○ NONE", breakdown, "LOS CLEAR" if bool(info.los) else "LOS BLOCKED", "IN RANGE" if bool(info.range_ok) else "OUT OF RANGE"]
-
+	var damage := Shot.damage_preview(actor, target)
+	g.hit_big_label.text = "%d%% HIT" % int(info.hit) if bool(info.los) and bool(info.range_ok) else "BLOCKED" if not bool(info.los) else "OUT OF RANGE"
+	g.shot_label.text = "%s  HP %d%s\nCRIT %d%%  ·  GRAZE %d%%\nDMG %d–%d  ·  ARMOR %d\nCRIT %d–%d  ·  GRAZE %d–%d\nSHRED %d on hit\n%s\n%s" % [target.name, int(target.hp), "  ·  FLANKED" if bool(info.flanked) else "", int(info.crit), int(info.graze), damage.normal[0], damage.normal[1], damage.armor, damage.critical[0], damage.critical[1], damage.graze[0], damage.graze[1], damage.shred, breakdown, "LOS CLEAR" if bool(info.los) else "LOS BLOCKED — red trace"]
+	if actor.has("ammo"): g.shot_label.text += "\nAMMO %d/%d · 2 AP" % [int(actor.ammo), int(actor.clip)]
+	targeting.trace(actor, target)

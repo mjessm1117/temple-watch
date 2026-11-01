@@ -150,3 +150,16 @@ func fall() -> void:
 	tween.chain().tween_interval(0.45)
 	tween.chain().tween_property(self, "scale", Vector3.ZERO, 0.22)
 	tween.chain().tween_callback(queue_free)
+
+var status_label: Label3D
+
+func set_status(u: Dictionary) -> void:
+	if status_label == null:
+		status_label = Label3D.new(); status_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		status_label.position.y = 2.0; status_label.font_size = 18; status_label.pixel_size = 0.0012; status_label.fixed_size = true
+		status_label.outline_size = 4; add_child(status_label)
+	var badges: Array[String] = []
+	for pair in [["concealed", "HIDDEN"], ["overwatch", "WATCH"], ["hunkered", "HUNKER"], ["stunned", "STUN"], ["disarmed", "DISARM"], ["rooted", "BOUND"], ["suppressed", "PINNED"], ["marked", "MARKED"], ["tricked", "TRICKED"]]:
+		if bool(u.get(pair[0], false)): badges.append(pair[1])
+	status_label.text = "%s\n%s%s  %s" % [str(u.name), "●".repeat(clampi(int(u.hp), 0, 10)) + (" %d/%d" % [int(u.hp), int(u.max_hp)] if int(u.max_hp) > 10 else ""), "  ⬟%d" % int(u.get("armor", 0)) if int(u.get("armor", 0)) > 0 else "", " · ".join(badges)]
+	status_label.modulate = Color("ffb09e") if str(u.side) == "enemy" else Color("b8edff")

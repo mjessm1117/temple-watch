@@ -1,6 +1,8 @@
 extends RefCounted
 class_name AbilityEngine
 
+const Combat = preload("res://scripts/combat_abilities.gd")
+const Bonds = preload("res://scripts/combat_bonds.gd")
 const Shot = preload("res://scripts/shot.gd")
 
 static func cost(def: Dictionary, u: Dictionary) -> int:
@@ -15,6 +17,8 @@ static func reason(m: RefCounted, u: Dictionary, id: String) -> String:
 	if m.result != "" or m.phase != "player": return "Mission inactive"
 	if id != "medpac" and id != "revive" and id != "free" and id != "move" and id not in u.get("kit", []): return "Not in kit"
 	var def: Dictionary = m.abilities[id]
+	var combat_reason := Combat.reason(m, u, id, def)
+	if combat_reason != "": return combat_reason
 	if int(u.get("ap", 0)) < cost(def, u) or (str(def.get("ap")) == "remaining" and int(u.get("ap", 0)) == 0): return "Need %d AP" % maxi(1, cost(def, u))
 	if int(u.get("focus_left", 0)) < int(def.get("focus", 0)): return "Need %d Focus" % int(def.focus)
 	var charge := str(def.get("charges", ""))
@@ -29,7 +33,7 @@ static func reason(m: RefCounted, u: Dictionary, id: String) -> String:
 		for ally in m.living("player"):
 			if Shot.distance(Shot.pos(u), Shot.pos(ally)) <= range_of(def, u) and (bool(ally.get("stunned", false)) or bool(ally.get("disarmed", false))): need = true
 		if not need: return "No ally needs Rally"
-	if str(def.get("target", "")) in ["ally_injured", "ally_down", "enemy", "enemy_droid", "enemy_subdue"] and targets(m, u, id).is_empty(): return "No valid target"
+	if str(def.get("target", "")) in ["ally_injured", "ally_down", "ally_bond", "ally_other", "enemy", "enemy_droid", "enemy_creature", "enemy_subdue"] and targets(m, u, id).is_empty(): return "No valid target"
 	if str(def.get("target", "")) in ["tile_console", "tile_scan", "tile_wall"] and tiles(m, u, id).is_empty(): return "No target tile"
 	return ""
 
@@ -45,11 +49,20 @@ static func targets(m: RefCounted, u: Dictionary, id: String) -> Array[Dictionar
 			if Shot.distance(Shot.pos(u), Shot.pos(t)) > radius: continue
 			if kind == "ally_down" and str(t.get("status", "ok")) != "down": continue
 			if kind == "ally_injured" and str(t.get("status", "ok")) != "down" and int(t.hp) >= int(t.max_hp): continue
-			if kind == "ally" and str(t.get("status", "ok")) == "down": continue
+			if kind in ["ally", "ally_other", "ally_bond"] and int(t.hp) <= 0: continue
+			if kind in ["ally_other", "ally_bond"] and (int(t.id) == int(u.id) or int(t.ap) >= 3): continue
+			if kind == "ally_bond":
+				if t not in Bonds.partners(m, u): continue
+				if bool(m.bond_pairs[u.bondmates[int(t.id)]].get("aid_used", false)): continue
+			if id == "stabilize" and bool(t.get("stable", false)): continue
 			out.append(t)
 	elif kind.begins_with("enemy"):
 		for t in m.living("enemy"):
-			if not bool(t.get("awake", false)) or Shot.distance(Shot.pos(u), Shot.pos(t)) > radius: continue
+			if not bool(t.get("awake", false)) and not bool(t.get("spotted", false)): continue
+			if Shot.distance(Shot.pos(u), Shot.pos(t)) > radius: continue
+			if kind == "enemy_creature" and not bool(t.get("horror", false)) and not "creature" in t.get("tags", []): continue
+			if id == "backup" and Combat.best_helper(m, u, t).is_empty(): continue
+			if id == "bondStrike" and not _bond_can_shoot(m, u, t): continue
 			if kind == "enemy_droid" and not bool(t.get("droid", false)): continue
 			if id == "mindTrick" and (str(t.get("class_name", "")) == "Sith Warrior" or bool(t.get("droid", false))): continue
 			if kind == "enemy_subdue" and bool(t.get("no_capture", false)): continue
@@ -63,14 +76,16 @@ static func tiles(m: RefCounted, u: Dictionary, id: String) -> Array[Vector2i]:
 	if not m.abilities.has(id): return out
 	var def: Dictionary = m.abilities[id]
 	var kind := str(def.get("target", ""))
-	if kind not in ["tile", "tile_console", "tile_wall", "tile_scan"]: return out
+	if kind == "tile_interact": return Combat.interactables(m, u)
+	if kind not in ["tile", "tile_console", "tile_wall", "tile_scan", "tile_area"]: return out
 	for y in range(int(m.spec.height)):
 		for x in range(int(m.spec.width)):
 			var p := Vector2i(x, y)
 			if Shot.distance(Shot.pos(u), p) > range_of(def, u): continue
 			if kind == "tile_console" and m.tile(p) not in ["k", "D"]: continue
 			if kind == "tile_scan" and m.tile(p) != "q": continue
-			if kind == "tile_wall" and m.tile(p) not in ["#", "c", "h", "k"]: continue
+			if kind == "tile_wall" and not m._destructible(p): continue
+			if kind == "tile_area" and m.tile(p) == "#": continue
 			if kind == "tile" and (not m.passable(p) or m.occupied(p)): continue
 			if id == "leap" and p == Shot.pos(u): continue
 			if id not in ["leap", "hack", "collapse", "scan"] and not Shot.los(m, Shot.pos(u), p): continue
@@ -87,7 +102,10 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 		for option in targets(m, u, id):
 			if int(option.id) == target_id: t = option; break
 		if t.is_empty(): return false
-	if target_kind in ["tile", "tile_console", "tile_wall", "tile_scan"] and tile not in tiles(m, u, id): return false
+	if target_kind.begins_with("tile") and tile not in tiles(m, u, id): return false
+	if str(def.effect) == "interact": return Combat.interact(m, u, tile)
+	var was_concealed := bool(u.get("concealed", false))
+	var ghost_used := bool(u.get("ghost_used", false))
 	var spend := cost(def, u)
 	u.ap = int(u.ap) - spend
 	u.focus_left = int(u.get("focus_left", 0)) - int(def.get("focus", 0))
@@ -97,7 +115,9 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 		var cds: Dictionary = u.get("cooldowns", {})
 		cds[id] = m.turn + int(def.cooldown) + 1
 		u.cooldowns = cds
+	if int(def.get("ammo_cost", 0)) > 0 and u.has("ammo"): u.ammo = int(u.ammo) - int(def.ammo_cost)
 	var effect := str(def.get("effect", ""))
+	if effect in Combat.EFFECTS: Combat.effect(m, u, t, tile, id, def)
 	match effect:
 		"heal": _heal(m, u, t, def)
 		"attack": _attack(m, u, t, def, id)
@@ -114,7 +134,7 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 			if id == "battleMed": u.battle_med_source = int(u.id)
 			for enemy in m.living("enemy"):
 				if Shot.distance(Shot.pos(u), Shot.pos(enemy)) <= range_of(def, u): enemy.debuff_aim = int(def.get("enemy_aim", 0)); enemy.debuff_until = m.turn + 1
-		"focus": u.focus_left = mini(int(u.focus), int(u.focus_left) + int(def.get("amount", 0)))
+		"focus": u.focus_left = mini(int(u.focus), int(u.focus_left) + int(def.get("amount", 0)) + (1 if "wildBond" in u.get("passives", []) else 0))
 		"ap": u.ap = int(u.ap) + int(def.get("amount", 0))
 		"leap": u.x = tile.x; u.y = tile.y; u.leap_aim = int(def.get("next_strike_aim", 0)); m._wake_groups(); m._enemy_reaction_fire(u)
 		"area_attack":
@@ -140,6 +160,11 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 		"hunker": u.hunkered = true
 		"displace": _displace(m, u, t, def)
 		_: pass
+	if m.has_method("setup_combat") and (effect in ["attack", "area_attack", "status", "displace", "blast", "wave", "breach", "collapse", "backup", "bond_strike"]):
+		var ghost_triggered := not ghost_used and bool(u.get("ghost_used", false))
+		u.concealed = was_concealed
+		preload("res://scripts/combat_concealment.gd").break_squad(m, u)
+		if ghost_triggered: u.concealed = true
 	if int(def.get("darkness", 0)) > 0: u.darkness = int(u.get("darkness", 0)) + int(def.darkness)
 	m.message("%s uses %s." % [u.name, def.name])
 	m.ability_uses[id] = int(m.ability_uses.get(id, 0)) + 1
@@ -165,8 +190,11 @@ static func _attack(m: RefCounted, u: Dictionary, t: Dictionary, def: Dictionary
 	var damage_range: Array = def.get("damage", u.damage) if typeof(def.get("damage")) == TYPE_ARRAY else u.damage
 	for i in range(int(def.get("shots", 1))):
 		if int(t.hp) <= 0: break
-		if m.rng.randi_range(1, 100) > chance: continue
+		if m.rng.randi_range(1, 100) > chance:
+			if bool(def.get("follow_hit", false)): break
+			continue
 		var damage: int = m.rng.randi_range(int(damage_range[0]), int(damage_range[1])) + int(def.get("damage_mod", 0))
+		if int(def.get("crit_mod", 0)) > 0 and m.rng.randi_range(1, 100) <= int(info.crit) + int(def.crit_mod): damage += 2
 		m.apply_damage(t, maxi(1, damage - int(t.get("armor", 0))), u)
 	if bool(def.get("pierce", false)):
 		var direction := Shot.pos(t) - Shot.pos(u)
@@ -195,11 +223,22 @@ static func _buff(m: RefCounted, _u: Dictionary, t: Dictionary, def: Dictionary)
 	if def.has("shield"): t.shield = int(t.get("shield", 0)) + int(def.shield)
 
 static func _displace(m: RefCounted, u: Dictionary, t: Dictionary, def: Dictionary) -> void:
+	if m.rng.randi_range(1, 100) > int(def.get("chance", 100)): return
 	var step := Vector2i(signi(int(t.x) - int(u.x)), signi(int(t.y) - int(u.y)))
+	if bool(def.get("pull", false)): step = -step
 	for i in range(int(def.get("distance", 2))):
+		if bool(def.get("pull", false)) and Shot.distance(Shot.pos(u), Shot.pos(t)) <= 1.5: break
 		var q: Vector2i = Shot.pos(t) + step
 		if not m.passable(q) or m.occupied(q, int(t.id)):
 			m.apply_damage(t, int(def.get("collision_damage", 3)), u)
 			if m.in_bounds(q): m.damage_cover(q, 4)
 			break
 		t.x = q.x; t.y = q.y
+
+static func _bond_can_shoot(m: RefCounted, u: Dictionary, t: Dictionary) -> bool:
+	for p in Bonds.partners(m, u):
+		var bond: Dictionary = m.bond_pairs[u.bondmates[int(p.id)]]
+		if int(bond.lvl) < 4 or bool(bond.get("strike_used", false)) or int(p.get("ammo", 1)) <= 0: continue
+		var info := Shot.calculate(m, p, t)
+		if bool(info.los) and bool(info.range_ok): return true
+	return false

@@ -4,6 +4,7 @@ const Audio = preload("res://scripts/audio.gd")
 var view_camera: Camera3D
 var overlay: Control
 var _scorches: Array[Node3D] = []
+var float_anchors: Array[Dictionary] = []
 var _hit_stop_serial := 0
 var _time_scale_before := 1.0
 
@@ -179,7 +180,7 @@ func float_text(at: Vector3, value: String, color: Color, large := false) -> voi
 	overlay.add_child(label)
 	label.position = view_camera.unproject_position(at) - Vector2(35, 18)
 	var tween := create_tween().set_parallel(true)
-	tween.tween_property(label, "position:y", label.position.y - 75, 0.8)
+	float_anchors.append({"label":label, "at":at, "age":0.0})
 	tween.tween_property(label, "modulate:a", 0.0, 0.8).set_delay(0.2)
 	tween.chain().tween_callback(label.queue_free)
 
@@ -188,3 +189,47 @@ func heal(at: Vector3, amount: int) -> void:
 	_flash(at, color, 1.8, 0.42)
 	burst(at, color, 14)
 	float_text(at + Vector3.UP * 0.7, "+%d HP" % amount if amount > 0 else "PROTECTED", color, true)
+
+func ring(at: Vector3, color: Color, radius: float = 1.0) -> void:
+	var node := MeshInstance3D.new()
+	var mesh := TorusMesh.new(); mesh.inner_radius = 0.88; mesh.outer_radius = 1.0
+	node.mesh = mesh; node.material_override = _material(color); node.position = at
+	node.scale = Vector3.ONE * 0.12; add_child(node)
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(node, "scale", Vector3(radius, 0.15, radius), 0.5)
+	tween.tween_property(node, "transparency", 1.0, 0.5)
+	tween.chain().tween_callback(node.queue_free)
+
+func ability(id: String, from: Vector3, to: Vector3) -> void:
+	# The web's blue telekinesis / gold mind / green life / violet stasis vocabulary.
+	if id == "pull": shockwave(to, from)
+	elif id in ["push", "forceWave"]: shockwave(from, to); ring(from - Vector3.UP * 0.8, Color("9fe7ff"), 2.8)
+	elif id in ["stun", "mindTrick", "beastCalm"]:
+		ring(to + Vector3.UP * 0.5, Color("e0bd78"), 0.65); burst(to, Color("ffe7a0"), 18)
+	elif id in ["forceHeal", "massHeal", "medBeacon", "forceRevive", "heal", "medpac", "revive", "reviveStim"]:
+		for i in range(3): ring(to + Vector3.UP * (i * 0.35 - 0.7), Color("7fd99a"), 0.7 + i * 0.2)
+		_flash(to, Color("7fd99a"), 2.0, 0.5)
+	elif id in ["stasisField", "choke", "shadowStep", "root"]:
+		for i in range(4): ring(to + Vector3.UP * (i * 0.4 - 0.7), Color("b294f5"), 0.6)
+		burst(to, Color("b294f5"), 22)
+	elif id in ["barrier", "shieldDrone", "shieldWall", "guard"]:
+		var dome := _sphere(to, 0.85, Color("7fd99a")); dome.transparency = 0.65
+		var tween := create_tween(); tween.tween_property(dome, "transparency", 1.0, 0.85); tween.tween_callback(dome.queue_free)
+	elif id in ["grenade", "ionNade", "barrage", "moStrike", "tremor", "collapse"]:
+		burst(to, Color("b294f5") if id == "ionNade" else Color("ffb050"), 32)
+		ring(to - Vector3.UP * 0.8, Color("ffb050"), 1.8)
+		if id != "ionNade": cover_chunks(to); _scorch(to)
+	elif id in ["breach", "saberThrow", "flurry", "mightyBlow", "precisionStrike", "sweep"]: saber(from, to)
+	elif id in ["battleMed", "meditate", "bondAid", "bondStrike", "handoff", "moRally", "moSurge"]:
+		ring(from - Vector3.UP * 0.8, Color("79d3e2"), 2.2); ring(to - Vector3.UP * 0.8, Color("79d3e2"), 1.0)
+	elif id in ["rapidFire", "deadeye", "chainShot", "snipe", "fanFire", "coverFire", "suppress", "backup"]: bolt(from, to, false, false)
+	else: ring(to, Color("79d3e2"), 0.7)
+
+func _process(delta: float) -> void:
+	for i in range(float_anchors.size()-1,-1,-1):
+		var entry: Dictionary = float_anchors[i]
+		if not is_instance_valid(entry.label): float_anchors.remove_at(i); continue
+		if view_camera == null: continue
+		entry.age = float(entry.age) + delta
+		entry.label.visible = not view_camera.is_position_behind(entry.at)
+		entry.label.position = view_camera.unproject_position(entry.at) - Vector2(35,18 + float(entry.age)*70)
