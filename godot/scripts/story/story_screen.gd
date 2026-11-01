@@ -1,16 +1,27 @@
 extends Control
 signal completed
-## Shared visual controller for briefing, dialogue, and Codex scenes.
-
+## All story modes retain the campaign-owned engine and completion contract.
 const StoryEngine = preload("res://scripts/story/story_engine.gd")
+const UI = preload("res://scripts/campaign/ui.gd")
+const World = preload("res://scripts/ui_world.gd")
 @export_enum("briefing", "dialogue", "codex") var mode := "briefing"
 var engine: RefCounted
 var campaign_state: Dictionary = {}
 var scene_data: Dictionary = {}
 var codex_category := "planet"
 var demo_mode := true
+var outer_frame: MarginContainer
 var body: VBoxContainer
 var result_label: Label
+var narrative: Label
+var bond_meter: ProgressBar
+var bond_label: Label
+var choices_box: VBoxContainer
+var choice_buttons: Array[Button] = []
+var typed := 0.0
+var decision_recorded := false
+var completed_once := false
+var portrait_count := 0
 
 func set_campaign_state(value: Dictionary) -> void:
 	demo_mode = false
@@ -20,13 +31,17 @@ func set_campaign_state(value: Dictionary) -> void:
 
 func show_scene(value: Dictionary) -> void:
 	scene_data = value
+	decision_recorded = false
+	completed_once = false
 	if is_node_ready(): _build()
 
 func _ready() -> void:
 	var flow = get_node_or_null("/root/CampaignFlow")
 	if flow != null and flow.active and demo_mode:
-		set_campaign_state(flow.session().state)
-		show_scene(flow.screen)
+		demo_mode = false
+		campaign_state = flow.session().state
+		engine = StoryEngine.new(campaign_state)
+		scene_data = flow.screen
 		completed.connect(flow.story_finished)
 	if engine == null: engine = StoryEngine.new(campaign_state)
 	if campaign_state.is_empty(): campaign_state = engine.state
@@ -40,208 +55,265 @@ func _ready() -> void:
 	_build()
 
 func _build() -> void:
-	for child in get_children(): child.queue_free()
-	var bg := ColorRect.new()
-	bg.color = Color("101826")
+	UI.clear(self)
+	choice_buttons.clear()
+	narrative = null
+	bond_meter = null
+	portrait_count = 0
+	var bg := World.new()
+	bg.stage = "archive" if mode == "codex" else "temple"
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 	var wash := ColorRect.new()
-	wash.color = Color("18283a")
-	wash.anchor_right = 1
-	wash.offset_bottom = 120
+	wash.color = Color(0.02,0.05,0.06,0.4 if mode == "codex" else 0.78)
+	wash.mouse_filter = MOUSE_FILTER_IGNORE
+	wash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(wash)
+	var dust := preload("res://scripts/ui_atmosphere.gd").new()
+	dust.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(dust)
 	var outer := MarginContainer.new()
+	outer_frame = outer
 	outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	outer.add_theme_constant_override("margin_left", 64)
-	outer.add_theme_constant_override("margin_right", 64)
-	outer.add_theme_constant_override("margin_top", 38)
-	outer.add_theme_constant_override("margin_bottom", 34)
+	for side in ["left","right"]: outer.add_theme_constant_override("margin_"+side,36)
+	for side in ["top","bottom"]: outer.add_theme_constant_override("margin_"+side,24)
 	add_child(outer)
-	body = VBoxContainer.new()
-	body.add_theme_constant_override("separation", 22)
+	body = UI.column(16)
 	outer.add_child(body)
 	if mode == "codex": _build_codex()
 	else: _build_story()
+	UI.slide(outer)
 
-func _label(text: String, size: int, color: Color = Color("ecf0f5")) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.add_theme_font_size_override("font_size", size)
-	l.add_theme_color_override("font_color", color)
-	return l
-
-func _button(text: String, description: String = "") -> Button:
-	var button := Button.new()
-	button.text = text
-	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	button.custom_minimum_size.y = 56
-	button.add_theme_font_size_override("font_size", 18)
-	button.add_theme_color_override("font_color",Color("f3f2ec"))
-	button.add_theme_color_override("font_hover_color",Color("f6d796"))
-	button.add_theme_stylebox_override("normal",_style(Color("23364c"),Color("49647d")))
-	button.add_theme_stylebox_override("hover",_style(Color("314960"),Color("cba96b")))
-	button.add_theme_stylebox_override("pressed",_style(Color("435970"),Color("eac78c")))
-	return button
-
-func _style(fill: Color, border: Color) -> StyleBoxFlat:
-	var box := StyleBoxFlat.new()
-	box.bg_color = fill
-	box.border_color = border
-	box.set_border_width_all(1)
-	box.set_corner_radius_all(6)
-	box.content_margin_left = 22
-	box.content_margin_right = 22
-	box.content_margin_top = 11
-	box.content_margin_bottom = 11
-	return box
+func _header(title: String, detail: String) -> void:
+	var head := HBoxContainer.new()
+	body.add_child(head)
+	head.add_child(UI.icon("holocron",32))
+	var mark := UI.label(title,24,UI.ACCENT)
+	mark.size_flags_horizontal = SIZE_EXPAND_FILL
+	head.add_child(mark)
+	var date := UI.label(detail,14,UI.GOLD)
+	date.autowrap_mode = TextServer.AUTOWRAP_OFF
+	head.add_child(date)
+	body.add_child(HSeparator.new())
 
 func _build_story() -> void:
-	var head := HBoxContainer.new()
-	head.add_theme_constant_override("separation", 25)
-	body.add_child(head)
-	var mark := _label("TEMPLE WATCH",21,Color("d6ac70"))
-	mark.autowrap_mode = TextServer.AUTOWRAP_OFF
-	mark.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(mark)
-	var year := _label("%s  ·  %s BBY" % ["OLD REPUBLIC" if int(campaign_state.era)==1 else "RUUSAN" if int(campaign_state.era)==2 else "HIGH REPUBLIC",str(campaign_state.story.bby)],19,Color("9eb0c5"))
-	year.autowrap_mode = TextServer.AUTOWRAP_OFF
-	head.add_child(year)
-	var divider := HSeparator.new()
-	body.add_child(divider)
-	var columns := HBoxContainer.new()
-	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	columns.add_theme_constant_override("separation", 38)
-	body.add_child(columns)
-	var left := VBoxContainer.new()
-	left.custom_minimum_size.x = 400
-	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	left.add_theme_constant_override("separation", 27)
-	_scroll_column(columns, left)
-	left.add_child(_label("MISSION FILE  /  %s" % scene_data.get("eyebrow","TEMPLE"),20,Color("d6ac70")))
-	left.add_child(_label(scene_data.get("title","The Temple"),34))
-	if scene_data.has("who") and scene_data.who != "":
-		var name: String = scene_data.get("name",engine.table("CAST").get(scene_data.who,{}).get("n",scene_data.who))
-		left.add_child(_label(name.to_upper(),25,Color("a9d1d8")))
-	var narrative := _label(scene_data.get("text",""),21,Color("dce5ec"))
-	narrative.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	left.add_child(narrative)
+	var kind: String = scene_data.get("kind","briefing")
+	var is_talk := kind in ["talk","beat","grief"]
+	_header("TEMPLE WATCH", "%s  /  %s BBY" % ["OLD REPUBLIC" if int(campaign_state.era)==1 else "RUUSAN" if int(campaign_state.era)==2 else "HIGH REPUBLIC",str(campaign_state.story.bby)])
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation",20)
+	row.size_flags_vertical = SIZE_EXPAND_FILL
+	body.add_child(row)
+	var visual := UI.column(12)
+	visual.custom_minimum_size.x = 330
+	row.add_child(visual)
+	visual.add_child(UI.label("TEMPLE CONVERSATION" if is_talk else "HOLOLINK  /  MISSION CONTROL",13,UI.GOLD))
+	var who: String = scene_data.get("who","")
+	var speaker: String = scene_data.get("name",engine.table("CAST").get(who,{}).get("n","Jedi Council"))
+	if speaker.is_empty(): speaker = "Jedi Council"
+	if is_talk:
+		var portraits := HBoxContainer.new()
+		portraits.add_theme_constant_override("separation",8)
+		visual.add_child(portraits)
+		_portrait(portraits,speaker,1.0,Vector2(158,230))
+		_portrait(portraits,"COMMANDER",-1.0,Vector2(158,230))
+		_bond(visual,who)
+	else:
+		var holo_frame := UI.panel()
+		visual.add_child(holo_frame)
+		var holo := World.new()
+		holo.stage = "holo"
+		holo.planet_key = str(engine.mission(scene_data.get("id","")).get("where",scene_data.get("eyebrow","coruscant")))
+		holo.custom_minimum_size = Vector2(290,225)
+		holo_frame.add_child(holo)
+		visual.add_child(UI.label(str(engine.mission(scene_data.get("id","")).get("where",scene_data.get("eyebrow","TARGET PROJECTION"))).to_upper(),14,UI.ACCENT))
+		_portrait(visual,speaker,1.0,Vector2(290,180))
+	visual.add_child(UI.label("SECURE TRANSMISSION\nJEDI ARCHIVE · CHANNEL 06",12,UI.MUTED))
+	var frame := UI.panel(Color(0.04,0.075,0.085,0.96))
+	frame.size_flags_horizontal = SIZE_EXPAND_FILL
+	row.add_child(frame)
+	var content := UI.column(12)
+	content.size_flags_horizontal = SIZE_EXPAND_FILL
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	frame.add_child(scroll)
+	scroll.add_child(content)
+	content.add_child(UI.label(str(scene_data.get("eyebrow","TEMPLE")).to_upper(),13,UI.GOLD))
+	content.add_child(UI.label(scene_data.get("title","The Temple"),32,UI.ACCENT))
+	narrative = UI.label(scene_data.get("text",""),18)
+	content.add_child(narrative)
+	typed = 0
+	narrative.visible_characters = 0
+	var reveal := UI.button("Reveal transmission",_reveal)
+	reveal.custom_minimum_size.y = 30
+	reveal.add_theme_font_size_override("font_size",12)
+	content.add_child(reveal)
 	if scene_data.get("goal","") != "":
-		left.add_child(_label("OBJECTIVE",19,Color("d6ac70")))
-		left.add_child(_label(scene_data.goal,19,Color("b8c7d3")))
-	var right := VBoxContainer.new()
-	right.custom_minimum_size.x = 440
-	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	right.add_theme_constant_override("separation", 16)
-	_scroll_column(columns, right)
-	right.add_child(_label("YOUR DECISION",20,Color("d6ac70")))
-	if scene_data.get("kind","") == "briefing":
-		right.add_child(_label("Choose an approach before deployment.",24,Color("b8c7d3")))
+		content.add_child(UI.label("OBJECTIVE  /  " + str(scene_data.goal),16,UI.GOLD))
+	content.add_child(UI.label("YOUR DECISION",13,UI.MUTED))
+	choices_box = UI.column(8)
+	content.add_child(choices_box)
 	for choice in scene_data.get("choices",[]):
-		var button := _button(choice.get("label","Continue"))
-		button.pressed.connect(_choose.bind(choice.get("id","")))
-		right.add_child(button)
-		if choice.get("text","") != "": right.add_child(_label(choice.text,18,Color("a9bdcf")))
+		var card := UI.column(3)
+		choices_box.add_child(card)
+		var button := UI.button(choice.get("label","Continue"),_choose.bind(choice.get("id",""),true))
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.custom_minimum_size.y = 44
+		card.add_child(button)
+		choice_buttons.append(button)
+		var preview := _preview(choice)
+		if not preview.is_empty(): card.add_child(UI.label(preview,13,UI.MUTED))
+		if choice.get("text","") != "": card.add_child(UI.label(choice.text,14,UI.MUTED))
 	if scene_data.get("choices",[]).is_empty():
-		var next := _button("Return to Temple" if scene_data.get("kind") == "debrief" else "Continue")
-		next.pressed.connect(func(): completed.emit())
-		right.add_child(next)
-	result_label = _label("",20,Color("b9dca9"))
-	result_label.custom_minimum_size.y = 50
-	right.add_child(result_label)
+		choices_box.add_child(UI.button("Return to Temple" if kind == "debrief" else "Continue",_finish))
+	result_label = UI.label("",15,UI.ACCENT)
+	content.add_child(result_label)
 	var foot := HBoxContainer.new()
 	body.add_child(foot)
-	var hint := _label("Every choice leaves a record in the Temple archive.",19,Color("8398ad"))
-	hint.autowrap_mode = TextServer.AUTOWRAP_OFF
-	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var hint := UI.label("Every choice leaves a record in the Temple archive.",13,UI.MUTED)
+	hint.size_flags_horizontal = SIZE_EXPAND_FILL
 	foot.add_child(hint)
-	var vision := _label("THE VISION  %d / 10" % int(campaign_state.story.shadow),20,Color("d6ac70"))
+	var vision := UI.label("THE VISION  %d / 10" % int(campaign_state.story.shadow),14,UI.GOLD)
 	vision.autowrap_mode = TextServer.AUTOWRAP_OFF
 	foot.add_child(vision)
 
-func _choose(id: String) -> void:
+func _portrait(parent: Node, caption: String, facing: float, dimensions: Vector2) -> void:
+	var frame := UI.panel()
+	frame.size_flags_horizontal = SIZE_EXPAND_FILL
+	parent.add_child(frame)
+	var column := UI.column(6)
+	frame.add_child(column)
+	var portrait := World.new()
+	portrait.stage = "portrait"
+	portrait.facing = facing
+	portrait.unit_kind = "scout" if facing < 0 or caption in ["Doc Bren","Sgt. Rhal Dax","Ilsa Myr","Grak Ordo"] else "jedi"
+	portrait.custom_minimum_size = dimensions
+	column.add_child(portrait)
+	column.add_child(UI.label(caption.to_upper(),12,UI.ACCENT))
+	portrait_count += 1
+
+func _bond(parent: Node, who: String) -> void:
+	bond_label = UI.label("BOND / TRUST  %d" % int(campaign_state.saga.t.get(who,0)),14,UI.GOLD)
+	parent.add_child(bond_label)
+	bond_meter = ProgressBar.new()
+	bond_meter.min_value = -3
+	bond_meter.max_value = 3
+	bond_meter.value = float(campaign_state.saga.t.get(who,0))
+	bond_meter.show_percentage = false
+	bond_meter.custom_minimum_size.y = 8
+	var track := UI.style(UI.PANEL_ALT)
+	track.set_content_margin_all(0)
+	bond_meter.add_theme_stylebox_override("background",track)
+	var fill := UI.style(UI.ACCENT,UI.ACCENT)
+	fill.set_content_margin_all(0)
+	bond_meter.add_theme_stylebox_override("fill",fill)
+	parent.add_child(bond_meter)
+
+func _preview(choice: Dictionary) -> String:
+	var parts: Array[String] = []
+	for key in choice.get("cost",{}): parts.append("Cost: %s %s" % [_number(choice.cost[key]),str(key).capitalize()])
+	for key in choice.get("fx",{}):
+		var value = choice.fx[key]
+		if key == "trust" and value is Dictionary:
+			for person in value:
+				var name: String = engine.table("CAST").get(person,{}).get("n",person)
+				parts.append("%s trust %s%s" % [name,"+" if value[person] > 0 else "",_number(value[person])])
+		elif key == "loyalty" and value is Dictionary:
+			parts.append("%s loyalty %s" % [str(value.get("seat","Council")).capitalize(),_number(value.get("n",0))])
+		elif value is int or value is float:
+			var title: String = {"t":"Trust","mob":"Mobility","orderDark":"Order Darkness","favor":"Senate Favor"}.get(key,str(key).capitalize())
+			parts.append("%s %s%s" % [title,"+" if value > 0 else "",_number(value)])
+
+	return " · ".join(parts)
+
+func _number(value: Variant) -> String:
+	return str(int(value)) if (value is float or value is int) and float(value) == int(value) else str(value)
+
+func _process(delta: float) -> void:
+	# Autowrapped archive entries can temporarily enlarge a container during layout.
+	if is_instance_valid(outer_frame) and outer_frame.size != size:
+		outer_frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	if is_instance_valid(narrative) and narrative.visible_characters >= 0:
+		typed += delta*65
+		narrative.visible_characters = int(typed)
+		if narrative.visible_characters >= narrative.text.length(): narrative.visible_characters = -1
+
+func _reveal() -> void:
+	if is_instance_valid(narrative): narrative.visible_characters = -1
+
+func _choose(id: String, animate: bool = false) -> void:
+	if decision_recorded: return
 	var result: Dictionary = engine.apply_choice(campaign_state,id)
 	if not result.get("ok",false):
 		result_label.text = result.get("reason","Unavailable")
 		return
+	decision_recorded = true
+	_reveal()
+	for button in choice_buttons: button.disabled = true
 	result_label.text = "Decision recorded: %s" % result.choice.get("label","")
+	if is_instance_valid(bond_meter):
+		var value := float(campaign_state.saga.t.get(scene_data.get("who",""),0))
+		bond_label.text = "BOND / TRUST  %d" % int(value)
+		create_tween().tween_property(bond_meter,"value",value,0.45)
+	# Button activation lets the player see the bond settle before departure.
+	# Direct callers retain the immediate completion contract.
+	if animate and is_instance_valid(bond_meter):
+		await get_tree().create_timer(0.55).timeout
+	_finish()
+
+func _finish() -> void:
+	if completed_once: return
+	completed_once = true
 	completed.emit()
-	for node in result_label.get_parent().get_children():
-		if node is Button: node.disabled = true
 
 func _build_codex() -> void:
-	var head := HBoxContainer.new()
-	head.add_theme_constant_override("separation",25)
-	body.add_child(head)
-	var title := _label("TEMPLE ARCHIVE",48)
-	title.autowrap_mode = TextServer.AUTOWRAP_OFF
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(title)
-	var year := _label("CODEX  /  %s BBY" % str(campaign_state.story.bby),21,Color("d6ac70"))
-	year.autowrap_mode = TextServer.AUTOWRAP_OFF
-	head.add_child(year)
-	body.add_child(_label("History survives because someone remembered it.",23,Color("a9bdcf")))
-	body.add_child(HSeparator.new())
-	var columns := HBoxContainer.new()
-	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	columns.add_theme_constant_override("separation",36)
-	body.add_child(columns)
-	var rail := VBoxContainer.new()
-	rail.custom_minimum_size.x = 290
-	rail.add_theme_constant_override("separation",4)
-	var rail_scroll := ScrollContainer.new()
-	rail_scroll.custom_minimum_size.x = 310
-	rail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	columns.add_child(rail_scroll)
-	rail_scroll.add_child(rail)
+	var found := 0
+	for category in campaign_state.codex.values(): found += category.size()
+	_header("TEMPLE ARCHIVE", "%d ENTRIES FOUND  /  %s BBY" % [found,str(campaign_state.story.bby)])
+	body.add_child(UI.label("History survives because someone remembered it.",24,UI.ACCENT))
+	var tabs := HFlowContainer.new()
+	tabs.add_theme_constant_override("h_separation",6)
+	body.add_child(tabs)
 	for item in engine.table("KINDS"):
 		var category: String = item[0]
-		var button := _button(str(item[1]))
-		button.custom_minimum_size.y = 39
-		button.add_theme_font_size_override("font_size",18)
-		for style_name in ["normal","hover","pressed"]:
-			var style: StyleBoxFlat = button.get_theme_stylebox(style_name).duplicate()
-			style.content_margin_top = 4
-			style.content_margin_bottom = 4
-			button.add_theme_stylebox_override(style_name,style)
-		button.pressed.connect(_category.bind(category))
-		rail.add_child(button)
-	var entries_panel := PanelContainer.new()
-	entries_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	entries_panel.add_theme_stylebox_override("panel",_style(Color("192a3d"),Color("445c73")))
-	columns.add_child(entries_panel)
+		var all: Array = engine.codex_entries(campaign_state,category,false)
+		var met: Array = engine.codex_entries(campaign_state,category)
+		var button := UI.button("%s  %d/%d" % [item[1],met.size(),all.size()],_category.bind(category))
+		button.add_theme_font_size_override("font_size",13)
+		button.toggle_mode = true
+		button.button_pressed = category == codex_category
+		tabs.add_child(button)
+	var panel := UI.panel(Color(0.04,0.075,0.085,0.88))
+	panel.size_flags_vertical = SIZE_EXPAND_FILL
+	body.add_child(panel)
 	var scroll := ScrollContainer.new()
-	entries_panel.add_child(scroll)
-	var list := VBoxContainer.new()
-	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	list.add_theme_constant_override("separation",20)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel.add_child(scroll)
+	var list := UI.column(12)
+	list.size_flags_horizontal = SIZE_EXPAND_FILL
 	scroll.add_child(list)
-	var category_name := codex_category.capitalize()
-	list.add_child(_label(category_name.to_upper() + "  /  DISCOVERED",20,Color("d6ac70")))
-	var entries: Array = engine.codex_entries(campaign_state,codex_category)
-	if entries.is_empty(): list.add_child(_label("No entries discovered yet.",26,Color("a9bdcf")))
+	list.add_child(UI.label(codex_category.to_upper() + "  /  ARCHIVE RECORDS",14,UI.GOLD))
+	var entries: Array = engine.codex_entries(campaign_state,codex_category,false)
+	entries.sort_custom(func(a,b): return int(campaign_state.codex.get(codex_category,{}).get(a.id,false)) > int(campaign_state.codex.get(codex_category,{}).get(b.id,false)))
+	if entries.is_empty(): list.add_child(UI.label("No records in this archive yet.",18,UI.MUTED))
 	for entry in entries:
-		var card := PanelContainer.new()
-		card.add_theme_stylebox_override("panel",_style(Color("23364c"),Color("49647d")))
+		var unlocked: bool = campaign_state.codex.get(codex_category,{}).get(entry.id,false)
+		var card := UI.panel(UI.PANEL_ALT if unlocked else UI.PANEL)
+		card.set_meta("unlocked",unlocked)
 		list.add_child(card)
-		var content := VBoxContainer.new()
-		content.add_theme_constant_override("separation",10)
-		card.add_child(content)
-		content.add_child(_label(str(entry.name).replace("_"," ").capitalize(),29,Color("f2e6cd")))
-		content.add_child(_label(entry.lore,22,Color("d0dce6")))
-	body.add_child(_label("New entries appear as missions, people and places become known to your Order.",18,Color("8398ad")))
-	var back := _button("← Return to Temple")
-	back.pressed.connect(func(): completed.emit())
-	body.add_child(back)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation",18)
+		card.add_child(row)
+		row.add_child(UI.icon("holocron" if unlocked else "locked",48,UI.ACCENT if unlocked else UI.MUTED))
+		var content := UI.column(5)
+		content.size_flags_horizontal = SIZE_EXPAND_FILL
+		row.add_child(content)
+		content.add_child(UI.label(str(entry.name).replace("_"," ").capitalize() if unlocked else "Sealed holocron",23,UI.ACCENT if unlocked else UI.MUTED))
+		content.add_child(UI.label(entry.lore if unlocked else "UNDISCOVERED · Encounter this record’s subject to unlock its history.",16,UI.TEXT if unlocked else UI.MUTED))
+	body.add_child(UI.label("New records unlock as missions, people and places become known to your Order.",13,UI.MUTED))
+	body.add_child(UI.button("← Return to Temple",_finish))
 
 func _category(category: String) -> void:
 	codex_category = category
 	_build()
-
-func _scroll_column(parent: Node, column: VBoxContainer) -> void:
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_horizontal = SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	parent.add_child(scroll)
-	scroll.add_child(column)
