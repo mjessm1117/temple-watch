@@ -5,6 +5,7 @@ const Stage = preload("res://scripts/campaign/loadout_stage.gd")
 const Actor = preload("res://scripts/campaign/loadout_actor.gd")
 const Arsenal = preload("res://scripts/campaign/loadout_arsenal.gd")
 const Gear = preload("res://scripts/campaign/gear.gd")
+var capacity := 4
 var flow: Node
 var selected: Array = []
 var deploy: Button
@@ -32,10 +33,11 @@ var arsenal: VBoxContainer
 func _ready() -> void:
 	flow = get_node("/root/CampaignFlow")
 	var c = flow.session()
-	selected = c.state.pending_mission.get("squad", c.state.get("loadout_squad", c.default_squad().slice(0, 4))).duplicate()
-	selected = selected.filter(func(id): return Details.fit(c.soldier(str(id)))).slice(0, 4)
+	capacity = c.squad_capacity()
+	selected = c.state.pending_mission.get("squad", c.state.get("loadout_squad", c.default_squad().slice(0, capacity))).duplicate()
+	selected = selected.filter(func(id): return Details.fit(c.soldier(str(id)))).slice(0, capacity)
 	for id in c.default_squad():
-		if selected.size() < 4 and not selected.has(id): selected.append(id)
+		if selected.size() < capacity and not selected.has(id): selected.append(id)
 	var bg := ColorRect.new(); bg.color = S.BG; bg.set_anchors_and_offsets_preset(PRESET_FULL_RECT); add_child(bg)
 	_build_stage(); _build_header(); _build_footer()
 	card_row = HBoxContainer.new(); card_row.add_theme_constant_override("separation", 12); add_child(card_row)
@@ -57,7 +59,7 @@ func _build_header() -> void:
 	var title := S.column(3); title.size_flags_horizontal = SIZE_EXPAND_FILL; row.add_child(title)
 	title.add_child(S.label("JEDI TEMPLE  /  HANGAR 07  /  DEPLOYMENT", 12, S.CYAN))
 	title.add_child(S.label("SQUAD LOADOUT", 32))
-	title.add_child(S.label("Choose four. Equip for the mission. Bring everyone home.", 13, S.MUTED))
+	title.add_child(S.label("Choose up to %d. Equip for the mission. Bring everyone home." % capacity, 13, S.MUTED))
 	var info := S.column(5); row.add_child(info)
 	resources = S.label("", 14, S.GOLD); resources.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; info.add_child(resources)
 	var option: Dictionary = flow.session().state.get("launch_option", {})
@@ -108,8 +110,8 @@ func _refresh() -> void:
 	_draw_cards()
 	var roster: Array = selected.map(func(id): return c.soldier(str(id)))
 	stage.show_squad(roster); stage.focus_slot(focus_index)
-	counter.text = "%d / 4 READY FOR DEPLOYMENT" % selected.size()
-	deploy.disabled = selected.size() != 4 or not selected.all(func(id): return Details.fit(c.soldier(str(id))))
+	counter.text = "%d / %d READY FOR DEPLOYMENT" % [selected.size(), capacity]
+	deploy.disabled = selected.size() != capacity or not selected.all(func(id): return Details.fit(c.soldier(str(id))))
 	resources.text = "%d Cr   /   %d Intel   /   %d Kyber" % [c.state.res.credits, c.state.res.intel, c.state.res.kyber]
 	if focus_index >= selected.size(): focus_index = -1
 	if focus_index >= 0: _build_drawer()
@@ -186,7 +188,7 @@ func swap_soldier(id: String) -> bool:
 func _toggle(id: String) -> void:
 	# Preserve the existing automation/API contract, including remove then add.
 	if selected.has(id): selected.erase(id)
-	elif selected.size() < 4 and Details.fit(flow.session().soldier(id)): selected.append(id)
+	elif selected.size() < capacity and Details.fit(flow.session().soldier(id)): selected.append(id)
 	focus_index = -1; drawer.hide(); _persist_selection(); _refresh()
 
 func _persist_selection() -> void:
@@ -238,7 +240,7 @@ func _process(_delta: float) -> void:
 	if not is_instance_valid(stage_container) or focus_index >= 0: return
 	var mouse := get_local_mouse_position()
 	var index := -1
-	if stage_container.get_rect().has_point(mouse): index = clampi(int(mouse.x / (size.x / 4.0)), 0, 3)
+	if stage_container.get_rect().has_point(mouse): index = clampi(int(mouse.x / (size.x / maxf(1, selected.size()))), 0, selected.size() - 1)
 	if index != hover_index:
 		hover_index = index; stage.highlight(index)
 		if index >= 0 and audio: audio.play()
@@ -247,7 +249,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		close_inspector(); get_viewport().set_input_as_handled()
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and focus_index < 0 and stage_container.get_global_rect().has_point(event.position):
-		inspect(clampi(int(event.position.x / (size.x / 4.0)), 0, 3)); get_viewport().set_input_as_handled()
+		inspect(clampi(int(event.position.x / (size.x / maxf(1, selected.size()))), 0, selected.size() - 1)); get_viewport().set_input_as_handled()
 
 func _deploy() -> void:
-	flow.launch_squad(selected)
+	if not flow.launch_squad(selected): notice.text = "Deployment unavailable; review squad readiness and mission requirements."

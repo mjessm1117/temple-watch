@@ -3012,5 +3012,67 @@
         }
       ]
     }
+  },
+  "EDICTS": {
+    "relief": {
+      "n": "Relief mandate",
+      "desc": "+2 recovery per day; monthly stipend −30 Cr.",
+      "cost": 30
+    },
+    "scholarship": {
+      "n": "Open archives",
+      "desc": "+50% research; monthly upkeep 2 Intel.",
+      "cost": 0
+    },
+    "discretion": {
+      "n": "Quiet footsteps",
+      "desc": "Covert ambush −10%, capture −5%; monthly upkeep 25 Cr.",
+      "cost": 25
+    },
+    "reclamation": {
+      "n": "Reclamation charter",
+      "desc": "+20 Cr per victory; monthly Order Darkness +1.",
+      "cost": 0
+    }
+  },
+  "PROJECTS": {
+    "bacta": {
+      "n": "Bacta reserve",
+      "days": 8,
+      "cost": {
+        "credits": 60
+      },
+      "research": "",
+      "desc": "Permanent +1 daily wound recovery.",
+      "effect": {
+        "recovery": 1
+      }
+    },
+    "weave": {
+      "n": "Reinforced field weave",
+      "days": 12,
+      "cost": {
+        "credits": 100,
+        "kyber": 1
+      },
+      "research": "",
+      "desc": "Permanent +1 squad armor.",
+      "effect": {
+        "armor": 1
+      }
+    },
+    "focus": {
+      "n": "Attunement lens",
+      "days": 14,
+      "cost": {
+        "credits": 90,
+        "kyber": 2
+      },
+      "research": "kyberLore",
+      "desc": "Permanent +1 Jedi Focus.",
+      "effect": {
+        "focus": 1
+      }
+    }
   }
 }

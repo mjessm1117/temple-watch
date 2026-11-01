@@ -110,3 +110,29 @@ static func teams_panel(view) -> void:
 		for crisis in c.state.team_assignments:
 			if c.state.team_assignments[crisis] == team.id: fact(box,"Assignment",str(crisis))
 	box.add_child(UI.button("Manage teams at the Temple",view._temple))
+
+static func field_panel(view) -> void:
+	## Integration: galaxy.gd:_field_panel delegates here; offers use stable IDs.
+	var c = view.campaign
+	var box: VBoxContainer = view.detail
+	var ops = preload("res://scripts/campaign/strat_ops.gd")
+	box.add_child(UI.label("FIELD OPERATIONS", 22, UI.ACCENT))
+	var offers: Array = c.state.field.list.filter(func(op): return op.st == "open")
+	var selected: Dictionary = ops.offer(c, view.field_key)
+	if selected.is_empty() and not offers.is_empty(): selected = offers[0]; view.field_key = selected.id
+	for op in offers: box.add_child(UI.button("%s · %dd left" % [Data.get_table("galaxy", "FIELD_OPS")[op.k].n, op.exp], view._field.bind(str(op.id))))
+	if not selected.is_empty():
+		var definition: Dictionary = Data.get_table("galaxy", "FIELD_OPS")[selected.k]
+		fact(box, "Destination", str(selected.planet))
+		fact(box, "Deadline", "%d days to accept · %d days away" % [selected.exp, definition.days])
+		for r in c.state.roster:
+			if preload("res://scripts/campaign/strat_roster.gd").ready(r): box.add_child(UI.button(("✓ " if r.id in view.field_team else "+ ") + str(r.n), view._toggle_field.bind(str(r.id))))
+		var risk: Dictionary = c.field_risk(selected.id, view.field_team)
+		fact(box, "Forecast", "%d%% success · ambush %d%% · wound %d%% · capture on failure %d%%" % [risk.success, risk.ambush, risk.wound, risk.capture])
+		fact(box, "Why", " · ".join(risk.why))
+		fact(box, "Reward", Intel.resources(risk.rewards))
+		fact(box, "Fee", "%d Cr" % int(definition.get("fee", 0)))
+		box.add_child(UI.button("SEND TEAM", view._send_field.bind(str(selected.id)), int(risk.success) > 0))
+	for op in c.state.field.list:
+		if op.st == "team": fact(box, "Away", "%s · returns in %d days" % [Data.get_table("galaxy", "FIELD_OPS")[op.k].n, op.left])
+	for entry in c.state.field.log: box.add_child(UI.label(str(entry.get("text", entry.k)), 14))

@@ -1,5 +1,7 @@
 extends RefCounted
 const Data = preload("res://scripts/campaign/data.gd")
+const Base = preload("res://scripts/campaign/strat_base.gd")
+const Council = preload("res://scripts/campaign/strat_council.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
 
 static func ensure(campaign) -> void:
@@ -7,7 +9,7 @@ static func ensure(campaign) -> void:
 
 static func ready(campaign, wing: String) -> bool:
 	ensure(campaign)
-	return int(campaign.state.wings.get(wing, 0)) > 0 and int(campaign.state.modules.cd.get(wing, 0)) == 0
+	return Base.operational(campaign.state, wing) and int(campaign.state.modules.cd.get(wing, 0)) == 0
 
 static func use(campaign, wing: String) -> bool:
 	ensure(campaign)
@@ -44,4 +46,6 @@ static func take_next_battle_buffs(campaign) -> Dictionary:
 	ensure(campaign)
 	var buffs: Dictionary = campaign.state.modules.next.duplicate(true)
 	campaign.state.modules.next.clear()
+	var support := Council.consume_support(campaign)
+	for key in support: buffs[key] = int(buffs.get(key, 0)) + int(support[key])
 	return buffs

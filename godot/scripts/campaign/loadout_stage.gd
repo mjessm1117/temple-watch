@@ -60,7 +60,7 @@ func _layout_actors() -> void:
 	if camera == null: return
 	var viewport_size := get_viewport().get_visible_rect().size
 	var span := 2.0 * home.z * tan(deg_to_rad(camera.fov * 0.5)) * viewport_size.x / maxf(1, viewport_size.y)
-	for i in actors.size(): actors[i].position.x = (float(i) - 1.5) * span / 4.0
+	for i in actors.size(): actors[i].position.x = (float(i) - (actors.size() - 1) * 0.5) * span / maxf(1, actors.size())
 
 func focus_slot(index: int) -> void:
 	focused = index
@@ -78,6 +78,7 @@ func _make_dust() -> void:
 	for i in mm.instance_count: dust_points.append(Vector3(rng.randf_range(-10, 10), rng.randf_range(0, 5), rng.randf_range(-3, 3)))
 
 func _process(delta: float) -> void:
+	if preload("res://scripts/campaign/strat_preferences.gd").get_value("motion"): delta = 0.0
 	time += delta
 	_layout_actors()
 	var target := home
