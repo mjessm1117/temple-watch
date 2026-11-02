@@ -55,3 +55,27 @@ Screenshots: `docs/godot/shots/meshy1-{obj_terminal,cover_half_temple}-{before,a
 Reproduction: install the existing Meshy tool dependencies locally with `npm install --no-save --package-lock=false @gltf-transform/core @gltf-transform/extensions @gltf-transform/functions meshoptimizer sharp`. `gen.mjs OUT ASSET --preview-only --letter A --brief art/briefs/ASSET.json` creates a preview; `--refine-preview TASK_ID` refines a selected letter. `--submit-only` and `--resume` separate background submission/polling without duplicating paid tasks. Use one ledger writer. Never rerun paid creation for this completed batch.
 
 Local postprocess: `temple-kitbash.mjs` then `prop.mjs ... 3000 --godot` for cover; `prop.mjs ... 4000 --godot --screen-emission` for terminal. Provenance lists source task IDs and hybrid authorship. Web-game paths unchanged; all added/modified text files below 600 lines. No push.
+
+## Meshy batch 1b — v2 rejected at preview gate (2026-11-01)
+
+Jess rejected v1 as cannon-like and kept Terminal B. New brief: low stacked sandstone wall with tight rubble. Applied `/home/jess/hive/skills/meshy-art-director/SKILL.md`; inspected existing column reference and all three locally rendered clay previews, close and at ~25 units. Raw previews stay labeled in ignored `art/meshy1b/`; exact prompts and scores are committed in `art/briefs/`.
+
+| Letter | Silhouette | Style vs columns | Cleanliness | Poly fit | Preview tris | Verdict |
+|---|---:|---:|---:|---:|---:|---|
+| A | 2 | 2 | 4 | 3 | 8192 | Rejected: thin upright wall, about eight courses of small bricks; lacks the broad chunky low-cover mass. |
+| B | 3 | 3 | 3 | 4 | 8265 | Best alternate but rejected: roughly five to six courses, narrow upright wall silhouette, uneven protruding rubble; not the requested two or three large low courses. |
+| C | 1 | 2 | 2 | 2 | 7910 | Rejected: tall architectural facade with repeated arch recesses, broad cap and vertical piers; violates the explicit NOT-list. |
+
+Style scores assess untextured geometry; poly-fit scores estimate simplification potential, not budget compliance. **No silhouette scores >=4: no winner, no refine, no paid retry.** No v2 asset or LODs were produced, no model switch changed, and no new after shots were taken because nothing was integrated. The rejected v1 remains on disk and remains the existing switch target; Terminal B is untouched. This is a stopped art round, not an accepted replacement.
+
+| Letter | Stage | Task id | Before | After | Spent |
+|---|---|---|---:|---:|---:|
+| A | preview | 01a19a97-e1f2-740e-a2d4-954303ec5755 | 11035 | 11015 | 20 |
+| B | preview | 01a19a97-e98e-77e0-accb-22d5bdc7f98c | 11015 | 10995 | 20 |
+| C | preview | 01a19a97-f2f1-7358-b7a8-08a3888b3a0d | 10995 | 10975 | 20 |
+
+Independent final `/v1/balance` check: **10975**; initial **11035**; spent **60/80**. Three previews, zero refines, zero rigging. Tool supports per-brief credit and task caps; batch1b cap is 80 with at most three previews and one refine. Durable local ledger: `art/meshy1b/ledger.json`. Contact sheet: `docs/godot/shots/meshy1b-previews.png` (A–C with scores, no winner).
+
+White squares: pre-existing **temple dust particles**, also visible in `meshy1-cover_half_temple-before.png`, not Meshy integration artifacts or hover markers. `godot/data/maps/themes.json` temple `part` selects dust (140 particles, color 16767392); `map_presentation.gd:weather` creates 0.075 × 0.075 untextured billboard QuadMeshes with unshaded material. Left unchanged as requested.
+
+Validation: `./godot/test.sh` exit 0; all 15 suites passed, zero failures and no SCRIPT ERROR or ERROR. `map_art_test` passed (107716 checks across 62 maps). JavaScript syntax checks and `git diff --check` passed. All changed/added text files are below 600 lines. No web-game changes; no push.

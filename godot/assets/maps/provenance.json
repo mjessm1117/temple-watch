@@ -69,5 +69,59 @@
         }
       }
     ]
+  },
+  "meshy1b": {
+    "generator": "Meshy",
+    "model": "meshy-6",
+    "date": "2026-11-01",
+    "asset": "cover_half_temple_v2",
+    "status": "rejected_at_preview_gate",
+    "winner": null,
+    "balance_before": 11035,
+    "balance_after": 10975,
+    "credits_spent": 60,
+    "credit_cap": 80,
+    "rigging": false,
+    "refine_task": null,
+    "integration": "None; v1 switch target and Terminal B unchanged. No v2 GLB or LODs produced.",
+    "preview_tasks": {
+      "A": "01a19a97-e1f2-740e-a2d4-954303ec5755",
+      "B": "01a19a97-e98e-77e0-accb-22d5bdc7f98c",
+      "C": "01a19a97-f2f1-7358-b7a8-08a3888b3a0d"
+    },
+    "scores_order": [
+      "silhouette",
+      "style",
+      "cleanliness",
+      "poly_fit"
+    ],
+    "scores": {
+      "A": [
+        2,
+        2,
+        4,
+        3
+      ],
+      "B": [
+        3,
+        3,
+        3,
+        4
+      ],
+      "C": [
+        1,
+        2,
+        2,
+        2
+      ]
+    },
+    "verdicts": {
+      "A": "Rejected: thin upright wall, about eight courses of small bricks; lacks the broad chunky low-cover mass.",
+      "B": "Best alternate but rejected: roughly five to six courses, narrow upright wall silhouette, uneven protruding rubble; not the requested two or three large low courses.",
+      "C": "Rejected: tall architectural facade with repeated arch recesses, broad cap and vertical piers; violates the explicit NOT-list."
+    },
+    "brief": "art/briefs/cover_half_temple_v2.json",
+    "contact_sheet": "docs/godot/shots/meshy1b-previews.png",
+    "raw_previews": "art/meshy1b/ (local, gitignored)"
   }
 }

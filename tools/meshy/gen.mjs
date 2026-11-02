@@ -67,9 +67,10 @@ if(args.includes('--preview-only')||args.includes('--refine-preview')){
  if(args.includes('--resume')){
   if(!entry?.id)throw Error('No saved task to resume');
  }else{
+  const cap=spec.credit_cap??200, previewCap=spec.preview_cap??8, refineCap=spec.refine_cap??2;
   const reserved=ledger.tasks.reduce((sum,t)=>sum+t.cost,0);
-  if(Math.max(ledger.start-before,reserved)+cost>200)throw Error('200 credit cap: stopped');
-  if(ledger.tasks.filter(t=>t.mode===mode).length>=(refine?2:8))throw Error('Task count cap');
+  if(Math.max(ledger.start-before,reserved)+cost>cap)throw Error(cap+' credit cap: stopped');
+  if(ledger.tasks.filter(t=>t.mode===mode).length>=(refine?refineCap:previewCap))throw Error('Task count cap');
   if(entry)throw Error('Task already submitted; use --resume');
   const body=refine?{mode,preview_task_id:value('--refine-preview'),texture_prompt:spec.texture,enable_pbr:false}:{mode,prompt:spec.variants[letter],ai_model:'meshy-6',should_remesh:true,target_polycount:8000,topology:'triangle'};
   entry={asset,letter,mode,cost,before,status:'SUBMITTING'};ledger.tasks.push(entry);save();

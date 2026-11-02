@@ -6,7 +6,7 @@ func run() -> void:
 	root.size = Vector2i(1280,720)
 	root.content_scale_size = Vector2i(1280,720)
 	var args := OS.get_cmdline_user_args()
-	var source := ProjectSettings.globalize_path("res://../art/meshy1/" + args[0])
+	var source := ProjectSettings.globalize_path("res://../art/" + ("meshy1b/" if args[0].begins_with("cover_half_temple_v2") else "meshy1/") + args[0])
 	var doc := GLTFDocument.new(); var state := GLTFState.new()
 	assert(doc.append_from_file(source,state) == OK)
 	var model: Node3D = doc.generate_scene(state)
