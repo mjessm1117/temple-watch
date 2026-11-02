@@ -1,0 +1,405 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Graphics restart: 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Graphics restart: 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Graphics restart: 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Graphics restart: 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+aim: 12 geometry and WotC height fixture cases
+geometry: directional cover, blockers, corner peeks
+actions: AP, shot spending, win/lose
+mission: 26x26, two routes, staged groups, announced drop, cover break
+AI: cover, flank, Jedi priority, engagement throttle
+skills: 31 class abilities exercised, medpacs, revive, wound and total squad loss
+map: 3 wide routes, shortest 21 steps, 2 high-ground ramps
+rescue bot story: 20/20 wins (100%), 20 freed, 0 clock losses, 11 medical uses
+rescue bot normal: 10/20 wins (50%), 20 freed, 0 clock losses, 40 medical uses
+rescue bot hard: 4/20 wins (20%), 18 freed, 0 clock losses, 46 medical uses
+rescue bot legend: 1/20 wins (5%), 10 freed, 1 clock losses, 38 medical uses
+presentation: scene loaded, movement, shot and three enemy turns
+TEST RESULTS: 367 checks, 0 failures; Normal rescue bot 10/20 wins (50%)
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CAMPAIGN TEST RESULTS: 45 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+STORY TEST RESULTS: 225 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+LOOP TEST RESULTS: 348 checks, 0 failures; campaign bot loss
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+SITH TEST RESULTS: 499 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+STRATEGY TEST RESULTS: 119 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+COMBAT7 TEST RESULTS: 118 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+MAP relay 26x26 routes=2 cover=[5, 5, 4, 5] high=239 sight=289/76
+MAP shrine 30x26 routes=2 cover=[6, 7, 6, 5] high=277 sight=370/82
+MAP rescue 34x26 routes=2 cover=[9, 6, 5, 6] high=147 sight=462/83
+MAP envoy 26x30 routes=2 cover=[5, 5, 3, 5] high=137 sight=318/112
+MAP archive 30x30 routes=2 cover=[7, 4, 3, 5] high=161 sight=465/73
+MAP sabotage 34x30 routes=2 cover=[6, 8, 5, 8] high=175 sight=518/117
+MAP escort 26x34 routes=2 cover=[8, 4, 7, 8] high=144 sight=366/115
+MAP blockade 30x34 routes=2 cover=[8, 9, 10, 5] high=362 sight=485/113
+MAP cache 34x34 routes=2 cover=[15, 9, 10, 8] high=177 sight=652/57
+MAP hutt 26x26 routes=2 cover=[5, 5, 3, 5] high=114 sight=284/82
+MAP dock 30x26 routes=2 cover=[5, 6, 5, 5] high=135 sight=375/81
+MAP vault 34x26 routes=2 cover=[8, 1, 4, 6] high=144 sight=509/45
+MAP ilum 26x30 routes=2 cover=[5, 4, 3, 5] high=246 sight=340/91
+MAP adraasHunt 30x30 routes=2 cover=[7, 5, 4, 5] high=164 sight=432/103
+MAP taris 34x30 routes=2 cover=[9, 12, 7, 5] high=174 sight=574/55
+MAP thul 26x34 routes=2 cover=[8, 8, 7, 7] high=312 sight=379/99
+MAP depot 30x34 routes=2 cover=[11, 5, 6, 5] high=361 sight=489/117
+MAP fort 34x34 routes=2 cover=[8, 7, 9, 12] high=411 sight=606/111
+MAP r_muster 26x26 routes=2 cover=[5, 4, 3, 5] high=242 sight=286/81
+MAP r_ravine 30x26 routes=2 cover=[5, 4, 4, 5] high=278 sight=380/79
+MAP r_caves 34x26 routes=2 cover=[8, 8, 5, 8] high=314 sight=479/61
+MAP r_sixth 26x30 routes=2 cover=[6, 5, 3, 5] high=272 sight=335/93
+MAP r_seventh 30x30 routes=2 cover=[8, 7, 3, 5] high=318 sight=441/93
+MAP r_bomb 34x30 routes=2 cover=[11, 8, 6, 5] high=364 sight=552/82
+MAP r_hospital 26x34 routes=2 cover=[5, 6, 6, 6] high=318 sight=382/103
+MAP r_nexus 30x34 routes=2 cover=[10, 5, 7, 7] high=361 sight=494/108
+MAP r_snipers 34x34 routes=2 cover=[8, 8, 12, 16] high=408 sight=598/106
+MAP r_dump 26x26 routes=2 cover=[5, 6, 2, 5] high=239 sight=289/76
+MAP r_prisoners 30x26 routes=2 cover=[6, 6, 5, 5] high=278 sight=381/73
+MAP r_codes 34x26 routes=2 cover=[8, 7, 7, 7] high=314 sight=474/63
+MAP r_supply 26x30 routes=2 cover=[7, 5, 3, 5] high=274 sight=334/93
+MAP h_hetzal 30x30 routes=2 cover=[6, 6, 3, 5] high=321 sight=439/98
+MAP h_grove 34x30 routes=2 cover=[9, 5, 6, 7] high=365 sight=546/91
+MAP h_valo 26x34 routes=2 cover=[5, 4, 7, 6] high=148 sight=363/121
+MAP h_tempest 30x34 routes=2 cover=[10, 7, 10, 9] high=172 sight=472/121
+MAP h_husks 34x34 routes=2 cover=[12, 14, 12, 11] high=407 sight=607/94
+MAP h_beacon 26x26 routes=2 cover=[5, 6, 5, 5] high=111 sight=277/85
+MAP h_roots 30x26 routes=2 cover=[7, 3, 4, 5] high=276 sight=382/76
+MAP h_salvage 34x26 routes=2 cover=[5, 6, 6, 6] high=317 sight=480/64
+MAP h_scouts 26x30 routes=2 cover=[7, 5, 3, 5] high=273 sight=339/88
+MAP h_cache 30x30 routes=2 cover=[6, 6, 4, 5] high=164 sight=429/106
+MAP h_prisoners 34x30 routes=2 cover=[9, 9, 6, 9] high=174 sight=525/101
+MAP h_buoy 26x34 routes=2 cover=[7, 7, 8, 7] high=144 sight=364/113
+MAP h_outpost 30x34 routes=2 cover=[11, 7, 9, 8] high=359 sight=492/102
+MAP ilsaDrop 34x34 routes=2 cover=[13, 9, 8, 11] high=185 sight=593/120
+MAP brenClinic 26x26 routes=2 cover=[5, 4, 5, 5] high=114 sight=269/93
+MAP grakClan 30x26 routes=2 cover=[7, 3, 4, 5] high=278 sight=383/75
+MAP web_dantooine_crossroads 32x28 routes=2 cover=[6, 7, 7, 9] high=22 sight=495/33
+MAP web_shrine_terraces 30x30 routes=2 cover=[8, 6, 5, 5] high=55 sight=501/25
+MAP web_hold_the_ford 30x29 routes=2 cover=[2, 3, 6, 7] high=18 sight=501/13
+MAP web_frozen_watchpost 28x28 routes=2 cover=[5, 5, 4, 6] high=30 sight=403/34
+MAP web_detention_level_5 29x30 routes=2 cover=[16, 17, 13, 16] high=6 sight=361/91
+MAP web_smuggler_grotto 28x30 routes=2 cover=[7, 4, 16, 15] high=20 sight=366/84
+MAP web_antenna_ridge 31x34 routes=2 cover=[4, 2, 18, 7] high=46 sight=575/52
+MAP web_rooftop_chase 34x28 routes=2 cover=[17, 14, 9, 5] high=15 sight=505/52
+MAP web_listening_post_interior 33x29 routes=2 cover=[14, 11, 7, 7] high=6 sight=516/51
+MAP web_overgrown_relay 30x28 routes=2 cover=[4, 2, 6, 6] high=27 sight=476/22
+MAP web_balmorra_fuel_farm 34x28 routes=2 cover=[3, 1, 7, 6] high=30 sight=568/15
+MAP web_refinery_stacks 32x29 routes=2 cover=[4, 5, 4, 3] high=50 sight=523/50
+MAP web_canyon_run 26x31 routes=2 cover=[7, 1, 10, 3] high=30 sight=394/46
+MAP web_deepway_tunnels 28x29 routes=2 cover=[7, 10, 11, 10] high=18 sight=372/68
+MISSIONS RESULTS: 516 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TEMPLE VIEW TEST RESULTS: 154 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+LOADOUT TEST RESULTS: 75 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+GALAXY VIEWPORT: window (0, 0), root (1366, 768), map (920.0, 471.0), 3D (920, 471)
+Galaxy view: 62 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+SCREENS TEST RESULTS: 38 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+INTEGRATION TEST RESULTS: 61 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ERROR: res://data/maps/h_grove.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_grove.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_grove.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_grove.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_grove.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_grove.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_grove.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_grove.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_grove.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_roots.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_roots.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_roots.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_roots.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_roots.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_roots.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_scouts.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_scouts.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_scouts.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_scouts.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_scouts.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/h_scouts.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/web_hold_the_ford.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/web_hold_the_ford.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/web_hold_the_ford.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/web_overgrown_relay.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/web_overgrown_relay.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/web_overgrown_relay.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: res://data/maps/web_overgrown_relay.json: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_test.gd:76)
+ERROR: jungle mapped: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:24)
+ERROR: jungle mapped: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:24)
+ERROR: jungle mapped: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:24)
+ERROR: jungle mapped: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:24)
+ERROR: jungle mapped: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:24)
+ERROR: jungle mapped: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:24)
+ERROR: jungle mapped: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:24)
+ERROR: jungle mapped: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:24)
+ERROR: jungle mapped: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:24)
+ERROR: jungle missing half_cover: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:37)
+ERROR: jungle missing half_cover: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:37)
+ERROR: jungle missing half_cover: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:37)
+ERROR: jungle missing half_cover: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:37)
+ERROR: jungle missing half_cover: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:37)
+ERROR: jungle missing half_cover: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:37)
+ERROR: jungle missing half_cover: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:37)
+ERROR: jungle missing half_cover: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:37)
+ERROR: jungle missing half_cover: full cover tall
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/map_art_test.gd:14)
+       [1] validate (res://tests/map_art_test.gd:46)
+       [2] run (res://tests/map_art_meshy_test.gd:37)

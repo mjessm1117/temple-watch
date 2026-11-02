@@ -345,5 +345,195 @@
     "script_errors": 0,
     "all_suites_zero_failures": true,
     "normal_rescue_wins": "10/20"
+  },
+  "meshy5": {
+    "status": "complete_two_accepted_one_rejected",
+    "balance_before": 9625,
+    "balance_after": 9475,
+    "credits_spent": 150,
+    "credit_cap": 150,
+    "tasks": [
+      {
+        "asset": "cover_half_snow",
+        "letter": "A",
+        "mode": "preview",
+        "id": "01a19d23-8e1a-76e2-a458-ce74b0b86313",
+        "cost": 20,
+        "before": 9625,
+        "after": 9605,
+        "status": "SUCCEEDED"
+      },
+      {
+        "asset": "cover_half_snow",
+        "letter": "B",
+        "mode": "preview",
+        "id": "01a19d23-963f-75e1-9553-9fd100832a0e",
+        "cost": 20,
+        "before": 9605,
+        "after": 9585,
+        "status": "SUCCEEDED"
+      },
+      {
+        "asset": "cover_half_jungle",
+        "letter": "A",
+        "mode": "preview",
+        "id": "01a19d23-9df3-7235-a4b7-890812688add",
+        "cost": 20,
+        "before": 9585,
+        "after": 9565,
+        "status": "SUCCEEDED"
+      },
+      {
+        "asset": "cover_half_jungle",
+        "letter": "B",
+        "mode": "preview",
+        "id": "01a19d23-a636-7174-ae1a-841e692aa4c8",
+        "cost": 20,
+        "before": 9565,
+        "after": 9545,
+        "status": "SUCCEEDED"
+      },
+      {
+        "asset": "cover_full_jungle",
+        "letter": "A",
+        "mode": "preview",
+        "id": "01a19d23-adba-77b1-853a-af951fb37a78",
+        "cost": 20,
+        "before": 9545,
+        "after": 9525,
+        "status": "SUCCEEDED"
+      },
+      {
+        "asset": "cover_full_jungle",
+        "letter": "B",
+        "mode": "preview",
+        "id": "01a19d23-b628-7588-801b-0cbe96bf2166",
+        "cost": 20,
+        "before": 9525,
+        "after": 9505,
+        "status": "SUCCEEDED"
+      },
+      {
+        "asset": "cover_half_snow",
+        "letter": "C",
+        "mode": "preview",
+        "id": "01a19d2a-d573-77f5-8392-e8e8f0c09264",
+        "cost": 20,
+        "before": 9505,
+        "after": 9485,
+        "status": "SUCCEEDED"
+      },
+      {
+        "asset": "cover_half_snow",
+        "letter": "A",
+        "mode": "refine",
+        "id": "01a19d2e-920a-7575-88d1-5b6f7b6533e6",
+        "cost": 10,
+        "before": 9485,
+        "after": 9475,
+        "status": "SUCCEEDED"
+      }
+    ],
+    "scores": [
+      {
+        "asset": "cover_half_snow",
+        "letter": "A",
+        "silhouette": 4,
+        "proportion_raw": 2,
+        "proportion_after_side_trim": 4,
+        "raw_fit_height": 0.586,
+        "verdict": "accepted after four-plane side trim and local matte material repair"
+      },
+      {
+        "asset": "cover_half_snow",
+        "letter": "B",
+        "silhouette": 2,
+        "proportion_raw": 1,
+        "raw_fit_height": 0.267,
+        "verdict": "rejected: wide low crate platform"
+      },
+      {
+        "asset": "cover_half_snow",
+        "letter": "C",
+        "silhouette": 3,
+        "proportion_raw": 2,
+        "raw_fit_height": 0.576,
+        "verdict": "rejected: spread base and too low"
+      },
+      {
+        "asset": "cover_half_jungle",
+        "letter": "A",
+        "silhouette": 2,
+        "proportion_raw": 4,
+        "raw_fit_height": 0.707,
+        "verdict": "rejected: upright stump rather than fallen log or wall"
+      },
+      {
+        "asset": "cover_half_jungle",
+        "letter": "B",
+        "silhouette": 3,
+        "proportion_raw": 2,
+        "raw_fit_height": 0.562,
+        "verdict": "rejected: ground apron and blocky vertical wall; side-trim trial still looked box-like and had open boundaries"
+      },
+      {
+        "asset": "cover_full_jungle",
+        "letter": "A",
+        "silhouette": 4,
+        "proportion_raw": 4,
+        "raw_fit_height": 1.476,
+        "verdict": "accepted: trunk and buttress roots, locally fitted and textured"
+      },
+      {
+        "asset": "cover_full_jungle",
+        "letter": "B",
+        "silhouette": 3,
+        "proportion_raw": 3,
+        "raw_fit_height": 1.449,
+        "verdict": "rejected: narrow ruined pillar rather than massive trunk"
+      }
+    ],
+    "accepted_assets": [
+      {
+        "asset": "cover_half_snow",
+        "source_preview": "01a19d23-8e1a-76e2-a458-ce74b0b86313",
+        "source_refine": "01a19d2e-920a-7575-88d1-5b6f7b6533e6",
+        "local_work": "uniform four-side trim; generated pale texture replaced with matte charcoal rock, blue ice and snow material groups",
+        "path": "res://assets/maps/meshy5/cover_half_snow_v1.glb",
+        "lod0_triangles": 2998,
+        "lod1_triangles": 800
+      },
+      {
+        "asset": "cover_full_jungle",
+        "source_preview": "01a19d23-adba-77b1-853a-af951fb37a78",
+        "local_work": "uniform height fit to 1.85 with four side cuts, capped where closed; locally baked 512px deep brown bark/green moss texture; no refine",
+        "path": "res://assets/maps/meshy5/cover_full_jungle_v3.glb",
+        "lod0_triangles": 2999,
+        "lod1_triangles": 800
+      }
+    ],
+    "rejected_assets": [
+      {
+        "asset": "cover_half_jungle",
+        "reason": "A upright stump; B too low and box-like after side trim; old mapping retained"
+      }
+    ],
+    "mapping_changes": [
+      "meshy_themes.snow.half_cover",
+      "meshy_themes.jungle.full_cover"
+    ],
+    "validation": {
+      "godot_import_exit": 0,
+      "godot_test_exit": 0,
+      "all_suites_zero_failures": true,
+      "script_errors": 0,
+      "normal_rescue_wins": "10/20",
+      "map_art": {
+        "checks": 179392,
+        "maps": 62,
+        "failures": 0
+      },
+      "initial_v2_failure": "full jungle 1.446 < 1.8; corrected v3 passed"
+    }
   }
 }

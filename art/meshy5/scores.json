@@ -1,0 +1,12 @@
+{
+  "scale_rule": "Uniform fit inside 0.98 tile. Half cover target 0.7-0.9 high; full cover must be clearly taller than half.",
+  "previews": [
+    {"asset":"cover_half_snow","letter":"A","silhouette":4,"proportion_raw":2,"proportion_after_side_trim":4,"raw_fit_height":0.586,"verdict":"accepted after four-plane side trim and local matte material repair"},
+    {"asset":"cover_half_snow","letter":"B","silhouette":2,"proportion_raw":1,"raw_fit_height":0.267,"verdict":"rejected: wide low crate platform"},
+    {"asset":"cover_half_snow","letter":"C","silhouette":3,"proportion_raw":2,"raw_fit_height":0.576,"verdict":"rejected: spread base and too low"},
+    {"asset":"cover_half_jungle","letter":"A","silhouette":2,"proportion_raw":4,"raw_fit_height":0.707,"verdict":"rejected: upright stump rather than fallen log or wall"},
+    {"asset":"cover_half_jungle","letter":"B","silhouette":3,"proportion_raw":2,"raw_fit_height":0.562,"verdict":"rejected: ground apron and blocky vertical wall; side-trim trial still looked box-like and had open boundaries"},
+    {"asset":"cover_full_jungle","letter":"A","silhouette":4,"proportion_raw":4,"raw_fit_height":1.476,"verdict":"accepted: trunk and buttress roots, locally fitted and textured"},
+    {"asset":"cover_full_jungle","letter":"B","silhouette":3,"proportion_raw":3,"raw_fit_height":1.449,"verdict":"rejected: narrow ruined pillar rather than massive trunk"}
+  ]
+}

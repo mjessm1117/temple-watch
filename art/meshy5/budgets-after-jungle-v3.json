@@ -1,0 +1,16 @@
+[
+  {
+    "draws": 45,
+    "fps": 2.55772661074112,
+    "frames": 60,
+    "gpu": "llvmpipe (LLVM 21.1.8, 256 bits)",
+    "id": "h_roots",
+    "p95_ms": 1192.397,
+    "renderer": "gl_compatibility",
+    "theme": "jungle",
+    "total_draws": 101,
+    "total_primitives": 204880,
+    "tris": 192185,
+    "zoom": 39.0
+  }
+]

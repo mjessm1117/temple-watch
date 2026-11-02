@@ -1,0 +1,30 @@
+[
+  {
+    "draws": 49,
+    "fps": 2.57831314635893,
+    "frames": 60,
+    "gpu": "llvmpipe (LLVM 21.1.8, 256 bits)",
+    "id": "ilum",
+    "p95_ms": 815.992,
+    "renderer": "gl_compatibility",
+    "theme": "snow",
+    "total_draws": 105,
+    "total_primitives": 112634,
+    "tris": 100025,
+    "zoom": 39.0
+  },
+  {
+    "draws": 45,
+    "fps": 3.91971457683709,
+    "frames": 60,
+    "gpu": "llvmpipe (LLVM 21.1.8, 256 bits)",
+    "id": "h_roots",
+    "p95_ms": 1033.858,
+    "renderer": "gl_compatibility",
+    "theme": "jungle",
+    "total_draws": 101,
+    "total_primitives": 204874,
+    "tris": 192179,
+    "zoom": 39.0
+  }
+]

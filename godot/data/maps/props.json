@@ -33,7 +33,7 @@
       "half_cover": "res://assets/maps/meshy3/cover_half_caves_v1.glb"
     },
     "jungle": {
-      "full_cover": "res://assets/maps/meshy3/cover_full_jungle_v1.glb"
+      "full_cover": "res://assets/maps/meshy5/cover_full_jungle_v3.glb"
     },
     "plains": {
       "full_cover": "res://assets/maps/meshy3/cover_full_plains_v1.glb",
@@ -41,7 +41,7 @@
     },
     "snow": {
       "full_cover": "res://assets/maps/meshy4/cover_full_snow_v1.glb",
-      "half_cover": "res://assets/maps/meshy3/cover_half_snow_v1.glb"
+      "half_cover": "res://assets/maps/meshy5/cover_half_snow_v1.glb"
     },
     "city": {
       "full_cover": "res://assets/maps/meshy3/cover_full_city_v1.glb",

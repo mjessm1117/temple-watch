@@ -1,0 +1,13 @@
+{
+  "asset": "cover_half_snow",
+  "credit_cap": 150,
+  "preview_cap": 7,
+  "refine_cap": 3,
+  "brief": "Waist-high snow cover at 25-unit battle camera; compact 1.3-1.6 width:height, nearly square depth; 3000/800 triangles. References: docs/godot/shots/meshy4-ilum-before-close.png and docs/godot/shots/meshy4-stage-cover_half_snow-rejected.png.",
+  "texture": "Dark charcoal blue rock and dark weathered gunmetal visible across most vertical faces. Irregular white snow crust only on top and ledges, pale blue ice in crevices. High contrast, matte, no broad plain white face or box.",
+  "variants": {
+    "A": "Single compact waist-high snow-crusted angular rock pile for a stylized tactics game, three interlocking large dark boulders make one solid grounded mass, width only 1.35 times height, depth nearly as wide as width, irregular broken top and chunky vertical faces with snow on top. No ground plane, slab, flat box, scattered stones, thin legs or long horizontal shape.",
+    "B": "Single compact waist-high barricade of two chunky half-buried dark steel supply crates wedged between jagged rocks, one solid grounded mass. Width 1.45 times height, depth nearly as wide as width; irregular stepped snow caps but exposed vertical metal panels and rock. Stylized low-poly game cover, readable at 25 units. No ground plane, platform, long row, plain white box or thin details.",
+    "C": "Single compact waist-high jagged dark rock barricade in snow, three interlocked nearly vertical chunky rock slabs, large exposed dark stone fronts, uneven thick snow crust only on the top ridges. Width 1.15 times height, depth equal to height, one solid grounded mass, tall enough for crouching cover when fitted to a one-tile square. Stylized low-poly tactics game prop. No ground plane, no spreading snow skirt, no wide base, no long row, no box, no scattered stones."
+  }
+}

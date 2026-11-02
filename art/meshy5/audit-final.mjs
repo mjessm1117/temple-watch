@@ -1,0 +1,2 @@
+import {NodeIO} from '@gltf-transform/core';import sharp from 'sharp';
+for(const path of process.argv.slice(2)){const d=await new NodeIO().read(path);let tris=0;for(const m of d.getRoot().listMeshes())for(const p of m.listPrimitives())tris+=(p.getIndices()?.getCount()||p.getAttribute('POSITION').getCount())/3;const textures=[];for(const t of d.getRoot().listTextures()){const z=await sharp(t.getImage()).metadata();textures.push([z.width,z.height]);}console.log(JSON.stringify({path,tris,textures}));}

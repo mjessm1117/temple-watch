@@ -1,0 +1,9 @@
+{
+  "asset": "cover_half_jungle", "credit_cap": 150, "preview_cap": 6, "refine_cap": 3,
+  "brief": "Waist-high jungle cover at 25-unit battle camera; compact 1.3-1.6 width:height, nearly square depth; 3000/800 triangles. References: docs/godot/shots/meshy3b-stage-close.png and docs/godot/shots/meshyint-temple-close.png.",
+  "texture": "Deep dark brown bark and roots, rich dark forest green moss and vines, tiny muted stone patches. Saturated deep greens and browns, strong dark vertical faces, matte, no pale washed-out texture.",
+  "variants": {
+    "A": "Single compact waist-high fallen jungle tree trunk resting on a cluster of thick exposed roots, one grounded solid cover mass. Width 1.45 times height, depth nearly as wide as width, chunky broken bark and irregular mossy crest. Stylized low-poly tactics game prop readable at 25 units. No ground plane, flat platform, thin branches, long narrow log or scattered pieces.",
+    "B": "Single compact low ruined jungle stone wall made of three huge broken blocks tightly fused with thick tree roots and vines. Waist high, width 1.5 times height, depth nearly as wide as width, irregular chunky top, solid grounded mass. Stylized low-poly tactics game cover. No ground plate, tall pillar, doorway, long thin wall, scattered debris or pale stone."
+  }
+}
