@@ -1,0 +1,43 @@
+{
+  "asset": "cover_half_snow",
+  "theme": "snow",
+  "description": "cover half snow",
+  "credit_cap": 500,
+  "preview_cap": 20,
+  "refine_cap": 9,
+  "lod0": 3000,
+  "lod1": 800,
+  "height": 0.8,
+  "width": 1,
+  "texture": "pale blue-grey insulated panels, white snow along top, small orange markings. Matte rough surfaces, sparse clean details.",
+  "variants": {
+    "A": "Original stylized chunky matte science fiction tactics prop. Broad readable beveled forms, all sides finished. One low wide solid rectangular insulated polar barricade block. Compact block about as wide as tall, width 1.2 times height, deep footprint, thick flat top, continuous solid body reaching ground. No ground plate, wheels, vehicles, feet, legs, posts, arches, floating parts, logos or text. Not glossy or rounded.",
+    "B": "Original stylized chunky matte science fiction tactics prop. Broad readable beveled forms, all sides finished. A compact squat polar outpost supply block with thick insulated panels and flat snow-dusted lid. Width only 1.25 times height, deep footprint, solid continuous sides, chunky beveled edges. No ground plate, wheels, vehicles, feet, legs, posts, arches, floating parts, logos or text. Not glossy or rounded.",
+    "C": "Original stylized matte polar outpost game prop. One single compact almost cubical insulated supply box, width 1.2 times height, depth equal to height. Chunky beveled square corners, thick continuous solid walls all the way to the ground. Flat sealed lid with a light frost coating, pale blue-grey panels, tiny orange marking. Simple bold filled block, no feet, no legs, no posts, no arches, no holes, no ground plate, no wheels, no protrusions. Not a long low wall. No text or logos."
+  },
+  "scores": {
+    "A": [
+      2,
+      4,
+      4,
+      4,
+      "Rejected: W:H 2.91, too low"
+    ],
+    "B": [
+      3,
+      4,
+      5,
+      5,
+      "Rejected: W:H 2.01, too low"
+    ],
+    "C": [
+      4,
+      4,
+      3,
+      4,
+      "WINNER: remove loose shards"
+    ]
+  },
+  "winner": "C",
+  "postprocess": "Keep largest connected component: solid 4123-triangle block; remove four detached shards. Clean preview W:H:D 1.222:1:1.222."
+}

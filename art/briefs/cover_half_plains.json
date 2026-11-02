@@ -1,0 +1,34 @@
+{
+  "asset": "cover_half_plains",
+  "theme": "plains",
+  "description": "cover half plains",
+  "credit_cap": 500,
+  "preview_cap": 20,
+  "refine_cap": 9,
+  "lod0": 3000,
+  "lod1": 800,
+  "height": 0.8,
+  "width": 1,
+  "texture": "grey stone, khaki fabric sandbags, dull metal cap. Matte rough surfaces, sparse clean details.",
+  "variants": {
+    "A": "Original stylized chunky matte science fiction tactics prop. Broad readable beveled forms, all sides finished. One low wide solid rectangular frontier stone block with inset tightly packed khaki sandbags. Compact block about as wide as tall, width 1.2 times height, deep footprint, thick flat top, continuous solid body reaching ground. No ground plate, wheels, vehicles, feet, legs, posts, arches, floating parts, logos or text. Not glossy or rounded.",
+    "B": "Original stylized chunky matte science fiction tactics prop. Broad readable beveled forms, all sides finished. A compact squat frontier defensive block built from two courses of massive grey stones with a few tightly fitted khaki sandbags. Deep footprint, width only 1.25 times height, continuous filled mass, flat broad top. No ground plate, wheels, vehicles, feet, legs, posts, arches, floating parts, logos or text. Not glossy or rounded."
+  },
+  "scores": {
+    "A": [
+      4,
+      4,
+      4,
+      4,
+      "WINNER: compact masonry mass"
+    ],
+    "B": [
+      2,
+      3,
+      3,
+      4,
+      "Rejected: ground plate, wide"
+    ]
+  },
+  "winner": "A"
+}
