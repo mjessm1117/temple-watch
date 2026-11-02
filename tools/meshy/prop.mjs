@@ -17,17 +17,19 @@ await D.transform(prune(),dedup(),flatten(),join(),weld(),simplify({simplifier:M
  textureCompress({encoder:sharp,targetFormat:godot?'png':'webp',resize:[512,512],quality:80}),prune());
 if(!godot)await D.transform(quantize(),meshopt({encoder:MeshoptEncoder,level:'medium'}));
 let after=0;for(const me of D.getRoot().listMeshes())for(const p of me.listPrimitives())after+=(p.getIndices()?.getCount()||0)/3;
-if(godot && after>TRIS*1.02){
+for(const error of [0.02,0.05,0.1,0.2]){
+ if(!godot || after<=TRIS)break;
  // Attribute-aware collapse protects the screen's UV island when crossing seams.
  for(const me of D.getRoot().listMeshes())for(const p of me.listPrimitives()){
   const uv=p.getAttribute('TEXCOORD_0'),position=p.getAttribute('POSITION'),indices=p.getIndices();
   if(!uv||!indices)continue;
-  const [reduced]=MeshoptSimplifier.simplifyWithAttributes(new Uint32Array(indices.getArray()),position.getArray(),3,uv.getArray(),2,[1,1],null,Math.floor(indices.getCount()*TRIS/after/3)*3,.02,['Permissive']);
+  const [reduced]=MeshoptSimplifier.simplifyWithAttributes(new Uint32Array(indices.getArray()),position.getArray(),3,uv.getArray(),2,[1,1],null,Math.floor(indices.getCount()*TRIS/after/3)*3,error,['Permissive']);
   indices.setArray(reduced);
  }
  await D.transform(prune());
  after=0;for(const me of D.getRoot().listMeshes())for(const p of me.listPrimitives())after+=(p.getIndices()?.getCount()||p.getAttribute('POSITION').getCount())/3;
 }
+if(godot && after>TRIS)throw Error(`Cannot meet ${TRIS} triangle cap: ${after}; output not written`);
 // A cyan-only emissive mask keeps the screen readable without making the metal glow.
 if(godot && process.argv.includes('--screen-emission')){
  for(const m of D.getRoot().listMaterials()){

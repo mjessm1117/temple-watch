@@ -68,8 +68,9 @@ if(args.includes('--preview-only')||args.includes('--refine-preview')){
   if(!entry?.id)throw Error('No saved task to resume');
  }else{
   const reserved=ledger.tasks.reduce((sum,t)=>sum+t.cost,0);
-  if(Math.max(ledger.start-before,reserved)+cost>200)throw Error('200 credit cap: stopped');
-  if(ledger.tasks.filter(t=>t.mode===mode).length>=(refine?2:8))throw Error('Task count cap');
+  // Shared accounts may have unrelated work running; cap this durable batch ledger.
+  if(reserved+cost>200)throw Error('200 credit cap: stopped');
+  if(ledger.tasks.filter(t=>t.mode===mode).length>=(refine?3:8))throw Error('Task count cap');
   if(entry)throw Error('Task already submitted; use --resume');
   const body=refine?{mode,preview_task_id:value('--refine-preview'),texture_prompt:spec.texture,enable_pbr:false}:{mode,prompt:spec.variants[letter],ai_model:'meshy-6',should_remesh:true,target_polycount:8000,topology:'triangle'};
   entry={asset,letter,mode,cost,before,status:'SUBMITTING'};ledger.tasks.push(entry);save();
