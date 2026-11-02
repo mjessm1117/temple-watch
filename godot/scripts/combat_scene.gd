@@ -9,9 +9,8 @@ func _setup_scene() -> void:
 	# Native-resolution HUD/3D; imported meshes choose a cheaper distant LOD.
 	prior_mesh_lod = g.get_viewport().mesh_lod_threshold
 	g.get_viewport().mesh_lod_threshold = 4.0
-	RenderingServer.directional_shadow_atlas_set_size(2048,true)
-	RenderingServer.directional_soft_shadow_filter_set_quality(RenderingServer.SHADOW_QUALITY_SOFT_LOW)
-	RenderingServer.environment_set_ssao_quality(RenderingServer.ENV_SSAO_QUALITY_LOW,true,0.5,2,40,80)
+	g.get_node("/root/Graphics").battle = true
+	g.get_node("/root/Graphics").apply_all.call_deferred()
 	g.tree_exiting.connect(_restore_render_quality)
 	g.terrain = Node3D.new(); g.terrain.name = "Terrain"; g.add_child(g.terrain)
 	g.figures = Node3D.new(); g.figures.name = "Units"; g.add_child(g.figures)
@@ -166,8 +165,5 @@ func arrange_labels() -> void:
 func _restore_render_quality() -> void:
 	# Battle-only quality choices do not leak into the other screens.
 	g.get_viewport().mesh_lod_threshold = prior_mesh_lod
-	var shadows := "rendering/lights_and_shadows/"
-	var ao := "rendering/environment/ssao/"
-	RenderingServer.directional_shadow_atlas_set_size(int(ProjectSettings.get_setting(shadows+"directional_shadow/size")),bool(ProjectSettings.get_setting(shadows+"directional_shadow/16_bits")))
-	RenderingServer.directional_soft_shadow_filter_set_quality(int(ProjectSettings.get_setting(shadows+"directional_shadow/soft_shadow_filter_quality")))
-	RenderingServer.environment_set_ssao_quality(int(ProjectSettings.get_setting(ao+"quality")),bool(ProjectSettings.get_setting(ao+"half_size")),float(ProjectSettings.get_setting(ao+"adaptive_target")),int(ProjectSettings.get_setting(ao+"blur_passes")),float(ProjectSettings.get_setting(ao+"fadeout_from")),float(ProjectSettings.get_setting(ao+"fadeout_to")))
+	g.get_node("/root/Graphics").battle = false
+	g.get_node("/root/Graphics").apply_all.call_deferred()

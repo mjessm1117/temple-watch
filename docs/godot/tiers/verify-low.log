@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+     at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6347)
+OpenGL API 3.3.0 NVIDIA 595.99.02 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4090 Laptop GPU
+
+ART WINDOW: (1366, 768) viewport (1366.0, 768.0)
+ART WINDOW: (1366, 768) viewport (1366.0, 768.0)
+ART WINDOW: (1366, 768) viewport (1366.0, 768.0)
+ART WINDOW: (1366, 768) viewport (1366.0, 768.0)
+ART WINDOW: (1366, 768) viewport (1366.0, 768.0)
+ART WINDOW: (1366, 768) viewport (1366.0, 768.0)
+ART WINDOW: (1366, 768) viewport (1366.0, 768.0)
+ART WINDOW: (1366, 768) viewport (1366.0, 768.0)
+ART WINDOW: (1366, 768) viewport (1366.0, 768.0)
+Graphics low (gl_compatibility): 267 checks, 0 failures

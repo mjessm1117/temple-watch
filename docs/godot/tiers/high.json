@@ -1,0 +1,15 @@
+{
+	"adapter": "NVIDIA GeForce RTX 4090 Laptop GPU",
+	"dimensions": "34x34",
+	"draw_calls_max": 128,
+	"fps_at_p95_frame": 15.9154570919277,
+	"fps_avg": 25.1007953814537,
+	"fps_p95": 48.4261501210654,
+	"frame_ms_p95": 62.832,
+	"map": "cache",
+	"primitives_max": 472325,
+	"renderer": "forward_plus",
+	"resolution": "1366x768",
+	"samples": 600,
+	"tier": "high"
+}
