@@ -406,6 +406,8 @@ func _request_end_turn() -> void:
 
 func _end_turn() -> void:
 	if playing_enemy_events or player_attack_pending or mission.result != "": return
+	# --- wave10 story ---
+	if mission.get("bond_pairs") != null: preload("res://scripts/combat_bonds.gd").nearby_cohesion(mission)
 	if DisplayServer.get_name() == "headless" and not animate_headless:
 		mission.end_turn()
 		mission.action_events.clear()

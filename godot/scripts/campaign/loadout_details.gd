@@ -53,6 +53,10 @@ static func card(c, r: Dictionary, action: Callable) -> PanelContainer:
 	heading.custom_minimum_size.y = 36; col.add_child(heading)
 	col.add_child(S.label("%s  ·  %s  ·  R%d" % [nickname(r), r.cls, int(r.rank)], 12, S.GOLD))
 	col.add_child(S.label(status(c, r), 11, S.GREEN if fit(r) else S.RED))
+	# --- wave10 story ---
+	var bond_badge := S.label("BOND  " + preload("res://scripts/campaign/bond_overlay.gd").summary(c.state,str(r.id)),11,S.CYAN)
+	bond_badge.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	bond_badge.tooltip_text = bond_badge.text; col.add_child(bond_badge)
 	var stats := Gear.battle_stats(c, str(r.id))
 	for key in ["hp", "aim", "will"]:
 		var row := HBoxContainer.new(); col.add_child(row)

@@ -12,6 +12,9 @@ static func setup(m: RefCounted, state: Dictionary) -> void:
 			var bond: Dictionary = m.bond_pairs.get(key, {})
 			if int(bond.get("lvl", 0)) < 1: continue
 			u.bondmates[int(partner.id)] = key
+			# --- wave10 story ---
+			if int(bond.lvl) >= 2: u.will = int(u.get("will",0)) + 5
+			if int(bond.lvl) >= 3: u.crit = int(u.get("crit",0)) + 2
 			for skill in ["bondAid", "bondStrike"]:
 				if skill == "bondStrike" and int(bond.lvl) < 4: continue
 				if skill not in u.kit: u.kit.append(skill)
@@ -25,11 +28,25 @@ static func partners(m: RefCounted, u: Dictionary) -> Array[Dictionary]:
 
 static func assist(m: RefCounted, u: Dictionary, t: Dictionary) -> void:
 	var key: String = u.bondmates[int(t.id)]
+	# --- wave10 story ---
+	m.bond_pairs[key].cohesion = int(m.bond_pairs[key].get("cohesion",0)) + 4
 	m.bond_pairs[key].aid_used = true
 	t.ap = mini(3, int(t.ap) + 1)
 	for status in ["stunned", "disarmed", "rooted", "suppressed", "suppressed_by"]: t.erase(status)
 	if int(t.get("debuff_aim", 0)) == -30: t.erase("debuff_aim")
 	m.message("%s steadies %s: +1 AP, conditions cleared." % [u.name, t.name])
+
+# --- wave10 story ---
+static func nearby_cohesion(m: RefCounted) -> void:
+	var jedi: Array = m.living("player").filter(func(u): return u.has("rid") and str(u.get("class_name", "")) in ["Guardian","Consular","Sentinel","Wayseeker","Defender"])
+	for i in jedi.size():
+		for j in range(i+1,jedi.size()):
+			var a: Dictionary = jedi[i]; var b: Dictionary = jedi[j]
+			if Shot.distance(Shot.pos(a),Shot.pos(b)) > 2: continue
+			var ids: Array[String] = [str(a.rid),str(b.rid)]; ids.sort()
+			var key := "|".join(ids)
+			if not m.bond_pairs.has(key): m.bond_pairs[key] = {"lvl":0,"n":0,"dr":[]}
+			m.bond_pairs[key].cohesion = int(m.bond_pairs[key].get("cohesion",0)) + 1
 
 static func strike(m: RefCounted, u: Dictionary, enemy: Dictionary) -> void:
 	for ally in partners(m, u):

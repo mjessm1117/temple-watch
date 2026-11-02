@@ -107,7 +107,8 @@ func _build_story() -> void:
 	var visual := UI.column(12)
 	visual.custom_minimum_size.x = 330
 	row.add_child(visual)
-	visual.add_child(UI.label("TEMPLE CONVERSATION" if is_talk else "HOLOLINK  /  MISSION CONTROL",13,UI.GOLD))
+	# --- wave10 story ---
+	visual.add_child(UI.label("BATTLE COMMS" if kind == "beat" else "TEMPLE CONVERSATION" if is_talk else "HOLOLINK  /  MISSION CONTROL",13,UI.GOLD))
 	var who: String = scene_data.get("who","")
 	var speaker: String = scene_data.get("name",engine.table("CAST").get(who,{}).get("n","Jedi Council"))
 	if speaker.is_empty(): speaker = "Jedi Council"
@@ -115,9 +116,11 @@ func _build_story() -> void:
 		var portraits := HBoxContainer.new()
 		portraits.add_theme_constant_override("separation",8)
 		visual.add_child(portraits)
-		_portrait(portraits,speaker,1.0,Vector2(158,230))
-		_portrait(portraits,"COMMANDER",-1.0,Vector2(158,230))
-		_bond(visual,who)
+		# --- wave10 story ---
+		var pair_names: PackedStringArray = str(scene_data.get("name","")).split(" & ") if scene_data.has("pair") else PackedStringArray()
+		_portrait(portraits,str(pair_names[0]) if pair_names.size() == 2 else speaker,1.0,Vector2(158,230))
+		_portrait(portraits,str(pair_names[1]) if pair_names.size() == 2 else "COMMANDER",-1.0,Vector2(158,230))
+		if who != "" or scene_data.has("pair"): _bond(visual,who)
 	else:
 		var holo_frame := UI.panel()
 		visual.add_child(holo_frame)
@@ -187,19 +190,21 @@ func _portrait(parent: Node, caption: String, facing: float, dimensions: Vector2
 	var portrait := World.new()
 	portrait.stage = "portrait"
 	portrait.facing = facing
-	portrait.unit_kind = "scout" if facing < 0 or caption in ["Doc Bren","Sgt. Rhal Dax","Ilsa Myr","Grak Ordo"] else "jedi"
+	portrait.unit_kind = "scout" if (facing < 0 and not scene_data.has("pair")) or caption in ["Doc Bren","Sgt. Rhal Dax","Ilsa Myr","Grak Ordo"] else "jedi"
 	portrait.custom_minimum_size = dimensions
 	column.add_child(portrait)
 	column.add_child(UI.label(caption.to_upper(),12,UI.ACCENT))
 	portrait_count += 1
 
 func _bond(parent: Node, who: String) -> void:
-	bond_label = UI.label("BOND / TRUST  %d" % int(campaign_state.saga.t.get(who,0)),14,UI.GOLD)
+	# --- wave10 story ---
+	var pair: Dictionary = campaign_state.bonds.get(scene_data.get("pair",""),{})
+	bond_label = UI.label("BOND %d / 8  ·  %d cohesion" % [int(pair.get("lvl",0)),int(pair.get("n",0))] if scene_data.has("pair") else "BOND / TRUST  %d" % int(campaign_state.saga.t.get(who,0)),14,UI.GOLD)
 	parent.add_child(bond_label)
 	bond_meter = ProgressBar.new()
-	bond_meter.min_value = -3
-	bond_meter.max_value = 3
-	bond_meter.value = float(campaign_state.saga.t.get(who,0))
+	bond_meter.min_value = 0 if scene_data.has("pair") else -3
+	bond_meter.max_value = 8 if scene_data.has("pair") else 3
+	bond_meter.value = float(pair.get("lvl",0)) if scene_data.has("pair") else float(campaign_state.saga.t.get(who,0))
 	bond_meter.show_percentage = false
 	bond_meter.custom_minimum_size.y = 8
 	var track := UI.style(UI.PANEL_ALT)
@@ -215,6 +220,10 @@ func _preview(choice: Dictionary) -> String:
 	for key in choice.get("cost",{}): parts.append("Cost: %s %s" % [_number(choice.cost[key]),str(key).capitalize()])
 	for key in choice.get("fx",{}):
 		var value = choice.fx[key]
+		# --- wave10 story ---
+		if key == "flag": parts.append("Recorded in the Temple archive")
+		elif key in ["mission","personal"]: parts.append("Mission lead unlocked")
+		elif key == "unitDark": parts.append("Jedi Darkness changes")
 		if key == "trust" and value is Dictionary:
 			for person in value:
 				var name: String = engine.table("CAST").get(person,{}).get("n",person)
@@ -222,7 +231,7 @@ func _preview(choice: Dictionary) -> String:
 		elif key == "loyalty" and value is Dictionary:
 			parts.append("%s loyalty %s" % [str(value.get("seat","Council")).capitalize(),_number(value.get("n",0))])
 		elif value is int or value is float:
-			var title: String = {"t":"Trust","mob":"Mobility","orderDark":"Order Darkness","favor":"Senate Favor"}.get(key,str(key).capitalize())
+			var title: String = {"t":"Trust","mob":"Mobility","orderDark":"Order Darkness","favor":"Senate Favor","bond_points":"Bond cohesion"}.get(key,str(key).capitalize())
 			parts.append("%s %s%s" % [title,"+" if value > 0 else "",_number(value)])
 
 	return " · ".join(parts)
@@ -253,8 +262,10 @@ func _choose(id: String, animate: bool = false) -> void:
 	for button in choice_buttons: button.disabled = true
 	result_label.text = "Decision recorded: %s" % result.choice.get("label","")
 	if is_instance_valid(bond_meter):
-		var value := float(campaign_state.saga.t.get(scene_data.get("who",""),0))
-		bond_label.text = "BOND / TRUST  %d" % int(value)
+		# --- wave10 story ---
+		var pair: Dictionary = campaign_state.bonds.get(scene_data.get("pair",""),{})
+		var value := float(pair.get("lvl",0)) if scene_data.has("pair") else float(campaign_state.saga.t.get(scene_data.get("who",""),0))
+		bond_label.text = "BOND %d / 8  ·  %d cohesion" % [int(pair.get("lvl",0)),int(pair.get("n",0))] if scene_data.has("pair") else "BOND / TRUST  %d" % int(value)
 		create_tween().tween_property(bond_meter,"value",value,0.45)
 	# Button activation lets the player see the bond settle before departure.
 	# Direct callers retain the immediate completion contract.

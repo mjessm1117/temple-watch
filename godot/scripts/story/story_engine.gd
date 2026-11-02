@@ -2,7 +2,8 @@ extends RefCounted
 ## Campaign-owned story state. The caller serializes `state` as a Dictionary.
 
 const BOND_NEED := [8, 10, 12, 14, 16, 18, 20, 22]
-const SOURCES := ["data-story", "data-era2", "data-era3", "data-saga", "data-codex", "data-life", "story-era3", "ui-codex", "tutorial"]
+const SOURCES := ["data-story", "data-era2", "data-era3", "data-saga", "data-codex", "data-life", "story-era3", "ui-codex", "tutorial", "wave10-choices", "wave10-talks"]
+const ChoiceScenes = preload("res://scripts/story/story_choices.gd")
 var state: Dictionary
 var data: Dictionary = {}
 
@@ -75,7 +76,8 @@ func ensure_state(s: Dictionary) -> void:
 func start_briefing(mission_id: String) -> Dictionary:
 	var m := mission(mission_id)
 	if m.is_empty(): return {}
-	var choices: Array = [{"id":"brief:0","label":"As briefed","text":table("AP_BRIEF").get("d",""),"fx":{},"cost":{}}]
+	# --- wave10 story ---
+	var choices: Array = [{"id":"brief:0","label":"As briefed","text":table("AP_BRIEF").get("d",""),"fx":table("W10_BRIEF_DEFAULT").get("fx",{}),"cost":{}}]
 	var approaches: Dictionary = table("APPROACH")
 	var options: Array = approaches.get(mission_id, approaches.get("_", []))
 	for i in options.size():
@@ -129,7 +131,12 @@ func start_debrief(result: Dictionary) -> Dictionary:
 	var choices: Array = []
 	for i in aftermath.get("ch",[]).size():
 		var c: Dictionary = aftermath.ch[i]
-		choices.append({"id":"after:%d" % i,"label":c.get("l",""),"text":_saga_text(state,str(c.get("say","")),aftermath.get("who","")),"fx":c.get("fx",{}),"need":c.get("need",[])})
+		# --- wave10 story ---
+		var fx: Dictionary = c.get("fx",{})
+		if fx.is_empty(): fx = table("W10_CHOICE_OVERRIDES").get(after_key,{}).get(str(i),{})
+		choices.append({"id":"after:%d" % i,"label":c.get("l",""),"text":_saga_text(state,str(c.get("say","")),aftermath.get("who","")),"fx":fx,"need":c.get("need",[])})
+	# --- wave10 story ---
+	if choices.is_empty(): choices = ChoiceScenes.debrief_choices(table("W10_DEBRIEF"),won)
 	var scene := {"kind":"debrief","id":id,"title":aftermath.get("t",m.get("n",id)),"eyebrow":"Mission complete" if won else "Mission lost","text":text + ("\n\n" + _saga_text(state,str(aftermath.get("text","")),aftermath.get("who","")) if not aftermath.is_empty() else ""),"choices":choices,"who":aftermath.get("who","")}
 	state.pending = scene
 	return scene
@@ -195,7 +202,10 @@ func advance_era(s: Dictionary) -> bool:
 
 func next_temple_talk(s: Dictionary) -> Dictionary:
 	ensure_state(s)
-	if int(s.era) != 1: return {}
+	# --- wave10 story ---
+	var pair_scene: Dictionary = ChoiceScenes.pair_talk(s,table("W10_PAIR_TALKS"))
+	if not pair_scene.is_empty(): return pair_scene
+	if int(s.era) != 1: return ChoiceScenes.temple_talk(s,table("W10_TALKS"))
 	var visit_key := "%d|%d" % [int(s.step),int(s.story.done)]
 	if s.saga.get("visit","") != visit_key:
 		s.saga.visit = visit_key
@@ -204,7 +214,7 @@ func next_temple_talk(s: Dictionary) -> Dictionary:
 	for talk in table("TALKS"):
 		if s.saga.seen.has(talk.id) or not _cast_active(s,talk.who): continue
 		if _when(s,talk.get("when",{}),talk.who): ready.append(talk)
-	if ready.is_empty(): return {}
+	if ready.is_empty(): return ChoiceScenes.temple_talk(s,table("W10_TALKS"))
 	var selected: Dictionary = {}
 	if int(s.saga.get("forced_count",0)) < 2:
 		for talk in ready:
@@ -212,17 +222,23 @@ func next_temple_talk(s: Dictionary) -> Dictionary:
 	if selected.is_empty() and s.saga.get("talked","") != visit_key:
 		for talk in ready:
 			if not talk.get("force",false): selected = talk; break
-	if selected.is_empty(): return {}
+	if selected.is_empty(): return ChoiceScenes.temple_talk(s,table("W10_TALKS"))
 	var choices: Array = []
 	for i in selected.ch.size():
 		var c: Dictionary = selected.ch[i]
-		choices.append({"id":"talk:%d" % i,"label":c.get("l",""),"text":_saga_text(s,str(c.get("say","")),selected.who),"fx":c.get("fx",{}),"need":c.get("need",[])})
+		# --- wave10 story ---
+		var fx: Dictionary = c.get("fx",{})
+		if fx.is_empty(): fx = table("W10_CHOICE_OVERRIDES").get(selected.id,{}).get(str(i),{})
+		choices.append({"id":"talk:%d" % i,"label":c.get("l",""),"text":_saga_text(s,str(c.get("say","")),selected.who),"fx":fx,"need":c.get("need",[])})
 	var scene := {"kind":"talk","id":selected.id,"who":selected.who,"name":_cast_name(s,selected.who),"title":selected.t,"eyebrow":"Temple conversation","text":_saga_text(s,selected.text,selected.who),"choices":choices,"forced":selected.get("force",false)}
 	s.pending = scene
 	return scene
 
 func next_story_event(s: Dictionary) -> Dictionary:
 	ensure_state(s)
+	# --- wave10 story ---
+	var grief: Dictionary = ChoiceScenes.grief(s,table("W10_GRIEF_SCENE"))
+	if not grief.is_empty(): return grief
 	for event in table("EVENTS"):
 		if s.story.seen.has(event.id) or not _when(s,event.trigger,""): continue
 		var choices: Array = []
@@ -294,14 +310,19 @@ func era_epilogues(s: Dictionary) -> Array:
 	return lines
 
 func next_squad_beat(s: Dictionary, mission_id: String, turn: int, squad: Array) -> Dictionary:
-	if int(s.era) != 1 or turn < 2 or turn > 3 or s.get("beat_mission","") == mission_id: return {}
-	for beat in table("SQUAD_BEATS"):
-		if s.saga.seen.has("beat:"+str(beat.id)) or not squad.has(_cast_name(s,beat.who)) or not _when(s,beat.get("when",{}),beat.who): continue
-		if beat.has("foe") and not mission(mission_id).get("foes",[]).any(func(f): return f[0] == beat.foe): continue
-		var scene := {"kind":"beat","id":beat.id,"mission_id":mission_id,"who":beat.who,"name":_cast_name(s,beat.who),"title":"Comms · Turn %d" % turn,"eyebrow":mission(mission_id).get("n",mission_id),"text":beat.txt,"choices":[{"id":"beat:0","label":beat.a.label,"text":beat.a.txt,"fx":beat.a.get("saga",{}),"battle":beat.a.get("do",{})},{"id":"beat:1","label":beat.b.label,"text":beat.b.txt,"fx":beat.b.get("saga",{}),"battle":beat.b.get("do",{})}]}
-		s.pending = scene
-		return scene
-	return {}
+	if turn < 2 or turn > 3 or s.get("beat_mission","") == mission_id: return {}
+	if int(s.era) == 1:
+		for beat in table("SQUAD_BEATS"):
+			if s.saga.seen.has("beat:"+str(beat.id)) or not squad.has(_cast_name(s,beat.who)) or not _when(s,beat.get("when",{}),beat.who): continue
+			if beat.has("foe") and not mission(mission_id).get("foes",[]).any(func(f): return f[0] == beat.foe): continue
+			var scene := {"kind":"beat","id":beat.id,"mission_id":mission_id,"who":beat.who,"name":_cast_name(s,beat.who),"title":"Comms · Turn %d" % turn,"eyebrow":mission(mission_id).get("n",mission_id),"text":beat.txt,"choices":[{"id":"beat:0","label":beat.a.label,"text":beat.a.txt,"fx":beat.a.get("saga",{}),"battle":beat.a.get("do",{})},{"id":"beat:1","label":beat.b.label,"text":beat.b.txt,"fx":beat.b.get("saga",{}),"battle":beat.b.get("do",{})}]}
+			s.pending = scene
+			return scene
+	# --- wave10 story ---
+	var family := str(mission(mission_id).get("type", "investigate"))
+	var fallback: Dictionary = ChoiceScenes.mid_scene(s,mission_id,turn,family,table("W10_MID"))
+	if not fallback.is_empty(): s.pending = fallback
+	return fallback
 
 func apply_choice(s: Dictionary, choice_id: String) -> Dictionary:
 	ensure_state(s)
@@ -316,6 +337,8 @@ func apply_choice(s: Dictionary, choice_id: String) -> Dictionary:
 			if resource == "orderDark": s.orderDark = int(s.orderDark)+int(c.cost[resource])
 			else: _gain(s,resource,-int(c.cost[resource]))
 		_apply_effects(s,c.get("fx",{}),scene.get("who",""))
+		# --- wave10 story ---
+		ChoiceScenes.apply(s,scene,c)
 		if scene.kind == "briefing": s.approach = c.get("battle",c.get("fx",{}))
 		if scene.kind == "beat": s.battle_choice = c.get("battle",{})
 		if scene.kind == "talk":

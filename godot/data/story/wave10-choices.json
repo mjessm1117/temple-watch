@@ -1,0 +1,324 @@
+{
+  "records": {
+    "W10_MID": [
+      {
+        "id": "w10_mid_1",
+        "family": "rescue",
+        "title": "A second signal",
+        "text": "A second distress call reaches the squad.",
+        "choices": [
+          {
+            "label": "Protect the people first",
+            "text": "The squad moves with care.",
+            "fx": {
+              "favor": 1,
+              "flag": "w10_mercy_1"
+            },
+            "battle": {
+              "heal": 1
+            }
+          },
+          {
+            "label": "Press the objective",
+            "text": "The squad keeps its momentum.",
+            "fx": {
+              "intel": 1,
+              "flag": "w10_resolve_1"
+            },
+            "battle": {
+              "aim": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_mid_2",
+        "family": "defend",
+        "title": "Hold the line",
+        "text": "A local garrison asks where the Jedi should stand.",
+        "choices": [
+          {
+            "label": "Protect the people first",
+            "text": "The squad moves with care.",
+            "fx": {
+              "favor": 1,
+              "flag": "w10_mercy_2"
+            },
+            "battle": {
+              "heal": 1
+            }
+          },
+          {
+            "label": "Press the objective",
+            "text": "The squad keeps its momentum.",
+            "fx": {
+              "intel": 1,
+              "flag": "w10_resolve_2"
+            },
+            "battle": {
+              "aim": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_mid_3",
+        "family": "investigate",
+        "title": "A sealed record",
+        "text": "The team finds a damaged archive.",
+        "choices": [
+          {
+            "label": "Protect the people first",
+            "text": "The squad moves with care.",
+            "fx": {
+              "favor": 1,
+              "flag": "w10_mercy_3"
+            },
+            "battle": {
+              "heal": 1
+            }
+          },
+          {
+            "label": "Press the objective",
+            "text": "The squad keeps its momentum.",
+            "fx": {
+              "intel": 1,
+              "flag": "w10_resolve_3"
+            },
+            "battle": {
+              "aim": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_mid_4",
+        "family": "sabotage",
+        "title": "The quiet route",
+        "text": "An engineer offers a narrow path.",
+        "choices": [
+          {
+            "label": "Protect the people first",
+            "text": "The squad moves with care.",
+            "fx": {
+              "favor": 1,
+              "flag": "w10_mercy_4"
+            },
+            "battle": {
+              "heal": 1
+            }
+          },
+          {
+            "label": "Press the objective",
+            "text": "The squad keeps its momentum.",
+            "fx": {
+              "intel": 1,
+              "flag": "w10_resolve_4"
+            },
+            "battle": {
+              "aim": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_mid_5",
+        "family": "escort",
+        "title": "A fork in the road",
+        "text": "The convoy reaches two exposed passages.",
+        "choices": [
+          {
+            "label": "Protect the people first",
+            "text": "The squad moves with care.",
+            "fx": {
+              "favor": 1,
+              "flag": "w10_mercy_5"
+            },
+            "battle": {
+              "heal": 1
+            }
+          },
+          {
+            "label": "Press the objective",
+            "text": "The squad keeps its momentum.",
+            "fx": {
+              "intel": 1,
+              "flag": "w10_resolve_5"
+            },
+            "battle": {
+              "aim": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_mid_6",
+        "family": "assault",
+        "title": "An open channel",
+        "text": "The enemy commander offers a brief parley.",
+        "choices": [
+          {
+            "label": "Protect the people first",
+            "text": "The squad moves with care.",
+            "fx": {
+              "favor": 1,
+              "flag": "w10_mercy_6"
+            },
+            "battle": {
+              "heal": 1
+            }
+          },
+          {
+            "label": "Press the objective",
+            "text": "The squad keeps its momentum.",
+            "fx": {
+              "intel": 1,
+              "flag": "w10_resolve_6"
+            },
+            "battle": {
+              "aim": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_mid_7",
+        "family": "rescue",
+        "title": "One more voice",
+        "text": "A survivor calls beyond the extraction lane.",
+        "choices": [
+          {
+            "label": "Protect the people first",
+            "text": "The squad moves with care.",
+            "fx": {
+              "favor": 1,
+              "flag": "w10_mercy_7"
+            },
+            "battle": {
+              "heal": 1
+            }
+          },
+          {
+            "label": "Press the objective",
+            "text": "The squad keeps its momentum.",
+            "fx": {
+              "intel": 1,
+              "flag": "w10_resolve_7"
+            },
+            "battle": {
+              "aim": 2
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_mid_8",
+        "family": "investigate",
+        "title": "A witness waits",
+        "text": "A witness has seen who came before.",
+        "choices": [
+          {
+            "label": "Protect the people first",
+            "text": "The squad moves with care.",
+            "fx": {
+              "favor": 1,
+              "flag": "w10_mercy_8"
+            },
+            "battle": {
+              "heal": 1
+            }
+          },
+          {
+            "label": "Press the objective",
+            "text": "The squad keeps its momentum.",
+            "fx": {
+              "intel": 1,
+              "flag": "w10_resolve_8"
+            },
+            "battle": {
+              "aim": 2
+            }
+          }
+        ]
+      }
+    ],
+    "W10_DEBRIEF": {
+      "win": [
+        {
+          "label": "Send aid to the locals",
+          "fx": {
+            "favor": 2,
+            "flag": "w10_aid_sent"
+          }
+        },
+        {
+          "label": "Secure the evidence",
+          "fx": {
+            "intel": 2,
+            "flag": "w10_evidence_kept"
+          }
+        }
+      ],
+      "lose": [
+        {
+          "label": "Recover the wounded",
+          "fx": {
+            "favor": 1,
+            "flag": "w10_wounded_aided"
+          }
+        },
+        {
+          "label": "Study what went wrong",
+          "fx": {
+            "intel": 1,
+            "flag": "w10_loss_studied"
+          }
+        }
+      ]
+    },
+    "W10_GRIEF": {
+      "dead": "{partner} has fallen. {survivor} returns to the Temple with an empty place at their side.",
+      "dark": "{partner} has turned from the light. {survivor} still hears their voice in the training hall."
+    },
+    "W10_BRIEF_DEFAULT": {
+      "fx": {
+        "intel": 1
+      }
+    },
+    "W10_GRIEF_SCENE": {
+      "title": "An empty place",
+      "eyebrow": "Temple · After the mission",
+      "choices": [
+        {
+          "label": "Remember their service",
+          "fx": {
+            "favor": 1
+          }
+        },
+        {
+          "label": "Give the squad time together",
+          "fx": {
+            "intel": 1
+          }
+        }
+      ]
+    },
+    "W10_CHOICE_OVERRIDES": {
+      "envoy:lose": {
+        "1": {
+          "favor": 1
+        }
+      },
+      "rescue:a": {
+        "1": {
+          "favor": 1
+        }
+      },
+      "v1": {
+        "1": {
+          "favor": 1
+        }
+      }
+    }
+  }
+}
