@@ -41,7 +41,7 @@ static func describe(row: Array, state: Dictionary) -> Dictionary:
 		var action: Dictionary = Data.get_table("temple", "MOD_ACTS")[wing]
 		var cooldown := int(state.get("modules", {}).get("cd", {}).get(wing, 0))
 		module = str(action.n)
-		status = "L%d · %s" % [level, "NO POWER" if built and not Base.operational(state, wing) else "READY" if cooldown == 0 else "%d missions" % cooldown]
+		status = "L%d · %s" % [level, "%d missions" % cooldown if cooldown > 0 else "NO POWER" if built and not Base.operational(state, wing) else "READY"]
 		if not built: status = "Build · %d Cr" % int(data.cost[1]); target = "Build"
 		if str(state.build) == wing: status = "Upgrading" if built else "Under construction"
 		if wing in ["medical", "gardens"]: color = Color("86d5b3")
