@@ -8,6 +8,9 @@ const Legacy = preload("res://scripts/campaign/legacy.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const StrategyUI = preload("res://scripts/campaign/strat_ui.gd")
 const Base = preload("res://scripts/campaign/strat_base.gd")
+const HomeBadges = preload("res://scripts/campaign/home_badges.gd")
+const HomeTabs = preload("res://scripts/campaign/home_tabs.gd")
+const HomeResources = preload("res://scripts/campaign/home_resources.gd")
 const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 var build_slot := "b0"
 var field_team: Array = []
@@ -56,11 +59,9 @@ func _build_shell() -> void:
 	var title := HBoxContainer.new(); rows.add_child(title)
 	var brand := UI.label("TEMPLE WATCH", 27, Color("78d2df")); brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL; title.add_child(brand)
 	status_label = UI.label("", 15, UI.GOLD); title.add_child(status_label)
-	var resources := HBoxContainer.new(); resources.add_theme_constant_override("separation", 20); rows.add_child(resources)
-	var res: Dictionary = campaign.state.res
-	for item in [["Cr", "credits"], ["In", "intel"], ["Ky", "kyber"], ["SF", "favor"], ["Rc", "recruits"]]:
-		resources.add_child(UI.label("● %s  %d" % [item[0], int(res[item[1]])], 14, Color("80cbd6")))
-	resources.add_child(UI.label("◈ Order Darkness  %d/100" % int(campaign.state.orderDark), 14, Color("b5a2d3")))
+	var resources := HBoxContainer.new(); resources.add_theme_constant_override("separation", 18); rows.add_child(resources)
+	HomeResources.add_row(resources, campaign)
+	resources.add_child(UI.label("Order Darkness  %d/100" % int(campaign.state.orderDark), 13, Color("b5a2d3")))
 	var era_label := UI.label("JEDI TEMPLE  /  %s" % {1:"OLD REPUBLIC", 2:"NEW SITH WARS", 3:"HIGH REPUBLIC"}.get(int(campaign.state.era), "REPUBLIC"), 13, UI.MUTED)
 	era_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; era_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; resources.add_child(era_label)
 	for row in [title, resources]:
@@ -76,10 +77,11 @@ func _build_shell() -> void:
 	var nav := HBoxContainer.new(); nav.add_theme_constant_override("separation", 7); footer.add_child(nav)
 	for name in ["Command", "Roster", "Research", "Build", "Arsenal", "Teams", "Legacy", "Codex", "Galaxy"]:
 		var button := UI.button(name, _change_page.bind(name)); button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		HomeTabs.decorate(button, name)
 		button.mouse_entered.connect(func(): temple_view.sound.play())
 		nav.add_child(button); nav_buttons[name] = button
 	nav.add_child(UI.button("Menu", func(): get_node("/root/CampaignFlow").go("menu")))
-	var readout := UI.column(6); add_child(readout); readout.position = Vector2(25, 125); readout.size.x = 180
+	var readout := UI.column(5); add_child(readout); readout.position = Vector2(25, 124); readout.size.x = 200
 	readout.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	readout.add_child(UI.label("THE ORDER ENDURES", 13, UI.ACCENT))
 	var active := 0; var wounded := 0; var built := 0
@@ -89,8 +91,8 @@ func _build_shell() -> void:
 	for level in campaign.state.wings.values():
 		if int(level) > 0: built += 1
 	readout.add_child(UI.label("%d active · %d wounded\n%d / 8 wings online\n%d missions waiting" % [active, wounded, built, campaign.state.options.size()], 13, UI.MUTED))
-	var power := Base.power(campaign.state)
-	readout.add_child(UI.label("POWER %d / %d\n%d staff · squad %d\nSith Darkness %d / 12" % [power.used, power.capacity, campaign.state.facility.workers.size(), campaign.squad_capacity(), campaign.darkness_segments()], 13, UI.ACCENT))
+	readout.add_child(HomeResources.power_label(campaign))
+	readout.add_child(UI.label("%d staff · squad %d\nSith Darkness %d / 12" % [campaign.state.facility.workers.size(), campaign.squad_capacity(), campaign.darkness_segments()], 13, UI.ACCENT))
 	readout.add_child(UI.label("1–7 stations\nG galaxy · Esc close", 12, Color("627d87")))
 	station_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.97)); add_child(station_panel)
 	station_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -110,6 +112,7 @@ func _open_room(id: String, target: String) -> void:
 
 func _close_station() -> void:
 	panel_open = false
+	HomeTabs.update(nav_buttons, HomeBadges.collect(campaign), page, panel_open)
 	if panel_tween != null: panel_tween.kill()
 	if Prefs.get_value("motion"):
 		station_panel.hide(); return
@@ -145,7 +148,7 @@ func _change_page(name: String, room_id: String = "") -> void:
 
 func _show_page() -> void:
 	UI.clear(page_content)
-	for name in nav_buttons: nav_buttons[name].button_pressed = name == page
+	HomeTabs.update(nav_buttons, HomeBadges.collect(campaign), page, panel_open)
 	status_label.text = "MONTH %d  ·  DAY %d  ·  WEEK %d" % [int(campaign.state.month), int(campaign.state.day), campaign.week()]
 	page_content.add_child(UI.label(page.to_upper(), 30, UI.ACCENT))
 	if selected_room != "" and temple_view.rooms.has(selected_room):

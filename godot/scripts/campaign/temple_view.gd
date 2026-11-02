@@ -45,7 +45,7 @@ func setup(save_state: Dictionary) -> void:
 	camera = Camera3D.new(); camera.projection = Camera3D.PROJECTION_ORTHOGONAL
 	camera.size = 31.5; world.add_child(camera); camera.current = true
 	camera.position = Vector3(0, 17.3, 42); camera.look_at(Vector3(0, 5.8, 0))
-	art = Geometry.new(); galaxy = art.galaxy(world)
+	art = Geometry.new(); galaxy = art.galaxy(world, false)
 	temple = Node3D.new(); temple.name = "TempleCutaway"; world.add_child(temple)
 	art.architecture(temple)
 	for row in Rooms.ROOMS:
@@ -72,30 +72,33 @@ func _make_button(info: Dictionary) -> void:
 	if not Prefs.get_value("tips"): b.tooltip_text = ""
 	for style_name in ["normal", "hover", "pressed", "focus"]:
 		var style := StyleBoxFlat.new(); style.bg_color = Color(0.1, 0.4, 0.46, 0.16 if style_name != "normal" else 0)
-		style.border_color = Color("7bdce4") if style_name != "normal" else Color(0.2, 0.4, 0.43, 0.15)
+		style.border_color = Color("7bdce4") if style_name != "normal" else Color("a68c64" if not info.built else "386873")
 		style.set_border_width_all(1); style.set_corner_radius_all(2); b.add_theme_stylebox_override(style_name, style)
 	add_child(b); buttons[info.id] = b
-	var name_label := Label.new(); name_label.text = str({"council":"Council", "gardens":"Gardens", "sp0":"Knowledge", "sp2":"Reconciliation"}.get(info.id, info.name)).to_upper()
-	name_label.add_theme_font_size_override("font_size", 12 if info.kind != "spire" else 11)
-	name_label.add_theme_color_override("font_color", info.color if info.built else Color("adb6b4"))
+	if not info.built: b.add_child(preload("res://scripts/campaign/home_room_outline.gd").new())
+	var name_label := Label.new(); name_label.text = str(info.name).to_upper()
+	name_label.add_theme_font_size_override("font_size", 10 if info.kind in ["spire", "council"] else 11)
+	name_label.add_theme_color_override("font_color", info.color if info.built else Color("e0c49a"))
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	name_label.offset_top = 3; name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
+	name_label.offset_top = 2; name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
 	var line := Label.new()
-	line.text = str(info.status)
-	if info.built and info.module != "": line.text = str(info.status) + "\nStaff %d · Power %d" % [info.staff, preload("res://scripts/campaign/strat_base.gd").POWER[info.wing]]
+	line.text = str(info.status) if info.built else "BUILDING" if info.status == "Under construction" else "SEALED · EXCAVATE" if info.kind == "vault" else "BUILD HERE" if info.kind in ["spire", "annex"] or info.wing != "" else str(info.status)
 	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	line.add_theme_font_size_override("font_size", 11)
-	line.add_theme_color_override("font_color", Color("e3c384") if info.built else Color("b3a182"))
+	line.add_theme_font_size_override("font_size", 10)
+	line.add_theme_color_override("font_color", Color("e3c384") if info.built else Color("c5ae88"))
 	line.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	line.offset_top = -31 if info.built and info.module != "" else -17
+	line.offset_top = -17
 	line.offset_bottom = -1; line.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(line)
+	for label in [name_label, line]:
+		var plate := StyleBoxFlat.new(); plate.bg_color = Color(0.018, 0.045, 0.057, 0.82)
+		plate.set_corner_radius_all(2); label.add_theme_stylebox_override("normal", plate)
 	for label in [name_label, line]:
 		label.add_theme_color_override("font_shadow_color", Color("02090c"))
 		label.add_theme_constant_override("shadow_offset_x", 1); label.add_theme_constant_override("shadow_offset_y", 1)
 	name_label.name = "RoomName"; line.name = "RoomDetail"
-	name_label.visible = info.id in ["council", "medical", "barracks", "gardens"]
-	line.visible = false
+	name_label.visible = true
+	line.visible = true
 	b.mouse_entered.connect(_hover.bind(str(info.id)))
 	b.focus_entered.connect(_hover.bind(str(info.id)))
 	b.mouse_exited.connect(_unhover.bind(str(info.id)))
@@ -115,8 +118,8 @@ func _hover(id: String) -> void:
 
 func _unhover(id: String) -> void:
 	if hovered == id:
-		buttons[id].get_node("RoomName").visible = id in ["council", "medical", "barracks", "gardens"]
-		buttons[id].get_node("RoomDetail").visible = false
+		buttons[id].get_node("RoomName").visible = true
+		buttons[id].get_node("RoomDetail").visible = true
 		hovered = ""; room_hovered.emit("Select a room to manage the Order.  •  Gold: module ready  •  Dark: awaiting construction")
 
 func _process(delta: float) -> void:

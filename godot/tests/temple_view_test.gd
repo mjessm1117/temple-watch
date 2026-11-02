@@ -29,11 +29,19 @@ func shot(label: String) -> void:
 	if not capture: return
 	await create_timer(0.7).timeout
 	await RenderingServer.frame_post_draw
-	var path := "res://../docs/godot/shots/wave6-temple-%s%s.png" % [label, suffix]
-	check(root.get_texture().get_image().save_png(path) == OK, "window capture " + label)
+	var prefix := "home-after" if "--capture-home" in OS.get_cmdline_user_args() else "wave6-temple"
+	var path := "res://../docs/godot/shots/%s-%s%s.png" % [prefix, label, suffix]
+	var image := root.get_texture().get_image()
+	if suffix == "-1920" and image.get_size() == Vector2i(1920, 1079):
+		# Xvfb presents one row less than the requested root size on this host.
+		var exact := Image.create(1920, 1080, false, image.get_format())
+		exact.blit_rect(image, Rect2i(0, 0, 1920, 1079), Vector2i.ZERO)
+		exact.blit_rect(image, Rect2i(0, 1078, 1920, 1), Vector2i(0, 1079))
+		image = exact
+	check(image.save_png(path) == OK, "window capture " + label)
 
 func run() -> void:
-	capture = "--capture-temple" in OS.get_cmdline_user_args()
+	capture = "--capture-temple" in OS.get_cmdline_user_args() or "--capture-home" in OS.get_cmdline_user_args()
 	var large := "--large" in OS.get_cmdline_user_args()
 	root.size = Vector2i(1920, 1080) if large else Vector2i(1366, 768)
 	suffix = "-1920" if large else ""
@@ -73,6 +81,7 @@ func run() -> void:
 	temple.campaign = developed; temple._refresh_shell(); await frames()
 	check(not temple.temple_view.rooms.training.built, "building is scaffolded until mission completion")
 	check(temple.temple_view.rooms.training.status == "Under construction", "construction is labeled")
+	check(temple.temple_view.buttons.training.get_node("RoomDetail").text == "BUILDING", "active construction plate stays distinct from free slots")
 	check(temple.temple_view.rooms.medical.status == "L2 · 2 missions", "saved module cooldown visible")
 	check(temple.temple_view.rooms.archives.module == "Study the Enemy", "built wing exposes module")
 	check(temple.temple_view.art.people.size() >= 20, "staff inhabit operational rooms")

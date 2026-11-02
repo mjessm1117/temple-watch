@@ -161,7 +161,7 @@ func person(cell: Node3D, at: Vector3, color: Color, walking: bool) -> void:
 		box(actor, Vector3(0, 0.94, 0.105), Vector3(0.17, 0.035, 0.03), Color("172b34"))
 	people.append({"node":actor, "origin":at, "walk":walking, "phase":float(people.size())})
 
-func galaxy(parent: Node3D) -> Node3D:
+func galaxy(parent: Node3D, show_labels: bool = true) -> Node3D:
 	var disk := Node3D.new(); disk.name = "Galaxy"; disk.position = Vector3(0, -6.3, -4); parent.add_child(disk)
 	var plane := PlaneMesh.new(); plane.size = Vector2(64, 48)
 	var cloud := MeshInstance3D.new(); cloud.mesh = plane
@@ -183,9 +183,10 @@ func galaxy(parent: Node3D) -> Node3D:
 		var at := Vector3((float(data.x) - 300.0) / 11.0, 0.5, (float(data.y) - 180.0) / 9.0)
 		var mesh := SphereMesh.new(); mesh.radius = 0.09; mesh.height = 0.18
 		var planet := shape(disk, mesh, at, Color("88c4d5"), 1.7); planet.name = str(key); planets[key] = planet
-		var label := Label3D.new(); label.text = str(key); label.font_size = 20; label.pixel_size = 0.013
-		label.position = at + Vector3(0, 0.25, 0); label.modulate = Color("6d939e")
-		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED; disk.add_child(label)
+		if show_labels:
+			var label := Label3D.new(); label.text = str(key); label.font_size = 20; label.pixel_size = 0.013
+			label.position = at + Vector3(0, 0.25, 0); label.modulate = Color("6d939e")
+			label.billboard = BaseMaterial3D.BILLBOARD_ENABLED; disk.add_child(label)
 	# A quiet star field beyond the temple, using one draw call.
 	var distant := MultiMesh.new(); distant.transform_format = MultiMesh.TRANSFORM_3D
 	distant.mesh = star; distant.instance_count = 850
