@@ -2,10 +2,14 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 test_log=$(mktemp)
-trap 'rm -f "$test_log"' EXIT
-for suite in run campaign_test story_port_test loop_test sith_test strategy_test combat7_test missions_test temple_view_test loadout_test galaxy_view_test screens_test integration_test map_art_test terrain_test; do
+test_data=$(mktemp -d)
+export XDG_DATA_HOME="$test_data"
+trap 'rm -f "$test_log"; rm -rf "$test_data"' EXIT
+run_suite() {
+  local suite="$1"
+  shift
   set +e
-  "${GODOT_BIN:-/home/jess/projects/.tools/godot/godot}" --headless --path . -s "tests/$suite.gd" 2>&1 | tee "$test_log"
+  "${GODOT_BIN:-/home/jess/projects/.tools/godot/godot}" --headless --path . -s "tests/$suite.gd" "$@" 2>&1 | tee "$test_log"
   test_status=${PIPESTATUS[0]}
   set -e
   if grep -Eq 'SCRIPT ERROR|Parse Error|ERROR:|[1-9][0-9]* failures' "$test_log"; then
@@ -13,4 +17,15 @@ for suite in run campaign_test story_port_test loop_test sith_test strategy_test
     exit 1
   fi
   if [ "$test_status" -ne 0 ]; then exit "$test_status"; fi
+}
+# Real process restarts, with no rendering-method CLI override.
+run_suite graphics_boot_test -- --save=low
+run_suite graphics_boot_test -- --expect=low --save=medium
+run_suite graphics_boot_test -- --expect=medium --save=high
+run_suite graphics_boot_test -- --expect=high
+for suite in run campaign_test story_port_test loop_test sith_test strategy_test combat7_test missions_test temple_view_test loadout_test galaxy_view_test screens_test integration_test map_art_test terrain_test; do
+  run_suite "$suite"
 done
+run_suite graphics_test --rendering-method gl_compatibility -- --graphics=low
+run_suite graphics_test --rendering-method forward_plus -- --graphics=medium
+run_suite graphics_test --rendering-method forward_plus -- --graphics=high

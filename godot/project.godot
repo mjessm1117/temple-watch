@@ -3,9 +3,11 @@ config_version=5
 [application]
 config/name="Temple Watch — Rescue"
 run/main_scene="res://scenes/menu.tscn"
+config/project_settings_override="user://override.cfg"
 config/features=PackedStringArray("4.4", "Forward Plus")
 
 [autoload]
+Graphics="*res://scripts/graphics_settings.gd"
 CampaignFlow="*res://scripts/campaign_bridge.gd"
 
 [display]
@@ -14,6 +16,7 @@ window/size/viewport_height=768
 window/stretch/mode="canvas_items"
 
 [rendering]
+rendering_device/fallback_to_opengl3=true
 renderer/rendering_method="forward_plus"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/default_filters/use_nearest_mipmap_filter=false

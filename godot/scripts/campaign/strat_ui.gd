@@ -170,6 +170,7 @@ static func field(view) -> void:
 
 static func settings(view) -> void:
 	var box: VBoxContainer = view._card("PRESENTATION SETTINGS", "Saved on this device.")
+	box.add_child(preload("res://scripts/graphics_options.gd").new())
 	for row in [["speed","Animation speed",[0.5,1.0,2.0,4.0]], ["cine","Cinematics",[true,false]], ["motion","Reduced motion",[true,false]], ["numbers","Show numbers",[true,false]], ["cb","Colorblind palette",[true,false]], ["tips","Tips",[true,false]]]:
 		box.add_child(UI.label(row[1], 16, UI.GOLD))
 		var buttons := HFlowContainer.new(); box.add_child(buttons)

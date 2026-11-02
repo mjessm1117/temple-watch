@@ -44,6 +44,7 @@ func _ready() -> void:
 	var column := UI.column(12)
 	column.size_flags_horizontal = SIZE_EXPAND_FILL
 	scroll.add_child(column)
+	column.add_child(preload("res://scripts/graphics_options.gd").new())
 	column.add_child(UI.label("THE SEALED RECORD",26,UI.ACCENT))
 	column.add_child(UI.label("NEW CAMPAIGN  /  CHOOSE YOUR DIFFICULTY",13,UI.MUTED))
 	var descriptions := {

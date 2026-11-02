@@ -2,7 +2,7 @@ extends Node3D
 ## One read-only art renderer for the rescue fixture and all campaign biomes.
 const Maps = preload("res://scripts/map_catalog.gd")
 const Shot = preload("res://scripts/shot.gd")
-const Batch = preload("res://scripts/meshy_theme_batch.gd")
+const Batch = preload("res://scripts/graphics_batch.gd")
 const Meshy = preload("res://scripts/meshy_theme_models.gd")
 const Geometry = preload("res://scripts/map_art_geometry.gd")
 const STONE = preload("res://assets/env/stone.gdshader")
@@ -64,6 +64,11 @@ func apply_environment(world: WorldEnvironment, key: DirectionalLight3D, theme_n
 	if RenderingServer.get_current_rendering_method() == "gl_compatibility":
 		# LDR Compatibility has no ACES highlight rolloff: avoid clipping pale cover.
 		key.light_energy *= 0.55; env.ambient_light_energy *= 0.8
+
+	var graphics := get_node_or_null("/root/Graphics")
+	if graphics:
+		graphics.apply_environment(env)
+		graphics.apply_node.call_deferred(weakref(key))
 
 func setup_palette(t: Dictionary) -> void:
 	var surface: Dictionary = t.surface
@@ -157,17 +162,23 @@ func refresh_damage() -> void:
 				var alpha := (0.8 if crack else 0.28)*maxf(0,1.0-u.length())
 				picture.set_pixel(x,y,Color(0.04,0.035,0.03,alpha))
 		scar_texture = ImageTexture.create_from_image(picture)
+	var fallback: Array[Transform3D] = []
 	for tile in mission.cover_hp:
 		var c: String = mission.tile(tile)
 		var maximum := 8 if c == "#" else 4
 		if int(mission.cover_hp[tile]) >= maximum: continue
 		var h := 1.92 if c == "#" else 0.82
+		if RenderingServer.get_current_rendering_method() == "gl_compatibility":
+			fallback.append(Transform3D(Basis.from_scale(Vector3(0.98,h+0.02,0.98)),Vector3(tile.x,Shot.elevation(mission,tile)*0.7+h*0.5,tile.y)))
+			continue
 		# Project onto the actual mesh surface; no floating damage-card geometry.
 		var scar := Decal.new(); scar.texture_albedo = scar_texture
 		scar.size = Vector3(0.92,h+0.08,0.92)
 		scar.position = Vector3(tile.x,Shot.elevation(mission,tile)*0.7+h*0.5,tile.y)
 		scar.normal_fade = 0.0; scar.upper_fade = 0.03; scar.lower_fade = 0.03
 		damage_root.add_child(scar)
+
+	preload("res://scripts/graphics_damage.gd").build(damage_root,scar_texture,fallback)
 
 func ring(b, at: Vector3, mat: Material, radius := 0.43) -> void:
 	for i in 24:
@@ -265,18 +276,28 @@ func overwatch_zones(m: RefCounted) -> Array[Dictionary]:
 
 
 func weather(settings: Dictionary, width: int, height: int) -> void:
-	var node := GPUParticles3D.new(); node.amount = int(settings.n); node.lifetime = 12.0
-	node.visibility_aabb = AABB(Vector3(-4,-2,-4),Vector3(width+8,12,height+8))
+	var compatibility := RenderingServer.get_current_rendering_method() == "gl_compatibility"
+	# CPU weather keeps the phone path independent of GPU particle processing.
+	var node = CPUParticles3D.new() if compatibility else GPUParticles3D.new()
+	node.amount = int(settings.n); node.lifetime = 12.0
+	if not compatibility: node.visibility_aabb = AABB(Vector3(-4,-2,-4),Vector3(width+8,12,height+8))
 	node.position = Vector3(float(width)/2,3,float(height)/2)
-	var process := ParticleProcessMaterial.new(); process.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	var process = node if compatibility else ParticleProcessMaterial.new()
+	process.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX if compatibility else ParticleProcessMaterial.EMISSION_SHAPE_BOX
 	process.emission_box_extents = Vector3(float(width)/2+2,3,float(height)/2+2)
 	var kind := str(settings.kind)
 	var fall := 9.0 if kind == "rain" else 0.6 if kind == "snow" else -0.4 if kind == "ember" else 0.05
 	process.direction = Vector3.DOWN if fall >= 0 else Vector3.UP; process.spread = 8.0 if kind == "rain" else 60.0
 	process.initial_velocity_min = absf(fall)*0.5; process.initial_velocity_max = absf(fall); process.gravity = Vector3.ZERO
-	process.scale_min = 0.5; process.scale_max = 1.0
-	node.process_material = process
+	if compatibility:
+		process.scale_amount_min = 0.5; process.scale_amount_max = 1.0
+	else:
+		process.scale_min = 0.5; process.scale_max = 1.0
+		node.process_material = process
 	var mesh := QuadMesh.new(); mesh.size = Vector2(0.035,0.4) if kind == "rain" else Vector2(0.075,0.075)
 	var mat := material(color(int(settings.color)),0.6 if kind in ["firefly","ember"] else 0.0)
 	mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED; mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mesh.material = mat; node.draw_pass_1 = mesh; add_child(node)
+	mesh.material = mat
+	if compatibility: node.mesh = mesh
+	else: node.draw_pass_1 = mesh
+	add_child(node)
