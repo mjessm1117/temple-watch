@@ -78,6 +78,7 @@ func run() -> void:
 		if area > largest_area: largest = str(path); largest_area = area
 		await process_frame
 	check(themes.size() == 8,"all eight themes exercised including temple rescue fixture")
+	await preload("res://tests/map_art_meshy_test.gd").new().run(self,art)
 	# An independently transformed, off-centre GLB must fit for every cardinal orientation.
 	for kind in ["crate","wall_metal","pillar","relay","terminal","console","rubble","barrel"]:
 		for angle in [0.0,PI/2,PI,PI*1.5,0.37]:

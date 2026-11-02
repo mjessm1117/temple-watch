@@ -1,5 +1,6 @@
 extends RefCounted
 ## Original procedural architecture. No collision, navigation or rules live here.
+const Meshy = preload("res://scripts/meshy_theme_models.gd")
 const Shot = preload("res://scripts/shot.gd")
 var r
 var b
@@ -78,15 +79,24 @@ func floor_tile(m: RefCounted, tile: Vector2i) -> void:
 
 func cover(m: RefCounted, tile: Vector2i) -> void:
 	var c: String = m.tile(tile)
-	# Boundary rule tiles remain blocked; the scenery beyond them describes the edge.
-	if tile.x == 0 or tile.y == 0 or tile.x == int(m.spec.width)-1 or tile.y == int(m.spec.height)-1: return
+	# Plots without interior full cover (the temple fixture) use sparse rear/side piers
+	# on existing blocked boundary tiles. Leave the foreground open for unit readability.
+	if tile.x == 0 or tile.y == 0 or tile.x == int(m.spec.width)-1 or tile.y == int(m.spec.height)-1:
+		if r.interior_full_cover or Meshy.cover_path(r.props,theme,"full_cover").is_empty(): return
+		if not ((tile.x == 0 and tile.y > 0 and tile.y%8 == 0) or (tile.y == 0 and tile.x > 0 and tile.x%8 == 0)): return
 	if c not in ["#","c","h","k","r","x"]: return
 	var at := Vector3(tile.x,Shot.elevation(m,tile)*0.7,tile.y)
 	var horizontal: bool = m.tile(tile+Vector2i.LEFT) == c or m.tile(tile+Vector2i.RIGHT) == c
 	var vertical: bool = m.tile(tile+Vector2i.UP) == c or m.tile(tile+Vector2i.DOWN) == c
 	var angle := PI/2 if vertical and not horizontal else 0.0
 	b.begin_record({"tile":tile,"kind":c,"floor":at.y,"role":"cover"})
-	if c == "#":
+	var mesh_angle := Meshy.cover_angle(m,tile,horizontal,vertical)
+	var cover_kind := "full_cover" if c == "#" else "half_cover" if c in ["c","h"] else ""
+	# Explicit barrel/console/rubble art remains intact.
+	var mapped := Meshy.cover_path(r.props,theme,cover_kind) if not m.spec.get("prop_overrides",{}).has(tile) else ""
+	if not mapped.is_empty() and b.pair(mapped,at,0.98,1.9 if c == "#" else 0.8,mesh_angle):
+		pass
+	elif c == "#":
 		# The same tall silhouette applies to the boundary and interior: both block LOS.
 		if theme in ["snow","caves","plains"]:
 			put("boulder","wall",at+Vector3.UP*0.96,Vector3(0.98,1.92,0.98))
@@ -117,8 +127,6 @@ func cover(m: RefCounted, tile: Vector2i) -> void:
 		r.prop("rubble",at,0.87,0.22,angle)
 	elif c == "k":
 		r.prop("console",at,0.85,0.79,angle)
-	elif theme in ["temple","ruins"] and c in ["h","c"] and r.props.get("meshy1_enabled",false) and not str(r.props.meshy1_models.half_cover).is_empty():
-		b.model(str(r.props.meshy1_models.half_cover),at,0.98,0.8,angle,true)
 	elif c == "h" or (theme in ["temple","ruins","caves"] and c == "c"):
 		put("box","dark",at+Vector3.UP*0.08,Vector3(0.94,0.16,0.58),angle)
 		for row in 3:
