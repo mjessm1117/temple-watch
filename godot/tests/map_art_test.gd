@@ -87,6 +87,11 @@ func run() -> void:
 	var sliced: AABB = art.batch.model("res://assets/maps/meshy1/cover_half_temple_v2.glb",Vector3.ZERO,0.98,0.8,0.0,true)
 	check(absf(sliced.size.y-0.239163) < 0.001,"uniform slice preserves source height")
 	check(absf(sliced.position.y) < 0.001 and sliced.size.x <= 0.981 and sliced.size.z <= 0.981,"uniform slice grounded within tile")
+	# The full-height side trim and retained LOD must stay grounded at crouching-cover height.
+	for lod in ["", "_lod1"]:
+		var trimmed: AABB = art.batch.model("res://assets/maps/meshy1/cover_half_temple_v3%s.glb" % lod,Vector3.ZERO,0.98,0.8,0.0,true)
+		check(trimmed.size.y >= 0.7 and trimmed.size.y <= 0.9,"side trim half-cover height"+lod)
+		check(absf(trimmed.position.y) < 0.001 and trimmed.size.x <= 1.0 and trimmed.size.z <= 1.0,"side trim grounded within tile"+lod)
 	art.batch.buckets.clear()
 	var source := Node3D.new(); root.add_child(source)
 	var grid := preload("res://scripts/map_art_grid.gd").new(); root.add_child(grid); grid.bind(source)

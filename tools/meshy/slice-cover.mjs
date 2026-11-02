@@ -1,11 +1,27 @@
-// Local, attribute-preserving horizontal slice. Caps follow cut-edge loops.
+// Local, attribute-preserving horizontal slice or vertical side trim. Caps follow cut-edge loops.
 // node tools/meshy/slice-cover.mjs source.glb output.glb cutY
+// node tools/meshy/slice-cover.mjs source.glb output.glb --sides minX maxX [height=.8]
+// Side planes are in uniformly height-scaled coordinates, before centering.
 import fs from 'node:fs';
 import {NodeIO} from '@gltf-transform/core';
 import {weld,prune} from '@gltf-transform/functions';
-const [source,target,yArg]=process.argv.slice(2);
+const [source,target,yArg,left,right,height=".8"]=process.argv.slice(2);
+const sides=yArg==='--sides';
 const io=new NodeIO(),d=await io.read(source),buffer=d.getRoot().listBuffers()[0];
-const planes=[{axis:1,value:+yArg,sign:1}];
+let initialScale=1;
+if(sides){
+ let minY=Infinity,maxY=-Infinity;
+ for(const m of d.getRoot().listMeshes())for(const p of m.listPrimitives()){
+  const a=p.getAttribute('POSITION').getArray();
+  for(let i=1;i<a.length;i+=3){minY=Math.min(minY,a[i]);maxY=Math.max(maxY,a[i]);}
+ }
+ initialScale=+height/(maxY-minY);
+ for(const m of d.getRoot().listMeshes())for(const p of m.listPrimitives()){
+  const a=p.getAttribute('POSITION').getArray();for(let i=0;i<a.length;i++)a[i]*=initialScale;
+ }
+}
+const planes=sides?[{axis:0,value:+left,sign:-1},{axis:0,value:+right,sign:1}]:[{axis:1,value:+yArg,sign:1}];
+if(sides&&!(+left<+right&&+right-+left<=1))throw Error('Side trim must fit one tile');
 let caps=0;
 for(const mesh of d.getRoot().listMeshes())for(const p of mesh.listPrimitives()){
  const semantics=p.listSemantics().filter(s=>s!=='TANGENT');
@@ -67,6 +83,23 @@ for(const mesh of d.getRoot().listMeshes())for(const p of mesh.listPrimitives())
   }
   faces=clipped;
  }
+ // Recess the exposed cut surface in small facets, retaining the original course outline.
+ // Move shared boundary vertices too, so the cap and wall cannot separate.
+ if(sides)for(const face of faces){
+  const cap=face.every(v=>Math.abs(v.NORMAL?.[0]||0)===1);
+  for(const v of face)for(const plane of planes){
+   if(Math.abs(v.POSITION[0]-plane.value)>1e-6)continue;
+   const [,y,z]=v.POSITION;
+   const chip=.012+.018*Math.abs(Math.sin(y*31+z*13))+.012*Math.abs(Math.sin(z*37-y*9));
+   v.POSITION=[v.POSITION[0]-plane.sign*chip,y,z];
+  }
+  if(cap){
+   const a=face[0].POSITION,b=face[1].POSITION,c=face[2].POSITION;
+   const u=b.map((v,i)=>v-a[i]),v=c.map((v,i)=>v-a[i]);
+   const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+   const length=Math.hypot(...n)||1;for(const vertex of face)vertex.NORMAL=n.map(x=>x/length);
+  }
+ }
  for(const s of semantics)p.setAttribute(s,d.createAccessor().setType(p.getAttribute(s).getType()).setArray(new Float32Array(faces.flatMap(f=>f.flatMap(v=>v[s])))).setBuffer(buffer));
  p.setAttribute('TANGENT',null).setIndices(null);
 }
@@ -74,10 +107,10 @@ const lo=[Infinity,Infinity,Infinity],hi=lo.map(v=>-v);
 for(const m of d.getRoot().listMeshes())for(const p of m.listPrimitives()){
  const a=p.getAttribute('POSITION').getArray();for(let i=0;i<a.length;i++){lo[i%3]=Math.min(lo[i%3],a[i]);hi[i%3]=Math.max(hi[i%3],a[i]);}
 }
-const size=hi.map((v,i)=>v-lo[i]),scale=.98/Math.max(size[0],size[2]);
+const size=hi.map((v,i)=>v-lo[i]),scale=sides?1:.98/Math.max(size[0],size[2]);
 for(const m of d.getRoot().listMeshes())for(const p of m.listPrimitives()){
  const a=p.getAttribute('POSITION').getArray();for(let i=0;i<a.length;i++)a[i]=(a[i]-(i%3===1?lo[1]:(lo[i%3]+hi[i%3])/2))*scale;
 }
 await d.transform(weld(),prune());await io.write(target,d);
-const report={source,planes,source_slice_bounds:{lo,hi},uniform_scale:scale,dimensions:size.map(v=>v*scale),cap_triangles:caps};
+const report={source,planes,source_slice_bounds:{lo,hi},uniform_scale:initialScale*scale,dimensions:size.map(v=>v*scale),cap_triangles:caps};
 fs.writeFileSync(target+'.json',JSON.stringify(report,null,2)+'\n');console.log(report);

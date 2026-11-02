@@ -168,5 +168,84 @@
     "integration": "Rejected v2 and separate LOD1 retained on disk. Empty meshy1_models.half_cover restores pre-Meshy procedural cover; meshy1_enabled true keeps Terminal B enabled. v1 and terminal assets unchanged.",
     "brief": "art/briefs/cover_half_temple_v2_slice.json",
     "comparison": "docs/godot/shots/meshy1c-slice.png"
+  },
+  "meshy1d": {
+    "generator": "Existing Meshy refine + local vertical side trim",
+    "date": "2026-11-01",
+    "status": "accepted",
+    "refine_task": "01a19a9e-621c-737e-85f0-7f16a1df3644",
+    "source": "art/meshy1c/cover_half_temple_v2.B.raw.glb",
+    "credits_spent": 0,
+    "api_calls": 0,
+    "credentials_loaded": false,
+    "uniform_scale": 0.9054454778449318,
+    "whole_scaled_height": 0.8,
+    "cut_planes_scaled_x": [
+      -0.36,
+      0.62
+    ],
+    "cut_planes_source_x": [
+      -0.39759434312582015,
+      0.6847458131611347
+    ],
+    "cap_triangles_before_simplification": 374,
+    "processing": "slice-cover.mjs --sides -0.36 0.62: uniformly scale whole B to .80 high, cut sides, reuse boundary-loop caps and nearby stone UVs. Recess cut faces by .012-.042 in shared boundary vertices with flat cap normals for broken stone facets; ground and center. prop.mjs --godot: UV-aware simplification; LOD1 --simplify-error=.08.",
+    "files": [
+      "res://assets/maps/meshy1/cover_half_temple_v3.glb",
+      "res://assets/maps/meshy1/cover_half_temple_v3_lod1.glb"
+    ],
+    "lods": {
+      "lod0": {
+        "lo": [
+          -0.48833024501800537,
+          0,
+          -0.4220539629459381
+        ],
+        "hi": [
+          0.48894238471984863,
+          0.7885099053382874,
+          0.4280126690864563
+        ],
+        "dimensions": [
+          0.977272629737854,
+          0.7885099053382874,
+          0.8500666320323944
+        ],
+        "tris": 3000,
+        "textures": [
+          [
+            512,
+            512
+          ]
+        ]
+      },
+      "_lod1": {
+        "lo": [
+          -0.4768763780593872,
+          0,
+          -0.4220539629459381
+        ],
+        "hi": [
+          0.48689335584640503,
+          0.7855472564697266,
+          0.4278080463409424
+        ],
+        "dimensions": [
+          0.9637697339057922,
+          0.7855472564697266,
+          0.8498620092868805
+        ],
+        "tris": 800,
+        "textures": [
+          [
+            512,
+            512
+          ]
+        ]
+      }
+    },
+    "integration": "half_cover points to v3; LOD1 retained as separate artifact. v1/v2 and Terminal B unchanged.",
+    "verdict": "Accepted: chunky low sandstone wall at battle distance and action camera, crouching-cover height, tile fit, no visible holes.",
+    "comparison": "docs/godot/shots/meshy1d-trim.png"
   }
 }
