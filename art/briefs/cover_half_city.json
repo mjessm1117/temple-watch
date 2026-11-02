@@ -1,0 +1,30 @@
+{
+  "asset": "cover_half_city",
+  "description": "Low durasteel street barrier, one tile, 0.8 units tall, wider than tall.",
+  "lod0": 3000,
+  "lod1": 800,
+  "height": 0.8,
+  "width": 1.0,
+  "texture": "Matte dark violet grey metal, one thin horizontal cyan neon strip on the front, restrained worn edges.",
+  "variants": {
+    "A": "Original stylized chunky matte science fiction tactics game prop, broad readable shapes, no logos, no text, no ground plane. One low wide solid rectangular durasteel street barricade block. Width greater than height, thick flat top, continuous solid body reaching the ground, beveled chunky edges. Dark violet grey metal and a thin inset cyan strip. No posts, legs, arches, gaps, ground plate, plants or protrusions.",
+    "B": "Original stylized chunky matte science fiction tactics game prop, broad readable shapes, no logos, no text, no ground plane. Retro futuristic undercity street divider made of a single squat armored metal planter-shaped block, sealed flat lid with no vegetation. Broad horizontal silhouette, wider than tall, solid continuous walls. Matte violet charcoal painted steel, thin cyan status light. No posts, feet, legs, archway or floor platform."
+  },
+  "scores": {
+    "A": [
+      5,
+      4,
+      5,
+      5,
+      "WINNER"
+    ],
+    "B": [
+      2,
+      3,
+      3,
+      4,
+      "Rejected: feet and arch"
+    ]
+  },
+  "winner": "A"
+}

@@ -1,0 +1,30 @@
+{
+  "asset": "cover_full_dock",
+  "description": "Stacked industrial cargo crates, full cover in one square tile, height 1.85 units.",
+  "lod0": 3000,
+  "lod1": 800,
+  "height": 1.85,
+  "width": 1.0,
+  "texture": "Matte gunmetal cargo crates, broad black retaining straps, sparse yellow and black hazard stripes, worn edges, no gloss.",
+  "variants": {
+    "A": "Original stylized chunky matte science fiction tactics game prop, broad readable shapes, no logos, no text, no ground plane. Two large cubical industrial cargo crates stacked vertically, forming a tall square tower twice as tall as wide. Heavy flat panels and two broad retaining straps. Square chunky corners, solid mass, gunmetal with hazard stripes. No rounded shapes, gloss, vehicle, wheels, ground plate or loose pieces.",
+    "B": "Original stylized chunky matte science fiction tactics game prop, broad readable shapes, no logos, no text, no ground plane. Retro industrial spaceport freight stack, two armored steel shipping boxes strapped firmly atop each other. Overall narrow square footprint and tall rectangular silhouette, height twice its width. Matte gunmetal paneling with bold hazard bands. No wheels, vehicle, platform, glossy surfaces or curved forms."
+  },
+  "scores": {
+    "A": [
+      4,
+      4,
+      3,
+      4,
+      "WINNER"
+    ],
+    "B": [
+      3,
+      2,
+      4,
+      4,
+      "Rejected: wheels"
+    ]
+  },
+  "winner": "A"
+}
