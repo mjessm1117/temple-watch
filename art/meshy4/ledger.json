@@ -1,0 +1,63 @@
+{
+  "start": 9885,
+  "tasks": [
+    {
+      "asset": "cover_full_temple",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9885,
+      "status": "SUCCEEDED",
+      "id": "01a19b41-5cd3-77b9-8108-2d398ad462a6",
+      "after": 9865
+    },
+    {
+      "asset": "cover_full_temple",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9865,
+      "status": "SUCCEEDED",
+      "id": "01a19b41-671f-718f-94ca-70074bc923a8",
+      "after": 9845
+    },
+    {
+      "asset": "cover_full_temple",
+      "letter": "C",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9845,
+      "status": "SUCCEEDED",
+      "id": "01a19b41-6f27-770b-a956-07c6a8848a37",
+      "after": 9825
+    },
+    {
+      "asset": "cover_full_snow",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9825,
+      "status": "SUCCEEDED",
+      "id": "01a19b41-7787-7758-af7a-86fffb6b6eef",
+      "after": 9805
+    },
+    {
+      "asset": "cover_full_snow",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9805,
+      "status": "SUCCEEDED",
+      "id": "01a19b41-7fc9-73dc-8fe1-1cf612a762b0",
+      "after": 9785
+    },
+    {
+      "asset": "cover_full_snow",
+      "letter": "C",
+      "mode": "preview",
+      "cost": 0,
+      "before": 9785,
+      "status": "NOT_SUBMITTED_CONFIRMED_ACCOUNT_LIST"
+    }
+  ]
+}

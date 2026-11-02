@@ -1,0 +1,19 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+     at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6347)
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 21.1.8, 256 bits)
+
+ART WINDOW: (1920, 1080) viewport (1920.0, 1080.0)
+MESHY SAMPLE {"draws":56,"fps":4.6142072826495,"frames":60,"gpu":"llvmpipe (LLVM 21.1.8, 256 bits)","id":"fixture","p95_ms":306.909,"renderer":"gl_compatibility","theme":"temple","total_draws":110,"total_primitives":273227,"tris":139617,"zoom":23.0}
+MESHY SHOT /home/jess/projects/tw-meshy/batch4/godot/../docs/godot/shots/meshy4-fixture-before.png
+MESHY SHOT /home/jess/projects/tw-meshy/batch4/godot/../docs/godot/shots/meshy4-fixture-before-close.png
+ART WINDOW: (1920, 1080) viewport (1920.0, 1080.0)
+MESHY SAMPLE {"draws":64,"fps":6.48838249706914,"frames":60,"gpu":"llvmpipe (LLVM 21.1.8, 256 bits)","id":"ilum","p95_ms":177.844,"renderer":"gl_compatibility","theme":"snow","total_draws":120,"total_primitives":282518,"tris":148727,"zoom":39.0}
+MESHY SHOT /home/jess/projects/tw-meshy/batch4/godot/../docs/godot/shots/meshy4-ilum-before.png
+MESHY SHOT /home/jess/projects/tw-meshy/batch4/godot/../docs/godot/shots/meshy4-ilum-before-close.png
+ART WINDOW: (1920, 1080) viewport (1920.0, 1080.0)
+MESHY SAMPLE {"draws":65,"fps":5.72384016634243,"frames":60,"gpu":"llvmpipe (LLVM 21.1.8, 256 bits)","id":"relay","p95_ms":206.472,"renderer":"gl_compatibility","theme":"plains","total_draws":121,"total_primitives":314940,"tris":177127,"zoom":33.8}
+MESHY SHOT /home/jess/projects/tw-meshy/batch4/godot/../docs/godot/shots/meshy4-relay-before.png
+MESHY SHOT /home/jess/projects/tw-meshy/batch4/godot/../docs/godot/shots/meshy4-relay-before-close.png

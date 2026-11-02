@@ -1,0 +1,62 @@
+[
+  {
+    "asset": "cover_full_temple",
+    "letter": "A",
+    "silhouette": 3,
+    "style_geometry": 4,
+    "cleanliness": 3,
+    "poly_fit_estimate": 3,
+    "preview_triangles": 7520,
+    "reason": "Carved pilasters read as temple stone, but broad facade and doorway-like recess weaken full-cover mass.",
+    "verdict": "deferred_at_lease_boundary",
+    "refine": false
+  },
+  {
+    "asset": "cover_full_temple",
+    "letter": "B",
+    "silhouette": 2,
+    "style_geometry": 4,
+    "cleanliness": 2,
+    "poly_fit_estimate": 3,
+    "preview_triangles": 7690,
+    "reason": "Open colonnade and thin legs; poor solid-cover silhouette.",
+    "verdict": "deferred_at_lease_boundary",
+    "refine": false
+  },
+  {
+    "asset": "cover_full_temple",
+    "letter": "C",
+    "silhouette": 4,
+    "style_geometry": 4,
+    "cleanliness": 3,
+    "poly_fit_estimate": 3,
+    "preview_triangles": 6633,
+    "reason": "Tall paired fluted columns and broken lintel read clearly; top debris and open centre require final fit review.",
+    "verdict": "deferred_at_lease_boundary",
+    "refine": false
+  },
+  {
+    "asset": "cover_full_snow",
+    "letter": "A",
+    "silhouette": 4,
+    "style_geometry": 4,
+    "cleanliness": 3,
+    "poly_fit_estimate": 4,
+    "preview_triangles": 8135,
+    "reason": "Pointed irregular rock cluster reads as an outcrop at distance; needs dark rock versus snow texture separation.",
+    "verdict": "deferred_at_lease_boundary",
+    "refine": false
+  },
+  {
+    "asset": "cover_full_snow",
+    "letter": "B",
+    "silhouette": 3,
+    "style_geometry": 3,
+    "cleanliness": 3,
+    "poly_fit_estimate": 4,
+    "preview_triangles": 7753,
+    "reason": "Strong vertical slab but flat split crown and broad foot remain too architectural.",
+    "verdict": "deferred_at_lease_boundary",
+    "refine": false
+  }
+]

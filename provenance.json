@@ -1,0 +1,133 @@
+{
+  "batch": "meshy4",
+  "status": "stopped_at_file_lease_boundary",
+  "balance_before": 9885,
+  "balance_after": 9785,
+  "credits_spent": 100,
+  "credit_cap": 300,
+  "tasks": [
+    {
+      "asset": "cover_full_temple",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9885,
+      "status": "SUCCEEDED",
+      "id": "01a19b41-5cd3-77b9-8108-2d398ad462a6",
+      "after": 9865
+    },
+    {
+      "asset": "cover_full_temple",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9865,
+      "status": "SUCCEEDED",
+      "id": "01a19b41-671f-718f-94ca-70074bc923a8",
+      "after": 9845
+    },
+    {
+      "asset": "cover_full_temple",
+      "letter": "C",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9845,
+      "status": "SUCCEEDED",
+      "id": "01a19b41-6f27-770b-a956-07c6a8848a37",
+      "after": 9825
+    },
+    {
+      "asset": "cover_full_snow",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9825,
+      "status": "SUCCEEDED",
+      "id": "01a19b41-7787-7758-af7a-86fffb6b6eef",
+      "after": 9805
+    },
+    {
+      "asset": "cover_full_snow",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9805,
+      "status": "SUCCEEDED",
+      "id": "01a19b41-7fc9-73dc-8fe1-1cf612a762b0",
+      "after": 9785
+    },
+    {
+      "asset": "cover_full_snow",
+      "letter": "C",
+      "mode": "preview",
+      "cost": 0,
+      "before": 9785,
+      "status": "NOT_SUBMITTED_CONFIRMED_ACCOUNT_LIST"
+    }
+  ],
+  "scores": [
+    {
+      "asset": "cover_full_temple",
+      "letter": "A",
+      "silhouette": 3,
+      "style_geometry": 4,
+      "cleanliness": 3,
+      "poly_fit_estimate": 3,
+      "preview_triangles": 7520,
+      "reason": "Carved pilasters read as temple stone, but broad facade and doorway-like recess weaken full-cover mass.",
+      "verdict": "deferred_at_lease_boundary",
+      "refine": false
+    },
+    {
+      "asset": "cover_full_temple",
+      "letter": "B",
+      "silhouette": 2,
+      "style_geometry": 4,
+      "cleanliness": 2,
+      "poly_fit_estimate": 3,
+      "preview_triangles": 7690,
+      "reason": "Open colonnade and thin legs; poor solid-cover silhouette.",
+      "verdict": "deferred_at_lease_boundary",
+      "refine": false
+    },
+    {
+      "asset": "cover_full_temple",
+      "letter": "C",
+      "silhouette": 4,
+      "style_geometry": 4,
+      "cleanliness": 3,
+      "poly_fit_estimate": 3,
+      "preview_triangles": 6633,
+      "reason": "Tall paired fluted columns and broken lintel read clearly; top debris and open centre require final fit review.",
+      "verdict": "deferred_at_lease_boundary",
+      "refine": false
+    },
+    {
+      "asset": "cover_full_snow",
+      "letter": "A",
+      "silhouette": 4,
+      "style_geometry": 4,
+      "cleanliness": 3,
+      "poly_fit_estimate": 4,
+      "preview_triangles": 8135,
+      "reason": "Pointed irregular rock cluster reads as an outcrop at distance; needs dark rock versus snow texture separation.",
+      "verdict": "deferred_at_lease_boundary",
+      "refine": false
+    },
+    {
+      "asset": "cover_full_snow",
+      "letter": "B",
+      "silhouette": 3,
+      "style_geometry": 3,
+      "cleanliness": 3,
+      "poly_fit_estimate": 4,
+      "preview_triangles": 7753,
+      "reason": "Strong vertical slab but flat split crown and broad foot remain too architectural.",
+      "verdict": "deferred_at_lease_boundary",
+      "refine": false
+    }
+  ],
+  "accepted_assets": [],
+  "mapping_changes": [],
+  "blocker": "Relay blink requires runtime hook outside lease; see docs/godot/meshy4/REPORT.md"
+}
