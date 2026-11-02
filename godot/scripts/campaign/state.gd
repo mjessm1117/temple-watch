@@ -60,6 +60,8 @@ func new_campaign(difficulty: String = "normal") -> void:
 		r.pick = Progression.pending_rank(r)
 		state.roster.append(r)
 	story = Story.new(state)
+	# --- wave10 story ---
+	preload("res://scripts/campaign/bond_story.gd").ensure(state)
 	ensure_strategy()
 	ensure_teams()
 	Integration.bind(self)
@@ -101,6 +103,8 @@ func _migrate() -> void:
 		if not r.has("assign"): r.assign = ""
 		if not r.has("stress"): r.stress = 0
 	story = Story.new(state)
+	# --- wave10 story ---
+	preload("res://scripts/campaign/bond_story.gd").ensure(state)
 	ensure_strategy()
 	ensure_teams()
 	Integration.bind(self)
@@ -299,6 +303,8 @@ func apply_mission_result(result: Dictionary) -> Dictionary:
 			var b := soldier(str(deployed[j].get("id", deployed[j].get("rid", ""))))
 			if not a.is_empty() and not b.is_empty() and str(a.status) == "active" and str(b.status) == "active":
 				Legacy.bond_points(self, str(a.id), str(b.id), int(Data.get_table("temple", "BOND").together) + (int(Data.get_table("temple", "BOND").win) if win else 0))
+	# --- wave10 story ---
+	preload("res://scripts/campaign/bond_story.gd").settle(self,result)
 	change_unrest(region_for_mission(id), int(Data.get_table("galaxy", "UNREST").win if win else Data.get_table("galaxy", "UNREST").lose))
 	if win and not state.pending_mission.is_empty() and state.pending_mission.has("hostages") and not state.pending_mission.has("sith_offer_id"):
 		for captive_id in state.pending_mission.hostages:

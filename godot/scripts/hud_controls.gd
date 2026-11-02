@@ -98,6 +98,11 @@ func _build_ui() -> void:
 	g.hud = CanvasLayer.new(); g.add_child(g.hud)
 	var root := Control.new(); root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); root.mouse_filter = Control.MOUSE_FILTER_IGNORE; g.hud.add_child(root)
 	g.overlay = root
+	# --- wave10 story ---
+	var bond_lines := preload("res://scripts/campaign/bond_overlay.gd").new()
+	bond_lines.name = "BondLines"; bond_lines.game = g
+	bond_lines.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	root.add_child(bond_lines)
 	g.fx.setup(g.camera, root)
 	var top := PanelContainer.new(); top.anchor_right = 1.0; top.offset_bottom = 64; root.add_child(top); _style_panel(top)
 	var top_row := HBoxContainer.new(); top.add_child(top_row)
@@ -178,6 +183,10 @@ func _refresh() -> void:
 	g.objective_label.text = "TURN %d · %s%s · %s" % [g.mission.turn,objective.label,clock_note,str(objective.phase).to_upper()]
 	g.selected_label.text = "%s\n%s%s\nHP %s\nAP %s\nFOCUS %d  •  MEDPACS %d%s" % [u.get("name", ""), u.get("class_name", ""), "  WOUNDED" if bool(u.get("wounded", false)) else "", "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, 3 - int(u.get("ap", 0)))), int(u.get("focus_left", 0)), int(u.get("medpacs", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
 	if u.has("ammo"): g.selected_label.text += "\nAMMO %d/%d" % [int(u.ammo), int(u.clip)]
+	# --- wave10 story ---
+	var flow = g.get_node_or_null("/root/CampaignFlow")
+	if flow != null and flow.active and u.has("rid"):
+		g.selected_label.text += "\nBOND  " + preload("res://scripts/campaign/bond_overlay.gd").summary(flow.session().state,str(u.rid))
 	if bool(u.get("concealed", false)): g.selected_label.text += "\nCONCEALED"
 	if g.mission.get("momentum") != null: g.selected_label.text += "\nMOMENTUM %d/10" % int(g.mission.momentum)
 	var kind := str(u.get("model", ""))

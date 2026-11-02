@@ -92,7 +92,13 @@ static func result(campaign, m) -> Dictionary:
 			"hurt":int(u.hp) < int(u.max_hp), "kills":int(u.get("kills", 0)),
 			"quote":u.get("quote", ""), "captures":int(u.get("captures", 0)), "dark":int(u.get("dark", 0)) + int(u.get("darkness", 0))})
 	var pending: Dictionary = campaign.state.pending_mission
+	# --- wave10 story ---
+	var cohesion: Dictionary = {}
+	if m.get("bond_pairs") != null:
+		for pair in m.bond_pairs:
+			if int(m.bond_pairs[pair].get("cohesion",0)) > 0: cohesion[pair] = int(m.bond_pairs[pair].cohesion)
 	return {"mission_id":pending.mission_id, "win":m.result == "win", "units":rows,
+		"bond_cohesion":cohesion,
 		"mercy":m.get("mercy_events") if m.get("mercy_events") != null else [], "story":bool(pending.get("story", false)), "bonds_recorded":true,
 		"family":m.spec.get("family","rescue"), "map_id":m.spec.get("id","rescue"),
 		"objectives_completed":m.objective_state.get("done",{}).size(), "civilians_saved":int(m.objective_state.get("saved",0)),

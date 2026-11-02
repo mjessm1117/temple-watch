@@ -100,6 +100,8 @@ static func roster(view) -> void:
 static func soldier(view, box: VBoxContainer, r: Dictionary) -> void:
 	var c = view.campaign
 	box.add_child(UI.label("%s · fatigue %d/100 · stress %d · %s" % [Roster.fatigue_status(r), r.fatigue, r.stress, r.assign if r.assign != "" else "on call"], 14, UI.GOLD))
+	# --- wave10 story ---
+	box.add_child(UI.label("BONDS  " + preload("res://scripts/campaign/bond_overlay.gd").summary(c.state,str(r.id)),13,UI.ACCENT))
 	if int(r.fatigue) >= 34: box.add_child(UI.label("Tired: −5 aim, −10 will. Exhausted at 67: cannot deploy. Rest to recover.", 13, UI.MUTED))
 	var row := HFlowContainer.new(); box.add_child(row)
 	button(view, row, "Retrain · 40 Cr", Roster.train.bind(c, str(r.id), "retrain"), Roster.ready(r))

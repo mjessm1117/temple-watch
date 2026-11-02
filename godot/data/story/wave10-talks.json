@@ -1,0 +1,446 @@
+{
+  "records": {
+    "W10_TALKS": [
+      {
+        "id": "w10_talk_1",
+        "title": "The empty seat",
+        "text": "A Council member asks what the Order owes those who do not return.",
+        "choices": [
+          {
+            "label": "Listen and remember",
+            "fx": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ask them to help the next squad",
+            "fx": {
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_talk_2",
+        "title": "A quiet hour",
+        "text": "A Jedi asks how you keep faith after a hard campaign.",
+        "choices": [
+          {
+            "label": "Listen and remember",
+            "fx": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ask them to help the next squad",
+            "fx": {
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_talk_3",
+        "title": "The archive lamp",
+        "text": "An archivist has kept a lamp burning for the missing.",
+        "choices": [
+          {
+            "label": "Listen and remember",
+            "fx": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ask them to help the next squad",
+            "fx": {
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_talk_4",
+        "title": "An unspoken lesson",
+        "text": "A Padawan wonders whether courage can be taught.",
+        "choices": [
+          {
+            "label": "Listen and remember",
+            "fx": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ask them to help the next squad",
+            "fx": {
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_talk_5",
+        "title": "The healing ward",
+        "text": "A healer asks who will visit the wounded tonight.",
+        "choices": [
+          {
+            "label": "Listen and remember",
+            "fx": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ask them to help the next squad",
+            "fx": {
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_talk_6",
+        "title": "A distant world",
+        "text": "A Jedi remembers a settlement the Council almost overlooked.",
+        "choices": [
+          {
+            "label": "Listen and remember",
+            "fx": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ask them to help the next squad",
+            "fx": {
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_talk_7",
+        "title": "The practice floor",
+        "text": "Two Jedi disagree over the purpose of drills.",
+        "choices": [
+          {
+            "label": "Listen and remember",
+            "fx": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ask them to help the next squad",
+            "fx": {
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_talk_8",
+        "title": "A measured promise",
+        "text": "A Council member asks what promise the Order can keep.",
+        "choices": [
+          {
+            "label": "Listen and remember",
+            "fx": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ask them to help the next squad",
+            "fx": {
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_talk_9",
+        "title": "The morning watch",
+        "text": "A sentinel shares a report from the outer wards.",
+        "choices": [
+          {
+            "label": "Listen and remember",
+            "fx": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ask them to help the next squad",
+            "fx": {
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_talk_10",
+        "title": "An old map",
+        "text": "The archive holds a route drawn by a lost scout.",
+        "choices": [
+          {
+            "label": "Listen and remember",
+            "fx": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ask them to help the next squad",
+            "fx": {
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_talk_11",
+        "title": "Before deployment",
+        "text": "A Jedi asks what should be said to a new squad.",
+        "choices": [
+          {
+            "label": "Listen and remember",
+            "fx": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ask them to help the next squad",
+            "fx": {
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_talk_12",
+        "title": "The last candle",
+        "text": "A Council member leaves a candle beside the names of the fallen.",
+        "choices": [
+          {
+            "label": "Listen and remember",
+            "fx": {
+              "favor": 1
+            }
+          },
+          {
+            "label": "Ask them to help the next squad",
+            "fx": {
+              "intel": 1
+            }
+          }
+        ]
+      }
+    ],
+    "W10_PAIR_TALKS": [
+      {
+        "id": "w10_pair_1",
+        "min_level": 1,
+        "title": "A shared watch",
+        "text": "Two Jedi keep the final watch together.",
+        "choices": [
+          {
+            "label": "Share what still weighs on you",
+            "fx": {
+              "bond_points": 3
+            }
+          },
+          {
+            "label": "Make a plan for the next mission",
+            "fx": {
+              "bond_points": 3,
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_pair_2",
+        "min_level": 1,
+        "title": "The same step",
+        "text": "Their practice blades stop in the same instant.",
+        "choices": [
+          {
+            "label": "Share what still weighs on you",
+            "fx": {
+              "bond_points": 3
+            }
+          },
+          {
+            "label": "Make a plan for the next mission",
+            "fx": {
+              "bond_points": 3,
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_pair_3",
+        "min_level": 1,
+        "title": "A steady hand",
+        "text": "One Jedi notices the other hiding a tremor.",
+        "choices": [
+          {
+            "label": "Share what still weighs on you",
+            "fx": {
+              "bond_points": 3
+            }
+          },
+          {
+            "label": "Make a plan for the next mission",
+            "fx": {
+              "bond_points": 3,
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_pair_4",
+        "min_level": 1,
+        "title": "After the rescue",
+        "text": "They speak of the lives carried home.",
+        "choices": [
+          {
+            "label": "Share what still weighs on you",
+            "fx": {
+              "bond_points": 3
+            }
+          },
+          {
+            "label": "Make a plan for the next mission",
+            "fx": {
+              "bond_points": 3,
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_pair_5",
+        "min_level": 2,
+        "title": "The long corridor",
+        "text": "A quiet walk becomes an honest conversation.",
+        "choices": [
+          {
+            "label": "Share what still weighs on you",
+            "fx": {
+              "bond_points": 3
+            }
+          },
+          {
+            "label": "Make a plan for the next mission",
+            "fx": {
+              "bond_points": 3,
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_pair_6",
+        "min_level": 2,
+        "title": "A promise kept",
+        "text": "One remembers a promise made under fire.",
+        "choices": [
+          {
+            "label": "Share what still weighs on you",
+            "fx": {
+              "bond_points": 3
+            }
+          },
+          {
+            "label": "Make a plan for the next mission",
+            "fx": {
+              "bond_points": 3,
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_pair_7",
+        "min_level": 2,
+        "title": "The better question",
+        "text": "They disagree, then find the question beneath it.",
+        "choices": [
+          {
+            "label": "Share what still weighs on you",
+            "fx": {
+              "bond_points": 3
+            }
+          },
+          {
+            "label": "Make a plan for the next mission",
+            "fx": {
+              "bond_points": 3,
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_pair_8",
+        "min_level": 2,
+        "title": "The old scar",
+        "text": "A scar brings back a mission neither has forgotten.",
+        "choices": [
+          {
+            "label": "Share what still weighs on you",
+            "fx": {
+              "bond_points": 3
+            }
+          },
+          {
+            "label": "Make a plan for the next mission",
+            "fx": {
+              "bond_points": 3,
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_pair_9",
+        "min_level": 3,
+        "title": "At the archive door",
+        "text": "They choose which memory to leave for the next generation.",
+        "choices": [
+          {
+            "label": "Share what still weighs on you",
+            "fx": {
+              "bond_points": 3
+            }
+          },
+          {
+            "label": "Make a plan for the next mission",
+            "fx": {
+              "bond_points": 3,
+              "intel": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "w10_pair_10",
+        "min_level": 3,
+        "title": "The night before",
+        "text": "Before deployment, they decide to trust each other again.",
+        "choices": [
+          {
+            "label": "Share what still weighs on you",
+            "fx": {
+              "bond_points": 3
+            }
+          },
+          {
+            "label": "Make a plan for the next mission",
+            "fx": {
+              "bond_points": 3,
+              "intel": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
