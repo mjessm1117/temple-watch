@@ -17,5 +17,10 @@
     "dock": "metal",
     "city": "metal"
   },
-  "asset_root": "res://assets/maps/"
+  "asset_root": "res://assets/maps/",
+  "meshy1_enabled": true,
+  "meshy1_models": {
+    "objective": "res://assets/maps/meshy1/obj_terminal_v1.glb",
+    "half_cover": "res://assets/maps/meshy1/cover_half_temple_v1.glb"
+  }
 }

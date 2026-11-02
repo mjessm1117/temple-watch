@@ -48,5 +48,39 @@ async function one(kind,out){const prop=!!PROPS[kind],[p,t]=PROPS[kind]||PROMPTS
  if(prop)return log('done (prop)');
  try{const rg=await post('/v1/rigging',{input_task_id:rf,height_meters:kind==='nihilStorm'||kind==='drengir'?2.1:1.8});log('rig '+rg);const G=await wait('/v1/rigging/'+rg);
   await get(G.result.rigged_character_glb_url,`${out}/${kind}.rig.glb`);log('done')}catch(e){log('rig failed: '+e.message)}}
-const [out,...kinds]=process.argv.slice(2);fs.mkdirSync(out,{recursive:true});
-const res=await Promise.allSettled((kinds.length?kinds:Object.keys(PROMPTS)).map(k=>one(k,out)));res.forEach(r=>r.status==='rejected'&&console.log('FAILED',r.reason.message));
+// Art-direction modes: out asset --brief file.json --letter A --preview-only
+// or --refine-preview TASK_ID. --submit-only queues; --resume polls a saved task.
+// Single-writer ledger: do not run these commands concurrently. These modes never rig.
+const args=process.argv.slice(2);
+if(args.includes('--preview-only')||args.includes('--refine-preview')){
+ const value=f=>args[args.indexOf(f)+1],out=args[0],asset=args[1],letter=value('--letter');
+ if(!/^[A-D]$/.test(letter))throw Error('--letter A–D required');
+ fs.mkdirSync(out,{recursive:true});
+ const spec=JSON.parse(fs.readFileSync(value('--brief'),'utf8'));
+ const ledgerPath=`${out}/ledger.json`;
+ const balance=async()=>{const r=await fetch(API+'/v1/balance',{headers:H()});if(!r.ok)throw Error('balance '+r.status);return (await r.json()).balance};
+ const before=await balance();
+ const ledger=fs.existsSync(ledgerPath)?JSON.parse(fs.readFileSync(ledgerPath)): {start:before,tasks:[]};
+ const refine=args.includes('--refine-preview'),cost=refine?10:20,mode=refine?'refine':'preview';
+ const save=()=>fs.writeFileSync(ledgerPath,JSON.stringify(ledger,null,2)+'\n');
+ let entry=ledger.tasks.find(t=>t.asset===asset&&t.letter===letter&&t.mode===mode);
+ if(args.includes('--resume')){
+  if(!entry?.id)throw Error('No saved task to resume');
+ }else{
+  const reserved=ledger.tasks.reduce((sum,t)=>sum+t.cost,0);
+  if(Math.max(ledger.start-before,reserved)+cost>200)throw Error('200 credit cap: stopped');
+  if(ledger.tasks.filter(t=>t.mode===mode).length>=(refine?2:8))throw Error('Task count cap');
+  if(entry)throw Error('Task already submitted; use --resume');
+  const body=refine?{mode,preview_task_id:value('--refine-preview'),texture_prompt:spec.texture,enable_pbr:false}:{mode,prompt:spec.variants[letter],ai_model:'meshy-6',should_remesh:true,target_polycount:8000,topology:'triangle'};
+  entry={asset,letter,mode,cost,before,status:'SUBMITTING'};ledger.tasks.push(entry);save();
+  entry.id=await post('/v2/text-to-3d',body);entry.after=await balance();entry.status='SUBMITTED';save();console.log(asset,letter,mode,entry.id,before,entry.after);
+ }
+ if(args.includes('--submit-only'))process.exit(0);
+ const result=await wait('/v2/text-to-3d/'+entry.id);
+ await get(result.model_urls.glb,`${out}/${asset}.${letter}.${refine?'raw':'preview'}.glb`);
+ entry.status=result.status;entry.completion_balance=await balance();save();
+ console.log('completed',asset,letter,mode,entry.after);
+}else{
+ const [out,...kinds]=args;fs.mkdirSync(out,{recursive:true});
+ const res=await Promise.allSettled((kinds.length?kinds:Object.keys(PROMPTS)).map(k=>one(k,out)));res.forEach(r=>r.status==='rejected'&&console.log('FAILED',r.reason.message));
+}

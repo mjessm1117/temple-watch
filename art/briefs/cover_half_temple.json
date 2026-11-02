@@ -1,0 +1,10 @@
+{
+  "asset": "cover_half_temple",
+  "variants": {
+    "A": "Original stylized chunky tactical game prop, broad clean planes, readable miniature silhouette, matte surfaces, standalone single object, no ground plane, no text, no logos, no characters, no glossy rounded forms. Low wide barricade made of a fallen carved stone column lying horizontally between two chunky broken stone blocks. Width to height ratio 1.25, squat compact footprint, flat grounded bottom. Broad shallow carved bands.",
+    "B": "Original stylized chunky tactical game prop, broad clean planes, readable miniature silhouette, matte surfaces, standalone single object, no ground plane, no text, no logos, no characters, no glossy rounded forms. Warm matte sandstone half cover obstacle, one short thick fallen column drum on its side with shallow geometric carvings and two supporting squared masonry blocks, chipped large edges, compact width to height ratio 1.25.",
+    "C": "Original stylized chunky tactical game prop, broad clean planes, readable miniature silhouette, matte surfaces, standalone single object, no ground plane, no text, no logos, no characters, no glossy rounded forms. Ancient space temple ruin barricade, fallen short fluted column lying horizontally cradled in massive broken masonry blocks. Restrained ceremonial geometric bands, chunky silhouette, width to height ratio 1.25, no upright column.",
+    "D": "Original stylized chunky tactical game prop, broad clean planes, readable miniature silhouette, matte surfaces, standalone single object, no ground plane, no text, no logos, no characters, no glossy rounded forms. Squat single tile stone barricade, three large interlocking stone blocks supporting a horizontal broken carved column segment, clear horizontal top edge, broad flat faces, shallow simple relief, width to height ratio 1.25."
+  },
+  "texture": "Warm tan matte sandstone, darker recessed shallow carvings, restrained weathered bronze bands, large clean stone faces, no moss, no shine."
+}

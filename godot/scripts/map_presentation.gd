@@ -222,8 +222,11 @@ func objective(b, m: RefCounted, tile: Vector2i, family: String) -> void:
 		b.put("box",palette.metal,at+Vector3(0,0.22,0.31),Vector3(0.38,0.28,0.16))
 		b.put("box",palette.fire if done else palette.glow,at+Vector3(0,0.25,0.397),Vector3(0.22,0.07,0.012))
 	else:
-		b.model("res://assets/maps/%s.glb" % ("relay" if family in ["destroy_relay","defend"] else "terminal"),at,0.72,1.18)
-		b.put("box",palette.glow,at+Vector3(0,0.92,0.30),Vector3(0.30,0.17,0.025))
+		if props.get("meshy1_enabled",false):
+			b.model(str(props.meshy1_models.objective),at,0.72,1.18)
+		else:
+			b.model("res://assets/maps/%s.glb" % ("relay" if family in ["destroy_relay","defend"] else "terminal"),at,0.72,1.18)
+			b.put("box",palette.glow,at+Vector3(0,0.92,0.30),Vector3(0.30,0.17,0.025))
 	ring(b,at,palette.evac if done else palette.objective)
 	b.end_record(); light(at+Vector3.UP*1.3,Color("74d4e4"),0.6,2.0,marker_root)
 
