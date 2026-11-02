@@ -1,0 +1,44 @@
+[
+  {
+    "draws": 56,
+    "fps": 4.6142072826495,
+    "frames": 60,
+    "gpu": "llvmpipe (LLVM 21.1.8, 256 bits)",
+    "id": "fixture",
+    "p95_ms": 306.909,
+    "renderer": "gl_compatibility",
+    "theme": "temple",
+    "total_draws": 110,
+    "total_primitives": 273227,
+    "tris": 139617,
+    "zoom": 23.0
+  },
+  {
+    "draws": 64,
+    "fps": 6.48838249706914,
+    "frames": 60,
+    "gpu": "llvmpipe (LLVM 21.1.8, 256 bits)",
+    "id": "ilum",
+    "p95_ms": 177.844,
+    "renderer": "gl_compatibility",
+    "theme": "snow",
+    "total_draws": 120,
+    "total_primitives": 282518,
+    "tris": 148727,
+    "zoom": 39.0
+  },
+  {
+    "draws": 65,
+    "fps": 5.72384016634243,
+    "frames": 60,
+    "gpu": "llvmpipe (LLVM 21.1.8, 256 bits)",
+    "id": "relay",
+    "p95_ms": 206.472,
+    "renderer": "gl_compatibility",
+    "theme": "plains",
+    "total_draws": 121,
+    "total_primitives": 314940,
+    "tris": 177127,
+    "zoom": 33.8
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "asset": "cover_full_temple",
+  "credit_cap": 300,
+  "preview_cap": 13,
+  "refine_cap": 4,
+  "texture": "Warm pale tan sandstone matching classical fluted temple columns, cream chipped edges, muted bronze carved accents, dark recessed stone grooves. Matte mineral stone, no bright yellow paint.",
+  "variants": {
+    "A": "Single stylized chunky matte game scenery prop, clean readable silhouette at 25 metres, no ground plane, no surrounding scene. Tall narrow broken ancient temple wall, twice as tall as wide, thick solid sandstone masonry with deep fluted pilasters carved into its face, jagged broken top and large chipped corners. No cabinet, doors, boxes, shelves or metal.",
+    "B": "Single stylized chunky matte game scenery prop, clean readable silhouette at 25 metres, no ground plane, no surrounding scene. Two thick fluted stone columns pressed tightly together supporting a cracked heavy carved lintel, solid stone infill between columns, twice as tall as wide, ancient ruined temple fragment. No open doorway, no furniture, no pedestal platform.",
+    "C": "Single stylized chunky matte game scenery prop, clean readable silhouette at 25 metres, no ground plane, no surrounding scene. Tall monolithic ruined temple pier, deeply carved vertical stone ribs, broken asymmetric crown, thick broad masonry body, two times taller than wide. Large geometric carved bands, no box panels or doors."
+  },
+  "references": [
+    "docs/godot/shots/meshy3b-stage-close.png",
+    "docs/godot/shots/meshyint-temple-close.png"
+  ],
+  "brief": "Replace weak shipped silhouette at battle camera; uniform fit only; LOD0 <=3000, LOD1 <=800, textures <=1024. Full cover >=1.8 tall; half cover 0.7\u20130.9 tall and wider than tall."
+}

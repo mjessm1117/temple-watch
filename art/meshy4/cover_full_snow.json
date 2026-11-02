@@ -1,0 +1,17 @@
+{
+  "asset": "cover_full_snow",
+  "credit_cap": 300,
+  "preview_cap": 13,
+  "refine_cap": 4,
+  "texture": "Dark charcoal slate rock or gunmetal exposed across most vertical faces, thick chalk white snow on upward ledges, pale blue frost and ice, deep dark cracks. Strong dark and light contrast, matte.",
+  "variants": {
+    "A": "Single stylized chunky matte game scenery prop, clean readable silhouette at 25 metres, no ground plane, no surrounding scene. Tall narrow jagged dark rock outcrop, twice as tall as wide, three tightly clustered angular rock spires with deep cracks, thick uneven snow caps and icicles on ledges. Heavy solid base. No box, cabinet, refrigerator or ground plane.",
+    "B": "Single stylized chunky matte game scenery prop, clean readable silhouette at 25 metres, no ground plane, no surrounding scene. Tall thick shattered durasteel bulkhead fragment twice as tall as wide, jagged broken slanted top, massive exposed dark metal ribs with deep packed snow between them and ice crust on edges. No door, screen or cabinet.",
+    "C": "Single stylized chunky matte game scenery prop, clean readable silhouette at 25 metres, no ground plane, no surrounding scene. Tall compact angular glacier rock pillar, two times taller than wide, asymmetrical split pointed crown, rough dark rock faces exposed below thick windblown snow ledges and blue ice seams. No rectangular box or ground slab."
+  },
+  "references": [
+    "docs/godot/shots/meshy3b-stage-close.png",
+    "docs/godot/shots/meshyint-temple-close.png"
+  ],
+  "brief": "Replace weak shipped silhouette at battle camera; uniform fit only; LOD0 <=3000, LOD1 <=800, textures <=1024. Full cover >=1.8 tall; half cover 0.7\u20130.9 tall and wider than tall."
+}

@@ -1,0 +1,19 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+     at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6347)
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 21.1.8, 256 bits)
+
+ART WINDOW: (1920, 1080) viewport (1920.0, 1080.0)
+MESHY SAMPLE {"draws":56,"fps":1.32045249530199,"frames":60,"gpu":"llvmpipe (LLVM 21.1.8, 256 bits)","id":"fixture","p95_ms":1685.997,"renderer":"gl_compatibility","theme":"temple","total_draws":110,"total_primitives":279219,"tris":142613,"zoom":23.0}
+MESHY SHOT /home/jess/projects/tw-meshy/batch4/godot/../docs/godot/shots/meshy4-fixture-after.png
+MESHY SHOT /home/jess/projects/tw-meshy/batch4/godot/../docs/godot/shots/meshy4-fixture-after-close.png
+ART WINDOW: (1920, 1080) viewport (1920.0, 1080.0)
+MESHY SAMPLE {"draws":65,"fps":1.8093312823156,"frames":60,"gpu":"llvmpipe (LLVM 21.1.8, 256 bits)","id":"ilum","p95_ms":1214.891,"renderer":"gl_compatibility","theme":"snow","total_draws":121,"total_primitives":281551,"tris":147715,"zoom":39.0}
+MESHY SHOT /home/jess/projects/tw-meshy/batch4/godot/../docs/godot/shots/meshy4-ilum-after.png
+MESHY SHOT /home/jess/projects/tw-meshy/batch4/godot/../docs/godot/shots/meshy4-ilum-after-close.png
+ART WINDOW: (1920, 1080) viewport (1920.0, 1080.0)
+MESHY SAMPLE {"draws":66,"fps":2.00856035030899,"frames":60,"gpu":"llvmpipe (LLVM 21.1.8, 256 bits)","id":"relay","p95_ms":1130.759,"renderer":"gl_compatibility","theme":"plains","total_draws":122,"total_primitives":313883,"tris":176070,"zoom":33.8}
+MESHY SHOT /home/jess/projects/tw-meshy/batch4/godot/../docs/godot/shots/meshy4-relay-after.png
+MESHY SHOT /home/jess/projects/tw-meshy/batch4/godot/../docs/godot/shots/meshy4-relay-after-close.png

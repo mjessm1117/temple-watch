@@ -1,0 +1,17 @@
+{
+  "asset": "cover_half_snow",
+  "credit_cap": 300,
+  "preview_cap": 13,
+  "refine_cap": 4,
+  "texture": "Thick white snow rounded over upper surfaces, dark blue charcoal rock and weathered dark grey metal exposed on lower sides, pale blue icy crust. Strong contrasting exposed dark faces, no plain white box.",
+  "variants": {
+    "A": "Single stylized chunky matte game scenery prop, clean readable silhouette at 25 metres, no ground plane, no surrounding scene. Compact low snow drift covering three chunky angular rocks, waist high, width 1.3 times height, deep footprint. Large exposed rough rock faces below rounded uneven snow cap, solid mass reaches ground. No thin flat base, box, legs, posts or ground plane.",
+    "B": "Single stylized chunky matte game scenery prop, clean readable silhouette at 25 metres, no ground plane, no surrounding scene. Waist high tightly packed cluster of dark broken boulders with heavy windblown snow shoulders, width 1.25 times height, deep solid footprint, asymmetric sloping snowy top and visible angular stone faces. No tower, box or ground plate.",
+    "C": "Single stylized chunky matte game scenery prop, clean readable silhouette at 25 metres, no ground plane, no surrounding scene. Compact low supply barricade almost buried in a thick uneven snow drift, one broken ribbed metal crate with two chunky dark rocks at its sides, width 1.3 times height. Exposed metal and rock lower faces. No legs, screen, tower or ground platform."
+  },
+  "references": [
+    "docs/godot/shots/meshy3b-stage-close.png",
+    "docs/godot/shots/meshyint-temple-close.png"
+  ],
+  "brief": "Replace weak shipped silhouette at battle camera; uniform fit only; LOD0 <=3000, LOD1 <=800, textures <=1024. Full cover >=1.8 tall; half cover 0.7\u20130.9 tall and wider than tall."
+}

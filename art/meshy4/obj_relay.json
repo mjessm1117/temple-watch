@@ -1,0 +1,17 @@
+{
+  "asset": "obj_relay",
+  "credit_cap": 300,
+  "preview_cap": 13,
+  "refine_cap": 4,
+  "texture": "Matte dark gunmetal lattice, pale grey dish face with dark rim, worn steel equipment housing, one vivid saturated red-orange beacon lamp at the top to remain steadily emissive, restrained orange hazard accents. No large glowing screen. No blinking or animation.",
+  "variants": {
+    "A": "Single stylized chunky matte game scenery prop, clean readable silhouette at 25 metres, no ground plane, no surrounding scene. Compact communications relay mast, chunky tapered lattice tower with thick diagonal cross braces and clear open triangular gaps, large circular satellite dish mounted on upper side, short antenna at top, heavy small base equipment housing, tiny beacon light. No kiosk, screen or ground platform.",
+    "B": "Single stylized chunky matte game scenery prop, clean readable silhouette at 25 metres, no ground plane, no surrounding scene. Military field radio relay, short robust steel truss tower with wide diagonal lattice struts, prominent tilted concave radar dish and two antenna rods, integrated compact solid equipment base and small warning light. Twice as tall as wide. No screen, terminal or kiosk.",
+    "C": "Single stylized chunky matte game scenery prop, clean readable silhouette at 25 metres, no ground plane, no surrounding scene. Sci fi communications mast, thick four-legged lattice support with visible crossbracing rising from square radio equipment housing, large off-centre circular antenna dish and short top aerial with beacon lamp. Chunky low polygon miniature, no display screen or ground plane."
+  },
+  "references": [
+    "docs/godot/shots/meshy3b-stage-close.png",
+    "docs/godot/shots/meshyint-temple-close.png"
+  ],
+  "brief": "Replace weak shipped silhouette at battle camera; uniform fit only; LOD0 <=3000, LOD1 <=800, textures <=1024. Full cover >=1.8 tall; half cover 0.7\u20130.9 tall and wider than tall."
+}

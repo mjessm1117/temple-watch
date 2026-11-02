@@ -1,0 +1,5 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+MAP ART: 62 maps; largest res://data/maps/cache.json (1156 tiles)
+MAP ART FPS: skipped: headless has no GPU frames; run tests/map_art_test.gd -- --fps in a real window
+MAP ART TEST RESULTS: 179392 checks, 0 failures

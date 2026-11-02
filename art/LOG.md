@@ -114,3 +114,37 @@ The final trim has **374 cap triangles** before simplification. Planar caps look
 Shots: `docs/godot/shots/meshy1d-cover-after.png`, `meshy1d-cover-after-close.png`, and `meshy1d-trim.png`. Real 1920×1080 Godot windows, HUD and deterministic fixture mission/seed/cameras copied from v1/1c. Final capture used a fixed-size X11 display after a Wayland window-size assertion interrupted a draft capture. Comparison labels report true uniform W×H×D, with whole B at 0.80 height and v3 at native dimensions. Pre-existing dust is unchanged.
 
 Validation: `./godot/test.sh` exit **0**, all **15 suites** passed, zero failures and no SCRIPT ERROR or ERROR. `map_art_test` passed with the final v3 active, including grounded tile bounds, cover height and unchanged mission/RNG/cover/LOS checks; new checks cover both v3 LOD bounds. JavaScript syntax and `git diff --check` passed. Every added/changed text file is below 600 lines. Web-game files unchanged; no subagents, no push. Local commit on `meshy/batch1`.
+
+## Meshy batch 4 — stopped at lease boundary (2026-11-01)
+
+Applied meshy-art-director; inspected temple column and prior cover reference shots.
+Five previews submitted: temple A/B/C and full snow A/B. Starting balance 9885,
+final balance 9785, confirmed **100/300 credits**, no refines or rigging. Full snow C
+submission was interrupted before task creation; account listing and balance
+confirm no charge. All five paid GLBs and uniform-fit close/distance renders are
+preserved in art/meshy4. Exact prompts, task IDs, numeric balances and per-preview
+scores are in root provenance.json and art/meshy4/{ledger,scores}.json.
+
+Temple A/B/C silhouette scores: 3/2/4. Full snow A/B: 4/3. Temple C and snow A
+are provisional silhouette candidates only, not accepted replacements. Half snow
+and relay were not generated. All four current mappings remain unchanged.
+
+**Blocker:** relay blinking light cannot survive the current static GLB mesh
+extraction/MultiMesh batching path. Runtime animation/material support requires
+a change outside the lease. Stopped under Jess's explicit stop-and-report rule;
+see docs/godot/meshy4/REPORT.md for evidence and scope needed to resume.
+
+Six before screenshots cover temple fixture, Ilum snow and relay mission. Existing
+visible-triangle/total-draw gate passes those scenes; relay total rendered primitives
+314940 exceed 300K if all passes/UI are counted. No all-map compliance claim.
+`./godot/test.sh`: exit 0, all 15 suites, zero failures and SCRIPT ERROR lines.
+Normal/gameplay unchanged. No after screenshots, production LODs, or final stage
+shots: this batch is incomplete. Local meshy/batch4 commit only; no push.
+
+## Meshy batch 4 — resumed and finished (2026-11-02)
+
+Tech lead replaced the relay blink with a steady emissive beacon. Reused the five original paid previews. Submitted six new previews (half snow A/B/C, relay A/B/C) and refined only silhouette-4 winners: temple C, full snow A, half snow B, relay B. Final balance **9,625** from 9,885, total **260/300 credits**; this continuation spent 160, stopping 40 above the required account floor. Task IDs, credits, scores and verdicts are in `art/meshy4/ledger.json`, `scores.json` and `provenance.json`.
+
+Accepted and integrated: temple C (warm column pair, 2,998/800 tris); full snow A (dark rock spire, small side trim for 1.85 height, 3,000/800); relay B (dish mast and steady textured emissive beacon, 2,938/768). All textures are at most 512², with a 1² beacon mask. Only these three `props.json` mappings changed. Rejected half snow B after refinement: uniform one-tile fit was only 0.473 high; a capped side trim reached 0.72 but looked too much like the original white box. Its shipped mapping stays intact. No top slicing, nonuniform scaling, animation or batching-code change.
+
+Before/after mission captures and a close stage comparison per accepted asset are under `docs/godot/shots/meshy4-*.png`; the rejected half snow stage view is preserved too. Full report and phone-budget measurements: `docs/godot/meshy4/REPORT.md`.

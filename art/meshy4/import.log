@@ -1,0 +1,3 @@
+Initial Godot editor import completed successfully. Verbose progress omitted.
+WARNING: Vector3 cannot be normalized, the elements must be finite. Making (0, 0, 0) as a fallback.
+WARNING: Vector3 cannot be normalized, the elements must be finite. Making (0, 0, 0) as a fallback.

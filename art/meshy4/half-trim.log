@@ -1,0 +1,30 @@
+prune: Removed types... Accessor (4)
+{
+  source: 'art/meshy4/cover_half_snow.B.raw.glb',
+  planes: [
+    { axis: 0, value: -0.5, sign: -1 },
+    { axis: 0, value: 0.5, sign: 1 }
+  ],
+  source_slice_bounds: {
+    lo: [ -0.49992069602012634, -0.3596091866493225, -0.6784254312515259 ],
+    hi: [ 0.4995668828487396, 0.35984399914741516, 0.6758602857589722 ]
+  },
+  uniform_scale: 0.8041188720537135,
+  dimensions: [ 0.999487578868866, 0.7194531857967377, 1.354285717010498 ],
+  cap_triangles: 267
+}
+prune: Removed types... Accessor (4)
+{
+  source: 'art/meshy4/cover_half_snow.B.rot.glb',
+  planes: [
+    { axis: 0, value: -0.5, sign: -1 },
+    { axis: 0, value: 0.5, sign: 1 }
+  ],
+  source_slice_bounds: {
+    lo: [ -0.49920138716697693, 0, -0.4990348219871521 ],
+    hi: [ 0.4995321035385132, 0.7200000286102295, 0.49999403953552246 ]
+  },
+  uniform_scale: 1.00075999994035,
+  dimensions: [ 0.9987334907054901, 0.7200000286102295, 0.9990288615226746 ],
+  cap_triangles: 274
+}
