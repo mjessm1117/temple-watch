@@ -22,7 +22,7 @@ for tier in low medium high; do
     "${GODOT_BIN:-/home/jess/projects/.tools/godot/godot}" --path . \
     --rendering-method "$renderer" -s res://tests/graphics_perf.gd \
     -- "--graphics=$tier" 2>&1 | tee "$perf_log"
-  if ! rg -q 'GRAPHICS PERF:' "$perf_log" || rg -q 'SCRIPT ERROR|Parse Error|ERROR:' "$perf_log"; then
+  if ! grep -q 'GRAPHICS PERF:' "$perf_log" || grep -qE 'SCRIPT ERROR|Parse Error|ERROR:' "$perf_log"; then
     echo "Graphics benchmark failed: $tier" >&2
     exit 1
   fi
