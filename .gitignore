@@ -5,3 +5,5 @@ dist/
 # Meshy batch 1 raw previews/refines and local render intermediates (>5 MB).
 art/meshy1/
 art/meshy1b/
+
+art/meshy1c/

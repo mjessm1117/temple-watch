@@ -58,7 +58,7 @@ func collect(node: Node3D, parent: Transform3D, out: Array) -> void:
 	for child in node.get_children():
 		if child is Node3D: collect(child,transform,out)
 
-func model(path: String, at: Vector3, width: float, height: float, angle := 0.0) -> AABB:
+func model(path: String, at: Vector3, width: float, height: float, angle := 0.0, uniform := false) -> AABB:
 	if not models.has(path):
 		if not ResourceLoader.exists(path): return AABB()
 		var instance: Node3D = load(path).instantiate()
@@ -72,7 +72,7 @@ func model(path: String, at: Vector3, width: float, height: float, angle := 0.0)
 		bounds = b if first else bounds.merge(b); first = false
 	if bounds.size.y < 0.001: return AABB()
 	var factor := width/maxf(bounds.size.x,bounds.size.z)
-	var scale_value := Vector3(factor,height/bounds.size.y,factor)
+	var scale_value := Vector3.ONE*minf(factor,height/bounds.size.y) if uniform else Vector3(factor,height/bounds.size.y,factor)
 	var fit := Transform3D(Basis.from_scale(scale_value),at-Vector3(bounds.get_center().x,bounds.position.y,bounds.get_center().z)*scale_value)
 	var actual := AABB(); first = true
 	for part in parts:

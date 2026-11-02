@@ -23,7 +23,7 @@ func run() -> void:
 	var height := 1.18 if args[0].begins_with("obj") else 0.8
 	var width := 0.8 if args[0].begins_with("obj") else 1.0
 	var factor := width/maxf(bounds.size.x,bounds.size.z)
-	var fit := Vector3(factor,height/bounds.size.y,factor)
+	var fit := Vector3.ONE*minf(factor,height/bounds.size.y)
 	model.scale = fit; model.position = -Vector3(bounds.get_center().x,bounds.position.y,bounds.get_center().z)*fit
 	for i in 2:
 		var container := SubViewportContainer.new(); container.position = Vector2(i*640,0); container.size = Vector2(640,720); root.add_child(container)

@@ -117,8 +117,8 @@ func cover(m: RefCounted, tile: Vector2i) -> void:
 		r.prop("rubble",at,0.87,0.22,angle)
 	elif c == "k":
 		r.prop("console",at,0.85,0.79,angle)
-	elif theme in ["temple","ruins"] and c in ["h","c"] and r.props.get("meshy1_enabled",false):
-		b.model(str(r.props.meshy1_models.half_cover),at,0.98,0.8,angle)
+	elif theme in ["temple","ruins"] and c in ["h","c"] and r.props.get("meshy1_enabled",false) and not str(r.props.meshy1_models.half_cover).is_empty():
+		b.model(str(r.props.meshy1_models.half_cover),at,0.98,0.8,angle,true)
 	elif c == "h" or (theme in ["temple","ruins","caves"] and c == "c"):
 		put("box","dark",at+Vector3.UP*0.08,Vector3(0.94,0.16,0.58),angle)
 		for row in 3:

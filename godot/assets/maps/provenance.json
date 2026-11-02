@@ -123,5 +123,50 @@
     "brief": "art/briefs/cover_half_temple_v2.json",
     "contact_sheet": "docs/godot/shots/meshy1b-previews.png",
     "raw_previews": "art/meshy1b/ (local, gitignored)"
+  },
+  "meshy1c": {
+    "generator": "Meshy refine + local horizontal slice",
+    "model": "meshy-6",
+    "date": "2026-11-01",
+    "status": "rejected_slice_restored_pre_meshy_cover",
+    "preview_task": "01a19a97-e98e-77e0-accb-22d5bdc7f98c",
+    "refine_task": "01a19a9e-621c-737e-85f0-7f16a1df3644",
+    "texture_prompt": "warm matte sandstone, faint geometric carving bands, tiny worn gold trim",
+    "enable_pbr": false,
+    "rigging": false,
+    "balance_before": 10845,
+    "balance_after_submit": 10825,
+    "balance_after": 10815,
+    "nominal_refine_credits": 10,
+    "observed_account_decrease": 30,
+    "credit_cap": 30,
+    "credit_note": "Account-wide delta conservatively reserved; only one refine submitted by this batch; no retry.",
+    "files": [
+      "res://assets/maps/meshy1/cover_half_temple_v2.glb",
+      "res://assets/maps/meshy1/cover_half_temple_v2_lod1.glb"
+    ],
+    "triangles": {
+      "LOD0": 3000,
+      "LOD1": 800
+    },
+    "texture_size": [
+      512,
+      512
+    ],
+    "processing": "tools/meshy/slice-cover.mjs: horizontal triangle clipping, closed boundary-loop triangulation, nearby stone atlas UVs on caps. prop.mjs --godot: UV-aware simplification, matte material, 512px PNG. No nonuniform scaling.",
+    "slice_y": 0.02,
+    "slice_height_above_source_min": 0.462950994,
+    "cap_triangles_before_simplification": 221,
+    "uniform_scale": 0.516605438,
+    "dimensions": [
+      0.98,
+      0.239163,
+      0.485231
+    ],
+    "ground_min_y": 0,
+    "verdict": "Fails 0.7\u20130.9 height and broken-top art gate. Source is actually 2.147 wider than tall; prior preview stretched height. Horizontal slicing cannot meet requested dimensions at uniform tile fit.",
+    "integration": "Rejected v2 and separate LOD1 retained on disk. Empty meshy1_models.half_cover restores pre-Meshy procedural cover; meshy1_enabled true keeps Terminal B enabled. v1 and terminal assets unchanged.",
+    "brief": "art/briefs/cover_half_temple_v2_slice.json",
+    "comparison": "docs/godot/shots/meshy1c-slice.png"
   }
 }
