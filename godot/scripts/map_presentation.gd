@@ -13,6 +13,7 @@ var batch = Batch.new()
 var theme := "temple"
 var mission: RefCounted
 var floor_bounds: Dictionary = {}
+var access_tiles: Dictionary = {}
 var marker_root: Node3D
 var damage_root: Node3D
 var damage_hash := 0
@@ -55,7 +56,8 @@ func apply_environment(world: WorldEnvironment, key: DirectionalLight3D, theme_n
 	env.fog_enabled = true; env.fog_light_color = color(int(t.fog[0])); env.fog_density = 0.0015
 	env.fog_aerial_perspective = 0.25
 	world.environment = env; key.light_color = color(int(t.key[0])); key.light_energy = float(t.key[1])*0.65; key.shadow_enabled = true
-	key.directional_shadow_max_distance = 100; key.light_angular_distance = 1.2
+	key.directional_shadow_max_distance = 60; key.light_angular_distance = 0.5
+	key.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
 	key.rotation_degrees = Vector3(-48,-38,0)
 
 func setup_palette(t: Dictionary) -> void:
@@ -76,14 +78,15 @@ func setup_palette(t: Dictionary) -> void:
 	palette.metal.metallic = 0.65; palette.metal.roughness = 0.4
 	palette.water.metallic = 0.3; palette.water.roughness = 0.18
 	palette.ground = floor_mat.duplicate()
-	palette.ground.set_shader_parameter("base_color",Color(surface.base).darkened(0.18))
-	palette.ground.set_shader_parameter("secondary_color",Color(surface.secondary).darkened(0.12))
+	palette.ground.set_shader_parameter("base_color",Color(surface.base).darkened(0.18 if theme in ["dock","city","temple"] else 0.0))
+	palette.ground.set_shader_parameter("secondary_color",Color(surface.secondary).darkened(0.12 if theme in ["dock","city","temple"] else 0.0))
 
 func build(m: RefCounted, _models: Dictionary = {}) -> void:
 	clear_children(self)
 	mission = m; theme = str(m.spec.get("theme","temple"))
-	batch.records.clear(); batch.buckets.clear(); floor_bounds.clear()
+	batch.records.clear(); batch.buckets.clear(); floor_bounds.clear(); access_tiles.clear()
 	var t: Dictionary = themes.get(theme,themes.temple); setup_palette(t)
+	access_tiles = preload("res://scripts/map_art_access.gd").prepare(m)
 	var geo := Geometry.new(self)
 	for y in int(m.spec.height):
 		for x in int(m.spec.width):
@@ -113,6 +116,7 @@ func bounds_of(node: Node3D, transform: Transform3D) -> AABB:
 	return out
 
 func light(at: Vector3, tint: Color, energy: float, radius: float, parent: Node = self) -> void:
+	if find_children("*","OmniLight3D",true,false).size() >= 4: return
 	var lamp := OmniLight3D.new(); lamp.position = at; lamp.light_color = tint
 	lamp.light_energy = energy; lamp.omni_range = radius; lamp.shadow_enabled = false; parent.add_child(lamp)
 

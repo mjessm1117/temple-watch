@@ -4,10 +4,10 @@
       "turn_limit": 5
     },
     "hack_terminal": {
-      "turn_limit": 8
+      "turn_limit": 9
     },
     "destroy_relay": {
-      "turn_limit": 6,
+      "turn_limit": 8,
       "objective": {
         "hp": 24
       }
@@ -23,12 +23,12 @@
     "ambush": {
       "objective": {
         "runner_mob": 7,
-        "runner_hp": 12
+        "runner_hp": 16
       }
     },
     "retaliation": {
       "objective": {
-        "civilian_interval": 3
+        "civilian_interval": 2
       }
     }
   }

@@ -16,6 +16,6 @@ for pid in "${pids[@]}"; do
 done
 for family in "${families[@]}"; do
   cat "$log_dir/$family.log"
-  if rg -q 'SCRIPT ERROR|Parse Error|ERROR:|turn safety limit' "$log_dir/$family.log"; then status=1; fi
+  if grep -qE 'SCRIPT ERROR|Parse Error|ERROR:|turn safety limit' "$log_dir/$family.log"; then status=1; fi
 done
 exit "$status"

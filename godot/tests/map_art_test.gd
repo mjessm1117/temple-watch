@@ -45,6 +45,10 @@ func validate(art, m: RefCounted, id: String) -> void:
 		if record.role == "cover":
 			if record.kind == "#": check(a.size.y >= 1.8,id+": full cover tall")
 			if record.kind in ["c","h","k"]: check(a.size.y < 0.9 and a.size.y >= 0.7,id+": half cover low")
+	check(art.find_children("*","OmniLight3D",true,false).size() <= 4,id+": at most four local lights")
+	for tile in art.access_tiles:
+		for lower: Vector2i in art.access_tiles[tile]:
+			check(m.passable(lower) and Shot.elevation(m,lower)<Shot.elevation(m,tile),id+": valid rendered stair landing")
 	check(art.find_children("*","CollisionObject3D",true,false).is_empty(),id+": art adds no collision")
 
 func run() -> void:

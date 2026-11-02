@@ -39,8 +39,10 @@ func put(shape: String, mat: Material, at: Vector3, size: Vector3, angle := 0.0)
 	return add_mesh(shapes[shape],mat,transform)
 
 func add_mesh(mesh: Mesh, mat: Material, transform: Transform3D) -> AABB:
-	var key := "%d:%d" % [mesh.get_instance_id(),mat.get_instance_id() if mat else 0]
-	if not buckets.has(key): buckets[key] = {"mesh":mesh,"material":mat,"transforms":[]}
+	var role := str(current.get("role","terrain"))
+	var shadows := role not in ["detail","objective"] and str(current.get("kind","")) not in ["skyline","distant landscape"]
+	var key := "%d:%d:%s:%s" % [mesh.get_instance_id(),mat.get_instance_id() if mat else 0,role,shadows]
+	if not buckets.has(key): buckets[key] = {"mesh":mesh,"material":mat,"transforms":[],"role":role,"shadows":shadows}
 	buckets[key].transforms.append(transform)
 	var bounds := transform*mesh.get_aabb()
 	if not current.is_empty():
@@ -84,6 +86,10 @@ func flush(parent: Node3D) -> void:
 		mm.mesh = bucket.mesh; mm.instance_count = bucket.transforms.size()
 		for i in mm.instance_count: mm.set_instance_transform(i,bucket.transforms[i])
 		var instance := MultiMeshInstance3D.new(); instance.multimesh = mm; instance.material_override = bucket.material
+		if not bucket.shadows: instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		if bucket.role == "scenery":
+			instance.visibility_range_end = 95.0
+			instance.visibility_range_end_margin = 8.0
 		parent.add_child(instance)
 	buckets.clear()
 

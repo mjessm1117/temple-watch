@@ -95,6 +95,7 @@ static func load_map(path: String) -> Dictionary:
 	for x in [2,data.width-3]:
 		for y in [6,data.height-6]: put(rows,Vector2i(x,y),"c")
 	for at in data.evac: put(rows, point(at), "E")
+	preload("res://scripts/map_art_elevation.gd").apply(rows, data.get("elevation", []))
 	data.rows = rows
 	return data
 
