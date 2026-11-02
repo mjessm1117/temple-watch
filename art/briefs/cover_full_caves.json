@@ -1,0 +1,33 @@
+{
+  "asset": "cover_full_caves",
+  "description": "caves full cover at battle camera ~25 units and close-up",
+  "lod0": 3000,
+  "lod1": 800,
+  "height": 1.85,
+  "width": 1.0,
+  "credit_cap": 500,
+  "preview_cap": 21,
+  "refine_cap": 7,
+  "texture": "Matte very dark brown and charcoal rock, sparse small violet mineral patches inset into the surface. Broad coherent color regions, no text or logos, no gloss.",
+  "variants": {
+    "A": "Original stylized chunky matte science fiction tactics prop. Broad readable planar shapes, all sides finished. Two large cubical angular cave rock blocks stacked vertically, forming a tall square solid tower twice as tall as wide. Deep square footprint, continuous solid body reaching the ground, broad flat top, lightly beveled chunky edges. No ground plate, platform, vehicles, wheels, legs, posts, arches, holes, floating pieces, gloss or rounded shapes.",
+    "B": "Original stylized chunky matte science fiction tactics prop. Broad readable planar shapes, all sides finished. A single upright rectangular monolith of angular cave rock blocks, height 2.2 times its width, depth equal to width. Heavy solid uninterrupted mass, squared broad top, a shallow horizontal seam halfway up, restrained edge wear. No ground plate, platform, vehicles, wheels, legs, posts, arches, holes, floating pieces, gloss or rounded shapes."
+  },
+  "scores": {
+    "A": [
+      3,
+      3,
+      3,
+      4,
+      "Deep central separation"
+    ],
+    "B": [
+      4,
+      3,
+      4,
+      4,
+      "WINNER: solid angular mass"
+    ]
+  },
+  "winner": "B"
+}
