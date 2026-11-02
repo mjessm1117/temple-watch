@@ -121,6 +121,8 @@ func _unhover(id: String) -> void:
 
 func _process(delta: float) -> void:
 	if camera == null: return
+	if get_parent() != null and get_parent().get("selected_room") == "forge":
+		preload("res://scripts/campaign/forge_screen.gd").render(get_parent())
 	if Prefs.get_value("motion"):
 		_project_rooms(); return
 	time += delta * float(Prefs.get_value("speed"))

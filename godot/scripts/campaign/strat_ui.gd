@@ -79,6 +79,8 @@ static func build(view) -> void:
 		button(view, box, "Online" if c.state.mods.spire.get(id, false) else "Build · 350 Cr + 2 Kyber", Base.spire.bind(c, str(id)), not c.state.mods.spire.get(id, false))
 
 static func projects(view) -> void:
+	# --- wave10 gear ---
+	preload("res://scripts/campaign/research_screen.gd").render(view)
 	var c = view.campaign
 	var box: VBoxContainer = view._card("FORGE PROJECTS", "One engineering project at a time. Requires a powered Forge; assigned artisans accelerate production.")
 	for id in Data.get_table("temple", "PROJECTS"):

@@ -23,7 +23,8 @@ run_suite graphics_boot_test -- --save=low
 run_suite graphics_boot_test -- --expect=low --save=medium
 run_suite graphics_boot_test -- --expect=medium --save=high
 run_suite graphics_boot_test -- --expect=high
-for suite in run campaign_test story_port_test loop_test sith_test strategy_test combat7_test missions_test temple_view_test loadout_test galaxy_view_test screens_test integration_test map_art_test terrain_test; do
+# --- wave10 gear ---
+for suite in run campaign_test gear_research_test story_port_test loop_test sith_test strategy_test combat7_test missions_test temple_view_test loadout_test galaxy_view_test screens_test integration_test map_art_test terrain_test; do
   run_suite "$suite"
 done
 run_suite graphics_test --rendering-method gl_compatibility -- --graphics=low

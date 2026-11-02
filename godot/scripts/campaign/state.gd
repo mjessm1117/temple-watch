@@ -11,6 +11,8 @@ const Integration = preload("res://scripts/campaign/integration.gd")
 const SAVE_PATH = "user://campaign.json"
 var state: Dictionary = {}
 const Base = preload("res://scripts/campaign/strat_base.gd")
+# --- wave10 gear ---
+const ResearchQueue = preload("res://scripts/campaign/research_queue.gd")
 const Roster = preload("res://scripts/campaign/strat_roster.gd")
 const Ops = preload("res://scripts/campaign/strat_ops.gd")
 const Identity = preload("res://scripts/campaign/strat_identity.gd")
@@ -21,6 +23,8 @@ signal darkness_changed(segments: int, value: int)
 
 func ensure_strategy() -> void:
 	Base.ensure(state); Roster.ensure(state); Identity.ensure(self); Ops.ensure(self)
+	# --- wave10 gear ---
+	ResearchQueue.ensure(state)
 
 func darkness_segments() -> int:
 	return int(sith.project_status().segments) if sith != null else 2
@@ -151,9 +155,12 @@ func researched(id: String) -> bool:
 	return id in ["", "0", "0.0"] or state.research.done.has(id)
 
 func start_research(id: String) -> bool:
+	# --- wave10 gear ---
+	ResearchQueue.ensure(state)
 	var project: Dictionary = Data.get_table("research", "RESEARCH").get(id, {})
-	if project.is_empty() or not Base.operational(state, "archives") or str(state.research.cur) != "": return false
+	if project.is_empty() or not Base.operational(state, "archives") or str(state.research.cur) != "" or not state.research.queue.is_empty(): return false
 	if researched(id) or int(project.get("era", 1)) > int(state.era): return false
+	if int(state.get("elapsed_days", 0)) < int(project.get("min_day", 0)): return false
 	for need in project.get("need", []):
 		if not researched(str(need)): return false
 	if not spend(project.get("cost", {})): return false
@@ -205,6 +212,8 @@ func advance_mission() -> void:
 	ensure_teams()
 
 func _tick_research(days: int) -> void:
+	# --- wave10 gear ---
+	ResearchQueue.activate(self)
 	var id := str(state.research.cur)
 	if id == "" or not Base.operational(state, "archives"): return
 	var speed := (1.5 if int(state.wings.archives) >= 2 else 1.0) * (1.0 + 0.5 * Base.staff_count(state, "archives"))
@@ -212,11 +221,8 @@ func _tick_research(days: int) -> void:
 	state.research.prog = float(state.research.prog) + days * speed
 	var project: Dictionary = Data.get_table("research", "RESEARCH")[id]
 	if float(state.research.prog) >= float(project.days):
-		state.research.done.append(id)
-		state.news.append("Research complete: %s." % project.n)
-		if id == "kyberLore": gain("kyber", 1)
-		if project.has("dark"): gain("orderDark", int(project.dark))
-		state.research.cur = ""; state.research.prog = 0.0
+		# --- wave10 gear ---
+		ResearchQueue.complete(self, id)
 
 func _month_tick() -> void:
 	var core: Dictionary = Data.all("core")
@@ -312,6 +318,8 @@ func apply_mission_result(result: Dictionary) -> Dictionary:
 	if receipt.advance:
 		Integration.ignored(self, receipt.ignored)
 		advance_mission()
+	# --- wave10 gear ---
+	if bool(result.get("win", false)) and researched("holonet"): gain("intel", 1)
 	Roster.after_mission(self, result); Identity.after_mission(self, result)
 	for row in summary.rows:
 		var r := soldier(str(row.id))

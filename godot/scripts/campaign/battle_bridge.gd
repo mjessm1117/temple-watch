@@ -47,7 +47,10 @@ static func create(campaign, seed_value: int) -> RefCounted:
 	for fx in campaign.state.get("finale_effects", []): effects(m, campaign, fx)
 	effects(m, campaign, campaign.state.get("battle_buffs", {}))
 	preload("res://scripts/campaign/battle_sith.gd").setup(campaign,m)
-	return preload("res://scripts/combat_mission.gd").adopt(m, campaign.state)
+	# --- wave10 gear ---
+	var combat = preload("res://scripts/combat_mission.gd").adopt(m, campaign.state)
+	preload("res://scripts/campaign/gear.gd").apply_campaign_effects(combat, campaign)
+	return combat
 
 static func effects(m, campaign, fx: Dictionary) -> void:
 	for u in m.living("player"):
