@@ -35,7 +35,9 @@ static func gear_text(r: Dictionary) -> String:
 	var items: Array = Data.get_table("gear", "SABERS" if jedi else "WEAPONS")
 	var tier := int(r.gear.saber if jedi else r.gear.w)
 	var armor: Dictionary = Data.get_table("gear", "ARMOR").get(str(r.gear.armor), {})
-	return "%s · T%d\n%s" % [items[tier].n, tier + 1, armor.get("n", r.gear.armor)]
+	var base_mark: String = ["I", "II", "III"][clampi(int(r.gear.mk.get("s" if jedi else "w", 1)) - 1, 0, 2)]
+	var armor_mark: String = ["I", "II", "III"][clampi(int(r.gear.mk.get("armor:" + str(r.gear.armor), 1)) - 1, 0, 2)]
+	return "%s Mk %s · T%d\n%s Mk %s" % [items[tier].n, base_mark, tier + 1, armor.get("n", r.gear.armor), armor_mark]
 
 static func modules_text(r: Dictionary) -> String:
 	var modules: Array[String] = []

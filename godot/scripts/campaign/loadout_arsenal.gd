@@ -3,6 +3,7 @@ const S = preload("res://scripts/campaign/loadout_style.gd")
 const Gear = preload("res://scripts/campaign/gear.gd")
 const Data = preload("res://scripts/campaign/data.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
+const Base = preload("res://scripts/campaign/strat_base.gd")
 var host: Control
 var soldier_id := ""
 var offers: Array[Dictionary] = []
@@ -22,18 +23,33 @@ func setup(owner_screen: Control, id: String) -> void:
 	var pool: Array = Data.get_table("gear", "SABERS" if jedi else "WEAPONS")
 	var tier := int(r.gear.saber if jedi else r.gear.w)
 	section("SABER" if jedi else "WEAPON")
-	add_child(S.label(str(pool[tier].n) + " · T%d" % (tier + 1), 14))
+	var base_kind := "s" if jedi else "w"
+	var base_lv := int(r.gear.mk.get(base_kind, 1))
+	add_child(S.label("%s · Mk %s · T%d" % [pool[tier].n, ["I", "II", "III"][base_lv - 1], tier + 1], 14))
+	if base_lv < 3:
+		var base_res: String = Data.get_table("gear", "MK_RES")[base_kind][base_lv - 1]
+		var base_cost := Gear.price(c, int(Data.get_table("gear", "MK_COST")[base_lv]))
+		var base_reason := "Powered Forge required" if not Base.operational(c.state, "forge") else lock_reason(c, {"res":base_res}, base_cost)
+		offer("base_mark", base_kind, "", "Forge to Mk " + ["I", "II", "III"][base_lv], base_reason, base_cost, 0, Gear.preview(c, id, "base_mark", base_kind))
 	if tier + 1 < pool.size():
 		var item: Dictionary = pool[tier + 1]
 		var kyber := maxi(1, int(item.get("kyber", 0)) - (1 if c.state.staff.has("forge") else 0) - (1 if c.researched("kyberLore") else 0)) if jedi else 0
 		var cost := int(item.cost) if jedi else Gear.price(c, int(item.cost))
-		offer("saber" if jedi else "weapon", "", "", "Craft " + str(item.n), lock_reason(c, item, cost, kyber), cost, kyber)
+		var action := "saber" if jedi else "weapon"
+		offer(action, "", "", "Craft " + str(item.n), lock_reason(c, item, cost, kyber), cost, kyber, Gear.preview(c, id, action))
 	section("ARMOR")
 	for key in Data.get_table("gear", "ARMOR"):
 		var item: Dictionary = Data.get_table("gear", "ARMOR")[key]
 		if item.get("who", "any") not in ["any", "jedi" if jedi else "troop"]: continue
 		var cost := Gear.price(c, int(item.get("cost", 0)))
-		offer("armor", "", key, str(item.n), "Equipped" if r.gear.armor == key else lock_reason(c, item, cost), cost, 0, str(item.get("desc", "")))
+		offer("armor", "", key, str(item.n), "Equipped" if r.gear.armor == key else lock_reason(c, item, cost), cost, 0, Gear.preview(c, id, "armor", "", str(key)))
+	if Data.get_table("gear", "ARMOR").get(str(r.gear.armor), {}).has("mk"):
+		var armor_lv := int(r.gear.mk.get("armor:" + str(r.gear.armor), 1))
+		if armor_lv < 3:
+			var armor_res: String = Data.get_table("gear", "MK_RES").a[armor_lv - 1]
+			var armor_cost := Gear.price(c, int(Data.get_table("gear", "MK_COST")[armor_lv]))
+			var armor_reason := "Powered Forge required" if not Base.operational(c.state, "forge") else lock_reason(c, {"res":armor_res}, armor_cost)
+			offer("armor_mark", "", "", "Forge armor to Mk " + ["I", "II", "III"][armor_lv], armor_reason, armor_cost, 0, Gear.preview(c, id, "armor_mark"))
 	section("UTILITY")
 	for key in Data.get_table("gear", "UTIL"):
 		var item: Dictionary = Data.get_table("gear", "UTIL")[key]; var cost := Gear.price(c, int(item.get("cost", 0)))
@@ -56,7 +72,7 @@ func setup(owner_screen: Control, id: String) -> void:
 				if lv < 3:
 					var res: String = Data.get_table("gear", "MK_RES")[kind][lv - 1]
 					var cost := Gear.price(c, int(Data.get_table("gear", "MK_COST")[lv]))
-					offer("upgrade", kind, key, "Upgrade to Mk " + ["I", "II", "III"][lv], lock_reason(c, {"res":res}, cost), cost)
+					offer("upgrade", kind, key, "Upgrade to Mk " + ["I", "II", "III"][lv], lock_reason(c, {"res":res}, cost), cost, 0, Gear.preview(c, id, "upgrade", kind, str(key)))
 			else:
 				var cost := Gear.price(c, int(item.cost))
 				var reason := lock_reason(c, item, cost)
@@ -86,9 +102,24 @@ func lock_reason(c, item: Dictionary, cost: int, kyber: int = 0) -> String:
 
 func offer(action: String, kind: String, key: String, title: String, reason: String, cost: int, kyber: int = 0, tip: String = "") -> void:
 	var label := title + (" · %d Cr" % cost if cost > 0 else "") + (" + %d Ky" % kyber if kyber > 0 else "")
-	var b := S.button(label, host.change_gear.bind(action, kind, key), reason == "")
+	var callback: Callable = armor_upgrade if action == "armor_mark" else base_upgrade.bind(kind) if action == "base_mark" else host.change_gear.bind(action, kind, key)
+	var b := S.button(label, callback, reason == "")
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT; b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	b.tooltip_text = tip; add_child(b); host.wire_button(b)
+	if tip.begins_with("Aim "):
+		var comparison := S.label(tip, 11, S.CYAN); comparison.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; add_child(comparison)
 	if reason != "":
 		var why := S.label(reason, 11, S.MUTED); why.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; add_child(why)
 	offers.append({"action":action, "kind":kind, "key":key, "enabled":reason == "", "button":b})
+
+func armor_upgrade() -> void:
+	var c = host.flow.session()
+	if Gear.upgrade_armor(c, soldier_id):
+		host.flow.save()
+		host._refresh()
+
+func base_upgrade(kind: String) -> void:
+	var c = host.flow.session()
+	if Gear.upgrade_base(c, soldier_id, kind):
+		host.flow.save()
+		host._refresh()
