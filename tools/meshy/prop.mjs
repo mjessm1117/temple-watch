@@ -41,4 +41,9 @@ if(godot && process.argv.includes('--screen-emission')){
   m.setEmissiveTexture(D.createTexture('screen emission').setImage(png).setMimeType('image/png')).setEmissiveFactor([0.5,0.5,0.5]);
  }
 }
+// Godot derives extracted texture filenames from these names.
+for(const [i,texture] of D.getRoot().listTextures().entries()){
+ texture.setName((texture.getName()||`texture_${i}`).replace(/[^A-Za-z0-9_.-]/g,'_'));
+ if(texture.getURI())texture.setURI(texture.getURI().replace(/[^A-Za-z0-9_./-]/g,'_'));
+}
 await io.write(outP,D);console.log(outP,Math.round(tris),'→',Math.round(after),'tris');

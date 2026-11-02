@@ -1,0 +1,34 @@
+{
+  "asset": "obj_beacon",
+  "theme": "city",
+  "description": "obj beacon",
+  "credit_cap": 500,
+  "preview_cap": 20,
+  "refine_cap": 9,
+  "lod0": 4000,
+  "lod1": 1000,
+  "height": 1.6,
+  "width": 1,
+  "texture": "matte violet-grey and ivory metal, bright cyan lens and inset status panels. Matte rough surfaces, sparse clean details.",
+  "variants": {
+    "A": "Original stylized chunky matte science fiction tactics prop. Broad readable beveled forms, all sides finished. One evacuation beacon, chunky square solid pedestal supporting a large faceted cyan signal lamp. Tall compact silhouette, broad lamp cap, no thin antenna, no separate base plate. No ground plate, wheels, vehicles, feet, legs, posts, arches, floating parts, logos or text. Not glossy or rounded.",
+    "B": "Original stylized chunky matte science fiction tactics prop. Broad readable beveled forms, all sides finished. A rescue extraction signal device with a thick armored rectangular upright body and a large square cyan luminous crown. Sturdy connected forms, squat body directly grounded, broad inset controls. No ground plate, wheels, vehicles, feet, legs, posts, arches, floating parts, logos or text. Not glossy or rounded."
+  },
+  "scores": {
+    "A": [
+      2,
+      2,
+      4,
+      4,
+      "Rejected: round lamp, plate"
+    ],
+    "B": [
+      4,
+      4,
+      4,
+      4,
+      "WINNER: armored beacon crown"
+    ]
+  },
+  "winner": "B"
+}

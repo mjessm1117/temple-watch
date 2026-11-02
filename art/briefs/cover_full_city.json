@@ -1,0 +1,34 @@
+{
+  "asset": "cover_full_city",
+  "theme": "city",
+  "description": "cover full city",
+  "credit_cap": 500,
+  "preview_cap": 20,
+  "refine_cap": 9,
+  "lod0": 3000,
+  "lod1": 800,
+  "height": 1.85,
+  "width": 1,
+  "texture": "dark violet-grey metal, restrained cyan and magenta inset strips. Matte rough surfaces, sparse clean details.",
+  "variants": {
+    "A": "Original stylized chunky matte science fiction tactics prop. Broad readable beveled forms, all sides finished. Two large cubical armored urban utility cabinets stacked vertically, forming a tall square tower twice as tall as wide. Continuous solid silhouette, shallow panel recesses. No ground plate, wheels, vehicles, feet, legs, posts, arches, floating parts, logos or text. Not glossy or rounded.",
+    "B": "Original stylized chunky matte science fiction tactics prop. Broad readable beveled forms, all sides finished. A tall narrow solid undercity armored service cabinet. Rectangular monolith twice as tall as wide with deep square footprint, two stacked bulky compartments and sparse inset light channels. No ground plate, wheels, vehicles, feet, legs, posts, arches, floating parts, logos or text. Not glossy or rounded."
+  },
+  "scores": {
+    "A": [
+      4,
+      4,
+      4,
+      5,
+      "WINNER: solid armored cabinet"
+    ],
+    "B": [
+      4,
+      4,
+      4,
+      5,
+      "Alternate: narrow cabinet"
+    ]
+  },
+  "winner": "A"
+}
