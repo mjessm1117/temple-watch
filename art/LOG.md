@@ -95,3 +95,22 @@ Local `slice-cover.mjs` clips at source **y = 0.020**, **0.462951 above the orig
 Real-window 1920×1080 HUD shots use the same mission, seed and camera as v1. `meshy1c-cover-candidate.png` and `-candidate-close.png` preserve the rejected slice in game; requested `meshy1c-cover-after.png` and `-after-close.png` show the final restored cover. `meshy1c-slice.png` compares whole refined B and sliced v2, clay and textured, with uniform-fit dimensions. The pre-existing white dust squares remain unchanged.
 
 Validation: initial Godot editor import completed before generation. `./godot/test.sh` exit **0**, all **15 suites** passed, zero failures, no SCRIPT ERROR or ERROR. `map_art_test` passed both independently and in the suite: **107718 checks across 62 maps**. Added regression checks ensure uniform fitting preserves the rejected slice's real height and grounded tile bounds. JavaScript syntax and `git diff --check` pass; every added/changed text file is below 600 lines. Web-game paths, v1 GLB and Terminal B GLB unchanged. Local commit only; no push, no subagents.
+
+## Meshy batch 1d — full-height B with side trim accepted (2026-11-01)
+
+**Zero credits, zero Meshy API calls, no key loaded.** Reused whole refined B (`01a19a9e-621c-737e-85f0-7f16a1df3644`) from `art/meshy1c/cover_half_temple_v2.B.raw.glb`, not the rejected horizontal slice. Initial editor import passed using `/home/jess/projects/.tools/godot/godot` because `godot` was not on PATH.
+
+Extended `tools/meshy/slice-cover.mjs` with `--sides minX maxX [height]`, preserving its horizontal mode and boundary-loop/nearby-stone-UV cap logic. Whole-source uniform scale **0.905445478** gives **1.718 × 0.800 × 0.859**. Vertical X cuts at **-0.360 and +0.620** in scaled coordinates retain a 0.980-wide strip around the chunky central courses. This placement aligns the upper right cut near a block joint and keeps the foot rubble within the tile; staggered joints prevent both planes following every course. Rejected the first -0.530/+0.450 placement because it visibly sliced the rubble. No top slicing or nonuniform stretching.
+
+The final trim has **374 cap triangles** before simplification. Planar caps looked sawn in close-up, so cut surfaces and their shared boundary vertices receive shallow inward facets (0.012–0.042 units) with face normals, keeping the boundary sealed and the original course outline. UVs reuse nearby stone atlas samples. Grounded min y is **0**. `prop.mjs --godot` retains UV-aware simplification and 512² PNG textures; the new optional `--simplify-error=.08` lets LOD1 reach its budget (default tolerance unchanged).
+
+| Output | True W × H × D | Triangles | Texture |
+|---|---|---:|---|
+| v3 LOD0 | 0.977273 × 0.788510 × 0.850067 | 3000 | 512 × 512 |
+| v3 LOD1 | 0.963770 × 0.785547 × 0.849862 | 800 | 512 × 512 |
+
+**Verdict: accepted.** Reviewed the final clay/textured comparison, battle view at roughly 25 units, and action-camera close-up: chunky upright sandstone half wall, crouching-cover height, broken ends, no visible cut holes, no cannon silhouette or ankle-high stub. `meshy1_models.half_cover` points to `cover_half_temple_v3.glb`; separate `_lod1.glb` retained. v1/v2 and Terminal B remain untouched.
+
+Shots: `docs/godot/shots/meshy1d-cover-after.png`, `meshy1d-cover-after-close.png`, and `meshy1d-trim.png`. Real 1920×1080 Godot windows, HUD and deterministic fixture mission/seed/cameras copied from v1/1c. Final capture used a fixed-size X11 display after a Wayland window-size assertion interrupted a draft capture. Comparison labels report true uniform W×H×D, with whole B at 0.80 height and v3 at native dimensions. Pre-existing dust is unchanged.
+
+Validation: `./godot/test.sh` exit **0**, all **15 suites** passed, zero failures and no SCRIPT ERROR or ERROR. `map_art_test` passed with the final v3 active, including grounded tile bounds, cover height and unchanged mission/RNG/cover/LOS checks; new checks cover both v3 LOD bounds. JavaScript syntax and `git diff --check` passed. Every added/changed text file is below 600 lines. Web-game files unchanged; no subagents, no push. Local commit on `meshy/batch1`.
