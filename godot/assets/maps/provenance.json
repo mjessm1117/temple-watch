@@ -21,5 +21,152 @@
     ],
     "adapted": "res://assets/env/stone.gdshader and the repository\u2019s Wave 3/4 env_art.gd materials, arcade, terrace edges and lamp construction. Existing GLB source/credits above unchanged.",
     "geometry": "Instanced original faceted rocks, low walls, sandbags, platforms, stairs, ramps, trees, facade panels, skyline, gate, glowing markers and objective figures. Original procedural crack/scorch decal texture."
+  },
+  "meshy1": {
+    "generator": "Meshy",
+    "model": "meshy-6",
+    "date": "2026-11-01",
+    "original_designs": true,
+    "balance_before": 11215,
+    "balance_after": 11035,
+    "credits_spent": 180,
+    "rigging": false,
+    "enable_pbr": false,
+    "switch": "godot/data/maps/props.json: meshy1_enabled",
+    "assets": [
+      {
+        "file": "res://assets/maps/meshy1/obj_terminal_v1.glb",
+        "winner": "B",
+        "triangles": 3996,
+        "preview_tasks": {
+          "A": "01a19a41-a239-771f-93c0-3e9fcb3b20bc",
+          "B": "01a19a42-ca49-73ce-a09c-83bb310df7a2",
+          "C": "01a19a43-2465-72f5-a24e-c750b9761ca8",
+          "D": "01a19a43-2bc4-75c5-b318-c874a9c4f28e"
+        },
+        "refine_task": "01a19a46-6cc4-726e-9d5d-a75c372ba7ae",
+        "processing": "prop.mjs --godot; 512px PNG; matte; UV-aware simplify; cyan emission mask",
+        "fit": {
+          "width": 0.72,
+          "height": 1.18
+        }
+      },
+      {
+        "file": "res://assets/maps/meshy1/cover_half_temple_v1.glb",
+        "winner": "D",
+        "triangles": 2997,
+        "preview_tasks": {
+          "A": "01a19a43-329a-749a-9cdf-d222c93e9051",
+          "B": "01a19a43-396c-756d-a93b-855e461ece2b",
+          "C": "01a19a43-4090-7168-98bc-0b92e1955f48",
+          "D": "01a19a43-481d-74ac-b762-3f0b0894e308"
+        },
+        "refine_task": "01a19a46-73f8-7459-a1de-4083f232cef8",
+        "processing": "temple-kitbash.mjs: Meshy D masonry clipped and capped; original local fluted column and carved-band texture. prop.mjs --godot, 512px PNG, matte.",
+        "fit": {
+          "width": 0.98,
+          "height": 0.8
+        }
+      }
+    ]
+  },
+  "meshy1b": {
+    "generator": "Meshy",
+    "model": "meshy-6",
+    "date": "2026-11-01",
+    "asset": "cover_half_temple_v2",
+    "status": "rejected_at_preview_gate",
+    "winner": null,
+    "balance_before": 11035,
+    "balance_after": 10975,
+    "credits_spent": 60,
+    "credit_cap": 80,
+    "rigging": false,
+    "refine_task": null,
+    "integration": "None; v1 switch target and Terminal B unchanged. No v2 GLB or LODs produced.",
+    "preview_tasks": {
+      "A": "01a19a97-e1f2-740e-a2d4-954303ec5755",
+      "B": "01a19a97-e98e-77e0-accb-22d5bdc7f98c",
+      "C": "01a19a97-f2f1-7358-b7a8-08a3888b3a0d"
+    },
+    "scores_order": [
+      "silhouette",
+      "style",
+      "cleanliness",
+      "poly_fit"
+    ],
+    "scores": {
+      "A": [
+        2,
+        2,
+        4,
+        3
+      ],
+      "B": [
+        3,
+        3,
+        3,
+        4
+      ],
+      "C": [
+        1,
+        2,
+        2,
+        2
+      ]
+    },
+    "verdicts": {
+      "A": "Rejected: thin upright wall, about eight courses of small bricks; lacks the broad chunky low-cover mass.",
+      "B": "Best alternate but rejected: roughly five to six courses, narrow upright wall silhouette, uneven protruding rubble; not the requested two or three large low courses.",
+      "C": "Rejected: tall architectural facade with repeated arch recesses, broad cap and vertical piers; violates the explicit NOT-list."
+    },
+    "brief": "art/briefs/cover_half_temple_v2.json",
+    "contact_sheet": "docs/godot/shots/meshy1b-previews.png",
+    "raw_previews": "art/meshy1b/ (local, gitignored)"
+  },
+  "meshy1c": {
+    "generator": "Meshy refine + local horizontal slice",
+    "model": "meshy-6",
+    "date": "2026-11-01",
+    "status": "rejected_slice_restored_pre_meshy_cover",
+    "preview_task": "01a19a97-e98e-77e0-accb-22d5bdc7f98c",
+    "refine_task": "01a19a9e-621c-737e-85f0-7f16a1df3644",
+    "texture_prompt": "warm matte sandstone, faint geometric carving bands, tiny worn gold trim",
+    "enable_pbr": false,
+    "rigging": false,
+    "balance_before": 10845,
+    "balance_after_submit": 10825,
+    "balance_after": 10815,
+    "nominal_refine_credits": 10,
+    "observed_account_decrease": 30,
+    "credit_cap": 30,
+    "credit_note": "Account-wide delta conservatively reserved; only one refine submitted by this batch; no retry.",
+    "files": [
+      "res://assets/maps/meshy1/cover_half_temple_v2.glb",
+      "res://assets/maps/meshy1/cover_half_temple_v2_lod1.glb"
+    ],
+    "triangles": {
+      "LOD0": 3000,
+      "LOD1": 800
+    },
+    "texture_size": [
+      512,
+      512
+    ],
+    "processing": "tools/meshy/slice-cover.mjs: horizontal triangle clipping, closed boundary-loop triangulation, nearby stone atlas UVs on caps. prop.mjs --godot: UV-aware simplification, matte material, 512px PNG. No nonuniform scaling.",
+    "slice_y": 0.02,
+    "slice_height_above_source_min": 0.462950994,
+    "cap_triangles_before_simplification": 221,
+    "uniform_scale": 0.516605438,
+    "dimensions": [
+      0.98,
+      0.239163,
+      0.485231
+    ],
+    "ground_min_y": 0,
+    "verdict": "Fails 0.7\u20130.9 height and broken-top art gate. Source is actually 2.147 wider than tall; prior preview stretched height. Horizontal slicing cannot meet requested dimensions at uniform tile fit.",
+    "integration": "Rejected v2 and separate LOD1 retained on disk. Empty meshy1_models.half_cover restores pre-Meshy procedural cover; meshy1_enabled true keeps Terminal B enabled. v1 and terminal assets unchanged.",
+    "brief": "art/briefs/cover_half_temple_v2_slice.json",
+    "comparison": "docs/godot/shots/meshy1c-slice.png"
   }
 }

@@ -1,0 +1,12 @@
+{
+  "asset": "cover_half_temple_v2",
+  "credit_cap": 80,
+  "preview_cap": 3,
+  "refine_cap": 1,
+  "variants": {
+    "A": "A squat solid masonry barricade for crouching soldiers. Continuous solid stone from ground to broken horizontal top. Single original stylized chunky game prop, matte sandstone, broad clean planes. Low stacked stone wall, wider than tall, width 1.25 times height, compact rectangular footprint. Two or three staggered courses of large carved rectangular sandstone blocks, flat-ish broken top, a few fallen blocks tight against its foot. Faint geometric carving, tiny worn gold trim hints. No column, cannon, legs, supports, arch, posts, ground plate, upright shards, spikes, tall towers, text or people.",
+    "B": "Warm ancient temple masonry: two thick rows of broad ashlar blocks with chipped corners and shallow geometric bands. A short solid low wall remnant. Single original stylized chunky game prop, matte sandstone, broad clean planes. Low stacked stone wall, wider than tall, width 1.25 times height, compact rectangular footprint. Two or three staggered courses of large carved rectangular sandstone blocks, flat-ish broken top, a few fallen blocks tight against its foot. Faint geometric carving, tiny worn gold trim hints. No column, cannon, legs, supports, arch, posts, ground plate, upright shards, spikes, tall towers, text or people.",
+    "C": "Low defensive rubble wall in a ruined ceremonial courtyard. Three tightly interlocking courses of heavy squared stones; broad horizontal silhouette, restrained damage. Single original stylized chunky game prop, matte sandstone, broad clean planes. Low stacked stone wall, wider than tall, width 1.25 times height, compact rectangular footprint. Two or three staggered courses of large carved rectangular sandstone blocks, flat-ish broken top, a few fallen blocks tight against its foot. Faint geometric carving, tiny worn gold trim hints. No column, cannon, legs, supports, arch, posts, ground plate, upright shards, spikes, tall towers, text or people."
+  },
+  "texture": "Warm tan matte sandstone matching classical temple columns, large clean block faces, subtle shallow geometric carvings darkened in recesses, sparse worn muted gold inlay hints, no shine, no moss, no text."
+}

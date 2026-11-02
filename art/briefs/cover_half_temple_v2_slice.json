@@ -1,0 +1,9 @@
+{
+  "asset": "cover_half_temple_v2",
+  "brief": "Slice preview B into chunky low sandstone cover at 25 units: uniform fit, 3000/800 triangle LODs, 512px texture; reference meshy1b-previews.png B and existing temple columns.",
+  "credit_cap": 30,
+  "preview_cap": 0,
+  "refine_cap": 1,
+  "preview_task": "01a19a97-e98e-77e0-accb-22d5bdc7f98c",
+  "texture": "warm matte sandstone, faint geometric carving bands, tiny worn gold trim"
+}

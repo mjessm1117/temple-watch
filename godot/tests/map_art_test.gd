@@ -83,6 +83,10 @@ func run() -> void:
 		for angle in [0.0,PI/2,PI,PI*1.5,0.37]:
 			var actual: AABB = art.batch.model("res://assets/maps/%s.glb" % kind,Vector3(2,1.4,3),0.85,0.8,angle)
 			check(actual.size.x <= 0.851 and actual.size.z <= 0.851 and absf(actual.position.y-1.4) < 0.001,"imported bounds: %s @ %f" % [kind,angle])
+	# The rejected horizontal slice must never be stretched into passing half-cover height.
+	var sliced: AABB = art.batch.model("res://assets/maps/meshy1/cover_half_temple_v2.glb",Vector3.ZERO,0.98,0.8,0.0,true)
+	check(absf(sliced.size.y-0.239163) < 0.001,"uniform slice preserves source height")
+	check(absf(sliced.position.y) < 0.001 and sliced.size.x <= 0.981 and sliced.size.z <= 0.981,"uniform slice grounded within tile")
 	art.batch.buckets.clear()
 	var source := Node3D.new(); root.add_child(source)
 	var grid := preload("res://scripts/map_art_grid.gd").new(); root.add_child(grid); grid.bind(source)
