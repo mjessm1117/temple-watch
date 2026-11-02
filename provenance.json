@@ -1,9 +1,9 @@
 {
   "batch": "meshy4",
-  "status": "stopped_at_file_lease_boundary",
+  "status": "complete_three_accepted_one_rejected",
   "balance_before": 9885,
-  "balance_after": 9785,
-  "credits_spent": 100,
+  "balance_after": 9625,
+  "credits_spent": 260,
   "credit_cap": 300,
   "tasks": [
     {
@@ -63,6 +63,106 @@
       "cost": 0,
       "before": 9785,
       "status": "NOT_SUBMITTED_CONFIRMED_ACCOUNT_LIST"
+    },
+    {
+      "asset": "cover_full_temple",
+      "letter": "C",
+      "mode": "refine",
+      "cost": 10,
+      "before": 9785,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-00e6-707e-9f66-a9e087251a23",
+      "after": 9775
+    },
+    {
+      "asset": "cover_full_snow",
+      "letter": "A",
+      "mode": "refine",
+      "cost": 10,
+      "before": 9775,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-0d00-776e-99de-7b8156cfd60c",
+      "after": 9765
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9765,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-1518-71b9-a382-d46f6a52d428",
+      "after": 9745
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9745,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-1d46-7339-8917-2c62ea5b6a44",
+      "after": 9725
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "C",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9725,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-2592-768f-92d7-3b75cc8c0572",
+      "after": 9705
+    },
+    {
+      "asset": "obj_relay",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9705,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-2e31-741d-b585-30392af9ae8d",
+      "after": 9685
+    },
+    {
+      "asset": "obj_relay",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9685,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-3641-7447-bc85-81574ed2c500",
+      "after": 9665
+    },
+    {
+      "asset": "obj_relay",
+      "letter": "C",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9665,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-3f2d-73ed-a0c1-612127cb08e4",
+      "after": 9645
+    },
+    {
+      "asset": "obj_relay",
+      "letter": "B",
+      "mode": "refine",
+      "cost": 10,
+      "before": 9645,
+      "status": "SUCCEEDED",
+      "id": "01a19b4d-e784-76bb-a69a-f51c13090d41",
+      "after": 9635
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "B",
+      "mode": "refine",
+      "cost": 10,
+      "before": 9635,
+      "status": "SUCCEEDED",
+      "id": "01a19b4e-7fc1-70cc-ad63-f952c0d81c5e",
+      "after": 9625
     }
   ],
   "scores": [
@@ -75,7 +175,7 @@
       "poly_fit_estimate": 3,
       "preview_triangles": 7520,
       "reason": "Carved pilasters read as temple stone, but broad facade and doorway-like recess weaken full-cover mass.",
-      "verdict": "deferred_at_lease_boundary",
+      "verdict": "rejected_preview",
       "refine": false
     },
     {
@@ -87,7 +187,7 @@
       "poly_fit_estimate": 3,
       "preview_triangles": 7690,
       "reason": "Open colonnade and thin legs; poor solid-cover silhouette.",
-      "verdict": "deferred_at_lease_boundary",
+      "verdict": "rejected_preview",
       "refine": false
     },
     {
@@ -99,8 +199,8 @@
       "poly_fit_estimate": 3,
       "preview_triangles": 6633,
       "reason": "Tall paired fluted columns and broken lintel read clearly; top debris and open centre require final fit review.",
-      "verdict": "deferred_at_lease_boundary",
-      "refine": false
+      "verdict": "accepted",
+      "refine": true
     },
     {
       "asset": "cover_full_snow",
@@ -111,8 +211,8 @@
       "poly_fit_estimate": 4,
       "preview_triangles": 8135,
       "reason": "Pointed irregular rock cluster reads as an outcrop at distance; needs dark rock versus snow texture separation.",
-      "verdict": "deferred_at_lease_boundary",
-      "refine": false
+      "verdict": "accepted",
+      "refine": true
     },
     {
       "asset": "cover_full_snow",
@@ -123,11 +223,127 @@
       "poly_fit_estimate": 4,
       "preview_triangles": 7753,
       "reason": "Strong vertical slab but flat split crown and broad foot remain too architectural.",
-      "verdict": "deferred_at_lease_boundary",
+      "verdict": "rejected_preview",
+      "refine": false
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "A",
+      "silhouette": 3,
+      "style_geometry": 3,
+      "cleanliness": 3,
+      "poly_fit_estimate": 4,
+      "preview_triangles": 8133,
+      "reason": "Three recognizable boulders but the gaps weaken the solid waist-high cover mass.",
+      "verdict": "rejected_preview",
+      "refine": false
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "B",
+      "silhouette": 4,
+      "style_geometry": 4,
+      "cleanliness": 4,
+      "poly_fit_estimate": 4,
+      "preview_triangles": 7809,
+      "reason": "Cohesive, low sloping mound with broad footprint; clear half-cover silhouette.",
+      "verdict": "rejected_after_fit_review",
+      "refine": true
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "C",
+      "silhouette": 2,
+      "style_geometry": 3,
+      "cleanliness": 2,
+      "poly_fit_estimate": 4,
+      "preview_triangles": 7789,
+      "reason": "Crate and rocks are disconnected, leaving an open center and weak cover mass.",
+      "verdict": "rejected_preview",
+      "refine": false
+    },
+    {
+      "asset": "obj_relay",
+      "letter": "A",
+      "silhouette": 3,
+      "style_geometry": 3,
+      "cleanliness": 3,
+      "poly_fit_estimate": 3,
+      "preview_triangles": 7558,
+      "reason": "Lattice reads, but the dish is too small and silhouette is spindly.",
+      "verdict": "rejected_preview",
+      "refine": false
+    },
+    {
+      "asset": "obj_relay",
+      "letter": "B",
+      "silhouette": 4,
+      "style_geometry": 4,
+      "cleanliness": 4,
+      "poly_fit_estimate": 3,
+      "preview_triangles": 7953,
+      "reason": "Large dish, braced lattice mast and base housing remain distinct at game distance.",
+      "verdict": "accepted",
+      "refine": true
+    },
+    {
+      "asset": "obj_relay",
+      "letter": "C",
+      "silhouette": 3,
+      "style_geometry": 3,
+      "cleanliness": 3,
+      "poly_fit_estimate": 3,
+      "preview_triangles": 7849,
+      "reason": "Solid housing and antenna, but the dish is too small and legs dominate.",
+      "verdict": "rejected_preview",
       "refine": false
     }
   ],
-  "accepted_assets": [],
-  "mapping_changes": [],
-  "blocker": "Relay blink requires runtime hook outside lease; see docs/godot/meshy4/REPORT.md"
+  "accepted_assets": [
+    {
+      "asset": "cover_full_temple",
+      "letter": "C",
+      "lod0_triangles": 2998,
+      "lod1_triangles": 800,
+      "path": "res://assets/maps/meshy4/cover_full_temple_v1.glb"
+    },
+    {
+      "asset": "cover_full_snow",
+      "letter": "A",
+      "lod0_triangles": 3000,
+      "lod1_triangles": 800,
+      "path": "res://assets/maps/meshy4/cover_full_snow_v1.glb"
+    },
+    {
+      "asset": "obj_relay",
+      "letter": "B",
+      "lod0_triangles": 2938,
+      "lod1_triangles": 768,
+      "path": "res://assets/maps/meshy4/obj_relay_v1.glb"
+    }
+  ],
+  "mapping_changes": [
+    "meshy_themes.temple.full_cover",
+    "meshy_themes.snow.full_cover",
+    "meshy_objectives.relay"
+  ],
+  "blocker": null,
+  "credits_spent_resume": 160,
+  "hard_balance_floor": 9585,
+  "relay_beacon": "steady emissive texture; no animation",
+  "half_snow_uniform_fit_height": 0.473,
+  "rejected_assets": [
+    {
+      "asset": "cover_half_snow",
+      "letter": "B",
+      "reason": "Uniform one-tile fit is only 0.473 high; side-trim reaches 0.72 but exposes a broad pale face that reads as the original white box. Existing mapping retained."
+    }
+  ],
+  "validation": {
+    "godot_test_exit": 0,
+    "suites": 15,
+    "script_errors": 0,
+    "all_suites_zero_failures": true,
+    "normal_rescue_wins": "10/20"
+  }
 }

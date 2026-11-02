@@ -74,6 +74,35 @@ func run() -> void:
 	root.size = Vector2i(1280, 720) if preview else Vector2i(1920, 1080)
 	root.content_scale_size = root.size
 	var output: String
+	if "--final" in args:
+		var asset := args[1]
+		var height := 1.85 if asset.begins_with("cover_full") else (0.8 if asset.begins_with("cover_half") else 1.6)
+		var scene := scene_in(root)
+		var candidate := model(FINAL + asset + "_v1.glb", height, 1.0)
+		candidate.position.x += 0.9
+		scene.add_child(candidate)
+		var column := model("res://assets/maps/pillar.glb", 2.2, 0.7)
+		column.position.x -= 0.9
+		scene.add_child(column)
+		var floor_mesh := MeshInstance3D.new()
+		var floor := PlaneMesh.new()
+		floor.size = Vector2(5, 5)
+		floor_mesh.mesh = floor
+		floor_mesh.position.y = -0.02
+		var floor_mat := StandardMaterial3D.new()
+		floor_mat.albedo_color = Color("48515a")
+		floor_mesh.material_override = floor_mat
+		scene.add_child(floor_mesh)
+		camera_in(scene, Vector3(2.5, 2.7, 4.4), Vector3(0, 0.85, 0), 42)
+		label("MESHY 4 / " + asset + " / close review", Vector2(40, 30))
+		label("temple column reference", Vector2(190, 975))
+		label("candidate / uniform fit", Vector2(1060, 975))
+		output = "res://../docs/godot/shots/meshy4-stage-" + asset + ".png"
+		await create_timer(1.0).timeout
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png(ProjectSettings.globalize_path(output))
+		quit()
+		return
 	if preview:
 		var file := args[1]
 		var height := 1.85 if file.begins_with("cover_full") else (0.8 if file.begins_with("cover_half") or file.begins_with("obj_charge") else 1.6)
@@ -87,7 +116,7 @@ func run() -> void:
 			viewport.own_world_3d = true
 			container.add_child(viewport)
 			var scene := scene_in(viewport)
-			scene.add_child(model(RAW + file, height, 1.0, true))
+			scene.add_child(model(RAW + file, height, 1.0, not "--textured" in args))
 			camera_in(scene, Vector3(2.4, 2.6, 3.7) if i == 0 else Vector3(5.147, 17.934, 16.64), Vector3(0, height * 0.45, 0), 40 if i == 0 else 45)
 			label(file + (" / close" if i == 0 else " / ~25 units"), Vector2(i * 640 + 15, 15))
 		output = RAW + file.replace(".glb", ".png")

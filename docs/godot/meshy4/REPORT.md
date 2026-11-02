@@ -1,87 +1,49 @@
-# Meshy batch 4 — stopped at file-lease boundary
+# Meshy batch 4 — final report
 
-No replacement is accepted or integrated. All four shipped mappings remain unchanged.
+The 2026-11-01 tech lead decision replaced the relay blink with a **steady emissive beacon**. Three replacements are integrated; half snow was rejected after final fit review. No batching, renderer, gameplay, map layout, or Normal difficulty code changed.
 
-The requested relay needs a **blinking light**. The current runtime in
-`godot/scripts/map_art_batch.gd` collects only MeshInstance3D geometry and materials
-(`collect`), frees the instantiated GLB scene (`model`), then emits static MultiMeshes
-(`flush`). GLB animation players and animated nodes do not survive this path.
-`meshy_theme_batch.gd` uses that same static batching for both LODs. A static emissive
-texture can supply a bright dot, but cannot supply the requested blink.
+## Credit ledger
 
-Supporting the blink requires a runtime material/animation hook in the presentation
-or batching path, outside this lane's lease. No such change was made. The user's
-explicit instruction, “If a code change outside the lease is needed, stop and describe
-it in REPORT.md,” caused the batch to stop. A follow-up needs either authorization
-for that runtime hook coordinated with the graphics lane, or acceptance of a steady
-emissive beacon. This is an incomplete art round, not a successful replacement batch.
+Starting balance **9,885**; balance at resume **9,785**; final balance **9,625**. The original five previews cost 100 credits. This continuation cost **160**: six previews at 20 and four refinements at 10. Total **260/300**, leaving 40 credits under the batch cap and 40 credits above the required 9,585 balance floor. The five paid original previews were reused; full snow C was never submitted or charged. Task IDs and per-task balances are in `art/meshy4/ledger.json` and `provenance.json`.
 
-## Generation and credit accounting
+## Decisions and production assets
 
-Reference images inspected before submission: `meshyint-temple-close.png` and
-`meshy3b-stage-close.png`. Four briefs with exact A/B/C prompts are retained in
-`art/meshy4/`, within the lease rather than the skill's default `art/briefs/`.
-Planned spend was 280 credits with 20 reserved. Five previews were submitted before
-the runtime limitation was found: temple A/B/C and full snow A/B. No refinement,
-rigging, or additional submission was authorized by a visual score.
+| Asset | Decision | Reason | LOD0 / LOD1 tris | Uniform in-game fit W × H × D |
+|---|---|---|---:|---:|
+| `cover_full_temple` | **Accepted C** | Paired fluted columns and broken lintel read clearly; warm pale sandstone matches the nearby temple columns. | 2,998 / 800 | 0.542 × 1.850 × 0.611 |
+| `cover_full_snow` | **Accepted A** | Tall jagged spire has dark charcoal rock across its vertical faces, with white snow and blue ice on ledges. | 3,000 / 800 | 0.996 × 1.850 × 0.953 |
+| `cover_half_snow` | **Rejected B; old mapping retained** | The intact dark-rock drift fits only 0.473 high; a 0.72-high side trim creates a flat pale face resembling the original white box. | No production LODs | Candidate: 1.000 × 0.473 × 0.891 |
+| `obj_relay` | **Accepted B** | Large dish, open braced mast and base housing read as a relay. A small red amber beacon at the antenna tip has a baked emissive texture and is steady. | 2,938 / 768 | 0.486 × 1.600 × 0.556 |
 
-Starting balance: **9,885**. Balance after stopping submissions: **9,785**.
-Confirmed spend: **100 / 300 credits**. Full snow C's local SUBMITTING reservation
-was interrupted before a task ID; account task listing confirms no C task and the
-balance confirms no charge. It must not be counted as a sixth paid task.
-All paid task IDs and numeric balances are preserved in `art/meshy4/ledger.json`.
-Already-paid downloads are retained for a future continuation; recovery makes only
-read-only status/download calls and cannot submit tasks.
+All accepted production textures are 512² or smaller; the beacon mask is 1². LOD0 and LOD1 are separate GLBs under `godot/assets/maps/meshy4/`. The map batcher uses uniform fit. Snow full cover needed a small capped side trim to reach 1.85 high inside one tile; its dark rock silhouette survives the trim. The half snow winner's natural wide proportions limit its one-tile fit to **0.473** high, below the tested 0.7–0.9 cover band. A uniformly scaled, capped side-trim trial reached 0.72 but its broad pale face recreated the box problem. Both versions were rejected, and the existing half snow mapping remains. No nonuniform scaling or top slicing was used.
 
-| Asset | Verdict | Reason | Production triangle counts |
-|---|---|---|---|
-| cover_full_temple | Deferred; current retained | Batch stopped before winner/refinement/integration | No new production LODs |
-| cover_full_snow | Deferred; current retained | Batch stopped before winner/refinement/integration | No new production LODs |
-| cover_half_snow | Not generated; current retained | Batch stopped before submission | No new production LODs |
-| obj_relay | Blocked; current retained | Blinking light requires out-of-lease runtime support | No new production LODs |
+## Preview review
 
-No model is assigned an acceptance score without visual inspection. No paid refine
-was made. No nonuniform scale or top slicing was used. Normal gameplay data,
-settings, renderer, lighting and map layouts are unchanged.
+Silhouette scores use 1–5 at the close and battle review distances. Only previews scoring at least 4 were refined. Refinement did not guarantee final acceptance.
 
-## Evidence and limitations
+| Asset | A | B | C | Refined |
+|---|---|---|---|---|
+| Temple full | 3 — broad facade | 2 — open, thin legs | **4 — clear column pair** | C |
+| Snow full | **4 — pointed outcrop** | 3 — architectural slab | Not submitted | A |
+| Snow half | 3 — separated boulders | **4 — coherent low mound** | 2 — open center and detached pieces | B, then rejected on fit |
+| Relay | 3 — small dish | **4 — dish, mast, base** | 3 — legs dominate | B |
 
-The capture harness preserves deterministic seed 17, Normal difficulty, default
-battle cameras and existing HUD. Before shots cover the temple fixture, snow Ilum
-map and relay mission, with close views. No after shots or final stage comparisons
-are claimed because no asset was integrated. Baseline counters are recorded in
-`art/meshy4/budgets-before.json`; llvmpipe software rendering is not phone FPS evidence.
-The final validation results and preview recovery status are appended below.
+The losing previews remain labeled in `art/meshy4/`. Detailed style, cleanliness, poly-fit scores and reasons are in `scores.json`. No preview scoring below 4 was refined.
 
-## Recovered preview review
+## Before → after in the game
 
-All five paid previews completed and were downloaded and visually inspected in
-uniform-fit close and ~25-unit clay renders. Scores are provisional geometry review;
-style does not assess missing textures and poly-fit is a simplification estimate.
+All six before and six after captures use seed 17, Normal difficulty, the existing HUD, default battle cameras, 1920×1080 output and the same Godot Compatibility renderer on llvmpipe. The pairs are [temple before](../shots/meshy4-fixture-before.png) → [after](../shots/meshy4-fixture-after.png), [snow before](../shots/meshy4-ilum-before.png) → [after](../shots/meshy4-ilum-after.png), and [relay before](../shots/meshy4-relay-before.png) → [after](../shots/meshy4-relay-after.png). Close camera pairs have the same names with `-close` before `.png`.
 
-| Preview | Silhouette | Style | Clean | Poly fit | Raw triangles | Reason |
-|---|---:|---:|---:|---:|---:|---|
-| cover_full_temple A | 3 | 4 | 3 | 3 | 7520 | Carved pilasters read as temple stone, but broad facade and doorway-like recess weaken full-cover mass. |
-| cover_full_temple B | 2 | 4 | 2 | 3 | 7690 | Open colonnade and thin legs; poor solid-cover silhouette. |
-| cover_full_temple C | 4 | 4 | 3 | 3 | 6633 | Tall paired fluted columns and broken lintel read clearly; top debris and open centre require final fit review. |
-| cover_full_snow A | 4 | 4 | 3 | 4 | 8135 | Pointed irregular rock cluster reads as an outcrop at distance; needs dark rock versus snow texture separation. |
-| cover_full_snow B | 3 | 3 | 3 | 4 | 7753 | Strong vertical slab but flat split crown and broad foot remain too architectural. |
+| Mission | Visible triangles before → after | Total draws before → after | Visual change |
+|---|---:|---:|---|
+| Temple fixture | 139,617 → 142,613 | 110 → 110 | Yellow box-like cover replaced by carved column pair. |
+| Snow Ilum | 148,727 → 147,715 | 120 → 121 | White full-cover cabinets replaced by dark ice spires; half cover unchanged. |
+| Relay | 177,127 → 176,070 | 121 → 122 | Kiosk replaced by dish mast with visible steady red beacon. |
 
-Temple C and snow A clear the preliminary silhouette threshold, but are **not
-accepted or refined** because the batch stopped at the lease boundary. All other
-previews fail that threshold. No further paid work is running.
+Visible geometry stays below 300K triangles and total draws below 150 in all three captures. Relay's all-pass `total_primitives` counter is **313,883** after, versus **314,940** before, so it remains above 300K if that separate counter is interpreted as the phone triangle budget. The existing capture gate uses visible primitives; this pre-existing distinction is retained here. llvmpipe FPS is not phone performance evidence.
 
-Baseline visible geometry: temple 139,617 triangles / 110 total draws; snow
-148,727 / 120; relay 177,127 / 121. The existing capture gate uses visible triangles
-and total draws. Relay total rendered primitives are 314,940 (including other passes
-and UI), above 300K if that counter is interpreted as the budget. This pre-existing
-difference is recorded rather than claiming all-map budget compliance.
+Close-up stage comparisons place each accepted asset beside the existing temple column: [temple](../shots/meshy4-stage-cover_full_temple.png), [full snow](../shots/meshy4-stage-cover_full_snow.png), [relay](../shots/meshy4-stage-obj_relay.png). The [rejected half snow candidate](../shots/meshy4-stage-cover_half_snow-rejected.png) is also preserved.
 
 ## Validation
 
-`./godot/test.sh` exited **0**: all 15 suites passed, zero failures, zero SCRIPT ERROR
-lines. Normal band/gameplay files are unchanged. Six before screenshots and five
-uniform-fit preview renders exist. `git diff --check` passed. No production LODs,
-after screenshots or final reference stage shots were produced; completion gates
-are therefore **not met**. Godot editor-generated untracked UID sidecars were
-removed after validation to preserve the lease. No tool bug fixes were needed.
+`./godot/test.sh` exited **0**: all 15 suites reported **0 failures**, with **0 SCRIPT ERROR** lines. Map art passed 179,392 checks; the Normal rescue band stayed at 10/20 wins (50%). `git diff --check` passed. The in-game capture script exited 0 with no SCRIPT ERROR. Normal gameplay files and batching code remain unchanged.

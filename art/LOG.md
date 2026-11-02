@@ -140,3 +140,11 @@ visible-triangle/total-draw gate passes those scenes; relay total rendered primi
 `./godot/test.sh`: exit 0, all 15 suites, zero failures and SCRIPT ERROR lines.
 Normal/gameplay unchanged. No after screenshots, production LODs, or final stage
 shots: this batch is incomplete. Local meshy/batch4 commit only; no push.
+
+## Meshy batch 4 — resumed and finished (2026-11-02)
+
+Tech lead replaced the relay blink with a steady emissive beacon. Reused the five original paid previews. Submitted six new previews (half snow A/B/C, relay A/B/C) and refined only silhouette-4 winners: temple C, full snow A, half snow B, relay B. Final balance **9,625** from 9,885, total **260/300 credits**; this continuation spent 160, stopping 40 above the required account floor. Task IDs, credits, scores and verdicts are in `art/meshy4/ledger.json`, `scores.json` and `provenance.json`.
+
+Accepted and integrated: temple C (warm column pair, 2,998/800 tris); full snow A (dark rock spire, small side trim for 1.85 height, 3,000/800); relay B (dish mast and steady textured emissive beacon, 2,938/768). All textures are at most 512², with a 1² beacon mask. Only these three `props.json` mappings changed. Rejected half snow B after refinement: uniform one-tile fit was only 0.473 high; a capped side trim reached 0.72 but looked too much like the original white box. Its shipped mapping stays intact. No top slicing, nonuniform scaling, animation or batching-code change.
+
+Before/after mission captures and a close stage comparison per accepted asset are under `docs/godot/shots/meshy4-*.png`; the rejected half snow stage view is preserved too. Full report and phone-budget measurements: `docs/godot/meshy4/REPORT.md`.

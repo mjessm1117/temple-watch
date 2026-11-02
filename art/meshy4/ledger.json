@@ -58,6 +58,106 @@
       "cost": 0,
       "before": 9785,
       "status": "NOT_SUBMITTED_CONFIRMED_ACCOUNT_LIST"
+    },
+    {
+      "asset": "cover_full_temple",
+      "letter": "C",
+      "mode": "refine",
+      "cost": 10,
+      "before": 9785,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-00e6-707e-9f66-a9e087251a23",
+      "after": 9775
+    },
+    {
+      "asset": "cover_full_snow",
+      "letter": "A",
+      "mode": "refine",
+      "cost": 10,
+      "before": 9775,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-0d00-776e-99de-7b8156cfd60c",
+      "after": 9765
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9765,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-1518-71b9-a382-d46f6a52d428",
+      "after": 9745
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9745,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-1d46-7339-8917-2c62ea5b6a44",
+      "after": 9725
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "C",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9725,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-2592-768f-92d7-3b75cc8c0572",
+      "after": 9705
+    },
+    {
+      "asset": "obj_relay",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9705,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-2e31-741d-b585-30392af9ae8d",
+      "after": 9685
+    },
+    {
+      "asset": "obj_relay",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9685,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-3641-7447-bc85-81574ed2c500",
+      "after": 9665
+    },
+    {
+      "asset": "obj_relay",
+      "letter": "C",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9665,
+      "status": "SUCCEEDED",
+      "id": "01a19b47-3f2d-73ed-a0c1-612127cb08e4",
+      "after": 9645
+    },
+    {
+      "asset": "obj_relay",
+      "letter": "B",
+      "mode": "refine",
+      "cost": 10,
+      "before": 9645,
+      "status": "SUCCEEDED",
+      "id": "01a19b4d-e784-76bb-a69a-f51c13090d41",
+      "after": 9635
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "B",
+      "mode": "refine",
+      "cost": 10,
+      "before": 9635,
+      "status": "SUCCEEDED",
+      "id": "01a19b4e-7fc1-70cc-ad63-f952c0d81c5e",
+      "after": 9625
     }
   ]
 }
