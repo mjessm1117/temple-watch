@@ -148,3 +148,17 @@ Tech lead replaced the relay blink with a steady emissive beacon. Reused the fiv
 Accepted and integrated: temple C (warm column pair, 2,998/800 tris); full snow A (dark rock spire, small side trim for 1.85 height, 3,000/800); relay B (dish mast and steady textured emissive beacon, 2,938/768). All textures are at most 512², with a 1² beacon mask. Only these three `props.json` mappings changed. Rejected half snow B after refinement: uniform one-tile fit was only 0.473 high; a capped side trim reached 0.72 but looked too much like the original white box. Its shipped mapping stays intact. No top slicing, nonuniform scaling, animation or batching-code change.
 
 Before/after mission captures and a close stage comparison per accepted asset are under `docs/godot/shots/meshy4-*.png`; the rejected half snow stage view is preserved too. Full report and phone-budget measurements: `docs/godot/meshy4/REPORT.md`.
+
+## Meshy batch 5 — snow half and jungle covers (2026-11-02)
+
+Applied meshy-art-director and the 150-credit cap. Live balance **9,625 → 9,475**: seven 20-credit previews and one 10-credit refine, no rigging. Exact prompts, task IDs, per-task balances, raw GLBs, rendered previews, scores and trim attempts are in `art/meshy5/` and root `provenance.json`. The third preview was used only for snow after its first two failed the fit gate.
+
+**Accepted snow half A** after scoring the side-trimmed preview 4/5 silhouette and 4/5 proportion. The untrimmed one-tile fit was only 0.586 high. Four capped side cuts with uniform scale retained a 0.980 × 0.798 × 0.980 rock pile. Meshy refinement produced a nearly white texture despite the dark-rock prompt, so locally authored matte charcoal rock, blue ice and snow material groups replace it. Final LOD0/LOD1: **2,998/800 triangles**, no texture. Real Ilum battle and close captures show dark exposed rock rather than a plain white box.
+
+**Rejected jungle half A/B.** A is an upright stump even though its bounds fit 0.707 high; B is only 0.562 high at one-tile fit and its capped side-trim attempt failed on open mesh boundaries. A permissive diagnostic trim still looked like a box with a flat apron. Neither met the requested fallen log or low wall. No paid refine or production GLB; `props.json` jungle half remains unmapped.
+
+**Accepted jungle full A** as a locally textured Meshy preview, no paid refine. The first uniform one-tile fit was 1.446 high and failed the map-art full-cover gate. A uniform height fit with four side cuts yields 0.980 × 1.850 × 0.980 with a trunk and buttress roots. A 512² local bark/moss texture in deep brown and green replaces the pale pillar. LOD0/LOD1: **2,999/800 triangles**. The preliminary recolor of the old pillar was rejected because it still read as a box; its raw candidate remains under `art/meshy5/`.
+
+Only the accepted snow half and jungle full paths changed in `props.json`; no gameplay, LOS, renderer, or other theme paths changed. Before/after Ilum and h_roots captures and three stage close-ups are in `docs/godot/shots/meshy5-*.png`. Full decisions, dimensions and render counters: `docs/godot/meshy5/REPORT.md`.
+
+Final validation: headless Godot import before tests; `./godot/test.sh` exit **0**, every suite 0 failures, 0 SCRIPT ERROR/ERROR lines, Normal rescue **10/20**. The focused map-art check passed **179,392 checks across 62 maps**; the full suite repeated that pass. The initial 1.446-high jungle candidate failed the full-cover height gate; corrected v3 passed. `git diff --check` passed. Local commit on `meshy/batch5`; no push.

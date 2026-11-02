@@ -1,0 +1,85 @@
+{
+  "start": 9625,
+  "tasks": [
+    {
+      "asset": "cover_half_snow",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9625,
+      "status": "SUCCEEDED",
+      "id": "01a19d23-8e1a-76e2-a458-ce74b0b86313",
+      "after": 9605
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9605,
+      "status": "SUCCEEDED",
+      "id": "01a19d23-963f-75e1-9553-9fd100832a0e",
+      "after": 9585
+    },
+    {
+      "asset": "cover_half_jungle",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9585,
+      "status": "SUCCEEDED",
+      "id": "01a19d23-9df3-7235-a4b7-890812688add",
+      "after": 9565
+    },
+    {
+      "asset": "cover_half_jungle",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9565,
+      "status": "SUCCEEDED",
+      "id": "01a19d23-a636-7174-ae1a-841e692aa4c8",
+      "after": 9545
+    },
+    {
+      "asset": "cover_full_jungle",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9545,
+      "status": "SUCCEEDED",
+      "id": "01a19d23-adba-77b1-853a-af951fb37a78",
+      "after": 9525
+    },
+    {
+      "asset": "cover_full_jungle",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9525,
+      "status": "SUCCEEDED",
+      "id": "01a19d23-b628-7588-801b-0cbe96bf2166",
+      "after": 9505
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "C",
+      "mode": "preview",
+      "cost": 20,
+      "before": 9505,
+      "status": "SUCCEEDED",
+      "id": "01a19d2a-d573-77f5-8392-e8e8f0c09264",
+      "after": 9485
+    },
+    {
+      "asset": "cover_half_snow",
+      "letter": "A",
+      "mode": "refine",
+      "cost": 10,
+      "before": 9485,
+      "status": "SUCCEEDED",
+      "id": "01a19d2e-920a-7575-88d1-5b6f7b6533e6",
+      "after": 9475
+    }
+  ]
+}

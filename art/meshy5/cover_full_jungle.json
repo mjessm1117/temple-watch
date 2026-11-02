@@ -1,0 +1,9 @@
+{
+  "asset": "cover_full_jungle", "credit_cap": 150, "preview_cap": 6, "refine_cap": 3,
+  "brief": "Tall full-cover jungle prop at 25-unit battle camera; taller than half cover, one-tile footprint; 3000/800 triangles. References: docs/godot/shots/meshyint-temple-close.png and docs/godot/shots/meshy3b-stage-close.png.",
+  "texture": "Very dark rich brown bark with deep crevices, saturated forest-green moss and vines on shaded roots, small black-green shadows. Matte high contrast, no pale grey or washed-out green, no bright white.",
+  "variants": {
+    "A": "Single massive upright jungle tree trunk with three thick buttress roots flaring into a compact base, broken jagged top, solid opaque tall cover silhouette, height twice its width, square one-tile footprint. Deep bark grooves and heavy moss bands. Stylized low-poly tactics game prop readable at 25 units. No branches, canopy, hole, ground plane, pedestal or pale stone.",
+    "B": "Single tall vine-choked ancient jungle pillar of dark cracked stone, thick tree roots wrapping and anchoring its base, solid broad opaque mass, jagged broken top. Height twice its width, compact square footprint, stylized low-poly tactics game full cover readable at 25 units. No arch, doorway, thin columns, ground plate or pale smooth surfaces."
+  }
+}
