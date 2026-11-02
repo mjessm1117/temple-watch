@@ -1,0 +1,25 @@
+{
+  "integration": "Meshy batches 1, 2, 3a and 3b; local assets only",
+  "mapping": "res://data/maps/props.json",
+  "sources": [
+    "art/meshy2-LOG.md",
+    "art/meshy3a-LOG.md",
+    "art/meshy3b-LOG.md",
+    "art/LOG.md"
+  ],
+  "review": "art/meshy-int-LOG.md",
+  "credits_spent": 0,
+  "asset_files_modified": false,
+  "runtime_adjustments": [
+    "Uniform one-tile fitting, cardinal rotation and grounding at Shot.elevation * 0.7",
+    "Explicit LOD0/LOD1 spatial MultiMeshes with complementary visibility ranges",
+    "Cave albedo black lift on duplicated runtime materials; source files unchanged",
+    "Compatibility light energy reduced to preserve pale surface detail",
+    "Sparse temple full-cover piers use existing blocked rear/side boundary tiles"
+  ],
+  "gaps": {
+    "jungle_half_cover": "No accepted asset; existing procedural half cover retained",
+    "terminal_lod1": "obj_terminal_v1_lod1.glb is absent; existing batch-1 terminal retained without a claimed explicit LOD pair"
+  },
+  "gameplay": "No changes to layouts, tile/cover values, rules, balance or mission RNG"
+}

@@ -2,7 +2,8 @@ extends Node3D
 ## One read-only art renderer for the rescue fixture and all campaign biomes.
 const Maps = preload("res://scripts/map_catalog.gd")
 const Shot = preload("res://scripts/shot.gd")
-const Batch = preload("res://scripts/map_art_batch.gd")
+const Batch = preload("res://scripts/meshy_theme_batch.gd")
+const Meshy = preload("res://scripts/meshy_theme_models.gd")
 const Geometry = preload("res://scripts/map_art_geometry.gd")
 const STONE = preload("res://assets/env/stone.gdshader")
 const TERRAIN = preload("res://assets/env/terrain.gdshader")
@@ -11,6 +12,7 @@ var props: Dictionary = Maps.read("res://data/maps/props.json")
 var palette: Dictionary = {}
 var batch = Batch.new()
 var theme := "temple"
+var interior_full_cover := false
 var mission: RefCounted
 var floor_bounds: Dictionary = {}
 var access_tiles: Dictionary = {}
@@ -59,6 +61,9 @@ func apply_environment(world: WorldEnvironment, key: DirectionalLight3D, theme_n
 	key.directional_shadow_max_distance = 60; key.light_angular_distance = 0.5
 	key.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
 	key.rotation_degrees = Vector3(-48,-38,0)
+	if RenderingServer.get_current_rendering_method() == "gl_compatibility":
+		# LDR Compatibility has no ACES highlight rolloff: avoid clipping pale cover.
+		key.light_energy *= 0.55; env.ambient_light_energy *= 0.8
 
 func setup_palette(t: Dictionary) -> void:
 	var surface: Dictionary = t.surface
@@ -84,9 +89,13 @@ func setup_palette(t: Dictionary) -> void:
 func build(m: RefCounted, _models: Dictionary = {}) -> void:
 	clear_children(self)
 	mission = m; theme = str(m.spec.get("theme","temple"))
-	batch.records.clear(); batch.buckets.clear(); floor_bounds.clear(); access_tiles.clear()
+	batch.material_lift = props.get("meshy_material_lift",{})
+	batch.records.clear(); batch.buckets.clear(); batch.reset_lods(); floor_bounds.clear(); access_tiles.clear()
+	# Campaign cameras scale with map size; keep the near half detailed at their default zoom.
+	batch.lod_distance = maxf(float(props.get("meshy_lod_distance",26.0)),maxf(m.spec.width,m.spec.height)*1.3 if m.modern else 0.0)
 	var t: Dictionary = themes.get(theme,themes.temple); setup_palette(t)
 	access_tiles = preload("res://scripts/map_art_access.gd").prepare(m)
+	interior_full_cover = m.board.slice(1,m.board.size()-1).any(func(row): return "#" in str(row).substr(1,int(m.spec.width)-2))
 	var geo := Geometry.new(self)
 	for y in int(m.spec.height):
 		for x in int(m.spec.width):
@@ -94,12 +103,17 @@ func build(m: RefCounted, _models: Dictionary = {}) -> void:
 	geo.backdrop(int(m.spec.width),int(m.spec.height))
 	batch.flush(self)
 	var rim := DirectionalLight3D.new(); rim.light_color = color(int(t.rim[0])); rim.light_energy = float(t.rim[1])*0.4
-	rim.rotation_degrees = Vector3(-30,135,0); add_child(rim)
+	rim.rotation_degrees = Vector3(-30,135,0)
+	if RenderingServer.get_current_rendering_method() == "gl_compatibility": rim.light_energy *= 0.55
+	add_child(rim)
 	weather(t.part,int(m.spec.width),int(m.spec.height))
 	marker_root = Node3D.new(); marker_root.name = "Objectives"; add_child(marker_root)
 	damage_root = Node3D.new(); damage_root.name = "CoverDamage"; add_child(damage_root)
 	damage_hash = -1; marker_hash = -1
 	refresh_markers(m); refresh_damage()
+	if is_instance_valid(game):
+		var detection := preload("res://scripts/meshy_theme_markers.gd").new()
+		detection.game = game; add_child(detection)
 
 func clear_children(parent: Node) -> void:
 	for child in parent.get_children(): parent.remove_child(child); child.queue_free()
@@ -174,17 +188,24 @@ func refresh_markers(m: RefCounted) -> void:
 	var signature := hash([m.objective_state,m.pressure_state,m.prisoner,m.turn,m.units.map(func(u): return [u.hp,u.overwatch,u.spotted,u.x,u.y])])
 	if signature == marker_hash: return
 	marker_hash = signature; clear_children(marker_root)
-	var markers = Batch.new(); markers.models = batch.models
+	var markers = Batch.new(); markers.models = batch.models; markers.lod_distance = batch.lod_distance
 	# Records are replaced when escort/civilian positions change.
 	batch.records = batch.records.filter(func(record): return record.role != "objective")
 	for point in m.spec.evac:
 		var tile := Maps.point(point); var at := Vector3(tile.x,Shot.elevation(m,tile)*0.7,tile.y)
 		markers.begin_record({"tile":tile,"floor":at.y,"kind":"evac","role":"objective"})
+		# One small beacon at a zone corner leaves the walkable tile and unit centre clear.
+		if point == m.spec.evac[0]:
+			markers.pair(Meshy.objective_path(props,Meshy.action(props,"evac")),at+Vector3(0.33,0,0.33),0.25,0.44)
 		ring(markers,at,palette.evac); markers.end_record()
 	if bool(m.prisoner.get("active",true)) and m.in_bounds(Shot.pos(m.prisoner)) and m.result != "win":
 		var tile := Shot.pos(m.prisoner); var at := Vector3(tile.x,Shot.elevation(m,tile)*0.7,tile.y)
 		markers.begin_record({"tile":tile,"floor":at.y,"kind":"prisoner","role":"objective"})
-		person(markers,at,bool(m.prisoner.freed)); ring(markers,at,palette.objective); markers.end_record()
+		var restrained := false
+		if not bool(m.prisoner.freed):
+			restrained = markers.pair(Meshy.objective_path(props,Meshy.action(props,"rescue")),at,0.72,1.35)
+		if not restrained: person(markers,at,bool(m.prisoner.freed))
+		ring(markers,at,palette.objective); markers.end_record()
 	if m.modern:
 		for civilian in m.objective_state.get("civilians",[]):
 			if civilian.state != "waiting": continue
@@ -217,16 +238,18 @@ func objective(b, m: RefCounted, tile: Vector2i, family: String) -> void:
 	var at := Vector3(tile.x,Shot.elevation(m,tile)*0.7,tile.y)
 	var done: bool = m.objective_state.get("done",{}).has(tile)
 	b.begin_record({"tile":tile,"floor":at.y,"kind":family,"role":"objective"})
-	if family == "sabotage":
+	if b.pair(Meshy.objective_path(props,Meshy.action(props,family)),at,0.72,1.18):
+		pass
+	elif family == "hack_terminal" and props.get("meshy1_enabled",false) and not str(props.get("meshy1_models",{}).get("objective","")).is_empty():
+		# Batch 1 terminal has no explicit LOD1 in the shipped assets; preserve existing art.
+		b.model(str(props.meshy1_models.objective),at,0.72,1.18)
+	elif family == "sabotage":
 		b.model("res://assets/maps/barrel.glb",at,0.65,0.75)
 		b.put("box",palette.metal,at+Vector3(0,0.22,0.31),Vector3(0.38,0.28,0.16))
 		b.put("box",palette.fire if done else palette.glow,at+Vector3(0,0.25,0.397),Vector3(0.22,0.07,0.012))
 	else:
-		if props.get("meshy1_enabled",false):
-			b.model(str(props.meshy1_models.objective),at,0.72,1.18)
-		else:
-			b.model("res://assets/maps/%s.glb" % ("relay" if family in ["destroy_relay","defend"] else "terminal"),at,0.72,1.18)
-			b.put("box",palette.glow,at+Vector3(0,0.92,0.30),Vector3(0.30,0.17,0.025))
+		b.model("res://assets/maps/%s.glb" % ("relay" if family in ["destroy_relay","defend"] else "terminal"),at,0.72,1.18)
+		b.put("box",palette.glow,at+Vector3(0,0.92,0.30),Vector3(0.30,0.17,0.025))
 	ring(b,at,palette.evac if done else palette.objective)
 	b.end_record(); light(at+Vector3.UP*1.3,Color("74d4e4"),0.6,2.0,marker_root)
 
