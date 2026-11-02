@@ -88,3 +88,19 @@ Identical battle view: [Low](../shots/tiers-low.png), [Medium](../shots/tiers-me
 ## Remaining device checks
 
 No physical Android/iOS device, WebGL export, Vulkan-unavailable hardware, or D3D12 device was available. OS-default selection and forced-Compatibility fallback are tested; actual driver-failure recovery relies on Godot's enabled fallback. Mobile 0.75 scaling, power/thermal behavior, memory use and sustained phone FPS remain unmeasured. Low's scar meshes approximate the cover bounds rather than projecting precisely onto irregular models. Draw/primitive budgets were measured at the specified overview, not across every camera angle or late-battle reinforcements.
+
+## Performance A/B
+
+The identical `graphics_perf.gd` harness ran in a temporary `7c682bd` worktree and on `gfx/tiers`. It loaded `cache` with seed 17 and the same battle camera/HUD at 1366×768, disabled VSync, waited three seconds, then measured 600 process-frame intervals. Each run used a fresh `XDG_DATA_HOME`, Xvfb at `1366x768x24`, `__NV_PRIME_RENDER_OFFLOAD=1`, and `__GLX_VENDOR_LIBRARY_NAME=nvidia`. Base and High used Forward+; Low used Compatibility. The base imported its own unchanged assets before timing. The values below are medians of three sequential runs per variant; draw calls and primitives are the maximum observed within each run.
+
+| Variant | Avg fps | p95 frame ms | Draws | Primitives |
+| --- | ---: | ---: | ---: | ---: |
+| Base `7c682bd` | 29.78 | 87.93 | 128 | 472,325 |
+| High | 34.10 | 84.40 | 128 | 472,325 |
+| Low | 36.31 | 82.80 | 100 | 230,948 |
+
+Individual runs, in execution order: base **36.77/70.70**, **28.75/90.40**, **29.78/87.93**; High **34.10/84.40**, **35.78/80.97**, **33.98/85.90**; Low **32.61/86.66**, **36.31/82.80**, **48.63/39.38** (fps/p95 ms). All nine exited zero with no script or engine errors. An earlier pass before adding four scene-settling frames also showed matching base/High render counters and near-equal median fps; its apparent 35% High p95 regression disappeared on the corrected pass. That pass included immediate fixture replacement, which emitted Compatibility texture-leak errors on shutdown, so it is superseded here.
+
+For a direct Wave 9 method check, `map_preview.gd -- cache --fps --benchmark --authored` ran once on each tree at 1920×1080, with its own 10-second warmup and 1,200-frame sample. Base measured **27.8 fps / 41.00 ms p95**, High **27.9 fps / 38.76 ms p95**; both had **128 draws**. The script exited 1 for both because its 60 fps assertion failed, after printing valid samples; neither had a script error. Wave 9's historical **244.8 fps / 9.10 ms** capture recorded **99 draws** on an earlier scene state, so it is not an A/B against today's `7c682bd`. Other Godot processes used the same RTX 4090 during the three-run checks, and timing swung widely even between base runs. The exact cause of the historical-to-current absolute fps gap remains unresolved; the current base result shows it is not attributable to tier code. Competing GPU jobs and intervening scene content are outside this file lease and were left untouched.
+
+**Verdict:** High has no reproducible performance regression against `7c682bd` under the identical standalone harness. It has exactly the same measured rendering work, while its corrected median fps is 14.5% higher and p95 frame time 4.0% lower than base. These host-contended absolute fps values are not a device performance certification. The old 25 fps entry above came from sampling inside a suite that first loads every battle and repeatedly switches tiers. `graphics-render.sh` now runs captures separately from the standalone benchmark and writes `perf-{low,medium,high}.log`; the old JSON files remain historical measurements.

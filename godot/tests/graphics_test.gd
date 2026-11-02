@@ -42,7 +42,7 @@ func run() -> void:
 			await damage_check()
 			if rendered and "--capture" in OS.get_cmdline_user_args():
 				await create_timer(3.0).timeout
-				await sample()
+				if "--benchmark" in OS.get_cmdline_user_args(): await sample()
 				await save_shot(tier.replace("medium","med"))
 		if rendered: await RenderingServer.frame_post_draw
 		game.queue_free(); await frames()
