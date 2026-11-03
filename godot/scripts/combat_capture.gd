@@ -10,6 +10,7 @@ func run() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--kind="): kind = arg.trim_prefix("--kind=")
 		if arg.begins_with("--output="): output = arg.trim_prefix("--output=")
+	root.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_IGNORE
 	var game = load("res://scenes/rescue.tscn").instantiate()
 	root.add_child(game)
 	await process_frame
@@ -28,7 +29,23 @@ func run() -> void:
 	game.selected_id=int(players[2].id)
 	game.pivot=Vector3(8,0,20); game.zoom=15; game.yaw=0.2; game.pitch=0.83
 	game._refresh(); game._update_camera()
-	if kind == "concealment":
+	if kind == "idle":
+		game.action="move"; game.selected_id=int(players[0].id); game._refresh()
+	elif kind == "selected":
+		game.action="move"; game._refresh()
+	elif kind == "move":
+		game.action="move"; game.preview_tile=Vector2i(8,20); game.hovered=game.preview_tile; game._refresh()
+	elif kind == "enemy-turn":
+		m.phase="enemy"; game.action="move"; m.log_lines.append("Sith Acolyte moves into cover")
+		game._refresh(); game.phase_banner.visible=true
+	elif kind == "pause":
+		game.action="move"; game._refresh()
+		game.hud_controls.night.pause_back.visible=true
+		game.hud_controls.night.settings_box.visible=true
+	elif kind == "breakdown":
+		game.action="shoot"; game.target_id=int(enemy.id); game._refresh()
+		game.hud_controls.night.detail_open=true; game.hud_controls.night.refresh_target()
+	elif kind == "concealment":
 		m.spec.concealed=true; m.setup_combat(); enemy.awake=false
 		game._refresh()
 		game.warning_label.text="SQUAD CONCEALED  •  Red tiles expose the squad. Set overwatch before opening the ambush."
