@@ -33,16 +33,16 @@ Each line appears only when its saved flag is set. Resource rewards are granted 
 
 The shipped starting roster has **two Jedi** (Kira and Tor) and four non-Jedi (Rhal, Ilsa, Bren, Grak). All six receive an arc; their existing classes and roles remain intact.
 
-| Character | Step 1: Temple talk | Step 2: briefing | Step 3: resolution |
+| Character | Step 1: Temple talk | Step 2: briefing | Step 3: resolution rewards |
 |---|---|---|---|
-| Kira Venn | Kira keeps a second watch over the docking ring. She asks whether a warning is still useful when no one wants to hear it. | Kira marks a route through the service gantries. She asks you to trust the map she made by hand. | Kira has watched the gates for three nights. She asks whether to lead the next watch or finally sleep.; first choice +5 will, second +1 crit and +1 Darkness |
-| Tor Saalen | Tor checks the treatment cells after lights out. He wants to know who will protect a prisoner when the guns fall silent. | Tor spots a wounded attacker by the east bulkhead. He asks for a corridor to bring them in alive. | Tor has kept a list of the wounded on both sides. He asks whether to take responsibility for their care.; first choice +5 will, second +1 crit and +1 Darkness |
-| Sgt. Rhal Dax | Rhal sets an extra place in the mess. He says a squad needs room for whoever comes home late. | Rhal points to a service lift he secured before dawn. He asks you to move the squad through it. | Rhal has trained a replacement for every post. He asks whether to stay on the line or teach the next watch.; first choice +5 will, second +1 crit and +1 Darkness |
-| Ilsa Myr | Ilsa listens to old comms after the Temple sleeps. She has found a voice she knows in an enemy transmission. | Ilsa traces the voice to a relay beneath the street. She asks for a quiet approach. | Ilsa has the source file and a name. She asks whether to put it before the Council.; first choice +5 will, second +1 crit and +1 Darkness |
-| Doc Bren | Bren has moved a cot into the corridor. He says a locked infirmary helps no one outside it. | Bren spots an unused medical store near the objective. He asks for a minute to collect it. | Bren has treated everyone who reached his door. He asks whether the ward should remain open after the siege.; first choice +5 will, second +1 crit and +1 Darkness |
-| Grak Ordo | Grak polishes a cracked plate of armor. He says the clan gave it to him when he chose to guard this gate. | Grak identifies a clan mark on a supply crate. He asks to challenge its bearer openly. | Grak has an offer to return home. He asks whether his watch here is finished.; first choice +5 will, second +1 crit and +1 Darkness |
+| Kira Venn | Questions whether an unwelcome warning matters. | Maps a route through the service gantries. | Lead the watch: Kira deflect +5. Watch every gate: Kira aim +5, Darkness +1. |
+| Tor Saalen | Asks who protects prisoners after the guns fall silent. | Opens a corridor for a wounded attacker. | Take the ward: Tor will +5, Darkness −1. Use forbidden strength: Tor maximum Force +1, Darkness +1. |
+| Sgt. Rhal Dax | Keeps a place for the late returning squadmate. | Secures a service lift for the squad. | Stay on the line: Rhal will +8. Command the hard watch: Rhal aim +4, Darkness +1. |
+| Ilsa Myr | Finds a familiar voice in enemy comms. | Traces the voice to a street relay. | Submit evidence: intel +1, Ilsa aim +3. Hide the source: Ilsa crit +2, Darkness +1. |
+| Doc Bren | Moves a cot outside the infirmary. | Recovers an unused medical store. | Keep the ward open: Bren gains one medkit per battle. Reserve the ward: Bren HP +1, Darkness +1. |
+| Grak Ordo | Remembers the clan oath that brought him to the gate. | Challenges the bearer of a clan marked crate. | Stay: Grak armor +1. Pursue the clan debt: Grak gains one grenade per battle, Darkness +1. |
 
-Every arc opens its talk after one completed mission. The next briefing advances the arc, and a Temple conversation after two completed missions resolves it. If the character dies before resolution, the arc closes and the Journal adds a memorial line. `bonus.will`, `bonus.crit`, and `dark` use existing roster fields and battle stat calculation.
+The first Temple talk opens after one completed mission. The briefing opens after three completed missions or any bond reaches level 1. Resolution opens after six completed missions or at era 2 start. The Journal names the remaining missions and the alternate gate. A death before resolution closes the arc and adds a memorial line. Rewards use existing roster bonuses, Darkness, and intel; no new battle effects are introduced. Existing saves retain their arc step.
 
 ## Journal and era interludes
 
@@ -61,7 +61,7 @@ Every arc opens its talk after one completed mission. The next briefing advances
 ## Verification
 
 - Godot 4.7.2 headless import completed.
-- `story_night1_test.gd`: 141 checks, 0 failures. It covers all 20 callbacks with and without flags, eight mechanical effects, recurring text without repeated rewards, six three-step arc fixtures and deaths, Journal sections, both interludes, and old save load.
+- `story_night1_test.gd`: 249 checks, 0 failures. It covers callbacks, both unique rewards for all six arcs, mission/bond/era gates, deaths, Journal sections, interludes, and old and mid-arc save loads.
 - `story_bonds_test.gd`: 452 checks, 0 failures.
 - Full `./godot/test.sh`: exit 0, every suite 0 failures, 0 `SCRIPT ERROR`; Normal rescue bot 10/20 wins; campaign suite 45 checks, 0 failures.
 

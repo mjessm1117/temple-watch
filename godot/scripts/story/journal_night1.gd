@@ -11,7 +11,16 @@ static func entries(s: Dictionary, callbacks: Array, arcs: Array) -> Dictionary:
 		if stage == -1 or stage == 3: continue
 		var person: Dictionary = preload("res://scripts/story/arc_night1.gd").person(s, str(row.name))
 		if person.is_empty(): continue
-		var hint := "Speak at the Temple after a mission." if stage == 0 else "Bring them to the next briefing." if stage == 1 else "Return to the Temple for their decision."
+		var done := int(s.story.get("done", 0))
+		var hint := ""
+		if stage == 0:
+			hint = "Speak at the Temple now." if done >= 1 else "After 1 more mission: speak at the Temple."
+		elif stage == 1:
+			var wait := maxi(0, 3 - done)
+			hint = "Bring them to the next briefing now." if wait == 0 or preload("res://scripts/story/arc_night1.gd").has_bond(s) else "After %d more mission%s or any bond level 1: bring them to a briefing." % [wait, "" if wait == 1 else "s"]
+		else:
+			var wait := maxi(0, 6 - done)
+			hint = "Return to the Temple for their decision now." if wait == 0 or int(s.get("era", 1)) >= 2 else "After %d more mission%s or at era 2: return to the Temple." % [wait, "" if wait == 1 else "s"]
 		active.append("%s — %s: %s" % [row.name, row.title, hint])
 	return {"era":int(s.get("era", 1)),"choices":choices,"arcs":active,"fallen":s.get("memorials", []).duplicate()}
 
