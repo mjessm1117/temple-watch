@@ -2462,7 +2462,8 @@
           "intel": 1
         }
       },
-      "tip": "Research +4 days per mission, +1 Intel a month."
+      "tip": "Research +4 days per mission, +1 Intel a month.",
+      "plate": "RESEARCH +4 · INTEL"
     },
     "sp1": {
       "n": "Tower of Reassurance",
@@ -2471,7 +2472,8 @@
         "stress": 8,
         "will": 5
       },
-      "tip": "Every unit sheds 8 stress per mission; squads get +5 will in battle."
+      "tip": "Every unit sheds 8 stress per mission; squads get +5 will in battle.",
+      "plate": "WILL +5 · CALM"
     },
     "sp2": {
       "n": "Tower of Reconciliation",
@@ -2481,7 +2483,8 @@
           "favor": 3
         }
       },
-      "tip": "+3 Senate Favor a month: the Order mediates for the Republic."
+      "tip": "+3 Senate Favor a month: the Order mediates for the Republic.",
+      "plate": "FAVOR +3 / MONTH"
     },
     "sp3": {
       "n": "Tower of Guidance",
@@ -2489,7 +2492,8 @@
       "eff": {
         "xp": 5
       },
-      "tip": "Every unit you deploy gains 5 more XP per mission."
+      "tip": "Every unit you deploy gains 5 more XP per mission.",
+      "plate": "XP +5 / MISSION"
     }
   },
   "SPIRE_COST": {
@@ -2516,7 +2520,8 @@
       "tip": "With the Kyber Forge built: +2 Kyber a month.",
       "month": {
         "kyber": 2
-      }
+      },
+      "plate": "KYBER +2 / MONTH"
     },
     "holocron": {
       "n": "Holocron chamber",
@@ -2528,7 +2533,8 @@
       "research": 6,
       "found": {
         "intel": 4
-      }
+      },
+      "plate": "RESEARCH +6"
     },
     "crypt": {
       "n": "Jedi crypt",
@@ -2537,7 +2543,8 @@
       "tip": "Order Darkness −1 a month. The old masters rest easy.",
       "month": {
         "orderDark": -1
-      }
+      },
+      "plate": "DARKNESS -1 / MONTH"
     },
     "spring": {
       "n": "Hot spring",
@@ -2545,7 +2552,8 @@
       "wings": [],
       "tip": "Wounded heal 2 more days and everyone sheds 3 stress per mission.",
       "heal": 2,
-      "stress": 3
+      "stress": 3,
+      "plate": "HEAL +2 · CALM"
     },
     "guard": {
       "n": "Old Temple Guard barracks",
@@ -2556,7 +2564,8 @@
       "tip": "With the Barracks built: +1 Recruit a month.",
       "month": {
         "recruits": 1
-      }
+      },
+      "plate": "RECRUIT +1 / MONTH"
     },
     "cache": {
       "n": "Forgotten arms cache",
@@ -2568,7 +2577,8 @@
       "winCr": 10,
       "found": {
         "credits": 40
-      }
+      },
+      "plate": "CREDITS +10 / WIN"
     },
     "hall": {
       "n": "Old sparring hall",
@@ -2577,7 +2587,8 @@
         "training"
       ],
       "tip": "With the Training Salle built: units who sit out a mission gain 4 XP.",
-      "bench": 4
+      "bench": 4,
+      "plate": "BENCH XP +4"
     }
   },
   "UNDER_POOL": [
@@ -3074,5 +3085,118 @@
         "focus": 1
       }
     }
+  },
+  "BATTLE_BONUS": {
+    "medical": [
+      {},
+      {
+        "text": "+1 HP per squad member",
+        "plate": "SQUAD HP +1",
+        "hp": 1
+      },
+      {
+        "text": "+1 medpac, +1 HP per squad member",
+        "plate": "+1 MEDPAC · HP",
+        "kit": 1,
+        "hp": 1
+      },
+      {
+        "text": "+2 medpacs, +1 HP per squad member",
+        "kit": 2,
+        "hp": 1,
+        "plate": "+2 MEDPACS · HP"
+      }
+    ],
+    "training": [
+      {},
+      {
+        "text": "+5 aim for rank 2 or lower",
+        "rookieAim": 5,
+        "plate": "ROOKIE AIM +5"
+      },
+      {
+        "text": "+10 aim for rank 2 or lower",
+        "rookieAim": 10,
+        "plate": "ROOKIE AIM +10"
+      }
+    ],
+    "forge": [
+      {},
+      {
+        "text": "+1 Jedi damage",
+        "jdmg": 1,
+        "plate": "JEDI DMG +1"
+      },
+      {
+        "text": "+2 Jedi damage",
+        "jdmg": 2,
+        "plate": "JEDI DMG +2"
+      }
+    ],
+    "armory": [
+      {},
+      {
+        "text": "+5 trooper aim",
+        "plate": "TROOP AIM +5",
+        "troopAim": 5
+      },
+      {
+        "text": "+10 trooper aim",
+        "plate": "TROOP AIM +10",
+        "troopAim": 10
+      }
+    ],
+    "comms": [
+      {},
+      {
+        "text": "+5 squad aim",
+        "plate": "SQUAD AIM +5",
+        "aim": 5
+      }
+    ],
+    "archives": [
+      {},
+      {
+        "text": "+5% squad crit",
+        "plate": "CRIT +5%",
+        "crit": 5
+      },
+      {
+        "text": "+10% squad crit",
+        "plate": "CRIT +10%",
+        "crit": 10
+      }
+    ],
+    "gardens": [
+      {},
+      {
+        "text": "+5 squad will",
+        "will": 5,
+        "plate": "WILL +5"
+      },
+      {
+        "text": "+10 squad will",
+        "will": 10,
+        "plate": "WILL +10"
+      }
+    ],
+    "barracks": [
+      {},
+      {
+        "text": "+1 squad HP",
+        "hp": 1,
+        "plate": "SQUAD HP +1"
+      },
+      {
+        "text": "+2 squad HP",
+        "hp": 2,
+        "plate": "SQUAD HP +2"
+      },
+      {
+        "text": "+3 squad HP",
+        "hp": 3,
+        "plate": "SQUAD HP +3"
+      }
+    ]
   }
 }

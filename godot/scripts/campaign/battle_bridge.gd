@@ -42,6 +42,14 @@ static func create(campaign, seed_value: int) -> RefCounted:
 	if int(pending.get("fewer",0)) > 0:
 		for enemy in m.living("enemy").filter(func(u): return u.kind == "trooper").slice(0,int(pending.fewer)): m.units.erase(enemy)
 	m.units = players + m.units
+	for row in preload("res://scripts/campaign/temple_rooms.gd").active(campaign.state):
+		var bonus: Dictionary = row.bonus
+		effects(m, campaign, bonus)
+		for u in players:
+			u.will = int(u.will) + int(bonus.get("will", 0))
+			if int(u.rank) <= 2: u.aim = int(u.aim) + int(bonus.get("rookieAim", 0))
+			if int(u.focus) == 0: u.aim = int(u.aim) + int(bonus.get("troopAim", 0))
+	effects(m, campaign, campaign.state.get("events11", {}).get("modifier", {}))
 	if bool(m.prisoner.get("freed",false)) and not players.is_empty(): m.prisoner.escort_id = players[0].id
 	effects(m, campaign, campaign.state.get("approach", {}))
 	for fx in campaign.state.get("finale_effects", []): effects(m, campaign, fx)

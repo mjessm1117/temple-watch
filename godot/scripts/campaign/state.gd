@@ -17,12 +17,15 @@ const Roster = preload("res://scripts/campaign/strat_roster.gd")
 const Ops = preload("res://scripts/campaign/strat_ops.gd")
 const Identity = preload("res://scripts/campaign/strat_identity.gd")
 const Council = preload("res://scripts/campaign/strat_council.gd")
+const Events11 = preload("res://scripts/campaign/events11_engine.gd")
+const Crisis11 = preload("res://scripts/campaign/crisis11_engine.gd")
 signal month_advanced(month: int, snapshot: Dictionary)
 signal mission_resolved(result: Dictionary, summary: Dictionary)
 signal darkness_changed(segments: int, value: int)
 
 func ensure_strategy() -> void:
 	Base.ensure(state); Roster.ensure(state); Identity.ensure(self); Ops.ensure(self)
+	Events11.ensure(state)
 	# --- wave10 gear ---
 	ResearchQueue.ensure(state)
 
@@ -195,6 +198,7 @@ func advance_days(days: int) -> void:
 	ensure_strategy()
 	for _day in maxi(0, days):
 		state.elapsed_days = int(state.elapsed_days) + 1; state.day = int(state.day) + 1
+		Crisis11.tick(self)
 		Base.tick(self); Roster.tick(self); _tick_research(1); Ops.tick(self)
 		if int(state.day) > 30:
 			state.day = 1; state.month = int(state.month) + 1
@@ -257,6 +261,8 @@ func apply_mission_result(result: Dictionary) -> Dictionary:
 	## Contract: {mission_id, win, units:[{id,status,hp,max_hp,downed,hurt,kills,captures,dark}],
 	## rewards:{credits,intel,...}, intel, loot_credits, order_dark, story}. One call per finished mission.
 	var id := str(result.get("mission_id", state.pending_mission.get("mission_id", "")))
+	var before_res: Dictionary = state.res.duplicate(true)
+	var before_threat: Dictionary = Events11.threat_snapshot(state)
 	var mission: Dictionary = story.mission(id)
 	var win := bool(result.get("win", false))
 	var deployed: Array = result.get("units", [])
@@ -333,6 +339,7 @@ func apply_mission_result(result: Dictionary) -> Dictionary:
 	if receipt.advance and not selected.is_empty() and bool(selected.get("adv", false)): state.step = int(state.step) + 1
 	state.pending_mission = {}; state.chosen = -1
 	if receipt.advance: refresh_options()
+	Events11.after_mission(self, before_res, before_threat, bool(receipt.advance))
 	mission_resolved.emit(result.duplicate(true), summary.duplicate(true))
 	return summary
 

@@ -489,5 +489,13 @@
   "FATIGUE": {
     "at": null,
     "aim": -10
+  },
+  "THREAT11": {
+    "Taris": 3,
+    "Alderaan": 1,
+    "Nar Shaddaa": 2,
+    "Tatooine": 2,
+    "Ilum": 1,
+    "Coruscant": 1
   }
 }

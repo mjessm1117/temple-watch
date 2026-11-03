@@ -1,0 +1,582 @@
+{
+  "EVENTS": [
+    {
+      "id": "refugee_convoy",
+      "era": 1,
+      "planet": "Taris",
+      "title": "Refugee convoy",
+      "text": "Families flee an occupied world.",
+      "choices": [
+        [
+          "Escort them",
+          {
+            "credits": -40,
+            "favor": 4,
+            "threat": -1
+          }
+        ],
+        [
+          "Request Senate aid",
+          {
+            "favor": -2,
+            "intel": 2
+          }
+        ]
+      ]
+    },
+    {
+      "id": "lost_codes",
+      "era": 1,
+      "planet": "Coruscant",
+      "title": "Lost fleet codes",
+      "text": "An officer offers a damaged cipher cylinder.",
+      "choices": [
+        [
+          "Buy the cylinder",
+          {
+            "credits": -35,
+            "intel": 3
+          }
+        ],
+        [
+          "Trace the seller",
+          {
+            "intel": 1,
+            "threat": -1
+          }
+        ]
+      ]
+    },
+    {
+      "id": "kyber_smugglers",
+      "era": 1,
+      "planet": "Ilum",
+      "title": "Kyber smugglers",
+      "text": "A shipment of stolen crystals is intercepted.",
+      "choices": [
+        [
+          "Seize the cargo",
+          {
+            "kyber": 2,
+            "favor": -2
+          }
+        ],
+        [
+          "Pay the miners",
+          {
+            "credits": -45,
+            "kyber": 1,
+            "favor": 2
+          }
+        ]
+      ]
+    },
+    {
+      "id": "border_militia",
+      "era": 1,
+      "planet": "Alderaan",
+      "title": "Border militia",
+      "text": "Local volunteers ask for Temple instructors.",
+      "choices": [
+        [
+          "Train volunteers",
+          {
+            "credits": -30,
+            "threat": -1
+          }
+        ],
+        [
+          "Recruit scouts",
+          {
+            "intel": 2,
+            "favor": -1
+          }
+        ]
+      ]
+    },
+    {
+      "id": "hutt_toll",
+      "era": 1,
+      "planet": "Nar Shaddaa",
+      "title": "Hutt toll",
+      "text": "A syndicate has stopped medical transports.",
+      "choices": [
+        [
+          "Pay the toll",
+          {
+            "credits": -60,
+            "threat": -1
+          }
+        ],
+        [
+          "Expose the racket",
+          {
+            "intel": -1,
+            "favor": 3,
+            "threat": 1,
+            "wound": 3
+          }
+        ]
+      ]
+    },
+    {
+      "id": "temple_pilgrims",
+      "era": 1,
+      "planet": "Coruscant",
+      "title": "Temple pilgrims",
+      "text": "Pilgrims bring supplies and difficult questions.",
+      "choices": [
+        [
+          "Open the halls",
+          {
+            "favor": 3,
+            "credits": -20
+          }
+        ],
+        [
+          "Collect donations",
+          {
+            "credits": 40,
+            "favor": -2
+          }
+        ]
+      ]
+    },
+    {
+      "id": "rim_raiders",
+      "era": 1,
+      "planet": "Tatooine",
+      "min_threat": 2,
+      "title": "Rim raiders",
+      "text": "A frightened settlement reports raids.",
+      "choices": [
+        [
+          "Send supplies",
+          {
+            "credits": -50,
+            "threat": -2
+          }
+        ],
+        [
+          "Mark raider routes",
+          {
+            "intel": 2,
+            "threat": 1
+          }
+        ]
+      ]
+    },
+    {
+      "id": "spyglass",
+      "era": 1,
+      "planet": "Taris",
+      "min_threat": 2,
+      "title": "A signal in the rubble",
+      "text": "A hidden relay transmits invasion plans.",
+      "choices": [
+        [
+          "Decode it",
+          {
+            "intel": 3,
+            "credits": -20
+          }
+        ],
+        [
+          "Destroy it",
+          {
+            "threat": -1,
+            "favor": 1
+          }
+        ]
+      ]
+    },
+    {
+      "id": "field_healers",
+      "era": 1,
+      "planet": "Alderaan",
+      "title": "Field healers",
+      "text": "Civilian medics seek protection.",
+      "choices": [
+        [
+          "Fund a ward",
+          {
+            "credits": -45,
+            "favor": 3
+          }
+        ],
+        [
+          "Bring them to the Temple",
+          {
+            "credits": -20,
+            "heal": 3
+          }
+        ]
+      ]
+    },
+    {
+      "id": "supply_auction",
+      "era": 2,
+      "planet": "Coruscant",
+      "title": "Supply auction",
+      "text": "Quartermasters bid on scarce armor.",
+      "choices": [
+        [
+          "Buy reserves",
+          {
+            "credits": -75,
+            "mission_modifier": {
+              "hp": 1
+            }
+          }
+        ],
+        [
+          "Sell old stock",
+          {
+            "credits": 50,
+            "favor": -2
+          }
+        ]
+      ]
+    },
+    {
+      "id": "war_orphans",
+      "era": 2,
+      "planet": "Alderaan",
+      "title": "War orphans",
+      "text": "A shuttle of children arrives without guardians.",
+      "choices": [
+        [
+          "Shelter them",
+          {
+            "credits": -55,
+            "favor": 5
+          }
+        ],
+        [
+          "Ask the Senate",
+          {
+            "favor": -2,
+            "intel": 2
+          }
+        ]
+      ]
+    },
+    {
+      "id": "black_market",
+      "era": 2,
+      "planet": "Nar Shaddaa",
+      "min_threat": 2,
+      "title": "Black market contact",
+      "text": "A broker knows the next enemy landing zone.",
+      "choices": [
+        [
+          "Pay for coordinates",
+          {
+            "credits": -60,
+            "mission_modifier": {
+              "aim": 5
+            }
+          }
+        ],
+        [
+          "Report the broker",
+          {
+            "favor": 3,
+            "threat": 1
+          }
+        ]
+      ]
+    },
+    {
+      "id": "archive_fire",
+      "era": 2,
+      "planet": "Coruscant",
+      "title": "Archive fire",
+      "text": "A fire threatens century-old war records.",
+      "choices": [
+        [
+          "Save the records",
+          {
+            "credits": -35,
+            "intel": 3
+          }
+        ],
+        [
+          "Save the stores",
+          {
+            "credits": 30,
+            "intel": -1
+          }
+        ]
+      ]
+    },
+    {
+      "id": "peace_envoys",
+      "era": 2,
+      "planet": "Alderaan",
+      "title": "Peace envoys",
+      "text": "Two rival governors request a mediator.",
+      "choices": [
+        [
+          "Send a Jedi",
+          {
+            "favor": 4,
+            "threat": -1
+          }
+        ],
+        [
+          "Demand concessions",
+          {
+            "credits": 45,
+            "threat": 1
+          }
+        ]
+      ]
+    },
+    {
+      "id": "frontier_famine",
+      "era": 3,
+      "planet": "Tatooine",
+      "title": "Frontier famine",
+      "text": "A drought has emptied the granaries.",
+      "choices": [
+        [
+          "Ship food",
+          {
+            "credits": -65,
+            "favor": 5,
+            "threat": -1
+          }
+        ],
+        [
+          "Share irrigation plans",
+          {
+            "intel": -2,
+            "threat": -1
+          }
+        ]
+      ]
+    },
+    {
+      "id": "ancient_beacon",
+      "era": 3,
+      "planet": "Ilum",
+      "title": "Ancient beacon",
+      "text": "An old Jedi beacon wakes under the ice.",
+      "choices": [
+        [
+          "Study it",
+          {
+            "intel": 3,
+            "kyber": -1,
+            "jedi_bonus": 5
+          }
+        ],
+        [
+          "Secure the site",
+          {
+            "kyber": 1,
+            "threat": -1
+          }
+        ]
+      ]
+    },
+    {
+      "id": "diplomat_missing",
+      "era": 3,
+      "planet": "Alderaan",
+      "title": "Missing diplomat",
+      "text": "A Republic envoy vanishes en route.",
+      "choices": [
+        [
+          "Search discreetly",
+          {
+            "intel": -1,
+            "favor": 4
+          }
+        ],
+        [
+          "Post a reward",
+          {
+            "credits": -40,
+            "threat": -1
+          }
+        ]
+      ]
+    },
+    {
+      "id": "storm_routes",
+      "era": 3,
+      "planet": "Taris",
+      "title": "Storm routes",
+      "text": "Unusual hyperspace storms disrupt patrols.",
+      "choices": [
+        [
+          "Chart a safe route",
+          {
+            "intel": -2,
+            "mission_modifier": {
+              "mob": 1
+            }
+          }
+        ],
+        [
+          "Wait for clear skies",
+          {
+            "threat": 1,
+            "credits": 20
+          }
+        ]
+      ]
+    }
+  ],
+  "CRISES": [
+    {
+      "id": "planet_fall",
+      "title": "Taris near collapse",
+      "planet": "Taris",
+      "open_at": 3,
+      "days": 18,
+      "steps": [
+        [
+          [
+            "Evacuate civilians",
+            {
+              "credits": -50,
+              "favor": 2
+            }
+          ],
+          [
+            "Fortify the capital",
+            {
+              "credits": -70,
+              "threat": -1
+            }
+          ]
+        ],
+        [
+          [
+            "Break the siege",
+            {
+              "intel": -2,
+              "threat": -2
+            }
+          ],
+          [
+            "Call Republic ships",
+            {
+              "favor": -3,
+              "threat": -2
+            }
+          ]
+        ]
+      ],
+      "win": {
+        "favor": 6,
+        "threat": -2
+      },
+      "loss": {
+        "favor": -6,
+        "threat": 3
+      }
+    },
+    {
+      "id": "blockade",
+      "title": "Supply blockade",
+      "planet": "Alderaan",
+      "open_at": 6,
+      "days": 20,
+      "steps": [
+        [
+          [
+            "Find a smuggler route",
+            {
+              "intel": -2,
+              "credits": 20
+            }
+          ],
+          [
+            "Send relief freighters",
+            {
+              "credits": -60,
+              "favor": 2
+            }
+          ]
+        ],
+        [
+          [
+            "Clear the lanes",
+            {
+              "credits": -50,
+              "threat": -2
+            }
+          ],
+          [
+            "Negotiate passage",
+            {
+              "favor": -3,
+              "threat": -1
+            }
+          ]
+        ]
+      ],
+      "win": {
+        "credits": 80,
+        "threat": -1
+      },
+      "loss": {
+        "credits": -80,
+        "threat": 2
+      }
+    },
+    {
+      "id": "temple_traitor",
+      "title": "Traitor in the Temple",
+      "planet": "Coruscant",
+      "open_at": 9,
+      "days": 16,
+      "steps": [
+        [
+          [
+            "Audit the archives",
+            {
+              "intel": -2,
+              "favor": 1
+            }
+          ],
+          [
+            "Question the staff",
+            {
+              "favor": -2,
+              "intel": 1
+            }
+          ]
+        ],
+        [
+          [
+            "Expose the traitor",
+            {
+              "intel": -2,
+              "favor": 4
+            }
+          ],
+          [
+            "Offer redemption",
+            {
+              "credits": -40,
+              "favor": 3
+            }
+          ]
+        ]
+      ],
+      "win": {
+        "intel": 4,
+        "threat": -1
+      },
+      "loss": {
+        "intel": -4,
+        "threat": 2
+      }
+    }
+  ]
+}
