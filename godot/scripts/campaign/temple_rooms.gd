@@ -1,7 +1,30 @@
 extends RefCounted
-## Web room identities and WING_HOME arrangement; presentation only, never mutates a save.
+## Temple room identities and level bonuses shared by plates, briefing and battle setup.
 const Data = preload("res://scripts/campaign/data.gd")
 const Base = preload("res://scripts/campaign/strat_base.gd")
+static func bonus(wing: String, level: int) -> Dictionary:
+	var levels: Array = Data.get_table("temple", "BATTLE_BONUS").get(wing, [])
+	return levels[clampi(level, 0, levels.size() - 1)] if not levels.is_empty() else {}
+
+static func active(state: Dictionary) -> Array:
+	var rows := []
+	for wing in state.wings:
+		var level := int(state.wings[wing])
+		if level > 0 and Base.operational(state, wing): rows.append({"wing":wing, "level":level, "bonus":bonus(wing, level)})
+	return rows
+
+static func active_descriptions(state: Dictionary) -> PackedStringArray:
+	var lines := PackedStringArray()
+	for row in active(state): lines.append(str(row.bonus.text))
+	for id in state.get("mods", {}).get("spire", {}):
+		if bool(state.mods.spire[id]): lines.append(str(Data.get_table("temple", "SPIRES")[id].tip))
+	for slot in state.get("mods", {}).get("features", {}):
+		var feature: Dictionary = Data.get_table("temple", "BAY_FEAT").get(state.mods.features[slot], {})
+		var enabled := true
+		for wing in feature.get("wings", []):
+			if not Base.operational(state, str(wing)): enabled = false
+		if enabled and not feature.is_empty(): lines.append(str(feature.tip))
+	return lines
 const ROOMS = [
 	["council", "Council Chamber", "Command", "", 0.0, 11.0, "council"],
 	["war", "War Room", "Galaxy", "", -2.6, 7.5, "holo"],
@@ -64,12 +87,21 @@ static func describe(row: Array, state: Dictionary) -> Dictionary:
 	var at := Vector3(float(row[4]), float(row[5]), 0.0)
 	var staff := 0
 	var detail := status
+	var battle_plate := ""
 	if wing != "":
 		var slot := Base.slot_data(Base.slot_of(state, wing))
 		if not slot.is_empty(): at = Vector3(-7.8 + float(slot.x) * 5.2, 1.7 + (2 - int(slot.row)) * 2.9, 0)
 		staff = Base.staff_count(state, wing)
 		detail = status + " · " + Base.summary(state, wing)
+		if built: detail += " · Battle: " + (str(bonus(wing, level).get("text", "")) if Base.operational(state, wing) else "offline until power restored")
+		if Base.operational(state, wing): battle_plate = str(bonus(wing, level).get("plate", ""))
 	if id == "works": detail = "Power %d / %d · staff & excavation" % [Base.power(state).used, Base.power(state).capacity]
+	if row[6] == "spire" and built:
+		var spire: Dictionary = Data.get_table("temple", "SPIRES")[id]
+		detail += " · " + str(spire.tip); battle_plate = str(spire.plate)
+	if row[6] == "vault" and built:
+		var feature: Dictionary = Data.get_table("temple", "BAY_FEAT").get(state.get("mods", {}).get("features", {}).get(id, ""), {})
+		if not feature.is_empty(): detail += " · " + str(feature.tip); battle_plate = str(feature.plate)
 	return {"id":id, "name":row[1], "tab":target, "wing":wing, "built":built,
 		"level":level, "status":status, "module":module, "color":color, "kind":row[6],
-		"position":at, "staff":staff, "detail":detail}
+		"position":at, "staff":staff, "detail":detail, "battle_plate":battle_plate}

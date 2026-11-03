@@ -55,6 +55,10 @@ static func card(c, r: Dictionary, action: Callable) -> PanelContainer:
 	heading.custom_minimum_size.y = 36; col.add_child(heading)
 	col.add_child(S.label("%s  ·  %s  ·  R%d" % [nickname(r), r.cls, int(r.rank)], 12, S.GOLD))
 	col.add_child(S.label(status(c, r), 11, S.GREEN if fit(r) else S.RED))
+	var temple: PackedStringArray = preload("res://scripts/campaign/temple_rooms.gd").active_descriptions(c.state)
+	var temple_text := "Temple bonuses active: " + (", ".join(temple) if not temple.is_empty() else "none")
+	var temple_label := S.label(temple_text, 11, S.CYAN)
+	temple_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; temple_label.tooltip_text = temple_text; col.add_child(temple_label)
 	# --- wave10 story ---
 	var bond_badge := S.label("BOND  " + preload("res://scripts/campaign/bond_overlay.gd").summary(c.state,str(r.id)),11,S.CYAN)
 	bond_badge.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS

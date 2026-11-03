@@ -75,6 +75,9 @@ func refresh_signals() -> void:
 		if op.status in ["open","team"]:
 			var offer: Dictionary = campaign.state.sith.missions.get(op.mission_id,{})
 			operations.append({"planet":Intel.planet_for(campaign.story.mission(str(offer.get("mission","archive")))),"name":op.n,"id":op.id})
+	for active in campaign.state.crises11.active:
+		var crisis: Dictionary = preload("res://scripts/campaign/crisis11_engine.gd").definition(str(active.id))
+		operations.append({"planet":str(crisis.planet),"name":"%s · %d days" % [crisis.title,maxi(0,int(active.deadline)-int(campaign.state.elapsed_days))],"id":active.id})
 	for ship in ships: ship.queue_free()
 	ships.clear()
 	for op in campaign.state.field.list:
@@ -162,6 +165,7 @@ func _draw_labels(overlay: Control) -> void:
 		var active: bool = title == hovered or title == focused
 		var label_size := 15 if active else 12
 		var color := Color("dbe7e4") if active else Color("91afb9")
+		var threat := preload("res://scripts/campaign/events11_engine.gd").threat(campaign.state, title)
 		var offset := Vector2(14,18)
 		if p.x > size.x-125: offset.x = -font.get_string_size(title,HORIZONTAL_ALIGNMENT_LEFT,-1,label_size).x-14
 		if active:
@@ -170,6 +174,8 @@ func _draw_labels(overlay: Control) -> void:
 			overlay.draw_style_box(_plate(),Rect2(p+offset-Vector2(5,16),text_size+Vector2(10,3)))
 		overlay.draw_string_outline(font,p+offset,title,HORIZONTAL_ALIGNMENT_LEFT,-1,label_size,4,Color("061017"))
 		overlay.draw_string(font,p+offset,title,HORIZONTAL_ALIGNMENT_LEFT,-1,label_size,color)
+		if threat >= 2:
+			overlay.draw_string(font,p+offset+Vector2(0,15),"THREAT %d/5" % threat,HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("ef6a5d"))
 	for offer in offers:
 		var p := marker_position(offer.index)
 		if not bounds.has_point(p): continue

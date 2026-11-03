@@ -45,12 +45,36 @@ static func mission_panel(view) -> void:
 	var squad: Array = c.default_squad(o); var names := PackedStringArray()
 	for id in squad: names.append(str(c.soldier(str(id)).n))
 	fact(box,"Available roster",", ".join(names) if not names.is_empty() else "No fit soldiers")
+	var bonuses: PackedStringArray = preload("res://scripts/campaign/temple_rooms.gd").active_descriptions(c.state)
+	fact(box,"Temple bonuses active",", ".join(bonuses) if not bonuses.is_empty() else "Build Temple wings to prepare the squad",UI.ACCENT)
+	if not c.state.events11.modifier.is_empty(): fact(box,"Galaxy event bonus",Intel.resources(c.state.events11.modifier),UI.GOLD)
 	if not c.state.pending_mission.is_empty(): box.add_child(UI.label("Deployment ready. Return to the Temple to resume.",14,UI.GOLD))
 	if str(o.get("crisis","")) != "" and c.state.options.size() > 1:
 		box.add_child(UI.label("SECOND SQUAD",16,UI.ACCENT))
 		box.add_child(UI.label("Assign a strike team. This crisis resolves when you launch a different mission.",14,UI.MUTED))
 		for team in c.state.teams:
 			box.add_child(UI.button("Assign %s%s" % [team.n,"  ✓" if str(c.state.team_assignments.get(str(o.crisis),"")) == str(team.id) else ""],view._assign_team.bind(str(o.crisis),str(team.id))))
+
+static func events_panel(view) -> void:
+	var c = view.campaign; var box: VBoxContainer = view.detail
+	var events = preload("res://scripts/campaign/events11_engine.gd")
+	var crisis = preload("res://scripts/campaign/crisis11_engine.gd")
+	var card: Dictionary = events.pending(c.state)
+	if not card.is_empty():
+		box.add_child(UI.label("GALAXY EVENT · %s" % card.planet.to_upper(), 14, UI.GOLD))
+		box.add_child(UI.label(str(card.title), 21, UI.TEXT))
+		box.add_child(UI.label(str(card.text), 14))
+		for i in card.choices.size():
+			var choice: Array = card.choices[i]
+			box.add_child(UI.button("%s · %s" % [choice[0], events.effect_text(choice[1])], view._choose_event.bind(i)))
+	for active in c.state.crises11.active:
+		var row: Dictionary = crisis.definition(str(active.id))
+		box.add_child(UI.label("CRISIS · %s · %d days left" % [row.title, maxi(0, int(active.deadline)-int(c.state.elapsed_days))],16,UI.DANGER))
+		box.add_child(UI.label("%s · step %d / %d" % [row.planet,int(active.stage)+1,row.steps.size()],13,UI.MUTED))
+		for i in row.steps[int(active.stage)].size():
+			var choice: Array = row.steps[int(active.stage)][i]
+			box.add_child(UI.button("%s · %s" % [choice[0], events.effect_text(choice[1])],view._choose_crisis.bind(str(active.id),i),int(c.state.elapsed_days) >= int(active.ready_day)))
+		if int(c.state.elapsed_days) < int(active.ready_day): box.add_child(UI.label("Next step available tomorrow.",12,UI.MUTED))
 
 static func region_panel(view) -> void:
 	var box: VBoxContainer = view.detail; var c = view.campaign; var key: String = view.region
@@ -62,6 +86,7 @@ static func region_panel(view) -> void:
 	if not view.planet.is_empty():
 		box.add_child(UI.label(view.planet,25))
 		fact(box,"Biome",str(Art.BIOMES.get(view.planet,["Uncharted"])[0]))
+		fact(box,"Planet threat","%d / 5" % preload("res://scripts/campaign/events11_engine.gd").threat(c.state,view.planet),UI.DANGER)
 	box.add_child(UI.label(str(row[1]),21,UI.ACCENT)); box.add_child(UI.label(str(row[3]),15))
 	var unrest := Intel.unrest(c,key); var rules: Dictionary = Data.get_table("galaxy","UNREST")
 	fact(box,"Unrest","%s%s %d · %s" % ["▮".repeat(unrest),"▯".repeat(5-unrest),unrest,Data.get_table("galaxy","UNREST_WORD")[unrest]],UI.DANGER if unrest >= 3 else UI.ACCENT)

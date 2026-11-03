@@ -115,7 +115,18 @@ func _show_details() -> void:
 		"Teams": Details.teams_panel(self)
 		"Sith ops": _sith_panel()
 		_: Details.mission_panel(self)
+	Details.events_panel(self)
 	_wire_buttons(detail)
+
+func _choose_event(index: int) -> void:
+	if preload("res://scripts/campaign/events11_engine.gd").choose(campaign, index):
+		get_node("/root/CampaignFlow").save(); map_view.refresh_signals(); _show_details()
+	else: message.text = "Insufficient resources for that choice."
+
+func _choose_crisis(id: String, index: int) -> void:
+	if preload("res://scripts/campaign/crisis11_engine.gd").choose(campaign, id, index):
+		get_node("/root/CampaignFlow").save(); map_view.refresh_signals(); _show_details()
+	else: message.text = "Insufficient resources or the next crisis step is not ready."
 
 func _slide() -> void:
 	if transition and transition.is_running(): transition.kill()

@@ -90,6 +90,18 @@ func _make_button(info: Dictionary) -> void:
 	line.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	line.offset_top = -17
 	line.offset_bottom = -1; line.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(line)
+	if info.built and str(info.battle_plate) != "":
+		var battle_line := Label.new(); battle_line.name = "BattleBonus"
+		battle_line.text = str(info.battle_plate)
+		battle_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		battle_line.add_theme_font_size_override("font_size", 9)
+		battle_line.add_theme_color_override("font_color", Color("88dfbd"))
+		battle_line.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+		battle_line.offset_top = -32; battle_line.offset_bottom = -17
+		var battle_plate := StyleBoxFlat.new(); battle_plate.bg_color = Color(0.018, 0.045, 0.057, 0.96)
+		battle_plate.set_corner_radius_all(2); battle_line.add_theme_stylebox_override("normal", battle_plate)
+		battle_line.add_theme_color_override("font_shadow_color", Color("02090c"))
+		battle_line.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(battle_line)
 	for label in [name_label, line]:
 		var plate := StyleBoxFlat.new(); plate.bg_color = Color(0.018, 0.045, 0.057, 0.82)
 		plate.set_corner_radius_all(2); label.add_theme_stylebox_override("normal", plate)

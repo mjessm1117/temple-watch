@@ -35,7 +35,11 @@ func _ready() -> void:
 	if campaign.soldier(selected_id).is_empty() and not campaign.state.roster.is_empty(): selected_id = str(campaign.state.roster[0].id)
 	edict_draft = campaign.state.strategy.edict.duplicate()
 	_build_shell()
+	if not campaign.state.events11.summary.is_empty() and not bool(campaign.state.events11.summary.get("shown", false)):
+		panel_open = true; campaign.state.events11.summary.shown = true
+		get_node("/root/CampaignFlow").save()
 	_show_page()
+	if panel_open: _slide_station()
 	if get_tree().current_scene == self: get_node("/root/CampaignFlow").temple_story.call_deferred()
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -157,6 +161,8 @@ func _show_page() -> void:
 		if room.wing != "":
 			context.add_child(UI.label(Base.summary(campaign.state, room.wing), 14, UI.ACCENT))
 			context.add_child(UI.label(Base.production(campaign.state, room.wing), 14, UI.GOLD))
+			context.add_child(UI.label("Battle: " + (str(preload("res://scripts/campaign/temple_rooms.gd").bonus(str(room.wing), int(room.level)).get("text", "")) if Base.operational(campaign.state, str(room.wing)) else "offline until power restored" if room.built else "build this room for a squad bonus"), 14, UI.ACCENT))
+		elif room.built and room.kind in ["spire", "vault"]: context.add_child(UI.label(str(room.detail), 14, UI.ACCENT))
 		if room.built and room.wing != "":
 			var action: Dictionary = Data.get_table("temple", "MOD_ACTS")[room.wing]
 			context.add_child(UI.label(str(action.desc), 15, UI.MUTED))
@@ -182,6 +188,13 @@ func _card(title: String, description: String = "") -> VBoxContainer:
 	return box
 
 func _command() -> void:
+	var summary: Dictionary = campaign.state.events11.summary
+	if not summary.is_empty():
+		var report := _card("THIS MONTH · M%d D%d" % [int(summary.month),int(summary.day)],"Changes after your last mission")
+		for line in summary.changes: report.add_child(UI.label(str(line),14))
+		if summary.changes.is_empty(): report.add_child(UI.label("Resources and planetary threat held steady.",14,UI.MUTED))
+		if str(campaign.state.events11.pending) != "": report.add_child(UI.label("Galaxy event awaiting a decision",14,UI.GOLD))
+		for line in preload("res://scripts/campaign/crisis11_engine.gd").deadlines(campaign.state): report.add_child(UI.label(str(line),14,UI.DANGER))
 	var command := _card("THE ORDER ENDURES", "Guide the roster, tend the wounded, fund research and decide where the next squad deploys.")
 	var row := HFlowContainer.new(); command.add_child(row)
 	row.add_child(UI.button("Council & edicts", _change_page.bind("Council")))
