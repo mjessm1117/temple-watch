@@ -11,6 +11,7 @@ const EnemyPresentation = preload("res://scripts/enemy_presentation.gd")
 const AttackPresentation = preload("res://scripts/attack_presentation.gd")
 const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 const Ability = preload("res://scripts/abilities_engine.gd")
+const BattleCamera = preload("res://scripts/battle11_camera.gd")
 var animate_headless := false
 var cam = preload("res://scripts/cam_combat.gd").new()
 var scene_view = preload("res://scripts/combat_scene.gd").new()
@@ -77,7 +78,7 @@ func _ready() -> void:
 	mission = Mission.adopt(flow.create_battle(7), flow.campaign.state if flow.active and flow.campaign != null else {})
 	if mission.modern:
 		pivot = Vector3(float(mission.spec.width)*0.5,0,float(mission.spec.height)*0.5)
-		zoom = maxf(float(mission.spec.width),float(mission.spec.height))*1.3
+		zoom = BattleCamera.start_zoom(mission)
 	action_camera = bool(Prefs.get_value("cine"))
 	hud_controls = HudControls.new()
 	hud_controls.g = self
@@ -90,6 +91,7 @@ func _ready() -> void:
 	terrain_seen_board = mission.board.duplicate()
 	_build_ui()
 	selected_id = int(mission.living("player")[0].id)
+	pivot = BattleCamera.clamp_pivot(mission, Vector3(mission.living("player")[0].x, 0, mission.living("player")[0].y))
 	_update_camera()
 	_refresh()
 	var demo := ""
@@ -224,9 +226,9 @@ func _after_action() -> void:
 	end_turn_armed = false
 	warning_label.text = ""
 	var current: Dictionary = mission.unit_by_id(selected_id)
-	if not current.is_empty() and int(current.ap) <= 0:
+	if RescueSettings.battle_value("auto_select") and not current.is_empty():
 		var next_id: int = InputControls.next_squad(mission, selected_id, 1, true)
-		if next_id >= 0 and next_id != selected_id: _select(next_id)
+		if next_id >= 0 and next_id != selected_id: _select.call_deferred(next_id)
 
 func _cycle_target(direction: int) -> void:
 	var options: Array[Dictionary] = InputControls.valid_targets(mission, mission.unit_by_id(selected_id), action)
@@ -398,7 +400,7 @@ func _request_end_turn() -> void:
 		if int(u.ap) > 0: ready += 1
 	if ready > 0 and not end_turn_armed:
 		end_turn_armed = true
-		warning_label.text = "%d squad member%s still ha%s actions. Press Enter again to end turn." % [ready, "s" if ready != 1 else "", "ve" if ready != 1 else "s"]
+		warning_label.text = "%d squad member%s still ha%s actions. End turn? Press Enter or END TURN again." % [ready, "s" if ready != 1 else "", "ve" if ready != 1 else "s"]
 		return
 	end_turn_armed = false
 	warning_label.text = ""
@@ -471,10 +473,12 @@ func _show_shot() -> void:
 	hud_controls._show_shot()
 
 func _update_camera() -> void:
-	pitch = clampf(pitch, 0.25, 1.4)
-	zoom = clampf(zoom, 10.0, 65.0)
+	pitch = clampf(pitch, 0.6, 1.4)
+	zoom = clampf(zoom, 9.0, 65.0)
+	if mission != null: pivot = BattleCamera.clamp_pivot(mission, pivot)
 	var direction := Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
 	camera.position = pivot + direction * zoom
+	if mission != null: camera.position = BattleCamera.safe_position(mission, camera.position)
 	camera.look_at(pivot, Vector3.UP)
 
 func _screen_tile(screen: Vector2) -> Vector2i:

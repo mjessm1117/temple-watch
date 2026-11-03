@@ -10,6 +10,9 @@ func run() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--kind="): kind = arg.trim_prefix("--kind=")
 		if arg.begins_with("--output="): output = arg.trim_prefix("--output=")
+		if arg.begins_with("--width="):
+			var width := int(arg.trim_prefix("--width="))
+			root.size = Vector2i(width, 1080 if width >= 1920 else 768)
 	root.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_IGNORE
 	var game = load("res://scenes/rescue.tscn").instantiate()
 	root.add_child(game)
@@ -28,8 +31,12 @@ func run() -> void:
 	m.terrain_revision += 1
 	game.selected_id=int(players[2].id)
 	game.pivot=Vector3(8,0,20); game.zoom=15; game.yaw=0.2; game.pitch=0.83
+	if kind == "battle11-before": game.pivot = Vector3(9,0,17); game.zoom = 23.0
+	if kind == "battle11-after": game.pivot = Vector3(players[2].x,0,players[2].y); game.zoom = 12.0
 	game._refresh(); game._update_camera()
-	if kind == "idle":
+	if kind in ["battle11-before", "battle11-after"]:
+		game.action="move"; game._refresh()
+	elif kind == "idle":
 		game.action="move"; game.selected_id=int(players[0].id); game._refresh()
 	elif kind == "selected":
 		game.action="move"; game._refresh()
@@ -43,6 +50,10 @@ func run() -> void:
 		game.action="move"; game._refresh()
 		game.hud_controls.night.pause_back.visible=true
 		game.hud_controls.night.settings_box.visible=true
+	elif kind == "confirm":
+		game.action="move"; game._refresh(); game._request_end_turn()
+	elif kind == "handoff":
+		game.action="move"; game._refresh(); game.phase_banner.text="YOUR TURN"; game.phase_banner.modulate.a=1.0; game.phase_banner.visible=true
 	elif kind == "breakdown":
 		game.action="shoot"; game.target_id=int(enemy.id); game._refresh()
 		game.hud_controls.night.detail_open=true; game.hud_controls.night.refresh_target()
@@ -57,6 +68,7 @@ func run() -> void:
 	else:
 		game.action="shoot"; game.target_id=int(enemy.id); game._refresh()
 		game.warning_label.text="PREVIEW  •  Height, cover, armor and ammunition are included before confirmation."
+	game.scene_view.arrange_labels()
 	await create_timer(0.8).timeout
 	if kind == "reaction":
 		game.phase_banner.text="AMBUSH  •  REACTION FIRE"; game.phase_banner.visible=true

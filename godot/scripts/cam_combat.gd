@@ -7,7 +7,7 @@ var return_pivot := Vector3.ZERO
 var trace: Array[String] = []
 
 func wait(seconds: float) -> void:
-	seconds /= float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed"))
+	seconds /= float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if g.playing_enemy_events else 1.0)
 	var elapsed := 0.0
 	while elapsed < seconds and not skip_requested and is_instance_valid(g) and g.is_inside_tree():
 		await g.get_tree().process_frame
@@ -30,8 +30,9 @@ func frame(from: Vector3, to: Vector3, style: String = "shoot") -> void:
 	if style in ["push", "pull", "force", "reveal"]:
 		shoulder = from.lerp(to, 0.4) + side * maxf(4.0, from.distance_to(to) * 0.8) + Vector3.UP * 3.4
 		look = from.lerp(to, 0.5) + Vector3.UP
+	shoulder = preload("res://scripts/battle11_camera.gd").safe_position(g.mission, shoulder)
 	var initial_look: Vector3 = g.camera.position - g.camera.global_basis.z * 8.0
-	g.action_tween = g.create_tween().set_parallel(true).set_speed_scale(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")))
+	g.action_tween = g.create_tween().set_parallel(true).set_speed_scale(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if g.playing_enemy_events else 1.0))
 	g.action_tween.tween_property(g.camera, "position", shoulder, BLEND).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	g.action_tween.tween_method(func(value: Vector3): g.camera.look_at(value, Vector3.UP), initial_look, look, BLEND)
 	await wait(BLEND)

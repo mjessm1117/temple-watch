@@ -156,7 +156,8 @@ func arrange_labels() -> void:
 		var label: Label3D = view.status_label
 		var at: Vector2 = g.camera.unproject_position(view.global_position+Vector3.UP*2)
 		var rect := Rect2(at-Vector2(120,32),Vector2(240,64))
-		var overlap := false
+		var viewport: Vector2 = g.get_viewport().get_visible_rect().size
+		var overlap := not Rect2(Vector2(220, 64), viewport - Vector2(485, 302)).encloses(rect)
 		for used in placed:
 			if used.intersects(rect): overlap = true; break
 		label.visible = not overlap # Selected unit is first; crowded target details remain in the HUD.

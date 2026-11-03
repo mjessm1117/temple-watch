@@ -15,9 +15,11 @@ var _step_stream: AudioStreamWAV
 var _action_serial := 0
 var _cover_level := 0
 var downed := false
+var enemy_side := false
 
 func setup(u: Dictionary, scene: PackedScene, at: Vector3) -> void:
 	unit_id = int(u.id)
+	enemy_side = str(u.side) == "enemy"
 	position = at
 	model = scene.instantiate()
 	model.scale = Vector3.ONE * 1.2
@@ -46,7 +48,7 @@ func _find_animation(node: Node) -> AnimationPlayer:
 
 func play(clip: String) -> void:
 	if animation == null: return
-	animation.speed_scale = float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed"))
+	animation.speed_scale = float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if enemy_side else 1.0)
 	var name := clip if animation.has_animation(clip) else base_clip if animation.has_animation(base_clip) else "idle"
 	if animation.has_animation(name) and animation.current_animation != name:
 		animation.play(name, 0.14 if clip == "run" else 0.1)
@@ -102,13 +104,13 @@ func act(clip: String) -> void:
 		pose_motion.tween_property(model, "rotation:z", 0.0, 0.22).set_trans(Tween.TRANS_BACK)
 	else:
 		var delay := 0.12 if turn_motion != null and turn_motion.is_running() else 0.0
-		get_tree().create_timer(delay/float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed"))).timeout.connect(func() -> void:
+		get_tree().create_timer(delay/(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if enemy_side else 1.0))).timeout.connect(func() -> void:
 			if not is_instance_valid(self) or not alive or serial != _action_serial: return
 			play(clip)
 			pose_motion = _paced_tween()
 			pose_motion.tween_property(model, "rotation:x", -0.11 if clip == "shoot" else -0.2, 0.09)
 			pose_motion.tween_property(model, "rotation:x", 0.0, 0.24))
-	get_tree().create_timer(0.52/float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed"))).timeout.connect(func() -> void:
+	get_tree().create_timer(0.52/(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if enemy_side else 1.0))).timeout.connect(func() -> void:
 		if is_instance_valid(self) and alive and serial == _action_serial: play(base_clip))
 
 func face(point: Vector3) -> void:
@@ -168,4 +170,4 @@ func set_status(u: Dictionary) -> void:
 	status_label.modulate = (Color("f9bf60") if str(u.side) == "enemy" else Color("73d8ff")) if preload("res://scripts/campaign/strat_preferences.gd").get_value("cb") else (Color("ffb09e") if str(u.side) == "enemy" else Color("b8edff"))
 
 func _paced_tween() -> Tween:
-	return create_tween().set_speed_scale(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")))
+	return create_tween().set_speed_scale(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if enemy_side else 1.0))

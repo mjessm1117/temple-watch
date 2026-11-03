@@ -144,7 +144,7 @@ func _build_ui() -> void:
 	var top := PanelContainer.new(); top.anchor_right = 1.0; top.offset_bottom = 64; root.add_child(top); _style_panel(top)
 	var top_row := HBoxContainer.new(); top.add_child(top_row)
 	g.title_label = _label("TEMPLE WATCH", 20); g.title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top_row.add_child(g.title_label)
-	g.objective_label = _label("", 16); top_row.add_child(g.objective_label)
+	g.objective_label = _label("", 15); g.objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; g.objective_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top_row.add_child(g.objective_label)
 	var left := PanelContainer.new(); left.offset_top = 75; left.offset_left = 10; left.offset_right = 220; left.offset_bottom = 520; root.add_child(left); _style_panel(left)
 	var left_box := VBoxContainer.new(); left.add_child(left_box)
 	left_box.add_child(_label("SQUAD", 17))
@@ -161,7 +161,7 @@ func _build_ui() -> void:
 	var right_box := VBoxContainer.new(); right.add_child(right_box)
 	right_box.add_child(_label("TARGETING", 17))
 	g.hit_big_label = _label("--%", 31); g.hit_big_label.add_theme_color_override("font_color", Color("e9ca83")); right_box.add_child(g.hit_big_label)
-	g.shot_label = _label("Hover over a target", 15); g.shot_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.shot_label)
+	g.shot_label = _label("Hover over a target", 14); g.shot_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.shot_label)
 	right_box.add_child(_label("COMBAT LOG", 17))
 	g.log_label = _label("", 14); g.log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.log_label)
 	var bottom := PanelContainer.new(); bottom.anchor_top = 1.0; bottom.anchor_right = 1.0; bottom.anchor_bottom = 1.0; bottom.offset_top = -238; root.add_child(bottom); _style_panel(bottom)
@@ -170,7 +170,7 @@ func _build_ui() -> void:
 	info_row.visible = bool(g.Prefs.get_value("tips"))
 	g.path_label = _label("", 15); g.path_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; info_row.add_child(g.path_label)
 	info_row.add_child(_label("LMB PREVIEW/CONFIRM  •  RMB CANCEL/PAN  •  TAB / Q-E TARGET  •  WASD PAN  •  SPACE SKIP", 12))
-	g.warning_label = _label("", 15); g.warning_label.add_theme_color_override("font_color", Color("ffd37a")); bottom_box.add_child(g.warning_label)
+	g.warning_label = _label("", 15); g.warning_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; g.warning_label.add_theme_color_override("font_color", Color("ffd37a")); bottom_box.add_child(g.warning_label)
 	var row := HFlowContainer.new(); row.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.custom_minimum_size.y = 128; bottom_box.add_child(row)
 	var keys := {"move": "1", "shoot": "2", "strike": "3", "push": "4", "free": "5", "overwatch": "6", "hunker": "7"}
 	if g.mission.modern: keys.erase("free"); keys.interact = "5"
@@ -195,7 +195,7 @@ func _build_ui() -> void:
 	g.audio_slider = HSlider.new(); g.audio_slider.custom_minimum_size = Vector2(75, 0); g.audio_slider.max_value = 100; g.audio_slider.value = 55; g.audio_slider.value_changed.connect(func(value: float) -> void: g.sound.volume = value / 100.0); command_row.add_child(g.audio_slider)
 	command_row.add_child(_button("END TURN\nENTER", g._request_end_turn))
 	command_row.add_child(_button("RESTART\nR", func() -> void: g.get_tree().reload_current_scene()))
-	g.phase_banner = _label("ENEMY ACTIVITY", 31); g.phase_banner.visible = false; g.phase_banner.anchor_left = 0.5; g.phase_banner.anchor_top = 0.18; g.phase_banner.position = Vector2(-150, 0); root.add_child(g.phase_banner)
+	g.phase_banner = _label("ENEMY ACTIVITY", 30); g.phase_banner.visible = false; g.phase_banner.anchor_left = 0.5; g.phase_banner.anchor_right = 0.5; g.phase_banner.anchor_top = 0.18; g.phase_banner.offset_left = -370; g.phase_banner.offset_right = 370; g.phase_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; g.phase_banner.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; root.add_child(g.phase_banner)
 	g.phase_banner.modulate.a = 0.0
 	g.result_panel = PanelContainer.new(); g.result_panel.visible = false; g.result_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER); g.result_panel.offset_left = -220; g.result_panel.offset_right = 220; g.result_panel.offset_top = -100; g.result_panel.offset_bottom = 100; root.add_child(g.result_panel)
 	var result_box := VBoxContainer.new(); g.result_panel.add_child(result_box)

@@ -31,13 +31,13 @@ func setup(left_box: VBoxContainer, right_box: VBoxContainer) -> void:
 	var plate := PanelContainer.new(); left_box.add_child(plate)
 	plate.add_theme_stylebox_override("panel", panel_style())
 	var body := VBoxContainer.new(); plate.add_child(body)
-	name_label = label("", 17, Color("efd49b")); body.add_child(name_label)
-	vitals_label = label("", 13); body.add_child(vitals_label)
+	name_label = label("", 17, Color("efd49b")); name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; body.add_child(name_label)
+	vitals_label = label("", 12); vitals_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; body.add_child(vitals_label)
 	status_row = HBoxContainer.new(); body.add_child(status_row)
 	details_button = Button.new(); details_button.text = "ODDS BREAKDOWN ▸"; details_button.focus_mode = Control.FOCUS_NONE
 	details_button.pressed.connect(func() -> void: detail_open = not detail_open; refresh_target())
 	right_box.add_child(details_button)
-	target_details = label("", 13, Color("b8d3dd")); right_box.add_child(target_details)
+	target_details = label("", 12, Color("b8d3dd")); target_details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(target_details)
 	right_box.move_child(details_button, 3)
 	right_box.move_child(target_details, 4)
 	log_heading = right_box.get_child(5)
@@ -92,8 +92,8 @@ func refresh_target() -> void:
 	details_button.visible = aiming
 	target_details.visible = aiming
 	g.shot_label.visible = not aiming
-	if log_heading != null: log_heading.visible = not (aiming and detail_open)
-	g.log_label.visible = not (aiming and detail_open)
+	if log_heading != null: log_heading.visible = not aiming
+	g.log_label.visible = not aiming
 	if aiming:
 		var data: Dictionary = Targeting.shot_breakdown(g.mission, actor, target, g.action == "strike", int(actor.get("leap_aim",0)) if g.action == "strike" else 0)
 		var rows: Array[String] = []
@@ -119,7 +119,7 @@ func update_chips() -> void:
 		var at: Vector2 = g.camera.unproject_position(Vector3(enemy.x, Shot.elevation(g.mission, Shot.pos(enemy)) * 0.7 + 2.2, enemy.y))
 		if at.x < 210 or at.x > size.x - 270 or at.y < 75 or at.y > size.y - 170: continue
 		var chip := label("%d%% HIT  ·  %d%% CRIT" % [int(data.hit), int(data.crit)] if int(enemy.id) == g.target_id else "%d%%" % int(data.hit), 18 if int(enemy.id) == g.target_id else 14, Color("f2d38a"))
-		chip.position = at + Vector2(-45,-25); chip.add_theme_stylebox_override("normal", panel_style()); chips.add_child(chip)
+		chip.position = Vector2(at.x - 45, maxf(66.0, at.y - 65.0)); chip.add_theme_stylebox_override("normal", panel_style()); chips.add_child(chip)
 
 func _process(_delta: float) -> void:
 	if g == null or g.mission == null: return
@@ -131,6 +131,7 @@ func _process(_delta: float) -> void:
 		var tween := create_tween(); tween.tween_property(phase_plate, "position:y", 72.0, 0.22).set_trans(Tween.TRANS_SINE)
 		tween.tween_interval(1.0); tween.tween_property(phase_plate, "modulate:a", 0.0, 0.3)
 		tween.tween_callback(func() -> void: phase_plate.visible = false)
+	if g.phase_banner.visible and g.phase_banner.text == "YOUR TURN": phase_plate.visible = false
 	if phase == "enemy" and g.mission.log_lines.size() > last_log_count:
 		activity.text = str(g.mission.log_lines.back()); log_until = Time.get_ticks_msec() / 1000.0 + 2.0
 	last_log_count = g.mission.log_lines.size()
@@ -162,4 +163,9 @@ func build_pause() -> void:
 	cine.toggled.connect(func(value: bool) -> void: g.action_camera = value; g.Prefs.set_value("cine", value))
 	var tips := CheckButton.new(); tips.text = "Tips"; tips.button_pressed = bool(g.Prefs.get_value("tips")); settings_box.add_child(tips)
 	tips.toggled.connect(func(value: bool) -> void: g.Prefs.set_value("tips", value))
+	var enemy_speed := OptionButton.new(); enemy_speed.add_item("Enemy turns: Normal", 0); enemy_speed.add_item("Enemy turns: Fast", 1)
+	enemy_speed.selected = 1 if RescueSettings.battle_value("fast_enemy") else 0; settings_box.add_child(enemy_speed)
+	enemy_speed.item_selected.connect(func(index: int) -> void: RescueSettings.set_battle_value("fast_enemy", index == 1))
+	var auto_select := CheckButton.new(); auto_select.text = "Auto-select next ready unit"; auto_select.button_pressed = RescueSettings.battle_value("auto_select"); settings_box.add_child(auto_select)
+	auto_select.toggled.connect(func(value: bool) -> void: RescueSettings.set_battle_value("auto_select", value))
 	var menu := Button.new(); menu.text = "MAIN MENU"; menu.pressed.connect(func() -> void: g.get_node("/root/CampaignFlow").go("menu")); box.add_child(menu)
