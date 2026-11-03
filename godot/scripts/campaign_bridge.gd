@@ -77,10 +77,11 @@ func open_codex() -> void:
 
 func temple_story() -> void:
 	if not active: return
-	if show_sith_events(): return
 	var s: Dictionary = campaign.state
 	screen = s.get("pending", {})
-	if screen.get("kind", "") not in ["talk", "event", "vote"]: screen = story.next_story_event(s)
+	if screen.get("kind", "") not in ["talk", "event", "vote", "villain11", "scene11"]: screen = story.next_villain_beat(s)
+	if screen.is_empty() and show_sith_events(): return
+	if screen.is_empty(): screen = story.next_story_event(s)
 	if screen.is_empty() and int(s.get("vote_month", 0)) < int(s.month):
 		screen = story.next_council_vote(s)
 		if not screen.is_empty(): s.vote_month = int(s.month)
@@ -117,6 +118,7 @@ func launch_squad(ids: Array) -> bool:
 		if campaign.select_mission(int(campaign.state.launch_index), ids).is_empty(): return false
 		campaign.state.battle_buffs = preload("res://scripts/campaign/modules.gd").take_next_battle_buffs(campaign)
 	else: campaign.state.pending_mission.squad = ids.duplicate()
+	preload("res://scripts/story/villain11_arc.gd").attach_battle(campaign.state,campaign.state.pending_mission)
 	campaign.state.flow_stage = "battle"
 	save()
 	go("rescue")
@@ -158,6 +160,8 @@ func debrief(mission: RefCounted) -> void:
 	campaign.state.battle_result = result
 	screen = story.start_debrief({"mission_id":result.mission_id, "won":result.win,
 		"squad":result.units.filter(func(u): return u.status != "dead").map(func(u): return u.id), "saved_by":mission.saved_by, "clues":mission.clues})
+	if campaign.state.pending_mission.get("villain_present",false):
+		screen.text += "\n\nIntercepted at extraction — " + str(campaign.state.pending_mission.get("villain_end_bark",""))
 	screen.text = str(screen.get("text", "")) + "\n\n" + Battle.casualties(campaign, result)
 	var front := str(campaign.state.get("twin",{}).get("stage",""))
 	if front == "a": screen.text += "\n\nFRONT B awaits: a fresh squad of two to four, at most two Jedi. The date stays fixed until both fronts are settled."

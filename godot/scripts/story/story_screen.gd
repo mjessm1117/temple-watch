@@ -98,7 +98,7 @@ func _header(title: String, detail: String) -> void:
 
 func _build_story() -> void:
 	var kind: String = scene_data.get("kind","briefing")
-	var is_talk := kind in ["talk","beat","grief"]
+	var is_talk := kind in ["talk","beat","grief","scene11"]
 	_header("TEMPLE WATCH", "%s  /  %s BBY" % ["OLD REPUBLIC" if int(campaign_state.era)==1 else "RUUSAN" if int(campaign_state.era)==2 else "HIGH REPUBLIC",str(campaign_state.story.bby)])
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation",20)
@@ -117,10 +117,10 @@ func _build_story() -> void:
 		portraits.add_theme_constant_override("separation",8)
 		visual.add_child(portraits)
 		# --- wave10 story ---
-		var pair_names: PackedStringArray = str(scene_data.get("name","")).split(" & ") if scene_data.has("pair") else PackedStringArray()
-		_portrait(portraits,str(pair_names[0]) if pair_names.size() == 2 else speaker,1.0,Vector2(158,230))
-		_portrait(portraits,str(pair_names[1]) if pair_names.size() == 2 else "COMMANDER",-1.0,Vector2(158,230))
-		if who != "" or scene_data.has("pair"): _bond(visual,who)
+		var pair_names: PackedStringArray = str(scene_data.get("name","")).split(" & ") if scene_data.has("pair") or kind == "scene11" else PackedStringArray()
+		_portrait(portraits,str(pair_names[0]) if pair_names.size() >= 2 else speaker,1.0,Vector2(158,230))
+		_portrait(portraits,str(pair_names[1]) if pair_names.size() >= 2 else "COMMANDER",-1.0,Vector2(158,230))
+		if who != "" or scene_data.has("pair") or kind == "scene11": _bond(visual,who)
 	else:
 		var holo_frame := UI.panel()
 		visual.add_child(holo_frame)
@@ -131,7 +131,7 @@ func _build_story() -> void:
 		holo_frame.add_child(holo)
 		visual.add_child(UI.label(str(engine.mission(scene_data.get("id","")).get("where",scene_data.get("eyebrow","TARGET PROJECTION"))).to_upper(),14,UI.ACCENT))
 		_portrait(visual,speaker,1.0,Vector2(290,180))
-	visual.add_child(UI.label("SECURE TRANSMISSION\nJEDI ARCHIVE · CHANNEL 06",12,UI.MUTED))
+	visual.add_child(UI.label("TEMPLE RECORD\nJEDI ARCHIVE · SQUAD 06" if kind == "scene11" else "SECURE TRANSMISSION\nJEDI ARCHIVE · CHANNEL 06",12,UI.MUTED))
 	var frame := UI.panel(Color(0.04,0.075,0.085,0.96))
 	frame.size_flags_horizontal = SIZE_EXPAND_FILL
 	row.add_child(frame)
@@ -147,7 +147,7 @@ func _build_story() -> void:
 	content.add_child(narrative)
 	typed = 0
 	narrative.visible_characters = 0
-	var reveal := UI.button("Reveal transmission",_reveal)
+	var reveal := UI.button("Read conversation" if kind == "scene11" else "Review vision" if kind == "villain11" and int(campaign_state.era) != 2 else "Reveal transmission",_reveal)
 	reveal.custom_minimum_size.y = 30
 	reveal.add_theme_font_size_override("font_size",12)
 	content.add_child(reveal)
@@ -219,6 +219,7 @@ func _bond(parent: Node, who: String) -> void:
 
 func _preview(choice: Dictionary) -> String:
 	var parts: Array[String] = []
+	if int(choice.get("bond_points",0)) != 0: parts.append("Bond cohesion +%d" % int(choice.bond_points))
 	for key in choice.get("cost",{}): parts.append("Cost: %s %s" % [_number(choice.cost[key]),str(key).capitalize()])
 	for key in choice.get("fx",{}):
 		var value = choice.fx[key]
@@ -338,7 +339,7 @@ func _build_codex() -> void:
 func _build_journal(list: VBoxContainer) -> void:
 	var record: Dictionary = engine.journal(campaign_state)
 	list.add_child(UI.label("ERA %d  /  THE TEMPLE JOURNAL" % int(record.era),22,UI.GOLD))
-	for section in [["CHOICES REMEMBERED",record.choices],["PERSONAL ARCS",record.arcs],["FALLEN",record.fallen]]:
+	for section in [["CHOICES REMEMBERED",record.choices],["PERSONAL ARCS",record.arcs],["VILLAIN TRANSMISSIONS",record.get("villain",[])],["SQUAD SCENES",record.get("squad",[])],["FALLEN",record.fallen]]:
 		list.add_child(UI.label(str(section[0]),16,UI.ACCENT))
 		if section[1].is_empty(): list.add_child(UI.label("No entries yet.",14,UI.MUTED))
 		for line in section[1]: list.add_child(UI.label(str(line),16,UI.TEXT))

@@ -1,0 +1,119 @@
+{
+  "records": {
+    "W11_VILLAIN": [
+      {
+        "id": "v01",
+        "era": 1,
+        "done": 1,
+        "speaker": "Lord Kaan",
+        "title": "The equal throne",
+        "text": "A Force vision shows a future Sith Lord named Kaan. He promises every Lord a throne in a Brotherhood of Darkness."
+      },
+      {
+        "id": "v02",
+        "era": 1,
+        "done": 4,
+        "speaker": "Darth Bane",
+        "title": "A listener in the dark",
+        "text": "The vision returns: one voice does not join the applause. Bane records the names of the Lords and the cost of making all of them equal.",
+        "react": {
+          "light": "He hears your order spare prisoners, and calls mercy a weakness he cannot yet explain.",
+          "dark": "He hears how fear bought obedience, and recognizes Kaan’s bargain in your ranks."
+        }
+      },
+      {
+        "id": "v03",
+        "era": 2,
+        "done": 0,
+        "speaker": "Lord Kaan",
+        "title": "The army of Lords",
+        "text": "Kaan addresses the Brotherhood before Ruusan: every blade is a Lord, every Lord a share of victory."
+      },
+      {
+        "id": "v04",
+        "era": 2,
+        "done": 2,
+        "speaker": "Darth Bane",
+        "title": "The arithmetic of power",
+        "text": "Bane counts losses after each charge. A thousand Sith strike as one and still leave a thousand claims to command.",
+        "react": {
+          "light": "The captured wounded are returned. Bane wonders why the Jedi can afford restraint.",
+          "dark": "The reports of your harsh orders travel faster than your army. Bane calls that useful, then doubts it.",
+          "death": "The name {fallen} on your memorial rolls reaches Bane. He marks what Kaan spends without counting.",
+          "arc": "A squad member chose a harder path and stayed. Bane sees loyalty that Kaan cannot command."
+        }
+      },
+      {
+        "id": "v05",
+        "era": 2,
+        "done": 3,
+        "speaker": "Lord Kaan",
+        "title": "The caves answer",
+        "text": "Kaan gathers the Brotherhood below Ruusan. The ritual tablets call for every Lord to give the Force a single wound.",
+        "flag": "e2_caves_done"
+      },
+      {
+        "id": "v06",
+        "era": 2,
+        "done": 4,
+        "speaker": "Darth Bane",
+        "title": "A different succession",
+        "text": "Bane watches the seventh battle collapse. He writes two names in the margin of Kaan’s order: master and apprentice.",
+        "flag": "e2_seventh_done",
+        "react": {
+          "light": "Your answer is to pull survivors from the line. Bane has no place for that in his new rule.",
+          "dark": "Your use of fear proves power can narrow to one will. Bane decides even one is too many unless another can challenge it.",
+          "death": "{fallen} is named in the intercepted report. Bane crosses out the word victory.",
+          "arc": "A squad choice changed its future. Bane sees that choices outlive armies."
+        }
+      },
+      {
+        "id": "v07",
+        "era": 2,
+        "done": 5,
+        "speaker": "Lord Kaan",
+        "title": "The last weapon",
+        "text": "Kaan calls every Lord into the thought bomb. Bane does not answer the summons.",
+        "flag": "e2_bomb_known"
+      },
+      {
+        "id": "v08",
+        "era": 2,
+        "done": 6,
+        "speaker": "Darth Bane",
+        "title": "Two in the ashes",
+        "text": "The thought bomb ends Kaan’s Brotherhood. Bane sees its end and gives his doctrine its name: the Rule of Two.",
+        "flags_any": [
+          "boss_ru_won",
+          "e2_bomb_fired"
+        ],
+        "outcome": {
+          "win": "Your squad broke the ritual. Bane must build his new order from a defeat.",
+          "lose": "The bomb fired. Bane walks from the silence certain that Kaan destroyed himself."
+        }
+      },
+      {
+        "id": "v09",
+        "era": 3,
+        "done": 0,
+        "speaker": "Darth Bane",
+        "title": "An old holocron",
+        "text": "Centuries later, a sealed recording speaks in Bane’s voice. Kaan’s Brotherhood is gone; the Rule of Two was built to survive it.",
+        "react": {
+          "light": "Your archive keeps the warning in reach. A student asks how to spot a master who hides.",
+          "dark": "The archive is sealed by fear. A student hears the voice alone.",
+          "arc": "The record of an old squad choice survives beside the holocron. A student reads both.",
+          "death": "{fallen}’s name still stands by the archive door. The student reads it before opening the vault."
+        }
+      },
+      {
+        "id": "v10",
+        "era": 3,
+        "done": 2,
+        "speaker": "Darth Bane",
+        "title": "The unanswered warning",
+        "text": "The vision of Ruusan returns as the frontier burns. Bane’s lesson was patience; the Order must decide what to learn from Kaan’s failure."
+      }
+    ]
+  }
+}

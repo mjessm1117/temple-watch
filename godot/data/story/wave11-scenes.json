@@ -1,0 +1,339 @@
+{
+  "records": {
+    "W11_SCENES": [
+      {
+        "id": "s11_01",
+        "era": 1,
+        "done": 0,
+        "members": [
+          0,
+          1
+        ],
+        "bond": 0,
+        "title": "The second watch",
+        "lines": [
+          "Kira Venn: The docking ring is quiet.",
+          "Tor Saalen: Quiet is when the wounded finally sleep.",
+          "Kira Venn: Then I can take the next watch.",
+          "Tor Saalen: I will bring you caf."
+        ],
+        "choices": [
+          {
+            "label": "Make room for both voices",
+            "bond": 6,
+            "dark": -1
+          },
+          {
+            "label": "Demand a faster answer",
+            "bond": 2,
+            "dark": 2
+          }
+        ]
+      },
+      {
+        "id": "s11_02",
+        "era": 1,
+        "done": 1,
+        "members": [
+          2,
+          3
+        ],
+        "bond": 0,
+        "title": "A map with names",
+        "lines": [
+          "Sgt. Rhal Dax: I marked the routes in red.",
+          "Ilsa Myr: Mark the people who know them too.",
+          "Sgt. Rhal Dax: Routes change.",
+          "Ilsa Myr: People remember who came back."
+        ],
+        "choices": [
+          {
+            "label": "Make room for both voices",
+            "bond": 6,
+            "dark": -1
+          },
+          {
+            "label": "Demand a faster answer",
+            "bond": 2,
+            "dark": 2
+          }
+        ]
+      },
+      {
+        "id": "s11_03",
+        "era": 1,
+        "done": 2,
+        "members": [
+          0,
+          2,
+          4
+        ],
+        "bond": 0,
+        "title": "Three ways home",
+        "lines": [
+          "Kira Venn: One exit is blocked.",
+          "Sgt. Rhal Dax: I can open a service hatch.",
+          "Doc Bren: I can carry the wounded through it.",
+          "Kira Venn: Then we stay together."
+        ],
+        "choices": [
+          {
+            "label": "Make room for both voices",
+            "bond": 6,
+            "dark": -1
+          },
+          {
+            "label": "Demand a faster answer",
+            "bond": 2,
+            "dark": 2
+          }
+        ]
+      },
+      {
+        "id": "s11_04",
+        "era": 1,
+        "done": 3,
+        "members": [
+          1,
+          4
+        ],
+        "bond": 1,
+        "title": "The treatment list",
+        "lines": [
+          "Tor Saalen: I wrote down every prisoner we treated.",
+          "Doc Bren: Even the one who threatened you?",
+          "Tor Saalen: Especially that one.",
+          "Doc Bren: Then I will keep a copy."
+        ],
+        "choices": [
+          {
+            "label": "Make room for both voices",
+            "bond": 6,
+            "dark": -1
+          },
+          {
+            "label": "Demand a faster answer",
+            "bond": 2,
+            "dark": 2
+          }
+        ]
+      },
+      {
+        "id": "s11_05",
+        "era": 2,
+        "done": 0,
+        "members": [
+          0,
+          1
+        ],
+        "bond": 0,
+        "title": "Landing lights",
+        "lines": [
+          "Lord Ressa Vaun: The beacon is still burning.",
+          "Kell Darrow: It has a keeper.",
+          "Lord Ressa Vaun: Give the keeper relief before dawn.",
+          "Kell Darrow: I already sent two."
+        ],
+        "choices": [
+          {
+            "label": "Make room for both voices",
+            "bond": 6,
+            "dark": -1
+          },
+          {
+            "label": "Demand a faster answer",
+            "bond": 2,
+            "dark": 2
+          }
+        ]
+      },
+      {
+        "id": "s11_06",
+        "era": 2,
+        "done": 1,
+        "members": [
+          2,
+          3
+        ],
+        "bond": 0,
+        "title": "Ravine count",
+        "lines": [
+          "Sgt. Bo Hallan: We brought seven out.",
+          "Mira Tesk: I counted eight.",
+          "Sgt. Bo Hallan: The eighth was carrying me.",
+          "Mira Tesk: Put their name first."
+        ],
+        "choices": [
+          {
+            "label": "Make room for both voices",
+            "bond": 6,
+            "dark": -1
+          },
+          {
+            "label": "Demand a faster answer",
+            "bond": 2,
+            "dark": 2
+          }
+        ]
+      },
+      {
+        "id": "s11_07",
+        "era": 2,
+        "done": 2,
+        "members": [
+          0,
+          2,
+          4
+        ],
+        "bond": 0,
+        "title": "The unsent letter",
+        "lines": [
+          "Lord Ressa Vaun: I have not written to the families.",
+          "Sgt. Bo Hallan: I can sit with you.",
+          "Doc Ilo Venn: I can bring the names.",
+          "Lord Ressa Vaun: Bring them both."
+        ],
+        "choices": [
+          {
+            "label": "Make room for both voices",
+            "bond": 6,
+            "dark": -1
+          },
+          {
+            "label": "Demand a faster answer",
+            "bond": 2,
+            "dark": 2
+          }
+        ]
+      },
+      {
+        "id": "s11_08",
+        "era": 2,
+        "done": 3,
+        "members": [
+          1,
+          5
+        ],
+        "bond": 1,
+        "title": "Before the caves",
+        "lines": [
+          "Kell Darrow: The prisoners know a way in.",
+          "Rusk Abernath: They ask safe passage out.",
+          "Kell Darrow: Give them my word.",
+          "Rusk Abernath: I will hold you to it."
+        ],
+        "choices": [
+          {
+            "label": "Make room for both voices",
+            "bond": 6,
+            "dark": -1
+          },
+          {
+            "label": "Demand a faster answer",
+            "bond": 2,
+            "dark": 2
+          }
+        ]
+      },
+      {
+        "id": "s11_09",
+        "era": 3,
+        "done": 0,
+        "members": [
+          0,
+          1
+        ],
+        "bond": 0,
+        "title": "The frontier lamp",
+        "lines": [
+          "Knight Sava Orrin: Starlight has gone dark twice.",
+          "Tem Ruhl: I can hear its crew in the Force.",
+          "Knight Sava Orrin: Then we send help before the third time.",
+          "Tem Ruhl: I will go with them."
+        ],
+        "choices": [
+          {
+            "label": "Make room for both voices",
+            "bond": 6,
+            "dark": -1
+          },
+          {
+            "label": "Demand a faster answer",
+            "bond": 2,
+            "dark": 2
+          }
+        ]
+      },
+      {
+        "id": "s11_10",
+        "era": 3,
+        "done": 1,
+        "members": [
+          2,
+          3
+        ],
+        "bond": 0,
+        "title": "A path on paper",
+        "lines": [
+          "Sgt. Dace Morrow: This route ends in empty space.",
+          "Kiri Vass: A Path does not care what the chart says.",
+          "Sgt. Dace Morrow: Can we follow it?",
+          "Kiri Vass: Only if we trust each other."
+        ],
+        "choices": [
+          {
+            "label": "Listen together",
+            "bond": 5
+          }
+        ]
+      },
+      {
+        "id": "s11_11",
+        "era": 3,
+        "done": 2,
+        "members": [
+          0,
+          4,
+          5
+        ],
+        "bond": 0,
+        "title": "After the alarm",
+        "lines": [
+          "Knight Sava Orrin: The alarm stopped.",
+          "Doc Halden Pree: The patients have not.",
+          "Bruk Tannar: I can move the beds.",
+          "Knight Sava Orrin: I will clear the corridor."
+        ],
+        "choices": [
+          {
+            "label": "Listen together",
+            "bond": 5
+          }
+        ]
+      },
+      {
+        "id": "s11_12",
+        "era": 3,
+        "done": 3,
+        "members": [
+          1,
+          3
+        ],
+        "bond": 1,
+        "title": "A name for fear",
+        "lines": [
+          "Tem Ruhl: The empty place frightened me.",
+          "Kiri Vass: Say that again when we report.",
+          "Tem Ruhl: They will call it weakness.",
+          "Kiri Vass: Then they can hear it from both of us."
+        ],
+        "choices": [
+          {
+            "label": "Listen together",
+            "bond": 5
+          }
+        ]
+      }
+    ]
+  }
+}
