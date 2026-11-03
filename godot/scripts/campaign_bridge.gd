@@ -38,9 +38,9 @@ func continue_campaign() -> void:
 	story = Story.new(campaign.state)
 	active = true
 	var stage: String = campaign.state.get("flow_stage", "temple")
-	if stage in ["briefing", "debrief", "interlude"]:
+	if stage in ["briefing", "debrief", "interlude", "arc_transition"]:
 		screen = campaign.state.get("pending", {})
-		screen_return = "squad" if stage == "briefing" else "result" if stage == "debrief" else "temple"
+		screen_return = "squad" if stage == "briefing" else "result" if stage == "debrief" else "era_transition" if stage == "arc_transition" else "temple"
 		go("briefing" if stage == "briefing" else "dialogue")
 	elif stage in ["squad", "battle"]: go("squad")
 	else: go("temple")
@@ -97,6 +97,7 @@ func story_finished() -> void:
 		"squad":
 			campaign.state.flow_stage = "squad"; save(); go("squad")
 		"result": finish_result()
+		"era_transition": advance_era()
 		"battle":
 			Battle.effects(battle_game.mission, campaign, campaign.state.get("battle_choice", {}))
 			campaign.state.erase("battle_choice")
@@ -179,6 +180,13 @@ func finish_result() -> void:
 
 func advance_era() -> void:
 	var prior_era := int(campaign.state.era)
+	if prior_era == 1 and (campaign.state.flags.get("boss_or_won", false) or campaign.state.flags.get("temple_scarred", false)):
+		screen = story.next_era_resolution(campaign.state)
+		if not screen.is_empty():
+			screen_return = "era_transition"
+			campaign.state.flow_stage = "arc_transition"
+			save(); go("dialogue")
+			return
 	if story.advance_era(campaign.state):
 		campaign.state.teams = []; campaign.state.staff = {}; campaign.state.team_assignments = {}
 		campaign.state.field = {"list":[], "log":[]}

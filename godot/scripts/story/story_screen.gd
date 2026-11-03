@@ -159,10 +159,12 @@ func _build_story() -> void:
 	for choice in scene_data.get("choices",[]):
 		var card := UI.column(3)
 		choices_box.add_child(card)
-		var button := UI.button(choice.get("label","Continue"),_choose.bind(choice.get("id",""),true))
+		var label: String = choice.get("label","Continue")
+		if kind == "arc_resolution": label += "\n" + str(choice.get("effect", ""))
+		var button := UI.button(label,_choose.bind(choice.get("id",""),true))
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		button.custom_minimum_size.y = 44
+		button.custom_minimum_size.y = 64 if kind == "arc_resolution" else 44
 		card.add_child(button)
 		choice_buttons.append(button)
 		var preview := _preview(choice)

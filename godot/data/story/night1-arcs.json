@@ -7,20 +7,22 @@
         "title": "The Weight of Warning",
         "talk": "Kira keeps a second watch over the docking ring. She asks whether a warning is still useful when no one wants to hear it.",
         "brief": "Kira marks a route through the service gantries. She asks you to trust the map she made by hand.",
-        "resolution": "Kira has watched the gates for three nights. She asks whether to lead the next watch or finally sleep.",
+        "resolution": "Kira has watched the gates for three nights. She asks whether to lead the next watch or bear every warning herself.",
         "choices": [
           {
-            "label": "Keep Kira on the watch",
+            "label": "Lead the next watch with Kira",
             "bonus": {
-              "will": 5
-            }
+              "deflect": 5
+            },
+            "effect": "Kira deflect +5"
           },
           {
-            "label": "Send Kira to rest",
-            "dark": 1,
+            "label": "Ask Kira to watch every gate",
             "bonus": {
-              "crit": 1
-            }
+              "aim": 5
+            },
+            "dark": 1,
+            "effect": "Kira aim +5 · Darkness +1"
           }
         ]
       },
@@ -30,20 +32,23 @@
         "title": "A Mercy Remembered",
         "talk": "Tor checks the treatment cells after lights out. He wants to know who will protect a prisoner when the guns fall silent.",
         "brief": "Tor spots a wounded attacker by the east bulkhead. He asks for a corridor to bring them in alive.",
-        "resolution": "Tor has kept a list of the wounded on both sides. He asks whether to take responsibility for their care.",
+        "resolution": "Tor has kept a list of the wounded on both sides. He asks whether patient care is enough when the next battle comes.",
         "choices": [
           {
             "label": "Give Tor the ward",
             "bonus": {
               "will": 5
-            }
+            },
+            "dark": -1,
+            "effect": "Tor will +5 · Darkness -1"
           },
           {
-            "label": "Release Tor from the ward",
-            "dark": 1,
+            "label": "Let Tor draw on forbidden strength",
             "bonus": {
-              "crit": 1
-            }
+              "maxF": 1
+            },
+            "dark": 1,
+            "effect": "Tor maximum Force +1 · Darkness +1"
           }
         ]
       },
@@ -53,20 +58,22 @@
         "title": "The Empty Chair",
         "talk": "Rhal sets an extra place in the mess. He says a squad needs room for whoever comes home late.",
         "brief": "Rhal points to a service lift he secured before dawn. He asks you to move the squad through it.",
-        "resolution": "Rhal has trained a replacement for every post. He asks whether to stay on the line or teach the next watch.",
+        "resolution": "Rhal has trained a replacement for every post. He asks whether to hold his own line or command the hardest watch.",
         "choices": [
           {
             "label": "Keep Rhal on the line",
             "bonus": {
-              "will": 5
-            }
+              "will": 8
+            },
+            "effect": "Rhal will +8"
           },
           {
-            "label": "Put Rhal in training",
-            "dark": 1,
+            "label": "Give Rhal command of the hard watch",
             "bonus": {
-              "crit": 1
-            }
+              "aim": 4
+            },
+            "dark": 1,
+            "effect": "Rhal aim +4 · Darkness +1"
           }
         ]
       },
@@ -79,17 +86,22 @@
         "resolution": "Ilsa has the source file and a name. She asks whether to put it before the Council.",
         "choices": [
           {
-            "label": "Submit Ilsa\u2019s evidence",
+            "label": "Submit Ilsa’s evidence",
+            "res": {
+              "intel": 1
+            },
             "bonus": {
-              "will": 5
-            }
+              "aim": 3
+            },
+            "effect": "Intel +1 · Ilsa aim +3"
           },
           {
-            "label": "Seal Ilsa\u2019s source",
-            "dark": 1,
+            "label": "Hide the source and use the file",
             "bonus": {
-              "crit": 1
-            }
+              "crit": 2
+            },
+            "dark": 1,
+            "effect": "Ilsa crit +2 · Darkness +1"
           }
         ]
       },
@@ -102,17 +114,19 @@
         "resolution": "Bren has treated everyone who reached his door. He asks whether the ward should remain open after the siege.",
         "choices": [
           {
-            "label": "Keep Bren\u2019s ward open",
+            "label": "Keep Bren’s ward open",
             "bonus": {
-              "will": 5
-            }
+              "kits": 1
+            },
+            "effect": "Bren medkit +1 per battle"
           },
           {
-            "label": "Close the ward for rest",
-            "dark": 1,
+            "label": "Reserve the ward for our own",
             "bonus": {
-              "crit": 1
-            }
+              "hp": 1
+            },
+            "dark": 1,
+            "effect": "Bren HP +1 · Darkness +1"
           }
         ]
       },
@@ -127,15 +141,17 @@
           {
             "label": "Ask Grak to stay",
             "bonus": {
-              "will": 5
-            }
+              "armor": 1
+            },
+            "effect": "Grak armor +1"
           },
           {
-            "label": "Honor Grak\u2019s return",
-            "dark": 1,
+            "label": "Send Grak after the clan debt",
             "bonus": {
-              "crit": 1
-            }
+              "nades": 1
+            },
+            "dark": 1,
+            "effect": "Grak grenade +1 per battle · Darkness +1"
           }
         ]
       }

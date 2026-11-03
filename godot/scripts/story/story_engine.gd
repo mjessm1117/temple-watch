@@ -210,6 +210,9 @@ func advance_era(s: Dictionary) -> bool:
 	ensure_state(s)
 	return true
 
+func next_era_resolution(s: Dictionary) -> Dictionary:
+	return Arcs.next_era_resolution(s, table("N1_ARCS"))
+
 func next_temple_talk(s: Dictionary) -> Dictionary:
 	ensure_state(s)
 	# --- wave10 story ---
