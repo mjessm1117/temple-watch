@@ -5,6 +5,18 @@ var g
 var trace_root: Node3D
 var detection_root: Node3D
 
+static func shot_breakdown(m: RefCounted, actor: Dictionary, target: Dictionary, melee: bool = false, modifier: int = 0) -> Dictionary:
+	var data: Dictionary = Shot.calculate(m, actor, target, melee, modifier)
+	var aim_lines: Array = []
+	var raw := 0
+	for item in data.lines:
+		if str(item[0]) in ["Flanking critical chance", "Hunker blocks flank critical"]: continue
+		aim_lines.append(item)
+		raw += int(item[1])
+	if raw != int(data.hit): aim_lines.append(["Hit chance cap", int(data.hit) - raw])
+	data.aim_lines = aim_lines
+	return data
+
 func clear_trace() -> void:
 	if trace_root == null:
 		trace_root = Node3D.new(); g.add_child(trace_root)

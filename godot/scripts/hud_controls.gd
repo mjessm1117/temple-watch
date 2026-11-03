@@ -7,6 +7,15 @@ var g
 var techniques: HFlowContainer
 var techniques_open := false
 var targeting = preload("res://scripts/combat_targeting.gd").new()
+var night
+
+static func move_color(ap_cost: int) -> Color:
+	return Color("60b9ff") if ap_cost == 1 else Color("ffd16a")
+
+static func move_fill(ap_cost: int) -> Color:
+	var color := Color("0875df") if ap_cost == 1 else Color("e6a000")
+	color.a = 0.52
+	return color
 
 func _border(parent: Node3D, p: Vector2i, color: Color, height: float = 0.12) -> void:
 	var at := Vector3(p.x, Shot.elevation(g.mission, p) * 0.7 + height, p.y)
@@ -19,7 +28,9 @@ func _refresh_highlights(force: bool = false) -> void:
 	targeting.g = g
 	if force: targeting.detection()
 	if force: g._clear(g.range_highlights)
-	if g.path_label != null: g.path_label.text = ""
+	if g.path_label != null:
+		g.path_label.text = ""
+		g.path_label.add_theme_color_override("font_color", Color("edf3f4"))
 	var u: Dictionary = g.mission.unit_by_id(g.selected_id)
 	if u.is_empty() or g.mission.result != "" or g.mission.phase != "player": return
 	if g.target_id >= 0:
@@ -31,7 +42,13 @@ func _refresh_highlights(force: bool = false) -> void:
 			if p == Shot.pos(u): continue
 			var cost: int = int(reach.costs[p])
 			if cost > int(u.mob) and int(u.ap) < 2: continue
-			_border(g.range_highlights, p, Color("399ef2") if cost <= int(u.mob) else Color("f2ba47"))
+			var ap_cost := 1 if cost <= int(u.mob) else 2
+			var color := move_fill(ap_cost)
+			var tile: MeshInstance3D = g._box(g.range_highlights, Vector3(p.x, Shot.elevation(g.mission, p) * 0.7 + 0.10, p.y), Vector3(0.79, 0.025, 0.79), color)
+			var fill_material: StandardMaterial3D = g._mat(color, true)
+			fill_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			tile.material_override = fill_material
+			_border(g.range_highlights, p, move_color(ap_cost))
 	elif force and g.action not in ["move", "free", "overwatch", "hunker"] and g.mission.abilities.has(g.action):
 		var target_kind := str(g.mission.abilities[g.action].target)
 		if target_kind.begins_with("tile"):
@@ -56,14 +73,34 @@ func _refresh_highlights(force: bool = false) -> void:
 					var line: MeshInstance3D = g._box(g.hover_highlights, (here + next_at) * 0.5, Vector3(0.08, 0.04, here.distance_to(next_at)), Color("70dfff"))
 					line.look_at(next_at, Vector3.UP)
 					cursor = next
-				g.path_label.text = "%d AP  •  %d tiles%s" % [int(preview.ap), int(preview.tiles), "  •  FLANK %d" % preview.flanks.size() if not preview.flanks.is_empty() else ""]
+				g.path_label.text = "%d AP  •  %d tiles%s" % [int(preview.ap), int(preview.tiles), "  •  ⚠ FLANKED BY %s" % ", ".join(preview.flanks) if not preview.flanks.is_empty() else ""]
+				g.path_label.add_theme_color_override("font_color", Color("ff746b") if not preview.flanks.is_empty() else Color("91d6fa"))
 			else: g.path_label.text = ""
 		else: g.path_label.text = ""
 		var shields := "  •  COVER "
 		for entry in [["N", Vector2i.UP], ["E", Vector2i.RIGHT], ["S", Vector2i.DOWN], ["W", Vector2i.LEFT]]:
 			var value := Shot.cover(g.mission, shown, shown + entry[1] * 2)
 			shields += "%s%s " % [entry[0], "⬟" if value == 40 else "◐" if value == 20 else "○"]
+			if g.action == "move" and value > 0: _shield(g.hover_highlights, shown, entry[1], value == 40)
 		g.path_label.text += shields
+
+func _shield(parent: Node3D, tile: Vector2i, direction: Vector2i, full: bool) -> void:
+	var center := Vector3(tile.x + direction.x * 0.36, Shot.elevation(g.mission, tile) * 0.7 + 1.45, tile.y + direction.y * 0.36)
+	var points := [Vector2(-0.19, -0.16), Vector2(0.19, -0.16), Vector2(0.15, 0.09), Vector2(0, 0.21), Vector2(-0.15, 0.09)]
+	var mesh := ImmediateMesh.new()
+	var material := StandardMaterial3D.new(); material.albedo_color = Color("ffe6a2") if full else Color("9fe3ff")
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES, material)
+	if full:
+		for i in range(1, 4):
+			for j in [0, i, i + 1]: mesh.surface_add_vertex(center + Vector3(points[j].x, 0, points[j].y))
+	else:
+		for i in range(5):
+			var a: Vector2 = points[i]; var b: Vector2 = points[(i + 1) % 5]
+			var side := (b - a).normalized().orthogonal() * 0.018
+			for v in [a + side, b + side, b - side, a + side, b - side, a - side]: mesh.surface_add_vertex(center + Vector3(v.x, 0, v.y))
+	mesh.surface_end()
+	var icon := MeshInstance3D.new(); icon.mesh = mesh; parent.add_child(icon)
 
 
 func _label(text_value: String, size: int = 18) -> Label:
@@ -108,16 +145,17 @@ func _build_ui() -> void:
 	var top_row := HBoxContainer.new(); top.add_child(top_row)
 	g.title_label = _label("TEMPLE WATCH", 20); g.title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top_row.add_child(g.title_label)
 	g.objective_label = _label("", 16); top_row.add_child(g.objective_label)
-	var left := PanelContainer.new(); left.offset_top = 75; left.offset_left = 10; left.offset_right = 205; left.offset_bottom = 560; root.add_child(left); _style_panel(left)
+	var left := PanelContainer.new(); left.offset_top = 75; left.offset_left = 10; left.offset_right = 220; left.offset_bottom = 520; root.add_child(left); _style_panel(left)
 	var left_box := VBoxContainer.new(); left.add_child(left_box)
 	left_box.add_child(_label("SQUAD", 17))
 	for u in g.mission.living("player"):
 		var id: int = int(u.id)
-		left_box.add_child(_button(str(u.name), func() -> void: g._select(id)))
+		var squad_button := _button(str(u.name), func() -> void: g._select(id))
+		squad_button.custom_minimum_size.y = 38; left_box.add_child(squad_button)
 	g.portrait_viewport = SubViewport.new(); g.portrait_viewport.size = Vector2i(132, 100); g.portrait_viewport.transparent_bg = true; g.portrait_viewport.own_world_3d = true; g.portrait_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS; g.add_child(g.portrait_viewport)
 	var portrait_camera := Camera3D.new(); portrait_camera.position = Vector3(0.12, 1.6, 1.15); portrait_camera.fov = 30; g.portrait_viewport.add_child(portrait_camera); portrait_camera.look_at(Vector3(0, 1.45, 0)); portrait_camera.current = true
 	var portrait_light := DirectionalLight3D.new(); portrait_light.rotation_degrees = Vector3(-30, -35, 0); portrait_light.light_energy = 2.0; g.portrait_viewport.add_child(portrait_light)
-	var portrait := TextureRect.new(); portrait.texture = g.portrait_viewport.get_texture(); portrait.custom_minimum_size = Vector2(140, 50); portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; left_box.add_child(portrait)
+	var portrait := TextureRect.new(); portrait.texture = g.portrait_viewport.get_texture(); portrait.custom_minimum_size = Vector2(140, 44); portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; left_box.add_child(portrait)
 	g.selected_label = _label("", 14); left_box.add_child(g.selected_label)
 	var right := PanelContainer.new(); right.anchor_left = 1.0; right.anchor_right = 1.0; right.offset_left = -265; right.offset_right = -10; right.offset_top = 75; right.offset_bottom = 530; root.add_child(right); _style_panel(right)
 	var right_box := VBoxContainer.new(); right.add_child(right_box)
@@ -126,31 +164,25 @@ func _build_ui() -> void:
 	g.shot_label = _label("Hover over a target", 15); g.shot_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.shot_label)
 	right_box.add_child(_label("COMBAT LOG", 17))
 	g.log_label = _label("", 14); g.log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.log_label)
-	var bottom := PanelContainer.new(); bottom.anchor_top = 1.0; bottom.anchor_right = 1.0; bottom.anchor_bottom = 1.0; bottom.offset_top = -190; root.add_child(bottom); _style_panel(bottom)
+	var bottom := PanelContainer.new(); bottom.anchor_top = 1.0; bottom.anchor_right = 1.0; bottom.anchor_bottom = 1.0; bottom.offset_top = -238; root.add_child(bottom); _style_panel(bottom)
 	var bottom_box := VBoxContainer.new(); bottom.add_child(bottom_box)
 	var info_row := HBoxContainer.new(); bottom_box.add_child(info_row)
 	info_row.visible = bool(g.Prefs.get_value("tips"))
 	g.path_label = _label("", 15); g.path_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; info_row.add_child(g.path_label)
-	info_row.add_child(_label("LMB PREVIEW/CONFIRM  •  RMB CANCEL/PAN  •  TAB CYCLE  •  Q/E ROTATE  •  WASD PAN  •  SPACE SKIP", 12))
+	info_row.add_child(_label("LMB PREVIEW/CONFIRM  •  RMB CANCEL/PAN  •  TAB / Q-E TARGET  •  WASD PAN  •  SPACE SKIP", 12))
 	g.warning_label = _label("", 15); g.warning_label.add_theme_color_override("font_color", Color("ffd37a")); bottom_box.add_child(g.warning_label)
-	var row := HFlowContainer.new(); row.size_flags_horizontal = Control.SIZE_EXPAND_FILL; bottom_box.add_child(row)
-	var scroll := ScrollContainer.new(); scroll.custom_minimum_size.y = 52; scroll.visible = false
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; bottom_box.add_child(scroll)
-	techniques = HFlowContainer.new(); techniques.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(techniques)
+	var row := HFlowContainer.new(); row.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.custom_minimum_size.y = 128; bottom_box.add_child(row)
 	var keys := {"move": "1", "shoot": "2", "strike": "3", "push": "4", "free": "5", "overwatch": "6", "hunker": "7"}
 	if g.mission.modern: keys.erase("free"); keys.interact = "5"
-	var icons := {"move": "➜", "shoot": "◎", "strike": "✦", "push": "◈", "free": "◇", "interact":"◇", "overwatch": "◉", "hunker": "⬟"}
 	for mode in keys:
-		var b := _button("%s %s\n%s" % [keys[mode], icons[mode], mode.to_upper()], func() -> void: g._choose_action(mode))
+		var b = preload("res://scripts/hud_ability_button.gd").new(); b.custom_minimum_size = Vector2(126, 60); b.focus_mode = Control.FOCUS_NONE
+		b.pressed.connect(func() -> void: g._choose_action(mode))
 		row.add_child(b); g.action_buttons[mode] = b
-	row.add_child(_button("TECHNIQUES ▾",func():
-		techniques_open = not techniques_open; scroll.visible = techniques_open
-		bottom.offset_top = -246 if techniques_open else -190))
 	for mode in g.mission.abilities:
 		if mode in keys or mode == "move": continue
-		var b := _button(str(g.mission.abilities[mode].name), func() -> void: g._choose_action(mode))
-		if mode in ["interact", "reload"]: row.add_child(b)
-		else: techniques.add_child(b)
+		var b = preload("res://scripts/hud_ability_button.gd").new(); b.custom_minimum_size = Vector2(126, 60); b.focus_mode = Control.FOCUS_NONE
+		b.pressed.connect(func() -> void: g._choose_action(mode))
+		row.add_child(b)
 		g.action_buttons[mode] = b
 	var command_row := HBoxContainer.new(); bottom_box.add_child(command_row)
 	command_row.add_child(_button("INFO",func():
@@ -164,11 +196,13 @@ func _build_ui() -> void:
 	command_row.add_child(_button("END TURN\nENTER", g._request_end_turn))
 	command_row.add_child(_button("RESTART\nR", func() -> void: g.get_tree().reload_current_scene()))
 	g.phase_banner = _label("ENEMY ACTIVITY", 31); g.phase_banner.visible = false; g.phase_banner.anchor_left = 0.5; g.phase_banner.anchor_top = 0.18; g.phase_banner.position = Vector2(-150, 0); root.add_child(g.phase_banner)
+	g.phase_banner.modulate.a = 0.0
 	g.result_panel = PanelContainer.new(); g.result_panel.visible = false; g.result_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER); g.result_panel.offset_left = -220; g.result_panel.offset_right = 220; g.result_panel.offset_top = -100; g.result_panel.offset_bottom = 100; root.add_child(g.result_panel)
 	var result_box := VBoxContainer.new(); g.result_panel.add_child(result_box)
 	g.result_label = _label("", 28); result_box.add_child(g.result_label)
 	result_box.add_child(_button("Restart mission", func() -> void: g.get_tree().reload_current_scene()))
 	result_box.add_child(_button("Main menu", func() -> void: g.get_node("/root/CampaignFlow").go("menu")))
+	night = preload("res://scripts/hud_night1.gd").new(); night.g = g; root.add_child(night); night.setup(left_box, right_box)
 
 
 func _refresh() -> void:
@@ -210,16 +244,15 @@ func _refresh() -> void:
 		var def: Dictionary = g.mission.abilities[mode]
 		var reason: String = "" if mode == "move" else g.mission.ability_reason(g.selected_id, mode)
 		if mode == "move" and int(u.get("ap", 0)) <= 0: reason = "Need AP"
-		button.disabled = reason != ""
 		var key := str(["move", "shoot", "strike", "push", "free", "overwatch", "hunker"].find(mode) + 1) if core else ("F%d" % (extras.find(mode) + 1) if extras.find(mode) < 12 else "")
 		if mode == "interact": key = "5"
 		var ap := "all" if str(def.get("ap")) == "remaining" else str(int(def.get("ap", 1)))
 		var charges := str(def.get("charges", ""))
 		var detail := " • %d left" % int(u.get(charges, 0)) if charges != "" else ""
 		var cd: Dictionary = u.get("cooldowns", {})
-		if int(cd.get(mode, 0)) > g.mission.turn: detail += " • CD %d" % (int(cd[mode]) - g.mission.turn)
-		button.text = "%s %s\n%s AP%s%s" % [key, str(def.name), ap, detail, ""]
-		button.tooltip_text = reason if reason != "" else "%s • %s AP%s" % [def.name, ap, detail]
+		var turns := maxi(0, int(cd.get(mode, 0)) - g.mission.turn)
+		button.call("configure", mode, str(def.get("name", mode.capitalize())), key, ap, turns, reason, g.action == mode)
+		if charges != "": button.tooltip_text += detail
 	g.result_panel.visible = g.mission.result != ""
 	var cine_button: Button = g.overlay.find_child("CineButton", true, false)
 	if cine_button != null: cine_button.text = "ACTION CAM\n%s" % ("ON" if g.action_camera else "OFF")
@@ -228,12 +261,13 @@ func _refresh() -> void:
 		for member in g.mission.units:
 			if str(member.side) == "player" and bool(member.get("wounded", false)): wounded.append(str(member.name))
 		g.result_label.text = ("MISSION COMPLETE" if g.mission.result == "win" else "MISSION FAILED") + "\nWounded: " + (", ".join(wounded) if not wounded.is_empty() else "None")
-	g._refresh_figures(); _refresh_highlights(true); _show_shot()
+	g._refresh_figures(); _refresh_highlights(true); _show_shot(); night.refresh()
 
 
 func _show_shot() -> void:
 	targeting.g = g
 	targeting.clear_trace()
+	if night != null: night.refresh_target.call_deferred()
 	var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
 	if g.action not in ["shoot", "strike", "push", "move"]:
 		var def: Dictionary = g.mission.abilities.get(g.action, {})
@@ -268,7 +302,7 @@ func _show_shot() -> void:
 		g.hit_big_label.text = "PUSH" if legal else "NO PUSH"
 		g.shot_label.text = "%s  HP %d\n%s\nNo hit or crit roll.\nCosts %d AP and %d Focus." % [target.name, int(target.hp), "Guaranteed knockback if confirmed." if legal else "Move into range with clear line of sight.", int(g.mission.abilities.push.ap), int(g.mission.abilities.push.focus)]
 		return
-	var info: Dictionary = Shot.calculate(g.mission, actor, target, g.action == "strike", int(actor.get("leap_aim", 0)) if g.action == "strike" else 0)
+	var info: Dictionary = targeting.shot_breakdown(g.mission, actor, target, g.action == "strike", int(actor.get("leap_aim", 0)) if g.action == "strike" else 0)
 	g.hit_big_label.text = "%d%% HIT" % int(info.hit)
 	var breakdown := ""
 	for item in info.lines: breakdown += "%s  %+d\n" % [item[0], int(item[1])]
