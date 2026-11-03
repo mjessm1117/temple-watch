@@ -5,9 +5,11 @@ static func _point(m: RefCounted, tile: Vector2i, height: float = 0.0) -> Vector
 	return Vector3(tile.x, Shot.elevation(m, tile) * 0.7 + height, tile.y)
 
 static func drain(game: Node3D) -> void:
+	decorate(game)
 	while not game.mission.action_events.is_empty():
 		var event: Dictionary = game.mission.action_events.pop_front()
 		await show_event(game, event)
+	decorate(game)
 	for id in game.presentation_routes:
 		var u: Dictionary = game.mission.unit_by_id(int(id))
 		var view: Node3D = game.views.get(int(id))
@@ -93,6 +95,23 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 				if kind == "reload": actor.act("reload")
 			await game.cam.wait(0.2)
 	game.cam.finish()
+	decorate(game)
+
+static func decorate(game: Node3D) -> void:
+	for u in game.mission.units:
+		if not u.has("visual_tint") or int(u.get("hp",0)) <= 0: continue
+		var view: Node3D = game.views.get(int(u.id))
+		if view == null or view.has_meta("enemy11_tinted"): continue
+		view.set_meta("enemy11_tinted",true)
+		view.model.scale = Vector3.ONE * 1.2 * float(u.get("visual_scale",1.0))
+		var overlay := StandardMaterial3D.new()
+		overlay.albedo_color = Color(str(u.visual_tint),0.32)
+		overlay.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		_tint(view.model,overlay)
+
+static func _tint(node: Node, overlay: Material) -> void:
+	if node is MeshInstance3D: node.material_overlay = overlay
+	for child in node.get_children(): _tint(child,overlay)
 
 static func impact(game: Node3D, event: Dictionary) -> void:
 	var from := _point(game.mission, event.from, 1.15)

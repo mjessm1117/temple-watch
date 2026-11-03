@@ -761,5 +761,16 @@
     "name": "Wild Bond",
     "passive": true,
     "effect": "focus_bonus"
+  },
+  "lordLightning11": {
+    "name": "Force Lightning",
+    "target": "player",
+    "effect": "attack",
+    "range": 6,
+    "damage": [
+      3,
+      3
+    ],
+    "description": "Phase two: strikes the nearest soldier once per turn."
   }
 }

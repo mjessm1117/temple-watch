@@ -380,11 +380,11 @@
       "theme": "plains"
     },
     "r_ravine": {
-      "n": "Ravine of the Wounded",
+      "n": "Ravine Evacuation",
       "where": "Field hospital ravine · Ruusan",
-      "type": "escort",
+      "type": "evacuation",
       "story": 1,
-      "brief": "A Brotherhood sweep is coming down the ravine. Lord Hoth's wounded are still in it, and one of them is his student, Johun Othone. Walk him to the evac at the north end.",
+      "brief": "Five Army of Light wounded are trapped in the ravine. Gather each civilian so they follow the column to the blue exit. Brotherhood reinforcements arrive every two turns. Save at least four; every survivor counts.",
       "reward": {
         "credits": 70,
         "recruits": 1
@@ -392,17 +392,18 @@
       "bonus": {
         "favor": 4
       },
-      "bonusTxt": "Done by turn 6",
-      "map": "res://data/maps/r_ravine.json",
-      "family": "vip_extract",
-      "theme": "plains"
+      "bonusTxt": "All five civilians survive",
+      "map": "res://data/maps/w11_evacuation.json",
+      "family": "evacuation",
+      "theme": "plains",
+      "goal": "Gather five wounded civilians and escort at least four to the blue exit before the Brotherhood closes the ravine."
     },
     "r_caves": {
-      "n": "Kaan's Caves",
+      "n": "Kaan’s Holocron",
       "where": "Cave network · Ruusan",
-      "type": "investigate",
+      "type": "holocron_recovery",
       "story": 1,
-      "brief": "A prisoner says the Brotherhood is gathering in the caves. Copy the ritual tablets (Jedi or Medic, adjacent), then get anyone to an evac zone. Something in the dark only hunts Jedi.",
+      "brief": "A Brotherhood holocron lies in Kaan’s caves. Recover it, then get its carrier to the blue extraction zone. The carrier moves two tiles slower and hunters converge once it is taken.",
       "reward": {
         "credits": 60,
         "intel": 2
@@ -410,10 +411,11 @@
       "bonus": {
         "intel": 1
       },
-      "bonusTxt": "All 3 tablets",
-      "map": "res://data/maps/r_caves.json",
-      "family": "hack_terminal",
-      "theme": "caves"
+      "bonusTxt": "Carrier reaches extraction",
+      "map": "res://data/maps/w11_holocron.json",
+      "family": "holocron_recovery",
+      "theme": "caves",
+      "goal": "A Brotherhood holocron lies in Kaan’s caves. Recover it, then get its carrier to the blue extraction zone. The carrier moves two tiles slower and hunters converge once it is taken."
     },
     "r_sixth": {
       "n": "The Sixth Battle",
@@ -434,11 +436,11 @@
       "theme": "plains"
     },
     "r_seventh": {
-      "n": "The Seventh Battle",
+      "n": "The Seventh Battle: Lord Vorr",
       "where": "Kaan's line · Ruusan",
-      "type": "assault",
+      "type": "sith_lord_duel",
       "story": 1,
-      "brief": "The seventh battle of Ruusan. Lord Vorr holds the high ground over Kaan's line. Break him and the Army of Light can push through.",
+      "brief": "Lord Vorr commands the Brotherhood line. Defeat him to break it. At half health he gains Force lightning and calls guards; an Alchemist keeps his line standing.",
       "reward": {
         "credits": 100,
         "kyber": 1
@@ -446,10 +448,11 @@
       "bonus": {
         "favor": 4
       },
-      "bonusTxt": "Done by turn 6",
-      "map": "res://data/maps/r_seventh.json",
-      "family": "destroy_relay",
-      "theme": "plains"
+      "bonusTxt": "Lord defeated by turn 6",
+      "map": "res://data/maps/w11_duel.json",
+      "family": "sith_lord_duel",
+      "theme": "plains",
+      "goal": "Lord Vorr commands the Brotherhood line. Defeat him to break it. At half health he gains Force lightning and calls guards; an Alchemist keeps his line standing."
     },
     "r_bomb": {
       "n": "The Thought Bomb",

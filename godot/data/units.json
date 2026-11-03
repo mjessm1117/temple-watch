@@ -284,5 +284,126 @@
     ],
     "deflect": 35,
     "guard_deflect": 70
+  },
+  "assassin11": {
+    "name": "Sith Assassin",
+    "class_name": "Assassin",
+    "side": "enemy",
+    "hp": 5,
+    "aim": 80,
+    "mob": 7,
+    "damage": [
+      3,
+      5
+    ],
+    "range": 1.5,
+    "armor": 0,
+    "model": "agent",
+    "detection": 4,
+    "description": "Stealthed until adjacent or revealed; circles to flank.",
+    "visual_tint": "#8d64b5",
+    "visual_scale": 0.95
+  },
+  "shield_droid11": {
+    "name": "Shield Droid",
+    "class_name": "Shield Droid",
+    "side": "enemy",
+    "hp": 8,
+    "aim": 65,
+    "mob": 4,
+    "damage": [
+      2,
+      4
+    ],
+    "range": 7,
+    "armor": 0,
+    "model": "sithHeavy",
+    "droid": true,
+    "shield_front": 6,
+    "detection": 3,
+    "description": "Frontal shield blocks damage; flank it or break the shield.",
+    "visual_tint": "#7dcad5",
+    "visual_scale": 1.1
+  },
+  "alchemist11": {
+    "name": "Sith Alchemist",
+    "class_name": "Alchemist",
+    "side": "enemy",
+    "hp": 5,
+    "aim": 55,
+    "mob": 5,
+    "damage": [
+      2,
+      3
+    ],
+    "range": 7,
+    "armor": 0,
+    "model": "agent",
+    "detection": 3,
+    "description": "Heals and empowers allies from the rear; eliminate first.",
+    "visual_tint": "#83bb70",
+    "visual_scale": 0.95
+  },
+  "beast11": {
+    "name": "Ruusan War Beast",
+    "class_name": "Beast",
+    "side": "enemy",
+    "hp": 9,
+    "aim": 75,
+    "mob": 8,
+    "damage": [
+      3,
+      5
+    ],
+    "range": 1.5,
+    "armor": 0,
+    "model": "sithHeavy",
+    "tags": [
+      "creature"
+    ],
+    "detection": 3,
+    "description": "Fast melee charge smashes through half cover.",
+    "visual_tint": "#b97854",
+    "visual_scale": 1.25
+  },
+  "lord11": {
+    "name": "Brotherhood Sith Lord",
+    "class_name": "Sith Warrior",
+    "side": "enemy",
+    "hp": 42,
+    "aim": 78,
+    "mob": 6,
+    "damage": [
+      4,
+      6
+    ],
+    "range": 1.5,
+    "focus": 3,
+    "armor": 1,
+    "model": "sithHeavy",
+    "duel_boss": true,
+    "boss": true,
+    "detection": 4,
+    "description": "Phase two at half HP: Force lightning and guards.",
+    "visual_tint": "#cf5978",
+    "visual_scale": 1.28
+  },
+  "civilian11": {
+    "name": "Army of Light Wounded",
+    "class_name": "Civilian",
+    "side": "civilian",
+    "hp": 4,
+    "aim": 0,
+    "mob": 2,
+    "damage": [
+      0,
+      0
+    ],
+    "range": 0,
+    "armor": 0,
+    "model": "trooper",
+    "description": "Escort near a soldier to the blue exit.",
+    "visual_tint": "#e8dcbb",
+    "visual_scale": 0.8
   }
 }

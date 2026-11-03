@@ -5,6 +5,7 @@ var shown_tile := Vector2i(-1, -1)
 
 func _ready() -> void:
 	visible = false
+	var plate := preload("res://scripts/enemy11_plate.gd").new(); plate.name = "ThreatNotes11"; plate.bind(get_parent()); get_parent().add_child.call_deferred(plate)
 	var amber := StandardMaterial3D.new()
 	amber.albedo_color = Color("ffbd57")
 	amber.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED

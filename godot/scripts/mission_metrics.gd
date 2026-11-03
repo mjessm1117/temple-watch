@@ -31,6 +31,8 @@ static func report(m: RefCounted) -> Dictionary:
 		for x in int(m.spec.width):
 			if m.passable(Vector2i(x,y)): floor_count += 1
 	return {"contact_turn":m.metrics.contact_turn,"objective_turn":m.metrics.objective_turn,"evac_turn":m.metrics.evac_turn,
+		"civilians_saved":int(m.objective_state.get("saved",0)) if m.spec.family == "evacuation" else 0,
+		"civilians_total":m.objective_state.get("civilian_ids",[]).size() if m.spec.family == "evacuation" else 0,
 		"visited_tiles":m.metrics.visited.size(),"unused_area":1.0-float(m.metrics.visited.size())/maxi(1,floor_count),
 		"flank_opportunities":m.metrics.flank_opportunities,"peak_threats":m.metrics.peak_threats}
 

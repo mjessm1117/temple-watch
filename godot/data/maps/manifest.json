@@ -96,13 +96,13 @@
       "theme": "plains"
     },
     "r_ravine": {
-      "path": "res://data/maps/r_ravine.json",
-      "family": "vip_extract",
+      "path": "res://data/maps/w11_evacuation.json",
+      "family": "evacuation",
       "theme": "plains"
     },
     "r_caves": {
-      "path": "res://data/maps/r_caves.json",
-      "family": "hack_terminal",
+      "path": "res://data/maps/w11_holocron.json",
+      "family": "holocron_recovery",
       "theme": "caves"
     },
     "r_sixth": {
@@ -111,8 +111,8 @@
       "theme": "plains"
     },
     "r_seventh": {
-      "path": "res://data/maps/r_seventh.json",
-      "family": "destroy_relay",
+      "path": "res://data/maps/w11_duel.json",
+      "family": "sith_lord_duel",
       "theme": "plains"
     },
     "r_bomb": {
