@@ -1,19 +1,22 @@
 extends Button
 ## Drawn action glyphs keep the battle bar independent of imported artwork.
 var ability_id := ""
+var display_name := ""
 var hotkey := ""
 var cost := ""
 var cooldown := 0
 var active := false
 
-func configure(id: String, key: String, ap_cost: String, turns: int, reason: String, is_active: bool = false) -> void:
+func configure(id: String, name: String, key: String, ap_cost: String, turns: int, reason: String, is_active: bool = false) -> void:
 	ability_id = id
+	display_name = name
 	hotkey = key
 	cost = ap_cost
 	cooldown = turns
 	active = is_active
 	disabled = reason != ""
-	tooltip_text = reason if reason != "" else "%s · %s AP%s" % [id.capitalize(), cost, " · cooldown %d" % turns if turns > 0 else ""]
+	tooltip_text = "%s · %s AP%s" % [name, cost, " · cooldown %d" % turns if turns > 0 else ""]
+	if reason != "": tooltip_text += " · " + reason
 	text = ""
 	queue_redraw()
 
@@ -24,9 +27,9 @@ func _draw() -> void:
 	draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), gold, false, 2.0 if active else 1.0)
 	draw_rect(Rect2(6, 5, 19, 17), Color("30404b"), true)
 	draw_string(ThemeDB.fallback_font, Vector2(9, 18), hotkey, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
-	var c := Vector2(30, size.y * 0.55)
-	draw_string(ThemeDB.fallback_font, Vector2(49, 30), ability_id.capitalize(), HORIZONTAL_ALIGNMENT_LEFT, size.x - 52, 12, Color("edf3f4") if not disabled else Color("87919b"))
-	draw_string(ThemeDB.fallback_font, Vector2(49, 49), "%s AP" % cost, HORIZONTAL_ALIGNMENT_LEFT, size.x - 52, 12, gold)
+	var c := Vector2(29, size.y * 0.55)
+	draw_string(ThemeDB.fallback_font, Vector2(44, 30), display_name, HORIZONTAL_ALIGNMENT_LEFT, size.x - 47, 11, Color("edf3f4") if not disabled else Color("87919b"))
+	draw_string(ThemeDB.fallback_font, Vector2(44, 49), "%s AP" % cost, HORIZONTAL_ALIGNMENT_LEFT, size.x - 47, 12, gold)
 	match ability_id:
 		"move":
 			draw_line(c + Vector2(-9, 7), c + Vector2(7, -7), blue, 3)

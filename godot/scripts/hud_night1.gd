@@ -32,7 +32,7 @@ func setup(left_box: VBoxContainer, right_box: VBoxContainer) -> void:
 	plate.add_theme_stylebox_override("panel", panel_style())
 	var body := VBoxContainer.new(); plate.add_child(body)
 	name_label = label("", 17, Color("efd49b")); body.add_child(name_label)
-	vitals_label = label("", 14); body.add_child(vitals_label)
+	vitals_label = label("", 13); body.add_child(vitals_label)
 	status_row = HBoxContainer.new(); body.add_child(status_row)
 	details_button = Button.new(); details_button.text = "ODDS BREAKDOWN ▸"; details_button.focus_mode = Control.FOCUS_NONE
 	details_button.pressed.connect(func() -> void: detail_open = not detail_open; refresh_target())
@@ -68,7 +68,15 @@ func refresh() -> void:
 		for mate_id in u.get("bondmates", {}):
 			var mate: Dictionary = g.mission.unit_by_id(int(mate_id))
 			if not mate.is_empty(): bond = str(mate.get("name", "")); break
-		vitals_label.text = "%s\nHP %s\nWILL %s   AP %s\n%s" % [str(u.get("class_name", "Jedi")), "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp",0)) - int(u.get("hp",0)))), str(u.will) if u.has("will") else "—", "◆".repeat(int(u.get("ap",0))) + "◇".repeat(maxi(0, 3-int(u.get("ap",0)))), "BOND  " + bond if bond != "" else "NO BOND PARTNER"]
+		var rows: Array[String] = [str(u.get("class_name", "Jedi")), "HP %s" % ("●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))))]
+		var ap_pips := "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, 3 - int(u.get("ap", 0))))
+		rows.append(("WILL %s   " % str(u.will) if u.has("will") else "") + "AP %s" % ap_pips)
+		rows.append("FOCUS %d  ·  MEDPACS %d" % [int(u.get("focus_left", 0)), int(u.get("medpacs", 0))])
+		var supplies := "AMMO %d/%d" % [int(u.ammo), int(u.clip)] if u.has("ammo") else ""
+		if g.mission.get("momentum") != null: supplies += ("  ·  " if supplies != "" else "") + "MOMENTUM %d/10" % int(g.mission.momentum)
+		if supplies != "": rows.append(supplies)
+		rows.append("BOND  " + bond if bond != "" else "NO BOND PARTNER")
+		vitals_label.text = "\n".join(rows)
 		for child in status_row.get_children(): child.queue_free()
 		for key in ["hunkered", "overwatch", "concealed", "stunned", "rooted", "disarmed", "wounded"]:
 			if not bool(u.get(key, false)): continue
@@ -92,7 +100,9 @@ func refresh_target() -> void:
 		for item in data.aim_lines: rows.append("%s  %+d" % [item[0], int(item[1])])
 		rows.append("TOTAL  %d%%  ·  CRIT %d%%" % [int(data.hit), int(data.crit)])
 		var damage: Dictionary = Shot.damage_preview(actor, target)
-		target_details.text = "\n".join(rows) if detail_open else "%s  HP %d/%d\nCRIT %d%%  ·  GRAZE %d%%\nDAMAGE %d–%d  ·  ARMOR %d\n%s" % [str(target.name), int(target.hp), int(target.max_hp), int(data.crit), int(data.graze), int(damage.normal[0]), int(damage.normal[1]), int(damage.armor), "FLANKED" if bool(data.flanked) else "LOS CLEAR" if bool(data.los) else "LOS BLOCKED"]
+		var summary := "%s  HP %d/%d\nCRIT %d%%  ·  GRAZE %d%%\nDMG %d–%d  ·  ARMOR %d\nCRIT %d–%d  ·  GRAZE %d–%d\nSHRED %d on hit\n%s" % [str(target.name), int(target.hp), int(target.max_hp), int(data.crit), int(data.graze), int(damage.normal[0]), int(damage.normal[1]), int(damage.armor), int(damage.critical[0]), int(damage.critical[1]), int(damage.graze[0]), int(damage.graze[1]), int(damage.shred), "FLANKED" if bool(data.flanked) else "LOS CLEAR" if bool(data.los) else "LOS BLOCKED — red trace"]
+		if actor.has("ammo"): summary += "\nAMMO %d/%d · %d AP" % [int(actor.ammo), int(actor.clip), int(g.mission.abilities[g.action].ap)]
+		target_details.text = summary + ("\n" + "\n".join(rows) if detail_open else "")
 		details_button.text = "ODDS BREAKDOWN %s" % ("▾" if detail_open else "▸")
 	update_chips()
 

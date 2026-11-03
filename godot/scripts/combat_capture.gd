@@ -34,6 +34,7 @@ func run() -> void:
 	elif kind == "selected":
 		game.action="move"; game._refresh()
 	elif kind == "move":
+		m.set_tile(Vector2i(8,19), "c"); m.set_tile(Vector2i(9,20), "#"); m.terrain_revision += 1
 		game.action="move"; game.preview_tile=Vector2i(8,20); game.hovered=game.preview_tile; game._refresh()
 	elif kind == "enemy-turn":
 		m.phase="enemy"; game.action="move"; m.log_lines.append("Sith Acolyte moves into cover")

@@ -10,7 +10,12 @@ var targeting = preload("res://scripts/combat_targeting.gd").new()
 var night
 
 static func move_color(ap_cost: int) -> Color:
-	return Color("399ef2") if ap_cost == 1 else Color("f2ba47")
+	return Color("60b9ff") if ap_cost == 1 else Color("ffd16a")
+
+static func move_fill(ap_cost: int) -> Color:
+	var color := Color("0875df") if ap_cost == 1 else Color("e6a000")
+	color.a = 0.52
+	return color
 
 func _border(parent: Node3D, p: Vector2i, color: Color, height: float = 0.12) -> void:
 	var at := Vector3(p.x, Shot.elevation(g.mission, p) * 0.7 + height, p.y)
@@ -37,7 +42,13 @@ func _refresh_highlights(force: bool = false) -> void:
 			if p == Shot.pos(u): continue
 			var cost: int = int(reach.costs[p])
 			if cost > int(u.mob) and int(u.ap) < 2: continue
-			_border(g.range_highlights, p, move_color(1 if cost <= int(u.mob) else 2))
+			var ap_cost := 1 if cost <= int(u.mob) else 2
+			var color := move_fill(ap_cost)
+			var tile: MeshInstance3D = g._box(g.range_highlights, Vector3(p.x, Shot.elevation(g.mission, p) * 0.7 + 0.10, p.y), Vector3(0.79, 0.025, 0.79), color)
+			var fill_material: StandardMaterial3D = g._mat(color, true)
+			fill_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			tile.material_override = fill_material
+			_border(g.range_highlights, p, move_color(ap_cost))
 	elif force and g.action not in ["move", "free", "overwatch", "hunker"] and g.mission.abilities.has(g.action):
 		var target_kind := str(g.mission.abilities[g.action].target)
 		if target_kind.begins_with("tile"):
@@ -70,13 +81,26 @@ func _refresh_highlights(force: bool = false) -> void:
 		for entry in [["N", Vector2i.UP], ["E", Vector2i.RIGHT], ["S", Vector2i.DOWN], ["W", Vector2i.LEFT]]:
 			var value := Shot.cover(g.mission, shown, shown + entry[1] * 2)
 			shields += "%s%s " % [entry[0], "⬟" if value == 40 else "◐" if value == 20 else "○"]
-			if g.action == "move" and value > 0:
-				var shield := Label3D.new(); shield.text = "⬟" if value == 40 else "◐"
-				shield.font_size = 48; shield.modulate = Color("f1d280") if value == 40 else Color("8acdee")
-				shield.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-				shield.position = Vector3(shown.x + entry[1].x * 0.34, Shot.elevation(g.mission, shown) * 0.7 + 0.7, shown.y + entry[1].y * 0.34)
-				g.hover_highlights.add_child(shield)
+			if g.action == "move" and value > 0: _shield(g.hover_highlights, shown, entry[1], value == 40)
 		g.path_label.text += shields
+
+func _shield(parent: Node3D, tile: Vector2i, direction: Vector2i, full: bool) -> void:
+	var center := Vector3(tile.x + direction.x * 0.36, Shot.elevation(g.mission, tile) * 0.7 + 1.45, tile.y + direction.y * 0.36)
+	var points := [Vector2(-0.19, -0.16), Vector2(0.19, -0.16), Vector2(0.15, 0.09), Vector2(0, 0.21), Vector2(-0.15, 0.09)]
+	var mesh := ImmediateMesh.new()
+	var material := StandardMaterial3D.new(); material.albedo_color = Color("ffe6a2") if full else Color("9fe3ff")
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES, material)
+	if full:
+		for i in range(1, 4):
+			for j in [0, i, i + 1]: mesh.surface_add_vertex(center + Vector3(points[j].x, 0, points[j].y))
+	else:
+		for i in range(5):
+			var a: Vector2 = points[i]; var b: Vector2 = points[(i + 1) % 5]
+			var side := (b - a).normalized().orthogonal() * 0.018
+			for v in [a + side, b + side, b - side, a + side, b - side, a - side]: mesh.surface_add_vertex(center + Vector3(v.x, 0, v.y))
+	mesh.surface_end()
+	var icon := MeshInstance3D.new(); icon.mesh = mesh; parent.add_child(icon)
 
 
 func _label(text_value: String, size: int = 18) -> Label:
@@ -121,16 +145,17 @@ func _build_ui() -> void:
 	var top_row := HBoxContainer.new(); top.add_child(top_row)
 	g.title_label = _label("TEMPLE WATCH", 20); g.title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top_row.add_child(g.title_label)
 	g.objective_label = _label("", 16); top_row.add_child(g.objective_label)
-	var left := PanelContainer.new(); left.offset_top = 75; left.offset_left = 10; left.offset_right = 205; left.offset_bottom = 560; root.add_child(left); _style_panel(left)
+	var left := PanelContainer.new(); left.offset_top = 75; left.offset_left = 10; left.offset_right = 220; left.offset_bottom = 520; root.add_child(left); _style_panel(left)
 	var left_box := VBoxContainer.new(); left.add_child(left_box)
 	left_box.add_child(_label("SQUAD", 17))
 	for u in g.mission.living("player"):
 		var id: int = int(u.id)
-		left_box.add_child(_button(str(u.name), func() -> void: g._select(id)))
+		var squad_button := _button(str(u.name), func() -> void: g._select(id))
+		squad_button.custom_minimum_size.y = 38; left_box.add_child(squad_button)
 	g.portrait_viewport = SubViewport.new(); g.portrait_viewport.size = Vector2i(132, 100); g.portrait_viewport.transparent_bg = true; g.portrait_viewport.own_world_3d = true; g.portrait_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS; g.add_child(g.portrait_viewport)
 	var portrait_camera := Camera3D.new(); portrait_camera.position = Vector3(0.12, 1.6, 1.15); portrait_camera.fov = 30; g.portrait_viewport.add_child(portrait_camera); portrait_camera.look_at(Vector3(0, 1.45, 0)); portrait_camera.current = true
 	var portrait_light := DirectionalLight3D.new(); portrait_light.rotation_degrees = Vector3(-30, -35, 0); portrait_light.light_energy = 2.0; g.portrait_viewport.add_child(portrait_light)
-	var portrait := TextureRect.new(); portrait.texture = g.portrait_viewport.get_texture(); portrait.custom_minimum_size = Vector2(140, 50); portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; left_box.add_child(portrait)
+	var portrait := TextureRect.new(); portrait.texture = g.portrait_viewport.get_texture(); portrait.custom_minimum_size = Vector2(140, 44); portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; left_box.add_child(portrait)
 	g.selected_label = _label("", 14); left_box.add_child(g.selected_label)
 	var right := PanelContainer.new(); right.anchor_left = 1.0; right.anchor_right = 1.0; right.offset_left = -265; right.offset_right = -10; right.offset_top = 75; right.offset_bottom = 530; root.add_child(right); _style_panel(right)
 	var right_box := VBoxContainer.new(); right.add_child(right_box)
@@ -139,24 +164,23 @@ func _build_ui() -> void:
 	g.shot_label = _label("Hover over a target", 15); g.shot_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.shot_label)
 	right_box.add_child(_label("COMBAT LOG", 17))
 	g.log_label = _label("", 14); g.log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.log_label)
-	var bottom := PanelContainer.new(); bottom.anchor_top = 1.0; bottom.anchor_right = 1.0; bottom.anchor_bottom = 1.0; bottom.offset_top = -190; root.add_child(bottom); _style_panel(bottom)
+	var bottom := PanelContainer.new(); bottom.anchor_top = 1.0; bottom.anchor_right = 1.0; bottom.anchor_bottom = 1.0; bottom.offset_top = -238; root.add_child(bottom); _style_panel(bottom)
 	var bottom_box := VBoxContainer.new(); bottom.add_child(bottom_box)
 	var info_row := HBoxContainer.new(); bottom_box.add_child(info_row)
 	info_row.visible = bool(g.Prefs.get_value("tips"))
 	g.path_label = _label("", 15); g.path_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; info_row.add_child(g.path_label)
 	info_row.add_child(_label("LMB PREVIEW/CONFIRM  •  RMB CANCEL/PAN  •  TAB / Q-E TARGET  •  WASD PAN  •  SPACE SKIP", 12))
 	g.warning_label = _label("", 15); g.warning_label.add_theme_color_override("font_color", Color("ffd37a")); bottom_box.add_child(g.warning_label)
-	var scroll := ScrollContainer.new(); scroll.custom_minimum_size.y = 66; scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; bottom_box.add_child(scroll)
-	var row := HBoxContainer.new(); row.alignment = BoxContainer.ALIGNMENT_CENTER; row.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(row)
+	var row := HFlowContainer.new(); row.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.custom_minimum_size.y = 128; bottom_box.add_child(row)
 	var keys := {"move": "1", "shoot": "2", "strike": "3", "push": "4", "free": "5", "overwatch": "6", "hunker": "7"}
 	if g.mission.modern: keys.erase("free"); keys.interact = "5"
 	for mode in keys:
-		var b = preload("res://scripts/hud_ability_button.gd").new(); b.custom_minimum_size = Vector2(120, 62); b.focus_mode = Control.FOCUS_NONE
+		var b = preload("res://scripts/hud_ability_button.gd").new(); b.custom_minimum_size = Vector2(126, 60); b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(func() -> void: g._choose_action(mode))
 		row.add_child(b); g.action_buttons[mode] = b
 	for mode in g.mission.abilities:
 		if mode in keys or mode == "move": continue
-		var b = preload("res://scripts/hud_ability_button.gd").new(); b.custom_minimum_size = Vector2(120, 62); b.focus_mode = Control.FOCUS_NONE
+		var b = preload("res://scripts/hud_ability_button.gd").new(); b.custom_minimum_size = Vector2(126, 60); b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(func() -> void: g._choose_action(mode))
 		row.add_child(b)
 		g.action_buttons[mode] = b
@@ -227,7 +251,7 @@ func _refresh() -> void:
 		var detail := " • %d left" % int(u.get(charges, 0)) if charges != "" else ""
 		var cd: Dictionary = u.get("cooldowns", {})
 		var turns := maxi(0, int(cd.get(mode, 0)) - g.mission.turn)
-		button.call("configure", mode, key, ap, turns, reason, g.action == mode)
+		button.call("configure", mode, str(def.get("name", mode.capitalize())), key, ap, turns, reason, g.action == mode)
 		if charges != "": button.tooltip_text += detail
 	g.result_panel.visible = g.mission.result != ""
 	var cine_button: Button = g.overlay.find_child("CineButton", true, false)
