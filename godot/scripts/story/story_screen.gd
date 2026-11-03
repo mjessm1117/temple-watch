@@ -286,6 +286,10 @@ func _build_codex() -> void:
 	var tabs := HFlowContainer.new()
 	tabs.add_theme_constant_override("h_separation",6)
 	body.add_child(tabs)
+	var journal_button := UI.button("JOURNAL",_category.bind("journal"))
+	journal_button.toggle_mode = true
+	journal_button.button_pressed = codex_category == "journal"
+	tabs.add_child(journal_button)
 	for item in engine.table("KINDS"):
 		var category: String = item[0]
 		var all: Array = engine.codex_entries(campaign_state,category,false)
@@ -304,6 +308,10 @@ func _build_codex() -> void:
 	var list := UI.column(12)
 	list.size_flags_horizontal = SIZE_EXPAND_FILL
 	scroll.add_child(list)
+	if codex_category == "journal":
+		_build_journal(list)
+		body.add_child(UI.button("← Return to Temple",_finish))
+		return
 	list.add_child(UI.label(codex_category.to_upper() + "  /  ARCHIVE RECORDS",14,UI.GOLD))
 	var entries: Array = engine.codex_entries(campaign_state,codex_category,false)
 	entries.sort_custom(func(a,b): return int(campaign_state.codex.get(codex_category,{}).get(a.id,false)) > int(campaign_state.codex.get(codex_category,{}).get(b.id,false)))
@@ -324,6 +332,14 @@ func _build_codex() -> void:
 		content.add_child(UI.label(entry.lore if unlocked else "UNDISCOVERED · Encounter this record’s subject to unlock its history.",16,UI.TEXT if unlocked else UI.MUTED))
 	body.add_child(UI.label("New records unlock as missions, people and places become known to your Order.",13,UI.MUTED))
 	body.add_child(UI.button("← Return to Temple",_finish))
+
+func _build_journal(list: VBoxContainer) -> void:
+	var record: Dictionary = engine.journal(campaign_state)
+	list.add_child(UI.label("ERA %d  /  THE TEMPLE JOURNAL" % int(record.era),22,UI.GOLD))
+	for section in [["CHOICES REMEMBERED",record.choices],["PERSONAL ARCS",record.arcs],["FALLEN",record.fallen]]:
+		list.add_child(UI.label(str(section[0]),16,UI.ACCENT))
+		if section[1].is_empty(): list.add_child(UI.label("No entries yet.",14,UI.MUTED))
+		for line in section[1]: list.add_child(UI.label(str(line),16,UI.TEXT))
 
 func _category(category: String) -> void:
 	codex_category = category
