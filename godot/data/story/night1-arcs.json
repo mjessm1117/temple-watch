@@ -1,0 +1,144 @@
+{
+  "records": {
+    "N1_ARCS": [
+      {
+        "id": "arc_0",
+        "name": "Kira Venn",
+        "title": "The Weight of Warning",
+        "talk": "Kira keeps a second watch over the docking ring. She asks whether a warning is still useful when no one wants to hear it.",
+        "brief": "Kira marks a route through the service gantries. She asks you to trust the map she made by hand.",
+        "resolution": "Kira has watched the gates for three nights. She asks whether to lead the next watch or finally sleep.",
+        "choices": [
+          {
+            "label": "Keep Kira on the watch",
+            "bonus": {
+              "will": 5
+            }
+          },
+          {
+            "label": "Send Kira to rest",
+            "dark": 1,
+            "bonus": {
+              "crit": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "arc_1",
+        "name": "Tor Saalen",
+        "title": "A Mercy Remembered",
+        "talk": "Tor checks the treatment cells after lights out. He wants to know who will protect a prisoner when the guns fall silent.",
+        "brief": "Tor spots a wounded attacker by the east bulkhead. He asks for a corridor to bring them in alive.",
+        "resolution": "Tor has kept a list of the wounded on both sides. He asks whether to take responsibility for their care.",
+        "choices": [
+          {
+            "label": "Give Tor the ward",
+            "bonus": {
+              "will": 5
+            }
+          },
+          {
+            "label": "Release Tor from the ward",
+            "dark": 1,
+            "bonus": {
+              "crit": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "arc_2",
+        "name": "Sgt. Rhal Dax",
+        "title": "The Empty Chair",
+        "talk": "Rhal sets an extra place in the mess. He says a squad needs room for whoever comes home late.",
+        "brief": "Rhal points to a service lift he secured before dawn. He asks you to move the squad through it.",
+        "resolution": "Rhal has trained a replacement for every post. He asks whether to stay on the line or teach the next watch.",
+        "choices": [
+          {
+            "label": "Keep Rhal on the line",
+            "bonus": {
+              "will": 5
+            }
+          },
+          {
+            "label": "Put Rhal in training",
+            "dark": 1,
+            "bonus": {
+              "crit": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "arc_3",
+        "name": "Ilsa Myr",
+        "title": "Names in the Static",
+        "talk": "Ilsa listens to old comms after the Temple sleeps. She has found a voice she knows in an enemy transmission.",
+        "brief": "Ilsa traces the voice to a relay beneath the street. She asks for a quiet approach.",
+        "resolution": "Ilsa has the source file and a name. She asks whether to put it before the Council.",
+        "choices": [
+          {
+            "label": "Submit Ilsa\u2019s evidence",
+            "bonus": {
+              "will": 5
+            }
+          },
+          {
+            "label": "Seal Ilsa\u2019s source",
+            "dark": 1,
+            "bonus": {
+              "crit": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "arc_4",
+        "name": "Doc Bren",
+        "title": "The Open Door",
+        "talk": "Bren has moved a cot into the corridor. He says a locked infirmary helps no one outside it.",
+        "brief": "Bren spots an unused medical store near the objective. He asks for a minute to collect it.",
+        "resolution": "Bren has treated everyone who reached his door. He asks whether the ward should remain open after the siege.",
+        "choices": [
+          {
+            "label": "Keep Bren\u2019s ward open",
+            "bonus": {
+              "will": 5
+            }
+          },
+          {
+            "label": "Close the ward for rest",
+            "dark": 1,
+            "bonus": {
+              "crit": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "arc_5",
+        "name": "Grak Ordo",
+        "title": "The Oath at the Gate",
+        "talk": "Grak polishes a cracked plate of armor. He says the clan gave it to him when he chose to guard this gate.",
+        "brief": "Grak identifies a clan mark on a supply crate. He asks to challenge its bearer openly.",
+        "resolution": "Grak has an offer to return home. He asks whether his watch here is finished.",
+        "choices": [
+          {
+            "label": "Ask Grak to stay",
+            "bonus": {
+              "will": 5
+            }
+          },
+          {
+            "label": "Honor Grak\u2019s return",
+            "dark": 1,
+            "bonus": {
+              "crit": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

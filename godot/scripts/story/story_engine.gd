@@ -2,8 +2,11 @@ extends RefCounted
 ## Campaign-owned story state. The caller serializes `state` as a Dictionary.
 
 const BOND_NEED := [8, 10, 12, 14, 16, 18, 20, 22]
-const SOURCES := ["data-story", "data-era2", "data-era3", "data-saga", "data-codex", "data-life", "story-era3", "ui-codex", "tutorial", "wave10-choices", "wave10-talks"]
+const SOURCES := ["data-story", "data-era2", "data-era3", "data-saga", "data-codex", "data-life", "story-era3", "ui-codex", "tutorial", "wave10-choices", "wave10-talks", "night1-callbacks", "night1-arcs"]
 const ChoiceScenes = preload("res://scripts/story/story_choices.gd")
+const Callbacks = preload("res://scripts/story/callbacks_night1.gd")
+const Arcs = preload("res://scripts/story/arc_night1.gd")
+const Journal = preload("res://scripts/story/journal_night1.gd")
 var state: Dictionary
 var data: Dictionary = {}
 
@@ -57,6 +60,9 @@ func ensure_state(s: Dictionary) -> void:
 	if not s.has("pairs"): s.pairs = {}
 	if not s.has("codex"): s.codex = {}
 	if not s.has("eras"): s.eras = []
+	if not s.has("callback_seen"): s.callback_seen = {}
+	if not s.has("callback_rewarded"): s.callback_rewarded = {}
+	Arcs.ensure(s)
 	if not s.has("roster"):
 		s.roster = []
 		for key in table("CAST"):
@@ -84,6 +90,8 @@ func start_briefing(mission_id: String) -> Dictionary:
 		var a: Dictionary = options[i]
 		choices.append({"id":"brief:%d" % (i+1),"label":a.get("l",""),"text":a.get("d",""),"fx":a.get("fx",{}),"cost":a.get("cost",{})})
 	var scene := {"kind":"briefing","id":mission_id,"title":m.get("n",mission_id),"eyebrow":m.get("where","Mission briefing"),"text":_brief_text(mission_id,m),"goal":m.get("goal",""),"choices":choices}
+	Arcs.briefing(state,scene,table("N1_ARCS"))
+	Callbacks.apply(state,scene,table("N1_CALLBACKS"))
 	if mission_id == "dock":
 		var finale := finale_battle_effects(state)
 		scene.finale = finale
@@ -138,6 +146,7 @@ func start_debrief(result: Dictionary) -> Dictionary:
 	# --- wave10 story ---
 	if choices.is_empty(): choices = ChoiceScenes.debrief_choices(table("W10_DEBRIEF"),won)
 	var scene := {"kind":"debrief","id":id,"title":aftermath.get("t",m.get("n",id)),"eyebrow":"Mission complete" if won else "Mission lost","text":text + ("\n\n" + _saga_text(state,str(aftermath.get("text","")),aftermath.get("who","")) if not aftermath.is_empty() else ""),"choices":choices,"who":aftermath.get("who","")}
+	Callbacks.apply(state,scene,table("N1_CALLBACKS"))
 	state.pending = scene
 	return scene
 
@@ -182,6 +191,7 @@ func _apply_mission_flags(s: Dictionary, id: String, won: bool, result: Dictiona
 
 func advance_era(s: Dictionary) -> bool:
 	ensure_state(s)
+	Arcs.check_losses(s,table("N1_ARCS"))
 	var from: int = int(s.era)
 	if from >= 3 or not s.flags.get("boss_or_won" if from == 1 else "boss_ru_won",false) and not s.flags.get("temple_scarred" if from == 1 else "e2_bomb_fired",false): return false
 	var next: int = from+1
@@ -204,8 +214,10 @@ func next_temple_talk(s: Dictionary) -> Dictionary:
 	ensure_state(s)
 	# --- wave10 story ---
 	var pair_scene: Dictionary = ChoiceScenes.pair_talk(s,table("W10_PAIR_TALKS"))
-	if not pair_scene.is_empty(): return pair_scene
-	if int(s.era) != 1: return ChoiceScenes.temple_talk(s,table("W10_TALKS"))
+	if not pair_scene.is_empty(): return Callbacks.apply(s,pair_scene,table("N1_CALLBACKS"))
+	if int(s.era) != 1:
+		var later_talk: Dictionary = ChoiceScenes.temple_talk(s,table("W10_TALKS"))
+		return Callbacks.apply(s,later_talk,table("N1_CALLBACKS")) if not later_talk.is_empty() else {}
 	var visit_key := "%d|%d" % [int(s.step),int(s.story.done)]
 	if s.saga.get("visit","") != visit_key:
 		s.saga.visit = visit_key
@@ -214,7 +226,11 @@ func next_temple_talk(s: Dictionary) -> Dictionary:
 	for talk in table("TALKS"):
 		if s.saga.seen.has(talk.id) or not _cast_active(s,talk.who): continue
 		if _when(s,talk.get("when",{}),talk.who): ready.append(talk)
-	if ready.is_empty(): return ChoiceScenes.temple_talk(s,table("W10_TALKS"))
+	if ready.is_empty():
+		var arc_talk := Arcs.next_talk(s,table("N1_ARCS"))
+		if not arc_talk.is_empty(): return arc_talk
+		var extra_talk: Dictionary = ChoiceScenes.temple_talk(s,table("W10_TALKS"))
+		return Callbacks.apply(s,extra_talk,table("N1_CALLBACKS")) if not extra_talk.is_empty() else {}
 	var selected: Dictionary = {}
 	if int(s.saga.get("forced_count",0)) < 2:
 		for talk in ready:
@@ -222,7 +238,11 @@ func next_temple_talk(s: Dictionary) -> Dictionary:
 	if selected.is_empty() and s.saga.get("talked","") != visit_key:
 		for talk in ready:
 			if not talk.get("force",false): selected = talk; break
-	if selected.is_empty(): return ChoiceScenes.temple_talk(s,table("W10_TALKS"))
+	if selected.is_empty():
+		var arc_talk := Arcs.next_talk(s,table("N1_ARCS"))
+		if not arc_talk.is_empty(): return arc_talk
+		var extra_talk: Dictionary = ChoiceScenes.temple_talk(s,table("W10_TALKS"))
+		return Callbacks.apply(s,extra_talk,table("N1_CALLBACKS")) if not extra_talk.is_empty() else {}
 	var choices: Array = []
 	for i in selected.ch.size():
 		var c: Dictionary = selected.ch[i]
@@ -231,6 +251,7 @@ func next_temple_talk(s: Dictionary) -> Dictionary:
 		if fx.is_empty(): fx = table("W10_CHOICE_OVERRIDES").get(selected.id,{}).get(str(i),{})
 		choices.append({"id":"talk:%d" % i,"label":c.get("l",""),"text":_saga_text(s,str(c.get("say","")),selected.who),"fx":fx,"need":c.get("need",[])})
 	var scene := {"kind":"talk","id":selected.id,"who":selected.who,"name":_cast_name(s,selected.who),"title":selected.t,"eyebrow":"Temple conversation","text":_saga_text(s,selected.text,selected.who),"choices":choices,"forced":selected.get("force",false)}
+	Callbacks.apply(s,scene,table("N1_CALLBACKS"))
 	s.pending = scene
 	return scene
 
@@ -261,6 +282,7 @@ func next_council_vote(s: Dictionary) -> Dictionary:
 			var option: Dictionary = vote.opts[i]
 			choices.append({"id":"vote:%d" % i,"label":option.t,"fx":option.get("fx",{}),"pleases":option.get("pleases",[])})
 		var scene := {"kind":"vote","id":id,"title":vote.n,"eyebrow":"Jedi Council","text":vote.text,"choices":choices}
+		Callbacks.apply(s,scene,table("N1_CALLBACKS"))
 		s.pending = scene
 		return scene
 	return {}
@@ -339,6 +361,7 @@ func apply_choice(s: Dictionary, choice_id: String) -> Dictionary:
 		_apply_effects(s,c.get("fx",{}),scene.get("who",""))
 		# --- wave10 story ---
 		ChoiceScenes.apply(s,scene,c)
+		Arcs.chosen(s,scene,choice_id,table("N1_ARCS"))
 		if scene.kind == "briefing": s.approach = c.get("battle",c.get("fx",{}))
 		if scene.kind == "beat": s.battle_choice = c.get("battle",{})
 		if scene.kind == "talk":
@@ -358,6 +381,15 @@ func apply_choice(s: Dictionary, choice_id: String) -> Dictionary:
 		s.erase("pending")
 		return {"ok":true,"choice":c,"state":s}
 	return {"ok":false,"reason":"Choice unavailable"}
+
+func journal(s: Dictionary) -> Dictionary:
+	ensure_state(s)
+	return Journal.entries(s,table("N1_CALLBACKS"),table("N1_ARCS"))
+
+func era_interlude(s: Dictionary, from_era: int) -> Dictionary:
+	var scene := Journal.interlude(s,from_era,table("N1_CALLBACKS"))
+	s.pending = scene
+	return scene
 
 func _apply_effects(s: Dictionary, fx: Dictionary, who: String) -> void:
 	if fx.has("chance") and randf() >= float(fx.chance):

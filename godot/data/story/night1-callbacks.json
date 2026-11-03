@@ -1,0 +1,150 @@
+{
+  "records": {
+    "N1_CALLBACKS": [
+      {
+        "id": "callback_01",
+        "flag": "e1_strike_known",
+        "kind": "briefing",
+        "text": "You questioned the envoy; his warning puts guards on the west stair.",
+        "fx": {
+          "intel": 1
+        }
+      },
+      {
+        "id": "callback_02",
+        "flag": "e1_ambush_ready",
+        "kind": "debrief",
+        "text": "You kept the warning within the Order; the ambush teams are already in place.",
+        "fx": {
+          "favor": 1
+        }
+      },
+      {
+        "id": "callback_03",
+        "flag": "archive_backup",
+        "kind": "talk",
+        "text": "You copied the Archives to a hidden colony; one sealed index returns.",
+        "fx": {
+          "credits": 10
+        }
+      },
+      {
+        "id": "callback_04",
+        "flag": "e1_traitors",
+        "kind": "vote",
+        "text": "You kept the traitor list; the names narrow this search.",
+        "fx": {
+          "intel": 1
+        }
+      },
+      {
+        "id": "callback_05",
+        "flag": "e1_vault_read",
+        "kind": "briefing",
+        "text": "You opened the Ossus vault; its map marks a safer route.",
+        "fx": {
+          "favor": 1
+        }
+      },
+      {
+        "id": "callback_06",
+        "flag": "e1_defector",
+        "kind": "debrief",
+        "text": "You took in the Imperial defector; her report identifies a patrol.",
+        "fx": {
+          "credits": 10
+        }
+      },
+      {
+        "id": "callback_07",
+        "flag": "e1_refugees_in",
+        "kind": "talk",
+        "text": "You sheltered the Taris refugees; they warn you of a tunnel.",
+        "fx": {
+          "intel": 1
+        }
+      },
+      {
+        "id": "callback_08",
+        "flag": "e1_mando_honor",
+        "kind": "vote",
+        "text": "You honored the Mandalorian duel; the clan sends a scout.",
+        "fx": {
+          "favor": 1
+        }
+      },
+      {
+        "id": "callback_09",
+        "flag": "saresh_deal",
+        "kind": "briefing",
+        "text": "You made a deal with Saresh; his promised name reaches the Temple."
+      },
+      {
+        "id": "callback_10",
+        "flag": "e1_eleena_tracked",
+        "kind": "debrief",
+        "text": "You tracked Eleena Daru; her shuttle trace cuts through the noise."
+      },
+      {
+        "id": "callback_11",
+        "flag": "e1_docks_guarded",
+        "kind": "talk",
+        "text": "You posted Temple Guards at the docks; their watch catches a signal."
+      },
+      {
+        "id": "callback_12",
+        "flag": "e1_hutt_sold",
+        "kind": "vote",
+        "text": "You let the Hutt hold the schedule; the enemy now knows the patrol gaps."
+      },
+      {
+        "id": "callback_13",
+        "flag": "kira_foresight",
+        "kind": "briefing",
+        "text": "You believed Kira\u2019s vision; she recognizes the shape of this attack."
+      },
+      {
+        "id": "callback_14",
+        "flag": "tor_light",
+        "kind": "debrief",
+        "text": "You let Tor release Kessra; a former enemy passes on a warning."
+      },
+      {
+        "id": "callback_15",
+        "flag": "tor_blood",
+        "kind": "talk",
+        "text": "You allowed Tor\u2019s revenge; the silence between you follows this vote."
+      },
+      {
+        "id": "callback_16",
+        "flag": "ilsa_loyal",
+        "kind": "vote",
+        "text": "You paid Ilsa\u2019s debts; she brings the Council an unaltered report."
+      },
+      {
+        "id": "callback_17",
+        "flag": "bren_clinic",
+        "kind": "briefing",
+        "text": "You opened Bren\u2019s clinic; its patients know who crossed the lower city."
+      },
+      {
+        "id": "callback_18",
+        "flag": "grak_envoy",
+        "kind": "debrief",
+        "text": "You sent Grak as envoy; Clan Ordo answers his call."
+      },
+      {
+        "id": "callback_19",
+        "flag": "e2_bane_tracked",
+        "kind": "talk",
+        "text": "You sent trackers after the lone Sith; their last coordinates remain on file."
+      },
+      {
+        "id": "callback_20",
+        "flag": "e3_beacon_warned",
+        "kind": "vote",
+        "text": "You warned the Senate about Ro; the Beacon crew has time to prepare."
+      }
+    ]
+  }
+}

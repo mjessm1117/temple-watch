@@ -38,9 +38,9 @@ func continue_campaign() -> void:
 	story = Story.new(campaign.state)
 	active = true
 	var stage: String = campaign.state.get("flow_stage", "temple")
-	if stage in ["briefing", "debrief"]:
+	if stage in ["briefing", "debrief", "interlude"]:
 		screen = campaign.state.get("pending", {})
-		screen_return = "squad" if stage == "briefing" else "result"
+		screen_return = "squad" if stage == "briefing" else "result" if stage == "debrief" else "temple"
 		go("briefing" if stage == "briefing" else "dialogue")
 	elif stage in ["squad", "battle"]: go("squad")
 	else: go("temple")
@@ -102,7 +102,10 @@ func story_finished() -> void:
 			campaign.state.erase("battle_choice")
 			battle_game.set_process_unhandled_input(true)
 			battle_game._refresh()
-		_: go("temple")
+		_:
+			campaign.state.flow_stage = "temple"
+			campaign.state.erase("pending")
+			save(); go("temple")
 
 func launch_squad(ids: Array) -> bool:
 	if campaign.sith.project_status().defeated: return false
@@ -175,6 +178,7 @@ func finish_result() -> void:
 	go("temple")
 
 func advance_era() -> void:
+	var prior_era := int(campaign.state.era)
 	if story.advance_era(campaign.state):
 		campaign.state.teams = []; campaign.state.staff = {}; campaign.state.team_assignments = {}
 		campaign.state.field = {"list":[], "log":[]}
@@ -182,7 +186,10 @@ func advance_era() -> void:
 		campaign.state.erase("sith") # Each era starts a new, date-aligned strategic campaign.
 		campaign._migrate()
 		campaign.state.vote_month = 0
-		save(); go("temple")
+		screen = story.era_interlude(campaign.state,prior_era)
+		screen_return = "temple"
+		campaign.state.flow_stage = "interlude"
+		save(); go("dialogue")
 
 func open_intelligence(page: String = "operations") -> void:
 	if is_instance_valid(intelligence): intelligence.queue_free()
