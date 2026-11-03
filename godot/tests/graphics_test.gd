@@ -35,7 +35,7 @@ func run() -> void:
 		seen[str(game.mission.spec.get("theme","temple"))] = true
 		var env: Environment = game.scene_view.world.environment
 		check(env != null and game.terrain.get_child_count() > 0,"battle art loads: "+id)
-		check(env.ssao_enabled == (graphics.effective != "low"),"SSAO tier: "+id)
+		check(env.ssao_enabled == (graphics.effective == "high"),"SSAO tier: "+id)
 		check(game.scene_view.sun.shadow_enabled == (graphics.effective != "low"),"shadow tier: "+id)
 		if id == "cache":
 			await live_switch()
@@ -137,13 +137,14 @@ func resource_checks() -> void:
 
 func live_switch() -> void:
 	var before := hash([game.mission.board,game.mission.units,game.mission.cover_hp,game.mission.objective_state,game.mission.turn])
-	var env: Environment = game.scene_view.world.environment
 	for value in ["high","low","medium","high",tier]:
 		check(graphics.select_tier(value,false) == OK,"live switch "+value)
 		await frames()
+		var env: Environment = game.scene_view.world.environment
 		check(before == hash([game.mission.board,game.mission.units,game.mission.cover_hp,game.mission.objective_state,game.mission.turn]),"no gameplay mutation: "+value)
 		check(env.glow_enabled == (graphics.effective != "low"),"live glow: "+value)
-		check(is_equal_approx(env.glow_intensity,0.144 if graphics.effective == "medium" else 0.24),"restored glow intensity: "+value)
+		var glow := float(preload("res://scripts/gfx_theme_presets.gd").get_preset("ruins").glow)
+		check(is_equal_approx(env.glow_intensity,glow*(0.65 if graphics.effective == "medium" else 1.0)),"restored glow intensity: "+value)
 		var lod_count := 0
 		for instance in game.find_children("*","MultiMeshInstance3D",true,false):
 			if not instance.has_meta("graphics_lod"): continue

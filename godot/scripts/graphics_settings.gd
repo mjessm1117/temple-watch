@@ -5,6 +5,8 @@ const TIERS := ["low", "medium", "high"]
 const CONFIG := "user://graphics.cfg"
 const OVERRIDE := "user://override.cfg"
 const Resources = preload("res://scripts/graphics_resources.gd")
+const BattleArt = preload("res://scripts/env_art.gd")
+const Readability = preload("res://scripts/gfx_unit_readability.gd")
 var requested := "high"
 var effective := "high"
 var battle := false
@@ -99,9 +101,12 @@ func apply_globals() -> void:
 func apply_environment(env: Environment) -> void:
 	for property in ["ssao_enabled","ssil_enabled","glow_enabled","volumetric_fog_enabled"]:
 		var baseline = original(env,property)
-		env.set(property,baseline if effective != "low" else false)
+		env.set(property,baseline if (effective == "high" or property == "glow_enabled" and effective == "medium") else false)
 	for property in ["ssao_intensity","ssil_intensity","glow_intensity","volumetric_fog_density"]:
-		env.set(property,float(original(env,property))*(0.6 if effective == "medium" else 1.0))
+		env.set(property,float(original(env,property))*(0.65 if effective == "medium" else 1.0))
+	for property in ["fog_enabled","fog_height_density"]:
+		var baseline = original(env,property)
+		env.set(property,(baseline if effective != "low" else false) if property == "fog_enabled" else float(baseline)*(1.0 if effective == "high" else 0.0))
 
 func apply_node(reference: WeakRef) -> void:
 	var node = reference.get_ref()
@@ -114,7 +119,13 @@ func apply_node(reference: WeakRef) -> void:
 		node.screen_space_aa = original(node,"screen_space_aa") if high else (Viewport.SCREEN_SPACE_AA_DISABLED if RenderingServer.get_current_rendering_method() == "gl_compatibility" else Viewport.SCREEN_SPACE_AA_FXAA)
 		node.mesh_lod_threshold = (4.0 if battle and node == get_tree().root else float(original(node,"mesh_lod_threshold")))*(3.0 if low else 1.5 if not high else 1.0)
 		node.scaling_3d_scale = 0.75 if low and mobile_os() else original(node,"scaling_3d_scale")
-	if node is WorldEnvironment and node.environment: apply_environment(node.environment)
+	if node is WorldEnvironment and node.environment:
+		var owner = node.get_parent()
+		if owner != null and owner.has_method("_build_terrain") and owner.scene_view != null and owner.scene_view.sun != null:
+			var art = BattleArt.new()
+			art.apply_environment(node,owner.scene_view.sun,str(owner.mission.spec.get("theme","temple")))
+			art.free()
+		apply_environment(node.environment)
 	if node is Light3D:
 		original(node,"shadow_enabled")
 		if node is DirectionalLight3D: original(node,"light_angular_distance")
@@ -123,9 +134,23 @@ func apply_node(reference: WeakRef) -> void:
 	if node is GPUParticles3D or node is CPUParticles3D:
 		node.amount = maxi(1,roundi(float(original(node,"amount"))*(0.2 if low else 0.5 if not high else 1.0)))
 	if node is GeometryInstance3D:
+		Readability.apply(node)
 		if node.has_meta("graphics_lod"):
 			for property in ["visible","visibility_range_begin","visibility_range_end"]: original(node,property)
 			node.visible = original(node,"visible") if not low or int(node.get_meta("graphics_lod")) == 1 else false
 			for property in ["visibility_range_begin","visibility_range_end"]:
 				node.set(property,0.0 if low else float(original(node,property))*(0.6 if not high else 1.0))
 		resources.apply(node,low)
+
+func _process(_delta: float) -> void:
+	# The existing action camera marks only ability/attack cinematic shots.
+	for child in get_tree().root.get_children():
+		if not child.has_method("_build_terrain") or child.camera == null: continue
+		Readability.update_selection(child)
+		var enabled: bool = effective == "high" and bool(child.cinematic)
+		if bool(child.camera.get_meta("gfx_dof",false)) == enabled: continue
+		child.camera.set_meta("gfx_dof",enabled)
+		if child.camera.attributes == null: child.camera.attributes = CameraAttributesPractical.new()
+		child.camera.attributes.dof_blur_far_enabled = enabled
+		child.camera.attributes.dof_blur_far_distance = 8.0
+		child.camera.attributes.dof_blur_far_transition = 8.0

@@ -36,6 +36,10 @@ func setup(cam: Camera3D, ui: Control) -> void:
 	view_camera = cam
 	overlay = ui
 
+func _tier() -> String:
+	var graphics := get_node_or_null("/root/Graphics")
+	return str(graphics.effective) if graphics else "high"
+
 func _material(color: Color, glow := true) -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
@@ -55,6 +59,7 @@ func _sphere(at: Vector3, radius: float, color: Color) -> MeshInstance3D:
 	return node
 
 func _flash(at: Vector3, color: Color, energy: float, duration: float) -> void:
+	if _tier() == "low": return
 	var light := OmniLight3D.new()
 	light.light_color = color
 	light.light_energy = energy
@@ -67,6 +72,7 @@ func _flash(at: Vector3, color: Color, energy: float, duration: float) -> void:
 	tween.tween_callback(light.queue_free)
 
 func burst(at: Vector3, color: Color, count := 8) -> void:
+	count = mini(count,4 if _tier() == "low" else 8 if _tier() == "medium" else count)
 	var rng := RandomNumberGenerator.new(); rng.randomize()
 	for i in range(count):
 		var spark := _sphere(at, 0.025 if i % 3 else 0.04, color)
@@ -83,10 +89,15 @@ func _scorch(at: Vector3) -> void:
 	decal.mesh = mesh
 	decal.material_override = _material(Color("25201e"), false)
 	decal.position = Vector3(at.x, maxf(0.018, at.y - 1.08), at.z)
+	decal.set_meta("born_turn",_battle_turn())
 	add_child(decal)
 	_scorches.append(decal)
-	if _scorches.size() > 32:
+	if _scorches.size() > (12 if _tier() == "low" else 24):
 		_scorches.pop_front().queue_free()
+
+func _battle_turn() -> int:
+	var game := get_parent()
+	return int(game.mission.turn) if game != null and game.has_method("_build_terrain") and game.mission != null else 0
 
 func bolt(from: Vector3, to: Vector3, enemy: bool, miss: bool) -> void:
 	var color := Color("ff5364") if enemy else Color("70dfff")
@@ -125,7 +136,7 @@ func bolt(from: Vector3, to: Vector3, enemy: bool, miss: bool) -> void:
 	tween.chain().tween_callback(func() -> void:
 		_flash(end, Color("ffd7a4"), 0.9, 0.1)
 		burst(end, Color("e8c896") if miss else color, 10)
-		if miss: _scorch(end)
+		_scorch(end)
 		core.queue_free(); glow.queue_free())
 
 func shockwave(from: Vector3, to: Vector3) -> void:
@@ -137,12 +148,15 @@ func shockwave(from: Vector3, to: Vector3) -> void:
 	tween.tween_property(wave, "scale", Vector3(6, 0.12, 6), 0.36)
 	tween.chain().tween_callback(func() -> void:
 		burst(to, Color("9cefff"), 12)
+		ring(to - Vector3.UP * 0.8, Color("a1eeff"), 1.6)
+		if _tier() == "high": ring(to - Vector3.UP * 0.78, Color("c7f6ff"), 2.4)
 		cover_chunks(to)
 		wave.queue_free())
 
 func saber(from: Vector3, to: Vector3) -> void:
 	_cue("ignite")
 	var mid := (from + to) * 0.5 + Vector3.UP * 0.45
+	var ribbon := _saber_ribbon(from,to)
 	var trail := _sphere(mid, 0.13, Color("80eaff"))
 	trail.scale = Vector3(0.8, 0.8, 4.5)
 	trail.look_at(to, Vector3.UP)
@@ -151,13 +165,39 @@ func saber(from: Vector3, to: Vector3) -> void:
 	tween.tween_property(trail, "position", to, 0.15)
 	tween.tween_property(trail, "scale", Vector3.ZERO, 0.1)
 	tween.tween_callback(trail.queue_free)
+	var ribbon_fade := _paced_tween()
+	ribbon_fade.tween_property(ribbon,"transparency",1.0,0.24)
+	ribbon_fade.tween_callback(ribbon.queue_free)
 	burst(to, Color("f1fbff"), 12)
 	get_tree().create_timer(0.14/float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed"))).timeout.connect(func() -> void:
 		if is_instance_valid(self): _cue("clash"))
 
+func _saber_ribbon(from: Vector3, to: Vector3) -> MeshInstance3D:
+	var steps := 4 if _tier() == "low" else 10
+	var across := (to-from).cross(Vector3.UP).normalized()
+	if across.length_squared() < 0.01: across = Vector3.RIGHT
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in steps:
+		var a := float(i)/steps
+		var b := float(i+1)/steps
+		var pa := from.lerp(to,a)+Vector3.UP*(sin(a*PI)*0.7)
+		var pb := from.lerp(to,b)+Vector3.UP*(sin(b*PI)*0.7)
+		var wa := 0.26*(1.0-a)+0.03
+		var wb := 0.26*(1.0-b)+0.03
+		for point in [pa-across*wa,pa+across*wa,pb+across*wb,pa-across*wa,pb+across*wb,pb-across*wb]: surface.add_vertex(point)
+	var ribbon := MeshInstance3D.new()
+	ribbon.mesh = surface.commit()
+	var mat := _material(Color("6deaff"))
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	ribbon.material_override = mat
+	add_child(ribbon)
+	return ribbon
+
 func cover_chunks(at: Vector3) -> void:
 	var rng := RandomNumberGenerator.new(); rng.randomize()
-	for i in range(8):
+	for i in (3 if _tier() == "low" else 5 if _tier() == "medium" else 8):
 		var mesh := BoxMesh.new(); mesh.size = Vector3(0.14, 0.1, 0.14)
 		var chunk := MeshInstance3D.new(); chunk.mesh = mesh
 		chunk.material_override = _material(Color("9a9d98"), false)
@@ -226,6 +266,15 @@ func ability(id: String, from: Vector3, to: Vector3) -> void:
 	else: ring(to, Color("79d3e2"), 0.7)
 
 func _process(delta: float) -> void:
+	var current_turn := _battle_turn()
+	for i in range(_scorches.size()-1,-1,-1):
+		var mark := _scorches[i]
+		if not is_instance_valid(mark): _scorches.remove_at(i); continue
+		var age := current_turn-int(mark.get_meta("born_turn",current_turn))
+		if age >= 3:
+			mark.queue_free(); _scorches.remove_at(i)
+		else:
+			mark.transparency = clampf(float(age)/3.0,0.0,0.9)
 	for i in range(float_anchors.size()-1,-1,-1):
 		var entry: Dictionary = float_anchors[i]
 		if not is_instance_valid(entry.label): float_anchors.remove_at(i); continue
