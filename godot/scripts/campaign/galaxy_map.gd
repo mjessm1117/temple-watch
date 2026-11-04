@@ -30,10 +30,11 @@ var pointer_inside := false
 var overview_target := Vector3(0,0,-1.7)
 var overview_zoom := 79.0
 var haze_timer := 0.0
+var mini := false
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(400, 330)
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	custom_minimum_size = Vector2.ZERO if mini else Vector2(400, 330)
+	mouse_filter = Control.MOUSE_FILTER_IGNORE if mini else Control.MOUSE_FILTER_STOP
 	var container := SubViewportContainer.new(); container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	container.stretch = true; container.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(container)
 	viewport = SubViewport.new(); viewport.own_world_3d = true; viewport.transparent_bg = false
@@ -159,6 +160,17 @@ func _draw() -> void:
 
 func _draw_labels(overlay: Control) -> void:
 	var font := ThemeDB.fallback_font
+	if mini:
+		for title in planets:
+			var p := projected(planets[title].position)
+			if not Rect2(Vector2(5, 5), size - Vector2(10, 10)).has_point(p): continue
+			var threat := preload("res://scripts/campaign/events11_engine.gd").threat(campaign.state, title)
+			if threat >= 2:
+				overlay.draw_arc(p, 8, 0, TAU, 16, Color("ef6a5d"), 2, true)
+		for offer in offers:
+			var p := projected(planets[offer.planet].position)
+			overlay.draw_circle(p + Vector2(7, -7), 3, Color("f6bf67"))
+		return
 	var bounds := Rect2(Vector2(12,28),size-Vector2(24,54))
 	var compact := Phone.narrow(Phone.window_size())
 	var selected_planet := str(offers[selected].planet) if selected < offers.size() else "Coruscant"

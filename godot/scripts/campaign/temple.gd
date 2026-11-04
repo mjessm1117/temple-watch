@@ -11,7 +11,7 @@ const Base = preload("res://scripts/campaign/strat_base.gd")
 const HomeBadges = preload("res://scripts/campaign/home_badges.gd")
 const HomeTabs = preload("res://scripts/campaign/home_tabs.gd")
 const HomeResources = preload("res://scripts/campaign/home_resources.gd")
-const Home12RoomGrid = preload("res://scripts/campaign/home12_room_grid.gd")
+const GalaxyCard = preload("res://scripts/campaign/home12_galaxy_card.gd")
 const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 var build_slot := "b0"
 var field_team: Array = []
@@ -32,6 +32,8 @@ const TempleView = preload("res://scripts/campaign/temple_view.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
 var room_picker: PanelContainer
 var phone_grid: Control
+var mini_galaxy: Control
+var more_panel: PanelContainer
 
 func _ready() -> void:
 	campaign = get_node("/root/CampaignFlow").session()
@@ -64,7 +66,7 @@ func _build_shell() -> void:
 	var head := UI.panel(Color(0.035, 0.075, 0.09, 0.94)); add_child(head)
 	head.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	head.offset_left = 8 if compact else 20; head.offset_right = -8 if compact else -20
-	head.offset_top = 4 if compact else 14; head.offset_bottom = 80 if compact else 106
+	head.offset_top = 3 if compact else 14; head.offset_bottom = 95 if compact else 106
 	if compact:
 		var head_style: StyleBoxFlat = head.get_theme_stylebox("panel").duplicate()
 		head_style.set_content_margin_all(6); head.add_theme_stylebox_override("panel", head_style)
@@ -89,31 +91,47 @@ func _build_shell() -> void:
 		for child in row.get_children():
 			if child is Label: child.autowrap_mode = TextServer.AUTOWRAP_OFF
 	var foot_bg := ColorRect.new(); add_child(foot_bg); foot_bg.color = Color(0.02, 0.05, 0.065, 0.84)
-	foot_bg.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); foot_bg.offset_top = -108 if compact else -97
+	foot_bg.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); foot_bg.offset_top = -55 if compact else -97
 	foot_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var footer := UI.column(7); add_child(footer); footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	footer.offset_left = 8 if compact else 20; footer.offset_right = -8 if compact else -20
-	footer.offset_top = -105 if compact else -88; footer.offset_bottom = -5 if compact else -14
+	footer.offset_top = -51 if compact else -88; footer.offset_bottom = -4 if compact else -14
 	notice_label = UI.label("Select a room to manage the Order.  •  Gold: module ready  •  Dark: awaiting construction", 14, UI.MUTED)
 	if compact: notice_label.hide()
 	notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; footer.add_child(notice_label)
-	var nav := GridContainer.new(); nav.columns = 5 if compact else 10
+	var nav := GridContainer.new(); nav.columns = 6 if compact else 10
 	nav.add_theme_constant_override("h_separation", 4 if compact else 7)
 	nav.add_theme_constant_override("v_separation", 4); footer.add_child(nav)
 	var names := ["Galaxy", "Arsenal", "Roster", "Research", "Build", "Command", "Legacy", "Teams", "Codex"]
-	var titles := {"Galaxy":"Galaxy Map", "Arsenal":"Armory", "Roster":"Squad", "Research":"Archives", "Build":"Engineering", "Command":"Council / Story", "Legacy":"Memorial", "Teams":"Teams", "Codex":"Journal"}
+	var titles := {"Galaxy":"Galaxy", "Arsenal":"Armory", "Roster":"Squad", "Research":"Archives", "Build":"Build", "Command":"Council", "Legacy":"Memorial", "Teams":"Teams", "Codex":"Journal"}
 	for name in names:
 		var target: String = "Council" if name == "Command" else name
 		var button := UI.button(name, _change_page.bind(target)); button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.custom_minimum_size.y = 44
+		button.custom_minimum_size.y = 48 if compact else 44
 		HomeTabs.decorate(button, name)
-		button.text = "     " + str(titles[name])
-		if compact: button.add_theme_font_size_override("font_size", 12)
+		button.text = "   " + str(titles[name])
+		if compact: button.add_theme_font_size_override("font_size", 11)
 		button.mouse_entered.connect(func(): temple_view.sound.play())
-		nav.add_child(button); nav_buttons[name] = button
+		if not compact or name in ["Galaxy", "Arsenal", "Research", "Build", "Command"]: nav.add_child(button)
+		nav_buttons[name] = button
 	var menu_button := UI.button("Menu", func(): get_node("/root/CampaignFlow").go("menu"))
+	menu_button.name = "MenuCommand"
 	menu_button.custom_minimum_size.y = 44; menu_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	nav.add_child(menu_button)
+	if compact:
+		var more := UI.button("⋯  More", _toggle_more); more.name = "MoreCommands"
+		more.custom_minimum_size.y = 48; more.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		nav.add_child(more)
+		more_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.98)); add_child(more_panel)
+		more_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+		more_panel.offset_left = 8; more_panel.offset_right = -8
+		more_panel.offset_top = -112; more_panel.offset_bottom = -57
+		var extras := HBoxContainer.new(); more_panel.add_child(extras)
+		for name in ["Roster", "Legacy", "Teams", "Codex"]:
+			var button: Button = nav_buttons[name]
+			button.custom_minimum_size.y = 48; button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			extras.add_child(button)
+		extras.add_child(menu_button); more_panel.hide()
+	else: nav.add_child(menu_button)
 	var readout := UI.column(5); add_child(readout); readout.position = Vector2(25, 124); readout.size.x = 200
 	readout.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	readout.add_child(UI.label("THE ORDER ENDURES", 13, UI.ACCENT))
@@ -128,11 +146,15 @@ func _build_shell() -> void:
 	readout.add_child(UI.label("%d staff · squad %d\nSith Darkness %d / 12" % [campaign.state.facility.workers.size(), campaign.squad_capacity(), campaign.darkness_segments()], 13, UI.ACCENT))
 	readout.add_child(UI.label("1–7 stations\nG galaxy · Esc close", 12, Color("627d87")))
 	if compact: readout.hide()
+	mini_galaxy = GalaxyCard.new(); add_child(mini_galaxy)
+	mini_galaxy.setup(campaign, compact)
+	mini_galaxy.opened.connect(_open_galaxy)
+	mini_galaxy.position = Vector2(8, 100) if compact else Vector2(25, 340)
 	station_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.97)); add_child(station_panel)
 	station_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	station_panel.anchor_left = 0.0 if compact else 0.35; station_panel.offset_left = 8 if compact else 0
-	station_panel.offset_top = 84 if compact else 113; station_panel.offset_right = -8 if compact else -20
-	station_panel.offset_bottom = -110 if compact else -100
+	station_panel.offset_top = 98 if compact else 113; station_panel.offset_right = -8 if compact else -20
+	station_panel.offset_bottom = -57 if compact else -100
 	station_panel.visible = panel_open
 	var column := UI.column(8); station_panel.add_child(column)
 	var top := HBoxContainer.new(); column.add_child(top)
@@ -143,27 +165,28 @@ func _build_shell() -> void:
 	page_content = UI.column(13); page_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(page_content)
 	if compact:
 		_build_room_picker()
-		phone_grid = Home12RoomGrid.new(); add_child(phone_grid)
-		phone_grid.setup(temple_view.rooms, campaign.state)
-		phone_grid.room_selected.connect(_open_room)
-		phone_grid.galaxy_selected.connect(_open_galaxy)
-		move_child(phone_grid, 1)
+		phone_grid = null
 
 func _build_room_picker() -> void:
 	room_picker = UI.panel(Color(0.045, 0.09, 0.115, 0.98)); room_picker.visible = false
 	room_picker.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	room_picker.offset_left = 8; room_picker.offset_right = -8; room_picker.offset_top = 84; room_picker.offset_bottom = -110
+	room_picker.offset_left = 8; room_picker.offset_right = -8; room_picker.offset_top = 98; room_picker.offset_bottom = -57
 	add_child(room_picker)
 	var scroll := ScrollContainer.new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	room_picker.add_child(scroll)
 	var list := UI.column(5); list.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(list)
-	list.add_child(UI.button("CLOSE ROOMS", _toggle_rooms))
+	var close := UI.button("CLOSE ROOMS", _toggle_rooms); close.custom_minimum_size.y = 44; list.add_child(close)
 	for id in temple_view.rooms:
 		var info: Dictionary = temple_view.rooms[id]
-		list.add_child(UI.button("%s  ·  %s" % [info.name, info.status], _select_phone_room.bind(str(id))))
+		var button := UI.button("%s  ·  %s" % [info.name, info.status], _select_phone_room.bind(str(id)))
+		button.name = "DrawerRoom_" + str(id); button.custom_minimum_size.y = 44
+		list.add_child(button)
 
 func _toggle_rooms() -> void:
 	if room_picker != null: room_picker.visible = not room_picker.visible
+
+func _toggle_more() -> void:
+	if more_panel != null: more_panel.visible = not more_panel.visible
 
 func _select_phone_room(id: String) -> void:
 	room_picker.hide()
