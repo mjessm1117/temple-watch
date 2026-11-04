@@ -4,6 +4,7 @@ const Shot = preload("res://scripts/shot.gd")
 const InputControls = preload("res://scripts/input_controls.gd")
 const Ability = preload("res://scripts/abilities_engine.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
+const Rules12 = preload("res://scripts/rules12_actions.gd")
 var g
 var techniques: HFlowContainer
 var techniques_open := false
@@ -11,6 +12,11 @@ var targeting = preload("res://scripts/combat_targeting.gd").new()
 var night
 var phone
 var aim_ui
+
+static func ap_pips(unit: Dictionary) -> String:
+	var maximum: int = int(unit.get("max_ap", Rules12.ACTIONS_PER_TURN))
+	var available: int = clampi(int(unit.get("ap", 0)), 0, maximum)
+	return "◆".repeat(available) + "◇".repeat(maximum - available)
 
 static func move_color(ap_cost: int) -> Color:
 	return Color("60b9ff") if ap_cost == 1 else Color("ffd16a")
@@ -40,12 +46,11 @@ func _refresh_highlights(force: bool = false) -> void:
 		var target: Dictionary = g.mission.unit_by_id(g.target_id)
 		if not target.is_empty(): _border(g.hover_highlights, Shot.pos(target), Color("71ed9a") if str(target.side) == "player" else Color("ff746b"), 0.23)
 	if force and g.action == "move" and int(u.ap) > 0:
-		var reach: Dictionary = g.mission.paths(u, int(u.mob) * 2)
-		for p in reach.costs:
+		var blue: Dictionary = g.mission.reach_tiles(u, 1)
+		var yellow: Dictionary = g.mission.reach_tiles(u, 2) if int(u.ap) >= 2 else blue
+		for p in yellow.costs:
 			if p == Shot.pos(u): continue
-			var cost: int = int(reach.costs[p])
-			if cost > int(u.mob) and int(u.ap) < 2: continue
-			var ap_cost := 1 if cost <= int(u.mob) else 2
+			var ap_cost := 1 if blue.costs.has(p) else 2
 			var color := move_fill(ap_cost)
 			var tile: MeshInstance3D = g._box(g.range_highlights, Vector3(p.x, Shot.elevation(g.mission, p) * 0.7 + 0.10, p.y), Vector3(0.79, 0.025, 0.79), color)
 			var fill_material: StandardMaterial3D = g._mat(color, true)
@@ -227,7 +232,7 @@ func _refresh() -> void:
 	var objective: Dictionary = g.mission.objective_status()
 	var clock_note := " · %d turns left" % int(objective.turns_left) if int(objective.turns_left) >= 0 else " · clock starts on reveal" if objective.get("clock_trigger", "") == "concealment" else ""
 	g.objective_label.text = "TURN %d · %s%s · %s" % [g.mission.turn,objective.label,clock_note,str(objective.phase).to_upper()]
-	g.selected_label.text = "%s\n%s%s\nHP %s\nAP %s\nFOCUS %d  •  MEDPACS %d%s" % [u.get("name", ""), u.get("class_name", ""), "  WOUNDED" if bool(u.get("wounded", false)) else "", "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, (2 if g.mission.modern else 3) - int(u.get("ap", 0)))), int(u.get("focus_left", 0)), int(u.get("medpacs", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
+	g.selected_label.text = "%s\n%s%s\nHP %s\nAP %s\nFOCUS %d  •  MEDPACS %d%s" % [u.get("name", ""), u.get("class_name", ""), "  WOUNDED" if bool(u.get("wounded", false)) else "", "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), ap_pips(u), int(u.get("focus_left", 0)), int(u.get("medpacs", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
 	if u.has("ammo"): g.selected_label.text += "\nAMMO %d/%d" % [int(u.ammo), int(u.clip)]
 	# --- wave10 story ---
 	var flow = g.get_node_or_null("/root/CampaignFlow")

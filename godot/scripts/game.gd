@@ -250,7 +250,9 @@ func _frame_target() -> void:
 	var target: Dictionary = mission.unit_by_id(target_id)
 	if actor.is_empty() or target.is_empty(): return
 	var midpoint := Vector3((float(actor.x) + float(target.x)) * 0.5, 0, (float(actor.y) + float(target.y)) * 0.5)
-	_glide_to(midpoint, 0.38, BattleCamera.target_zoom(mission, Vector2(float(actor.x), float(actor.y)).distance_to(Vector2(float(target.x), float(target.y)))))
+	midpoint = preload("res://scripts/battle12_aim.gd").phone_frame_point(self, midpoint)
+	var framing_zoom: float = BattleCamera.target_zoom(mission, Vector2(float(actor.x), float(actor.y)).distance_to(Vector2(float(target.x), float(target.y))))
+	_glide_to(midpoint, 0.38, preload("res://scripts/battle12_aim.gd").frame_zoom(self, framing_zoom))
 
 func _cancel_order() -> void:
 	target_id = -1

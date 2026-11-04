@@ -19,7 +19,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	overlay = Control.new(); overlay.name = "PhoneBattleHUD"
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE; root.add_child(overlay)
-	var strip := PanelContainer.new(); strip.anchor_right = 1.0; strip.offset_bottom = 46
+	var strip := PanelContainer.new(); strip.anchor_right = 1.0; strip.offset_bottom = 48
 	var strip_style: StyleBoxFlat = night.panel_style(); strip_style.set_content_margin_all(2)
 	strip.add_theme_stylebox_override("panel", strip_style); overlay.add_child(strip)
 	var heading := HBoxContainer.new(); strip.add_child(heading)
@@ -27,18 +27,15 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	g.objective_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	g.objective_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	g.objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
+	unit_card.custom_minimum_size = Vector2(155, 44); heading.add_child(unit_card)
 	heading.add_child(_button("◀", func() -> void: _cycle_unit(-1)))
 	heading.add_child(_button("▶", func() -> void: _cycle_unit(1)))
 	heading.add_child(_button("CENTER", g._recenter))
 	heading.add_child(_button("END TURN", _end_turn))
 	heading.add_child(_button("☰", _show_menu))
-	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
-	unit_card.offset_left = 6; unit_card.offset_right = 230; unit_card.offset_top = 48; unit_card.offset_bottom = 94
-	overlay.add_child(unit_card)
 	target_card = _button("TARGET", _toggle.bind("target")); target_card.name = "TargetCard"
-	target_card.anchor_left = 1.0; target_card.anchor_right = 1.0
-	target_card.offset_left = -230; target_card.offset_right = -6; target_card.offset_top = 48; target_card.offset_bottom = 94
-	overlay.add_child(target_card)
+	target_card.visible = false; overlay.add_child(target_card)
 	var tray := PanelContainer.new(); tray.name = "AbilityTray"
 	tray.anchor_top = 1.0; tray.anchor_right = 1.0; tray.anchor_bottom = 1.0
 	tray.offset_top = -76
@@ -113,7 +110,7 @@ func refresh(from_game: bool = false) -> void:
 	else: action_name.text = "Choose an action · tap the map to preview"
 	_update_actions(from_game)
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
-	unit_card.text = "%s  HP %s  %s  ▾" % [str(unit.get("name", "UNIT")).left(12), str(unit.get("hp", "?")), "◆".repeat(int(unit.get("ap", 0))) + "◇".repeat(maxi(0, (2 if g.mission.modern else 3) - int(unit.get("ap", 0))))]
+	unit_card.text = "%s  HP %s  %s  ▾" % [str(unit.get("name", "UNIT")).left(12), str(unit.get("hp", "?")), g.hud_controls.ap_pips(unit)]
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	target_card.text = "%s  %s  ▾" % [str(target.get("name", "TARGET")), g.hit_big_label.text]
 	popup.visible = open_card != ""
@@ -175,6 +172,10 @@ func _unit_details(unit: Dictionary) -> String:
 	lines.append("FOCUS %d  ·  MEDPACS %d" % [int(unit.get("focus_left", 0)), int(unit.get("medpacs", 0))])
 	if unit.has("ammo"): lines.append("AMMO %d/%d" % [int(unit.ammo), int(unit.clip)])
 	if g.mission.get("momentum") != null: lines.append("MOMENTUM %d/10" % int(g.mission.momentum))
+	var cooldowns: Dictionary = unit.get("cooldowns", {})
+	for ability in cooldowns:
+		var remaining: int = maxi(0, int(cooldowns[ability]) - g.mission.turn)
+		if remaining > 0: lines.append("%s  ·  %d TURN CD" % [str(g.mission.abilities.get(ability, {}).get("name", ability)).to_upper(), remaining])
 	var partners: Array[String] = []
 	for mate_id in unit.get("bondmates", {}):
 		var mate: Dictionary = g.mission.unit_by_id(int(mate_id))
