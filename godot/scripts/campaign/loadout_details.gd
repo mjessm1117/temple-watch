@@ -48,56 +48,20 @@ static func modules_text(r: Dictionary) -> String:
 			modules.append("%s Mk %s" % [item.get("n", key), ["I", "II", "III"][clampi(int(r.gear.mk.get(kind + "." + key, 1)) - 1, 0, 2)]])
 	return " · ".join(modules) if not modules.is_empty() else "MODULES  —"
 
-static func card(c, r: Dictionary, action: Callable) -> PanelContainer:
-	if Phone.narrow(Phone.window_size()):
-		var compact := S.panel(); compact.name = "Card_" + str(r.id)
-		compact.custom_minimum_size = Vector2(155, 100)
-		var content := S.column(3); compact.add_child(content)
-		var select := S.button(str(r.n), action); select.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		select.custom_minimum_size.y = 38; content.add_child(select)
-		content.add_child(S.label("%s · R%d · HP %d" % [r.cls, int(r.rank), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 12, S.GOLD))
-		content.add_child(S.label(status(c, r), 12, S.GREEN if fit(r) else S.RED))
-		return compact
-	var p := S.panel(); p.name = "Card_" + str(r.id); p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var col := S.column(4); p.add_child(col)
-	var heading := S.button(str(r.n), action); heading.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	heading.icon = S.icon(str(r.cls).to_lower()); heading.add_theme_font_size_override("font_size", 17)
-	heading.custom_minimum_size.y = 36; col.add_child(heading)
-	col.add_child(S.label("%s  ·  %s  ·  R%d" % [nickname(r), r.cls, int(r.rank)], 12, S.GOLD))
-	col.add_child(S.label(status(c, r), 11, S.GREEN if fit(r) else S.RED))
-	var temple: PackedStringArray = preload("res://scripts/campaign/temple_rooms.gd").active_descriptions(c.state)
-	var temple_text := "Temple bonuses active: " + (", ".join(temple) if not temple.is_empty() else "none")
-	var temple_label := S.label(temple_text, 11, S.CYAN)
-	temple_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; temple_label.tooltip_text = temple_text; col.add_child(temple_label)
-	# --- wave10 story ---
-	var bond_badge := S.label("BOND  " + preload("res://scripts/campaign/bond_overlay.gd").summary(c.state,str(r.id)),11,S.CYAN)
-	bond_badge.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	bond_badge.tooltip_text = bond_badge.text; col.add_child(bond_badge)
-	var stats := Gear.battle_stats(c, str(r.id))
-	for key in ["hp", "aim", "will"]:
-		var row := HBoxContainer.new(); col.add_child(row)
-		var l := S.label(key.to_upper(), 11, S.MUTED); l.custom_minimum_size.x = 38; row.add_child(l)
-		var bar := ProgressBar.new(); bar.show_percentage = false; bar.custom_minimum_size = Vector2(50, 7)
-		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL; bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		bar.max_value = 20 if key == "hp" else 120; bar.value = int(stats.get(key, 0))
-		bar.add_theme_stylebox_override("background", S.box(Color("213238"), Color.TRANSPARENT, 0))
-		bar.add_theme_stylebox_override("fill", S.box(S.GREEN if key == "hp" else S.CYAN if key == "aim" else S.GOLD, Color.TRANSPARENT, 0)); row.add_child(bar)
-		var value := S.label(str(int(stats.get(key, 0))), 12); value.custom_minimum_size.x = 26; value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; row.add_child(value)
-	var gear_label := S.label(gear_text(r).replace("\n", "  /  "), 12)
-	gear_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; gear_label.tooltip_text = gear_text(r); col.add_child(gear_label)
-	var detail := modules_text(r)
-	var utility: Dictionary = Data.get_table("gear", "UTIL").get(str(r.gear.get("util", "none")), {})
-	if r.gear.get("util", "none") != "none": detail += " · " + str(utility.get("n", r.gear.util))
-	var mods := S.label(detail, 11, S.MUTED); mods.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; mods.tooltip_text = detail; col.add_child(mods)
-	var skills := HBoxContainer.new(); skills.add_theme_constant_override("separation", 3); col.add_child(skills)
-	var abilities: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/abilities.json"))
-	for key in kit(r):
-		var chip := TextureRect.new(); chip.texture = S.icon(ability_icon(str(key)))
-		chip.custom_minimum_size = Vector2(21, 21); chip.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		chip.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		chip.tooltip_text = str(abilities.get(key, {}).get("name", str(key).capitalize())); chip.mouse_filter = Control.MOUSE_FILTER_STOP; skills.add_child(chip)
-	if not fit(r): p.modulate = Color("899194")
-	return p
+static func card(c, r: Dictionary, action: Callable, portrait: Texture2D = null) -> PanelContainer:
+	var compact := S.panel(); compact.name = "Card_" + str(r.id)
+	compact.add_theme_stylebox_override("panel", S.box(S.PANEL, S.EDGE, 4))
+	compact.custom_minimum_size = Vector2(128, 62); compact.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var content := S.column(2); compact.add_child(content)
+	var select := S.button(str(r.n), action); select.alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	select.custom_minimum_size.y = 44; select.clip_text = true
+	select.add_theme_font_size_override("font_size", 12); content.add_child(select)
+	if portrait != null:
+		var face := Sprite2D.new(); face.texture = portrait; face.position = Vector2(21, 21)
+		face.scale = Vector2(0.33, 0.33); select.add_child(face)
+	content.add_child(S.label("%s · R%d · HP %d" % [r.cls, int(r.rank), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 10, S.GOLD))
+	if not fit(r): compact.modulate = Color("899194")
+	return compact
 
 static func ability_icon(key: String) -> String:
 	return {"strike":"strike", "reviveStim":"stabilize", "forceHeal":"heal", "forceRevive":"stabilize", "rapidFire":"shoot", "deadeye":"mark", "saberThrow":"strike", "runGun":"shoot", "battleMed":"heal", "mindTrick":"panic", "hunker":"guard", "rally":"guard", "barrier":"barrier", "stun":"stunned", "sweep":"strike", "subdue":"disarm", "suppress":"shoot", "scan":"mark", "rocket":"grenade"}.get(key, key)
