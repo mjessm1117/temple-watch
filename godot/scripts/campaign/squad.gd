@@ -5,6 +5,7 @@ const Stage = preload("res://scripts/campaign/loadout_stage.gd")
 const Actor = preload("res://scripts/campaign/loadout_actor.gd")
 const Arsenal = preload("res://scripts/campaign/loadout_arsenal.gd")
 const Gear = preload("res://scripts/campaign/gear.gd")
+const Phone = preload("res://scripts/phone_layout.gd")
 var capacity := 4
 var flow: Node
 var selected: Array = []
@@ -17,6 +18,7 @@ var portrait_actors: Dictionary = {}
 var stage: Node3D
 var stage_container: SubViewportContainer
 var card_row: HBoxContainer
+var card_scroll: ScrollContainer
 var footer: HBoxContainer
 var header: PanelContainer
 var drawer: PanelContainer
@@ -42,7 +44,11 @@ func _ready() -> void:
 		if selected.size() < capacity and not selected.has(id): selected.append(id)
 	var bg := ColorRect.new(); bg.color = S.BG; bg.set_anchors_and_offsets_preset(PRESET_FULL_RECT); add_child(bg)
 	_build_stage(); _build_header(); _build_footer()
-	card_row = HBoxContainer.new(); card_row.add_theme_constant_override("separation", 12); add_child(card_row)
+	card_row = HBoxContainer.new(); card_row.add_theme_constant_override("separation", 12)
+	if Phone.narrow(Phone.window_size()):
+		card_scroll = ScrollContainer.new(); card_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		add_child(card_scroll); card_scroll.add_child(card_row)
+	else: add_child(card_row)
 	drawer = S.panel(); add_child(drawer); drawer.hide()
 	for r in c.state.roster: _portrait(r)
 	_make_audio()
@@ -57,21 +63,22 @@ func _build_stage() -> void:
 	stage_container.add_child(viewport); stage = Stage.new(); viewport.add_child(stage)
 
 func _build_header() -> void:
+	var compact := Phone.narrow(Phone.window_size())
 	header = S.panel(); add_child(header); var row := HBoxContainer.new(); header.add_child(row)
 	var title := S.column(3); title.size_flags_horizontal = SIZE_EXPAND_FILL; row.add_child(title)
-	title.add_child(S.label("JEDI TEMPLE  /  HANGAR 07  /  DEPLOYMENT", 12, S.CYAN))
-	title.add_child(S.label("SQUAD LOADOUT", 32))
-	title.add_child(S.label("Choose up to %d. Equip for the mission. Bring everyone home." % capacity, 13, S.MUTED))
+	if not compact: title.add_child(S.label("JEDI TEMPLE  /  HANGAR 07  /  DEPLOYMENT", 12, S.CYAN))
+	title.add_child(S.label("SQUAD LOADOUT", 20 if compact else 32))
+	if not compact: title.add_child(S.label("Choose up to %d. Equip for the mission. Bring everyone home." % capacity, 13, S.MUTED))
 	var info := S.column(5); row.add_child(info)
 	resources = S.label("", 14, S.GOLD); resources.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; info.add_child(resources)
 	var option: Dictionary = flow.session().state.get("launch_option", {})
 	var mission := str(option.get("n", option.get("mission", "Detention Line"))).to_upper().replace("_", " ")
-	info.add_child(S.label("OPERATION  /  " + mission, 16, S.CYAN))
+	info.add_child(S.label("OPERATION  /  " + mission, 12 if compact else 16, S.CYAN))
 	var mission_id := str(option.get("mission", "rescue"))
 	var hint := "Select a soldier to inspect gear or swap with the roster."
 	if preload("res://scripts/campaign/battle_bridge.gd").map_path(mission_id).ends_with("rescue.json") and mission_id != "rescue":
 		hint = "Battlefield: Detention Line · free Mira and reach evacuation."
-	info.add_child(S.label(hint, 12, S.MUTED))
+	if not compact: info.add_child(S.label(hint, 12, S.MUTED))
 
 func _build_footer() -> void:
 	footer = HBoxContainer.new(); footer.add_theme_constant_override("separation", 16); add_child(footer)
@@ -79,16 +86,31 @@ func _build_footer() -> void:
 	var text := S.column(2); text.size_flags_horizontal = SIZE_EXPAND_FILL; footer.add_child(text)
 	counter = S.label("", 17, S.CYAN); text.add_child(counter)
 	notice = S.label("Click a soldier to inspect  ·  Esc returns to the lineup", 12, S.MUTED); text.add_child(notice)
+	if Phone.narrow(Phone.window_size()): notice.hide()
 	deploy = S.button("DEPLOY →", _deploy); deploy.custom_minimum_size = Vector2(210, 48)
+	if Phone.narrow(Phone.window_size()): deploy.custom_minimum_size = Vector2(100, 38)
 	deploy.add_theme_font_size_override("font_size", 19)
 	deploy.add_theme_stylebox_override("normal", S.box(Color("254651"), S.CYAN, 12)); footer.add_child(deploy); wire_button(deploy)
 
 func _layout() -> void:
 	if not is_instance_valid(header): return
+	if Phone.narrow(Phone.window_size()):
+		header.visible = focus_index < 0; footer.visible = focus_index < 0
+		header.position = Vector2(6, 5); header.size = Vector2(size.x - 12, 56)
+		footer.position = Vector2(6, size.y - 48); footer.size = Vector2(size.x - 12, 42)
+		stage_container.position = Vector2(0, 64); stage_container.size = Vector2(size.x, 78)
+		stage_container.custom_minimum_size.y = 78
+		card_scroll.position = Vector2(6, 146); card_scroll.size = Vector2(size.x - 12, maxf(65, size.y - 200))
+		card_scroll.visible = focus_index < 0
+		stage_container.visible = focus_index < 0
+		drawer.position = Vector2(6, 5); drawer.size = Vector2(size.x - 12, size.y - 10)
+		card_row.reset_size()
+		return
 	header.position = Vector2(24, 16); header.size = Vector2(size.x - 48, 100)
 	footer.position = Vector2(24, size.y - 62); footer.size = Vector2(size.x - 48, 48)
 	var width := size.x - (432 if focus_index >= 0 else 0)
 	stage_container.position = Vector2(0, 120); stage_container.size = Vector2(width, maxf(160, size.y - 432))
+	stage_container.custom_minimum_size.y = maxf(160, size.y - 432)
 	card_row.position = Vector2(24, size.y - 312); card_row.size = Vector2(width - 48, 236)
 	drawer.position = Vector2(size.x - 420, 128); drawer.size = Vector2(396, size.y - 204)
 	card_row.reset_size()

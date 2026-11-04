@@ -7,6 +7,7 @@ const OVERRIDE := "user://override.cfg"
 const Resources = preload("res://scripts/graphics_resources.gd")
 const BattleArt = preload("res://scripts/env_art.gd")
 const Readability = preload("res://scripts/gfx_unit_readability.gd")
+const Phone = preload("res://scripts/phone_layout.gd")
 var requested := "high"
 var effective := "high"
 var battle := false
@@ -21,13 +22,22 @@ static func default_tier(os_name: String = OS.get_name(), web := OS.has_feature(
 static func phone_ui_scale(size: Vector2i) -> float:
 	return 1.2 if mini(size.x, size.y) > 0 and mini(size.x, size.y) < 900 else 1.0
 
+func update_window_layout() -> void:
+	if DisplayServer.window_get_size() == Vector2i.ZERO and get_tree().root.size.x < 486:
+		get_tree().root.size = Vector2i(1366, 768)
+	var physical := Phone.window_size()
+	var base := physical if Phone.narrow(physical) else Vector2i(1366, 768)
+	if get_tree().root.content_scale_size != base: get_tree().root.content_scale_size = base
+	var factor := phone_ui_scale(physical) if DisplayServer.window_get_size().x > 0 or Phone.narrow(physical) else 1.0
+	if get_tree().root.content_scale_factor != factor: get_tree().root.content_scale_factor = factor
+
 static func effective_tier(wanted: String, renderer: String) -> String:
 	return "low" if renderer == "gl_compatibility" else wanted
 
 func _ready() -> void:
-	get_tree().root.content_scale_factor = phone_ui_scale(DisplayServer.window_get_size())
+	update_window_layout()
 	get_tree().root.size_changed.connect(func():
-		get_tree().root.content_scale_factor = phone_ui_scale(DisplayServer.window_get_size())
+		update_window_layout()
 		apply_all.call_deferred())
 	requested = read_tier()
 	# Automated fixtures can select quality without modifying a player's preferences.
@@ -80,8 +90,86 @@ func status_text() -> String:
 	return "Active: %s. Changes saved." % effective.capitalize()
 
 func _added(node: Node) -> void:
-	if node is Button or node is Viewport or node is WorldEnvironment or node is Light3D or node is GeometryInstance3D or node is GPUParticles3D or node is CPUParticles3D:
+	var report := node is Control and node.get_script() != null and str(node.get_script().resource_path).ends_with("sith_screen.gd")
+	var story := node is Control and node.get_script() != null and str(node.get_script().resource_path).ends_with("story_screen.gd")
+	if report or story or node is Button or node is Label or node is Viewport or node is WorldEnvironment or node is Light3D or node is GeometryInstance3D or node is GPUParticles3D or node is CPUParticles3D:
 		apply_node.call_deferred(weakref(node))
+		if report:
+			node.child_entered_tree.connect(func(_child: Node) -> void: _ensure_phone_report_close.call_deferred(weakref(node)))
+			node.child_entered_tree.connect(func(_child: Node) -> void: _adapt_phone_report.call_deferred(weakref(node)))
+		if story:
+			node.child_entered_tree.connect(func(_child: Node) -> void: _adapt_phone_story.call_deferred(weakref(node)))
+
+func _ensure_phone_report_close(reference: WeakRef) -> void:
+	var screen = reference.get_ref()
+	if not is_instance_valid(screen) or not Phone.narrow(Phone.window_size()) or screen.has_node("PhoneClose"): return
+	var close := Button.new(); close.name = "PhoneClose"; close.text = "CLOSE"
+	close.anchor_left = 1.0; close.anchor_right = 1.0
+	close.offset_left = -110; close.offset_right = -8; close.offset_top = 8; close.offset_bottom = 48
+	close.pressed.connect(screen._close)
+	screen.add_child(close)
+
+func _adapt_phone_report(reference: WeakRef) -> void:
+	var screen = reference.get_ref()
+	if not is_instance_valid(screen) or not Phone.narrow(Phone.window_size()) or not is_instance_valid(screen.body): return
+	var body: VBoxContainer = screen.body
+	if body.get_child_count() < 5 or body.has_node("PhoneTabScroll"): return
+	var margin: MarginContainer = body.get_parent()
+	for side in ["left", "right"]: margin.add_theme_constant_override("margin_" + side, 8)
+	for side in ["top", "bottom"]: margin.add_theme_constant_override("margin_" + side, 6)
+	body.add_theme_constant_override("separation", 5)
+	var heading: HBoxContainer = body.get_child(0)
+	heading.get_child(1).hide()
+	heading.get_child(2).hide()
+	var title: VBoxContainer = heading.get_child(0)
+	(title.get_child(1) as Label).add_theme_font_size_override("font_size", 23)
+	var tabs: HBoxContainer = body.get_child(2)
+	var tab_scroll := ScrollContainer.new(); tab_scroll.name = "PhoneTabScroll"
+	tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tab_scroll.custom_minimum_size.y = 40; body.add_child(tab_scroll); body.move_child(tab_scroll, 2)
+	tabs.reparent(tab_scroll)
+	tab_scroll.get_h_scroll_bar().modulate.a = 0.0
+	var project_box: VBoxContainer = body.get_child(1).get_child(1)
+	var project_row: HBoxContainer = project_box.get_child(0)
+	if project_row.get_child_count() > 1:
+		var date: Label = project_row.get_child(1)
+		date.reparent(project_box)
+		date.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	(project_box.get_child(2) as Label).text = "Conduit -2 · Stronghold -1 · Final pursuit -2"
+	var content: VBoxContainer = screen.page_content
+	for child in content.get_children():
+		if not child is HBoxContainer: continue
+		var position := child.get_index()
+		var stack := VBoxContainer.new(); stack.add_theme_constant_override("separation", 8)
+		content.add_child(stack); content.move_child(stack, position)
+		for column in child.get_children():
+			column.reparent(stack)
+			if column is Control: column.custom_minimum_size.x = 0
+		child.queue_free()
+
+func _adapt_phone_story(reference: WeakRef) -> void:
+	var screen = reference.get_ref()
+	if not is_instance_valid(screen) or not Phone.narrow(Phone.window_size()) or screen.mode == "codex": return
+	if not is_instance_valid(screen.outer_frame) or not is_instance_valid(screen.body): return
+	var outer: MarginContainer = screen.outer_frame
+	for side in ["left", "right"]: outer.add_theme_constant_override("margin_" + side, 8)
+	for side in ["top", "bottom"]: outer.add_theme_constant_override("margin_" + side, 6)
+	var body: VBoxContainer = screen.body
+	if body.get_child_count() < 4: return
+	body.add_theme_constant_override("separation", 4)
+	var row: HBoxContainer = body.get_child(2)
+	if row.get_child_count() < 2: return
+	row.get_child(0).hide()
+	var frame: Control = row.get_child(1)
+	frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.get_child(3).hide()
+	var content: VBoxContainer = screen.choices_box.get_parent()
+	if not content.has_node("PhoneSpeaker"):
+		var speaker := Label.new(); speaker.name = "PhoneSpeaker"
+		speaker.text = "SPEAKER  " + str(screen.scene_data.get("name", "Jedi Council"))
+		speaker.add_theme_font_size_override("font_size", 14)
+		content.add_child(speaker); content.move_child(speaker, 0)
 
 func original(object: Object, property: String) -> Variant:
 	var key := "graphics_"+property
@@ -118,8 +206,23 @@ func apply_environment(env: Environment) -> void:
 func apply_node(reference: WeakRef) -> void:
 	var node = reference.get_ref()
 	if not is_instance_valid(node) or not node.is_inside_tree() or node.is_queued_for_deletion(): return
+	if node is Control and node.get_script() != null and str(node.get_script().resource_path).ends_with("sith_screen.gd"):
+		_ensure_phone_report_close(reference)
+		_adapt_phone_report(reference)
+		return
+	if node is Control and node.get_script() != null and str(node.get_script().resource_path).ends_with("story_screen.gd"):
+		_adapt_phone_story(reference)
+		return
 	if node is Button:
-		node.custom_minimum_size.y = maxf(float(original(node,"custom_minimum_size").y),72.0) if phone_ui_scale(DisplayServer.window_get_size()) > 1.0 else original(node,"custom_minimum_size").y
+		var minimum := 38.0 if Phone.narrow(Phone.window_size()) else 72.0
+		var scaled := DisplayServer.window_get_size().x > 0 or Phone.narrow(Phone.window_size())
+		node.custom_minimum_size.y = maxf(float(original(node,"custom_minimum_size").y),minimum) if scaled and phone_ui_scale(Phone.window_size()) > 1.0 else original(node,"custom_minimum_size").y
+		return
+	if node is Label:
+		if not node.has_meta("phone_font_size"): node.set_meta("phone_font_size", node.get_theme_font_size("font_size"))
+		var base := int(node.get_meta("phone_font_size"))
+		var inside_room := node.get_parent() is Button and str(node.get_parent().name).begins_with("Room_")
+		node.add_theme_font_size_override("font_size", maxi(base, 12) if Phone.narrow(Phone.window_size()) and not inside_room else base)
 		return
 	var high := effective == "high"
 	var low := effective == "low"
@@ -155,7 +258,7 @@ func apply_node(reference: WeakRef) -> void:
 func _process(_delta: float) -> void:
 	# The existing action camera marks only ability/attack cinematic shots.
 	for child in get_tree().root.get_children():
-		if phone_ui_scale(DisplayServer.window_get_size()) > 1.0 and child.has_method("_deploy") and child.has_method("_layout") and is_instance_valid(child.footer):
+		if phone_ui_scale(Phone.window_size()) > 1.0 and child.has_method("_deploy") and child.has_method("_layout") and is_instance_valid(child.footer):
 			# Keep the deployment controls between the stage and cards on short screens.
 			child.stage_container.size.y = 130.0
 			child.footer.position.y = 250.0

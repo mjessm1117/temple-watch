@@ -6,6 +6,7 @@ signal field_selected(key: String)
 const Data = preload("res://scripts/campaign/data.gd")
 const Art = preload("res://scripts/campaign/galaxy_art.gd")
 const Intel = preload("res://scripts/campaign/galaxy_intel.gd")
+const Phone = preload("res://scripts/phone_layout.gd")
 var campaign
 var selected := 0
 var viewport: SubViewport
@@ -159,11 +160,14 @@ func _draw() -> void:
 func _draw_labels(overlay: Control) -> void:
 	var font := ThemeDB.fallback_font
 	var bounds := Rect2(Vector2(12,28),size-Vector2(24,54))
+	var compact := Phone.narrow(Phone.window_size())
+	var selected_planet := str(offers[selected].planet) if selected < offers.size() else "Coruscant"
 	for title in planets:
+		if compact and title != focused and title != selected_planet and title != "Coruscant": continue
 		var p := projected(planets[title].position)
 		if not bounds.has_point(p): continue
 		var active: bool = title == hovered or title == focused
-		var label_size := 15 if active else 12
+		var label_size := 16 if active else 14 if Phone.narrow(Phone.window_size()) else 12
 		var color := Color("dbe7e4") if active else Color("91afb9")
 		var threat := preload("res://scripts/campaign/events11_engine.gd").threat(campaign.state, title)
 		var offset := Vector2(14,18)
@@ -175,7 +179,7 @@ func _draw_labels(overlay: Control) -> void:
 		overlay.draw_string_outline(font,p+offset,title,HORIZONTAL_ALIGNMENT_LEFT,-1,label_size,4,Color("061017"))
 		overlay.draw_string(font,p+offset,title,HORIZONTAL_ALIGNMENT_LEFT,-1,label_size,color)
 		if threat >= 2:
-			overlay.draw_string(font,p+offset+Vector2(0,15),"THREAT %d/5" % threat,HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("ef6a5d"))
+			overlay.draw_string(font,p+offset+Vector2(0,15),"THREAT %d/5" % threat,HORIZONTAL_ALIGNMENT_LEFT,-1,12 if Phone.narrow(Phone.window_size()) else 10,Color("ef6a5d"))
 	for offer in offers:
 		var p := marker_position(offer.index)
 		if not bounds.has_point(p): continue
@@ -185,7 +189,7 @@ func _draw_labels(overlay: Control) -> void:
 		overlay.draw_arc(p,11*pulse,0,TAU,40,Color(color,0.7),1.2,true)
 		overlay.draw_circle(p,6,color)
 		overlay.draw_string(font,p+Vector2(-4,4),str(int(offer.index)+1),HORIZONTAL_ALIGNMENT_LEFT,-1,11,Color("081317"))
-		if offer.index != selected and hovered != offer.planet: continue
+		if compact or offer.index != selected and hovered != offer.planet: continue
 		var text_width := font.get_string_size(offer.name,HORIZONTAL_ALIGNMENT_LEFT,-1,13).x
 		var label_pos := p+Vector2(18,4)
 		if label_pos.x+text_width > size.x-10: label_pos.x = p.x-18-text_width
@@ -203,9 +207,9 @@ func _draw_labels(overlay: Control) -> void:
 		var p := projected(ship.position)
 		if bounds.has_point(p):
 			overlay.draw_arc(p,6,0,TAU,16,Color("a7c7cc"),1,true)
-			overlay.draw_string(font,p+Vector2(10,-5),str(ship.get_meta("label")),HORIZONTAL_ALIGNMENT_LEFT,-1,11,Color("a7c7cc"))
+			if not compact: overlay.draw_string(font,p+Vector2(10,-5),str(ship.get_meta("label")),HORIZONTAL_ALIGNMENT_LEFT,-1,11,Color("a7c7cc"))
 	overlay.draw_string(font,Vector2(18,25),"LIVE HOLOMAP  /  " + (focused.to_upper() if not focused.is_empty() else "REPUBLIC SPACE"),HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("79d3e2"))
-	overlay.draw_string(font,Vector2(18,size.y-15),"SCROLL zoom   ·   DRAG / WASD pan   ·   CLICK inspect",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("8aa2a5"))
+	overlay.draw_string(font,Vector2(18,size.y-15),"DRAG to pan · TAP a signal" if compact else "SCROLL zoom   ·   DRAG / WASD pan   ·   CLICK inspect",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("8aa2a5"))
 
 func _on_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:

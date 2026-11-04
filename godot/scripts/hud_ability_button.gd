@@ -6,6 +6,7 @@ var hotkey := ""
 var cost := ""
 var cooldown := 0
 var active := false
+var compact := false
 
 static func name_layout(value: String, button_width: float) -> Dictionary:
 	var font := ThemeDB.fallback_font
@@ -41,14 +42,18 @@ func _draw() -> void:
 	var blue := Color("7ecde7") if not disabled else Color("67737d")
 	draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), Color("111d29"), true)
 	draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), gold, false, 2.0 if active else 1.0)
-	draw_rect(Rect2(6, 5, 19, 17), Color("30404b"), true)
-	draw_string(ThemeDB.fallback_font, Vector2(9, 18), hotkey, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
-	var c := Vector2(29, size.y * 0.55)
-	var layout := name_layout(display_name, size.x)
-	var lines: Array = layout.lines
-	for i in range(lines.size()):
-		draw_string(ThemeDB.fallback_font, Vector2(44, 30 if lines.size() == 1 else 23 + i * 12), str(lines[i]), HORIZONTAL_ALIGNMENT_LEFT, -1, int(layout.size), Color("edf3f4") if not disabled else Color("87919b"))
-	draw_string(ThemeDB.fallback_font, Vector2(44, 51), "%s AP" % cost, HORIZONTAL_ALIGNMENT_LEFT, size.x - 47, 12, gold)
+	var c := Vector2(size.x * 0.5, size.y * 0.49) if compact else Vector2(29, size.y * 0.55)
+	if compact:
+		draw_string(ThemeDB.fallback_font, Vector2(4, 12), hotkey, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, gold)
+		draw_string(ThemeDB.fallback_font, Vector2(size.x - 16, size.y - 5), cost, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, gold)
+	else:
+		draw_rect(Rect2(6, 5, 19, 17), Color("30404b"), true)
+		draw_string(ThemeDB.fallback_font, Vector2(9, 18), hotkey, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
+		var layout := name_layout(display_name, size.x)
+		var lines: Array = layout.lines
+		for i in range(lines.size()):
+			draw_string(ThemeDB.fallback_font, Vector2(44, 30 if lines.size() == 1 else 23 + i * 12), str(lines[i]), HORIZONTAL_ALIGNMENT_LEFT, -1, int(layout.size), Color("edf3f4") if not disabled else Color("87919b"))
+		draw_string(ThemeDB.fallback_font, Vector2(44, 51), "%s AP" % cost, HORIZONTAL_ALIGNMENT_LEFT, size.x - 47, 12, gold)
 	match ability_id:
 		"move":
 			draw_line(c + Vector2(-9, 7), c + Vector2(7, -7), blue, 3)

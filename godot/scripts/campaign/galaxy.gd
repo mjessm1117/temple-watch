@@ -7,6 +7,7 @@ const GalaxyMap = preload("res://scripts/campaign/galaxy_map.gd")
 const Intel = preload("res://scripts/campaign/galaxy_intel.gd")
 const Details = preload("res://scripts/campaign/galaxy_details.gd")
 const Art = preload("res://scripts/campaign/galaxy_art.gd")
+const Phone = preload("res://scripts/phone_layout.gd")
 var campaign: Campaign
 var selected := 0
 var detail: VBoxContainer
@@ -42,13 +43,15 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		elif event.keycode == KEY_ENTER and page == "Briefing": _launch(); get_viewport().set_input_as_handled()
 
 func _build() -> void:
+	var compact := Phone.narrow(Phone.window_size())
 	var bg := ColorRect.new(); bg.color = Color("0a1113"); bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); add_child(bg)
 	var outer := UI.column(10); outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	outer.offset_left = 22; outer.offset_top = 16; outer.offset_right = -22; outer.offset_bottom = -12; add_child(outer)
+	outer.offset_left = 8 if compact else 22; outer.offset_top = 5 if compact else 16
+	outer.offset_right = -8 if compact else -22; outer.offset_bottom = -5 if compact else -12; add_child(outer)
 	var head := HBoxContainer.new(); outer.add_child(head)
 	var title := UI.column(0); title.size_flags_horizontal = Control.SIZE_EXPAND_FILL; head.add_child(title)
-	title.add_child(UI.label("J E D I   T E M P L E   /   W A R   R O O M",12,Color("79d3e2")))
-	title.add_child(UI.label("Galaxy command",30,Color("dbe7e4")))
+	if not compact: title.add_child(UI.label("J E D I   T E M P L E   /   W A R   R O O M",12,Color("79d3e2")))
+	title.add_child(UI.label("Galaxy command",20 if compact else 30,Color("dbe7e4")))
 	back_button = UI.button("←  GALAXY", _overview); back_button.visible = false; head.add_child(back_button)
 	head.add_child(UI.button("SITH INTELLIGENCE",func(): get_node("/root/CampaignFlow").open_intelligence()))
 	head.add_child(UI.button("←  TEMPLE",_temple))
@@ -59,29 +62,38 @@ func _build() -> void:
 	var map_panel := UI.panel(Color("0f191c")); map_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL; left.add_child(map_panel)
 	var style := map_panel.get_theme_stylebox("panel").duplicate(); style.set_content_margin_all(0); map_panel.add_theme_stylebox_override("panel",style)
 	map_view = GalaxyMap.new(); map_view.campaign = campaign; map_view.clip_contents = true; map_panel.add_child(map_view)
+	if compact: map_view.custom_minimum_size = Vector2(260, 130)
 	map_view.field_selected.connect(_field); map_view.mission_selected.connect(_select); map_view.planet_selected.connect(_planet); map_view.region_selected.connect(_region)
 	var region_chips := HFlowContainer.new(); region_chips.add_theme_constant_override("h_separation",4); left.add_child(region_chips)
 	for row in Data.get_table("galaxy","REGIONS"):
 		var b := UI.button(str(row[1]),_region.bind(str(row[0]))); b.custom_minimum_size.y = 28
 		b.add_theme_font_size_override("font_size",12); b.tooltip_text = str(row[3]); region_chips.add_child(b)
+	if compact: region_chips.hide()
 	var legend := HFlowContainer.new(); legend.add_theme_constant_override("h_separation",14); left.add_child(legend)
 	legend.add_child(UI.label("RISK",12,UI.MUTED))
 	for i in 4: legend.add_child(UI.label("● " + str(Data.get_table("galaxy","RISK")[i][1]),12,Intel.COLORS[i]))
 	legend.add_child(UI.label("◇ Field op   /   Red haze: Darkness + unrest",12,UI.MUTED))
 	for item in legend.get_children(): item.autowrap_mode = TextServer.AUTOWRAP_OFF
+	if compact: legend.hide()
 	var offer_scroll := ScrollContainer.new(); offer_scroll.custom_minimum_size.y = 82; offer_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; left.add_child(offer_scroll)
+	if compact: offer_scroll.custom_minimum_size.y = 44
 	chips = HFlowContainer.new(); chips.size_flags_horizontal = Control.SIZE_EXPAND_FILL; offer_scroll.add_child(chips)
-	var right := UI.panel(Color("15232a")); right.custom_minimum_size.x = 390; body.add_child(right)
-	var column := UI.column(10); column.custom_minimum_size.x = 360; right.add_child(column)
-	tabs = HBoxContainer.new(); column.add_child(tabs)
+	var right := UI.panel(Color("15232a")); right.custom_minimum_size.x = 250 if compact else 390; body.add_child(right)
+	var column := UI.column(10); column.custom_minimum_size.x = 225 if compact else 360; right.add_child(column)
+	tabs = HBoxContainer.new()
+	if compact:
+		var tab_scroll := ScrollContainer.new(); tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		tab_scroll.custom_minimum_size.y = 39; column.add_child(tab_scroll); tab_scroll.add_child(tabs)
+	else: column.add_child(tabs)
 	for tab in ["Briefing","Regions","Field ops","Teams","Sith ops"]:
-		var button := UI.button(tab,_tab.bind(tab)); button.add_theme_font_size_override("font_size",11)
+		var button := UI.button(tab,_tab.bind(tab)); button.add_theme_font_size_override("font_size",12 if compact else 11)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL; tabs.add_child(button)
 	scroll = ScrollContainer.new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
 	detail = UI.column(10); detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(detail)
 	launch_button = UI.button("MISSION BRIEFING  →",_launch); column.add_child(launch_button)
 	message = UI.label("Select a world or a signal.  ↑ ↓ offers  ·  Enter briefing  ·  Esc back  ·  T Temple",12,Color("8aa2a5")); outer.add_child(message)
+	if compact: message.hide()
 	_refresh_chips()
 
 func _refresh_chips() -> void:
@@ -102,6 +114,8 @@ func _show_details() -> void:
 	if not campaign.state.options.is_empty(): launch_button.disabled = launch_button.disabled or campaign.default_squad(campaign.state.options[selected]).is_empty()
 	var project: Dictionary = campaign.sith.project_status()
 	status.text = "Cr %d · Intel %d · Favor %d  |  Order Darkness %d/100  |  Sith Darkness %d/12 · next escalation day %d  |  M%d D%d" % [campaign.state.res.credits,campaign.state.res.intel,campaign.state.res.favor,campaign.state.orderDark,project.segments,project.next_escalation,campaign.state.month,campaign.state.day]
+	if Phone.narrow(Phone.window_size()):
+		status.text = "Cr %d · Intel %d · Favor %d · Darkness %d/100 · Sith %d/12 · M%d D%d" % [campaign.state.res.credits,campaign.state.res.intel,campaign.state.res.favor,campaign.state.orderDark,project.segments,campaign.state.month,campaign.state.day]
 	launch_button.disabled = launch_button.disabled or project.defeated
 	if campaign.state.get("twin",{}).get("stage", "") == "b":
 		detail.add_child(UI.label("FRONT B · fresh squad · up to 4, at most 2 Jedi",16,UI.GOLD))

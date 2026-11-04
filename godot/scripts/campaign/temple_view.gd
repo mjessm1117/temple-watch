@@ -6,6 +6,7 @@ const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 const Rooms = preload("res://scripts/campaign/temple_rooms.gd")
 const Geometry = preload("res://scripts/campaign/temple_geometry.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
+const Phone = preload("res://scripts/phone_layout.gd")
 var viewport: SubViewport
 var camera: Camera3D
 var world: Node3D
@@ -77,7 +78,7 @@ func _make_button(info: Dictionary) -> void:
 	add_child(b); buttons[info.id] = b
 	if not info.built: b.add_child(preload("res://scripts/campaign/home_room_outline.gd").new())
 	var name_label := Label.new(); name_label.text = str(info.name).to_upper()
-	name_label.add_theme_font_size_override("font_size", 10 if info.kind in ["spire", "council"] else 11)
+	name_label.add_theme_font_size_override("font_size", 12 if Phone.narrow(Phone.window_size()) else 10 if info.kind in ["spire", "council"] else 11)
 	name_label.add_theme_color_override("font_color", info.color if info.built else Color("e0c49a"))
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
@@ -102,6 +103,7 @@ func _make_button(info: Dictionary) -> void:
 		battle_plate.set_corner_radius_all(2); battle_line.add_theme_stylebox_override("normal", battle_plate)
 		battle_line.add_theme_color_override("font_shadow_color", Color("02090c"))
 		battle_line.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(battle_line)
+		if Phone.narrow(Phone.window_size()): battle_line.hide()
 	for label in [name_label, line]:
 		var plate := StyleBoxFlat.new(); plate.bg_color = Color(0.018, 0.045, 0.057, 0.82)
 		plate.set_corner_radius_all(2); label.add_theme_stylebox_override("normal", plate)
@@ -109,8 +111,8 @@ func _make_button(info: Dictionary) -> void:
 		label.add_theme_color_override("font_shadow_color", Color("02090c"))
 		label.add_theme_constant_override("shadow_offset_x", 1); label.add_theme_constant_override("shadow_offset_y", 1)
 	name_label.name = "RoomName"; line.name = "RoomDetail"
-	name_label.visible = true
-	line.visible = true
+	name_label.visible = not Phone.narrow(Phone.window_size())
+	line.visible = not Phone.narrow(Phone.window_size())
 	b.mouse_entered.connect(_hover.bind(str(info.id)))
 	b.focus_entered.connect(_hover.bind(str(info.id)))
 	b.mouse_exited.connect(_unhover.bind(str(info.id)))
@@ -122,16 +124,16 @@ func activate_room(id: String) -> void:
 
 func _hover(id: String) -> void:
 	hovered = id
-	buttons[id].get_node("RoomName").visible = true
-	buttons[id].get_node("RoomDetail").visible = true
+	buttons[id].get_node("RoomName").visible = not Phone.narrow(Phone.window_size())
+	buttons[id].get_node("RoomDetail").visible = not Phone.narrow(Phone.window_size())
 	var info: Dictionary = rooms[id]
 	room_hovered.emit("%s  /  %s%s  →  %s" % [info.name, info.detail, " · " + str(info.module) if info.built and info.module != "" else "", info.tab])
 	if sound != null: sound.play()
 
 func _unhover(id: String) -> void:
 	if hovered == id:
-		buttons[id].get_node("RoomName").visible = true
-		buttons[id].get_node("RoomDetail").visible = true
+		buttons[id].get_node("RoomName").visible = not Phone.narrow(Phone.window_size())
+		buttons[id].get_node("RoomDetail").visible = not Phone.narrow(Phone.window_size())
 		hovered = ""; room_hovered.emit("Select a room to manage the Order.  •  Gold: module ready  •  Dark: awaiting construction")
 
 func _process(delta: float) -> void:

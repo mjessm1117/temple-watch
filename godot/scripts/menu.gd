@@ -2,10 +2,13 @@ extends Control
 const UI = preload("res://scripts/campaign/ui.gd")
 const Settings = preload("res://scripts/settings.gd")
 const World = preload("res://scripts/ui_world.gd")
+const Phone = preload("res://scripts/phone_layout.gd")
 var picked := "normal"
 var buttons: Dictionary = {}
 
 func _ready() -> void:
+	if Phone.narrow(Phone.window_size()):
+		_build_phone(); return
 	var backdrop := World.new()
 	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(backdrop)
@@ -71,6 +74,47 @@ func _ready() -> void:
 	column.add_child(UI.button("Direct Rescue Mission",_start))
 	column.add_child(UI.label("THE ARCHIVE REMEMBERS EVERY CHOICE",12,UI.MUTED))
 	UI.slide(outer)
+
+func _build_phone() -> void:
+	var backdrop := World.new(); backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); add_child(backdrop)
+	var shade := ColorRect.new(); shade.color = Color("071116c9")
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); add_child(shade)
+	var outer := MarginContainer.new(); outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for side in ["left", "right", "top", "bottom"]: outer.add_theme_constant_override("margin_" + side, 10)
+	add_child(outer)
+	var body := UI.column(5); outer.add_child(body)
+	var head := HBoxContainer.new(); body.add_child(head)
+	var title := UI.label("TEMPLE WATCH", 32, UI.TEXT); title.size_flags_horizontal = SIZE_EXPAND_FILL
+	head.add_child(title)
+	var settings := UI.button("GRAPHICS", func() -> void: _phone_settings(body))
+	head.add_child(settings)
+	body.add_child(UI.label("COMMAND THE ORDER. BEND WHAT IS COMING.", 14, UI.ACCENT))
+	if Phone.window_size().x < Phone.window_size().y:
+		body.add_child(UI.label("Rotate your phone for the battle map.", 14, UI.GOLD))
+	var choices := HFlowContainer.new(); choices.add_theme_constant_override("h_separation", 4); body.add_child(choices)
+	for id in ["story", "normal", "hard", "legend"]:
+		var button := UI.button(id.capitalize(), _pick.bind(id)); button.toggle_mode = true
+		button.button_pressed = id == picked; choices.add_child(button); buttons[id] = button
+	var actions := HFlowContainer.new(); actions.add_theme_constant_override("h_separation", 5); body.add_child(actions)
+	var flow = get_node("/root/CampaignFlow")
+	var start := UI.button("START", func(): flow.new_campaign(picked)); start.name = "StartButton"
+	actions.add_child(start)
+	var saved = preload("res://scripts/campaign/state.gd").new()
+	var continuing := UI.button("CONTINUE", flow.continue_campaign, saved.load_save(flow.save_path))
+	continuing.name = "ContinueButton"; actions.add_child(continuing)
+	actions.add_child(UI.button("DIRECT RESCUE", _start))
+	var scroll := ScrollContainer.new(); scroll.size_flags_vertical = SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; body.add_child(scroll)
+	var lore := UI.column(5); lore.size_flags_horizontal = SIZE_EXPAND_FILL; scroll.add_child(lore)
+	lore.add_child(UI.label("A VISION OF FIRE", 18, UI.GOLD))
+	lore.add_child(UI.label("In meditation, the whole Council saw the same thing: the Temple burning, clone soldiers on its steps, a hooded figure in a red-lit office. Nobody knows when. Grand Master Zym orders it sealed in the Archives.", 14))
+	lore.add_child(UI.label("Run the Temple, send squads where they matter, and bend what’s coming.", 14, UI.MUTED))
+
+func _phone_settings(body: VBoxContainer) -> void:
+	if body.has_node("PhoneGraphics"):
+		body.get_node("PhoneGraphics").queue_free(); return
+	var settings := preload("res://scripts/graphics_options.gd").new()
+	settings.name = "PhoneGraphics"; body.add_child(settings)
 
 func _pick(id: String) -> void:
 	picked = id

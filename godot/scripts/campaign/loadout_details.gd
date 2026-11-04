@@ -3,6 +3,7 @@ const Gear = preload("res://scripts/campaign/gear.gd")
 const Data = preload("res://scripts/campaign/data.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
 const S = preload("res://scripts/campaign/loadout_style.gd")
+const Phone = preload("res://scripts/phone_layout.gd")
 
 static func fit(r: Dictionary) -> bool:
 	return preload("res://scripts/campaign/strat_roster.gd").ready(r)
@@ -48,6 +49,15 @@ static func modules_text(r: Dictionary) -> String:
 	return " · ".join(modules) if not modules.is_empty() else "MODULES  —"
 
 static func card(c, r: Dictionary, action: Callable) -> PanelContainer:
+	if Phone.narrow(Phone.window_size()):
+		var compact := S.panel(); compact.name = "Card_" + str(r.id)
+		compact.custom_minimum_size = Vector2(155, 100)
+		var content := S.column(3); compact.add_child(content)
+		var select := S.button(str(r.n), action); select.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		select.custom_minimum_size.y = 38; content.add_child(select)
+		content.add_child(S.label("%s · R%d · HP %d" % [r.cls, int(r.rank), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 12, S.GOLD))
+		content.add_child(S.label(status(c, r), 12, S.GREEN if fit(r) else S.RED))
+		return compact
 	var p := S.panel(); p.name = "Card_" + str(r.id); p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var col := S.column(4); p.add_child(col)
 	var heading := S.button(str(r.n), action); heading.alignment = HORIZONTAL_ALIGNMENT_LEFT
