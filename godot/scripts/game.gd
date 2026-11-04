@@ -78,7 +78,7 @@ func _ready() -> void:
 	mission = Mission.adopt(flow.create_battle(7), flow.campaign.state if flow.active and flow.campaign != null else {})
 	if mission.modern:
 		pivot = Vector3(float(mission.spec.width)*0.5,0,float(mission.spec.height)*0.5)
-		zoom = BattleCamera.start_zoom(mission)
+	zoom = BattleCamera.selected_zoom(mission)
 	action_camera = bool(Prefs.get_value("cine"))
 	hud_controls = HudControls.new()
 	hud_controls.g = self
@@ -216,7 +216,7 @@ func _select(id: int) -> void:
 	sound.play("click")
 	var u: Dictionary = mission.unit_by_id(id)
 	if mission.identity != null: mission.identity.voice(mission,u,"select")
-	if not u.is_empty(): _glide_to(Vector3(int(u.x), 0, int(u.y)), 0.35)
+	if not u.is_empty(): _glide_to(Vector3(int(u.x), 0, int(u.y)), 0.38, BattleCamera.selected_zoom(mission))
 	_refresh()
 
 func _after_action() -> void:
@@ -250,7 +250,7 @@ func _frame_target() -> void:
 	var target: Dictionary = mission.unit_by_id(target_id)
 	if actor.is_empty() or target.is_empty(): return
 	var midpoint := Vector3((float(actor.x) + float(target.x)) * 0.5, 0, (float(actor.y) + float(target.y)) * 0.5)
-	_glide_to(midpoint, 0.35)
+	_glide_to(midpoint, 0.38, BattleCamera.target_zoom(mission, Vector2(float(actor.x), float(actor.y)).distance_to(Vector2(float(target.x), float(target.y)))))
 
 func _cancel_order() -> void:
 	target_id = -1
@@ -260,18 +260,31 @@ func _cancel_order() -> void:
 	warning_label.text = ""
 	_refresh()
 
-func _glide_to(point: Vector3, seconds: float) -> void:
+func _recenter() -> void:
+	var unit: Dictionary = mission.unit_by_id(selected_id)
+	if unit.is_empty(): return
+	_glide_to(Vector3(unit.x, 0, unit.y), 0.38, BattleCamera.selected_zoom(mission))
+
+func _glide_to(point: Vector3, seconds: float, target_zoom: float = -1.0) -> void:
 	if Prefs.get_value("motion"):
-		pivot = point; _update_camera(); return
+		pivot = point
+		if target_zoom > 0.0: zoom = target_zoom
+		_update_camera(); return
 	seconds /= float(Prefs.get_value("speed"))
 	if camera_tween != null and camera_tween.is_running(): camera_tween.kill()
 	camera_tween = create_tween()
-	camera_tween.tween_property(self, "pivot", point, seconds).set_trans(Tween.TRANS_SINE)
+	camera_tween.set_parallel(true)
+	camera_tween.tween_property(self, "pivot", point, seconds).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	if target_zoom > 0.0: camera_tween.tween_property(self, "zoom", target_zoom, seconds).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	camera_tween.tween_callback(_update_camera)
 	set_process(true)
 
 func _process(_delta: float) -> void:
 	if mission != null: scene_view.arrange_labels()
+	if player_attack_pending and not playing_enemy_events and not cinematic and selected_id >= 0 and views.has(selected_id):
+		var moving_view: Node3D = views[selected_id]
+		if moving_view.motion != null and moving_view.motion.is_running():
+			pivot = pivot.lerp(Vector3(moving_view.position.x, 0, moving_view.position.z), minf(1.0, _delta * 7.0)); _update_camera()
 	if camera_tween != null and camera_tween.is_running(): _update_camera()
 	if cinematic or player_attack_pending or playing_enemy_events or mission == null: return
 	var direction := Vector2.ZERO
@@ -416,6 +429,7 @@ func _end_turn() -> void:
 		_refresh()
 		return
 	await preload("res://scripts/combat_turns.gd").play(self)
+	_recenter()
 
 
 func _demo(kind: String) -> void:
@@ -474,7 +488,7 @@ func _show_shot() -> void:
 
 func _update_camera() -> void:
 	pitch = clampf(pitch, 0.6, 1.4)
-	zoom = clampf(zoom, 9.0, 65.0)
+	zoom = clampf(zoom, 6.0, 65.0)
 	if mission != null: pivot = BattleCamera.clamp_pivot(mission, pivot)
 	var direction := Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
 	camera.position = pivot + direction * zoom

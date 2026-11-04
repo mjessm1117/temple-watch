@@ -135,6 +135,7 @@ func handle_event(event: InputEvent) -> void:
 		elif event.keycode == KEY_E:
 			if g.action in ["shoot", "strike", "push"]: g._cycle_target(1)
 			else: g._rotate_camera(PI / 2.0)
+		elif event.keycode == KEY_C: g._recenter()
 		elif event.keycode == KEY_R: g.get_tree().reload_current_scene()
 		elif event.keycode >= KEY_1 and event.keycode <= KEY_7:
 			g._choose_action(["move", "shoot", "strike", "push", "interact" if g.mission.modern else "free", "overwatch", "hunker"][event.keycode - KEY_1])

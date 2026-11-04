@@ -4,6 +4,12 @@ extends RefCounted
 static func start_zoom(m: RefCounted) -> float:
 	return clampf(maxf(float(m.spec.width), float(m.spec.height)) * 0.66, 11.0, 26.0) if m.modern else 12.0
 
+static func selected_zoom(m: RefCounted) -> float:
+	return clampf(start_zoom(m) / 2.5, 6.0, 13.0)
+
+static func target_zoom(m: RefCounted, separation: float) -> float:
+	return clampf(maxf(selected_zoom(m), separation * 1.25), 6.0, 22.0)
+
 static func clamp_zoom(value: float) -> float:
 	return clampf(value, 9.0, 65.0)
 

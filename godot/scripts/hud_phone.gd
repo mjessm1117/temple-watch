@@ -9,6 +9,9 @@ var action_name: Label
 var popup: PanelContainer
 var popup_body: VBoxContainer
 var open_card := ""
+var more_button: Button
+var ability_buttons: Array[Button] = []
+var end_confirm := false
 
 func setup(game, night_hud, root: Control, top: Control, left: Control, right: Control, bottom: Control, abilities: HFlowContainer) -> void:
 	g = game; night = night_hud
@@ -16,7 +19,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	overlay = Control.new(); overlay.name = "PhoneBattleHUD"
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE; root.add_child(overlay)
-	var strip := PanelContainer.new(); strip.anchor_right = 1.0; strip.offset_bottom = 34
+	var strip := PanelContainer.new(); strip.anchor_right = 1.0; strip.offset_bottom = 46
 	var strip_style: StyleBoxFlat = night.panel_style(); strip_style.set_content_margin_all(2)
 	strip.add_theme_stylebox_override("panel", strip_style); overlay.add_child(strip)
 	var heading := HBoxContainer.new(); strip.add_child(heading)
@@ -24,38 +27,43 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	g.objective_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	g.objective_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	g.objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	heading.add_child(_button("◀", func() -> void: _cycle_unit(-1)))
+	heading.add_child(_button("▶", func() -> void: _cycle_unit(1)))
+	heading.add_child(_button("CENTER", g._recenter))
 	heading.add_child(_button("END TURN", _end_turn))
 	heading.add_child(_button("☰", _show_menu))
 	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
-	unit_card.offset_left = 6; unit_card.offset_right = 224; unit_card.offset_top = 38; unit_card.offset_bottom = 75
+	unit_card.offset_left = 6; unit_card.offset_right = 230; unit_card.offset_top = 48; unit_card.offset_bottom = 94
 	overlay.add_child(unit_card)
 	target_card = _button("TARGET", _toggle.bind("target")); target_card.name = "TargetCard"
 	target_card.anchor_left = 1.0; target_card.anchor_right = 1.0
-	target_card.offset_left = -224; target_card.offset_right = -6; target_card.offset_top = 38; target_card.offset_bottom = 75
+	target_card.offset_left = -230; target_card.offset_right = -6; target_card.offset_top = 48; target_card.offset_bottom = 94
 	overlay.add_child(target_card)
 	var tray := PanelContainer.new(); tray.name = "AbilityTray"
 	tray.anchor_top = 1.0; tray.anchor_right = 1.0; tray.anchor_bottom = 1.0
-	tray.offset_top = -64
+	tray.offset_top = -76
 	var tray_style: StyleBoxFlat = night.panel_style(); tray_style.set_content_margin_all(2)
 	tray.add_theme_stylebox_override("panel", tray_style); overlay.add_child(tray)
 	var tray_box := VBoxContainer.new(); tray_box.add_theme_constant_override("separation", 0); tray.add_child(tray_box)
 	action_name = night.label("Tap or hold an ability for its name", 12, Color("e9ca83"))
-	action_name.custom_minimum_size.y = 13; tray_box.add_child(action_name)
+	action_name.custom_minimum_size.y = 17; tray_box.add_child(action_name)
 	var scroll := ScrollContainer.new(); scroll.name = "Abilities"
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 46; tray_box.add_child(scroll)
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 55; tray_box.add_child(scroll)
 	scroll.get_h_scroll_bar().modulate.a = 0.0
 	var track := HBoxContainer.new(); track.add_theme_constant_override("separation", 3); scroll.add_child(track)
 	for node in abilities.get_children():
 		var button: Button = node
-		button.reparent(track); button.custom_minimum_size = Vector2(46, 46)
-		button.set_meta("graphics_custom_minimum_size", Vector2(46, 46))
+		button.reparent(track); button.custom_minimum_size = Vector2(83, 55)
+		ability_buttons.append(button)
+		button.set_meta("graphics_custom_minimum_size", Vector2(83, 55))
 		button.set("compact", true); button.button_down.connect(_show_ability.bind(button))
 		button.pressed.connect(_show_ability.bind(button))
 		button.gui_input.connect(_ability_input.bind(button))
+	more_button = _button("MORE ▴", _toggle.bind("more")); more_button.custom_minimum_size = Vector2(84, 55); track.add_child(more_button)
 	popup = PanelContainer.new(); popup.name = "PhoneDetails"; popup.visible = false
 	popup.anchor_left = 0.5; popup.anchor_right = 0.5; popup.anchor_bottom = 1.0
-	popup.offset_left = -220; popup.offset_right = 220; popup.offset_top = 38; popup.offset_bottom = -74
+	popup.offset_left = -250; popup.offset_right = 250; popup.offset_top = 96; popup.offset_bottom = -80
 	popup.add_theme_stylebox_override("panel", night.panel_style()); overlay.add_child(popup)
 	var detail_scroll := ScrollContainer.new(); detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	popup.add_child(detail_scroll)
@@ -64,7 +72,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 
 func _button(title: String, action: Callable) -> Button:
 	var button := Button.new(); button.text = title; button.focus_mode = Control.FOCUS_NONE
-	button.custom_minimum_size.y = 38; button.pressed.connect(action)
+	button.custom_minimum_size.y = 46; button.pressed.connect(action)
 	return button
 
 func _show_ability(button: Button) -> void:
@@ -80,26 +88,47 @@ func _toggle(card: String) -> void:
 func _show_menu() -> void:
 	open_card = "menu"; refresh()
 
+func _cycle_unit(direction: int) -> void:
+	var id: int = preload("res://scripts/input_controls.gd").next_squad(g.mission, g.selected_id, direction)
+	if id >= 0: g._select(id)
+
 func _end_turn() -> void:
+	if not end_confirm:
+		end_confirm = true
+		action_name.text = "End the squad turn? Tap END TURN again."
+		return
+	end_confirm = false
 	g._request_end_turn()
-	if g.warning_label.text != "": action_name.text = g.warning_label.text
+	if g.end_turn_armed: g._request_end_turn()
 
 func _close() -> void:
 	open_card = ""; refresh()
 
-func refresh() -> void:
+func refresh(from_game: bool = false) -> void:
 	if overlay == null: return
-	if g.warning_label.text != "": action_name.text = g.warning_label.text
+	if g.warning_label.text.contains("TAB / SHIFT+TAB"): action_name.text = "Tap a target · FIRE to confirm · CANCEL to back"
+	elif g.warning_label.text != "": action_name.text = g.warning_label.text
+	elif end_confirm: action_name.text = "End the squad turn? Tap END TURN again."
 	elif g.path_label.text != "": action_name.text = g.path_label.text
+	else: action_name.text = "Choose an action · tap the map to preview"
+	_update_actions(from_game)
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
-	unit_card.text = "%s  HP %s  AP %s  ▾" % [str(unit.get("name", "UNIT")), str(unit.get("hp", "?")), str(unit.get("ap", "?"))]
+	unit_card.text = "%s  HP %s  %s  ▾" % [str(unit.get("name", "UNIT")).left(12), str(unit.get("hp", "?")), "◆".repeat(int(unit.get("ap", 0))) + "◇".repeat(maxi(0, (2 if g.mission.modern else 3) - int(unit.get("ap", 0))))]
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	target_card.text = "%s  %s  ▾" % [str(target.get("name", "TARGET")), g.hit_big_label.text]
 	popup.visible = open_card != ""
 	if open_card == "": return
 	if open_card == "settings": return
 	for child in popup_body.get_children(): child.queue_free()
-	if open_card == "unit":
+	if open_card == "more":
+		popup_body.add_child(night.label("MORE ACTIONS", 16, Color("efd49b")))
+		for button in ability_buttons:
+			if button.visible or not bool(button.get_meta("battle12_available", false)) or button.ability_id == "": continue
+			var mode: String = button.ability_id
+			if mode in ["move", "shoot", "overwatch", "reload"]: continue
+			var item := _button("%s  ·  %s AP%s" % [button.display_name, button.cost, "  ·  %d TURN CD" % button.cooldown if button.cooldown > 0 else ""], func() -> void: g._choose_action(mode); _close())
+			item.disabled = button.disabled; popup_body.add_child(item)
+	elif open_card == "unit":
 		popup_body.add_child(night.label("SQUAD  ·  tap a name to select", 14, Color("efd49b")))
 		var squad := HFlowContainer.new(); popup_body.add_child(squad)
 		for member in g.mission.living("player"):
@@ -126,6 +155,18 @@ func refresh() -> void:
 		popup_body.add_child(_button("RESTART MISSION", func() -> void: g.get_tree().reload_current_scene()))
 		popup_body.add_child(_button("MAIN MENU", func() -> void: g.get_node("/root/CampaignFlow").go("menu")))
 	popup_body.add_child(_button("CLOSE", _close))
+
+func _update_actions(from_game: bool) -> void:
+	if from_game:
+		for button in ability_buttons: button.set_meta("battle12_available", button.visible)
+	var primary: Array[String] = []
+	for mode in ["move", "shoot", "strike", "push", "overwatch", "reload", "hunker", "medpac"]:
+		if primary.size() >= 5: break
+		for button in ability_buttons:
+			if button.ability_id == mode and bool(button.get_meta("battle12_available", false)):
+				primary.append(mode); break
+	for button in ability_buttons:
+		button.visible = bool(button.get_meta("battle12_available", false)) and button.ability_id in primary
 
 func _unit_details(unit: Dictionary) -> String:
 	var lines: Array[String] = [str(unit.get("name", "UNIT")), str(unit.get("class_name", "Jedi"))]
