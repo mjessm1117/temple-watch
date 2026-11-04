@@ -4,6 +4,7 @@ const Campaign = preload("res://scripts/campaign/state.gd")
 const Story = preload("res://scripts/story/story_engine.gd")
 const Battle = preload("res://scripts/campaign/battle_bridge.gd")
 const Settings = preload("res://scripts/settings.gd")
+const Villain11Battle = preload("res://scripts/villain11_battle.gd")
 var campaign: RefCounted
 var story: RefCounted
 var active := false
@@ -127,7 +128,9 @@ func launch_squad(ids: Array) -> bool:
 func create_battle(seed_value: int) -> RefCounted:
 	if not active or campaign == null or campaign.state.get("flow_stage", "") != "battle":
 		return preload("res://scripts/mission.gd").new(seed_value)
-	return Battle.create(campaign, seed_value)
+	var battle: RefCounted = Battle.create(campaign, seed_value)
+	if battle != null: Villain11Battle.setup(battle, campaign.state.pending_mission)
+	return battle
 
 func battle_refresh(game: Node) -> void:
 	if not active or campaign == null or campaign.state.get("flow_stage", "") != "battle" or transitioning: return
@@ -156,12 +159,17 @@ func battle_beat(game: Node) -> void:
 func debrief(mission: RefCounted) -> void:
 	transitioning = false
 	if campaign.state.get("flow_stage", "") != "battle": return
+	Villain11Battle.finish(mission)
 	var result: Dictionary = Battle.result(campaign, mission)
+	result.villain_outcome = mission.objective_state.get("villain_outcome", "absent")
 	campaign.state.battle_result = result
 	screen = story.start_debrief({"mission_id":result.mission_id, "won":result.win,
 		"squad":result.units.filter(func(u): return u.status != "dead").map(func(u): return u.id), "saved_by":mission.saved_by, "clues":mission.clues})
 	if campaign.state.pending_mission.get("villain_present",false):
-		screen.text += "\n\nIntercepted at extraction — " + str(campaign.state.pending_mission.get("villain_end_bark",""))
+		screen.text += "\n\n" + Villain11Battle.outcome_text(str(mission.objective_state.villain_name), str(mission.objective_state.villain_outcome))
+		var encounters: Array = campaign.state.get("villain11_encounters", [])
+		encounters.append({"mission_id":result.mission_id, "name":mission.objective_state.villain_name, "outcome":mission.objective_state.villain_outcome})
+		campaign.state.villain11_encounters = encounters
 	screen.text = str(screen.get("text", "")) + "\n\n" + Battle.casualties(campaign, result)
 	var front := str(campaign.state.get("twin",{}).get("stage",""))
 	if front == "a": screen.text += "\n\nFRONT B awaits: a fresh squad of two to four, at most two Jedi. The date stays fixed until both fronts are settled."
