@@ -48,21 +48,23 @@ static func modules_text(r: Dictionary) -> String:
 			modules.append("%s Mk %s" % [item.get("n", key), ["I", "II", "III"][clampi(int(r.gear.mk.get(kind + "." + key, 1)) - 1, 0, 2)]])
 	return " · ".join(modules) if not modules.is_empty() else "MODULES  —"
 
-static func card(c, r: Dictionary, action: Callable) -> PanelContainer:
+static func card(c, r: Dictionary, action: Callable, portrait: Texture2D = null) -> PanelContainer:
 	if Phone.narrow(Phone.window_size()):
 		var compact := S.panel(); compact.name = "Card_" + str(r.id)
-		compact.custom_minimum_size = Vector2(155, 100)
-		var content := S.column(3); compact.add_child(content)
+		compact.add_theme_stylebox_override("panel", S.box(S.PANEL, S.EDGE, 4))
+		compact.custom_minimum_size = Vector2(180, 82)
+		var content := S.column(2); compact.add_child(content)
 		var select := S.button(str(r.n), action); select.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		select.custom_minimum_size.y = 38; content.add_child(select)
-		content.add_child(S.label("%s · R%d · HP %d" % [r.cls, int(r.rank), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 12, S.GOLD))
-		content.add_child(S.label(status(c, r), 12, S.GREEN if fit(r) else S.RED))
+		select.custom_minimum_size.y = 44; select.icon = portrait; select.expand_icon = true; content.add_child(select)
+		content.add_child(S.label("%s · R%d · HP %d" % [r.cls, int(r.rank), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 10, S.GOLD))
+		content.add_child(S.label(status(c, r), 10, S.GREEN if fit(r) else S.RED))
 		return compact
 	var p := S.panel(); p.name = "Card_" + str(r.id); p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var col := S.column(4); p.add_child(col)
 	var heading := S.button(str(r.n), action); heading.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	heading.icon = S.icon(str(r.cls).to_lower()); heading.add_theme_font_size_override("font_size", 17)
-	heading.custom_minimum_size.y = 36; col.add_child(heading)
+	heading.icon = portrait if portrait != null else S.icon(str(r.cls).to_lower()); heading.expand_icon = true
+	heading.add_theme_font_size_override("font_size", 17)
+	heading.custom_minimum_size.y = 60; col.add_child(heading)
 	col.add_child(S.label("%s  ·  %s  ·  R%d" % [nickname(r), r.cls, int(r.rank)], 12, S.GOLD))
 	col.add_child(S.label(status(c, r), 11, S.GREEN if fit(r) else S.RED))
 	var temple: PackedStringArray = preload("res://scripts/campaign/temple_rooms.gd").active_descriptions(c.state)

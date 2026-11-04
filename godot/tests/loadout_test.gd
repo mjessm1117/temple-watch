@@ -40,7 +40,7 @@ func run() -> void:
 	check(screen.drawer.visible and screen.stage.focused == 3, "clicking a 3D soldier opens panel and focuses camera")
 	c.soldier("u5").wound = 8
 	check(not screen.swap_soldier("u5"), "wounded soldier cannot replace selected soldier")
-	screen._build_drawer()
+	screen._tab("roster")
 	check(screen.choices["u5"].disabled, "wounded roster button is disabled")
 	check(Details.status(c, c.soldier("u5")).contains("8 days"), "wound recovery time displayed")
 	c.soldier("u5").assign = "rest"
