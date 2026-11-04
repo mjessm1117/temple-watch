@@ -11,6 +11,7 @@ const Base = preload("res://scripts/campaign/strat_base.gd")
 const HomeBadges = preload("res://scripts/campaign/home_badges.gd")
 const HomeTabs = preload("res://scripts/campaign/home_tabs.gd")
 const HomeResources = preload("res://scripts/campaign/home_resources.gd")
+const Home12RoomGrid = preload("res://scripts/campaign/home12_room_grid.gd")
 const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 var build_slot := "b0"
 var field_team: Array = []
@@ -30,6 +31,7 @@ var selected_room := ""
 const TempleView = preload("res://scripts/campaign/temple_view.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
 var room_picker: PanelContainer
+var phone_grid: Control
 
 func _ready() -> void:
 	campaign = get_node("/root/CampaignFlow").session()
@@ -62,49 +64,56 @@ func _build_shell() -> void:
 	var head := UI.panel(Color(0.035, 0.075, 0.09, 0.94)); add_child(head)
 	head.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	head.offset_left = 8 if compact else 20; head.offset_right = -8 if compact else -20
-	head.offset_top = 4 if compact else 14; head.offset_bottom = 76 if compact else 106
+	head.offset_top = 4 if compact else 14; head.offset_bottom = 80 if compact else 106
 	if compact:
 		var head_style: StyleBoxFlat = head.get_theme_stylebox("panel").duplicate()
 		head_style.set_content_margin_all(6); head.add_theme_stylebox_override("panel", head_style)
 	var rows := UI.column(5); head.add_child(rows)
 	var title := HBoxContainer.new(); rows.add_child(title)
-	var brand := UI.label("TEMPLE WATCH", 27, Color("78d2df")); brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL; title.add_child(brand)
-	if compact: title.add_child(UI.button("ROOMS", _toggle_rooms))
-	status_label = UI.label("", 15, UI.GOLD); title.add_child(status_label)
-	var resources := HBoxContainer.new(); resources.add_theme_constant_override("separation", 18)
+	var brand := UI.label("TEMPLE WATCH", 22 if compact else 27, Color("78d2df")); brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL; title.add_child(brand)
 	if compact:
-		var resource_scroll := ScrollContainer.new(); resource_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-		resource_scroll.custom_minimum_size.y = 24; rows.add_child(resource_scroll); resource_scroll.add_child(resources)
-		resource_scroll.get_h_scroll_bar().modulate.a = 0.0
-	else: rows.add_child(resources)
+		var rooms_button := UI.button("ROOMS", _toggle_rooms); rooms_button.custom_minimum_size.y = 44
+		title.add_child(rooms_button)
+	status_label = UI.label("", 15, UI.GOLD); title.add_child(status_label)
+	var resources := HBoxContainer.new(); resources.add_theme_constant_override("separation", 8 if compact else 18)
+	rows.add_child(resources)
 	HomeResources.add_row(resources, campaign)
+	resources.add_child(HomeResources.power_label(campaign))
 	resources.add_child(UI.label("Order Darkness  %d/100" % int(campaign.state.orderDark), 13, Color("b5a2d3")))
-	var era_label := UI.label("JEDI TEMPLE  /  %s" % {1:"OLD REPUBLIC", 2:"NEW SITH WARS", 3:"HIGH REPUBLIC"}.get(int(campaign.state.era), "REPUBLIC"), 13, UI.MUTED)
-	era_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; era_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; resources.add_child(era_label)
+	if not compact:
+		var era_label := UI.label("JEDI TEMPLE  /  %s" % {1:"OLD REPUBLIC", 2:"NEW SITH WARS", 3:"HIGH REPUBLIC"}.get(int(campaign.state.era), "REPUBLIC"), 13, UI.MUTED)
+		era_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; era_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; resources.add_child(era_label)
+	else:
+		for label in resources.get_children(): label.add_theme_font_size_override("font_size", 11)
 	for row in [title, resources]:
 		for child in row.get_children():
 			if child is Label: child.autowrap_mode = TextServer.AUTOWRAP_OFF
 	var foot_bg := ColorRect.new(); add_child(foot_bg); foot_bg.color = Color(0.02, 0.05, 0.065, 0.84)
-	foot_bg.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); foot_bg.offset_top = -73 if compact else -97
+	foot_bg.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); foot_bg.offset_top = -108 if compact else -97
 	foot_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var footer := UI.column(7); add_child(footer); footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	footer.offset_left = 8 if compact else 20; footer.offset_right = -8 if compact else -20
-	footer.offset_top = -68 if compact else -88; footer.offset_bottom = -5 if compact else -14
+	footer.offset_top = -105 if compact else -88; footer.offset_bottom = -5 if compact else -14
 	notice_label = UI.label("Select a room to manage the Order.  •  Gold: module ready  •  Dark: awaiting construction", 14, UI.MUTED)
-	if compact: notice_label.text = "Tap a room or ROOMS to browse."
+	if compact: notice_label.hide()
 	notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; footer.add_child(notice_label)
-	var nav := HBoxContainer.new(); nav.add_theme_constant_override("separation", 7)
-	if compact:
-		var nav_scroll := ScrollContainer.new(); nav_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-		nav_scroll.custom_minimum_size.y = 40; footer.add_child(nav_scroll); nav_scroll.add_child(nav)
-		nav_scroll.get_h_scroll_bar().modulate.a = 0.0
-	else: footer.add_child(nav)
-	for name in ["Command", "Roster", "Research", "Build", "Arsenal", "Teams", "Legacy", "Codex", "Galaxy"]:
-		var button := UI.button(name, _change_page.bind(name)); button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var nav := GridContainer.new(); nav.columns = 5 if compact else 10
+	nav.add_theme_constant_override("h_separation", 4 if compact else 7)
+	nav.add_theme_constant_override("v_separation", 4); footer.add_child(nav)
+	var names := ["Galaxy", "Arsenal", "Roster", "Research", "Build", "Command", "Legacy", "Teams", "Codex"]
+	var titles := {"Galaxy":"Galaxy Map", "Arsenal":"Armory", "Roster":"Squad", "Research":"Archives", "Build":"Engineering", "Command":"Council / Story", "Legacy":"Memorial", "Teams":"Teams", "Codex":"Journal"}
+	for name in names:
+		var target: String = "Council" if name == "Command" else name
+		var button := UI.button(name, _change_page.bind(target)); button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.custom_minimum_size.y = 44
 		HomeTabs.decorate(button, name)
+		button.text = "     " + str(titles[name])
+		if compact: button.add_theme_font_size_override("font_size", 12)
 		button.mouse_entered.connect(func(): temple_view.sound.play())
 		nav.add_child(button); nav_buttons[name] = button
-	nav.add_child(UI.button("Menu", func(): get_node("/root/CampaignFlow").go("menu")))
+	var menu_button := UI.button("Menu", func(): get_node("/root/CampaignFlow").go("menu"))
+	menu_button.custom_minimum_size.y = 44; menu_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	nav.add_child(menu_button)
 	var readout := UI.column(5); add_child(readout); readout.position = Vector2(25, 124); readout.size.x = 200
 	readout.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	readout.add_child(UI.label("THE ORDER ENDURES", 13, UI.ACCENT))
@@ -122,8 +131,8 @@ func _build_shell() -> void:
 	station_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.97)); add_child(station_panel)
 	station_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	station_panel.anchor_left = 0.0 if compact else 0.35; station_panel.offset_left = 8 if compact else 0
-	station_panel.offset_top = 80 if compact else 113; station_panel.offset_right = -8 if compact else -20
-	station_panel.offset_bottom = -76 if compact else -100
+	station_panel.offset_top = 84 if compact else 113; station_panel.offset_right = -8 if compact else -20
+	station_panel.offset_bottom = -110 if compact else -100
 	station_panel.visible = panel_open
 	var column := UI.column(8); station_panel.add_child(column)
 	var top := HBoxContainer.new(); column.add_child(top)
@@ -132,12 +141,18 @@ func _build_shell() -> void:
 	var scroll := ScrollContainer.new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
 	page_content = UI.column(13); page_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(page_content)
-	if compact: _build_room_picker()
+	if compact:
+		_build_room_picker()
+		phone_grid = Home12RoomGrid.new(); add_child(phone_grid)
+		phone_grid.setup(temple_view.rooms, campaign.state)
+		phone_grid.room_selected.connect(_open_room)
+		phone_grid.galaxy_selected.connect(_open_galaxy)
+		move_child(phone_grid, 1)
 
 func _build_room_picker() -> void:
 	room_picker = UI.panel(Color(0.045, 0.09, 0.115, 0.98)); room_picker.visible = false
 	room_picker.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	room_picker.offset_left = 8; room_picker.offset_right = -8; room_picker.offset_top = 80; room_picker.offset_bottom = -76
+	room_picker.offset_left = 8; room_picker.offset_right = -8; room_picker.offset_top = 84; room_picker.offset_bottom = -110
 	add_child(room_picker)
 	var scroll := ScrollContainer.new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	room_picker.add_child(scroll)
