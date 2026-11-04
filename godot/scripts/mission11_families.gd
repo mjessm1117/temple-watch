@@ -76,6 +76,7 @@ static func check(m: RefCounted) -> void:
 			if not boss.is_empty() and int(boss.hp) <= 0: win(m,"The Sith Lord falls. The Brotherhood line breaks.")
 
 static func damage(m: RefCounted, target: Dictionary) -> void:
+	preload("res://scripts/villain11_battle.gd").on_damage(m, target)
 	if m.spec.family != "sith_lord_duel" or not bool(target.get("duel_boss",false)): return
 	if int(target.hp) > 0 and int(target.hp)*2 <= int(target.max_hp) and int(m.objective_state.boss_phase) == 1:
 		m.objective_state.boss_phase = 2; target.duel_phase = 2

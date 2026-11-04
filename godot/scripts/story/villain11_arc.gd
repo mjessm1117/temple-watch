@@ -67,6 +67,9 @@ static func journal(s: Dictionary, record: Dictionary, rows: Array) -> void:
 	var lines: Array = []
 	for row in rows:
 		if s.villain11_seen.has(row.id): lines.append("%s — %s" % [row.speaker,row.title])
+	for encounter in s.get("villain11_encounters", []):
+		var summary := preload("res://scripts/villain11_battle.gd").outcome_text(str(encounter.get("name", "Sith Lord")), str(encounter.get("outcome", "absent")))
+		if not summary.is_empty(): lines.append(summary)
 	record.villain = lines
 
 static func _fallen_name(s: Dictionary) -> String:
