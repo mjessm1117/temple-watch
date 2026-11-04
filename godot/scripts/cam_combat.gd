@@ -5,6 +5,16 @@ var g
 var skip_requested := false
 var return_pivot := Vector3.ZERO
 var trace: Array[String] = []
+var touch = preload("res://scripts/touch_input.gd").new()
+
+func _ready() -> void:
+	touch.g = g
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
+		g.set_process_unhandled_input(false)
+	if event is InputEventScreenTouch or event is InputEventScreenDrag:
+		touch.handle(event)
 
 func wait(seconds: float) -> void:
 	seconds /= float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if g.playing_enemy_events else 1.0)

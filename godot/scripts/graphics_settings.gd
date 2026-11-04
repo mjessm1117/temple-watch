@@ -15,13 +15,20 @@ var resources := Resources.new()
 static func mobile_os(os_name: String = OS.get_name()) -> bool:
 	return os_name in ["Android", "iOS"]
 
-static func default_tier(os_name: String = OS.get_name()) -> String:
-	return "low" if mobile_os(os_name) else "high"
+static func default_tier(os_name: String = OS.get_name(), web := OS.has_feature("web"), mobile := OS.has_feature("mobile"), touchscreen := DisplayServer.is_touchscreen_available()) -> String:
+	return "low" if web or mobile or touchscreen or mobile_os(os_name) else "high"
+
+static func phone_ui_scale(size: Vector2i) -> float:
+	return 1.2 if mini(size.x, size.y) > 0 and mini(size.x, size.y) < 900 else 1.0
 
 static func effective_tier(wanted: String, renderer: String) -> String:
 	return "low" if renderer == "gl_compatibility" else wanted
 
 func _ready() -> void:
+	get_tree().root.content_scale_factor = phone_ui_scale(DisplayServer.window_get_size())
+	get_tree().root.size_changed.connect(func():
+		get_tree().root.content_scale_factor = phone_ui_scale(DisplayServer.window_get_size())
+		apply_all.call_deferred())
 	requested = read_tier()
 	# Automated fixtures can select quality without modifying a player's preferences.
 	for arg in OS.get_cmdline_user_args():
@@ -73,7 +80,7 @@ func status_text() -> String:
 	return "Active: %s. Changes saved." % effective.capitalize()
 
 func _added(node: Node) -> void:
-	if node is Viewport or node is WorldEnvironment or node is Light3D or node is GeometryInstance3D or node is GPUParticles3D or node is CPUParticles3D:
+	if node is Button or node is Viewport or node is WorldEnvironment or node is Light3D or node is GeometryInstance3D or node is GPUParticles3D or node is CPUParticles3D:
 		apply_node.call_deferred(weakref(node))
 
 func original(object: Object, property: String) -> Variant:
@@ -111,6 +118,9 @@ func apply_environment(env: Environment) -> void:
 func apply_node(reference: WeakRef) -> void:
 	var node = reference.get_ref()
 	if not is_instance_valid(node) or not node.is_inside_tree() or node.is_queued_for_deletion(): return
+	if node is Button:
+		node.custom_minimum_size.y = maxf(float(original(node,"custom_minimum_size").y),72.0) if phone_ui_scale(DisplayServer.window_get_size()) > 1.0 else original(node,"custom_minimum_size").y
+		return
 	var high := effective == "high"
 	var low := effective == "low"
 	if node is Viewport:
@@ -145,6 +155,11 @@ func apply_node(reference: WeakRef) -> void:
 func _process(_delta: float) -> void:
 	# The existing action camera marks only ability/attack cinematic shots.
 	for child in get_tree().root.get_children():
+		if phone_ui_scale(DisplayServer.window_get_size()) > 1.0 and child.has_method("_deploy") and child.has_method("_layout") and is_instance_valid(child.footer):
+			# Keep the deployment controls between the stage and cards on short screens.
+			child.stage_container.size.y = 130.0
+			child.footer.position.y = 250.0
+			child.footer.size.y = 72.0
 		if not child.has_method("_build_terrain") or child.camera == null: continue
 		Readability.update_selection(child)
 		var enabled: bool = effective == "high" and bool(child.cinematic)
