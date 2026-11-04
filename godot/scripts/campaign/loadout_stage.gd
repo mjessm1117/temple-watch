@@ -60,10 +60,13 @@ func _layout_actors() -> void:
 	if camera == null: return
 	var viewport_size := get_viewport().get_visible_rect().size
 	var span := 2.0 * home.z * tan(deg_to_rad(camera.fov * 0.5)) * viewport_size.x / maxf(1, viewport_size.y)
-	for i in actors.size(): actors[i].position.x = (float(i) - (actors.size() - 1) * 0.5) * span / maxf(1, actors.size())
+	for i in actors.size():
+		actors[i].visible = focused < 0 or i == focused
+		actors[i].position.x = 0.0 if focused >= 0 else (float(i) - (actors.size() - 1) * 0.5) * span / maxf(1, actors.size())
 
 func focus_slot(index: int) -> void:
 	focused = index
+	_layout_actors()
 	for i in actors.size(): actors[i].highlighted = i == focused
 
 func highlight(index: int) -> void:
@@ -84,8 +87,8 @@ func _process(delta: float) -> void:
 	var target := home
 	var look := gaze
 	if focused >= 0 and focused < actors.size():
-		look = actors[focused].position + Vector3(0, 1.2, 0)
-		target = look + Vector3(0.1, 0.35, 3.6)
+		look = Vector3(0, 1.2, 0)
+		target = look + Vector3(0.0, 0.25, 3.1)
 	target += Vector3(sin(time * 0.18) * 0.06, sin(time * 0.23) * 0.025, cos(time * 0.16) * 0.04)
 	camera.position = camera.position.lerp(target, 1.0 - exp(-delta * 4.0))
 	gaze = gaze.lerp(look if focused >= 0 else Vector3(0, 1.06, 0), 1.0 - exp(-delta * 4.0))

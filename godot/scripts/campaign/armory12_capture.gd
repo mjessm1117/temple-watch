@@ -5,6 +5,7 @@ func _initialize() -> void:
 
 func capture() -> void:
 	var phone := "phone" in OS.get_cmdline_user_args()
+	var slots := "slots" in OS.get_cmdline_user_args()
 	root.size = Vector2i(844, 390) if phone else Vector2i(1366, 768)
 	var flow = root.get_node("CampaignFlow")
 	flow.save_path = "user://armory12-capture.json"
@@ -17,10 +18,10 @@ func capture() -> void:
 	var screen = load("res://scenes/squad.tscn").instantiate(); root.add_child(screen)
 	await process_frame
 	screen.inspect(0)
-	if phone: screen.arsenal._select_slot("weapon")
+	if not slots: screen.arsenal._select_slot("weapon")
 	await create_timer(1.5).timeout
 	await RenderingServer.frame_post_draw
-	var name := "wave12-armory-phone.png" if phone else "wave12-armory-desktop.png"
+	var name := "wave12-armory-phone-slots.png" if slots else "wave12-armory-phone.png" if phone else "wave12-armory-desktop.png"
 	var path := ProjectSettings.globalize_path("res://../docs/godot/shots/" + name)
 	print("CAPTURE ", name, " ", root.get_texture().get_image().save_png(path))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(flow.save_path))

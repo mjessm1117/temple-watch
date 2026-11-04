@@ -33,7 +33,7 @@ var hum: AudioStreamPlayer
 var arsenal: VBoxContainer
 var compact_layout := false
 var armory_skills := false
-var armory_slot := "weapon"
+var armory_slot := ""
 
 func _ready() -> void:
 	flow = get_node("/root/CampaignFlow")
@@ -47,7 +47,7 @@ func _ready() -> void:
 		if selected.size() < capacity and not selected.has(id): selected.append(id)
 	var bg := ColorRect.new(); bg.color = S.BG; bg.set_anchors_and_offsets_preset(PRESET_FULL_RECT); add_child(bg)
 	_build_stage(); _build_header(); _build_footer()
-	card_row = HBoxContainer.new(); card_row.add_theme_constant_override("separation", 12)
+	card_row = HBoxContainer.new(); card_row.add_theme_constant_override("separation", 6)
 	card_scroll = ScrollContainer.new(); card_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	add_child(card_scroll); card_scroll.add_child(card_row)
 	drawer = S.panel(); add_child(drawer); drawer.hide()
@@ -98,15 +98,15 @@ func _layout() -> void:
 	var compact := Phone.narrow(Phone.window_size())
 	if compact != compact_layout:
 		compact_layout = compact; _draw_cards()
-	card_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if compact else ScrollContainer.SCROLL_MODE_AUTO
+	card_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	if compact:
 		header.visible = focus_index < 0; footer.visible = focus_index < 0
 		header.position = Vector2(6, 5); header.size = Vector2(size.x - 12, 56)
 		_footer_rect(6, -78, -6)
 		if focus_index >= 0:
-			stage_container.position = Vector2(0, 4); stage_container.size = Vector2(270, size.y - 105)
-			card_scroll.position = Vector2(6, size.y - 103); card_scroll.size = Vector2(size.x - 12, 98)
-			drawer.position = Vector2(276, 4); drawer.size = Vector2(size.x - 282, size.y - 105)
+			stage_container.position = Vector2(0, 4); stage_container.size = Vector2(168, size.y - 88)
+			card_scroll.position = Vector2(6, size.y - 84); card_scroll.size = Vector2(size.x - 12, 80)
+			drawer.position = Vector2(174, 4); drawer.size = Vector2(size.x - 180, size.y - 88)
 		else:
 			stage_container.position = Vector2(0, 64); stage_container.size = Vector2(size.x, 78)
 			card_scroll.position = Vector2(6, 146); card_scroll.size = Vector2(size.x - 12, maxf(65, size.y - 200))
@@ -116,11 +116,11 @@ func _layout() -> void:
 		return
 	header.position = Vector2(24, 16); header.size = Vector2(size.x - 48, 100)
 	_footer_rect(24, -80, -8)
-	var width := size.x - (432 if focus_index >= 0 else 0)
-	stage_container.position = Vector2(0, 120); stage_container.size = Vector2(width, maxf(160, size.y - 432))
-	stage_container.custom_minimum_size.y = maxf(160, size.y - 432)
-	card_scroll.position = Vector2(24, size.y - 282); card_scroll.size = Vector2(width - 48, 198)
-	drawer.position = Vector2(size.x - 420, 128); drawer.size = Vector2(396, size.y - 204)
+	var width := size.x - (536 if focus_index >= 0 else 0)
+	stage_container.position = Vector2(0, 120); stage_container.size = Vector2(width, maxf(160, size.y - 270))
+	stage_container.custom_minimum_size.y = maxf(160, size.y - 270)
+	card_scroll.position = Vector2(24, size.y - 180); card_scroll.size = Vector2(width - 48, 94)
+	drawer.position = Vector2(size.x - 524, 128); drawer.size = Vector2(500, size.y - 204)
 	card_row.reset_size()
 	card_row.size.x = width - 48
 
@@ -169,7 +169,7 @@ func _draw_cards() -> void:
 
 func inspect(index: int) -> void:
 	if index < 0 or index >= selected.size(): return
-	focus_index = index; drawer_tab = "arsenal"; armory_skills = false; armory_slot = "weapon"
+	focus_index = index; drawer_tab = "arsenal"; armory_skills = false; armory_slot = ""
 	drawer.show(); stage.focus_slot(index); _draw_cards(); _build_drawer(); _layout()
 	drawer.modulate.a = 0.0; create_tween().tween_property(drawer, "modulate:a", 1.0, 0.22)
 
@@ -180,17 +180,14 @@ func _build_drawer() -> void:
 	S.clear(drawer); choices.clear()
 	drawer_content = S.column(9); drawer.add_child(drawer_content)
 	var r: Dictionary = flow.session().soldier(str(selected[focus_index]))
-	var top := HBoxContainer.new(); drawer_content.add_child(top)
 	var compact := Phone.narrow(Phone.window_size())
-	var title := S.label(str(r.n) + (" · R%d" % int(r.rank) if compact else ""), 16 if compact else 22)
-	title.size_flags_horizontal = SIZE_EXPAND_FILL; top.add_child(title)
-	top.add_child(S.label("%d Cr · %d Ky" % [flow.session().state.res.credits, flow.session().state.res.kyber], 11, S.GOLD))
-	var close := S.button("×", close_inspector); close.custom_minimum_size = Vector2(44, 44)
-	close.tooltip_text = "Return to lineup (Esc)"; top.add_child(close); wire_button(close)
-	var stats := Gear.battle_stats(flow.session(), str(r.id))
 	if not compact:
-		drawer_content.add_child(S.label("%s · Rank %d · %s" % [r.cls, int(r.rank), r.get("title", "Republic")], 13, S.GOLD))
-		drawer_content.add_child(S.label("DMG %s  /  MOVE %d  /  ARMOR %d" % [str(stats.get("dmg", [])), int(stats.get("mob", 0)), int(stats.get("armor", 0))], 12, S.MUTED))
+		var top := HBoxContainer.new(); drawer_content.add_child(top)
+		var title := S.label(str(r.n), 22); title.size_flags_horizontal = SIZE_EXPAND_FILL; top.add_child(title)
+		top.add_child(S.label("%d Cr · %d Ky" % [flow.session().state.res.credits, flow.session().state.res.kyber], 11, S.GOLD))
+		var close := S.button("×", close_inspector); close.custom_minimum_size = Vector2(44, 44)
+		close.tooltip_text = "Return to lineup (Esc)"; top.add_child(close); wire_button(close)
+	var stats := Gear.battle_stats(flow.session(), str(r.id))
 	var tabs := HBoxContainer.new(); drawer_content.add_child(tabs)
 	for tab in ["roster", "arsenal", "skills"]:
 		var label := "SWAP" if tab == "roster" and compact else "SWAP SOLDIER" if tab == "roster" else "SKILLS" if tab == "skills" else "GEAR" if compact else "ARMORY"
@@ -198,6 +195,9 @@ func _build_drawer() -> void:
 		b.custom_minimum_size.y = 44
 		b.modulate = S.CYAN if (tab == "skills" and armory_skills) or (drawer_tab == tab and not armory_skills) else Color.WHITE
 		tabs.add_child(b); wire_button(b)
+	if compact:
+		var close := S.button("×", close_inspector); close.custom_minimum_size = Vector2(44, 44)
+		tabs.add_child(close); wire_button(close)
 	var scroll := ScrollContainer.new(); scroll.size_flags_vertical = SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; drawer_content.add_child(scroll)
 	if drawer_tab == "arsenal":

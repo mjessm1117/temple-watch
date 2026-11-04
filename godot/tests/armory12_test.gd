@@ -13,6 +13,26 @@ func check(ok: bool, message: String) -> void:
 	checks += 1
 	if not ok: failures += 1; push_error("ARMORY12: " + message)
 
+func slots_inside(screen: Control, label: String) -> void:
+	var viewport := Rect2(Vector2.ZERO, screen.size)
+	for tile in screen.arsenal.slot_row.get_children():
+		check(viewport.encloses(tile.get_global_rect()), "%s slot %s stays inside viewport" % [label, tile.name])
+
+func deltas_inside(screen: Control, label: String) -> void:
+	var found := 0
+	for offer in screen.arsenal.offers:
+		if not offer.card.visible: continue
+		var row: Control = offer.card.find_child("Deltas", true, false)
+		if row == null: continue
+		for delta in row.get_children():
+			found += 1
+			check(offer.card.get_global_rect().encloses(delta.get_global_rect()), "%s picker delta stays inside card" % label)
+	check(found > 0, "%s picker exposes stat deltas" % label)
+
+func roster_inside(screen: Control, label: String) -> void:
+	for card in screen.cards.values():
+		check(screen.card_scroll.get_global_rect().encloses(card.get_global_rect()), "%s roster card %s stays visible" % [label, card.name])
+
 func run() -> void:
 	root.size = Vector2i(1366, 768)
 	var flow = root.get_node("CampaignFlow")
@@ -21,6 +41,17 @@ func run() -> void:
 	await process_frame
 	screen.inspect(0)
 	check(screen.stage_container.visible and screen.stage.focused == 0, "selected Jedi stays on 3D stage")
+	check(screen.stage.actors[0].visible and absf(screen.stage.actors[0].position.x) < 0.01 and not screen.stage.actors[1].visible, "selected actor stands alone at stage center")
+	slots_inside(screen, "desktop")
+	roster_inside(screen, "desktop")
+	screen.arsenal._select_slot("weapon")
+	await process_frame
+	var desktop_upgrade: Dictionary = screen.arsenal.offers.filter(func(o): return o.action == "base_mark")[0]
+	var desktop_delta: Control = desktop_upgrade.card.find_child("Deltas", true, false)
+	check(screen.drawer.get_global_rect().encloses(desktop_delta.get_global_rect()), "desktop upgrade deltas remain in inspector")
+	screen.arsenal._select_slot("armor")
+	await process_frame
+	deltas_inside(screen, "desktop")
 	check(screen.cards.size() == screen.selected.size(), "all squad portrait cards remain visible")
 	check(screen.arsenal.slot_row.get_child_count() >= 7, "gear slots expose saber, armor, utility and modules")
 	check(screen.arsenal.offers.any(func(o): return o.action == "saber"), "saber picker has craft offer")
@@ -43,6 +74,7 @@ func run() -> void:
 	var troop = flow.campaign.soldier(troop_id)
 	troop.rank = 2; troop.picks = []
 	screen.inspect(2); screen.arsenal._show_skills()
+	check(screen.stage.actors[2].visible and absf(screen.stage.actors[2].position.x) < 0.01 and not screen.stage.actors[0].visible, "selection moves the center actor")
 	check(screen.arsenal.picker.get_node_or_null("SkillTree") != null, "rank choices appear as a skill tree")
 	var options: Array = Progression.tree_options(troop, Progression.pending_rank(troop))
 	check(not options.is_empty(), "trooper has a pending promotion choice")
@@ -51,7 +83,19 @@ func run() -> void:
 	check(Progression.pending_rank(troop) != 1, "selected rank is no longer pending")
 	root.size = Vector2i(844, 390)
 	await process_frame
-	screen._layout()
+	screen.inspect(0)
+	await process_frame
+	slots_inside(screen, "phone")
+	roster_inside(screen, "phone")
+	screen.arsenal._select_slot("weapon")
+	await process_frame
+	var phone_upgrade: Dictionary = screen.arsenal.offers.filter(func(o): return o.action == "base_mark")[0]
+	var phone_delta: Control = phone_upgrade.card.find_child("Deltas", true, false)
+	check(screen.drawer.get_global_rect().encloses(phone_delta.get_global_rect()), "phone upgrade deltas remain in inspector")
+	screen.arsenal._select_slot("armor")
+	await process_frame
+	deltas_inside(screen, "phone")
+	check(screen.stage.actors[0].visible and absf(screen.stage.actors[0].position.x) < 0.01 and not screen.stage.actors[1].visible, "phone selection centers selected actor")
 	check(screen.stage_container.visible and screen.stage_container.size.y >= 200, "phone keeps actor visible")
 	check(screen.drawer.get_global_rect().end.x <= screen.size.x and screen.drawer.get_global_rect().end.y <= screen.size.y, "phone picker fits screen")
 	check(screen.card_scroll.visible and screen.card_scroll.get_global_rect().end.y <= screen.size.y, "phone squad cards fit screen")
