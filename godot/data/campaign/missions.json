@@ -400,6 +400,7 @@
     },
     "r_caves": {
       "n": "Kaan’s Holocron",
+      "turn_limit": 5,
       "where": "Cave network · Ruusan",
       "type": "holocron_recovery",
       "story": 1,

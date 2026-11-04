@@ -52,7 +52,7 @@ func run() -> void:
 			check(m.result != "",id+" campaign bot terminates")
 			finish_turns[m.turn] = int(finish_turns.get(m.turn,0))+1
 			if m.result == "win": wins += 1
-		print("MISSIONS11 CAMPAIGN %s: %d/20 wins (%d%%)" % [families[id],wins,wins*5])
+		print("MISSIONS11 CAMPAIGN %s (%s): %d/20 wins (%d%%)" % [id,families[id],wins,wins*5])
 		print("MISSIONS11 TURNS %s: %s" % [families[id],JSON.stringify(finish_turns)])
 		check(wins >= 7 and wins <= 16,id+" campaign Normal 35–80% band")
 	if "--family" in OS.get_cmdline_user_args():

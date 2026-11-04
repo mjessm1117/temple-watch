@@ -10,6 +10,7 @@ static func setup(m: RefCounted) -> void:
 	var s: Dictionary = m.objective_state
 	match str(m.spec.family):
 		"holocron_recovery":
+			m.spec.turn_limit = int(Maps.read("res://data/campaign/missions.json").MISSIONS.r_caves.turn_limit)
 			s.item_at = Maps.point(m.spec.objective.points[0]); s.carrier_id = -1
 			m.message("Recover the holocron. Its carrier moves two tiles slower; reach extraction before the Brotherhood converges.")
 		"evacuation":

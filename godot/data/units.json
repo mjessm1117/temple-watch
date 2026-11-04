@@ -370,7 +370,7 @@
     "name": "Brotherhood Sith Lord",
     "class_name": "Sith Warrior",
     "side": "enemy",
-    "hp": 42,
+    "hp": 54,
     "aim": 78,
     "mob": 6,
     "damage": [
