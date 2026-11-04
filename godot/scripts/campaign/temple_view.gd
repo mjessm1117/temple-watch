@@ -85,6 +85,7 @@ func _make_button(info: Dictionary) -> void:
 	name_label.offset_top = 2; name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
 	var line := Label.new()
 	line.text = str(info.status) if info.built else "BUILDING" if info.status == "Under construction" else "SEALED · EXCAVATE" if info.kind == "vault" else "BUILD HERE" if info.kind in ["spire", "annex"] or info.wing != "" else str(info.status)
+	if info.wing != "" and info.built: line.text += " · %d staff" % int(info.staff)
 	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	line.add_theme_font_size_override("font_size", 10)
 	line.add_theme_color_override("font_color", Color("e3c384") if info.built else Color("c5ae88"))
@@ -111,6 +112,14 @@ func _make_button(info: Dictionary) -> void:
 		label.add_theme_color_override("font_shadow_color", Color("02090c"))
 		label.add_theme_constant_override("shadow_offset_x", 1); label.add_theme_constant_override("shadow_offset_y", 1)
 	name_label.name = "RoomName"; line.name = "RoomDetail"
+	if str(info.id) == "war" or "NO POWER" in str(info.status) or "construction" in str(info.status):
+		var alert := Label.new(); alert.name = "RoomAlert"
+		alert.text = str(state.options.size()) if str(info.id) == "war" else "!"
+		alert.add_theme_font_size_override("font_size", 12)
+		alert.add_theme_color_override("font_color", Color("f6bf67"))
+		alert.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+		alert.offset_left = -20; alert.offset_right = -2
+		alert.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(alert)
 	name_label.visible = not Phone.narrow(Phone.window_size())
 	line.visible = not Phone.narrow(Phone.window_size())
 	b.mouse_entered.connect(_hover.bind(str(info.id)))

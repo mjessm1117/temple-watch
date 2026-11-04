@@ -30,6 +30,7 @@ done
 run_suite battle12_test
 run_suite mobile_web1_test
 run_suite rules12_test
+run_suite temple12_test --resolution 844x390 -- --phone
 run_suite graphics_test --rendering-method gl_compatibility -- --graphics=low
 run_suite graphics_test --rendering-method forward_plus -- --graphics=medium
 run_suite graphics_test --rendering-method forward_plus -- --graphics=high
