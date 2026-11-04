@@ -1,6 +1,7 @@
 extends RefCounted
 const Shot = preload("res://scripts/shot.gd")
 const Maps = preload("res://scripts/map_catalog.gd")
+const Families11 = preload("res://scripts/mission11_families.gd")
 
 static func setup(m: RefCounted) -> void:
 	var f := str(m.spec.family)
@@ -14,11 +15,13 @@ static func setup(m: RefCounted) -> void:
 		m.prisoner.escort_id = m.living("player")[0].id
 	if f == "ambush": spawn_runner(m,m.spec.objective)
 	if f == "operation": begin_step(m)
+	if Families11.applies(m): Families11.setup(m)
 	m.message("%s — %s" % [m.spec.name,status(m).label])
 
 static func targets(m: RefCounted) -> Array[Vector2i]:
 	var out: Array[Vector2i] = []
 	if m.result != "": return out
+	if Families11.applies(m): return Families11.targets(m)
 	if m.objective_state.phase != "primary" and m.spec.family not in ["hack_terminal","sabotage"]: return out
 	match str(m.spec.family):
 		"rescue", "vip_extract":
@@ -40,6 +43,7 @@ static func interact(m: RefCounted, u: Dictionary, p: Vector2i) -> Dictionary:
 	if not targets(m).has(p): return {"ok":false,"reason":"No active objective here"}
 	u.ap = int(u.ap)-1
 	var f := str(m.spec.family)
+	if Families11.applies(m): Families11.interact(m,u,p)
 	match f:
 		"rescue", "vip_extract":
 			m.prisoner.freed = true; m.prisoner.escort_id = u.id
@@ -87,6 +91,7 @@ static func at_evac(m: RefCounted, p: Vector2i) -> bool:
 
 static func check(m: RefCounted) -> void:
 	if m.result != "": return
+	if Families11.applies(m): Families11.check(m); return
 	var f := str(m.spec.family)
 	if bool(m.objective_state.get("objective_ready",false)) or f == "pursuit": primary_done(m)
 	if f == "operation": check_step(m)
@@ -108,6 +113,7 @@ static func check(m: RefCounted) -> void:
 
 static func enemy_end(m: RefCounted) -> void:
 	if m.result != "": return
+	if Families11.applies(m): Families11.enemy_end(m); return
 	var f := str(m.spec.family)
 	if f in ["rescue","vip_extract"] and bool(m.prisoner.freed):
 		var vip := Shot.pos(m.prisoner)
@@ -143,6 +149,7 @@ static func player_start(m: RefCounted) -> void:
 	var limit := int(m.spec.turn_limit)
 	if limit > 0 and start > 0 and m.turn-start >= limit:
 		fail(m,"%s window closed." % str(m.spec.family).replace("_"," "))
+	if Families11.applies(m): Families11.player_start(m)
 	check(m)
 
 static func current_step(m: RefCounted) -> Dictionary:
@@ -198,6 +205,7 @@ static func runner_turn(m: RefCounted, u: Dictionary) -> bool:
 static func status(m: RefCounted) -> Dictionary:
 	var s: Dictionary = m.objective_state
 	var label := "Extract the squad" if s.phase == "evac" else str(m.spec.family).replace("_"," ").capitalize()
+	if Families11.applies(m): label = Families11.status(m)
 	if s.phase == "primary":
 		match str(m.spec.family):
 			"rescue": label = "Free the prisoner, then escort to evac"

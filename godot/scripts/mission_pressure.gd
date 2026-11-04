@@ -5,6 +5,11 @@ const AI = preload("res://scripts/ai.gd")
 
 static func setup(m: RefCounted) -> void:
 	m.pressure_state = {"pending":[],"last_entry":-1,"waves":0,"brood_turn":0,"chain_turn":0,"chain_count":0,"calm_turn":0,"serial":0}
+	# Introduce one new threat at a time across the late war and later era.
+	var variants := {"dock":[2,0,"assassin11"],"r_muster":[1,0,"shield_droid11"],"r_bomb":[2,0,"alchemist11"],"r_nexus":[0,0,"beast11"],"h_roots":[1,0,"beast11"]}
+	if variants.has(str(m.spec.id)):
+		var swap: Array = variants[str(m.spec.id)]
+		if m.spec.groups.size() > int(swap[0]) and m.spec.groups[int(swap[0])].size() > int(swap[1]): m.spec.groups[int(swap[0])][int(swap[1])][0] = swap[2]
 	# Local additions avoid changing the combat lane's unit catalog.
 	var droid: Dictionary = m.catalog.trooper.duplicate(true)
 	droid.name = "Security Droid"; droid.droid = true; droid.class_name = "Security Droid"
@@ -65,7 +70,7 @@ static func player_start(m: RefCounted) -> void:
 		if wave > 2: kinds.append("agent")
 		if m.spec.has("wave_roster") and wave < m.spec.wave_roster.size(): kinds = m.spec.wave_roster[wave].duplicate()
 		queue(m,kinds,1,"Defense wave %d" % (wave+1)); m.pressure_state.waves += 1
-	elif m.spec.family != "defend" and m.turn == 4: queue(m,["trooper","trooper"],1,"Patrol support")
+	elif m.spec.family not in ["defend","holocron_recovery","evacuation","sith_lord_duel"] and m.turn == 4: queue(m,["trooper","trooper"],1,"Patrol support")
 
 static func brood(m: RefCounted) -> void:
 	if not bool(m.spec.get("swarm",false)) or m.turn % 2 != 0 or int(m.pressure_state.brood_turn) == m.turn: return

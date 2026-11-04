@@ -58,6 +58,7 @@ static func targets(m: RefCounted, u: Dictionary, id: String) -> Array[Dictionar
 			out.append(t)
 	elif kind.begins_with("enemy"):
 		for t in m.living("enemy"):
+			if preload("res://scripts/enemy11_tactics.gd").hidden(m,t): continue
 			if not bool(t.get("awake", false)) and not bool(t.get("spotted", false)): continue
 			if Shot.distance(Shot.pos(u), Shot.pos(t)) > radius: continue
 			if kind == "enemy_creature" and not bool(t.get("horror", false)) and not "creature" in t.get("tags", []): continue

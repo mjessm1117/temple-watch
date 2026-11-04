@@ -6,6 +6,8 @@ const Objectives = preload("res://scripts/mission_objectives.gd")
 const Pressure = preload("res://scripts/mission_pressure.gd")
 const Hack = preload("res://scripts/mission_hack.gd")
 const Telemetry = preload("res://scripts/mission_metrics.gd")
+const Families11 = preload("res://scripts/mission11_families.gd")
+const Enemy11 = preload("res://scripts/enemy11_tactics.gd")
 var objective_state: Dictionary = {}
 var pressure_state: Dictionary = {}
 var hack_state: Dictionary = {}
@@ -198,12 +200,14 @@ func ability_reason(id: int, ability_id: String) -> String:
 
 func apply_damage(target: Dictionary, amount: int, _source: Dictionary = {}) -> int:
 	if int(target.hp) <= 0: return 0
+	if modern: amount = Enemy11.intercept_damage(self,target,amount,_source)
 	if modern and bool(_source.get("horror",false)) and str(target.side) == "player" and str(target.class_name) not in ["Guardian","Consular"]: return 0
 	var shield: int = int(target.get("shield", 0))
 	var absorbed: int = mini(shield, amount)
 	target.shield = shield - absorbed
 	var actual: int = mini(int(target.hp), maxi(0, amount - absorbed))
 	target.hp = int(target.hp) - actual
+	if modern: Families11.damage(self,target)
 	if int(target.hp) <= 0 and str(target.side) == "player":
 		target.status = "down"; target.wounded = true; target.ap = 0; target.overwatch = false; target.hunkered = false
 		message("%s is Downed. Revive them this mission." % target.name)
@@ -296,6 +300,7 @@ func shot(id: int, target_id: int, mode: String = "shoot") -> bool:
 	var a := unit_by_id(id)
 	var t := unit_by_id(target_id)
 	if a.is_empty() or t.is_empty() or int(t.hp) <= 0 or a.side == t.side or result != "" or phase != str(a.side) or str(a.get("status", "ok")) == "down": return false
+	if modern and str(a.side) == "player" and Enemy11.hidden(self,t): return false
 	if str(a.side) == "player" and mode not in a.get("kit", []): return false
 	var melee := mode == "strike"
 	var ap_cost := int(abilities[mode].ap)
@@ -386,9 +391,12 @@ func free_prisoner(id: int) -> bool:
 	return true
 
 func _wake_groups() -> void:
+	if modern:
+		for e in living("enemy"): Enemy11.hidden(self,e)
 	var groups: Dictionary = {}
 	for u in living("enemy"):
 		if int(u.group) < 0 or bool(u.awake): continue
+		if modern and Enemy11.hidden(self,u): continue
 		if not groups.has(int(u.group)): groups[int(u.group)] = []
 		groups[int(u.group)].append(u)
 		for p in living("player"):
@@ -474,6 +482,7 @@ func begin_enemy_turn() -> void:
 
 func enemy_actor(e: Dictionary, fired: Dictionary) -> void:
 	if result != "" or phase != "enemy": return
+	if modern and Enemy11.act(self,e,fired): return
 	if modern and Objectives.runner_turn(self,e): return
 	if modern and Hack.controlled_turn(self,e): return
 	if modern and bool(e.awake) and Pressure.horror_turn(self,e): return
