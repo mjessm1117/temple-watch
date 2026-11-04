@@ -10,6 +10,7 @@ var techniques_open := false
 var targeting = preload("res://scripts/combat_targeting.gd").new()
 var night
 var phone
+var aim_ui
 
 static func move_color(ap_cost: int) -> Color:
 	return Color("60b9ff") if ap_cost == 1 else Color("ffd16a")
@@ -173,7 +174,11 @@ func _build_ui() -> void:
 	g.path_label = _label("", 15); g.path_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; info_row.add_child(g.path_label)
 	info_row.add_child(_label("LMB PREVIEW/CONFIRM  •  RMB CANCEL/PAN  •  TAB / Q-E TARGET  •  WASD PAN  •  SPACE SKIP", 12))
 	g.warning_label = _label("", 15); g.warning_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; g.warning_label.add_theme_color_override("font_color", Color("ffd37a")); bottom_box.add_child(g.warning_label)
-	var row := HFlowContainer.new(); row.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.custom_minimum_size.y = 128; bottom_box.add_child(row)
+	var ability_scroll := ScrollContainer.new(); ability_scroll.name = "DesktopAbilities"
+	ability_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	ability_scroll.custom_minimum_size.y = 128; ability_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bottom_box.add_child(ability_scroll)
+	var row := HFlowContainer.new(); row.size_flags_horizontal = Control.SIZE_EXPAND_FILL; ability_scroll.add_child(row)
 	var keys := {"move": "1", "shoot": "2", "strike": "3", "push": "4", "free": "5", "overwatch": "6", "hunker": "7"}
 	if g.mission.modern: keys.erase("free"); keys.interact = "5"
 	for mode in keys:
@@ -205,6 +210,8 @@ func _build_ui() -> void:
 	result_box.add_child(_button("Restart mission", func() -> void: g.get_tree().reload_current_scene()))
 	result_box.add_child(_button("Main menu", func() -> void: g.get_node("/root/CampaignFlow").go("menu")))
 	night = preload("res://scripts/hud_night1.gd").new(); night.g = g; root.add_child(night); night.setup(left_box, right_box)
+	aim_ui = preload("res://scripts/battle12_aim.gd").new()
+	aim_ui.setup(g, root, Phone.narrow(Phone.window_size()))
 	if Phone.narrow(Phone.window_size()):
 		phone = preload("res://scripts/hud_phone.gd").new()
 		phone.setup(g, night, root, top, left, right, bottom, row)
@@ -220,7 +227,7 @@ func _refresh() -> void:
 	var objective: Dictionary = g.mission.objective_status()
 	var clock_note := " · %d turns left" % int(objective.turns_left) if int(objective.turns_left) >= 0 else " · clock starts on reveal" if objective.get("clock_trigger", "") == "concealment" else ""
 	g.objective_label.text = "TURN %d · %s%s · %s" % [g.mission.turn,objective.label,clock_note,str(objective.phase).to_upper()]
-	g.selected_label.text = "%s\n%s%s\nHP %s\nAP %s\nFOCUS %d  •  MEDPACS %d%s" % [u.get("name", ""), u.get("class_name", ""), "  WOUNDED" if bool(u.get("wounded", false)) else "", "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, 3 - int(u.get("ap", 0)))), int(u.get("focus_left", 0)), int(u.get("medpacs", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
+	g.selected_label.text = "%s\n%s%s\nHP %s\nAP %s\nFOCUS %d  •  MEDPACS %d%s" % [u.get("name", ""), u.get("class_name", ""), "  WOUNDED" if bool(u.get("wounded", false)) else "", "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, (2 if g.mission.modern else 3) - int(u.get("ap", 0)))), int(u.get("focus_left", 0)), int(u.get("medpacs", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
 	if u.has("ammo"): g.selected_label.text += "\nAMMO %d/%d" % [int(u.ammo), int(u.clip)]
 	# --- wave10 story ---
 	var flow = g.get_node_or_null("/root/CampaignFlow")
@@ -267,7 +274,8 @@ func _refresh() -> void:
 			if str(member.side) == "player" and bool(member.get("wounded", false)): wounded.append(str(member.name))
 		g.result_label.text = ("MISSION COMPLETE" if g.mission.result == "win" else "MISSION FAILED") + "\nWounded: " + (", ".join(wounded) if not wounded.is_empty() else "None")
 	g._refresh_figures(); _refresh_highlights(true); _show_shot(); night.refresh()
-	if phone != null: phone.refresh()
+	if phone != null: phone.refresh(true)
+	if aim_ui != null: aim_ui.refresh()
 
 
 func _show_shot() -> void:
@@ -275,6 +283,7 @@ func _show_shot() -> void:
 	targeting.clear_trace()
 	if night != null: night.refresh_target.call_deferred()
 	if phone != null: phone.refresh.call_deferred()
+	if aim_ui != null: aim_ui.refresh.call_deferred()
 	var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
 	if g.action not in ["shoot", "strike", "push", "move"]:
 		var def: Dictionary = g.mission.abilities.get(g.action, {})

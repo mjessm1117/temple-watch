@@ -69,7 +69,7 @@ func refresh() -> void:
 			var mate: Dictionary = g.mission.unit_by_id(int(mate_id))
 			if not mate.is_empty(): bond = str(mate.get("name", "")); break
 		var rows: Array[String] = [str(u.get("class_name", "Jedi")), "HP %s" % ("●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))))]
-		var ap_pips := "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, 3 - int(u.get("ap", 0))))
+		var ap_pips := "◆".repeat(int(u.get("ap", 0))) + "◇".repeat(maxi(0, (2 if g.mission.modern else 3) - int(u.get("ap", 0))))
 		rows.append(("WILL %s   " % str(u.will) if u.has("will") else "") + "AP %s" % ap_pips)
 		rows.append("FOCUS %d  ·  MEDPACS %d" % [int(u.get("focus_left", 0)), int(u.get("medpacs", 0))])
 		var supplies := "AMMO %d/%d" % [int(u.ammo), int(u.clip)] if u.has("ammo") else ""
