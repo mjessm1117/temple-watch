@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#10191e">
+  <title>$GODOT_PROJECT_NAME</title>
+  $GODOT_HEAD_INCLUDE
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; background: #10191e; overflow: hidden; }
+    body { color: #f6e8c4; font-family: Georgia, "Times New Roman", serif; touch-action: none; }
+    #canvas { display: block; width: 100%; height: 100%; outline: none; }
+    #loading { position: fixed; inset: 0; display: grid; place-items: center; z-index: 4;
+      background: radial-gradient(ellipse at 50% 35%, #304647 0%, #17282d 47%, #0b161b 100%); }
+    #loading[hidden] { display: none; }
+    .panel { width: min(440px, calc(100vw - 48px)); text-align: center; }
+    .mark { display: block; margin: 0 auto 18px; width: 72px; height: 72px; border: 2px solid #bd9e64;
+      transform: rotate(45deg); box-shadow: 0 0 0 5px #182a2d, 0 0 0 6px #6f735c; }
+    .mark::before { content: "✦"; display: block; font: 48px/68px Georgia, serif; color: #e7c77b; transform: rotate(-45deg); }
+    h1 { margin: 26px 0 5px; font-size: clamp(25px, 6vw, 38px); letter-spacing: .13em; font-weight: 400; }
+    p { margin: 10px 0 22px; font: 15px/1.5 Arial, sans-serif; color: #d8d9cb; }
+    .track { height: 14px; padding: 3px; border: 1px solid #9e8c66; background: #081216; box-shadow: 0 0 24px #a7864860; }
+    #bar { height: 100%; width: 0; background: linear-gradient(90deg, #998156, #edcf87); transition: width .2s ease; }
+    #percent { margin-top: 10px; color: #f5db98; font: 15px Arial, sans-serif; font-variant-numeric: tabular-nums; }
+    #error { color: #ffd0b7; }
+  </style>
+</head>
+<body>
+  <canvas id="canvas">Your browser does not support canvas.</canvas>
+  <div id="loading" role="status" aria-live="polite">
+    <div class="panel">
+      <span class="mark" aria-hidden="true"></span>
+      <h1>TEMPLE WATCH</h1>
+      <p id="message">Loading Temple Watch...</p>
+      <div class="track" role="progressbar" aria-label="Download progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress"><div id="bar"></div></div>
+      <div id="percent">0%</div>
+      <p id="error" hidden></p>
+    </div>
+  </div>
+  <script src="$GODOT_URL"></script>
+  <script>
+    const GODOT_CONFIG = $GODOT_CONFIG;
+    const engine = new Engine(GODOT_CONFIG);
+    const loading = document.getElementById('loading');
+    const message = document.getElementById('message');
+    const progress = document.getElementById('progress');
+    const bar = document.getElementById('bar');
+    const percent = document.getElementById('percent');
+    function update(current, total) {
+      if (total > 0) {
+        const value = Math.max(0, Math.min(100, Math.floor(current / total * 100)));
+        progress.setAttribute('aria-valuenow', value);
+        bar.style.width = value + '%';
+        percent.textContent = value + '%';
+        if (value === 100) message.textContent = 'Preparing Temple Watch...';
+      }
+    }
+    function failure(error) {
+      console.error(error);
+      message.textContent = 'Temple Watch could not load.';
+      document.getElementById('error').hidden = false;
+      document.getElementById('error').textContent = String(error);
+    }
+    async function start() {
+      const missing = Engine.getMissingFeatures({threads: false});
+      if (missing.length) throw new Error('Missing browser features: ' + missing.join(', '));
+      if (GODOT_CONFIG.serviceWorker && 'serviceWorker' in navigator) {
+        const hadController = Boolean(navigator.serviceWorker.controller);
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (hadController) location.reload();
+        });
+        try {
+          const registration = await navigator.serviceWorker.register(GODOT_CONFIG.serviceWorker,
+            {scope: './', updateViaCache: 'none'});
+          await registration.update();
+          await navigator.serviceWorker.ready;
+          if (!navigator.serviceWorker.controller) {
+            await Promise.race([
+              new Promise(resolve => navigator.serviceWorker.addEventListener('controllerchange', resolve, {once: true})),
+              new Promise(resolve => setTimeout(resolve, 3000))
+            ]);
+          }
+        } catch (error) {
+          console.warn('Offline cache:', error);
+        }
+      }
+      await engine.startGame({onProgress: update});
+      loading.hidden = true;
+    }
+    start().catch(failure);
+  </script>
+</body>
+</html>
