@@ -4,9 +4,10 @@ class_name AbilityEngine
 const Combat = preload("res://scripts/combat_abilities.gd")
 const Bonds = preload("res://scripts/combat_bonds.gd")
 const Shot = preload("res://scripts/shot.gd")
+const Rules12 = preload("res://scripts/rules12_actions.gd")
 
 static func cost(def: Dictionary, u: Dictionary) -> int:
-	return int(u.get("ap", 0)) if str(def.get("ap")) == "remaining" else int(def.get("ap", 1))
+	return Rules12.cost(def, u)
 
 static func range_of(def: Dictionary, u: Dictionary) -> float:
 	return float(u.get("range", 0)) if str(def.get("range")) == "weapon" else float(def.get("range", 0))
@@ -19,7 +20,7 @@ static func reason(m: RefCounted, u: Dictionary, id: String) -> String:
 	var def: Dictionary = m.abilities[id]
 	var combat_reason := Combat.reason(m, u, id, def)
 	if combat_reason != "": return combat_reason
-	if int(u.get("ap", 0)) < cost(def, u) or (str(def.get("ap")) == "remaining" and int(u.get("ap", 0)) == 0): return "Need %d AP" % maxi(1, cost(def, u))
+	if int(u.get("ap", 0)) < cost(def, u) or (int(u.get("ap", 0)) == 0 and cost(def, u) > 0): return "Need %d AP" % maxi(1, cost(def, u))
 	if int(u.get("focus_left", 0)) < int(def.get("focus", 0)): return "Need %d Focus" % int(def.focus)
 	var charge := str(def.get("charges", ""))
 	if charge != "" and int(u.get(charge, 0)) <= 0: return "No charges"
@@ -50,7 +51,7 @@ static func targets(m: RefCounted, u: Dictionary, id: String) -> Array[Dictionar
 			if kind == "ally_down" and str(t.get("status", "ok")) != "down": continue
 			if kind == "ally_injured" and str(t.get("status", "ok")) != "down" and int(t.hp) >= int(t.max_hp): continue
 			if kind in ["ally", "ally_other", "ally_bond"] and int(t.hp) <= 0: continue
-			if kind in ["ally_other", "ally_bond"] and (int(t.id) == int(u.id) or int(t.ap) >= 3): continue
+			if kind in ["ally_other", "ally_bond"] and (int(t.id) == int(u.id) or int(t.ap) >= Rules12.ACTIONS_PER_TURN): continue
 			if kind == "ally_bond":
 				if t not in Bonds.partners(m, u): continue
 				if bool(m.bond_pairs[u.bondmates[int(t.id)]].get("aid_used", false)): continue
@@ -148,7 +149,7 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 			for enemy in m.living("enemy"):
 				if Shot.distance(Shot.pos(u), Shot.pos(enemy)) <= range_of(def, u): enemy.debuff_aim = int(def.get("enemy_aim", 0)); enemy.debuff_until = m.turn + 1
 		"focus": u.focus_left = mini(int(u.focus), int(u.focus_left) + int(def.get("amount", 0)) + (1 if "wildBond" in u.get("passives", []) else 0))
-		"ap": u.ap = int(u.ap) + int(def.get("amount", 0))
+		"ap": u.ap = mini(Rules12.ACTIONS_PER_TURN, int(u.ap) + int(def.get("amount", 0)))
 		"leap": u.x = tile.x; u.y = tile.y; u.leap_aim = int(def.get("next_strike_aim", 0)); m._wake_groups(); m._enemy_reaction_fire(u)
 		"area_attack":
 			for enemy in m.living("enemy"):
@@ -181,6 +182,7 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 	if int(def.get("darkness", 0)) > 0: u.darkness = int(u.get("darkness", 0)) + int(def.darkness)
 	m.message("%s uses %s." % [u.name, def.name])
 	m.ability_uses[id] = int(m.ability_uses.get(id, 0)) + 1
+	if bool(def.get("ends_turn", false)): u.ap = 0
 	m._check_lose()
 	return true
 

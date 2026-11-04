@@ -59,7 +59,7 @@ func mission(id: String) -> RefCounted:
 func adjacent(m: RefCounted, u: Dictionary, p: Vector2i) -> void:
 	for d in Shot.DIRS:
 		if m.passable(p+d) and not m.occupied(p+d,int(u.id)):
-			u.x = p.x+d.x; u.y = p.y+d.y; u.ap = 3; return
+			u.x = p.x+d.x; u.y = p.y+d.y; u.ap = 2; return
 	check(false,"objective has an interaction tile")
 
 func extract(m: RefCounted) -> void:
@@ -79,10 +79,10 @@ func _rules() -> void:
 			check(not m.interact(u,p).ok,id+" distant interaction rejected")
 			adjacent(m,u,p); var copy := u.duplicate(true)
 			check(not m.interact(copy,p).ok,id+" foreign actor rejected")
-			u.ap = 0; check(not m.interact(u,p).ok,id+" no AP rejected"); u.ap = 3
+			u.ap = 0; check(not m.interact(u,p).ok,id+" no AP rejected"); u.ap = 2
 			m.phase = "enemy"; check(not m.interact(u,p).ok,id+" enemy phase rejected"); m.phase = "player"
 			var response: Dictionary = m.interact(u,p)
-			check(response.ok and int(u.ap) == 2,id+" interact spends exactly one AP")
+			check(response.ok and int(u.ap) == 1,id+" interact spends exactly one AP")
 			if id != "dock": check(not m.interact(u,p).ok,id+" cannot repeat completed objective")
 		var safety := 0
 		while m.objective_state.phase == "primary" and not m.interactables().is_empty() and safety < 10:
@@ -176,7 +176,7 @@ func _operations() -> void:
 	check(chase.objective_state.phase == "evac","stunning courier completes chase")
 	var ambush = mission("adraasHunt")
 	runner = ambush.unit_by_id(int(ambush.objective_state.runner_id))
-	runner.x = runner.runner_exit[0]; runner.y = runner.runner_exit[1]; runner.ap = 3; ambush.phase = "enemy"
+	runner.x = runner.runner_exit[0]; runner.y = runner.runner_exit[1]; runner.ap = 2; ambush.phase = "enemy"
 	Objectives.runner_turn(ambush,runner)
 	check(ambush.result == "loss","runner reaches exit: ambush fails")
 	ambush = mission("adraasHunt")
@@ -204,7 +204,7 @@ func _hacks_and_swarm() -> void:
 	m.units = m.units.filter(func(member): return member.side == "player")
 	m._spawn("trooper",int(u.x),int(u.y)-2,0); var droid: Dictionary = m.units[-1]; droid.droid = true; droid.controlled_until = m.turn+1
 	m._spawn("trooper",int(u.x)+2,int(u.y)-2,1); var target: Dictionary = m.units[-1]
-	droid.aim = 200; droid.ap = 3; m.phase = "enemy"
+	droid.aim = 200; droid.ap = 2; m.phase = "enemy"
 	var hp := int(target.hp); Hack.controlled_turn(m,droid)
 	check(droid.side == "enemy" and not droid.has("controlled_until") and int(target.hp) < hp,"controlled droid attacks an enemy then restores allegiance")
 	droid.aim = 80; droid.hack_aim_until = 3; m.turn = 3; Hack.player_start(m)

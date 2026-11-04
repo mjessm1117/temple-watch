@@ -26,9 +26,9 @@ static func adopt(source: RefCounted, campaign_state: Dictionary = {}) -> RefCou
 
 func setup_combat(campaign_state: Dictionary = {}) -> void:
 	if modern:
-		abilities.rewardSafe = {"name":"Safe hack", "target":"tile_reward", "effect":"reward_hack", "ap":1, "range":4}
-		abilities.rewardRisky = {"name":"Risky hack", "target":"tile_reward", "effect":"reward_hack", "ap":1, "range":4}
-		abilities.relayAttack = {"name":"Fire at relay", "target":"tile_relay", "effect":"relay_attack", "ap":2, "range":"weapon", "ammo_cost":1}
+		abilities.rewardSafe = {"name":"Safe hack", "target":"tile_reward", "effect":"reward_hack", "ap":1, "cost":1, "ends_turn":false, "range":4}
+		abilities.rewardRisky = {"name":"Risky hack", "target":"tile_reward", "effect":"reward_hack", "ap":1, "cost":1, "ends_turn":false, "range":4}
+		abilities.relayAttack = {"name":"Fire at relay", "target":"tile_relay", "effect":"relay_attack", "ap":1, "cost":1, "ends_turn":true, "range":"weapon", "ammo_cost":1}
 	identity = preload("res://scripts/tactical_identity.gd").new(campaign_state)
 	squad_concealed = bool(spec.get("concealed", spec.get("concealment", false)))
 	for u in units:

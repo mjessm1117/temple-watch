@@ -23,7 +23,7 @@ static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> bool:
 	match str(e.get("kind","")):
 		"assassin11":
 			if bool(e.get("stunned",false)): return false
-			if not bool(e.awake): e.ap = 3
+			if not bool(e.awake): e.ap = 2
 			var target: Dictionary = nearest(m,e)
 			if target.is_empty(): return true
 			var dest := flank(m,e,target)
@@ -62,7 +62,7 @@ static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> bool:
 			if m.tile(blocker) in ["c","h","k"]:
 				m.set_tile(blocker,"r"); m.terrain_revision += 1
 				m.message("The beast charges through half cover!")
-			var reach: Dictionary = m.paths(e,int(e.mob)*2); var best := Shot.pos(e)
+			var reach: Dictionary = m.reach_tiles(e, 1); var best := Shot.pos(e)
 			for p in reach.costs:
 				if Shot.distance(p,Shot.pos(prey)) < Shot.distance(best,Shot.pos(prey)): best = p
 			if best != Shot.pos(e): m.move(int(e.id),best)
@@ -90,7 +90,7 @@ static func cardinal(delta: Vector2i) -> Vector2i:
 	return Vector2i(signi(delta.x),0) if absi(delta.x) >= absi(delta.y) else Vector2i(0,signi(delta.y))
 
 static func flank(m: RefCounted, e: Dictionary, target: Dictionary) -> Vector2i:
-	var reach: Dictionary = m.paths(e,int(e.mob)*2); var best := Shot.pos(e); var score := -INF
+	var reach: Dictionary = m.reach_tiles(e, 1); var best := Shot.pos(e); var score := -INF
 	for p in reach.costs:
 		var d := Shot.distance(p,Shot.pos(target))
 		var side: int = absi(p.x-int(target.x)) if absi(int(e.y)-int(target.y)) > absi(int(e.x)-int(target.x)) else absi(p.y-int(target.y))

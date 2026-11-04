@@ -78,6 +78,15 @@ static func choose_destination(m: RefCounted, e: Dictionary, budget: int = -1, r
 		if score > best_score + 0.01: best_score = score; best = q
 	return best
 
+static func can_attack_from(m: RefCounted, e: Dictionary, at: Vector2i) -> bool:
+	var probe := e.duplicate()
+	probe.x = at.x; probe.y = at.y
+	for target in m.living("player"):
+		if is_melee(e) and maxi(absi(at.x-int(target.x)), absi(at.y-int(target.y))) > 1: continue
+		var info: Dictionary = Shot.calculate(m, probe, target, is_melee(e))
+		if bool(info.los) and bool(info.range_ok): return true
+	return false
+
 static func scamper(m: RefCounted, e: Dictionary) -> void:
 	if int(e.hp) <= 0: return
 	if m.phase == "enemy": e.skip_turn = true
@@ -141,9 +150,14 @@ static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> void:
 			return
 	if int(e.ap) >= 1:
 		var dest := choose_destination(m, e, int(e.mob))
+		if int(e.ap) >= 2 and not can_attack_from(m, e, dest):
+			var dash := choose_destination(m, e, int(e.mob) * 2)
+			if dash != Shot.pos(e) and destination_score(m, e, dash) > destination_score(m, e, dest) + 0.01:
+				m.move(int(e.id), dash)
+				return
 		if dest != Shot.pos(e): m.move(int(e.id), dest)
 	if int(e.hp) <= 0: return
-	if int(e.ap) >= (1 if is_melee(e) else 2) and not bool(e.get("disarmed", false)):
+	if int(e.ap) >= 1 and not bool(e.get("disarmed", false)):
 		target = choose_target(m, e, fired)
 		if not target.is_empty():
 			var mode := "strike" if is_melee(e) else "shoot"

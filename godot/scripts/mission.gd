@@ -17,6 +17,7 @@ const Shot = preload("res://scripts/shot.gd")
 const AI = preload("res://scripts/ai.gd")
 const Settings = preload("res://scripts/settings.gd")
 const Ability = preload("res://scripts/abilities_engine.gd")
+const Rules12 = preload("res://scripts/rules12_actions.gd")
 var spec: Dictionary
 var catalog: Dictionary
 var abilities: Dictionary
@@ -39,7 +40,6 @@ var action_events: Array[Dictionary] = []
 var ability_uses: Dictionary = {}
 var clues := 0
 var saved_by: Dictionary = {}
-
 func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") -> void:
 	rng.seed = seed_value
 	spec = Maps.load_map(data_path)
@@ -97,9 +97,10 @@ func _spawn(kind: String, x: int, y: int, group: int) -> void:
 		u.damage = [maxi(1, int(u.damage[0]) + penalty), maxi(2, int(u.damage[1]) + penalty)]
 	else:
 		u.aim = int(u.aim) + int(difficulty.get("player_aim", 0))
+		u.mob = int(u.mob) + int(difficulty.get("player_mob", 0))
 		u.hp = int(u.hp) + int(difficulty.get("player_hp", 0))
 		u.max_hp = int(u.hp)
-	u["ap"] = 3 if str(u.side) == "player" else 0
+	u["ap"] = Rules12.ACTIONS_PER_TURN if str(u.side) == "player" else 0
 	u["focus_left"] = int(u.get("focus", 0))
 	u["group"] = group
 	u["awake"] = group < 0
@@ -245,16 +246,17 @@ func paths(u: Dictionary, budget: int = 10) -> Dictionary:
 			prev[q] = p
 			queue.append(q)
 	return {"costs": costs, "prev": prev}
-
+func reach_tiles(unit: Dictionary, actions: int) -> Dictionary:
+	return Rules12.reach(self, unit, actions)
 func move(id: int, dest: Vector2i) -> bool:
 	var u := unit_by_id(id)
 	if u.is_empty() or result != "" or phase != str(u.side) or int(u.ap) < 1 or str(u.get("status", "ok")) == "down": return false
-	var reach := paths(u, int(u.mob) * 2)
+	var reach := reach_tiles(u, 2)
 	if not reach.costs.has(dest) or dest == Shot.pos(u): return false
 	var cost: int = int(reach.costs[dest])
 	var ap_cost: int = 1 if cost <= int(u.mob) else 2
 	if int(u.ap) < ap_cost: return false
-	u.ap = int(u.ap) - ap_cost
+	Rules12.spend_move(u, ap_cost)
 	var old: Vector2i = Shot.pos(u)
 	if modern: Telemetry.travel(self,u,dest,reach.prev)
 	u.x = dest.x
@@ -274,7 +276,6 @@ func move(id: int, dest: Vector2i) -> bool:
 		_check_win()
 	else: _reaction_fire(u)
 	return true
-
 func _follow_prisoner(old: Vector2i, dest: Vector2i) -> void:
 	var p := Vector2i(int(prisoner.x), int(prisoner.y))
 	var delta := dest - p
@@ -303,13 +304,13 @@ func shot(id: int, target_id: int, mode: String = "shoot") -> bool:
 	if modern and str(a.side) == "player" and Enemy11.hidden(self,t): return false
 	if str(a.side) == "player" and mode not in a.get("kit", []): return false
 	var melee := mode == "strike"
-	var ap_cost := int(abilities[mode].ap)
+	var ap_cost := Rules12.cost(abilities[mode], a)
 	if int(a.ap) < ap_cost: return false
 	if melee and "strike" not in a.get("kit", []) and str(a.get("side", "")) == "player": return false
 	if melee and max(abs(int(a.x) - int(t.x)), abs(int(a.y) - int(t.y))) > 1: return false
 	var info: Dictionary = Shot.calculate(self, a, t, melee, int(a.get("leap_aim", 0)) if melee else 0)
 	if not bool(info.los) or not bool(info.range_ok): return false
-	a.ap = int(a.ap) - ap_cost
+	Rules12.spend(a, abilities[mode])
 	_apply_attack(a, t, info, mode)
 	if melee: a.leap_aim = 0
 	if str(a.side) == "player": _wake_groups()
@@ -359,7 +360,7 @@ func push(id: int, target_id: int) -> bool:
 	if str(a.get("class_name", "")) not in ["Guardian", "Consular", "Sith Warrior"]: return false
 	if int(a.ap) < int(abilities.push.ap) or int(a.focus_left) < int(abilities.push.focus): return false
 	if Shot.distance(Shot.pos(a), Shot.pos(t)) > float(abilities.push.range) or not Shot.los(self, Shot.pos(a), Shot.pos(t)): return false
-	a.ap = int(a.ap) - int(abilities.push.ap)
+	Rules12.spend(a, abilities.push)
 	a.focus_left = int(a.focus_left) - int(abilities.push.focus)
 	if modern and str(a.side) == "player": break_concealment("Force push")
 	var old_target := Shot.pos(t)
@@ -454,7 +455,7 @@ func hunker(id: int) -> bool:
 	var u := unit_by_id(id)
 	if u.is_empty() or u.side != "player" or phase != "player" or int(u.ap) <= 0 or result != "": return false
 	if "hunker" not in u.get("kit", []): return false
-	u.ap = 0
+	u.ap = int(u.ap) - 1
 	u.hunkered = true
 	u.overwatch = false
 	message("%s hunkers down (+30 defense; flank critical blocked)." % u.name)
@@ -477,7 +478,7 @@ func begin_enemy_turn() -> void:
 	if result != "": return
 	phase = "enemy"
 	_wake_groups()
-	for u in living("enemy"): u.ap = 3; u.overwatch = false
+	for u in living("enemy"): u.ap = Rules12.ACTIONS_PER_TURN; u.overwatch = false
 	if modern: Pressure.brood(self)
 
 func enemy_actor(e: Dictionary, fired: Dictionary) -> void:
@@ -486,7 +487,7 @@ func enemy_actor(e: Dictionary, fired: Dictionary) -> void:
 	if modern and Objectives.runner_turn(self,e): return
 	if modern and Hack.controlled_turn(self,e): return
 	if modern and bool(e.awake) and Pressure.horror_turn(self,e): return
-	if modern and bool(e.awake) and Objectives.defense_turn(self,e): return
+	if modern and bool(e.awake) and Rules12.defense_turn(self,e): return
 	if bool(e.awake): AI.act(self,e,fired)
 
 func finish_enemy_turn() -> void:
@@ -503,7 +504,7 @@ func finish_enemy_turn() -> void:
 	phase = "player"
 	for p in living("player"):
 		if modern and bool(p.overwatch): message("Overwatch held: nothing crossed %s's sight." % p.name)
-		p.ap = 3; p.overwatch = false; p.hunkered = false
+		p.ap = Rules12.ACTIONS_PER_TURN; p.overwatch = false; p.hunkered = false
 		if int(p.get("buff_until", 0)) <= turn: p.erase("buff_defense"); p.erase("buff_aim")
 		if int(p.get("guard_until", 0)) <= turn: p.erase("guard")
 	for e in living("enemy"):

@@ -3,15 +3,19 @@
     "name": "Move",
     "ap": 1,
     "target": "tile",
-    "effect": "move"
+    "effect": "move",
+    "cost": 1,
+    "ends_turn": false
   },
   "shoot": {
     "name": "Shoot",
-    "ap": 2,
+    "ap": 1,
     "target": "enemy",
     "effect": "attack",
     "weapon": true,
-    "range": "weapon"
+    "range": "weapon",
+    "cost": 1,
+    "ends_turn": true
   },
   "strike": {
     "name": "Strike",
@@ -20,7 +24,9 @@
     "effect": "attack",
     "melee": true,
     "weapon": true,
-    "range": 1.5
+    "range": 1.5,
+    "cost": 1,
+    "ends_turn": true
   },
   "push": {
     "name": "Push",
@@ -30,26 +36,34 @@
     "target": "enemy",
     "effect": "displace",
     "distance": 2,
-    "collision_damage": 3
+    "collision_damage": 3,
+    "cost": 1,
+    "ends_turn": true
   },
   "free": {
     "name": "Free Mira",
     "ap": 1,
     "target": "prisoner",
-    "effect": "free"
+    "effect": "free",
+    "cost": 1,
+    "ends_turn": false
   },
   "overwatch": {
     "name": "Overwatch",
-    "ap": "remaining",
+    "ap": 1,
     "target": "self",
-    "effect": "overwatch"
+    "effect": "overwatch",
+    "cost": 1,
+    "ends_turn": true
   },
   "hunker": {
     "name": "Hunker Down",
-    "ap": "remaining",
+    "ap": 1,
     "target": "self",
     "effect": "hunker",
-    "defense": 30
+    "defense": 30,
+    "cost": 1,
+    "ends_turn": false
   },
   "medpac": {
     "name": "Medpac",
@@ -59,7 +73,9 @@
     "effect": "heal",
     "heal": 4,
     "revive": 2,
-    "charges": "medpacs"
+    "charges": "medpacs",
+    "cost": 1,
+    "ends_turn": false
   },
   "revive": {
     "name": "Revive",
@@ -67,25 +83,31 @@
     "range": 1.5,
     "target": "ally_down",
     "effect": "heal",
-    "revive": 2
+    "revive": 2,
+    "cost": 1,
+    "ends_turn": false
   },
   "guard": {
     "name": "Guard",
-    "ap": "remaining",
+    "ap": 1,
     "target": "self",
     "effect": "guard",
-    "defense": 25
+    "defense": 25,
+    "cost": 1,
+    "ends_turn": false
   },
   "meditate": {
     "name": "Meditate",
-    "ap": 2,
+    "ap": 1,
     "target": "self",
     "effect": "focus",
-    "amount": 2
+    "amount": 2,
+    "cost": 1,
+    "ends_turn": false
   },
   "saberThrow": {
     "name": "Saber Throw",
-    "ap": "remaining",
+    "ap": 1,
     "focus": 2,
     "range": 5,
     "target": "enemy",
@@ -96,7 +118,9 @@
     ],
     "chance": 85,
     "ignore_cover": true,
-    "pierce": true
+    "pierce": true,
+    "cost": 1,
+    "ends_turn": true
   },
   "leap": {
     "name": "Force Leap",
@@ -105,28 +129,34 @@
     "range": 6,
     "target": "tile",
     "effect": "leap",
-    "next_strike_aim": 15
+    "next_strike_aim": 15,
+    "cost": 1,
+    "ends_turn": false
   },
   "sweep": {
     "name": "Saber Sweep",
-    "ap": "remaining",
+    "ap": 1,
     "focus": 2,
     "range": 1.5,
     "target": "self",
     "effect": "area_attack",
     "damage": "weapon",
     "aim_mod": -10,
-    "melee": true
+    "melee": true,
+    "cost": 1,
+    "ends_turn": true
   },
   "stun": {
     "name": "Stun",
-    "ap": "remaining",
+    "ap": 1,
     "focus": 2,
     "range": 5,
     "target": "enemy",
     "effect": "status",
     "status": "stunned",
-    "chance": 85
+    "chance": 85,
+    "cost": 1,
+    "ends_turn": true
   },
   "forceHeal": {
     "name": "Force Heal",
@@ -137,7 +167,9 @@
     "target": "ally_injured",
     "effect": "heal",
     "heal": 4,
-    "revive": 2
+    "revive": 2,
+    "cost": 1,
+    "ends_turn": false
   },
   "barrier": {
     "name": "Force Barrier",
@@ -147,53 +179,63 @@
     "target": "ally",
     "effect": "buff",
     "defense": 40,
-    "duration": 1
+    "duration": 1,
+    "cost": 1,
+    "ends_turn": false
   },
   "battleMed": {
     "name": "Battle Meditation",
-    "ap": "remaining",
+    "ap": 1,
     "focus": 3,
     "range": 6,
     "target": "self",
     "effect": "aura",
     "aim": 10,
     "enemy_aim": -10,
-    "duration": 1
+    "duration": 1,
+    "cost": 1,
+    "ends_turn": true
   },
   "mindTrick": {
     "name": "Mind Trick",
-    "ap": "remaining",
+    "ap": 1,
     "focus": 3,
     "range": 5,
     "target": "enemy",
     "effect": "status",
     "status": "tricked",
-    "chance": 70
+    "chance": 70,
+    "cost": 1,
+    "ends_turn": true
   },
   "forceRevive": {
     "name": "Force Revive",
-    "ap": "remaining",
+    "ap": 1,
     "focus": 4,
     "range": 1.5,
     "target": "ally_down",
     "effect": "heal",
     "revive": 4,
-    "charges": "force_revive"
+    "charges": "force_revive",
+    "cost": 1,
+    "ends_turn": false
   },
   "suppress": {
     "name": "Suppress",
-    "ap": "remaining",
+    "ap": 1,
     "range": "weapon",
     "target": "enemy",
     "effect": "status",
     "status": "suppressed",
     "aim": -30,
     "reaction": true,
-    "ammo_cost": 1
+    "ammo_cost": 1,
+    "cost": 1,
+    "ends_turn": true
   },
   "rapidFire": {
     "name": "Rapid Fire",
-    "ap": "remaining",
+    "ap": 1,
     "range": "weapon",
     "target": "enemy",
     "effect": "attack",
@@ -201,7 +243,9 @@
     "shots": 2,
     "aim_mod": -15,
     "cooldown": 1,
-    "ammo_cost": 2
+    "ammo_cost": 2,
+    "cost": 1,
+    "ends_turn": true
   },
   "rally": {
     "name": "Rally",
@@ -209,7 +253,9 @@
     "range": 4,
     "target": "self",
     "effect": "aura",
-    "clear_status": true
+    "clear_status": true,
+    "cost": 1,
+    "ends_turn": false
   },
   "mark": {
     "name": "Mark",
@@ -218,7 +264,9 @@
     "target": "enemy",
     "effect": "status",
     "status": "marked",
-    "ally_aim": 15
+    "ally_aim": 15,
+    "cost": 1,
+    "ends_turn": true
   },
   "runGun": {
     "name": "Run & Gun",
@@ -226,18 +274,22 @@
     "target": "self",
     "effect": "ap",
     "amount": 1,
-    "cooldown": 1
+    "cooldown": 1,
+    "cost": 0,
+    "ends_turn": false
   },
   "deadeye": {
     "name": "Deadeye",
-    "ap": "remaining",
+    "ap": 1,
     "range": "weapon",
     "target": "enemy",
     "effect": "attack",
     "damage": "weapon",
     "damage_mod": 3,
     "aim_mod": -20,
-    "ammo_cost": 1
+    "ammo_cost": 1,
+    "cost": 1,
+    "ends_turn": true
   },
   "heal": {
     "name": "Medkit",
@@ -247,7 +299,9 @@
     "effect": "heal",
     "heal": 4,
     "revive": 2,
-    "charges": "medpacs"
+    "charges": "medpacs",
+    "cost": 1,
+    "ends_turn": false
   },
   "smoke": {
     "name": "Smoke",
@@ -258,14 +312,18 @@
     "radius": 1,
     "defense": 20,
     "duration": 2,
-    "charges": "smoke"
+    "charges": "smoke",
+    "cost": 1,
+    "ends_turn": true
   },
   "hack": {
     "name": "Hack",
-    "ap": "remaining",
+    "ap": 1,
     "range": 4,
     "target": "tile_console",
-    "effect": "hack"
+    "effect": "hack",
+    "cost": 1,
+    "ends_turn": true
   },
   "reviveStim": {
     "name": "Revive Stim",
@@ -274,11 +332,13 @@
     "target": "ally_down",
     "effect": "heal",
     "revive": 2,
-    "charges": "medpacs"
+    "charges": "medpacs",
+    "cost": 1,
+    "ends_turn": false
   },
   "protocol": {
     "name": "Combat Protocol",
-    "ap": "remaining",
+    "ap": 1,
     "range": 8,
     "target": "enemy_droid",
     "effect": "attack",
@@ -288,7 +348,9 @@
     ],
     "chance": 100,
     "no_los": true,
-    "ignore_cover": true
+    "ignore_cover": true,
+    "cost": 1,
+    "ends_turn": true
   },
   "shieldDrone": {
     "name": "Shield Drone",
@@ -297,11 +359,13 @@
     "target": "ally",
     "effect": "buff",
     "shield": 4,
-    "charges": "shield_drone"
+    "charges": "shield_drone",
+    "cost": 1,
+    "ends_turn": false
   },
   "choke": {
     "name": "Choke",
-    "ap": "remaining",
+    "ap": 1,
     "focus": 2,
     "range": 5,
     "target": "enemy",
@@ -312,20 +376,24 @@
     ],
     "chance": 90,
     "ignore_cover": true,
-    "darkness": 2
+    "darkness": 2,
+    "cost": 1,
+    "ends_turn": true
   },
   "subdue": {
     "name": "Subdue",
-    "ap": "remaining",
+    "ap": 1,
     "range": 1.5,
     "target": "enemy_subdue",
     "effect": "capture",
     "chance": 60,
-    "stunned_chance": 85
+    "stunned_chance": 85,
+    "cost": 1,
+    "ends_turn": true
   },
   "collapse": {
     "name": "Collapse",
-    "ap": "remaining",
+    "ap": 1,
     "focus": 3,
     "range": 5,
     "target": "tile_wall",
@@ -333,60 +401,82 @@
     "damage": [
       4,
       4
-    ]
+    ],
+    "cost": 1,
+    "ends_turn": true
   },
   "defLine": {
     "name": "Defensive Line",
     "passive": true,
     "effect": "adjacent_defense",
-    "defense": 15
+    "defense": 15,
+    "cost": 0,
+    "ap": 0,
+    "ends_turn": false
   },
   "reflectM": {
     "name": "Reflect Mastery",
     "passive": true,
     "effect": "reflect",
-    "chance": 65
+    "chance": 65,
+    "cost": 0,
+    "ap": 0,
+    "ends_turn": false
   },
   "spotter": {
     "name": "Spotter",
     "passive": true,
     "effect": "squadsight",
-    "range": 11
+    "range": 11,
+    "cost": 0,
+    "ap": 0,
+    "ends_turn": false
   },
   "ghost": {
     "name": "Ghost",
     "passive": true,
     "effect": "reconceal",
-    "charges": 1
+    "charges": 1,
+    "cost": 0,
+    "ap": 0,
+    "ends_turn": false
   },
   "hackDroid": {
     "name": "Hack Droid",
-    "ap": "remaining",
+    "ap": 1,
     "range": 4,
     "target": "enemy_droid",
     "effect": "status",
     "status": "stunned",
-    "chance": 60
+    "chance": 60,
+    "cost": 1,
+    "ends_turn": true
   },
   "scan": {
     "name": "Scan Clue",
     "ap": 1,
     "range": 1.5,
     "target": "tile_scan",
-    "effect": "scan"
+    "effect": "scan",
+    "cost": 1,
+    "ends_turn": false
   },
   "reload": {
     "name": "Reload",
     "ap": 1,
     "target": "self",
-    "effect": "reload"
+    "effect": "reload",
+    "cost": 1,
+    "ends_turn": false
   },
   "interact": {
     "name": "Interact",
     "ap": 1,
     "target": "tile_interact",
     "effect": "interact",
-    "range": 1.5
+    "range": 1.5,
+    "cost": 1,
+    "ends_turn": false
   },
   "pull": {
     "name": "Force Pull",
@@ -398,7 +488,9 @@
     "distance": 3,
     "collision_damage": 2,
     "pull": true,
-    "chance": 90
+    "chance": 90,
+    "cost": 1,
+    "ends_turn": true
   },
   "breach": {
     "name": "Saber Breach",
@@ -406,11 +498,13 @@
     "target": "tile_wall",
     "effect": "breach",
     "range": 1.5,
-    "cover_damage": 8
+    "cover_damage": 8,
+    "cost": 1,
+    "ends_turn": true
   },
   "grenade": {
     "name": "Grenade",
-    "ap": 2,
+    "ap": 1,
     "target": "tile_area",
     "effect": "blast",
     "range": 6,
@@ -420,11 +514,13 @@
     ],
     "charges": "grenades",
     "friendly_fire": true,
-    "cover_damage": 4
+    "cover_damage": 4,
+    "cost": 1,
+    "ends_turn": true
   },
   "ionNade": {
     "name": "Ion Grenade",
-    "ap": 2,
+    "ap": 1,
     "target": "tile_area",
     "effect": "blast",
     "range": 6,
@@ -435,14 +531,18 @@
     "droid_damage": 4,
     "charges": "grenades",
     "friendly_fire": true,
-    "status": "stunned"
+    "status": "stunned",
+    "cost": 1,
+    "ends_turn": true
   },
   "stabilize": {
     "name": "Stabilize",
     "ap": 1,
     "target": "ally_down",
     "effect": "stabilize",
-    "range": 1.5
+    "range": 1.5,
+    "cost": 1,
+    "ends_turn": false
   },
   "liftUp": {
     "name": "Pick Up",
@@ -450,28 +550,36 @@
     "target": "ally_down",
     "effect": "heal",
     "range": 1.5,
-    "revive": 2
+    "revive": 2,
+    "cost": 1,
+    "ends_turn": false
   },
   "door": {
     "name": "Open Door",
     "ap": 1,
     "target": "tile_interact",
     "effect": "interact",
-    "range": 1.5
+    "range": 1.5,
+    "cost": 1,
+    "ends_turn": false
   },
   "console": {
     "name": "Use Console",
     "ap": 1,
     "target": "tile_interact",
     "effect": "interact",
-    "range": 1.5
+    "range": 1.5,
+    "cost": 1,
+    "ends_turn": false
   },
   "plant": {
     "name": "Plant Charge",
     "ap": 1,
     "target": "tile_interact",
     "effect": "interact",
-    "range": 1.5
+    "range": 1.5,
+    "cost": 1,
+    "ends_turn": false
   },
   "shadowStep": {
     "name": "Shadow Step",
@@ -480,75 +588,91 @@
     "effect": "shadow",
     "focus": 1,
     "range": 5,
-    "next_strike_aim": 20
+    "next_strike_aim": 20,
+    "cost": 1,
+    "ends_turn": false
   },
   "beastCalm": {
     "name": "Beast Calm",
-    "ap": "remaining",
+    "ap": 1,
     "target": "enemy_creature",
     "effect": "status",
     "focus": 2,
     "range": 5,
     "chance": 75,
-    "status": "stunned"
+    "status": "stunned",
+    "cost": 1,
+    "ends_turn": true
   },
   "holdLine": {
     "name": "Hold the Line",
-    "ap": "remaining",
+    "ap": 1,
     "target": "self",
-    "effect": "hold_line"
+    "effect": "hold_line",
+    "cost": 1,
+    "ends_turn": true
   },
   "disarm": {
     "name": "Disarm",
-    "ap": "remaining",
+    "ap": 1,
     "target": "enemy",
     "effect": "status",
     "focus": 2,
     "range": 5,
     "chance": 80,
-    "status": "disarmed"
+    "status": "disarmed",
+    "cost": 1,
+    "ends_turn": true
   },
   "root": {
     "name": "Force Bind",
-    "ap": "remaining",
+    "ap": 1,
     "target": "enemy",
     "effect": "status",
     "focus": 2,
     "range": 5,
     "chance": 80,
-    "status": "rooted"
+    "status": "rooted",
+    "cost": 1,
+    "ends_turn": true
   },
   "flurry": {
     "name": "Flurry",
-    "ap": "remaining",
+    "ap": 1,
     "target": "enemy",
     "effect": "attack",
     "range": 1.5,
     "melee": true,
     "shots": 2,
     "aim_mod": -10,
-    "focus": 1
+    "focus": 1,
+    "cost": 1,
+    "ends_turn": true
   },
   "mightyBlow": {
     "name": "Mighty Blow",
-    "ap": "remaining",
+    "ap": 1,
     "target": "enemy",
     "effect": "attack",
     "range": 1.5,
     "melee": true,
     "damage_mod": 2,
-    "focus": 2
+    "focus": 2,
+    "cost": 1,
+    "ends_turn": true
   },
   "precisionStrike": {
     "name": "Precision Strike",
-    "ap": "remaining",
+    "ap": 1,
     "target": "enemy",
     "effect": "attack",
     "range": 1.5,
     "melee": true,
     "damage_mod": 1,
     "aim_mod": 20,
-    "focus": 2
+    "focus": 2,
+    "cost": 1,
+    "ends_turn": true
   },
   "massHeal": {
     "name": "Mass Heal",
@@ -557,7 +681,9 @@
     "effect": "mass_heal",
     "focus": 3,
     "range": 4,
-    "heal": 2
+    "heal": 2,
+    "cost": 1,
+    "ends_turn": false
   },
   "medBeacon": {
     "name": "Med Beacon",
@@ -566,11 +692,13 @@
     "effect": "mass_heal",
     "range": 3,
     "heal": 2,
-    "charges": "med_beacon"
+    "charges": "med_beacon",
+    "cost": 1,
+    "ends_turn": false
   },
   "forceWave": {
     "name": "Force Wave",
-    "ap": "remaining",
+    "ap": 1,
     "target": "self",
     "effect": "wave",
     "focus": 3,
@@ -580,21 +708,25 @@
       2
     ],
     "chance": 40,
-    "status": "stunned"
+    "status": "stunned",
+    "cost": 1,
+    "ends_turn": true
   },
   "stasisField": {
     "name": "Stasis Field",
-    "ap": "remaining",
+    "ap": 1,
     "target": "self",
     "effect": "wave",
     "focus": 4,
     "range": 3.2,
     "chance": 60,
-    "status": "stunned"
+    "status": "stunned",
+    "cost": 1,
+    "ends_turn": true
   },
   "tremor": {
     "name": "Tremor",
-    "ap": "remaining",
+    "ap": 1,
     "target": "tile_area",
     "effect": "blast",
     "focus": 3,
@@ -604,18 +736,22 @@
       2
     ],
     "cover_damage": 4,
-    "clear_overwatch": true
+    "clear_overwatch": true,
+    "cost": 1,
+    "ends_turn": true
   },
   "chainShot": {
     "name": "Chain Shot",
-    "ap": "remaining",
+    "ap": 1,
     "target": "enemy",
     "effect": "attack",
     "range": "weapon",
     "shots": 2,
     "follow_hit": true,
     "aim_mod": -10,
-    "ammo_cost": 2
+    "ammo_cost": 2,
+    "cost": 1,
+    "ends_turn": true
   },
   "coverFire": {
     "name": "Covering Fire",
@@ -625,7 +761,9 @@
     "range": "weapon",
     "status": "suppressed",
     "aim": -30,
-    "ammo_cost": 1
+    "ammo_cost": 1,
+    "cost": 1,
+    "ends_turn": true
   },
   "handoff": {
     "name": "Hand Off",
@@ -633,7 +771,9 @@
     "target": "ally_other",
     "effect": "handoff",
     "range": 4,
-    "once_turn": true
+    "once_turn": true,
+    "cost": 1,
+    "ends_turn": false
   },
   "backup": {
     "name": "Call Backup",
@@ -641,7 +781,9 @@
     "target": "enemy",
     "effect": "backup",
     "range": "weapon",
-    "squad_once": true
+    "squad_once": true,
+    "cost": 0,
+    "ends_turn": false
   },
   "moSurge": {
     "name": "Momentum Surge",
@@ -649,7 +791,9 @@
     "target": "self",
     "effect": "surge",
     "momentum": 3,
-    "once_turn": true
+    "once_turn": true,
+    "cost": 0,
+    "ends_turn": false
   },
   "moRally": {
     "name": "Momentum Rally",
@@ -657,7 +801,9 @@
     "target": "self",
     "effect": "momentum_rally",
     "momentum": 5,
-    "squad_once": true
+    "squad_once": true,
+    "cost": 0,
+    "ends_turn": false
   },
   "moStrike": {
     "name": "Fire Support",
@@ -670,22 +816,26 @@
       3,
       5
     ],
-    "cover_damage": 4
+    "cover_damage": 4,
+    "cost": 0,
+    "ends_turn": false
   },
   "snipe": {
     "name": "Snipe",
-    "ap": 3,
+    "ap": 1,
     "target": "enemy",
     "effect": "attack",
     "range": "weapon",
     "damage_mod": 2,
     "aim_mod": 15,
     "crit_mod": 20,
-    "ammo_cost": 1
+    "ammo_cost": 1,
+    "cost": 1,
+    "ends_turn": true
   },
   "barrage": {
     "name": "Barrage",
-    "ap": 3,
+    "ap": 1,
     "target": "tile_area",
     "effect": "blast",
     "range": "weapon",
@@ -695,7 +845,9 @@
     ],
     "cover_damage": 4,
     "cooldown": 1,
-    "ammo_cost": 2
+    "ammo_cost": 2,
+    "cost": 1,
+    "ends_turn": true
   },
   "shieldWall": {
     "name": "Shield Wall",
@@ -704,63 +856,88 @@
     "effect": "aura",
     "range": 1.5,
     "defense": 20,
-    "duration": 1
+    "duration": 1,
+    "cost": 1,
+    "ends_turn": false
   },
   "taunt": {
     "name": "Draw Fire",
     "ap": 1,
     "target": "self",
-    "effect": "taunt"
+    "effect": "taunt",
+    "cost": 1,
+    "ends_turn": false
   },
   "fanFire": {
     "name": "Fan the Hammer",
-    "ap": 2,
+    "ap": 1,
     "target": "enemy",
     "effect": "attack",
     "range": "weapon",
     "shots": 3,
     "aim_mod": -15,
     "damage_mod": -1,
-    "ammo_cost": 3
+    "ammo_cost": 3,
+    "cost": 1,
+    "ends_turn": true
   },
   "bondAid": {
     "name": "Bond: Teamwork",
     "ap": 1,
     "target": "ally_bond",
     "effect": "bond_aid",
-    "range": 8
+    "range": 8,
+    "cost": 1,
+    "ends_turn": false
   },
   "bondStrike": {
     "name": "Bond: Crossfire",
     "ap": 1,
     "target": "enemy",
     "effect": "bond_strike",
-    "range": "weapon"
+    "range": "weapon",
+    "cost": 1,
+    "ends_turn": true
   },
   "shredder": {
     "name": "Shredder",
     "passive": true,
-    "effect": "shred"
+    "effect": "shred",
+    "cost": 0,
+    "ap": 0,
+    "ends_turn": false
   },
   "sense": {
     "name": "Sense",
     "passive": true,
-    "effect": "detection"
+    "effect": "detection",
+    "cost": 0,
+    "ap": 0,
+    "ends_turn": false
   },
   "executioner": {
     "name": "Executioner",
     "passive": true,
-    "effect": "wounded_aim"
+    "effect": "wounded_aim",
+    "cost": 0,
+    "ap": 0,
+    "ends_turn": false
   },
   "pathfinder": {
     "name": "Pathfinder",
     "passive": true,
-    "effect": "mobility"
+    "effect": "mobility",
+    "cost": 0,
+    "ap": 0,
+    "ends_turn": false
   },
   "wildBond": {
     "name": "Wild Bond",
     "passive": true,
-    "effect": "focus_bonus"
+    "effect": "focus_bonus",
+    "cost": 0,
+    "ap": 0,
+    "ends_turn": false
   },
   "lordLightning11": {
     "name": "Force Lightning",
@@ -771,6 +948,9 @@
       3,
       3
     ],
-    "description": "Phase two: strikes the nearest soldier once per turn."
+    "description": "Phase two: strikes the nearest soldier once per turn.",
+    "cost": 1,
+    "ap": 1,
+    "ends_turn": true
   }
 }

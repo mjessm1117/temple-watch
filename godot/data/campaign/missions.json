@@ -384,7 +384,7 @@
       "where": "Field hospital ravine · Ruusan",
       "type": "evacuation",
       "story": 1,
-      "brief": "Five Army of Light wounded are trapped in the ravine. Gather each civilian so they follow the column to the blue exit. Brotherhood reinforcements arrive every two turns. Save at least four; every survivor counts.",
+      "brief": "Five Army of Light wounded are trapped in the ravine. Gather each civilian so they follow the column to the blue exit. Brotherhood reinforcements arrive every two turns. Save all five.",
       "reward": {
         "credits": 70,
         "recruits": 1
@@ -396,11 +396,11 @@
       "map": "res://data/maps/w11_evacuation.json",
       "family": "evacuation",
       "theme": "plains",
-      "goal": "Gather five wounded civilians and escort at least four to the blue exit before the Brotherhood closes the ravine."
+      "goal": "Gather all five wounded civilians and escort them to the blue exit before the Brotherhood closes the ravine."
     },
     "r_caves": {
       "n": "Kaan’s Holocron",
-      "turn_limit": 5,
+      "turn_limit": 9,
       "where": "Cave network · Ruusan",
       "type": "holocron_recovery",
       "story": 1,

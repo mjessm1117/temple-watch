@@ -14,7 +14,7 @@ static func reason(m: RefCounted, u: Dictionary, id: String, def: Dictionary) ->
 	if int(def.get("momentum", 0)) > 0 and (m.get("momentum") == null or m.momentum < int(def.momentum)): return "Need %d Momentum" % int(def.momentum)
 	if id == "bondAid":
 		for p in Bonds.partners(m, u):
-			if not bool(m.bond_pairs[u.bondmates[int(p.id)]].get("aid_used", false)) and int(p.ap) < 3: return ""
+			if not bool(m.bond_pairs[u.bondmates[int(p.id)]].get("aid_used", false)) and int(p.ap) < 2: return ""
 		return "No ready bondmate"
 	if id == "bondStrike" and Bonds.partners(m, u).is_empty(): return "Bondmate unavailable"
 	return ""
@@ -61,8 +61,8 @@ static func effect(m: RefCounted, u: Dictionary, t: Dictionary, tile: Vector2i, 
 				if def.has("damage"): m.apply_damage(enemy, int(def.damage[0]), u)
 				if int(enemy.hp) > 0 and m.rng.randi_range(1, 100) <= int(def.chance): enemy.stunned = true; enemy.stunned_until = m.turn + 1; enemy.overwatch = false
 		"blast": _blast(m, u, tile, def)
-		"handoff": t.ap = mini(3, int(t.ap) + 1)
-		"surge": u.ap = int(u.ap) + 1
+		"handoff": t.ap = mini(2, int(t.ap) + 1)
+		"surge": u.ap = mini(2, int(u.ap) + 1)
 		"momentum_rally":
 			for ally in m.living("player"): ally.buff_aim = int(ally.get("buff_aim", 0)) + 10; ally.buff_until = m.turn + 1
 		"taunt": u.taunt = true; u.taunt_until = m.turn + 1

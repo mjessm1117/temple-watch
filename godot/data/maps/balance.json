@@ -30,6 +30,12 @@
       "objective": {
         "civilian_interval": 2
       }
+    },
+    "evacuation": {
+      "turn_limit": 9
+    },
+    "sith_lord_duel": {
+      "turn_limit": 11
     }
   }
 }

@@ -40,7 +40,7 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 		assertion.call(int(Controls.move_preview(m, actor, dash).ap) == 2, "dash preview costs two AP")
 		actor.ap = 1
 		assertion.call(Controls.move_preview(m, actor, dash).is_empty(), "dash disabled with one AP")
-		actor.ap = 3
+		actor.ap = 2
 	assertion.call(Controls.move_preview(m, actor, start).is_empty(), "current tile cannot be ordered")
 	assertion.call(Controls.valid_targets(m, squad[2], "shoot").is_empty(), "unspotted enemies cannot be targeted")
 	var enemy: Dictionary = m.living("enemy")[0]
@@ -48,14 +48,14 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 	enemy.x = int(actor.x) + 1; enemy.y = int(actor.y)
 	var shooter: Dictionary = squad[2]
 	assertion.call(Controls.valid_targets(m, shooter, "shoot").size() == 1, "legal spotted shooter target appears")
-	shooter.ap = 1
+	shooter.ap = 0
 	assertion.call(Controls.valid_targets(m, shooter, "shoot").is_empty(), "shot unavailable without AP")
-	shooter.ap = 3
+	shooter.ap = 2
 	assertion.call(Controls.next_squad(m, int(actor.id), 1) == int(squad[1].id), "Tab advances squad")
 	var tracked: RefCounted = Mission.new(7)
 	var mover: Dictionary = tracked.living("enemy")[0]
 	mover.awake = true
-	mover.ap = 3
+	mover.ap = 2
 	tracked.phase = "enemy"
 	var from: Vector2i = Shot.pos(mover)
 	var destination := Vector2i(-1, -1)

@@ -28,6 +28,7 @@ for suite in run campaign_test campaign11_test gear_research_test story_port_tes
   run_suite "$suite"
 done
 run_suite mobile_web1_test
+run_suite rules12_test
 run_suite graphics_test --rendering-method gl_compatibility -- --graphics=low
 run_suite graphics_test --rendering-method forward_plus -- --graphics=medium
 run_suite graphics_test --rendering-method forward_plus -- --graphics=high

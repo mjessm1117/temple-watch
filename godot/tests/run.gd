@@ -128,20 +128,24 @@ func _test_actions() -> void:
 	var start_ap: int = int(u.ap)
 	check(m.move(int(u.id), Vector2i(4, 20)), "move legal")
 	check(int(u.ap) == start_ap - 1, "move costs 1 AP")
-	check(m.move(int(u.id), Vector2i(4, 12)), "dash legal")
-	check(int(u.ap) == 0, "dash costs 2 AP")
-	check(not m.move(int(u.id), Vector2i(4, 11)), "zero AP blocks move")
+	check(not m.move(int(u.id), Vector2i(4, 12)), "dash needs two actions")
+	var dash = Mission.new(1)
+	var runner: Dictionary = dash.living("player")[0]
+	runner.x = 4; runner.y = 20
+	check(dash.move(int(runner.id), Vector2i(4, 12)), "dash legal")
+	check(int(runner.ap) == 0, "dash costs 2 AP")
+	check(not dash.move(int(runner.id), Vector2i(4, 11)), "zero AP blocks move")
 	m.units = m.living("player")
 	m.end_turn()
-	check(int(u.ap) == 3, "turn restores 3 AP")
+	check(int(u.ap) == 2, "turn restores 2 actions")
 	var small = _blank()
 	small._spawn("soldier", 2, 2, -1)
 	small._spawn("trooper", 5, 2, -1)
 	var shooter: Dictionary = small.units[0]
 	var target: Dictionary = small.units[1]
 	check(small.shot(int(shooter.id), int(target.id)), "rifle shot legal")
-	check(int(shooter.ap) == 1, "rifle shot costs 2 AP")
-	check(not small.shot(int(shooter.id), int(target.id)), "second shot blocked at 1 AP")
+	check(int(shooter.ap) == 0, "rifle shot ends turn")
+	check(not small.shot(int(shooter.id), int(target.id)), "second shot blocked")
 	var fail = Mission.new(1)
 	for i in range(int(fail.spec.turn_limit)): fail.end_turn()
 	check(fail.result == "loss", "clock loss path")
@@ -173,7 +177,7 @@ func _test_mission_layout() -> void:
 	push.set_tile(Vector2i(5, 2), "c")
 	check(push.push(int(push.units[0].id), int(push.units[1].id)), "Force Push legal")
 	check(push.tile(Vector2i(5, 2)) == "r", "Force Push destroys cover")
-	check(int(push.units[0].ap) == 2 and int(push.units[0].focus_left) == 2, "Force Push AP and Focus")
+	check(int(push.units[0].ap) == 0 and int(push.units[0].focus_left) == 2, "Force Push ends turn and spends Focus")
 	print("mission: 26x26, two routes, staged groups, announced drop, cover break")
 
 func _test_ai() -> void:
@@ -277,7 +281,7 @@ func _test_wave4_rules() -> void:
 	heavy.set_tile(Vector2i(4, 5), "c")
 	heavy._apply_attack(heavy.units[0], heavy.units[1], {"hit": 100, "crit": 0}, "shoot")
 	check(int(heavy.cover_hp[Vector2i(4, 5)]) == 1, "heavy hit damages adjacent cover")
-	check(m.hunker(int(a.id)) and int(a.ap) == 0, "hunker ends action")
+	check(m.hunker(int(a.id)) and int(a.ap) == 1, "hunker costs one action")
 	check(Shot.calculate(m, t, a).lines.any(func(line: Array) -> bool: return line[0] == "Defense" and int(line[1]) == -30), "hunker grants 30 defense")
 	m.set_tile(Vector2i(3, 5), "c")
 	var hunker_flank: Dictionary = Shot.calculate(m, {"x": 1, "y": 5, "aim": 70, "range": 9}, a)

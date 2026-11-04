@@ -59,7 +59,8 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 			var used: bool = m.use_ability(int(u.id), id, target_id, tile)
 			assertion.call(used, "%s resolves %s" % [kind, id])
 			if used:
-				assertion.call(int(u.ap) == ap_before - Ability.cost(def, {"ap": ap_before}) + (int(def.get("amount", 0)) if id == "runGun" else 0), "%s spends AP" % id)
+				var remaining := ap_before - Ability.cost(def, {"ap": ap_before}) + (int(def.get("amount", 0)) if id == "runGun" else 0)
+				assertion.call(int(u.ap) == (0 if bool(def.get("ends_turn", false)) else mini(2, remaining)), "%s spends AP" % id)
 				if id != "meditate": assertion.call(int(u.focus_left) == focus_before - int(def.get("focus", 0)), "%s spends Focus" % id)
 				if charge != "": assertion.call(int(u.get(charge, 0)) == charges_before - 1, "%s spends charge" % id)
 				if id == "leap": assertion.call(Shot.pos(u) == tile, "Force Leap changes position")
@@ -74,7 +75,7 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 				if id == "barrier": assertion.call(int(ally.get("buff_defense", 0)) == 40, "Force Barrier grants full cover defense")
 				if id == "smoke": assertion.call(int(ally.get("buff_defense", 0)) == 20, "Smoke protects nearby ally")
 				if id == "battleMed": assertion.call(int(u.get("buff_aim", 0)) == 10 and int(enemy.get("debuff_aim", 0)) == -10, "Battle Meditation shifts squad and enemy aim")
-				if id == "runGun": assertion.call(int(u.ap) == ap_before + 1, "Run & Gun grants a free action")
+				if id == "runGun": assertion.call(int(u.ap) == mini(2, ap_before + 1), "Run & Gun restores one action up to the turn limit")
 				if id == "stun": assertion.call(bool(enemy.get("stunned", false)), "Stun applies")
 				if id == "shieldDrone": assertion.call(int(ally.get("shield", 0)) == 4, "Shield Drone absorbs four")
 				if id in ["forceRevive", "reviveStim"]: assertion.call(int(ally.hp) > 0 and bool(ally.wounded), "%s revives Wounded" % id)
@@ -85,7 +86,7 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 	injured.hp = int(injured.max_hp) - 2
 	assertion.call(m.use_ability(int(actor.id), "medpac", int(injured.id)), "medpac heals ally")
 	assertion.call(int(injured.hp) == int(injured.max_hp), "healing caps at max HP")
-	actor.ap = 3; injured.hp -= 3
+	actor.ap = 2; injured.hp -= 3
 	assertion.call(m.use_ability(int(actor.id), "medpac", int(injured.id)), "second medpac heals")
 	assertion.call(int(actor.medpacs) == 0 and m.ability_reason(int(actor.id), "medpac") == "No charges", "medpac charges run out")
 	var down: RefCounted = arena("soldier")
@@ -102,7 +103,7 @@ static func run_checks(runner: SceneTree, assertion: Callable) -> void:
 	var force: RefCounted = arena("consular")
 	force.units[1].hp -= 4
 	assertion.call(force.use_ability(int(force.units[0].id), "forceHeal", int(force.units[1].id)), "Force Heal works")
-	force.units[0].ap = 3; force.units[0].focus_left = 9; force.units[1].hp -= 3
+	force.units[0].ap = 2; force.units[0].focus_left = 9; force.units[1].hp -= 3
 	assertion.call(force.ability_reason(int(force.units[0].id), "forceHeal").begins_with("Cooldown"), "Force Heal cooldown shown")
 	var distant: RefCounted = arena("consular")
 	distant.units[1].x = 5; distant.units[1].y = 2

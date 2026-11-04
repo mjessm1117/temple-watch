@@ -66,10 +66,10 @@ func run() -> void:
 			var near: Vector2i = target+d
 			if m.passable(near) and not m.occupied(near,int(actor.id)):
 				actor.x = near.x; actor.y = near.y; break
-		actor.ap = 3; game.selected_id = int(actor.id)
+		actor.ap = 2; game.selected_id = int(actor.id)
 		game._choose_action("interact")
 		await game._use_ability(-1,target)
-		check(int(actor.ap) == 2,"live Interact consumes exactly one AP")
+		check(int(actor.ap) == 1,"live Interact consumes exactly one AP")
 	check(m.objective_state.phase == "evac" and m.objective_state.done.size() == 2,"Interact completes the sabotage objective in a real battle")
 	check(not m.squad_concealed and not "MIRA" in game.objective_label.text,"interaction reveals squad and updates family HUD")
 	check(not m.pressure_state.pending.is_empty() and int(m.pressure_state.pending[0].turn) > m.turn,"evac reinforcements announced a turn ahead")

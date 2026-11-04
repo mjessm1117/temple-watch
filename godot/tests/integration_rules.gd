@@ -106,7 +106,7 @@ func _tactical_contracts(check: Callable) -> void:
 	actor.x = 4; actor.y = 4; ally.x = 5; ally.y = 4
 	m.set_tile(Vector2i(4,4),"."); m.set_tile(Vector2i(5,4),".")
 	for i in 2:
-		actor.ap = 3; ally.hp = int(ally.max_hp)-4
+		actor.ap = 2; ally.hp = int(ally.max_hp)-4
 		check.call(m.use_ability(int(actor.id),"medpac",int(ally.id)),"actual healing succeeds")
 	check.call(m.mercy_events.size() == 2 and m.mercy_events[0].action_id != m.mercy_events[1].action_id,"verified mercy gets distinct action IDs")
 	var result_id: String = c.state.pending_mission.result_id
@@ -117,10 +117,10 @@ func _tactical_contracts(check: Callable) -> void:
 	m = launch(c,{"mission":"archive","map_variant":0})
 	actor = m.living("player")[0]
 	var terminal: Vector2i = m.interactables()[0]
-	actor.x = terminal.x-1; actor.y = terminal.y; actor.ap = 3
+	actor.x = terminal.x-1; actor.y = terminal.y; actor.ap = 2
 	var options: Dictionary = m.Hack.options(m,actor,terminal)
 	check.call(not options.is_empty() and options.has("safe") and options.has("risky"),"objective terminal offers independent reward hacks")
-	check.call(m.use_ability(int(actor.id),"rewardSafe",-1,terminal) and int(actor.ap) == 2 and m.objective_state.done.is_empty(),"reward hack spends one AP without copying primary terminal")
+	check.call(m.use_ability(int(actor.id),"rewardSafe",-1,terminal) and int(actor.ap) == 1 and m.objective_state.done.is_empty(),"reward hack spends one AP without copying primary terminal")
 	check.call(m.living("enemy").any(func(u): return bool(u.get("droid",false))),"authored hack map contains a hackable security droid")
 	var barrel := Vector2i(4,4)
 	actor.x = 5; actor.y = 4
@@ -131,10 +131,10 @@ func _tactical_contracts(check: Callable) -> void:
 	m = launch(c,{"mission":"dock","map_variant":0})
 	actor = m.living("player")[2]
 	var relay: Vector2i = m.interactables()[0]
-	actor.x = relay.x-1; actor.y = relay.y; actor.ap = 3
+	actor.x = relay.x-1; actor.y = relay.y; actor.ap = 2
 	var ammo := int(actor.ammo); var integrity := int(m.objective_state.relay_hp)
 	check.call(m.use_ability(int(actor.id),"relayAttack",-1,relay),"weapon can target relay")
-	check.call(int(actor.ap) == 1 and int(actor.ammo) == ammo-1 and int(m.objective_state.relay_hp)<integrity,"relay weapon attack charges AP and ammo once")
+	check.call(int(actor.ap) == 0 and int(actor.ammo) == ammo-1 and int(m.objective_state.relay_hp)<integrity,"relay weapon attack ends turn and spends ammo once")
 	c = Campaign.new("normal")
 	m = launch(c,{"mission":"rescue","map_variant":0})
 	m.units = m.units.filter(func(u): return u.side == "player")

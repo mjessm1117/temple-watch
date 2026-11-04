@@ -72,7 +72,7 @@ func run() -> void:
 func _holocron() -> void:
 	var m = mission("r_caves"); var u: Dictionary = m.living("player")[0]
 	var at: Vector2i = m.interactables()[0]
-	u.x = at.x-1; u.y = at.y; u.ap = 3
+	u.x = at.x-1; u.y = at.y; u.ap = 2
 	var before := int(u.mob)
 	check(m.interact(u,at).ok and int(u.mob) == before-2 and m.objective_state.phase == "evac","holocron pickup slows carrier and triggers extraction")
 	check(not m.pressure_state.pending.is_empty(),"holocron pursuit announced")
@@ -126,11 +126,11 @@ func _enemies() -> void:
 	var healer: Dictionary = m.living("enemy").filter(func(u): return u.kind == "alchemist11")[0]
 	var ally: Dictionary = m.living("enemy").filter(func(u): return u.kind != "alchemist11")[0]
 	ally.x = int(healer.x)+1; ally.y = int(healer.y); ally.hp = int(ally.hp)-2
-	m.phase = "enemy"; healer.ap = 3; var before := int(ally.hp); Enemy.act(m,healer,{})
+	m.phase = "enemy"; healer.ap = 2; var before := int(ally.hp); Enemy.act(m,healer,{})
 	check(int(ally.hp) > before,"alchemist heals a nearby ally")
 	var beast_map = mission("r_ravine"); var beast: Dictionary = beast_map.living("enemy").filter(func(u): return u.kind == "beast11")[0]
 	check(int(beast.mob) >= 8 and "creature" in beast.tags,"beast is fast melee creature")
-	beast_map.phase = "enemy"; beast.ap = 3; beast.awake = true
+	beast_map.phase = "enemy"; beast.ap = 2; beast.awake = true
 	var prey: Dictionary = beast_map.living("player")[0]; prey.x = int(beast.x); prey.y = int(beast.y)+3
 	var obstacle := Shot.pos(beast)+Vector2i.DOWN; beast_map.set_tile(obstacle,"c")
 	Enemy.act(beast_map,beast,{})

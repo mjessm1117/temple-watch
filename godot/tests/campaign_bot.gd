@@ -76,7 +76,7 @@ static func turn(m) -> void:
 			for e in foes:
 				if "strike" in u.kit and maxi(absi(int(u.x)-int(e.x)),absi(int(u.y)-int(e.y)))<=1:
 					if m.shot(int(u.id),int(e.id),"strike"): attacked = true; break
-				if "shoot" in u.kit and int(u.ap)>=2:
+				if "shoot" in u.kit and int(u.ap)>=1:
 					var info: Dictionary = Shot.calculate(m,u,e)
 					if info.los and info.range_ok and int(info.hit)>=40:
 						if int(u.get("ammo",1)) == 0: attacked = m.use_ability(int(u.id),"reload")
@@ -94,7 +94,7 @@ static func turn(m) -> void:
 				for e in foes:
 					if Shot.distance(Shot.pos(u),Shot.pos(e))<=float(u.mob)+1 and (Shot.distance(Shot.pos(e),dest)<Shot.distance(Shot.pos(u),dest)+3 or m.spec.family=="ambush"):
 						dest = Shot.pos(e); break
-			if advance_to(m,u,dest,int(u.ap)>=3): continue
+			if advance_to(m,u,dest,int(u.ap)>=2): continue
 			if u.has("ammo") and int(u.ammo)<int(u.clip): m.use_ability(int(u.id),"reload")
 			elif "overwatch" in u.kit: m.overwatch(int(u.id))
 			break

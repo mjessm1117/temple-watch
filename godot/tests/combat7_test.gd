@@ -55,11 +55,11 @@ func rules() -> void:
 	shooter.ammo = 1
 	check(m.shot(int(shooter.id), int(enemy.id)), "loaded weapon fires")
 	check(int(shooter.ammo) == 0, "shot consumes one round")
-	shooter.ap = 3
+	shooter.ap = 2
 	var rng_state: int = m.rng.state
-	check(not m.shot(int(shooter.id), int(enemy.id)) and int(shooter.ap) == 3 and m.rng.state == rng_state, "empty weapon rejects without AP or RNG changes")
+	check(not m.shot(int(shooter.id), int(enemy.id)) and int(shooter.ap) == 2 and m.rng.state == rng_state, "empty weapon rejects without AP or RNG changes")
 	check(not m.overwatch(int(shooter.id)), "empty weapon cannot overwatch")
-	check(m.use_ability(int(shooter.id), "reload") and int(shooter.ap) == 2 and int(shooter.ammo) == 4, "reload costs one AP and fills clip")
+	check(m.use_ability(int(shooter.id), "reload") and int(shooter.ap) == 1 and int(shooter.ammo) == 4, "reload costs one AP and fills clip")
 	check(not m.use_ability(int(shooter.id), "reload"), "full clip cannot waste reload")
 	var info := Shot.calculate(m, shooter, enemy)
 	var armor := int(enemy.get("armor",0)); enemy.armor = 2
@@ -133,20 +133,21 @@ func abilities() -> void:
 	m.abilities.pull.chance = 100
 	check(m.use_ability(int(u.id),"pull",int(t.id)), "Pull is available to Jedi")
 	check(m.tile(Vector2i(4,2)) == "r" and int(t.hp) == hp-2, "Pull collision destroys half cover")
+	u.ap = 2
 	m.set_tile(Vector2i(3,2),"#")
 	check(m.use_ability(int(u.id),"breach",-1,Vector2i(3,2)) and m.tile(Vector2i(3,2)) == "r", "saber breach opens a full wall")
-	u.ap = 3; m.set_tile(Vector2i(0,2),"#")
+	u.ap = 2; m.set_tile(Vector2i(0,2),"#")
 	check(Vector2i(0,2) not in Ability.tiles(m,u,"breach"), "breach cannot destroy map boundaries")
 	check(m.ability_reason(int(u.id),"interact") != "", "Interact is defensive until missions contract exists")
 	var obj := ObjectiveMission.new(); obj.setup_combat(); var actor: Dictionary = obj.units[0]; actor.x = 2; actor.y = 2
-	check(obj.use_ability(int(actor.id),"interact",-1,Vector2i(3,2)) and obj.used and int(actor.ap)==2, "Interact invokes mission contract for exactly one AP")
+	check(obj.use_ability(int(actor.id),"interact",-1,Vector2i(3,2)) and obj.used and int(actor.ap)==1, "Interact invokes mission contract for exactly one AP")
 	check(not obj.use_ability(int(actor.id),"interact",-1,Vector2i(3,2)), "completed objective cannot be used twice")
 	m = arena(); u = m.units[2]; var partner: Dictionary = m.units[3]
 	u.rid = "a"; partner.rid = "b"
 	Bonds.setup(m,{"bonds":{"a|b":{"lvl":4,"dr":[],"n":0}}})
 	partner.ap = 0; partner.stunned = true
 	check(m.use_ability(int(u.id),"bondAid",int(partner.id)) and int(partner.ap)==1 and not partner.has("stunned"), "legacy bond provides AP aid and clears conditions")
-	u.ap = 3
+	u.ap = 2
 	check(not m.use_ability(int(u.id),"bondAid",int(partner.id)), "bond aid has one shared charge per mission")
 	check(m.use_ability(int(u.id),"bondStrike",int(m.units[4].id)), "level four legacy bond grants crossfire")
 	check(not m.use_ability(int(u.id),"bondStrike",int(m.units[4].id)), "bond crossfire cannot repeat")
@@ -159,7 +160,7 @@ func abilities() -> void:
 	m = arena(); u=m.units[0]; t=m.units[4]; u.kit.append("disarm"); u.focus_left=10
 	t.x=5; t.y=2; m.abilities.disarm.chance=100
 	check(m.use_ability(int(u.id),"disarm",int(t.id)) and bool(t.get("disarmed",false)), "disarm applies")
-	m.phase="enemy"; t.ap=3
+	m.phase="enemy"; t.ap=2
 	check(not m.shot(int(t.id),int(u.id)), "disarm prevents enemy weapon fire")
 
 func effect_families() -> void:
@@ -177,12 +178,12 @@ func effect_families() -> void:
 	var m := arena(); var u: Dictionary=m.units[0]; var t: Dictionary=m.units[4]
 	u.kit.append_array(["shadowStep","stabilize","forceWave","stasisField","root","beastCalm"]); u.focus_left=30
 	check(m.use_ability(int(u.id),"shadowStep",-1,Vector2i(3,2)) and bool(u.concealed) and int(u.leap_aim)==20, "Shadow Step grants concealment and strike aim")
-	u.ap=3; m.units[1].hp=0; m.units[1].status="down"; m.units[1].x=3; m.units[1].y=3
+	u.ap=2; m.units[1].hp=0; m.units[1].status="down"; m.units[1].x=3; m.units[1].y=3
 	check(m.use_ability(int(u.id),"stabilize",int(m.units[1].id)) and bool(m.units[1].stable), "Stabilize records a stable downed ally")
 	for id in ["forceWave","stasisField","root","beastCalm"]:
-		u.ap=3; t.x=5; t.y=2; t.tags=["creature"]; t.erase("stunned"); m.abilities[id].chance=100
+		u.ap=2; t.x=5; t.y=2; t.tags=["creature"]; t.erase("stunned"); m.abilities[id].chance=100
 		check(m.use_ability(int(u.id),id,int(t.id)) and bool(t.get("rooted" if id=="root" else "stunned",false)), id+" applies its control effect")
-	m.phase="enemy"; t.ap=3
+	m.phase="enemy"; t.ap=2
 	check(not m.move(int(t.id),Vector2i(6,2)), "rooted enemy cannot move")
 	m.turn=2; m.tick_combat_status()
 	check(not bool(t.get("rooted",false)), "root expires at the next player turn")
@@ -195,7 +196,7 @@ func effect_families() -> void:
 	m=arena(); u=m.units[2]; t=m.units[4]
 	check(m.use_ability(int(u.id),"backup",int(t.id)) and int(m.units[3].ammo)==3, "Backup uses a real ally's ammunition")
 	check(not m.use_ability(int(u.id),"backup",int(t.id)), "Backup shared squad limit prevents repeats")
-	u.kit.append("holdLine"); u.ap=3
+	u.kit.append("holdLine"); u.ap=2
 	check(m.use_ability(int(u.id),"holdLine") and bool(u.hold_line), "Hold the Line arms multiple reactions")
 	m._reaction_fire(t); var ammo:=int(u.ammo); m._reaction_fire(t)
 	check(int(u.ammo)==ammo, "Hold the Line only shoots a given mover once")
@@ -227,7 +228,7 @@ func presentation() -> void:
 	while game.player_attack_pending: await process_frame
 	check(int(shooter.ammo)==ammo-1 and not game.cinematic, "skipping resolves one shot and restores camera")
 	check(game.cam.trace.find("camera_skipped") < game.cam.trace.find("resolve_%d" % int(shooter.id)), "skip precedes resolution in timeline")
-	shooter.ap=3; game.selected_id=int(shooter.id); game.cam.trace.clear()
+	shooter.ap=2; game.selected_id=int(shooter.id); game.cam.trace.clear()
 	var started := Time.get_ticks_msec()
 	await game._attack(int(enemy.id),"shoot")
 	check(Time.get_ticks_msec()-started >= 600 and game.cam.trace.find("camera_ready") < game.cam.trace.find("resolve_%d" % int(shooter.id)), "full 0.6-second blend arrives before resolution")
