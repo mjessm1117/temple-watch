@@ -48,6 +48,7 @@ func _ready() -> void:
 	for title in Data.get_table("galaxy", "PLANETS"):
 		var planet := Art.planet(world, title, index); planet.position = planet_position(title)
 		planet.set_meta("origin", planet.position); planets[title] = planet; index += 1
+	Art.travel_lines(world, planets)
 	for row in Data.get_table("galaxy", "REGIONS"):
 		var region := Node3D.new(); region.name = "Region_" + str(row[0]); world.add_child(region)
 		if float(row[2]) > 0: Art.ring(region, float(row[2])*0.11)

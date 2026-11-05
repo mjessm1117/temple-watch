@@ -6,6 +6,7 @@ const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 const Rooms = preload("res://scripts/campaign/temple_rooms.gd")
 const Geometry = preload("res://scripts/campaign/temple_geometry.gd")
 const Plates = preload("res://scripts/campaign/home13_room_plates.gd")
+const PhoneNames = preload("res://scripts/home14_room_names.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
 var viewport: SubViewport
@@ -20,6 +21,7 @@ var cell_nodes: Dictionary = {}
 var time := 0.0
 var hovered := ""
 var sound: AudioStreamPlayer
+var phone_names: Control
 var state: Dictionary
 
 func setup(save_state: Dictionary) -> void:
@@ -61,6 +63,8 @@ func setup(save_state: Dictionary) -> void:
 		if Prefs.get_value("cb"): info.color = Color("70baff") if info.built else Color("eeac65")
 		cell_nodes[info.id] = art.room(temple, info)
 		_make_button(info)
+	if Phone.narrow(Phone.window_size()):
+		phone_names = PhoneNames.new(); phone_names.buttons = buttons; phone_names.rooms = rooms; add_child(phone_names)
 	art.batch_static(temple)
 	sound = AudioStreamPlayer.new(); sound.volume_db = -30; add_child(sound)
 	var synth := preload("res://scripts/audio.gd").new()
@@ -172,3 +176,4 @@ func _project_rooms() -> void:
 		buttons[id].position = a * ratio
 		buttons[id].size = (b - a) * ratio
 		Plates.layout(buttons[id], info, Phone.narrow(Phone.window_size()))
+	if phone_names != null: phone_names.layout()

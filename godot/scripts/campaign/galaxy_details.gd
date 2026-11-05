@@ -20,7 +20,8 @@ static func mission_panel(view) -> void:
 	var risk := Intel.risk(c,m,o)
 	box.add_child(UI.label("%s  /  %s" % ["STORY MISSION" if o.get("story",false) else str(o.get("kind","Mission")).to_upper(),Intel.region_name(region).to_upper()],12,Color("79d3e2")))
 	box.add_child(UI.label(str(o.get("n",m.get("n",o.mission))),25,UI.TEXT))
-	box.add_child(UI.label(str(m.get("where",planet)),13,UI.MUTED))
+	if view.excerpt and not view.phone_more: return
+	if not view.excerpt or view.phone_more: box.add_child(UI.label(str(m.get("where",planet)),13,UI.MUTED))
 	if m.has("quote") and o.get("story",false): box.add_child(UI.label(str(m.quote),15,UI.MUTED))
 	box.add_child(UI.label(str(o.get("text",m.get("brief","Awaiting briefing."))),15))
 	if o.has("text") and o.text != m.get("brief",""): box.add_child(UI.label(str(m.get("brief","")),14,UI.MUTED))

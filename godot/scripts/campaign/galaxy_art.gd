@@ -82,3 +82,17 @@ static func ring(parent: Node3D, radius: float) -> MeshInstance3D:
 		var a := float(i)/160.0*TAU; line.surface_add_vertex(Vector3(cos(a)*radius,-1.6,sin(a)*radius))
 	line.surface_end()
 	return mesh(parent, line, mat)
+
+static func travel_lines(parent: Node3D, planets: Dictionary) -> void:
+	var routes := [["Coruscant", "Alderaan"], ["Coruscant", "Balmorra"], ["Alderaan", "Dantooine"], ["Balmorra", "Taris"], ["Dantooine", "Ilum"], ["Taris", "Sith frontier"], ["Coruscant", "Nar Shaddaa"]]
+	var lines := ImmediateMesh.new()
+	lines.surface_begin(Mesh.PRIMITIVE_LINES)
+	for route in routes:
+		if not planets.has(route[0]) or not planets.has(route[1]): continue
+		var a: Vector3 = planets[route[0]].position + Vector3(0, -0.65, 0)
+		var b: Vector3 = planets[route[1]].position + Vector3(0, -0.65, 0)
+		lines.surface_add_vertex(a); lines.surface_add_vertex(b)
+	lines.surface_end()
+	var mat := StandardMaterial3D.new(); mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = Color("4a99a5", 0.45); mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var node := mesh(parent, lines, mat); node.name = "TravelLines"

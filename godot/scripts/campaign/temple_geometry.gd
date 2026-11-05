@@ -71,7 +71,7 @@ func room(parent: Node3D, info: Dictionary) -> Node3D:
 	var wall := Color("283c44") if built else Color("172329")
 	box(cell, Vector3(0, height / 2, -1.55), Vector3(width, height, 0.18), wall)
 	# Recessed wall and lit threshold make the open face read as a room, not a flat plate.
-	box(cell, Vector3(0, height * 0.52, -1.43), Vector3(width - 0.4, height - 0.3, 0.05), Color("182a31") if built else Color("0c171c"))
+	box(cell, Vector3(0, height * 0.52, -1.43), Vector3(width - 0.4, height - 0.3, 0.05), color.darkened(0.67) if built else Color("0c171c"))
 	box(cell, Vector3(0, 0, 0), Vector3(width, 0.16, 3.3), Color("55616a") if built else wall)
 	box(cell, Vector3(0, 0.09, 0.3), Vector3(width - 0.34, 0.025, 2.35), Color("344f55") if built else Color("1a2528"))
 	for x in [-width / 2, width / 2]:
@@ -85,6 +85,13 @@ func room(parent: Node3D, info: Dictionary) -> Node3D:
 			brace.rotation.z = 0.55 if x < 0 else -0.55
 		for y in [0.6, 1.4]: box(cell, Vector3(0, y, -0.7), Vector3(width, 0.05, 0.05), Color("4c514b"))
 		return cell
+	# Broad illuminated wall and a shared animated monitor are legible at phone scale.
+	box(cell, Vector3(0, height * 0.55, -1.30), Vector3(width * 0.70, height * 0.52, 0.04), color.darkened(0.1), 1.75)
+	box(cell, Vector3(width * 0.23, height * 0.59, -1.24), Vector3(width * 0.31, 0.76, 0.055), Color("61cbd2"), 1.8)
+	# Recessed practicals and a worn floor strip give each occupied bay depth.
+	box(cell, Vector3(0, height * 0.66, -1.36), Vector3(width * 0.46, 0.52, 0.035), Color("10242d"))
+	box(cell, Vector3(0, height * 0.66, -1.32), Vector3(width * 0.32, 0.025, 0.04), color, 1.4)
+	box(cell, Vector3(0, 0.105, 0.84), Vector3(width * 0.48, 0.018, 1.12), color.darkened(0.72))
 	for x in [-width * 0.34, width * 0.34]:
 		box(cell, Vector3(x, height - 0.15, 0.3), Vector3(0.85, 0.04, 0.28), color, 1.4)
 	for x in [-1.0, 0.0, 1.0]:
@@ -92,6 +99,7 @@ func room(parent: Node3D, info: Dictionary) -> Node3D:
 	var light := OmniLight3D.new(); light.position = Vector3(0, 1.6, 0.4)
 	light.light_color = color; light.light_energy = 0.65; light.omni_range = 3.5; cell.add_child(light)
 	furnish(cell, str(info.kind), color)
+	if info.kind == "vault": person(cell, Vector3(-0.9, 0.1, 0.65), color, false)
 	if info.kind != "vault":
 		person(cell, Vector3(-1.1, 0.1, 0.6), color, true)
 		person(cell, Vector3(1.05, 0.1, -0.45), Color("e1d6b4"), false)
@@ -144,7 +152,7 @@ func furnish(cell: Node3D, kind: String, color: Color) -> void:
 
 func person(cell: Node3D, at: Vector3, color: Color, walking: bool) -> void:
 	var actor := Node3D.new(); actor.set_meta("animated", true); cell.add_child(actor); actor.position = at
-	var model := HUMAN.instantiate() as Node3D; actor.add_child(model); model.scale = Vector3.ONE * 0.48
+	var model := HUMAN.instantiate() as Node3D; actor.add_child(model); model.scale = Vector3.ONE * 1.3
 	var animator: AnimationPlayer = null
 	for node in model.find_children("*", "AnimationPlayer", true, false): animator = node; break
 	for node in model.find_children("*", "MeshInstance3D", true, false):
@@ -201,7 +209,9 @@ func galaxy(parent: Node3D, show_labels: bool = true) -> Node3D:
 
 func animate(time: float) -> void:
 	for key in materials:
-		if str(key).ends_with("/1.4"):
+		if str(key) == "%s/1.8" % Color("61cbd2").to_html():
+			materials[key].emission_energy_multiplier = 1.15 + sin(time * 9.0) * 0.25
+		elif str(key).ends_with("/1.4"):
 			materials[key].emission_energy_multiplier = 1.3 + sin(time * 1.5) * 0.18
 	for person_data in people:
 		var actor: Node3D = person_data.node
