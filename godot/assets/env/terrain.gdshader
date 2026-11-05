@@ -6,6 +6,7 @@ uniform vec4 secondary_color : source_color = vec4(0.19,0.25,0.12,1.0);
 uniform int biome = 0;
 uniform vec2 hover_tile = vec2(-100.0);
 uniform float grid_strength = 0.0;
+uniform float detail_quality = 0.0;
 varying vec3 world_pos;
 varying vec3 world_normal;
 float hash(vec2 p) { return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
@@ -29,12 +30,20 @@ void fragment() {
 		float joint=smoothstep(0.484,0.498,max(slab.x,slab.y));
 		float vein=sin(p.x*7.0+p.y*3.0+noise(p)*8.0)*0.025;
 		col*=1.0-joint*0.23+vein;
+		// Contact tint is baked into the material and costs no screen pass on Low.
+		col*=1.0-joint*0.075;
+		if(detail_quality>0.5) {
+			float chips=noise(p*11.0+vec2(3.7,8.1));
+			col*=0.94+chips*0.10;
+			rough=0.73+grain*0.15+chips*0.08;
+		}
 	} else if(biome==1) {
 		vec2 plate=abs(fract((p+0.5)/vec2(2.0,3.0))-0.5);
 		float seam=smoothstep(0.485,0.499,max(plate.x,plate.y));
 		float tread=step(0.85,sin((p.x+p.y)*55.0))*step(0.6,sin((p.x-p.y)*32.0));
 		col*=1.0-seam*0.5+tread*0.09;
 		rough=0.50+grain*0.15; metal=0.65;
+		if(detail_quality>0.5) rough+=noise(p*16.0)*0.08;
 	} else if(biome==2) {
 		col=mix(col,secondary_color.rgb*(0.9+detail),smoothstep(0.25,0.78,broad)*0.65);
 	} else if(biome==3) {
@@ -53,6 +62,7 @@ void fragment() {
 	ALBEDO=mix(col,vec3(0.28,0.62,0.68),grid*0.4);
 	EMISSION=vec3(0.15,0.45,0.53)*grid*0.15;
 	ROUGHNESS=rough; METALLIC=metal;
-	NORMAL_MAP=vec3(0.5+(grain-0.5)*0.08,0.5+(noise(p*25.0)-0.5)*0.08,1.0);
-	NORMAL_MAP_DEPTH=0.3;
+	float micro=detail_quality>0.5?noise(p*25.0):grain;
+	NORMAL_MAP=vec3(0.5+(grain-0.5)*0.08,0.5+(micro-0.5)*0.08,1.0);
+	NORMAL_MAP_DEPTH=detail_quality>0.5?0.42:0.3;
 }

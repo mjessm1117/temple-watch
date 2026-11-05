@@ -21,6 +21,9 @@ func apply_environment(world: WorldEnvironment, key: DirectionalLight3D, theme_n
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_BG
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
 	env.tonemap_exposure = float(preset.exposure)
+	env.adjustment_enabled = true
+	env.adjustment_contrast = 1.06
+	env.adjustment_saturation = 0.91
 	env.ssao_enabled = true
 	env.ssao_intensity = 0.82
 	env.ssao_radius = 0.85
