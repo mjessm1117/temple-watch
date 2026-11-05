@@ -1,0 +1,9 @@
+{
+  "credit_cap": 500,
+  "preview_cap": 12,
+  "refine_cap": 10,
+  "texture": "Hand painted low-poly game character. Clear flat color blocks: moss green long coat, tan cross-body strap and tunic, olive green skin, close black hair. Minimal surface noise, readable at mobile battle size.",
+  "variants": {
+    "A": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean humanoid anatomy, one person only. Tem Ruhl, young male Mirialan Jedi Wayseeker Padawan. Olive-green skin, close black hair, lithe build, long moss-green split travel coat over tan layered tunic, broad tan cross-body strap and boots. Distinct long green coat silhouette and green face. No lightsaber."
+  }
+}

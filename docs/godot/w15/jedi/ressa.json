@@ -1,0 +1,10 @@
+{
+  "credit_cap": 500,
+  "preview_cap": 12,
+  "refine_cap": 10,
+  "texture": "Hand painted low-poly game character. Clear flat color blocks: large muted gold armor and ochre plate pauldrons, deep maroon tunic, silver hair, warm skin. Minimal surface noise, readable at mobile battle size.",
+  "variants": {
+    "A": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean human anatomy, one person only. Lord Ressa Vaun, adult human woman Jedi Guardian commander of Ruusan. Cropped silver hair, oversized squared gold shoulder mantle and heavy ochre chest armor over deep maroon robes, armored boots. Broad commanding silhouette, distinct gold and maroon color blocks. No lightsaber.",
+    "B": "One full-body stylized low-poly game character, front facing A-pose with empty hands. Lord Ressa Vaun, veteran female Jedi commander, short silver hair. Powerful stocky silhouette in broad angular gold plate pauldrons, large ochre breastplate and armored boots. Deep maroon tunic visible beneath armor, short hip-length dark red cloak, no long skirts, no floor-length robes, no weapon, no base. Exaggerated plated shoulders must be visible at mobile icon size."
+  }
+}

@@ -53,3 +53,4 @@ run_suite map14_test --rendering-method gl_compatibility --resolution 1366x768 -
 run_suite home14_test --rendering-method gl_compatibility --resolution 844x390 -- --phone
 run_suite home14_test --rendering-method gl_compatibility --resolution 1366x768
 run_suite story14_test --rendering-method gl_compatibility -- --graphics=low
+run_suite jedi15_test --rendering-method gl_compatibility -- --graphics=low

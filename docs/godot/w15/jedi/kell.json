@@ -1,0 +1,10 @@
+{
+  "credit_cap": 500,
+  "preview_cap": 12,
+  "refine_cap": 10,
+  "texture": "Hand painted low-poly game character. Clear flat color blocks: pale blue short jacket, bright sky-blue satchel and sash, tan trousers, dark curly hair. Minimal surface noise, readable at mobile battle size.",
+  "variants": {
+    "A": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean human anatomy, one person only. Kell Darrow, teenage human male Jedi Consular Padawan in the Army of Light. Curly dark hair, compact pale blue scholar robe with short sleeves, wide sky-blue waist wrap, small brown satchel and boots. Boyish compact silhouette, distinct pale blue color block. No lightsaber.",
+    "B": "One full-body stylized low-poly game character, front facing A-pose with empty hands. Kell Darrow, short teenage human male Jedi Padawan, mop of curly dark hair. Distinct compact silhouette: pale blue short hooded jacket ending at waist, oversized bright sky-blue diagonal shoulder satchel, tan trousers, brown boots, bare forearms. No floor-length robe, no cape, no long skirt, no weapon, no base. Big bag and short jacket readable at mobile icon size."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "credit_cap": 500,
+  "preview_cap": 12,
+  "refine_cap": 10,
+  "texture": "Hand painted low-poly game character. Clear flat color blocks: white armor robe, rich royal blue short asymmetric cape and front panel, dark brown skin, black topknot. Minimal surface noise, readable at mobile battle size.",
+  "variants": {
+    "A": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean human anatomy, one person only. Knight Sava Orrin, adult dark-skinned human woman Jedi Guardian of the High Republic. Shaved hair at sides with a topknot, white armored robe, asymmetric short royal-blue cape on one shoulder, blue front panel, armored boots. Tall athletic silhouette, distinct royal-blue and white color blocks. No lightsaber.",
+    "B": "Rig-ready single humanoid character, full body facing forward, symmetrical T-pose with both arms held straight out from body and clearly separated from torso, fingers visible, feet apart. Knight Sava Orrin, athletic dark-skinned human woman, black topknot and shaved sides. White High Republic chest armor with large royal-blue shoulder plates, knee-length blue split tunic over black trousers, high boots, short blue sash at waist. Clean visible arm and leg gaps. No cape, no cloth behind arms, no weapon, no base. Stylized low-poly mobile game character."
+  }
+}

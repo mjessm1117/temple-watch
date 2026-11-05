@@ -118,7 +118,8 @@ func _refresh_figures() -> void:
 		if not g.views.has(id) and g.model_cache.has(model_name):
 			var view: Node3D = g.UnitView.new()
 			g.figures.add_child(view)
-			view.setup(u, g.model_cache[model_name], at)
+			var scene: PackedScene = preload("res://scripts/characters/jedi_models.gd").scene_for(u, g.model_cache[model_name])
+			view.setup(u, scene, at)
 			g.views[id] = view
 			if str(u.side) == "enemy" and not g.demo_mode:
 				g.fx.float_text(at + Vector3.UP * 1.9, "ALERT!", Color("ff786d"), true)
