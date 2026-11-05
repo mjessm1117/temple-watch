@@ -3,7 +3,7 @@ extends SceneTree
 
 const Lookup = preload("res://scripts/characters/jedi_models.gd")
 const IDS := ["kira", "tor", "satele", "ressa", "kell", "sava", "tem"]
-const CLIPS := ["idle", "saberIdle", "run", "walk", "swing", "swing2", "cast", "channel", "shoot", "hit", "death", "block", "throw"]
+const CLIPS := ["idle", "saberIdle", "gunIdle", "run", "walk", "swing", "swing2", "cast", "channel", "shoot", "hit", "death", "block", "throw", "aim"]
 var checks := 0
 var failures := 0
 
@@ -49,7 +49,9 @@ func run() -> void:
 		check(player != null and skeleton != null, id + " rig and player")
 		if player == null or skeleton == null: model.queue_free(); continue
 		Lookup.configure_animation(player)
-		for clip in CLIPS: check(player.has_animation(clip), id + " original " + clip)
+		for clip in CLIPS:
+			check(player.has_animation(clip), id + " original " + clip)
+			if player.has_animation(clip): check(player.get_animation(clip).get_track_count() >= 20, id + " full bone tracks " + clip)
 		for clip in ["idle", "run", "swing", "cast", "hit", "death"]:
 			if not player.has_animation(clip): continue
 			var bones: Array[String] = ["pelvis", "spine_01", "upperarm_l", "upperarm_r", "thigh_l", "thigh_r"]
@@ -66,6 +68,17 @@ func run() -> void:
 			check(player.get_blend_time(pair[0], pair[1]) > 0.0, id + " blend " + pair[0] + " to " + pair[1])
 		for clip in ["idle", "saberIdle", "run", "walk"]:
 			check(player.get_animation(clip).loop_mode == Animation.LOOP_LINEAR, id + " loops " + clip)
+		player.stop(); player.play("run", 0.0)
+		var foot_l := skeleton.find_bone("foot_l")
+		var foot_r := skeleton.find_bone("foot_r")
+		var low := INF; var high := -INF
+		for frame in 24:
+			player.seek(player.get_animation("run").length * float(frame) / 23.0, true)
+			var left := skeleton.to_global(skeleton.get_bone_global_pose(foot_l).origin).y
+			var right := skeleton.to_global(skeleton.get_bone_global_pose(foot_r).origin).y
+			var floor := minf(left, right)
+			low = minf(low, floor); high = maxf(high, floor)
+		check(high - low < 0.05, id + " planted foot height stays within 5 cm")
 		model.queue_free()
 	print("anim16: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
