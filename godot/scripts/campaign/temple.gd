@@ -312,6 +312,10 @@ func _roster() -> void:
 	for r in campaign.state.roster:
 		var status := "DEAD" if str(r.status) == "dead" else "WOUNDED · %d DAYS" % int(r.wound) if int(r.wound) > 0 else str(r.status).to_upper()
 		var box := _card("%s  ·  %s  ·  RANK %d" % [r.n, r.cls, int(r.rank)], "%s   •   %d XP   •   %d KILLS   •   %d MISSIONS" % [status, int(r.xp), int(r.kills), int(r.missions)])
+		if Progression.is_jedi(r):
+			var face := preload("res://scripts/story14_portraits.gd").picture(str(r.n), Vector2(64, 78))
+			face.name = "JediPortrait_" + str(r.id)
+			box.add_child(face)
 		StrategyUI.soldier(self, box, r)
 		if Progression.is_jedi(r) and r.status == "active" and r.get("title","") != "Padawan":
 			var counsel := OptionButton.new(); counsel.add_item("Counsel: none")

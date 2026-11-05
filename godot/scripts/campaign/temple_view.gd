@@ -9,6 +9,7 @@ const Plates = preload("res://scripts/campaign/home13_room_plates.gd")
 const PhoneNames = preload("res://scripts/home14_room_names.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
+const Show16Rooms = preload("res://scripts/show16_rooms.gd")
 var viewport: SubViewport
 var camera: Camera3D
 var world: Node3D
@@ -66,6 +67,7 @@ func setup(save_state: Dictionary) -> void:
 	if Phone.narrow(Phone.window_size()):
 		phone_names = PhoneNames.new(); phone_names.buttons = buttons; phone_names.rooms = rooms; add_child(phone_names)
 	art.batch_static(temple)
+	Show16Rooms.populate(cell_nodes, rooms, state, RenderingServer.get_current_rendering_method() == "gl_compatibility")
 	sound = AudioStreamPlayer.new(); sound.volume_db = -30; add_child(sound)
 	var synth := preload("res://scripts/audio.gd").new()
 	sound.stream = synth._synthesize("click"); synth.free()
