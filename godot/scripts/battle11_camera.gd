@@ -26,9 +26,10 @@ static func clamp_pivot(m: RefCounted, point: Vector3) -> Vector3:
 	return Vector3(clampf(point.x, edge, maxf(edge, float(m.spec.width) - 1.0 - edge)), 0.0, clampf(point.z, edge, maxf(edge, float(m.spec.height) - 1.0 - edge)))
 
 static func safe_position(m: RefCounted, point: Vector3) -> Vector3:
+	var minimum_height := 2.3 if bool(m.get("presentation_active")) else 5.0
 	if _phone_view():
-		return Vector3(point.x, maxf(5.0, point.y), point.z)
-	return Vector3(clampf(point.x, 0.5, float(m.spec.width) - 1.5), maxf(5.0, point.y), clampf(point.z, 0.5, float(m.spec.height) - 1.5))
+		return Vector3(point.x, maxf(minimum_height, point.y), point.z)
+	return Vector3(clampf(point.x, 0.5, float(m.spec.width) - 1.5), maxf(minimum_height, point.y), clampf(point.z, 0.5, float(m.spec.height) - 1.5))
 
 static func aim_position(m: RefCounted, point: Vector3) -> Vector3:
 	return Vector3(clampf(point.x, -18.0, float(m.spec.width) + 17.0), maxf(1.7, point.y), clampf(point.z, -18.0, float(m.spec.height) + 17.0))

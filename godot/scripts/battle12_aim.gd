@@ -10,6 +10,8 @@ var details: Button
 var summary: Label
 var phone := false
 var sight: Control
+var lighting: Node
+var cine_toggle: Button
 
 static func phone_frame_point(game, midpoint: Vector3) -> Vector3:
 	var size: Vector2i = preload("res://scripts/phone_layout.gd").window_size()
@@ -22,6 +24,12 @@ static func frame_zoom(game, base_zoom: float) -> float:
 
 func setup(game, root: Control, on_phone: bool) -> void:
 	g = game; phone = on_phone
+	lighting = preload("res://scripts/cine15_lighting.gd").new()
+	lighting.name = "Cine15AimLighting"; lighting.game = g; g.add_child(lighting)
+	var desktop_toggle: Button = root.find_child("CineButton", true, false)
+	if desktop_toggle != null:
+		desktop_toggle.pressed.connect(func() -> void:
+			preload("res://scripts/campaign/strat_preferences.gd").set_value("cine", g.action_camera))
 	panel = PanelContainer.new(); panel.name = "AimStrip"
 	panel.anchor_left = 0.5; panel.anchor_right = 0.5
 	panel.offset_left = -minf(350.0, root.size.x * 0.47)
@@ -53,6 +61,7 @@ func setup(game, root: Control, on_phone: bool) -> void:
 	row.add_child(_button("›", 44, func() -> void: g._cycle_target(1)))
 	confirm = _button("FIRE", 190, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
 	details = _button("ODDS", 64, _details); row.add_child(details)
+	cine_toggle = _button("CINE ON", 76, _toggle_cine); cine_toggle.name = "Cine15Toggle"; row.add_child(cine_toggle)
 	row.add_child(_button("CANCEL", 76, g._cancel_order))
 	panel.hide()
 
@@ -69,12 +78,14 @@ func refresh() -> void:
 	var active: bool = g.action != "move" and g.action != "free" and g.action != "overwatch" and g.action != "hunker" and g.target_id >= 0 and not actor.is_empty() and g.mission.phase == "player" and g.mission.result == ""
 	panel.visible = active
 	sight.visible = active
+	cine_toggle.text = "CINE ON" if g.action_camera else "CINE OFF"
 	if phone and g.hud_controls.phone != null:
 		g.hud_controls.phone.ability_tray.visible = not active
 		g.hud_controls.phone.ability_tray.offset_top = 0.0 if active else -76.0
 	elif g.hud_controls.desktop_bottom != null:
 		g.hud_controls.desktop_bottom.visible = not active
 	if not active:
+		lighting.reset()
 		g.cam.end_preview()
 		return
 	for child in targets.get_children(): child.queue_free()
@@ -96,6 +107,7 @@ func refresh() -> void:
 	confirm.disabled = target.is_empty() or g.player_attack_pending
 	if target.is_empty(): return
 	g.cam.preview(actor, target)
+	lighting.sync(actor, target)
 	summary.text = "%s  ·  HP %d/%d" % [str(target.name), int(target.hp), int(target.max_hp)]
 	if g.action in ["shoot", "strike"]:
 		var info: Dictionary = Shot.calculate(g.mission, actor, target, g.action == "strike")
@@ -108,6 +120,11 @@ func _confirm() -> void:
 	if g.target_id < 0: return
 	if g.action in ["shoot", "strike", "push"]: g._attack(g.target_id, g.action)
 	else: g._use_ability(g.target_id)
+
+func _toggle_cine() -> void:
+	g.action_camera = not g.action_camera
+	preload("res://scripts/campaign/strat_preferences.gd").set_value("cine", g.action_camera)
+	cine_toggle.text = "CINE ON" if g.action_camera else "CINE OFF"
 
 func _details() -> void:
 	if phone and g.hud_controls.phone != null:

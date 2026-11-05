@@ -17,7 +17,7 @@ func apply_environment(world: WorldEnvironment, key: DirectionalLight3D, theme_n
 	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color(preset.ambient)
-	env.ambient_light_energy = float(preset.ambient_power)
+	env.ambient_light_energy = maxf(0.58, float(preset.ambient_power))
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_BG
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
 	env.tonemap_exposure = float(preset.exposure)
@@ -36,9 +36,53 @@ func apply_environment(world: WorldEnvironment, key: DirectionalLight3D, theme_n
 	env.fog_aerial_perspective = 0.28
 	world.environment = env
 	key.light_color = Color(preset.sun)
-	key.light_energy = float(preset.sun_power)
+	key.light_energy = float(preset.sun_power) * 1.13
 	key.rotation_degrees = preset.sun_angle
 	key.shadow_enabled = true
 	key.directional_shadow_max_distance = 60
 	key.light_angular_distance = 1.7
 	key.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
+	_apply_mood(key, theme_name, preset)
+
+func _apply_mood(key: DirectionalLight3D, theme_name: String, preset: Dictionary) -> void:
+	var game := key.get_parent() as Node3D
+	if game == null or game.get("mission") == null: return
+	var graphics := game.get_node_or_null("/root/Graphics")
+	var low: bool = graphics != null and str(graphics.effective) == "low"
+	var old := game.get_node_or_null("Cine15PropPools")
+	if old != null: game.remove_child(old); old.queue_free()
+	var pools := Node3D.new(); pools.name = "Cine15PropPools"; game.add_child(pools)
+	var tint := Color("78cbdc") if theme_name in ["city", "dock", "caves"] else Color("ffb471") if theme_name in ["temple", "ruins", "plains"] else Color("a8d9f5") if theme_name == "snow" else Color("a9d28c")
+	if not low:
+		var fill := DirectionalLight3D.new(); fill.name = "Cine15ColorFill"
+		fill.light_color = tint; fill.light_energy = 0.27
+		fill.rotation_degrees = Vector3(-34, 125, 0); fill.shadow_enabled = false
+		pools.add_child(fill)
+	var squad: Array[Dictionary] = game.mission.living("player")
+	var anchor := Vector2(float(squad[0].x), float(squad[0].y)) if not squad.is_empty() else Vector2(float(game.mission.spec.width) * 0.5, float(game.mission.spec.height) * 0.5)
+	for offset in [Vector2(-2.0, -2.0), Vector2(3.0, 1.0)]:
+		var tile := Vector2i(clampi(roundi(anchor.x + offset.x), 1, int(game.mission.spec.width) - 2), clampi(roundi(anchor.y + offset.y), 1, int(game.mission.spec.height) - 2))
+		var at := Vector3(float(tile.x), Shot.elevation(game.mission, tile) * 0.7 + 0.16, float(tile.y))
+		if low:
+			var disc := MeshInstance3D.new(); disc.name = "Cine15EmissivePool"
+			var mesh := PlaneMesh.new(); mesh.size = Vector2(2.9, 2.9)
+			disc.mesh = mesh; disc.position = at
+			var mat := StandardMaterial3D.new(); mat.albedo_color = Color(tint, 0.82)
+			mat.albedo_texture = _pool_texture()
+			mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			mat.emission_enabled = true; mat.emission = tint; mat.emission_energy_multiplier = 1.1
+			disc.material_override = mat; pools.add_child(disc)
+		else:
+			var lamp := OmniLight3D.new(); lamp.name = "Cine15PropLamp"
+			lamp.position = at + Vector3.UP * 2.1; lamp.light_color = tint
+			lamp.light_energy = 1.05; lamp.omni_range = 4.2; lamp.shadow_enabled = false
+			pools.add_child(lamp)
+
+func _pool_texture() -> ImageTexture:
+	var image := Image.create(32, 32, false, Image.FORMAT_RGBA8)
+	for y in range(32):
+		for x in range(32):
+			var radius := Vector2((float(x) - 15.5) / 15.5, (float(y) - 15.5) / 15.5).length()
+			image.set_pixel(x, y, Color(1.0, 1.0, 1.0, 1.0 - smoothstep(0.1, 1.0, radius)))
+	return ImageTexture.create_from_image(image)
