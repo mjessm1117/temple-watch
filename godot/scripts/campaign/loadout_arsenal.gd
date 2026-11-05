@@ -106,7 +106,7 @@ func _build_slots(r: Dictionary, jedi: bool) -> void:
 	var tier := int(r.gear.saber if jedi else r.gear.w)
 	_slot("weapon", primary, str(pool[tier].n), int(r.gear.mk.get(base_kind, 1)), "strike" if jedi else "shoot")
 	var armor: Dictionary = Data.get_table("gear", "ARMOR").get(str(r.gear.armor), {})
-	_slot("armor", "ARMOR", str(armor.get("n", "Empty")), int(r.gear.mk.get("armor:" + str(r.gear.armor), 1)), "st_armor")
+	_slot("armor", "ARMOR", str(armor.get("n", "Empty")), int(r.gear.mk.get("armor:" + str(r.gear.armor), 1)), "armor_jedi" if jedi else "armor_troop")
 	_slot("utility", "UTILITY", str(Data.get_table("gear", "UTIL").get(str(r.gear.get("util", "none")), {}).get("n", "Empty")), 1, "st_hp")
 	var mods: Array = r.gear.smods if jedi else r.gear.mods
 	var mod_name := "Empty"
@@ -136,17 +136,30 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 	var b := S.button("", _select_slot.bind(key)); b.name = "Slot_" + key
 	b.custom_minimum_size = Vector2(116 if compact else 112, 44 if compact else 53)
 	b.size_flags_horizontal = SIZE_EXPAND_FILL
-	var glyph := TextureRect.new(); glyph.texture = S.icon(icon)
-	glyph.position = Vector2(5, 8); glyph.size = Vector2(25, 25)
+	b.tooltip_text = value
+	var art_key: String = str({"weapon":"saber" if icon == "strike" else "blaster", "armor":icon, "utility":"utility", "base_mod":"module", "armor_mod":"armor_mod", "form":"form", "color":"crystal", "evolution":"path"}.get(key, "module"))
+	var glyph := TextureRect.new(); glyph.name = "GearArt"
+	glyph.texture = load("res://assets/loadout/icons13/%s.png" % art_key)
 	glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; glyph.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	glyph.position = Vector2(2, 7); glyph.size = Vector2(30, 30)
 	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(glyph)
-	var name_label := S.label(title, 10 if compact else 11, S.CYAN)
-	name_label.position = Vector2(34, 4); name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
-	var item_label := S.label(value, 10 if compact else 11)
-	item_label.position = Vector2(34, 19); item_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	item_label.size = Vector2(73 if compact else 69, 17); item_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; b.add_child(item_label)
-	var tier := S.label("Mk " + _mark(mark), 10, _tier_color(mark))
-	tier.position = Vector2(34, 33 if not compact else 32); tier.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(tier)
+	var name_label := S.label(title, 9, S.CYAN)
+	name_label.position = Vector2(34, 2); name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
+	var display_value := value.get_slice(" (", 0) if key == "form" else value
+	var item_label := S.label(display_value, 9)
+	item_label.name = "ItemName"; item_label.position = Vector2(34, 16)
+	item_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	item_label.size = Vector2(101 if compact else 94, 13)
+	b.add_child(item_label)
+	var tier := S.label("Mk " + _mark(mark), 9, _tier_color(mark))
+	tier.name = "Tier"; tier.position = Vector2(34, 30)
+	tier.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(tier)
+	for i in 3:
+		var pip := ColorRect.new(); pip.name = "TierPip%d" % i
+		pip.color = _tier_color(mark) if i < mark else Color("2b3d44")
+		pip.position = Vector2(69 + i * 14, 38)
+		pip.size = Vector2(10, 3); pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(pip)
 	slot_row.add_child(b); host.wire_button(b)
 
 func _tier_color(mark: int) -> Color:

@@ -3,6 +3,7 @@ const Gear = preload("res://scripts/campaign/gear.gd")
 const Data = preload("res://scripts/campaign/data.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
+const Theme13 = preload("res://scripts/armory13_theme.gd")
 
 static func _upgrade(view, kind: String) -> void:
 	var c = view.campaign
@@ -36,3 +37,4 @@ static func render(view) -> void:
 		card.add_child(UI.label("%s Mk %s → Mk %s · %d Cr · %s" % [label, ["I", "II", "III"][lv - 1], ["I", "II", "III"][lv], cost, "READY" if unlocked else "Research: " + str(Data.get_table("research", "RESEARCH")[res].n)], 14, UI.GOLD))
 		card.add_child(UI.label(preview, 13, UI.ACCENT))
 		card.add_child(UI.button("Forge " + label + " Mk " + ["I", "II", "III"][lv], _upgrade.bind(view, kind), unlocked and int(c.state.res.credits) >= cost))
+	Theme13.apply_tree(card.get_parent())

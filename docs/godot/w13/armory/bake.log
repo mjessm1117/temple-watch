@@ -1,0 +1,17 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+     at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6347)
+MESA: info: vulkan: No DRI3 support detected - required for presentation
+Note: you can probably enable DRI3 in your Xorg config
+Vulkan 1.4.329 - Forward+ - Using Device #1: NVIDIA - NVIDIA GeForce RTX 4090 Laptop GPU
+
+BAKE saber 0
+BAKE blaster 0
+BAKE armor_jedi 0
+BAKE armor_troop 0
+BAKE utility 0
+BAKE module 0
+BAKE armor_mod 0
+BAKE form 0
+BAKE crystal 0
+BAKE path 0

@@ -2,6 +2,7 @@ extends RefCounted
 const Data = preload("res://scripts/campaign/data.gd")
 const Queue = preload("res://scripts/campaign/research_queue.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
+const Theme13 = preload("res://scripts/armory13_theme.gd")
 
 static func _queue(view, id: String) -> void:
 	if Queue.enqueue(view.campaign, id):
@@ -59,3 +60,4 @@ static func render(view) -> void:
 			label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(label)
 			var can := Queue.can_queue(c, str(id))
 			row.add_child(UI.button("Queue", _queue.bind(view, str(id)), can))
+	Theme13.apply_tree(view.page_content)

@@ -21,6 +21,27 @@ func _ready() -> void:
 	camera = Camera3D.new(); camera.fov = 30; camera.position = home; add_child(camera); camera.look_at(gaze)
 	var key := DirectionalLight3D.new(); key.rotation_degrees = Vector3(-38, -30, 0)
 	key.light_color = Color("d3e6ee"); key.light_energy = 1.1; key.shadow_enabled = true; add_child(key)
+	# Showroom lighting is limited to Forward+; Compatibility keeps its existing light count.
+	if get_node("/root/Graphics").effective != "low":
+		var warm := SpotLight3D.new(); warm.name = "ShowroomKey"
+		warm.position = Vector3(-1.8, 3.9, 2.2); add_child(warm); warm.look_at(Vector3(0, 1.0, 0))
+		warm.light_color = Color("f7dcad"); warm.light_energy = 3.2
+		warm.spot_range = 7; warm.spot_angle = 38
+		var rim := SpotLight3D.new(); rim.name = "ShowroomRim"
+		rim.position = Vector3(1.7, 2.8, -2.0); add_child(rim); rim.look_at(Vector3(0, 1.1, 0))
+		rim.light_color = Color("6ecce9"); rim.light_energy = 4.0
+		rim.spot_range = 6; rim.spot_angle = 42
+		var glow := MeshInstance3D.new(); glow.name = "ShowroomFloorGlow"
+		var disc := CylinderMesh.new(); disc.top_radius = 1.05; disc.bottom_radius = 1.05
+		disc.height = 0.012; disc.radial_segments = 32; glow.mesh = disc
+		glow.position = Vector3(0, -0.008, 0)
+		var glow_mat := StandardMaterial3D.new()
+		glow_mat.albedo_color = Color(0.11, 0.51, 0.67, 0.24)
+		glow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		glow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		glow_mat.emission_enabled = true; glow_mat.emission = Color("58b7d5")
+		glow_mat.emission_energy_multiplier = 1.0
+		glow.material_override = glow_mat; add_child(glow)
 	Actor.block(self, Vector3(0, -0.15, 0), Vector3(38, 0.25, 25), Color("18272e"))
 	# Temple ribs, recessed hangar door and an illuminated clerestory.
 	Actor.block(self, Vector3(0, 3.5, -4.7), Vector3(32, 8, 0.6), Color("111f29"))
