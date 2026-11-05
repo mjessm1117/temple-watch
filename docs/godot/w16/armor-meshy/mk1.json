@@ -1,0 +1,10 @@
+{
+  "credit_cap": 120,
+  "preview_cap": 4,
+  "refine_cap": 4,
+  "texture": "Matte earthy camel tan woven cloth, dark umber leather, visible stitched quilt seams, worn brown belt. No metal. No skin or mannequin.",
+  "variants": {
+    "A": "Single empty wearable torso garment, a short sleeveless Jedi-inspired tabard armor display piece. No person, body, head, arms, hands, mannequin, hanger, stand, ground or base. Distinct long split cloth front panels hanging below a thick quilted rectangular chest pad, crossed leather belt at waist, broad asymmetric cloth shoulder wrap. Open neck and hollow armholes. Warm tan and dark brown leather, visible quilting. Stylized matte low-poly game equipment, centered front three-quarter view, clean silhouette legible at 128 pixels. Original fantasy sci-fi design.",
+    "B": "CROPPED CHEST ARMOR OBJECT ONLY: a short thick rectangular quilted tan fabric chest pad, dark brown leather crossed belts and a broad asymmetrical padded shoulder wrap, over two SHORT split tabard flaps that stop at the waist. Floating hollow wearable shell with open neck and armholes. Ends at belt; absolutely no long robe, skirt, legs, cylindrical neck, mannequin, person, head, body, stand, hanger, ground or base. Side silhouette has one rounded soft padded shoulder, not metal pauldrons. Clearly visible diamond quilting engraved on the chest surface. Matte tan and brown low-poly game equipment, simple chunky shapes legible at 128 pixels, original fantasy sci-fi design."
+  }
+}

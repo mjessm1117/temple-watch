@@ -1,0 +1,5 @@
+*.glb
+*-preview.png
+*-large.png
+ledger.json
+_to_delete/
