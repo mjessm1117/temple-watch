@@ -65,6 +65,10 @@ func prepare(path: String, lift: float) -> void:
 				pixels.adjust_bcs(1.0,1.0-lift*2.0,1.0)
 				mat.albedo_texture = ImageTexture.create_from_image(pixels)
 			else: mat.albedo_color = mat.albedo_color.lightened(lift)
+			if path.contains("cover_half_caves_v6"):
+				mat.emission_enabled = true
+				mat.emission = Color(0.18,0.13,0.23)
+				mat.emission_energy_multiplier = 1.0
 			mesh.surface_set_material(surface,mat)
 		part.mesh = mesh; part.material = null
 	models[path] = parts

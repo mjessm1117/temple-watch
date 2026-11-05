@@ -80,6 +80,7 @@
   },
   "meshy_material_lift": {
     "res://assets/maps/meshy3/cover_full_caves_v1.glb": 0.22,
-    "res://assets/maps/meshy6/cover_half_caves_v6.glb": 0.30
+    "res://assets/maps/meshy6/cover_half_caves_v6.glb": 0.40,
+    "res://assets/maps/meshy6/cover_half_city_v6.glb": 0.12
   }
 }

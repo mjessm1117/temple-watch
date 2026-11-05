@@ -34,3 +34,30 @@ City’s phone triangle count rises because the replacement cover has more top-l
 - `./godot/test.sh`: exit 0; 47 zero-failure result lines, 0 `SCRIPT ERROR`, 0 `ERROR:` lines; Normal rescue **9/20** wins, within the required 9–11 band. `map_art_test` alone reports 179,474 checks, 0 failures.
 - `git diff --check` and `git diff --cached --check`: clean.
 - No `public/`, `functions/`, `tests/`, or `worker.js` files were changed. No push.
+
+## Review fix pass
+
+The map-art loader fits each model uniformly to at most 0.98 m horizontal span and 0.8 m height. The table uses the loader's recorded world-space AABB for tile (5, 5), in **width × depth × height** metres. Screen area is the same AABB's eight corners projected through the 844×390 battle camera; it is a repeatable projected bounding box, not a count of opaque pixels. The before column is main `6ad3117`, and after is the final swap.
+
+| Theme | World bounds before → after (m) | Phone projected box area before → after (px²) | Area ratio |
+|---|---|---:|---:|
+| Temple | 0.980×0.864×0.799 → 0.962×0.953×0.800 | 3,720 → 3,916 | 105.3% |
+| Ruins | 0.968×0.785×0.800 → 0.977×0.980×0.800 | 3,478 → 4,034 | 116.0% |
+| Plains | 0.980×0.980×0.721 → 0.956×0.876×0.800 | 3,793 → 3,689 | 97.2% |
+| Dock | 0.980×0.922×0.797 → 0.980×0.980×0.797 | 3,873 → 4,033 | 104.1% |
+| City | 0.980×0.404×0.786 → 0.960×0.960×0.800 | 2,532 → 3,929 | 155.2% |
+| Caves | 0.980×0.980×0.747 → 0.960×0.950×0.800 | 3,874 → 3,901 | 100.7% |
+
+The caves swap entered review at 0.960×0.459×0.800 m; its narrow depth caused the shard silhouette. Widened the positions and corrected the normals in both LOD GLBs to make the final 0.960×0.950×0.800 m fit. Its three final dimensions differ from the old prop by 2.0%, 3.1%, and 7.1%. Raised the caves texture contrast lift to 0.40 and added a restrained purple emission to separate it from the dark floor at phone Low. City received a 0.12 material lift; its phone projected area already exceeds the old piece, so no scale change was needed. Temple, ruins, plains, and dock have no footprint or height dimension more than 20% smaller than before.
+
+The sheet was regenerated at 1800×3597 px and inspected. It retains temple, city, and caves at phone Low and desktop Medium, and adds a phone aim-camera row from the same capture sequence used by `battle13_test.gd`, comparing main `6ad3117` with this swap. Its path remains `/home/jess/projects/tw-logs/art13/art13-before-after.jpg`.
+
+The larger unit GLB source files use many more small buffer views and a larger JSON table; their embedded WebP textures retain the same byte counts and 1024×1024 resolution as main. The real Web export remains below the shipped PCK limit, so the triangle-saving unit geometry was retained. Reimport also exposed a stale `shuttle.glb` image name: the GLB requested `shuttle_Image_0.webp` while the checked-in extracted file is `shuttle_0.webp`. The GLB image name now matches the existing texture.
+
+### Fix-pass gates
+
+- Real `tools/web/export_web.sh` run with its output redirected to `/tmp/art13-web-export`: final `index.pck` **24,961,840 bytes**, versus shipped **26,663,064 bytes** (1,701,224 bytes smaller). The export reported no `SCRIPT ERROR`, `Parse Error`, or `ERROR:` lines.
+- `python3 tools/web/prepare_web.py /tmp/art13-webcheck2`: exit 0; 40 unused Meshy GLBs and 116 duplicate rasters omitted.
+- Final Godot 4.7.2 headless import: exit 0; 0 `SCRIPT ERROR`, 0 `ERROR:` lines.
+- Final `./godot/test.sh`: exit 0; 47 zero-failure result lines, 0 `SCRIPT ERROR`, 0 `ERROR:` lines. Normal rescue **9/20** wins; `map_art_test` **179,474 checks, 0 failures**.
+- `git diff --check` and staged diff check: clean. No web-game files changed; no push.
