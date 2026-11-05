@@ -333,6 +333,36 @@
             "bond": 5
           }
         ]
+      },
+      {
+        "id": "s14_kira_tor",
+        "era": 1,
+        "done": 1,
+        "members": [0, 1],
+        "bond": 1,
+        "title": "The watch after",
+        "lines": [
+          "Kira Venn: I marked every shuttle that came back.",
+          "Tor Saalen: You missed the one we were on.",
+          "Kira Venn: I knew you would bring it in.",
+          "Tor Saalen: Then take the next watch with me."
+        ],
+        "choices": [{"label":"Share the watch","bond":5}]
+      },
+      {
+        "id": "s14_rhal_ilsa",
+        "era": 1,
+        "done": 1,
+        "members": [2, 3],
+        "bond": 1,
+        "title": "Names on the route",
+        "lines": [
+          "Sgt. Rhal Dax: The red route held.",
+          "Ilsa Myr: Three names were left beside it.",
+          "Sgt. Rhal Dax: Keep them on the map.",
+          "Ilsa Myr: I already have."
+        ],
+        "choices": [{"label":"Keep the names","bond":5}]
       }
     ]
   }
