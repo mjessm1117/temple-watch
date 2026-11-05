@@ -315,6 +315,7 @@ func _roster() -> void:
 		if Progression.is_jedi(r):
 			var face := preload("res://scripts/story14_portraits.gd").picture(str(r.n), Vector2(64, 78))
 			face.name = "JediPortrait_" + str(r.id)
+			face.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 			box.add_child(face)
 		StrategyUI.soldier(self, box, r)
 		if Progression.is_jedi(r) and r.status == "active" and r.get("title","") != "Padawan":
