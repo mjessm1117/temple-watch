@@ -1,0 +1,306 @@
+{
+  "schema": 1,
+  "jedi": [
+    {
+      "id": "kira",
+      "display_name": "Kira Venn",
+      "files": {
+        "model": "kira/kira.glb",
+        "lod": "kira/kira_lod.glb",
+        "preview": "kira/preview.png"
+      },
+      "tris": 3000,
+      "glb_bytes": 365532,
+      "lod_tris": 1400,
+      "lod_glb_bytes": 168300,
+      "height_m": 1.8,
+      "rig": "UE shared battle clips",
+      "animation_clips": [
+        "idle",
+        "saberIdle",
+        "run",
+        "walk",
+        "swing",
+        "cast",
+        "shoot",
+        "hit",
+        "death",
+        "block"
+      ],
+      "saber_color": "#62b3ff",
+      "mesh_task_ids": {
+        "preview": "01a1ad19-6264-744b-8c55-a495db09ef41",
+        "refine": "01a1ad1d-8f55-74ec-aa2c-89ff0ee12cbc",
+        "rig": "01a1ad1f-a423-7145-8dfb-d768a4f5df9d",
+        "other_previews": [],
+        "other_refines": []
+      },
+      "prompts": {
+        "preview": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean human anatomy, one person only. Kira Venn, adult human woman Jedi Guardian and visionary. Short black hair, broad pale armored shoulder guards, cropped amber tabard across chest, dark indigo split cloak, practical brown boots. Strong broad-shouldered silhouette, sympathetic stern face, distinct amber and indigo color blocks. No lightsaber.",
+        "texture": "Hand painted low-poly game character. Clear flat color blocks: amber chest tabard, dark indigo cape, pale cream shoulders, brown boots, warm tan skin, black hair. Minimal surface noise, readable at mobile battle size.",
+        "other_previews": {}
+      },
+      "credits_spent": 35
+    },
+    {
+      "id": "tor",
+      "display_name": "Tor Saalen",
+      "files": {
+        "model": "tor/tor.glb",
+        "lod": "tor/tor_lod.glb",
+        "preview": "tor/preview.png"
+      },
+      "tris": 3000,
+      "glb_bytes": 355256,
+      "lod_tris": 1400,
+      "lod_glb_bytes": 164180,
+      "height_m": 1.8,
+      "rig": "UE shared battle clips",
+      "animation_clips": [
+        "idle",
+        "saberIdle",
+        "run",
+        "walk",
+        "swing",
+        "cast",
+        "shoot",
+        "hit",
+        "death",
+        "block"
+      ],
+      "saber_color": "#8fe3ff",
+      "mesh_task_ids": {
+        "preview": "01a1ad19-6ae6-72e1-8444-93066985a446",
+        "refine": "01a1ad1d-9835-704b-9710-1689d75d4e59",
+        "rig": "01a1ad1f-f27d-743a-a88e-143a1630bf24",
+        "other_previews": [],
+        "other_refines": []
+      },
+      "prompts": {
+        "preview": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean human anatomy, one person only. Tor Saalen, young human male Jedi Consular Padawan. Tousled auburn hair, narrow teal tunic, cream open over-robe, bright cream diagonal sash, bare forearms, slim trousers and boots. Lean nervous scholar silhouette, distinct teal and cream color blocks. No lightsaber.",
+        "texture": "Hand painted low-poly game character. Clear flat color blocks: teal tunic, cream over-robe and diagonal sash, auburn hair, warm skin, brown boots. Minimal surface noise, readable at mobile battle size.",
+        "other_previews": {}
+      },
+      "credits_spent": 35
+    },
+    {
+      "id": "satele",
+      "display_name": "Satele Shan",
+      "files": {
+        "model": "satele/satele.glb",
+        "lod": "satele/satele_lod.glb",
+        "preview": "satele/preview.png"
+      },
+      "tris": 3000,
+      "glb_bytes": 358772,
+      "lod_tris": 1400,
+      "lod_glb_bytes": 170544,
+      "height_m": 1.8,
+      "rig": "UE shared battle clips",
+      "animation_clips": [
+        "idle",
+        "saberIdle",
+        "run",
+        "walk",
+        "swing",
+        "cast",
+        "shoot",
+        "hit",
+        "death",
+        "block"
+      ],
+      "saber_color": "#62b3ff",
+      "mesh_task_ids": {
+        "preview": "01a1ad19-72ea-73be-bdee-c0fe8b2aaccf",
+        "refine": "01a1ad1d-9fd2-7433-8f20-74f50212345b",
+        "rig": "01a1ad20-413a-75a4-b9cd-762be2450ab5",
+        "other_previews": [],
+        "other_refines": []
+      },
+      "prompts": {
+        "preview": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean human anatomy, one person only. Satele Shan, young human woman Jedi Knight. Long dark hair in a high braid, white raised collar, fitted navy battle robe with long white split side panels, slim armored bracers and boots. Tall graceful silhouette, distinct white and navy color blocks. No lightsaber.",
+        "texture": "Hand painted low-poly game character. Clear flat color blocks: white collar and split panels, deep navy blue fitted robe, dark braid, natural skin, silver bracers. Minimal surface noise, readable at mobile battle size.",
+        "other_previews": {}
+      },
+      "credits_spent": 35
+    },
+    {
+      "id": "ressa",
+      "display_name": "Lord Ressa Vaun",
+      "files": {
+        "model": "ressa/ressa.glb",
+        "lod": "ressa/ressa_lod.glb",
+        "preview": "ressa/preview.png"
+      },
+      "tris": 3000,
+      "glb_bytes": 368820,
+      "lod_tris": 1400,
+      "lod_glb_bytes": 172044,
+      "height_m": 1.8,
+      "rig": "UE shared battle clips",
+      "animation_clips": [
+        "idle",
+        "saberIdle",
+        "run",
+        "walk",
+        "swing",
+        "cast",
+        "shoot",
+        "hit",
+        "death",
+        "block"
+      ],
+      "saber_color": "#ffd166",
+      "mesh_task_ids": {
+        "preview": "01a1ad19-7b80-735e-a4b9-0e57ed0528cf",
+        "refine": "01a1ad1d-a8dd-7103-ac23-4a23e7cc6180",
+        "rig": "01a1ad20-9021-71e8-ba34-bf455e4cd2d7",
+        "other_previews": [
+          "01a1ad1b-ff0f-7277-bae4-8dc966c30e03"
+        ],
+        "other_refines": []
+      },
+      "prompts": {
+        "preview": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean human anatomy, one person only. Lord Ressa Vaun, adult human woman Jedi Guardian commander of Ruusan. Cropped silver hair, oversized squared gold shoulder mantle and heavy ochre chest armor over deep maroon robes, armored boots. Broad commanding silhouette, distinct gold and maroon color blocks. No lightsaber.",
+        "texture": "Hand painted low-poly game character. Clear flat color blocks: large muted gold armor and ochre plate pauldrons, deep maroon tunic, silver hair, warm skin. Minimal surface noise, readable at mobile battle size.",
+        "other_previews": {
+          "B": "One full-body stylized low-poly game character, front facing A-pose with empty hands. Lord Ressa Vaun, veteran female Jedi commander, short silver hair. Powerful stocky silhouette in broad angular gold plate pauldrons, large ochre breastplate and armored boots. Deep maroon tunic visible beneath armor, short hip-length dark red cloak, no long skirts, no floor-length robes, no weapon, no base. Exaggerated plated shoulders must be visible at mobile icon size."
+        }
+      },
+      "credits_spent": 55
+    },
+    {
+      "id": "kell",
+      "display_name": "Kell Darrow",
+      "files": {
+        "model": "kell/kell.glb",
+        "lod": "kell/kell_lod.glb",
+        "preview": "kell/preview.png"
+      },
+      "tris": 3000,
+      "glb_bytes": 350100,
+      "lod_tris": 1400,
+      "lod_glb_bytes": 159836,
+      "height_m": 1.8,
+      "rig": "UE shared battle clips",
+      "animation_clips": [
+        "idle",
+        "saberIdle",
+        "run",
+        "walk",
+        "swing",
+        "cast",
+        "shoot",
+        "hit",
+        "death",
+        "block"
+      ],
+      "saber_color": "#8fe3ff",
+      "mesh_task_ids": {
+        "preview": "01a1ad1c-072a-7011-9560-694571fb8eac",
+        "refine": "01a1ad1d-b172-77d8-9569-6dd36c2c1496",
+        "rig": "01a1ad20-e595-7492-aa64-84b8b8136c38",
+        "other_previews": [
+          "01a1ad19-82d7-7692-959c-0dcdfdefd0b8"
+        ],
+        "other_refines": []
+      },
+      "prompts": {
+        "preview": "One full-body stylized low-poly game character, front facing A-pose with empty hands. Kell Darrow, short teenage human male Jedi Padawan, mop of curly dark hair. Distinct compact silhouette: pale blue short hooded jacket ending at waist, oversized bright sky-blue diagonal shoulder satchel, tan trousers, brown boots, bare forearms. No floor-length robe, no cape, no long skirt, no weapon, no base. Big bag and short jacket readable at mobile icon size.",
+        "texture": "Hand painted low-poly game character. Clear flat color blocks: pale blue short jacket, bright sky-blue satchel and sash, tan trousers, dark curly hair. Minimal surface noise, readable at mobile battle size.",
+        "other_previews": {
+          "A": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean human anatomy, one person only. Kell Darrow, teenage human male Jedi Consular Padawan in the Army of Light. Curly dark hair, compact pale blue scholar robe with short sleeves, wide sky-blue waist wrap, small brown satchel and boots. Boyish compact silhouette, distinct pale blue color block. No lightsaber."
+        }
+      },
+      "credits_spent": 55
+    },
+    {
+      "id": "sava",
+      "display_name": "Knight Sava Orrin",
+      "files": {
+        "model": "sava/sava.glb",
+        "lod": "sava/sava_lod.glb",
+        "preview": "sava/preview.png"
+      },
+      "tris": 3000,
+      "glb_bytes": 327772,
+      "lod_tris": 1400,
+      "lod_glb_bytes": 151880,
+      "height_m": 1.8,
+      "rig": "UE shared battle clips",
+      "animation_clips": [
+        "idle",
+        "saberIdle",
+        "run",
+        "walk",
+        "swing",
+        "cast",
+        "shoot",
+        "hit",
+        "death",
+        "block"
+      ],
+      "saber_color": "#62b3ff",
+      "mesh_task_ids": {
+        "preview": "01a1ad22-468e-7485-a90f-43a0bfd7d21a",
+        "refine": "01a1ad24-971f-77c7-b35a-1a335a7a5612",
+        "rig": "01a1ad27-bab2-760a-a1c5-51ec07e9ed68",
+        "other_previews": [
+          "01a1ad19-8a3e-704f-b81e-ae5c314351d5"
+        ],
+        "other_refines": [
+          "01a1ad1d-b9af-71fd-8604-19cc9a76f526"
+        ]
+      },
+      "prompts": {
+        "preview": "Rig-ready single humanoid character, full body facing forward, symmetrical T-pose with both arms held straight out from body and clearly separated from torso, fingers visible, feet apart. Knight Sava Orrin, athletic dark-skinned human woman, black topknot and shaved sides. White High Republic chest armor with large royal-blue shoulder plates, knee-length blue split tunic over black trousers, high boots, short blue sash at waist. Clean visible arm and leg gaps. No cape, no cloth behind arms, no weapon, no base. Stylized low-poly mobile game character.",
+        "texture": "Hand painted low-poly game character. Clear flat color blocks: white armor robe, rich royal blue short asymmetric cape and front panel, dark brown skin, black topknot. Minimal surface noise, readable at mobile battle size.",
+        "other_previews": {
+          "A": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean human anatomy, one person only. Knight Sava Orrin, adult dark-skinned human woman Jedi Guardian of the High Republic. Shaved hair at sides with a topknot, white armored robe, asymmetric short royal-blue cape on one shoulder, blue front panel, armored boots. Tall athletic silhouette, distinct royal-blue and white color blocks. No lightsaber."
+        }
+      },
+      "credits_spent": 65
+    },
+    {
+      "id": "tem",
+      "display_name": "Tem Ruhl",
+      "files": {
+        "model": "tem/tem.glb",
+        "lod": "tem/tem_lod.glb",
+        "preview": "tem/preview.png"
+      },
+      "tris": 3000,
+      "glb_bytes": 342316,
+      "lod_tris": 1400,
+      "lod_glb_bytes": 162148,
+      "height_m": 1.8,
+      "rig": "UE shared battle clips",
+      "animation_clips": [
+        "idle",
+        "saberIdle",
+        "run",
+        "walk",
+        "swing",
+        "cast",
+        "shoot",
+        "hit",
+        "death",
+        "block"
+      ],
+      "saber_color": "#72e0a4",
+      "mesh_task_ids": {
+        "preview": "01a1ad19-92bd-72f6-b9f2-c89712acb692",
+        "refine": "01a1ad1d-c14b-72ee-9540-af22aac9f1c3",
+        "rig": "01a1ad22-03aa-75fd-abc2-4650b8fe448f",
+        "other_previews": [],
+        "other_refines": []
+      },
+      "prompts": {
+        "preview": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean humanoid anatomy, one person only. Tem Ruhl, young male Mirialan Jedi Wayseeker Padawan. Olive-green skin, close black hair, lithe build, long moss-green split travel coat over tan layered tunic, broad tan cross-body strap and boots. Distinct long green coat silhouette and green face. No lightsaber.",
+        "texture": "Hand painted low-poly game character. Clear flat color blocks: moss green long coat, tan cross-body strap and tunic, olive green skin, close black hair. Minimal surface noise, readable at mobile battle size.",
+        "other_previews": {}
+      },
+      "credits_spent": 35
+    }
+  ]
+}

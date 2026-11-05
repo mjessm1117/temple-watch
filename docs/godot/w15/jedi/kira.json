@@ -1,0 +1,9 @@
+{
+  "credit_cap": 500,
+  "preview_cap": 12,
+  "refine_cap": 10,
+  "texture": "Hand painted low-poly game character. Clear flat color blocks: amber chest tabard, dark indigo cape, pale cream shoulders, brown boots, warm tan skin, black hair. Minimal surface noise, readable at mobile battle size.",
+  "variants": {
+    "A": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean human anatomy, one person only. Kira Venn, adult human woman Jedi Guardian and visionary. Short black hair, broad pale armored shoulder guards, cropped amber tabard across chest, dark indigo split cloak, practical brown boots. Strong broad-shouldered silhouette, sympathetic stern face, distinct amber and indigo color blocks. No lightsaber."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "credit_cap": 500,
+  "preview_cap": 12,
+  "refine_cap": 10,
+  "texture": "Hand painted low-poly game character. Clear flat color blocks: white collar and split panels, deep navy blue fitted robe, dark braid, natural skin, silver bracers. Minimal surface noise, readable at mobile battle size.",
+  "variants": {
+    "A": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean human anatomy, one person only. Satele Shan, young human woman Jedi Knight. Long dark hair in a high braid, white raised collar, fitted navy battle robe with long white split side panels, slim armored bracers and boots. Tall graceful silhouette, distinct white and navy color blocks. No lightsaber."
+  }
+}

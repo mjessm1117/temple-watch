@@ -1,0 +1,9 @@
+{
+  "credit_cap": 500,
+  "preview_cap": 12,
+  "refine_cap": 10,
+  "texture": "Hand painted low-poly game character. Clear flat color blocks: teal tunic, cream over-robe and diagonal sash, auburn hair, warm skin, brown boots. Minimal surface noise, readable at mobile battle size.",
+  "variants": {
+    "A": "Stylized low-poly full-body game character, upright A-pose, facing forward, hands empty, no weapons, no base, clean human anatomy, one person only. Tor Saalen, young human male Jedi Consular Padawan. Tousled auburn hair, narrow teal tunic, cream open over-robe, bright cream diagonal sash, bare forearms, slim trousers and boots. Lean nervous scholar silhouette, distinct teal and cream color blocks. No lightsaber."
+  }
+}
