@@ -9,7 +9,7 @@ func run() -> void:
 	var args := OS.get_cmdline_user_args()
 	var phone := "--phone" in args
 	var phase := "before" if "--before" in args else "after"
-	var view := "impact" if "--impact" in args else "aim" if "--aim" in args else "tactical"
+	var view := "impact" if "--impact" in args else "aim" if "--aim" in args else "overhead" if "--overhead" in args else "tactical"
 	var theme := "temple"
 	for arg in args:
 		if arg.begins_with("--theme="): theme = arg.trim_prefix("--theme=")
@@ -29,7 +29,7 @@ func run() -> void:
 		if "shoot" in unit.get("kit", []): actor = unit; break
 	if actor.is_empty(): quit(2); return
 	game._select(int(actor.id))
-	if view != "tactical":
+	if view in ["aim", "impact"]:
 		var nearby: Dictionary = game.mission.paths(actor, 3)
 		for tile in nearby.costs:
 			if int(nearby.costs[tile]) == 3:
@@ -43,6 +43,7 @@ func run() -> void:
 		game.target_id = int(options[0].id)
 		game._frame_target(); game._refresh()
 	if game.camera_tween != null and game.camera_tween.is_running(): game.camera_tween.kill()
+	if view == "overhead": game.zoom = 44.0
 	game._update_camera()
 	for i in range(24): await process_frame
 	game.phase_banner.hide()
