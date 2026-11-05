@@ -19,3 +19,6 @@ static func clamp_pivot(m: RefCounted, point: Vector3) -> Vector3:
 
 static func safe_position(m: RefCounted, point: Vector3) -> Vector3:
 	return Vector3(clampf(point.x, 0.5, float(m.spec.width) - 1.5), maxf(5.0, point.y), clampf(point.z, 0.5, float(m.spec.height) - 1.5))
+
+static func aim_position(m: RefCounted, point: Vector3) -> Vector3:
+	return Vector3(clampf(point.x, -5.0, float(m.spec.width) + 4.0), maxf(1.7, point.y), clampf(point.z, -5.0, float(m.spec.height) + 4.0))

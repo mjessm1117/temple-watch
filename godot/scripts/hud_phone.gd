@@ -28,7 +28,8 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	g.objective_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	g.objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
-	unit_card.custom_minimum_size = Vector2(155, 44); heading.add_child(unit_card)
+	unit_card.custom_minimum_size = Vector2(155, 44)
+	unit_card.add_theme_font_size_override("font_size", 12); heading.add_child(unit_card)
 	heading.add_child(_button("◀", func() -> void: _cycle_unit(-1)))
 	heading.add_child(_button("▶", func() -> void: _cycle_unit(1)))
 	heading.add_child(_button("CENTER", g._recenter))
@@ -37,7 +38,10 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	target_card = _button("TARGET", _toggle.bind("target")); target_card.name = "TargetCard"
 	target_card.visible = false; overlay.add_child(target_card)
 	var tray := PanelContainer.new(); tray.name = "AbilityTray"
-	tray.anchor_top = 1.0; tray.anchor_right = 1.0; tray.anchor_bottom = 1.0
+	tray.anchor_left = 0.5; tray.anchor_right = 0.5
+	tray.anchor_top = 1.0; tray.anchor_bottom = 1.0
+	tray.offset_left = -minf(340.0, root.size.x * 0.47)
+	tray.offset_right = minf(340.0, root.size.x * 0.47)
 	tray.offset_top = -76
 	var tray_style: StyleBoxFlat = night.panel_style(); tray_style.set_content_margin_all(2)
 	tray.add_theme_stylebox_override("panel", tray_style); overlay.add_child(tray)
@@ -110,7 +114,7 @@ func refresh(from_game: bool = false) -> void:
 	else: action_name.text = "Choose an action · tap the map to preview"
 	_update_actions(from_game)
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
-	unit_card.text = "%s  HP %s  %s  ▾" % [str(unit.get("name", "UNIT")).left(12), str(unit.get("hp", "?")), g.hud_controls.ap_pips(unit)]
+	unit_card.text = "%s\nHP %s  %s  ▾" % [str(unit.get("name", "UNIT")), str(unit.get("hp", "?")), g.hud_controls.ap_pips(unit)]
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	target_card.text = "%s  %s  ▾" % [str(target.get("name", "TARGET")), g.hit_big_label.text]
 	popup.visible = open_card != ""
@@ -122,7 +126,6 @@ func refresh(from_game: bool = false) -> void:
 		for button in ability_buttons:
 			if button.visible or not bool(button.get_meta("battle12_available", false)) or button.ability_id == "": continue
 			var mode: String = button.ability_id
-			if mode in ["move", "shoot", "overwatch", "reload"]: continue
 			var item := _button("%s  ·  %s AP%s" % [button.display_name, button.cost, "  ·  %d TURN CD" % button.cooldown if button.cooldown > 0 else ""], func() -> void: g._choose_action(mode); _close())
 			item.disabled = button.disabled; popup_body.add_child(item)
 	elif open_card == "unit":
@@ -155,7 +158,7 @@ func refresh(from_game: bool = false) -> void:
 
 func _update_actions(from_game: bool) -> void:
 	if from_game:
-		for button in ability_buttons: button.set_meta("battle12_available", button.visible)
+		for button in ability_buttons: button.set_meta("battle12_available", button.visible and not button.disabled)
 	var primary: Array[String] = []
 	for mode in ["move", "shoot", "strike", "push", "overwatch", "reload", "hunker", "medpac"]:
 		if primary.size() >= 5: break
@@ -164,6 +167,10 @@ func _update_actions(from_game: bool) -> void:
 				primary.append(mode); break
 	for button in ability_buttons:
 		button.visible = bool(button.get_meta("battle12_available", false)) and button.ability_id in primary
+	var overflow := 0
+	for button in ability_buttons:
+		if bool(button.get_meta("battle12_available", false)) and not button.visible: overflow += 1
+	more_button.visible = overflow > 0
 
 func _unit_details(unit: Dictionary) -> String:
 	var lines: Array[String] = [str(unit.get("name", "UNIT")), str(unit.get("class_name", "Jedi"))]

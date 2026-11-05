@@ -11,6 +11,9 @@ var techniques_open := false
 var targeting = preload("res://scripts/combat_targeting.gd").new()
 var night
 var phone
+var bar
+var left_panel: PanelContainer
+var right_panel: PanelContainer
 var aim_ui
 
 static func ap_pips(unit: Dictionary) -> String:
@@ -154,6 +157,7 @@ func _build_ui() -> void:
 	g.title_label = _label("TEMPLE WATCH", 20); g.title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top_row.add_child(g.title_label)
 	g.objective_label = _label("", 15); g.objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; g.objective_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top_row.add_child(g.objective_label)
 	var left := PanelContainer.new(); left.offset_top = 75; left.offset_left = 10; left.offset_right = 220; left.offset_bottom = 520; root.add_child(left); _style_panel(left)
+	left_panel = left
 	var left_box := VBoxContainer.new(); left.add_child(left_box)
 	left_box.add_child(_label("SQUAD", 17))
 	for u in g.mission.living("player"):
@@ -166,33 +170,38 @@ func _build_ui() -> void:
 	var portrait := TextureRect.new(); portrait.texture = g.portrait_viewport.get_texture(); portrait.custom_minimum_size = Vector2(140, 44); portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; left_box.add_child(portrait)
 	g.selected_label = _label("", 14); left_box.add_child(g.selected_label)
 	var right := PanelContainer.new(); right.anchor_left = 1.0; right.anchor_right = 1.0; right.offset_left = -265; right.offset_right = -10; right.offset_top = 75; right.offset_bottom = 530; root.add_child(right); _style_panel(right)
+	right_panel = right
 	var right_box := VBoxContainer.new(); right.add_child(right_box)
 	right_box.add_child(_label("TARGETING", 17))
 	g.hit_big_label = _label("--%", 31); g.hit_big_label.add_theme_color_override("font_color", Color("e9ca83")); right_box.add_child(g.hit_big_label)
 	g.shot_label = _label("Hover over a target", 14); g.shot_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.shot_label)
 	right_box.add_child(_label("COMBAT LOG", 17))
 	g.log_label = _label("", 14); g.log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.log_label)
-	var bottom := PanelContainer.new(); bottom.anchor_top = 1.0; bottom.anchor_right = 1.0; bottom.anchor_bottom = 1.0; bottom.offset_top = -238; root.add_child(bottom); _style_panel(bottom)
+	var bottom := PanelContainer.new(); bottom.anchor_left = 0.5; bottom.anchor_right = 0.5
+	bottom.anchor_top = 1.0; bottom.anchor_bottom = 1.0
+	bottom.offset_left = -380; bottom.offset_right = 380; bottom.offset_top = -164
+	root.add_child(bottom); _style_panel(bottom)
 	var bottom_box := VBoxContainer.new(); bottom.add_child(bottom_box)
 	var info_row := HBoxContainer.new(); bottom_box.add_child(info_row)
-	info_row.visible = bool(g.Prefs.get_value("tips"))
+	info_row.visible = false
 	g.path_label = _label("", 15); g.path_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; info_row.add_child(g.path_label)
 	info_row.add_child(_label("LMB PREVIEW/CONFIRM  •  RMB CANCEL/PAN  •  TAB / Q-E TARGET  •  WASD PAN  •  SPACE SKIP", 12))
 	g.warning_label = _label("", 15); g.warning_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; g.warning_label.add_theme_color_override("font_color", Color("ffd37a")); bottom_box.add_child(g.warning_label)
+	g.warning_label.visible = false
 	var ability_scroll := ScrollContainer.new(); ability_scroll.name = "DesktopAbilities"
 	ability_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	ability_scroll.custom_minimum_size.y = 128; ability_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	ability_scroll.custom_minimum_size.y = 60; ability_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom_box.add_child(ability_scroll)
 	var row := HFlowContainer.new(); row.size_flags_horizontal = Control.SIZE_EXPAND_FILL; ability_scroll.add_child(row)
 	var keys := {"move": "1", "shoot": "2", "strike": "3", "push": "4", "free": "5", "overwatch": "6", "hunker": "7"}
 	if g.mission.modern: keys.erase("free"); keys.interact = "5"
 	for mode in keys:
-		var b = preload("res://scripts/hud_ability_button.gd").new(); b.custom_minimum_size = Vector2(126, 60); b.focus_mode = Control.FOCUS_NONE
+		var b = preload("res://scripts/hud_ability_button.gd").new(); b.custom_minimum_size = Vector2(108, 58); b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(func() -> void: g._choose_action(mode))
 		row.add_child(b); g.action_buttons[mode] = b
 	for mode in g.mission.abilities:
 		if mode in keys or mode == "move": continue
-		var b = preload("res://scripts/hud_ability_button.gd").new(); b.custom_minimum_size = Vector2(126, 60); b.focus_mode = Control.FOCUS_NONE
+		var b = preload("res://scripts/hud_ability_button.gd").new(); b.custom_minimum_size = Vector2(108, 58); b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(func() -> void: g._choose_action(mode))
 		row.add_child(b)
 		g.action_buttons[mode] = b
@@ -200,13 +209,13 @@ func _build_ui() -> void:
 	command_row.add_child(_button("INFO",func():
 		g.Prefs.set_value("numbers",not bool(g.Prefs.get_value("numbers"))); _refresh()))
 	var spacer := Control.new(); spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL; command_row.add_child(spacer)
-	var cine_button := _button("ACTION CAM\nON", func() -> void: g.action_camera = not g.action_camera; _refresh())
+	var cine_button := _button("CAM ON", func() -> void: g.action_camera = not g.action_camera; _refresh())
 	cine_button.name = "CineButton"; command_row.add_child(cine_button)
 	var mute_button := _button("SOUND", func() -> void: g.sound.muted = not g.sound.muted)
 	command_row.add_child(mute_button)
 	g.audio_slider = HSlider.new(); g.audio_slider.custom_minimum_size = Vector2(75, 0); g.audio_slider.max_value = 100; g.audio_slider.value = 55; g.audio_slider.value_changed.connect(func(value: float) -> void: g.sound.volume = value / 100.0); command_row.add_child(g.audio_slider)
-	command_row.add_child(_button("END TURN\nENTER", g._request_end_turn))
-	command_row.add_child(_button("RESTART\nR", func() -> void: g.get_tree().reload_current_scene()))
+	command_row.add_child(_button("END TURN", g._request_end_turn))
+	command_row.add_child(_button("RESTART", func() -> void: g.get_tree().reload_current_scene()))
 	g.phase_banner = _label("ENEMY ACTIVITY", 30); g.phase_banner.visible = false; g.phase_banner.anchor_left = 0.5; g.phase_banner.anchor_right = 0.5; g.phase_banner.anchor_top = 0.18; g.phase_banner.offset_left = -370; g.phase_banner.offset_right = 370; g.phase_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; g.phase_banner.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; root.add_child(g.phase_banner)
 	g.phase_banner.modulate.a = 0.0
 	g.result_panel = PanelContainer.new(); g.result_panel.visible = false; g.result_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER); g.result_panel.offset_left = -220; g.result_panel.offset_right = 220; g.result_panel.offset_top = -100; g.result_panel.offset_bottom = 100; root.add_child(g.result_panel)
@@ -220,10 +229,14 @@ func _build_ui() -> void:
 	if Phone.narrow(Phone.window_size()):
 		phone = preload("res://scripts/hud_phone.gd").new()
 		phone.setup(g, night, root, top, left, right, bottom, row)
+	else:
+		bar = preload("res://scripts/battle13_bar.gd").new()
+		bar.setup(g, root, row, g.action_buttons)
 
 
 func _refresh() -> void:
 	var u: Dictionary = g.mission.unit_by_id(g.selected_id)
+	g.warning_label.visible = phone == null and g.warning_label.text != "" and not g.warning_label.text.begins_with("TAB / SHIFT+TAB")
 	if u.is_empty() or int(u.get("hp", 0)) <= 0:
 		var survivors: Array[Dictionary] = g.mission.living("player")
 		if not survivors.is_empty():
@@ -269,10 +282,11 @@ func _refresh() -> void:
 		var cd: Dictionary = u.get("cooldowns", {})
 		var turns := maxi(0, int(cd.get(mode, 0)) - g.mission.turn)
 		button.call("configure", mode, str(def.get("name", mode.capitalize())), key, ap, turns, reason, g.action == mode)
+		button.set_meta("battle13_available", button.visible and not button.disabled)
 		if charges != "": button.tooltip_text += detail
 	g.result_panel.visible = g.mission.result != ""
 	var cine_button: Button = g.overlay.find_child("CineButton", true, false)
-	if cine_button != null: cine_button.text = "ACTION CAM\n%s" % ("ON" if g.action_camera else "OFF")
+	if cine_button != null: cine_button.text = "CAM %s" % ("ON" if g.action_camera else "OFF")
 	if g.mission.result != "":
 		var wounded: Array[String] = []
 		for member in g.mission.units:
@@ -280,7 +294,12 @@ func _refresh() -> void:
 		g.result_label.text = ("MISSION COMPLETE" if g.mission.result == "win" else "MISSION FAILED") + "\nWounded: " + (", ".join(wounded) if not wounded.is_empty() else "None")
 	g._refresh_figures(); _refresh_highlights(true); _show_shot(); night.refresh()
 	if phone != null: phone.refresh(true)
+	if bar != null: bar.refresh()
 	if aim_ui != null: aim_ui.refresh()
+	if phone == null:
+		var aiming: bool = aim_ui != null and aim_ui.panel.visible
+		left_panel.visible = not aiming
+		right_panel.visible = not aiming
 
 
 func _show_shot() -> void:

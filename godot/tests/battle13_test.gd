@@ -1,0 +1,121 @@
+extends SceneTree
+const InputControls = preload("res://scripts/input_controls.gd")
+const Shot = preload("res://scripts/shot.gd")
+const Camera = preload("res://scripts/cam_combat.gd")
+const Quality = preload("res://scripts/graphics_settings.gd")
+var checks := 0
+var failures := 0
+
+func _initialize() -> void:
+	run.call_deferred()
+
+func check(ok: bool, message: String) -> void:
+	checks += 1
+	if not ok: failures += 1; push_error(message)
+
+func run() -> void:
+	check(Camera.AIM_BLEND < 0.4, "aim transition is under 0.4 seconds")
+	check(Quality.effective_tier("high", "gl_compatibility") == "low", "Compatibility still forces Low")
+	for size in [Vector2i(844, 390), Vector2i(1366, 768)]:
+		await exercise(size)
+	print("BATTLE13 TEST RESULTS: %d checks, %d failures" % [checks, failures])
+	quit(1 if failures else 0)
+
+func exercise(size: Vector2i) -> void:
+	DisplayServer.window_set_size(size)
+	root.size = size
+	root.content_scale_size = size
+	await process_frame
+	var game = load("res://scenes/rescue.tscn").instantiate()
+	root.add_child(game)
+	await process_frame
+	game.demo_mode = true
+	game.set_process(false)
+	var actor: Dictionary = {}
+	for unit in game.mission.living("player"):
+		if "shoot" in unit.get("kit", []): actor = unit; break
+	check(not actor.is_empty(), "shooter exists at %s" % size)
+	if actor.is_empty(): game.queue_free(); return
+	game._select(int(actor.id))
+	var nearby: Dictionary = game.mission.paths(actor, 3)
+	for tile in nearby.costs:
+		if int(nearby.costs[tile]) == 1:
+			var enemy: Dictionary = game.mission.living("enemy")[0]
+			enemy.x = tile.x; enemy.y = tile.y; enemy.awake = true; enemy.spotted = true
+			break
+	var options: Array[Dictionary] = InputControls.valid_targets(game.mission, actor, "shoot")
+	check(not options.is_empty(), "visible target exists at %s" % size)
+	if options.is_empty(): game.queue_free(); return
+	game.action = "shoot"
+	game.target_id = int(options[0].id)
+	game._frame_target()
+	game._refresh()
+	for i in range(22): await process_frame
+	var aim = game.hud_controls.aim_ui
+	check(aim.panel.visible, "aim card opens at %s" % size)
+	check(game.cam.preview_active, "shoulder camera holds target at %s" % size)
+	var target: Dictionary = game.mission.unit_by_id(game.target_id)
+	var origin := Vector3(float(actor.x), Shot.elevation(game.mission, Shot.pos(actor)) * 0.7, float(actor.y))
+	var destination := Vector3(float(target.x), Shot.elevation(game.mission, Shot.pos(target)) * 0.7, float(target.y))
+	var shot_direction := destination - origin; shot_direction.y = 0.0
+	check((game.camera.position - origin).dot(shot_direction) < 0.0, "camera is behind shooter at %s" % size)
+	check(game.camera.position.distance_to(origin) < (8.5 if size.x < 1000 else 4.5), "camera is close to shooter at %s" % size)
+	var viewport := Rect2(Vector2.ZERO, Vector2(size))
+	if size.x < 1000:
+		var actor_at: Vector3 = game.views[int(actor.id)].global_position
+		var actor_bounds := Rect2()
+		var first := true
+		for x in [-0.55, 0.55]:
+			for y in [0.0, 2.3]:
+				for z in [-0.55, 0.55]:
+					var point: Vector2 = game.camera.unproject_position(actor_at + Vector3(x, y, z))
+					if first:
+						actor_bounds = Rect2(point, Vector2.ZERO); first = false
+					else: actor_bounds = actor_bounds.expand(point)
+		var phone = game.hud_controls.phone
+		var hud_top: float = minf(aim.panel.get_global_rect().position.y, phone.overlay.find_child("AbilityTray", true, false).get_global_rect().position.y)
+		var header_bottom: float = phone.overlay.get_child(0).get_global_rect().end.y
+		var screen_width: float = game.camera.get_viewport().get_visible_rect().size.x
+		print("BATTLE13 PHONE ACTOR: %s, safe y %.1f–%.1f" % [actor_bounds, header_bottom + 8.0, hud_top - 8.0])
+		check(actor_bounds.position.y >= header_bottom + 8.0 and actor_bounds.end.y <= hud_top - 8.0 and actor_bounds.position.x >= 8.0 and actor_bounds.end.x <= screen_width - 8.0, "selected unit fits between phone header and bottom HUD")
+	check(viewport.encloses(aim.panel.get_global_rect()), "aim card fits at %s" % size)
+	check(viewport.encloses(aim.confirm.get_global_rect()) and aim.confirm.size.y >= 44.0, "FIRE is reachable at %s" % size)
+	check(aim.confirm.text.contains("HIT") and aim.confirm.text.contains("DMG"), "hit and damage remain readable at %s" % size)
+	check(aim.summary.text.contains(str(target.name)) and viewport.encloses(aim.summary.get_global_rect()), "target card fits at %s" % size)
+	if size.x < 1000:
+		var phone = game.hud_controls.phone
+		check(phone != null and phone.overlay.visible, "compact phone HUD exists")
+		var count := 0
+		for button in phone.ability_buttons:
+			if button.visible:
+				count += 1
+				check(button.compact and button.hotkey != "" and button.size.y >= 44, "phone uses icon touch buttons")
+		check(count <= 5 and phone.more_button.visible, "phone shows at most five actions plus More")
+		check(viewport.encloses(phone.unit_card.get_global_rect()), "phone unit card fits")
+		check(phone.unit_card.text.contains(str(actor.name)), "phone unit name is complete")
+	else:
+		check(not game.hud_controls.left_panel.visible and not game.hud_controls.right_panel.visible, "tall panels fold away during aim")
+		var bar = game.hud_controls.bar
+		var count := 0
+		for button in bar.copies.values():
+			if button.visible: count += 1; check(viewport.encloses(button.get_global_rect()), "action button fits")
+		check(count <= 5 and bar.more.visible, "desktop shows at most five actions plus More")
+		check(viewport.encloses(bar.more.get_global_rect()), "desktop More fits")
+		var end_turn: Button = null
+		for node in game.overlay.find_children("*", "Button", true, false):
+			if node.text == "END TURN": end_turn = node; break
+		check(end_turn != null and viewport.encloses(end_turn.get_global_rect()), "END TURN label fits")
+	check(not game.scene_view.world.environment.ssao_enabled, "Low keeps SSAO disabled")
+	check(not game.scene_view.sun.shadow_enabled, "Low keeps dynamic shadows disabled")
+	game.cam.skip_preview_transition()
+	check(game.cam.preview_tween == null or not game.cam.preview_tween.is_running(), "aim transition skips immediately")
+	game._cancel_order()
+	check(not game.cam.preview_active and not game.cinematic and not aim.panel.visible, "cancel restores tactical view")
+	game.action = "shoot"
+	game.target_id = int(target.id)
+	game._frame_target(); game._refresh()
+	check(game.cam.preview_active, "second target selection reopens shoulder view")
+	game._attack(int(target.id), "shoot")
+	check(not game.cam.preview_active and not game.cinematic and game.action == "move", "fire restores tactical view")
+	game.queue_free()
+	for i in range(3): await process_frame

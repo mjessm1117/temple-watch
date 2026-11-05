@@ -35,6 +35,11 @@ func handle(event: InputEvent) -> void:
 			var tap := fingers.size() == 1 and should_click(start, event.position, moved, pinching)
 			fingers.erase(event.index)
 			if fingers.is_empty():
+				if tap and g.cam.preview_active and g.cam.preview_tween != null and g.cam.preview_tween.is_running():
+					g.cam.skip_preview_transition()
+					g.set_process_unhandled_input.call_deferred(true)
+					pinching = false
+					return
 				if tap and g.get_viewport().gui_get_hovered_control() == null and g._screen_tile(event.position).x >= 0:
 					var click := InputEventMouseButton.new()
 					click.button_index = MOUSE_BUTTON_LEFT; click.pressed = true; click.position = event.position
