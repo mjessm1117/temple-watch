@@ -36,3 +36,14 @@ Portraits are static rasters. Phone story no longer creates the offscreen live h
 - `./godot/test.sh`: exit 0; zero `SCRIPT ERROR` lines; every suite has zero failures; Normal rescue 9/20. `story14_test`: 148 checks, 0 failures on Low. Full results are in `test.log`.
 - Web retention check: all 26 portrait PNGs match `RUNTIME_RASTER_DIRS`.
 - `git diff --check`: clean.
+
+## Fix pass — 2026-11-05
+
+- Rebuilt all 26 portraits with deterministic per-ID material tint, camera angle and crop, key/rim light, and frame accents. Villains use red/black low-key lighting. The Council now has a blue three-figure hologram and a three-mark sigil card. The inspected [portrait sheet](portraits-sheet.png) shows 26 visibly distinct portraits; all 26 PNG MD5 hashes are unique. `story14_test` checks every hash.
+- Desktop briefing has one large speaker portrait, which updates with the speaker and caption. Skip is a compact top-right control. Phone spacing was tightened so the advance control and short objective are visible.
+- Replaced the after shots with captures taken after reveal. Added debrief shots with Kira's character beat and a phone battle comms bark:
+  - [Briefing phone](../../shots/wave14-story-after-phone.png) and [desktop](../../shots/wave14-story-after-desktop.png)
+  - [Debrief phone](../../shots/wave14-story-debrief-phone.png) and [desktop](../../shots/wave14-story-debrief-desktop.png)
+  - [Battle comms phone](../../shots/wave14-story-comms-phone.png)
+- Inspected all five final shots. Final briefing captures: phone 95 draw calls / 64,927 triangles; desktop 117 draw calls / 132,043 triangles. Portraits remain static rasters; no live portrait draw cost or new post effect.
+- Gate: headless import exit 0; `./godot/test.sh` exit 0, zero `SCRIPT ERROR` lines, zero failures in every suite, Normal rescue 9/20; `story14_test` 177 checks and zero failures; `git diff --check` clean. Logs: `import-fix.log`, `test-fix.log`, `story14-fix.log`.

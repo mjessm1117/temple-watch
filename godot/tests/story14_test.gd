@@ -20,6 +20,13 @@ func run() -> void:
 	var heroes: Array = ["Kira Venn","Tor Saalen","Sgt. Rhal Dax","Ilsa Myr","Doc Bren","Grak Ordo","Satele Shan","Jace Malcom","Varra Ordo","Lord Ressa Vaun","Kell Darrow","Sgt. Bo Hallan","Mira Tesk","Doc Ilo Venn","Rusk Abernath","Knight Sava Orrin","Tem Ruhl","Sgt. Dace Morrow","Kiri Vass","Doc Halden Pree","Bruk Tannar"]
 	var names: Array = heroes + ["Darth Malgus","Lord Kaan","Darth Bane","Marchion Ro"]
 	for name in names: check(Portraits.texture(name) != null,"baked portrait " + name)
+	var hashes := {}
+	for id in Portraits.NAMES.values():
+		var path := "res://assets/story/portraits14/%s.png" % id
+		var hash := FileAccess.get_md5(path)
+		check(not hashes.has(hash),"portrait md5 unique: " + id)
+		hashes[hash] = id
+	check(hashes.size() == 26,"26 unique portrait files")
 	var barks: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/story/story14-barks.json")).heroes
 	for name in heroes:
 		for event in ["contact","ally_down","objective_done","villain","last_enemy"]:
@@ -47,6 +54,10 @@ func run() -> void:
 		check(scene.choices_box.visible and scene.narrative.visible_characters == -1,"skip reveals choices %s" % size)
 		var portraits: Array = scene.find_children("*","TextureRect",true,false)
 		check(portraits.any(func(p): return p.texture != null and p.is_visible_in_tree()),"speaker portrait visible %s" % size)
+		if size.x > 900:
+			check(scene.big_speaker_portrait != null and not scene.speaker_portrait.is_visible_in_tree() if is_instance_valid(scene.speaker_portrait) else scene.big_speaker_portrait != null,"desktop has one speaker portrait")
+			var skip_buttons: Array = scene.find_children("*","Button",true,false).filter(func(b): return b.text == "SKIP")
+			check(skip_buttons.size() == 1 and skip_buttons[0].size.x < 150,"desktop skip is compact")
 		var stub := Node.new()
 		root.add_child(stub)
 		var comms := Comms.new(stub)

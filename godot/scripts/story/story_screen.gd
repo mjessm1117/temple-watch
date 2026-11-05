@@ -27,6 +27,8 @@ var dialogue_lines: PackedStringArray
 var dialogue_index := 0
 var speaker_plate: Label
 var speaker_portrait: TextureRect
+var big_speaker_portrait: TextureRect
+var big_speaker_caption: Label
 
 func set_campaign_state(value: Dictionary) -> void:
 	demo_mode = false
@@ -65,6 +67,8 @@ func _build() -> void:
 	narrative = null
 	bond_meter = null
 	portrait_count = 0
+	big_speaker_portrait = null
+	big_speaker_caption = null
 	var bg := World.new()
 	bg.stage = "archive" if mode == "codex" else "temple"
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -138,12 +142,12 @@ func _build_story() -> void:
 			holo.custom_minimum_size = Vector2(290,225)
 			holo_frame.add_child(holo)
 			visual.add_child(UI.label(str(engine.mission(scene_data.get("id","")).get("where",scene_data.get("eyebrow","TARGET PROJECTION"))).to_upper(),14,UI.ACCENT))
-			_portrait(visual,speaker,1.0,Vector2(290,180))
+			big_speaker_portrait = _portrait(visual,speaker,1.0,Vector2(290,180))
 		visual.add_child(UI.label("TEMPLE RECORD\nJEDI ARCHIVE · SQUAD 06" if kind == "scene11" else "SECURE TRANSMISSION\nJEDI ARCHIVE · CHANNEL 06",12,UI.MUTED))
 	var frame := UI.panel(Color(0.04,0.075,0.085,0.96))
 	frame.size_flags_horizontal = SIZE_EXPAND_FILL
 	row.add_child(frame)
-	var content := UI.column(12)
+	var content := UI.column(6 if phone else 12)
 	content.size_flags_horizontal = SIZE_EXPAND_FILL
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -152,16 +156,17 @@ func _build_story() -> void:
 	var speaking := HBoxContainer.new()
 	speaking.add_theme_constant_override("separation",12)
 	content.add_child(speaking)
-	speaker_portrait = Portraits14.picture(speaker,Vector2(54,68) if phone else Vector2(62,78))
-	speaking.add_child(speaker_portrait)
+	if phone:
+		speaker_portrait = Portraits14.picture(speaker,Vector2(44,54))
+		speaking.add_child(speaker_portrait)
 	speaker_plate = UI.label("SPEAKER  " + speaker.to_upper(),14,UI.ACCENT)
 	speaker_plate.size_flags_horizontal = SIZE_EXPAND_FILL
 	speaking.add_child(speaker_plate)
-	if phone:
-		var skip := UI.button("SKIP",_skip_dialogue)
-		skip.custom_minimum_size = Vector2(64,34)
-		skip.add_theme_font_size_override("font_size",11)
-		speaking.add_child(skip)
+	var skip := UI.button("SKIP",_skip_dialogue)
+	skip.custom_minimum_size = Vector2(64,34)
+	skip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	skip.add_theme_font_size_override("font_size",11)
+	speaking.add_child(skip)
 	content.add_child(UI.label(str(scene_data.get("eyebrow","TEMPLE")).to_upper(),13,UI.GOLD))
 	content.add_child(UI.label(scene_data.get("title","The Temple"),23 if phone else 32,UI.ACCENT))
 	dialogue_lines = str(scene_data.get("text","")).split("\n",false)
@@ -175,9 +180,10 @@ func _build_story() -> void:
 	reveal.custom_minimum_size.y = 30
 	reveal.add_theme_font_size_override("font_size",12)
 	content.add_child(reveal)
-	if not phone: content.add_child(UI.button("SKIP DIALOGUE",_skip_dialogue))
 	if scene_data.get("goal","") != "":
-		content.add_child(UI.label("OBJECTIVE  /  " + str(scene_data.goal),16,UI.GOLD))
+		var goal := str(scene_data.goal)
+		if phone: goal = goal.get_slice(".",0)
+		content.add_child(UI.label("OBJECTIVE  /  " + goal,12 if phone else 16,UI.GOLD))
 	content.add_child(UI.label("YOUR DECISION",13,UI.MUTED))
 	choices_box = UI.column(8)
 	content.add_child(choices_box)
@@ -209,7 +215,7 @@ func _build_story() -> void:
 	vision.autowrap_mode = TextServer.AUTOWRAP_OFF
 	foot.add_child(vision)
 
-func _portrait(parent: Node, caption: String, facing: float, dimensions: Vector2) -> void:
+func _portrait(parent: Node, caption: String, facing: float, dimensions: Vector2) -> TextureRect:
 	var frame := UI.panel()
 	frame.size_flags_horizontal = SIZE_EXPAND_FILL
 	parent.add_child(frame)
@@ -217,8 +223,11 @@ func _portrait(parent: Node, caption: String, facing: float, dimensions: Vector2
 	frame.add_child(column)
 	var portrait := Portraits14.picture(caption,dimensions)
 	column.add_child(portrait)
-	column.add_child(UI.label(caption.to_upper(),12,UI.ACCENT))
+	var caption_label := UI.label(caption.to_upper(),12,UI.ACCENT)
+	column.add_child(caption_label)
+	if dimensions.x > 200: big_speaker_caption = caption_label
 	portrait_count += 1
+	return portrait
 
 func _bond(parent: Node, who: String) -> void:
 	# --- wave10 story ---
@@ -292,8 +301,7 @@ func _advance_dialogue() -> void:
 	var cut := line.find(": ")
 	if cut > 0 and cut < 40:
 		var name := line.substr(0,cut)
-		speaker_plate.text = "SPEAKER  " + name.to_upper()
-		speaker_portrait.texture = Portraits14.texture(name)
+		_set_speaker(name)
 	narrative.text = _dialogue_text(line)
 	narrative.visible_characters = 0
 	typed = 0
@@ -301,9 +309,18 @@ func _advance_dialogue() -> void:
 
 func _skip_dialogue() -> void:
 	dialogue_index = dialogue_lines.size()-1
-	narrative.text = _dialogue_text(dialogue_lines[dialogue_index])
+	var line := dialogue_lines[dialogue_index]
+	var cut := line.find(": ")
+	if cut > 0 and cut < 40: _set_speaker(line.substr(0,cut))
+	narrative.text = _dialogue_text(line)
 	_reveal()
 	choices_box.visible = true
+
+func _set_speaker(name: String) -> void:
+	speaker_plate.text = "SPEAKER  " + name.to_upper()
+	if is_instance_valid(speaker_portrait): speaker_portrait.texture = Portraits14.texture(name)
+	if is_instance_valid(big_speaker_portrait): big_speaker_portrait.texture = Portraits14.texture(name)
+	if is_instance_valid(big_speaker_caption): big_speaker_caption.text = name.to_upper()
 
 func _choose(id: String, animate: bool = false) -> void:
 	if decision_recorded: return
