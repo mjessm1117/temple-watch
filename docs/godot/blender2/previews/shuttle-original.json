@@ -1,0 +1,12 @@
+{
+ "model": "godot/assets/maps/shuttle.glb",
+ "triangles": 6360,
+ "size_m": [
+  1.895,
+  1.559,
+  0.485
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

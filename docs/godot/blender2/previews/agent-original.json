@@ -1,0 +1,12 @@
+{
+ "model": "godot/assets/models/units/agent.glb",
+ "triangles": 11997,
+ "size_m": [
+  0.717,
+  0.648,
+  1.696
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

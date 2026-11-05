@@ -1,0 +1,1 @@
+Runtime LOD introspection attempt failed: ArrayMesh.surface_get_lods and RenderingServer.mesh_surface_get_lods are unavailable in Godot 4.7.2. Import settings and shipped LOD1 asset routing are reported instead.

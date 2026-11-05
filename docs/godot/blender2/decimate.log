@@ -1,0 +1,96 @@
+21:57:28 | INFO: Data are loaded, start creating Blender stuff
+21:57:28 | INFO: Blender create Mesh node Mesh_0
+21:57:28 | INFO: glTF import finished in 0.30s
+Info: Applied modifier was not first, result may not be as expected
+INFO Draco is available, use library at /snap/blender/7803/lib/libbf_intern_draco_bridge.so
+INFO MeshOptimizer is available, use library at /snap/blender/7803/lib/libbf_intern_meshopt_bridge.so
+21:57:29 | INFO: Starting glTF 2.0 export
+21:57:29 | INFO: Extracting primitive: Mesh_0
+21:57:29 | INFO: Primitives created: 1
+21:57:29 | WARNING: There are more than 4 joint vertex influences.The 4 with highest weight will be used (and normalized).
+21:57:37 | INFO: Finished glTF 2.0 export in 8.688565731048584 s
+
+DECIMATED {"source": "models/units/agent.glb", "v2": "godot/assets/models_v2/agent_v2.glb", "before": 11997, "after": 4925, "ratio": 0.41051929649078933, "mesh_count": 1}
+21:57:37 | INFO: Data are loaded, start creating Blender stuff
+21:57:37 | INFO: Blender create Mesh node output_unwrapped
+21:57:38 | INFO: glTF import finished in 0.27s
+Info: Applied modifier was not first, result may not be as expected
+21:57:38 | INFO: Starting glTF 2.0 export
+21:57:38 | INFO: Extracting primitive: output_unwrapped
+21:57:38 | INFO: Primitives created: 1
+21:57:38 | WARNING: There are more than 4 joint vertex influences.The 4 with highest weight will be used (and normalized).
+21:57:56 | INFO: Finished glTF 2.0 export in 18.556168794631958 s
+
+DECIMATED {"source": "models/units/jedi.glb", "v2": "godot/assets/models_v2/jedi_v2.glb", "before": 10323, "after": 4925, "ratio": 0.4770899932190255, "mesh_count": 1}
+21:57:56 | INFO: Data are loaded, start creating Blender stuff
+21:57:56 | INFO: Blender create Mesh node output_unwrapped
+21:57:57 | INFO: glTF import finished in 0.28s
+Info: Applied modifier was not first, result may not be as expected
+21:57:57 | INFO: Starting glTF 2.0 export
+21:57:57 | INFO: Extracting primitive: output_unwrapped.001
+21:57:57 | INFO: Primitives created: 1
+21:57:57 | WARNING: There are more than 4 joint vertex influences.The 4 with highest weight will be used (and normalized).
+21:58:29 | INFO: Finished glTF 2.0 export in 32.63083076477051 s
+
+DECIMATED {"source": "models/units/scout.glb", "v2": "godot/assets/models_v2/scout_v2.glb", "before": 10411, "after": 4925, "ratio": 0.4730573431946979, "mesh_count": 1}
+21:58:29 | INFO: Data are loaded, start creating Blender stuff
+21:58:29 | INFO: Blender create Mesh node output_unwrapped
+21:58:30 | INFO: glTF import finished in 0.27s
+Info: Applied modifier was not first, result may not be as expected
+21:58:30 | INFO: Starting glTF 2.0 export
+21:58:30 | INFO: Extracting primitive: output_unwrapped.002
+21:58:30 | INFO: Primitives created: 1
+21:58:30 | WARNING: There are more than 4 joint vertex influences.The 4 with highest weight will be used (and normalized).
+21:59:17 | INFO: Finished glTF 2.0 export in 47.06426644325256 s
+
+DECIMATED {"source": "models/units/sithHeavy.glb", "v2": "godot/assets/models_v2/sithHeavy_v2.glb", "before": 10244, "after": 4925, "ratio": 0.4807692307692308, "mesh_count": 1}
+21:59:17 | INFO: Data are loaded, start creating Blender stuff
+21:59:17 | INFO: Blender create Mesh node output_unwrapped
+21:59:17 | INFO: glTF import finished in 0.29s
+Info: Applied modifier was not first, result may not be as expected
+21:59:17 | INFO: Starting glTF 2.0 export
+21:59:17 | INFO: Extracting primitive: output_unwrapped.003
+21:59:17 | INFO: Primitives created: 1
+21:59:17 | WARNING: There are more than 4 joint vertex influences.The 4 with highest weight will be used (and normalized).
+22:00:29 | INFO: Finished glTF 2.0 export in 71.55165839195251 s
+
+DECIMATED {"source": "models/units/trooper.glb", "v2": "godot/assets/models_v2/trooper_v2.glb", "before": 10305, "after": 4925, "ratio": 0.47792333818534694, "mesh_count": 1}
+22:00:29 | INFO: Data are loaded, start creating Blender stuff
+22:00:29 | INFO: Blender create Mesh node output_unwrapped
+22:00:29 | INFO: glTF import finished in 0.06s
+22:00:29 | INFO: Starting glTF 2.0 export
+22:00:29 | INFO: Extracting primitive: output_unwrapped.004
+22:00:29 | INFO: Primitives created: 1
+22:00:29 | INFO: Finished glTF 2.0 export in 0.0207064151763916 s
+
+DECIMATED {"source": "maps/relay.glb", "v2": "godot/assets/models_v2/relay_v2.glb", "before": 8890, "after": 1477, "ratio": 0.16619797525309335, "mesh_count": 1}
+22:00:29 | INFO: Data are loaded, start creating Blender stuff
+22:00:29 | INFO: Blender create Mesh node output_unwrapped
+22:00:29 | INFO: glTF import finished in 0.05s
+22:00:29 | INFO: Starting glTF 2.0 export
+22:00:29 | INFO: Extracting primitive: output_unwrapped.005
+22:00:29 | INFO: Primitives created: 1
+22:00:29 | INFO: Finished glTF 2.0 export in 0.024399280548095703 s
+
+DECIMATED {"source": "maps/gantry.glb", "v2": "godot/assets/models_v2/gantry_v2.glb", "before": 8164, "after": 1477, "ratio": 0.18097746202841744, "mesh_count": 1}
+22:00:29 | INFO: Data are loaded, start creating Blender stuff
+22:00:29 | INFO: Blender create Mesh node output_unwrapped
+22:00:29 | INFO: glTF import finished in 0.07s
+22:00:29 | INFO: Starting glTF 2.0 export
+22:00:29 | INFO: Extracting primitive: output_unwrapped.006
+22:00:29 | INFO: Primitives created: 1
+22:00:29 | INFO: Finished glTF 2.0 export in 0.01660299301147461 s
+
+DECIMATED {"source": "maps/statue.glb", "v2": "godot/assets/models_v2/statue_v2.glb", "before": 7999, "after": 1477, "ratio": 0.18471058882360294, "mesh_count": 1}
+22:00:29 | INFO: Data are loaded, start creating Blender stuff
+22:00:29 | INFO: Blender create Mesh node 0
+22:00:29 | INFO: glTF import finished in 0.06s
+22:00:29 | INFO: Starting glTF 2.0 export
+22:00:29 | INFO: Extracting primitive: Mesh_0.001
+22:00:29 | INFO: Primitives created: 1
+22:00:29 | INFO: Finished glTF 2.0 export in 0.02177119255065918 s
+
+DECIMATED {"source": "maps/shuttle.glb", "v2": "godot/assets/models_v2/shuttle_v2.glb", "before": 6360, "after": 1477, "ratio": 0.23231132075471697, "mesh_count": 1}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit

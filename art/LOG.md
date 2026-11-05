@@ -166,3 +166,7 @@ Final validation: headless Godot import before tests; `./godot/test.sh` exit **0
 ## Blender 1 Godot model audit (2026-11-04)
 
 Audited all 97 GLBs under `godot/assets` with headless Blender. The 13 apparent untextured Icospheres are import-only Blender helpers absent from the GLBs. Godot's map and Meshy stage loaders already center and floor-fit props; flying vehicles use centered origins. Sith Heavy's off-center scan result is an animated pose, while its rest geometry is centered. No safe model edit or `_v2` export was warranted. Baseline battle-camera captures at desktop and phone sizes and the complete decision table are in `docs/godot/blender1/REPORT.md`. The Web export excludes the future v2 staging folder and the test-only capture script; the PCK measured 65,037,544 → 65,035,628 bytes.
+
+## Blender 2 — phone staging and blocky prop quote (2026-11-04)
+
+Staged nine Blender-only `_v2.glb` copies under `godot/assets/models_v2`; no gameplay swap. Five units are 4,925 triangles each. Relay and shuttle meet 1,500; gantry and statue needed gentler 4,082 and 3,999 to preserve their battle-size silhouettes. Four-view previews, desktop/phone A/B captures, LOD findings, 59,209-triangle representative-scene saving, and measured 1,275,196-byte Web PCK saving are in `docs/godot/blender2/REPORT.md`. Seven blocky props are quoted at 350 Meshy credits (210–490 range); read-only balance was 15,150. No Meshy generation call, credit spend, asset swap, or push.

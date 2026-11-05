@@ -1,0 +1,9 @@
+models/units/agent.glb 11997 4925 ['cheer', 'crouch'] 29
+models/units/jedi.glb 10323 4925 ['cheer', 'crouch'] 29
+models/units/scout.glb 10411 4925 ['cheer', 'crouch'] 29
+models/units/sithHeavy.glb 10244 4925 ['cheer', 'crouch'] 29
+models/units/trooper.glb 10305 4925 ['cheer', 'crouch'] 29
+maps/relay.glb 8890 1477 [] 0
+maps/gantry.glb 8164 4082 [] 0
+maps/statue.glb 7999 3999 [] 0
+maps/shuttle.glb 6360 1477 [] 0
