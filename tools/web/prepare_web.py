@@ -11,6 +11,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "godot"
 RASTER = {".png", ".webp", ".jpg", ".jpeg"}
+# Raster folders the game loads at runtime by path; kept in the web copy.
+RUNTIME_RASTER_DIRS = ("assets/loadout/icons13/",)
 
 
 def glb_images_embedded(path: Path) -> bool:
@@ -45,13 +47,15 @@ def main() -> None:
     all_glbs = list((SOURCE / "assets").rglob("*.glb"))
     if not all(glb_images_embedded(p) for p in all_glbs):
         raise SystemExit("An asset GLB has an external image dependency")
-    direct_rasters = re.findall(r"res://assets/[^\s\"']+?\.(?:png|webp|jpe?g)", runtime_scripts + game_data, re.I)
+    direct_rasters = [p for p in re.findall(r"res://assets/[^\s\"']+?\.(?:png|webp|jpe?g)", runtime_scripts + game_data, re.I)
+        if not p.removeprefix("res://").startswith(RUNTIME_RASTER_DIRS)]
     if direct_rasters:
         raise SystemExit(f"Raster paths used directly: {direct_rasters}")
     if "res://tests/" in runtime_scripts + game_data + (SOURCE / "project.godot").read_text():
         raise SystemExit("Game files refer to the test directory")
     # Godot's icon/boot art lives outside assets and remains in the copy.
-    raster_cuts = {p.relative_to(SOURCE).as_posix() for p in (SOURCE / "assets").rglob("*") if p.suffix.lower() in RASTER}
+    raster_cuts = {p.relative_to(SOURCE).as_posix() for p in (SOURCE / "assets").rglob("*")
+        if p.suffix.lower() in RASTER and not p.relative_to(SOURCE).as_posix().startswith(RUNTIME_RASTER_DIRS)}
     excluded = mesh_cuts | raster_cuts
     excluded_imports = {name + ".import" for name in excluded}
     def ignore(directory: str, names: list[str]) -> set[str]:
