@@ -1,0 +1,320 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Graphics restart: 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Graphics restart: 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Graphics restart: 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Graphics restart: 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+aim: 12 geometry and WotC height fixture cases
+geometry: directional cover, blockers, corner peeks
+actions: AP, shot spending, win/lose
+mission: 26x26, two routes, staged groups, announced drop, cover break
+AI: cover, flank, Jedi priority, engagement throttle
+skills: 31 class abilities exercised, medpacs, revive, wound and total squad loss
+map: 3 wide routes, shortest 21 steps, 2 high-ground ramps
+rescue bot story: 20/20 wins (100%), 20 freed, 0 clock losses, 41 medical uses
+rescue bot normal: 9/20 wins (45%), 19 freed, 8 clock losses, 43 medical uses
+rescue bot hard: 5/20 wins (25%), 19 freed, 3 clock losses, 25 medical uses
+rescue bot legend: 1/20 wins (5%), 11 freed, 18 clock losses, 27 medical uses
+presentation: scene loaded, movement, shot and three enemy turns
+TEST RESULTS: 368 checks, 0 failures; Normal rescue bot 9/20 wins (45%)
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CAMPAIGN TEST RESULTS: 45 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CAMPAIGN11 TEST RESULTS: 80 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+GEAR RESEARCH TEST RESULTS: 346 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+STORY TEST RESULTS: 225 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+STORY BONDS TEST RESULTS: 452 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+NIGHT1 STORY TEST RESULTS: 264 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Story11: 76 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+VILLAIN11 BATTLE: 21 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+LOOP TEST RESULTS: 357 checks, 0 failures; campaign bot loss
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+SITH TEST RESULTS: 499 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+STRATEGY TEST RESULTS: 119 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+COMBAT7 TEST RESULTS: 118 checks, 0 failures
+WARNING: 22 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+HUD NIGHT1 TEST RESULTS: 401 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+BATTLE11 TEST RESULTS: 394 checks, 0 failures
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+MAP relay 26x26 routes=2 cover=[5, 5, 4, 5] high=239 sight=289/76
+MAP shrine 30x26 routes=2 cover=[6, 7, 6, 5] high=277 sight=370/82
+MAP rescue 34x26 routes=2 cover=[9, 6, 5, 6] high=147 sight=462/83
+MAP envoy 26x30 routes=2 cover=[5, 5, 3, 5] high=137 sight=318/112
+MAP archive 30x30 routes=2 cover=[7, 4, 3, 5] high=161 sight=465/73
+MAP sabotage 34x30 routes=2 cover=[6, 8, 5, 8] high=175 sight=518/117
+MAP escort 26x34 routes=2 cover=[8, 4, 7, 8] high=144 sight=366/115
+MAP blockade 30x34 routes=2 cover=[8, 9, 10, 5] high=362 sight=485/113
+MAP cache 34x34 routes=2 cover=[15, 9, 10, 8] high=177 sight=652/57
+MAP hutt 26x26 routes=2 cover=[5, 5, 3, 5] high=114 sight=284/82
+MAP dock 30x26 routes=2 cover=[5, 6, 5, 5] high=135 sight=375/81
+MAP vault 34x26 routes=2 cover=[8, 1, 4, 6] high=144 sight=509/45
+MAP ilum 26x30 routes=2 cover=[5, 4, 3, 5] high=246 sight=340/91
+MAP adraasHunt 30x30 routes=2 cover=[7, 5, 4, 5] high=164 sight=432/103
+MAP taris 34x30 routes=2 cover=[9, 12, 7, 5] high=174 sight=574/55
+MAP thul 26x34 routes=2 cover=[8, 8, 7, 7] high=312 sight=379/99
+MAP depot 30x34 routes=2 cover=[11, 5, 6, 5] high=361 sight=489/117
+MAP fort 34x34 routes=2 cover=[8, 7, 9, 12] high=411 sight=606/111
+MAP r_muster 26x26 routes=2 cover=[5, 4, 3, 5] high=242 sight=286/81
+MAP w11_evacuation 26x34 routes=2 cover=[8, 3, 2, 5] high=242 sight=359/134
+MAP w11_holocron 34x26 routes=2 cover=[7, 8, 4, 7] high=314 sight=482/62
+MAP r_sixth 26x30 routes=2 cover=[6, 5, 3, 5] high=272 sight=335/93
+MAP w11_duel 30x30 routes=2 cover=[7, 5, 6, 5] high=318 sight=438/97
+MAP r_bomb 34x30 routes=2 cover=[11, 8, 6, 5] high=364 sight=552/82
+MAP r_hospital 26x34 routes=2 cover=[5, 6, 6, 6] high=318 sight=382/103
+MAP r_nexus 30x34 routes=2 cover=[10, 5, 7, 7] high=361 sight=494/108
+MAP r_snipers 34x34 routes=2 cover=[8, 8, 12, 16] high=408 sight=598/106
+MAP r_dump 26x26 routes=2 cover=[5, 6, 2, 5] high=239 sight=289/76
+MAP r_prisoners 30x26 routes=2 cover=[6, 6, 5, 5] high=278 sight=381/73
+MAP r_codes 34x26 routes=2 cover=[8, 7, 7, 7] high=314 sight=474/63
+MAP r_supply 26x30 routes=2 cover=[7, 5, 3, 5] high=274 sight=334/93
+MAP h_hetzal 30x30 routes=2 cover=[6, 6, 3, 5] high=321 sight=439/98
+MAP h_grove 34x30 routes=2 cover=[9, 5, 6, 7] high=365 sight=546/91
+MAP h_valo 26x34 routes=2 cover=[5, 4, 7, 6] high=148 sight=363/121
+MAP h_tempest 30x34 routes=2 cover=[10, 7, 10, 9] high=172 sight=472/121
+MAP h_husks 34x34 routes=2 cover=[12, 14, 12, 11] high=407 sight=607/94
+MAP h_beacon 26x26 routes=2 cover=[5, 6, 5, 5] high=111 sight=277/85
+MAP h_roots 30x26 routes=2 cover=[7, 3, 4, 5] high=276 sight=382/76
+MAP h_salvage 34x26 routes=2 cover=[5, 6, 6, 6] high=317 sight=480/64
+MAP h_scouts 26x30 routes=2 cover=[7, 5, 3, 5] high=273 sight=339/88
+MAP h_cache 30x30 routes=2 cover=[6, 6, 4, 5] high=164 sight=429/106
+MAP h_prisoners 34x30 routes=2 cover=[9, 9, 6, 9] high=174 sight=525/101
+MAP h_buoy 26x34 routes=2 cover=[7, 7, 8, 7] high=144 sight=364/113
+MAP h_outpost 30x34 routes=2 cover=[11, 7, 9, 8] high=359 sight=492/102
+MAP ilsaDrop 34x34 routes=2 cover=[13, 9, 8, 11] high=185 sight=593/120
+MAP brenClinic 26x26 routes=2 cover=[5, 4, 5, 5] high=114 sight=269/93
+MAP grakClan 30x26 routes=2 cover=[7, 3, 4, 5] high=278 sight=383/75
+MAP web_dantooine_crossroads 32x28 routes=2 cover=[6, 7, 7, 9] high=22 sight=495/33
+MAP web_shrine_terraces 30x30 routes=2 cover=[8, 6, 5, 5] high=55 sight=501/25
+MAP web_hold_the_ford 30x29 routes=2 cover=[2, 3, 6, 7] high=18 sight=501/13
+MAP web_frozen_watchpost 28x28 routes=2 cover=[5, 5, 4, 6] high=30 sight=403/34
+MAP web_detention_level_5 29x30 routes=2 cover=[16, 17, 13, 16] high=6 sight=361/91
+MAP web_smuggler_grotto 28x30 routes=2 cover=[7, 4, 16, 15] high=20 sight=366/84
+MAP web_antenna_ridge 31x34 routes=2 cover=[4, 2, 18, 7] high=46 sight=575/52
+MAP web_rooftop_chase 34x28 routes=2 cover=[17, 14, 9, 5] high=15 sight=505/52
+MAP web_listening_post_interior 33x29 routes=2 cover=[14, 11, 7, 7] high=6 sight=516/51
+MAP web_overgrown_relay 30x28 routes=2 cover=[4, 2, 6, 6] high=27 sight=476/22
+MAP web_balmorra_fuel_farm 34x28 routes=2 cover=[3, 1, 7, 6] high=30 sight=568/15
+MAP web_refinery_stacks 32x29 routes=2 cover=[4, 5, 4, 3] high=50 sight=523/50
+MAP web_canyon_run 26x31 routes=2 cover=[7, 1, 10, 3] high=30 sight=394/46
+MAP web_deepway_tunnels 28x29 routes=2 cover=[7, 10, 11, 10] high=18 sight=372/68
+MISSIONS RESULTS: 516 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+MISSIONS11 CAMPAIGN r_caves (holocron_recovery): 8/20 wins (40%)
+MISSIONS11 TURNS holocron_recovery: {"8":5,"9":3,"10":12}
+MISSIONS11 CAMPAIGN r_ravine (evacuation): 16/20 wins (80%)
+MISSIONS11 TURNS evacuation: {"8":5,"9":11,"10":4}
+MISSIONS11 CAMPAIGN r_seventh (sith_lord_duel): 16/20 wins (80%)
+MISSIONS11 TURNS sith_lord_duel: {"9":3,"10":8,"11":5,"12":4}
+Normal rescue bot: 9/20 wins
+MISSIONS11 RESULTS: 156 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TEMPLE VIEW TEST RESULTS: 155 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+HOME UI TEST RESULTS: 162 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+LOADOUT TEST RESULTS: 75 checks, 0 failures
+WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+GALAXY VIEWPORT: window (0, 0), root (1366, 768), map (920.0, 639.0), 3D (920, 639)
+Galaxy view: 62 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+SCREENS TEST RESULTS: 38 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+INTEGRATION TEST RESULTS: 61 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+MAP ART: 62 maps; largest res://data/maps/cache.json (1156 tiles)
+MAP ART FPS: skipped: headless has no GPU frames; run tests/map_art_test.gd -- --fps in a real window
+MAP ART TEST RESULTS: 179470 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TERRAIN relay: tiers { 0: 318, 1: 125, 2: 114 }; raised 239/557 (42.91%); wide routes 3; ramp graph 557
+TERRAIN shrine: tiers { 0: 371, 1: 128, 2: 149 }; raised 277/648 (42.75%); wide routes 3; ramp graph 648
+TERRAIN rescue: tiers { 0: 595, 1: 68, 2: 79 }; raised 147/742 (19.81%); wide routes 3; ramp graph 742
+TERRAIN envoy: tiers { 0: 517, 1: 71, 2: 66 }; raised 137/654 (20.95%); wide routes 3; ramp graph 654
+TERRAIN archive: tiers { 0: 604, 1: 89, 2: 72 }; raised 161/765 (21.05%); wide routes 3; ramp graph 765
+TERRAIN sabotage: tiers { 0: 694, 1: 74, 2: 101 }; raised 175/869 (20.14%); wide routes 3; ramp graph 869
+TERRAIN escort: tiers { 0: 597, 1: 93, 2: 51 }; raised 144/741 (19.43%); wide routes 3; ramp graph 741
+TERRAIN blockade: tiers { 0: 502, 1: 153, 2: 209 }; raised 362/864 (41.90%); wide routes 3; ramp graph 864
+TERRAIN cache: tiers { 0: 805, 1: 91, 2: 86 }; raised 177/982 (18.02%); wide routes 3; ramp graph 982
+TERRAIN hutt: tiers { 0: 444, 1: 73, 2: 41 }; raised 114/558 (20.43%); wide routes 3; ramp graph 558
+TERRAIN dock: tiers { 0: 516, 1: 73, 2: 62 }; raised 135/651 (20.74%); wide routes 3; ramp graph 651
+TERRAIN vault: tiers { 0: 605, 1: 85, 2: 59 }; raised 144/749 (19.23%); wide routes 3; ramp graph 749
+TERRAIN ilum: tiers { 0: 409, 1: 124, 2: 122 }; raised 246/655 (37.56%); wide routes 3; ramp graph 655
+TERRAIN adraasHunt: tiers { 0: 599, 1: 71, 2: 93 }; raised 164/763 (21.49%); wide routes 3; ramp graph 763
+TERRAIN taris: tiers { 0: 689, 1: 94, 2: 80 }; raised 174/863 (20.16%); wide routes 3; ramp graph 863
+TERRAIN thul: tiers { 0: 426, 1: 151, 2: 161 }; raised 312/738 (42.28%); wide routes 3; ramp graph 738
+TERRAIN depot: tiers { 0: 508, 1: 156, 2: 205 }; raised 361/869 (41.54%); wide routes 3; ramp graph 869
+TERRAIN fort: tiers { 0: 577, 1: 186, 2: 225 }; raised 411/988 (41.60%); wide routes 3; ramp graph 988
+TERRAIN r_muster: tiers { 0: 317, 1: 113, 2: 129 }; raised 242/559 (43.29%); wide routes 3; ramp graph 559
+TERRAIN r_ravine: tiers { 0: 508, 1: 129, 2: 113 }; raised 242/750 (32.27%); wide routes 3; ramp graph 750
+TERRAIN r_caves: tiers { 0: 428, 1: 154, 2: 160 }; raised 314/742 (42.32%); wide routes 3; ramp graph 742
+TERRAIN r_sixth: tiers { 0: 381, 1: 135, 2: 137 }; raised 272/653 (41.65%); wide routes 3; ramp graph 653
+TERRAIN r_seventh: tiers { 0: 443, 1: 144, 2: 174 }; raised 318/761 (41.79%); wide routes 3; ramp graph 761
+TERRAIN r_bomb: tiers { 0: 502, 1: 158, 2: 206 }; raised 364/866 (42.03%); wide routes 3; ramp graph 866
+TERRAIN r_hospital: tiers { 0: 427, 1: 144, 2: 174 }; raised 318/745 (42.68%); wide routes 3; ramp graph 745
+TERRAIN r_nexus: tiers { 0: 506, 1: 163, 2: 198 }; raised 361/867 (41.64%); wide routes 3; ramp graph 867
+TERRAIN r_snipers: tiers { 0: 572, 1: 191, 2: 217 }; raised 408/980 (41.63%); wide routes 3; ramp graph 980
+TERRAIN r_dump: tiers { 0: 319, 1: 122, 2: 117 }; raised 239/558 (42.83%); wide routes 3; ramp graph 558
+TERRAIN r_prisoners: tiers { 0: 372, 1: 127, 2: 151 }; raised 278/650 (42.77%); wide routes 3; ramp graph 650
+TERRAIN r_codes: tiers { 0: 425, 1: 148, 2: 166 }; raised 314/739 (42.49%); wide routes 3; ramp graph 739
+TERRAIN r_supply: tiers { 0: 378, 1: 133, 2: 141 }; raised 274/652 (42.02%); wide routes 3; ramp graph 652
+TERRAIN h_hetzal: tiers { 0: 443, 1: 139, 2: 182 }; raised 321/764 (42.02%); wide routes 3; ramp graph 764
+TERRAIN h_grove: tiers { 0: 504, 1: 159, 2: 206 }; raised 365/869 (42.00%); wide routes 3; ramp graph 869
+TERRAIN h_valo: tiers { 0: 598, 1: 81, 2: 67 }; raised 148/746 (19.84%); wide routes 3; ramp graph 746
+TERRAIN h_tempest: tiers { 0: 688, 1: 94, 2: 78 }; raised 172/860 (20.00%); wide routes 3; ramp graph 860
+TERRAIN h_husks: tiers { 0: 568, 1: 192, 2: 215 }; raised 407/975 (41.74%); wide routes 3; ramp graph 975
+TERRAIN h_beacon: tiers { 0: 444, 1: 70, 2: 41 }; raised 111/555 (20.00%); wide routes 3; ramp graph 555
+TERRAIN h_roots: tiers { 0: 377, 1: 129, 2: 147 }; raised 276/653 (42.27%); wide routes 3; ramp graph 653
+TERRAIN h_salvage: tiers { 0: 428, 1: 139, 2: 178 }; raised 317/745 (42.55%); wide routes 3; ramp graph 745
+TERRAIN h_scouts: tiers { 0: 379, 1: 136, 2: 137 }; raised 273/652 (41.87%); wide routes 3; ramp graph 652
+TERRAIN h_cache: tiers { 0: 599, 1: 71, 2: 93 }; raised 164/763 (21.49%); wide routes 3; ramp graph 763
+TERRAIN h_prisoners: tiers { 0: 689, 1: 75, 2: 99 }; raised 174/863 (20.16%); wide routes 3; ramp graph 863
+TERRAIN h_buoy: tiers { 0: 595, 1: 89, 2: 55 }; raised 144/739 (19.49%); wide routes 3; ramp graph 739
+TERRAIN h_outpost: tiers { 0: 502, 1: 169, 2: 190 }; raised 359/861 (41.70%); wide routes 3; ramp graph 861
+TERRAIN ilsaDrop: tiers { 0: 798, 1: 88, 2: 97 }; raised 185/983 (18.82%); wide routes 3; ramp graph 983
+TERRAIN brenClinic: tiers { 0: 443, 1: 70, 2: 44 }; raised 114/557 (20.47%); wide routes 3; ramp graph 557
+TERRAIN grakClan: tiers { 0: 375, 1: 126, 2: 152 }; raised 278/653 (42.57%); wide routes 3; ramp graph 653
+TERRAIN TEST RESULTS: 70666 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+BATTLE12 TEST RESULTS: 21 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+Mobile Web 1: 35 checks, 0 failures
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+RULES12 RESULTS: 179 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TEMPLE12 TEST RESULTS: 38 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ARMORY12 TEST RESULTS: 65 checks, 0 failures
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+Graphics low (gl_compatibility): 267 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+Graphics medium (forward_plus): 159 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+Graphics high (forward_plus): 177 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+gfx_night1 low: 222 checks, 0 failures
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+ART WINDOW: (0, 0) viewport (1366.0, 768.0)
+gfx_night1 high: 222 checks, 0 failures
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+HOME13 LAYOUT phone: map [P: (8.0, 74.0), S: (434.0, 246.0)] briefing [P: (468.0, 143.0), S: (213.0, 116.0)]
+HOME13 TEST RESULTS: 15 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+HOME13 ROOM war: button [P: (559.8467, 296.8263), S: (119.4667, 58.80432)] label [P: (559.8467, 298.8263), S: (119.4667, 26.0)]
+HOME13 ROOM archives: button [P: (686.6277, 296.8488), S: (119.4667, 58.80429)] label [P: (686.6277, 298.8488), S: (119.4667, 26.0)]
+HOME13 ROOM sp0: button [P: (386.742, 238.0125), S: (85.33331, 58.79825)] label [P: (386.742, 240.0125), S: (85.33331, 26.0)]
+HOME13 ROOM sp1: button [P: (513.5229, 238.0349), S: (85.33331, 58.79828)] label [P: (513.5229, 240.0349), S: (85.33331, 26.0)]
+HOME13 LAYOUT desktop: map [P: (22.0, 96.0), S: (920.0, 639.0)] briefing [P: (968.0, 275.0), S: (362.0, 399.0)]
+HOME13 TEST RESULTS: 1111 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+HOME13 LAYOUT phone: map [P: (8.0, 74.0), S: (434.0, 246.0)] briefing [P: (468.0, 143.0), S: (213.0, 116.0)]
+HOME13 TEST RESULTS: 16 checks, 0 failures

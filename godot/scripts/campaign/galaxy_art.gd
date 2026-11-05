@@ -43,7 +43,9 @@ static func planet(parent: Node3D, title: String, index: int) -> Node3D:
 	surface.set_shader_parameter("land", Color(appearance[2])); surface.set_shader_parameter("seed", float(index) * 3.71)
 	surface.set_shader_parameter("biome", appearance[3])
 	var sphere := SphereMesh.new(); sphere.radius = 0.83; sphere.height = 1.66
-	sphere.radial_segments = 48; sphere.rings = 24
+	# Small Low-tier planets do not need the desktop tessellation in either map view.
+	var low := RenderingServer.get_current_rendering_method() == "gl_compatibility"
+	sphere.radial_segments = 32 if low else 48; sphere.rings = 16 if low else 24
 	var body := mesh(root, sphere, surface); body.name = "Surface"; body.rotation.z = 0.2
 	var halo := material("atmosphere"); halo.set_shader_parameter("tint", Color(appearance[2]).lightened(0.22))
 	var shell := mesh(root, sphere, halo); shell.name = "Atmosphere"; shell.scale = Vector3.ONE * 1.13

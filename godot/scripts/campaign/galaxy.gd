@@ -15,6 +15,7 @@ var map_view: Control
 var message: Label
 var status: Label
 var tabs: HBoxContainer
+var tab_scroll: ScrollContainer
 var chips: HFlowContainer
 var scroll: ScrollContainer
 var page := "Briefing"
@@ -45,7 +46,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func _build() -> void:
 	var compact := Phone.narrow(Phone.window_size())
 	var bg := ColorRect.new(); bg.color = Color("0a1113"); bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); add_child(bg)
-	var outer := UI.column(10); outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var outer := UI.column(6); outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	outer.offset_left = 8 if compact else 22; outer.offset_top = 5 if compact else 16
 	outer.offset_right = -8 if compact else -22; outer.offset_bottom = -5 if compact else -12; add_child(outer)
 	var head := HBoxContainer.new(); outer.add_child(head)
@@ -59,35 +60,37 @@ func _build() -> void:
 	var body := HBoxContainer.new(); body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation",12); outer.add_child(body)
 	var left := UI.column(8); left.size_flags_horizontal = Control.SIZE_EXPAND_FILL; body.add_child(left)
-	var map_panel := UI.panel(Color("0f191c")); map_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL; left.add_child(map_panel)
+	var map_panel := UI.panel(Color("0f191c")); map_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL; map_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL; left.add_child(map_panel)
 	var style := map_panel.get_theme_stylebox("panel").duplicate(); style.set_content_margin_all(0); map_panel.add_theme_stylebox_override("panel",style)
 	map_view = GalaxyMap.new(); map_view.campaign = campaign; map_view.clip_contents = true; map_panel.add_child(map_view)
 	if compact: map_view.custom_minimum_size = Vector2(260, 130)
 	map_view.field_selected.connect(_field); map_view.mission_selected.connect(_select); map_view.planet_selected.connect(_planet); map_view.region_selected.connect(_region)
-	var region_chips := HFlowContainer.new(); region_chips.add_theme_constant_override("h_separation",4); left.add_child(region_chips)
-	for row in Data.get_table("galaxy","REGIONS"):
-		var b := UI.button(str(row[1]),_region.bind(str(row[0]))); b.custom_minimum_size.y = 28
-		b.add_theme_font_size_override("font_size",12); b.tooltip_text = str(row[3]); region_chips.add_child(b)
-	if compact: region_chips.hide()
-	var legend := HFlowContainer.new(); legend.add_theme_constant_override("h_separation",14); left.add_child(legend)
+	var right := UI.panel(Color("15232a")); right.custom_minimum_size.x = 228 if compact else 330; body.add_child(right)
+	var column := UI.column(7); column.custom_minimum_size.x = 212 if compact else 304; right.add_child(column)
+	tabs = HBoxContainer.new()
+	if compact:
+		var tab_row := HBoxContainer.new(); column.add_child(tab_row)
+		var previous := UI.button("‹", func(): tab_scroll.scroll_horizontal = maxi(0, tab_scroll.scroll_horizontal - 120))
+		previous.tooltip_text = "Scroll tabs left"; tab_row.add_child(previous)
+		tab_scroll = ScrollContainer.new(); tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		tab_scroll.custom_minimum_size.y = 39; tab_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tab_row.add_child(tab_scroll); tab_scroll.add_child(tabs)
+		var next := UI.button("›", func(): tab_scroll.scroll_horizontal += 120)
+		next.tooltip_text = "Scroll tabs right"; tab_row.add_child(next)
+	else: column.add_child(tabs)
+	for tab in ["Briefing","Regions","Field ops","Teams","Sith ops"]:
+		var button := UI.button(tab,_tab.bind(tab)); button.add_theme_font_size_override("font_size",12 if compact else 11)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL; tabs.add_child(button)
+	var legend := HFlowContainer.new(); legend.add_theme_constant_override("h_separation",14); column.add_child(legend)
 	legend.add_child(UI.label("RISK",12,UI.MUTED))
 	for i in 4: legend.add_child(UI.label("● " + str(Data.get_table("galaxy","RISK")[i][1]),12,Intel.COLORS[i]))
 	legend.add_child(UI.label("◇ Field op   /   Red haze: Darkness + unrest",12,UI.MUTED))
 	for item in legend.get_children(): item.autowrap_mode = TextServer.AUTOWRAP_OFF
 	if compact: legend.hide()
-	var offer_scroll := ScrollContainer.new(); offer_scroll.custom_minimum_size.y = 82; offer_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; left.add_child(offer_scroll)
-	if compact: offer_scroll.custom_minimum_size.y = 44
+	var offer_scroll := ScrollContainer.new(); offer_scroll.custom_minimum_size.y = 44 if compact else 70
+	offer_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(offer_scroll)
+	if compact: offer_scroll.hide()
 	chips = HFlowContainer.new(); chips.size_flags_horizontal = Control.SIZE_EXPAND_FILL; offer_scroll.add_child(chips)
-	var right := UI.panel(Color("15232a")); right.custom_minimum_size.x = 250 if compact else 390; body.add_child(right)
-	var column := UI.column(10); column.custom_minimum_size.x = 225 if compact else 360; right.add_child(column)
-	tabs = HBoxContainer.new()
-	if compact:
-		var tab_scroll := ScrollContainer.new(); tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-		tab_scroll.custom_minimum_size.y = 39; column.add_child(tab_scroll); tab_scroll.add_child(tabs)
-	else: column.add_child(tabs)
-	for tab in ["Briefing","Regions","Field ops","Teams","Sith ops"]:
-		var button := UI.button(tab,_tab.bind(tab)); button.add_theme_font_size_override("font_size",12 if compact else 11)
-		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL; tabs.add_child(button)
 	scroll = ScrollContainer.new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
 	detail = UI.column(10); detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(detail)
