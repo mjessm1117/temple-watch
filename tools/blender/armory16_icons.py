@@ -30,6 +30,8 @@ BLUE = mat("Kyber blue", (0.09, 0.54, 1.0), 0.0, 0.18, 0.8)
 GREEN = mat("Kyber green", (0.12, 0.95, 0.48), 0.0, 0.18, 0.8)
 PURPLE = mat("Kyber violet", (0.59, 0.31, 1.0), 0.0, 0.18, 0.8)
 RED = mat("Kyber red", (1.0, 0.18, 0.14), 0.0, 0.18, 0.8)
+YELLOW = mat("Kyber yellow", (1.0, 0.77, 0.19), 0.0, 0.18, 0.8)
+WHITE = mat("Kyber white", (0.76, 0.91, 1.0), 0.0, 0.18, 0.8)
 
 
 def clear():
@@ -167,6 +169,7 @@ for tier in (1, 2, 3):
                   (f"armor_troop_mk{tier}", lambda tier=tier: armor(tier, True))])
 ITEMS += [("crystal_blue", lambda: crystal(BLUE)), ("crystal_green", lambda: crystal(GREEN)),
           ("crystal_purple", lambda: crystal(PURPLE)), ("crystal_red", lambda: crystal(RED)),
+          ("crystal_yellow", lambda: crystal(YELLOW)), ("crystal_white", lambda: crystal(WHITE)),
           ("blaster", blaster), ("module", module), ("armor_mod", lambda: module(True))]
 
 for CURRENT, create in ITEMS:

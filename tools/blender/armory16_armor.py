@@ -36,10 +36,10 @@ def shell(name, tier, low):
     faces = []
     for j in range(rows):
         y = -0.5 + j / (rows - 1)
-        width = (0.43 + 0.06 * (y + 0.5)) * (1.0 if tier > 1 else 0.91)
+        width = (0.33 + 0.13 * (y + 0.5)) * (1.0 if tier > 1 else 0.91)
         for i in range(columns):
             t = -1 + 2 * i / (columns - 1)
-            verts.append((t * width, y, 0.18 - 0.13 * t * t + (0.02 if tier == 3 else 0)))
+            verts.append((t * width, y, 0.22 - 0.19 * t * t + (0.02 if tier == 3 else 0)))
     for j in range(rows - 1):
         for i in range(columns - 1):
             a = j * columns + i
@@ -97,8 +97,8 @@ def build(tier, low):
     mat = material(tier)
     detail = not low
     chest = [shell("Chest", tier, low)]
-    chest += [cube("Collar", (0, 0.47, 0.12), (0.96, 0.075, 0.10), 0.018)]
-    chest += [cube("Lower binding", (0, -0.47, 0.10), (0.85, 0.06, 0.09), 0.012)]
+    chest += [cube("Collar", (0, 0.47, 0.12), (0.86, 0.075, 0.10), 0.018)]
+    chest += [cube("Lower binding", (0, -0.47, 0.10), (0.66, 0.06, 0.09), 0.012)]
     if tier >= 2:
         chest += [cube("Center keel", (0, 0.01, 0.205), (0.075, 0.88, 0.05), 0.015)]
     if tier == 3:
@@ -125,6 +125,15 @@ def build(tier, low):
             parts.append(cube("Lower filigree", (0, -0.27, radius * 0.77), (0.40, 0.055, 0.05), 0.01))
         join(name, parts, mat)
 
+    # Blender is Z-up; pre-rotate so glTF gives Godot the intended Y-up shells.
+    for obj in bpy.context.scene.objects:
+        if obj.type != 'MESH':
+            continue
+        obj.rotation_euler.x += math.pi / 2
+        bpy.ops.object.select_all(action='DESELECT')
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.export_scene.gltf(filepath=str(ROOT / f"armor_mk{tier}_{'low' if low else 'high'}.glb"), export_format='GLB', use_selection=True, export_apply=True)
     for obj in bpy.context.selected_objects:

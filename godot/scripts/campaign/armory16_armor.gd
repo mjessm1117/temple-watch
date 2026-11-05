@@ -1,6 +1,7 @@
 extends RefCounted
 ## Armor is authored in Blender, then positioned in each skeleton's rest space.
 const ROOT := "res://assets/armor16/armor_mk%d_%s.glb"
+const JEDI_DEPTH := {"Tor Saalen":0.48, "Satele Shan":0.62, "Kell Darrow":0.58}
 
 static func skeleton(node: Node) -> Skeleton3D:
 	if node is Skeleton3D: return node
@@ -63,10 +64,11 @@ static func attach(model: Node3D, r: Dictionary, jedi: bool) -> void:
 	var spine := _position(sk, "spine_02")
 	var span := absf(left.x - right.x)
 	var torso_height := absf(_position(sk, "spine_01").y - _position(sk, "spine_03").y)
-	var tint := Color("765d43") if mark == 1 else Color("418996") if mark == 2 else Color("c4a060")
+	var tint := Color("705b47") if mark == 1 else Color("587e84") if mark == 2 else Color("907344")
 	if not jedi: tint = tint.lerp(Color("b1c4c6"), 0.28)
 	if armor == "beskar": tint = tint.lerp(Color("c9d3cb"), 0.38)
-	_piece(sk, chest, "spine_03", "ArmorPlate", spine + Vector3(0, 0, span * 0.32), Vector3(span * 0.94, torso_height * 1.07, span * 0.72), tint, show, low)
+	var front := float(JEDI_DEPTH.get(str(r.get("n", "")), 0.40)) if jedi else 0.17
+	_piece(sk, chest, "spine_03", "ArmorPlate", spine + Vector3(0, 0, span * front), Vector3(span * 0.76, torso_height * 0.78, span * 0.58), tint, show, low)
 	for side in ["l", "r"]:
 		var arm := _position(sk, "upperarm_" + side)
 		var forearm := _position(sk, "lowerarm_" + side)

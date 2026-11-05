@@ -1,4 +1,5 @@
 extends SceneTree
+const GUESTS := {"satele":"Satele Shan", "ressa":"Lord Ressa Vaun", "kell":"Kell Darrow", "sava":"Knight Sava Orrin", "tem":"Tem Ruhl"}
 
 func _initialize() -> void:
 	call_deferred("capture")
@@ -27,6 +28,9 @@ func capture() -> void:
 	flow.campaign.state.res.credits = 500
 	flow.campaign.state.res.kyber = 10
 	var soldier: Dictionary = flow.campaign.soldier(id)
+	var guest := ""
+	for key in GUESTS:
+		if key in args: guest = key; soldier.n = GUESTS[key]
 	if id == "u3": soldier.gear.armor = "heavy"
 	else: soldier.gear.armor = "armoredRobes"
 	soldier.gear.mk["armor:" + str(soldier.gear.armor)] = mark
@@ -41,9 +45,9 @@ func capture() -> void:
 	var draws := int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
 	var tris := int(Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME))
 	var suffix := "phone-low" if phone else "desktop-high"
-	var filename := "wave16-armory-%s-%s-%s-mk%d.png" % [phase, suffix, id, mark]
+	var filename := "wave16-armory-%s-%s-%s%s-mk%d.png" % [phase, suffix, id, "-" + guest if guest != "" else "", mark]
 	var path := ProjectSettings.globalize_path("res://../docs/godot/shots/" + filename)
-	print("ARMORY16 PERF %s %s %s mk%d draws=%d triangles=%d" % [phase, suffix, id, mark, draws, tris])
+	print("ARMORY16 PERF %s %s %s mk%d draws=%d triangles=%d fps=%d" % [phase, suffix, id, mark, draws, tris, Engine.get_frames_per_second()])
 	print("ARMORY16 SHOT %s result=%d" % [path, root.get_texture().get_image().save_png(path)])
 	screen.queue_free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(flow.save_path))
