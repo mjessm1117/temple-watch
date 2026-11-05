@@ -28,5 +28,7 @@ Read-only `GET /openapi/v1/balance`: **15,150 credits** at start (2026-11-04 UTC
 | 22 | ruins | A | refine | `01a1aa77-8ea3-7146-b1cf-ffdf301ce825` | 10 | 14760 | SUCCEEDED |
 | 23 | caves | A | refine | `01a1aa77-99e4-7391-a064-e16010611e89` | 10 | 14750 | SUCCEEDED |
 | 24 | jungle | B | refine | `01a1aa77-a80f-7491-9d80-42cbbceaa715` | 10 | 14740 | SUCCEEDED |
+| 25 | jungle retry | A | preview | `01a1aab3-f22b-76da-b5a5-4965612ad93a` | 20 | 14720 | SUCCEEDED |
+| 26 | jungle retry | A | refine | `01a1aab5-f541-77b4-b320-9333d5fa55da` | 10 | 14710 | SUCCEEDED |
 
-**Submitted spend: 410/490 credits.** Last observed batch balance: **14740**. Account balance can change independently of this batch.
+**Submitted spend: 440/490 credits; retry spend: 30/40.** Read-only retry balance before: **14740**; after: **14710**. Account balance can change independently of this batch.
