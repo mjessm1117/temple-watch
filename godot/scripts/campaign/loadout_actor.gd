@@ -2,6 +2,7 @@ extends Node3D
 ## One roster identity, shared by the hangar and portrait viewports.
 const Progression = preload("res://scripts/campaign/progression.gd")
 const Gear15 = preload("res://scripts/campaign/armory15_gear.gd")
+const JediModels = preload("res://scripts/characters/jedi_models.gd")
 var soldier_id := ""
 var model: Node3D
 var animation: AnimationPlayer
@@ -20,6 +21,11 @@ static func model_path(r: Dictionary) -> String:
 	var kind: String = "jedi" if Progression.is_jedi(r) else {"Medic":"medic", "Heavy":"heavy", "Scout":"scout", "Sniper":"scout"}.get(str(r.cls), "trooper")
 	return "res://assets/loadout/models/%s.glb" % kind
 
+static func model_scene(r: Dictionary) -> PackedScene:
+	var fallback: PackedScene = load(model_path(r))
+	if not Progression.is_jedi(r): return fallback
+	return JediModels.scene_for({"name": str(r.get("n", "")), "model": "jedi"}, fallback)
+
 func setup(r: Dictionary, portrait: bool = false) -> void:
 	soldier_id = str(r.id); name = "Soldier_" + soldier_id
 	jedi = Progression.is_jedi(r)
@@ -27,7 +33,7 @@ func setup(r: Dictionary, portrait: bool = false) -> void:
 	available = r.get("status", "active") == "active" and int(r.get("wound", 0)) == 0 and r.get("assign", "") == ""
 	tint = Color(str(r.get("col", "#e0bd78"))) if available else Color("66747a")
 	time = float(abs(soldier_id.hash()) % 100) / 10.0
-	model = load(model_path(r)).instantiate(); add_child(model)
+	model = model_scene(r).instantiate(); add_child(model)
 	model.scale = Vector3.ONE * 1.12
 	# Retain the textured armor/robes, with a subtle per-soldier and gear tint.
 	_tint_meshes(model, r)
