@@ -124,6 +124,8 @@ func _refresh_figures() -> void:
 			g.figures.add_child(view)
 			var scene: PackedScene = preload("res://scripts/characters/jedi_models.gd").scene_for(u, g.model_cache[model_name])
 			view.setup(u, scene, at)
+			if str(u.model) == "jedi" and scene != g.model_cache[model_name]:
+				preload("res://scripts/characters/jedi_models.gd").configure_animation(view.animation)
 			g.views[id] = view
 			if str(u.side) == "enemy" and not g.demo_mode:
 				g.fx.float_text(at + Vector3.UP * 1.9, "ALERT!", Color("ff786d"), true)
