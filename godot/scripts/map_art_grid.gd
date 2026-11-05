@@ -5,6 +5,11 @@ var source: Node3D
 var dirty := true
 var game: Node
 var view: MultiMeshInstance3D
+var focus := Vector2i(-999,-999)
+
+static func focus_alpha(position: Vector3, selected: Vector2i) -> float:
+	var d := Vector2(position.x-selected.x,position.z-selected.y).length()
+	return lerpf(0.08,0.63,1.0-smoothstep(2.0,7.0,d))
 
 func bind(original: Node3D, owner_game: Node = null) -> void:
 	game = owner_game
@@ -19,6 +24,11 @@ func changed(_child: Node) -> void: dirty = true
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(game): visible = not game.cinematic
+	if is_instance_valid(game) and is_instance_valid(game.mission):
+		var unit: Dictionary = game.mission.unit_by_id(game.selected_id)
+		if not unit.is_empty():
+			var selected := Vector2i(int(unit.x),int(unit.y))
+			if selected != focus: focus = selected; dirty = true
 	style_hover()
 	if not dirty or not is_instance_valid(source): return
 	dirty = false
@@ -37,6 +47,8 @@ func _process(_delta: float) -> void:
 		mm.set_instance_transform(index,transform)
 		var tint: Color = child.material_override.albedo_color
 		tint.a = 0.28 if child.mesh.size.x > 0.7 and child.mesh.size.z > 0.7 else 1.0
+		if focus.x > -900:
+			tint.a *= focus_alpha(child.position,focus)
 		mm.set_instance_color(index,tint); index += 1
 	mm.visible_instance_count = index; view.multimesh = mm
 

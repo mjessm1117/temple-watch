@@ -7,6 +7,7 @@ uniform int biome = 0;
 uniform vec2 hover_tile = vec2(-100.0);
 uniform float grid_strength = 0.0;
 uniform float detail_quality = 0.0;
+uniform float map_seed = 0.0;
 varying vec3 world_pos;
 varying vec3 world_normal;
 float hash(vec2 p) { return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
@@ -22,14 +23,18 @@ void fragment() {
 	vec2 p=world_pos.xz;
 	float broad=noise(p*0.22), grain=noise(p*32.0);
 	float detail=noise(p*4.0)*0.23+grain*0.08;
-	float tile=hash(floor(p+0.5));
-	vec3 col=base_color.rgb*(0.85+broad*0.24+detail+tile*0.035);
+	vec2 cell=floor(p+0.5);
+	float tile=hash(cell+vec2(map_seed*0.017,map_seed*0.031));
+	float wear=noise(p*0.78+vec2(map_seed*0.011,map_seed*0.023));
+	vec3 col=base_color.rgb*(0.84+broad*0.24+detail+tile*0.10);
+	col*=mix(0.88,1.06,smoothstep(0.12,0.84,wear));
 	float rough=0.9, metal=0.015;
 	if(biome==0) {
 		vec2 slab=abs(fract((p+0.5)/vec2(2.0,1.0))-0.5);
 		float joint=smoothstep(0.484,0.498,max(slab.x,slab.y));
 		float vein=sin(p.x*7.0+p.y*3.0+noise(p)*8.0)*0.025;
-		col*=1.0-joint*0.23+vein;
+		float crack=1.0-smoothstep(0.012,0.032,abs(fract(p.x*0.39+p.y*0.22+tile*4.0)-0.5));
+		col*=1.0-joint*0.23+vein-crack*step(0.78,tile)*0.12;
 		// Contact tint is baked into the material and costs no screen pass on Low.
 		col*=1.0-joint*0.075;
 		if(detail_quality>0.5) {
@@ -41,19 +46,25 @@ void fragment() {
 		vec2 plate=abs(fract((p+0.5)/vec2(2.0,3.0))-0.5);
 		float seam=smoothstep(0.485,0.499,max(plate.x,plate.y));
 		float tread=step(0.85,sin((p.x+p.y)*55.0))*step(0.6,sin((p.x-p.y)*32.0));
-		col*=1.0-seam*0.5+tread*0.09;
+		float scorch=smoothstep(0.70,0.86,noise(p*0.55+vec2(map_seed*0.01)));
+		col*=1.0-seam*0.5+tread*0.09-scorch*0.19;
 		rough=0.50+grain*0.15; metal=0.65;
+		float puddle=smoothstep(0.77,0.89,wear)*step(0.65,tile);
+		col=mix(col,col*vec3(0.64,0.82,0.91),puddle*0.58);
+		rough=mix(rough,0.20,puddle*0.72);
 		if(detail_quality>0.5) rough+=noise(p*16.0)*0.08;
 	} else if(biome==2) {
 		col=mix(col,secondary_color.rgb*(0.9+detail),smoothstep(0.25,0.78,broad)*0.65);
+		col=mix(col,secondary_color.rgb,smoothstep(0.52,0.78,wear)*0.26);
 	} else if(biome==3) {
 		col=mix(secondary_color.rgb, col,0.75+0.25*sin(p.x*2.0+noise(p*0.7)*6.0));
+		col*=0.88+wear*0.22;
 		rough=0.83;
 	} else if(biome==4) {
-		col*=0.96+sin(p.y*18.0+noise(p)*5.0)*0.035;
+		col*=0.88+wear*0.22+sin(p.y*18.0+noise(p)*5.0)*0.035;
 	} else {
 		col=mix(col,secondary_color.rgb,noise(p*1.9)*0.23);
-		col*=0.9+abs(sin(p.x*3.0+p.y*2.0+noise(p)*6.0))*0.15;
+		col*=0.82+wear*0.24+abs(sin(p.x*3.0+p.y*2.0+noise(p)*6.0))*0.12;
 	}
 	// Tactical grid is local to the hovered destination; never a permanent checkerboard.
 	vec2 edge=abs(fract(p+0.5)-0.5);

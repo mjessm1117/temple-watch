@@ -1,0 +1,46 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Can't obtain the XDG decoration manager. Libdecor will be used for drawing CSDs, if available.
+     at: init (platform/linuxbsd/wayland/wayland_thread.cpp:5635)
+WARNING: xdg-toplevel-icon protocol not found! Cannot set window icon.
+     at: init (platform/linuxbsd/wayland/wayland_thread.cpp:5642)
+Authorization required, but no authorization protocol specified
+
+Authorization required, but no authorization protocol specified
+
+libEGL warning: pci id for fd 20: 10de:2757, driver (null)
+
+pci id for fd 21: 10de:2757, driver (null)
+pci id for fd 22: 10de:2757, driver (null)
+libEGL warning: egl: failed to create dri2 screen
+pci id for fd 21: 10de:2757, driver (null)
+pci id for fd 22: 10de:2757, driver (null)
+libEGL warning: egl: failed to create dri2 screen
+Authorization required, but no authorization protocol specified
+
+libEGL warning: pci id for fd 20: 10de:2757, driver (null)
+
+pci id for fd 21: 10de:2757, driver (null)
+pci id for fd 22: 10de:2757, driver (null)
+libEGL warning: egl: failed to create dri2 screen
+pci id for fd 21: 10de:2757, driver (null)
+pci id for fd 22: 10de:2757, driver (null)
+libEGL warning: egl: failed to create dri2 screen
+Authorization required, but no authorization protocol specified
+
+libEGL warning: pci id for fd 20: 10de:2757, driver (null)
+
+pci id for fd 21: 10de:2757, driver (null)
+pci id for fd 22: 10de:2757, driver (null)
+libEGL warning: egl: failed to create dri2 screen
+pci id for fd 21: 10de:2757, driver (null)
+pci id for fd 22: 10de:2757, driver (null)
+libEGL warning: egl: failed to create dri2 screen
+Authorization required, but no authorization protocol specified
+
+OpenGL API 4.6 (Core Profile) Mesa 26.0.8-1ubuntu0.3 - Compatibility - Using Device: Intel - Mesa Intel(R) Graphics (RPL-S)
+
+MAP14 FIGHT after (1366, 768): draws=104 triangles=102093 adapter=Mesa Intel(R) Graphics (RPL-S)
+ERROR: Texture with GL ID of 75: leaked 349524 bytes.
+   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
+ERROR: Texture with GL ID of 76: leaked 349524 bytes.
+   at: ~Utilities (drivers/gles3/storage/utilities.cpp:82)
