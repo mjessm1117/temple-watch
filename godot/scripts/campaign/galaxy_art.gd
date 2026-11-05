@@ -2,6 +2,7 @@ extends RefCounted
 ## Procedural 3D art. Geography remains in galaxy.json; this is only appearance.
 static var cloud_noise: NoiseTexture2D
 const ROOT = "res://assets/galaxy/"
+const LOOK = "res://assets/ui/galaxy15/"
 const BIOMES = {
 	"Coruscant": ["Ecumenopolis", "172631", "637e86", 3.0],
 	"Alderaan": ["Temperate oceans", "174b78", "78a582", 0.0],
@@ -20,7 +21,8 @@ const BIOMES = {
 }
 
 static func material(file: String) -> ShaderMaterial:
-	var mat := ShaderMaterial.new(); mat.shader = load(ROOT + file + ".gdshader")
+	var mat := ShaderMaterial.new()
+	mat.shader = load((LOOK if file in ["nebula", "planet", "haze", "route"] else ROOT) + file + ".gdshader")
 	if file in ["nebula","planet","haze"]:
 		if cloud_noise == null:
 			cloud_noise = NoiseTexture2D.new(); cloud_noise.width = 512; cloud_noise.height = 512
@@ -28,6 +30,8 @@ static func material(file: String) -> ShaderMaterial:
 			var noise := FastNoiseLite.new(); noise.seed = 617; noise.frequency = 0.018
 			noise.fractal_octaves = 5; cloud_noise.noise = noise
 		mat.set_shader_parameter("cloud_noise",cloud_noise)
+	if file in ["nebula", "planet"]:
+		mat.set_shader_parameter("low_mode", RenderingServer.get_current_rendering_method() == "gl_compatibility")
 	return mat
 
 static func mesh(parent: Node3D, shape: Mesh, mat: Material) -> MeshInstance3D:
@@ -61,6 +65,10 @@ static func space(parent: Node3D) -> void:
 	sun.light_color = Color("d4ecff"); sun.light_energy = 1.65; parent.add_child(sun)
 	var plane := PlaneMesh.new(); plane.size = Vector2(76, 76)
 	var disk := mesh(parent, plane, material("nebula")); disk.position.y = -2.5; disk.name = "SpiralNebula"
+	if RenderingServer.get_current_rendering_method() != "gl_compatibility":
+		var dust := mesh(parent, plane, material("nebula")); dust.name = "FarDust"
+		dust.position = Vector3(0,-4.5,0); dust.scale = Vector3(1.35,1,1.35)
+		dust.material_override.set_shader_parameter("layer_alpha",0.22)
 	var stars := MultiMeshInstance3D.new(); stars.name = "Starfield"
 	var mm := MultiMesh.new(); mm.transform_format = MultiMesh.TRANSFORM_3D; mm.use_colors = true
 	var quad := QuadMesh.new(); quad.size = Vector2(0.22, 0.22); mm.mesh = quad; mm.instance_count = 3400
@@ -91,8 +99,11 @@ static func travel_lines(parent: Node3D, planets: Dictionary) -> void:
 		if not planets.has(route[0]) or not planets.has(route[1]): continue
 		var a: Vector3 = planets[route[0]].position + Vector3(0, -0.65, 0)
 		var b: Vector3 = planets[route[1]].position + Vector3(0, -0.65, 0)
-		lines.surface_add_vertex(a); lines.surface_add_vertex(b)
+		var bend := Vector3(0,0.0,1.0 if a.x < b.x else -1.0)
+		for segment in 20:
+			var t0 := float(segment)/20.0; var t1 := float(segment+1)/20.0
+			lines.surface_add_vertex(a.lerp(b,t0)+bend*sin(t0*PI))
+			lines.surface_add_vertex(a.lerp(b,t1)+bend*sin(t1*PI))
 	lines.surface_end()
-	var mat := StandardMaterial3D.new(); mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = Color("4a99a5", 0.45); mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	var node := mesh(parent, lines, mat); node.name = "TravelLines"
+	var node := mesh(parent, lines, material("route")); node.name = "TravelLines"
+	node.set_meta("route_count",routes.size())

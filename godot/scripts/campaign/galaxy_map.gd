@@ -49,6 +49,11 @@ func _ready() -> void:
 		var planet := Art.planet(world, title, index); planet.position = planet_position(title)
 		planet.set_meta("origin", planet.position); planets[title] = planet; index += 1
 	Art.travel_lines(world, planets)
+	var territory := Art.mesh(world, PlaneMesh.new(), Art.material("haze"))
+	territory.name = "SithTerritory"
+	territory.mesh.size = Vector2(15, 12)
+	territory.position = planet_position("Sith frontier") + Vector3(0,-1.1,0)
+	territory.material_override.set_shader_parameter("danger",0.85)
 	for row in Data.get_table("galaxy", "REGIONS"):
 		var region := Node3D.new(); region.name = "Region_" + str(row[0]); world.add_child(region)
 		if float(row[2]) > 0: Art.ring(region, float(row[2])*0.11)
@@ -221,6 +226,15 @@ func _draw_labels(overlay: Control) -> void:
 		if bounds.has_point(p):
 			overlay.draw_arc(p,6,0,TAU,16,Color("a7c7cc"),1,true)
 			if not compact: overlay.draw_string(font,p+Vector2(10,-5),str(ship.get_meta("label")),HORIZONTAL_ALIGNMENT_LEFT,-1,11,Color("a7c7cc"))
+	if not focused.is_empty():
+		var card_width := minf(188.0,size.x-36.0)
+		var card := Rect2(Vector2(16,38),Vector2(card_width,67))
+		overlay.draw_style_box(_plate(),card)
+		overlay.draw_string(font,card.position+Vector2(10,19),focused.to_upper(),HORIZONTAL_ALIGNMENT_LEFT,int(card_width-20),14,Color("dbe7e4"))
+		var biome := str(Art.BIOMES.get(focused,["Uncharted"])[0])
+		overlay.draw_string(font,card.position+Vector2(10,39),biome,HORIZONTAL_ALIGNMENT_LEFT,int(card_width-20),11,Color("79d3e2"))
+		var threat := preload("res://scripts/campaign/events11_engine.gd").threat(campaign.state,focused)
+		overlay.draw_string(font,card.position+Vector2(10,57),"THREAT %d / 5  ·  HOLO SCAN" % threat,HORIZONTAL_ALIGNMENT_LEFT,int(card_width-20),10,Color("ef6a5d") if threat > 1 else Color("8aa2a5"))
 	overlay.draw_string(font,Vector2(18,25),"LIVE HOLOMAP  /  " + (focused.to_upper() if not focused.is_empty() else "REPUBLIC SPACE"),HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("79d3e2"))
 	overlay.draw_string(font,Vector2(18,size.y-15),"DRAG to pan · TAP a signal" if compact else "SCROLL zoom   ·   DRAG / WASD pan   ·   CLICK inspect",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("8aa2a5"))
 
