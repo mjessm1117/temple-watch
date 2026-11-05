@@ -1,0 +1,1 @@
+../../../tools/meshy/prop.mjs

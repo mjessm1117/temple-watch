@@ -1,0 +1,12 @@
+{
+ "model": "docs/godot/meshy6/tasks/temple.C.preview.glb",
+ "triangles": 8037,
+ "size_m": [
+  1.895,
+  1.879,
+  0.786
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

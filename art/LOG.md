@@ -170,3 +170,11 @@ Audited all 97 GLBs under `godot/assets` with headless Blender. The 13 apparent 
 ## Blender 2 — phone staging and blocky prop quote (2026-11-04)
 
 Staged nine Blender-only `_v2.glb` copies under `godot/assets/models_v2`; no gameplay swap. Five units are 4,925 triangles each. Relay and shuttle meet 1,500; gantry and statue needed gentler 4,082 and 3,999 to preserve their battle-size silhouettes. Four-view previews, desktop/phone A/B captures, LOD findings, 59,209-triangle representative-scene saving, and measured 1,275,196-byte Web PCK saving are in `docs/godot/blender2/REPORT.md`. Seven blocky props are quoted at 350 Meshy credits (210–490 range); read-only balance was 15,150. No Meshy generation call, credit spend, asset swap, or push.
+
+## Meshy batch 6 — seven half-cover candidates (2026-11-04)
+
+Submitted **410/490 authorized credits**: seventeen 20-credit previews and seven 10-credit successful refines. Read-only opening balance **15,150**; last observed balance **14,740**. Exact task IDs and preview decisions are in `docs/godot/meshy6/ledger.md` and `preview-review.md`. No additional generation after the seventh refine.
+
+Staged seven one-tile v6 GLBs and separate 786–800-triangle LOD1s without changing shipped paths. Desktop and phone battle-camera A/B captures for every theme and `docs/godot/shots/meshy6-before-after.jpg` show six visual passes: temple, dock, plains, city, ruins and caves. Jungle fails because the candidate reads as yellow plant debris instead of a bag stack; it remains staged only. The city fit was corrected to 0.8 m after the restart and both city captures were refreshed. Dimensions, triangle counts, exact future wiring points and validation are in `docs/godot/meshy6/REPORT.md`.
+
+Gate: headless import passed; `./godot/test.sh` exited 0, every suite had 0 failures, 0 SCRIPT ERROR/ERROR lines, and Normal rescue was 9/20. `git diff --check` passed. Local commit only; no push.

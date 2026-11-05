@@ -1,0 +1,12 @@
+{
+  "credit_cap": 490,
+  "preview_cap": 21,
+  "refine_cap": 7,
+  "reference": "blender2-blocky-props.jpg: pale cube crates; existing cover_half_dock_v1.glb",
+  "texture": "Weathered pale grey ceramic composite and chipped ivory coating, dark graphite recesses, tiny faded safety yellow patches, matte industrial dock palette. No bright white.",
+  "variants": {
+    "A": "Low heap of battered dock cargo shielding, three bent curved composite hull fragments overlapping at irregular angles, torn uneven rim and tapered corners, asymmetrical silhouette. Pale grey spaceport salvage half cover for stylized low-poly tactics game, within one tile, four sides, no intact crate, no cube, no neat stack, no floor plate.",
+    "B": "Single collapsed industrial dock barrier made from two warped pale composite armor shells and one dark narrow pipe, impact-broken edges, lopsided sloping top, compact half-height cover. Stylized low-poly tactics game prop, one square tile, no box or rectangular crate, no broad flat top or base platform.",
+    "C": "Compact pile of three broad jagged pale grey spaceship armor wreck fragments, each one bent and overlapped at a different angle, lower edges touching the ground, torn dented sloped silhouette. Weathered dock salvage half cover for a stylized low-poly tactics game, one square tile. No cylindrical bowl, no hollow bucket, no upright barrier, no base disc or plate, no rectangular crate."
+  }
+}

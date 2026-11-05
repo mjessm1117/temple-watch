@@ -1,0 +1,187 @@
+22:40:09 | INFO: Data are loaded, start creating Blender stuff
+22:40:09 | INFO: Blender create Mesh node output_unwrapped
+22:40:09 | INFO: glTF import finished in 0.08s
+00:09.618  render           | Saved: '/tmp/_sheet_424772_front.png'
+00:09.736  render           | Saved: '/tmp/_sheet_424772_side.png'
+00:09.837  render           | Saved: '/tmp/_sheet_424772_top.png'
+00:09.928  render           | Saved: '/tmp/_sheet_424772_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/temple.A.preview.glb", "triangles": 8061, "size_m": [1.898, 1.832, 0.849], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:40:20 | INFO: Data are loaded, start creating Blender stuff
+22:40:20 | INFO: Blender create Mesh node output_unwrapped
+22:40:20 | INFO: glTF import finished in 0.08s
+00:09.717  render           | Saved: '/tmp/_sheet_425365_front.png'
+00:09.809  render           | Saved: '/tmp/_sheet_425365_side.png'
+00:09.910  render           | Saved: '/tmp/_sheet_425365_top.png'
+00:09.994  render           | Saved: '/tmp/_sheet_425365_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/temple.B.preview.glb", "triangles": 7325, "size_m": [1.897, 1.898, 0.792], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:41:05 | INFO: Data are loaded, start creating Blender stuff
+22:41:05 | INFO: Blender create Mesh node output_unwrapped
+22:41:05 | INFO: glTF import finished in 0.27s
+00:11.268  render           | Saved: '/tmp/_sheet_438695_front.png'
+00:11.464  render           | Saved: '/tmp/_sheet_438695_side.png'
+00:11.587  render           | Saved: '/tmp/_sheet_438695_top.png'
+00:11.698  render           | Saved: '/tmp/_sheet_438695_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/dock.A.preview.glb", "triangles": 7658, "size_m": [1.898, 1.639, 0.911], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:41:19 | INFO: Data are loaded, start creating Blender stuff
+22:41:19 | INFO: Blender create Mesh node output_unwrapped
+22:41:19 | INFO: glTF import finished in 0.18s
+00:11.960  render           | Saved: '/tmp/_sheet_440379_front.png'
+00:12.056  render           | Saved: '/tmp/_sheet_440379_side.png'
+00:12.157  render           | Saved: '/tmp/_sheet_440379_top.png'
+00:12.305  render           | Saved: '/tmp/_sheet_440379_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/dock.B.preview.glb", "triangles": 7772, "size_m": [1.897, 1.896, 0.614], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:41:30 | INFO: Data are loaded, start creating Blender stuff
+22:41:30 | INFO: Blender create Mesh node output_unwrapped
+22:41:30 | INFO: glTF import finished in 0.04s
+00:08.621  render           | Saved: '/tmp/_sheet_441838_front.png'
+00:08.950  render           | Saved: '/tmp/_sheet_441838_side.png'
+00:09.176  render           | Saved: '/tmp/_sheet_441838_top.png'
+00:09.322  render           | Saved: '/tmp/_sheet_441838_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/plains.A.preview.glb", "triangles": 8195, "size_m": [1.897, 1.711, 0.788], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:41:39 | INFO: Data are loaded, start creating Blender stuff
+22:41:39 | INFO: Blender create Mesh node output_unwrapped
+22:41:39 | INFO: glTF import finished in 0.04s
+00:05.398  render           | Saved: '/tmp/_sheet_442365_front.png'
+00:05.539  render           | Saved: '/tmp/_sheet_442365_side.png'
+00:05.653  render           | Saved: '/tmp/_sheet_442365_top.png'
+00:05.785  render           | Saved: '/tmp/_sheet_442365_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/plains.B.preview.glb", "triangles": 8156, "size_m": [1.846, 1.508, 1.385], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:41:45 | INFO: Data are loaded, start creating Blender stuff
+22:41:45 | INFO: Blender create Mesh node output_unwrapped
+22:41:45 | INFO: glTF import finished in 0.08s
+00:05.025  render           | Saved: '/tmp/_sheet_442708_front.png'
+00:05.117  render           | Saved: '/tmp/_sheet_442708_side.png'
+00:05.220  render           | Saved: '/tmp/_sheet_442708_top.png'
+00:05.379  render           | Saved: '/tmp/_sheet_442708_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/city.A.preview.glb", "triangles": 7585, "size_m": [1.896, 1.892, 0.826], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:41:53 | INFO: Data are loaded, start creating Blender stuff
+22:41:53 | INFO: Blender create Mesh node output_unwrapped
+22:41:53 | INFO: glTF import finished in 0.11s
+00:05.886  render           | Saved: '/tmp/_sheet_442961_front.png'
+00:06.011  render           | Saved: '/tmp/_sheet_442961_side.png'
+00:06.123  render           | Saved: '/tmp/_sheet_442961_top.png'
+00:06.234  render           | Saved: '/tmp/_sheet_442961_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/city.B.preview.glb", "triangles": 7948, "size_m": [1.873, 1.571, 0.873], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:42:05 | INFO: Data are loaded, start creating Blender stuff
+22:42:05 | INFO: Blender create Mesh node output_unwrapped
+22:42:05 | INFO: glTF import finished in 0.16s
+00:12.940  render           | Saved: '/tmp/_sheet_443231_front.png'
+00:13.297  render           | Saved: '/tmp/_sheet_443231_side.png'
+00:13.662  render           | Saved: '/tmp/_sheet_443231_top.png'
+00:13.793  render           | Saved: '/tmp/_sheet_443231_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/ruins.A.preview.glb", "triangles": 8100, "size_m": [1.899, 1.898, 0.915], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:42:22 | INFO: Data are loaded, start creating Blender stuff
+22:42:22 | INFO: Blender create Mesh node output_unwrapped
+22:42:22 | INFO: glTF import finished in 0.12s
+00:13.594  render           | Saved: '/tmp/_sheet_444476_front.png'
+00:13.711  render           | Saved: '/tmp/_sheet_444476_side.png'
+00:13.861  render           | Saved: '/tmp/_sheet_444476_top.png'
+00:14.006  render           | Saved: '/tmp/_sheet_444476_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/ruins.B.preview.glb", "triangles": 7844, "size_m": [1.819, 1.897, 1.096], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:42:31 | INFO: Data are loaded, start creating Blender stuff
+22:42:31 | INFO: Blender create Mesh node output_unwrapped
+22:42:31 | INFO: glTF import finished in 0.06s
+00:07.151  render           | Saved: '/tmp/_sheet_445385_front.png'
+00:07.300  render           | Saved: '/tmp/_sheet_445385_side.png'
+00:07.421  render           | Saved: '/tmp/_sheet_445385_top.png'
+00:07.513  render           | Saved: '/tmp/_sheet_445385_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/caves.A.preview.glb", "triangles": 7813, "size_m": [1.898, 0.917, 0.789], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:42:39 | INFO: Data are loaded, start creating Blender stuff
+22:42:39 | INFO: Blender create Mesh node output_unwrapped
+22:42:39 | INFO: glTF import finished in 0.10s
+00:07.006  render           | Saved: '/tmp/_sheet_445755_front.png'
+00:07.139  render           | Saved: '/tmp/_sheet_445755_side.png'
+00:07.259  render           | Saved: '/tmp/_sheet_445755_top.png'
+00:07.370  render           | Saved: '/tmp/_sheet_445755_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/caves.B.preview.glb", "triangles": 7861, "size_m": [1.873, 1.898, 1.094], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:42:47 | INFO: Data are loaded, start creating Blender stuff
+22:42:47 | INFO: Blender create Mesh node output_unwrapped
+22:42:47 | INFO: glTF import finished in 0.09s
+00:06.032  render           | Saved: '/tmp/_sheet_447775_front.png'
+00:06.153  render           | Saved: '/tmp/_sheet_447775_side.png'
+00:06.259  render           | Saved: '/tmp/_sheet_447775_top.png'
+00:06.373  render           | Saved: '/tmp/_sheet_447775_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/jungle.A.preview.glb", "triangles": 8353, "size_m": [1.896, 1.415, 0.81], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:42:54 | INFO: Data are loaded, start creating Blender stuff
+22:42:54 | INFO: Blender create Mesh node output_unwrapped
+22:42:54 | INFO: glTF import finished in 0.06s
+00:05.771  render           | Saved: '/tmp/_sheet_447974_front.png'
+00:05.871  render           | Saved: '/tmp/_sheet_447974_side.png'
+00:05.968  render           | Saved: '/tmp/_sheet_447974_top.png'
+00:06.073  render           | Saved: '/tmp/_sheet_447974_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/jungle.B.preview.glb", "triangles": 8238, "size_m": [1.887, 1.831, 1.072], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:44:04 | INFO: Data are loaded, start creating Blender stuff
+22:44:04 | INFO: Blender create Mesh node output_unwrapped
+22:44:04 | INFO: glTF import finished in 0.08s
+00:08.238  render           | Saved: '/tmp/_sheet_450674_front.png'
+00:08.354  render           | Saved: '/tmp/_sheet_450674_side.png'
+00:08.461  render           | Saved: '/tmp/_sheet_450674_top.png'
+00:08.546  render           | Saved: '/tmp/_sheet_450674_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/temple.C.preview.glb", "triangles": 8037, "size_m": [1.895, 1.879, 0.786], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:46:33 | INFO: Data are loaded, start creating Blender stuff
+22:46:33 | INFO: Blender create Mesh node output_unwrapped
+22:46:33 | INFO: glTF import finished in 0.06s
+00:06.288  render           | Saved: '/tmp/_sheet_467705_front.png'
+00:06.401  render           | Saved: '/tmp/_sheet_467705_side.png'
+00:06.491  render           | Saved: '/tmp/_sheet_467705_top.png'
+00:06.587  render           | Saved: '/tmp/_sheet_467705_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/dock.C.preview.glb", "triangles": 8175, "size_m": [1.899, 1.899, 0.773], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+22:47:55 | INFO: Data are loaded, start creating Blender stuff
+22:47:55 | INFO: Blender create Mesh node output_unwrapped
+22:47:56 | INFO: glTF import finished in 0.11s
+00:05.812  render           | Saved: '/tmp/_sheet_479202_front.png'
+00:05.936  render           | Saved: '/tmp/_sheet_479202_side.png'
+00:06.059  render           | Saved: '/tmp/_sheet_479202_top.png'
+00:06.174  render           | Saved: '/tmp/_sheet_479202_three_quarter.png'
+SHEET_OK {"model": "docs/godot/meshy6/tasks/city.C.preview.glb", "triangles": 7302, "size_m": [1.859, 1.86, 0.959], "parts": 1, "suspect_parts": [], "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit

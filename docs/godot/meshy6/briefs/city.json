@@ -1,0 +1,12 @@
+{
+  "credit_cap": 490,
+  "preview_cap": 21,
+  "refine_cap": 7,
+  "reference": "blender2-blocky-props.jpg: dark rectangular crates; existing cover_half_city_v1.glb",
+  "texture": "Dark violet charcoal metal, worn edges, restrained magenta and cyan signal strips, matte dystopian city palette. Dark body remains legible.",
+  "variants": {
+    "A": "Collapsed Coruscant street barrier made from two large bent dark metal armor panels leaning at different angles over twisted pipework, torn irregular top, triangular asymmetrical silhouette. Compact half-height one-tile stylized low-poly tactics cover, tiny cyan and magenta signal strips, no intact crate, no box, no level top or floor plate.",
+    "B": "One squat pile of damaged undercity machinery, angled vent cowling, curved duct and broken shield fragments interlocked in an irregular wedge with clear jagged edges. Dark purple-grey metal and restrained neon cyan/magenta, half-height single-tile low-poly game cover, no cube or rectangular container.",
+    "C": "Low asymmetric heap of torn dark violet metal street sign panels and curved vent wreckage resting directly on pavement, diagonal folds and sharp bent corners at varied heights, ragged skyline, sparse cyan and magenta edge lights. Compact half-height one-tile stylized city cover. No intact machinery cabinet, no upright wall, no flat base plate, no rectangular crate."
+  }
+}

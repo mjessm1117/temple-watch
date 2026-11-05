@@ -1,0 +1,14 @@
+23:05:21 | INFO: Data are loaded, start creating Blender stuff
+23:05:21 | INFO: Blender create Mesh node Mesh_0
+23:05:21 | INFO: glTF import finished in 0.02s
+INFO Draco is available, use library at /snap/blender/7803/lib/libbf_intern_draco_bridge.so
+INFO MeshOptimizer is available, use library at /snap/blender/7803/lib/libbf_intern_meshopt_bridge.so
+23:05:22 | INFO: Starting glTF 2.0 export
+23:05:22 | INFO: Extracting primitive: Mesh_0
+23:05:22 | INFO: Primitives created: 1
+23:05:22 | INFO: Finished glTF 2.0 export in 0.34003305435180664 s
+
+FIT {"input": "godot/assets/maps/meshy6/cover_half_city_v6.glb", "output": "docs/godot/meshy6/tasks/cover_half_city_v6.glb", "original_size": [0.8909059166908264, 0.9599999785423279, 0.800000011920929], "fit_size": [0.8909059366041259, 0.96, 0.8], "horizontal_scale": 1.0000000223517422, "vertical_scale": 0.999999985098839}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit

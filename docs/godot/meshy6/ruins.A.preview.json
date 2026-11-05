@@ -1,0 +1,12 @@
+{
+ "model": "docs/godot/meshy6/tasks/ruins.A.preview.glb",
+ "triangles": 8100,
+ "size_m": [
+  1.899,
+  1.898,
+  0.915
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

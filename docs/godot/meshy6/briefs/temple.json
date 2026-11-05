@@ -1,0 +1,12 @@
+{
+  "credit_cap": 490,
+  "preview_cap": 21,
+  "refine_cap": 7,
+  "reference": "blender2-blocky-props.jpg: orange rectangular layered slabs; existing cover_half_temple_v3.glb",
+  "texture": "Warm burnt orange sandstone, subtle tan fractured faces, muted ochre dust in crevices. Matte hand painted game texture, no white stone, no glossy finish.",
+  "variants": {
+    "A": "Single low half-height pile of five to seven large fractured burnt orange sandstone boulders, loosely interlocked with an uneven rising ridge and a broken asymmetrical outline. Jedi temple fallen stone cover for a stylized low-poly tactics game, within one square tile, four finished sides, no base plate, no wall, no rectangular slab, no arch, no column, no regular rows.",
+    "B": "One squat collapsed sandstone outcrop made of three broad irregular angular stones and small debris wedged between them, uneven pointed top, sloping sides, asymmetrical crescent silhouette. Warm orange temple ruin cover, stylized low-poly tactics game prop, one square tile and half-height, no squared brick courses, no rectangular wall, no floor slab.",
+    "C": "Low rough mound of four broad broken temple sandstone rocks resting directly on ground, offset and tilted, with one larger sloped wedge and chipped uneven crest. A squat asymmetrical natural pile, orange sandstone, stylized low-poly game cover, half height within one tile. No ground plate, no pedestal, no tall upright shards, no wall, no rectangular brick stack."
+  }
+}

@@ -1,0 +1,1 @@
+../../../tools/meshy/inspect.mjs

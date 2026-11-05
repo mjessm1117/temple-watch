@@ -1,0 +1,12 @@
+{
+ "model": "docs/godot/meshy6/tasks/city.C.preview.glb",
+ "triangles": 7302,
+ "size_m": [
+  1.859,
+  1.86,
+  0.959
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

@@ -1,0 +1,12 @@
+{
+ "model": "godot/assets/maps/meshy6/cover_half_jungle_v6.glb",
+ "triangles": 1475,
+ "size_m": [
+  0.96,
+  0.923,
+  0.776
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

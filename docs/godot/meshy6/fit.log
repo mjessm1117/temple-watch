@@ -1,0 +1,112 @@
+22:52:41 | INFO: Data are loaded, start creating Blender stuff
+22:52:41 | INFO: Blender create Mesh node 0
+22:52:41 | INFO: glTF import finished in 0.38s
+INFO Draco is available, use library at /snap/blender/7803/lib/libbf_intern_draco_bridge.so
+INFO MeshOptimizer is available, use library at /snap/blender/7803/lib/libbf_intern_meshopt_bridge.so
+22:52:41 | INFO: Starting glTF 2.0 export
+22:52:41 | INFO: Extracting primitive: Mesh_0
+22:52:42 | INFO: Primitives created: 1
+22:52:42 | INFO: Finished glTF 2.0 export in 0.47173285484313965 s
+
+FIT {"input": "docs/godot/meshy6/tasks/temple.C.raw.glb", "output": "docs/godot/meshy6/tasks/temple.fitted.glb", "original_size": [1.8953880071640015, 1.8785510063171387, 0.7855269908905029], "fit_size": [0.96, 0.9514721836627145, 0.8], "horizontal_scale": 0.5064926001280404, "vertical_scale": 1.018424585376869}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+godot/assets/maps/meshy6/cover_half_temple_v6.glb 8037 → 1495 tris
+godot/assets/maps/meshy6/cover_half_temple_v6_lod1.glb 8037 → 796 tris
+22:52:55 | INFO: Data are loaded, start creating Blender stuff
+22:52:55 | INFO: Blender create Mesh node 0
+22:52:55 | INFO: glTF import finished in 0.06s
+INFO Draco is available, use library at /snap/blender/7803/lib/libbf_intern_draco_bridge.so
+INFO MeshOptimizer is available, use library at /snap/blender/7803/lib/libbf_intern_meshopt_bridge.so
+22:52:55 | INFO: Starting glTF 2.0 export
+22:52:55 | INFO: Extracting primitive: Mesh_0
+22:52:55 | INFO: Primitives created: 1
+22:52:56 | INFO: Finished glTF 2.0 export in 0.26258063316345215 s
+
+FIT {"input": "docs/godot/meshy6/tasks/dock.C.raw.glb", "output": "docs/godot/meshy6/tasks/dock.fitted.glb", "original_size": [1.898669958114624, 1.8989670276641846, 0.7731239795684814], "fit_size": [0.9598498200529954, 0.96, 0.8], "horizontal_scale": 0.5055380035644134, "vertical_scale": 1.034762885567874}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+godot/assets/maps/meshy6/cover_half_dock_v6.glb 8175 → 1499 tris
+godot/assets/maps/meshy6/cover_half_dock_v6_lod1.glb 8175 → 786 tris
+22:53:09 | INFO: Data are loaded, start creating Blender stuff
+22:53:09 | INFO: Blender create Mesh node 0
+22:53:09 | INFO: glTF import finished in 0.05s
+INFO Draco is available, use library at /snap/blender/7803/lib/libbf_intern_draco_bridge.so
+INFO MeshOptimizer is available, use library at /snap/blender/7803/lib/libbf_intern_meshopt_bridge.so
+22:53:10 | INFO: Starting glTF 2.0 export
+22:53:10 | INFO: Extracting primitive: Mesh_0
+22:53:10 | INFO: Primitives created: 1
+22:53:10 | INFO: Finished glTF 2.0 export in 0.20284318923950195 s
+
+FIT {"input": "docs/godot/meshy6/tasks/plains.A.raw.glb", "output": "docs/godot/meshy6/tasks/plains.fitted.glb", "original_size": [1.8969939947128296, 1.7110719680786133, 0.7878810167312622], "fit_size": [0.96, 0.865911591672768, 0.8], "horizontal_scale": 0.5060638055131674, "vertical_scale": 1.0153817429426295}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+godot/assets/maps/meshy6/cover_half_plains_v6.glb 8195 → 1500 tris
+godot/assets/maps/meshy6/cover_half_plains_v6_lod1.glb 8195 → 800 tris
+22:53:18 | INFO: Data are loaded, start creating Blender stuff
+22:53:18 | INFO: Blender create Mesh node 0
+22:53:18 | INFO: glTF import finished in 0.06s
+INFO Draco is available, use library at /snap/blender/7803/lib/libbf_intern_draco_bridge.so
+INFO MeshOptimizer is available, use library at /snap/blender/7803/lib/libbf_intern_meshopt_bridge.so
+22:53:19 | INFO: Starting glTF 2.0 export
+22:53:19 | INFO: Extracting primitive: Mesh_0
+22:53:19 | INFO: Primitives created: 1
+22:53:19 | INFO: Finished glTF 2.0 export in 0.2598888874053955 s
+
+FIT {"input": "docs/godot/meshy6/tasks/city.C.raw.glb", "output": "docs/godot/meshy6/tasks/city.fitted.glb", "original_size": [1.858854055404663, 1.8597769737243652, 0.9594739675521851], "fit_size": [0.9595235979370474, 0.9600000000000001, 0.8], "horizontal_scale": 0.5161909269569654, "vertical_scale": 0.8337902090673331}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+godot/assets/maps/meshy6/cover_half_city_v6.glb 7302 → 1499 tris
+godot/assets/maps/meshy6/cover_half_city_v6_lod1.glb 7302 → 800 tris
+22:53:28 | INFO: Data are loaded, start creating Blender stuff
+22:53:28 | INFO: Blender create Mesh node 0
+22:53:28 | INFO: glTF import finished in 0.06s
+INFO Draco is available, use library at /snap/blender/7803/lib/libbf_intern_draco_bridge.so
+INFO MeshOptimizer is available, use library at /snap/blender/7803/lib/libbf_intern_meshopt_bridge.so
+22:53:28 | INFO: Starting glTF 2.0 export
+22:53:28 | INFO: Extracting primitive: Mesh_0
+22:53:28 | INFO: Primitives created: 1
+22:53:28 | INFO: Finished glTF 2.0 export in 0.22689199447631836 s
+
+FIT {"input": "docs/godot/meshy6/tasks/ruins.A.raw.glb", "output": "docs/godot/meshy6/tasks/ruins.fitted.glb", "original_size": [1.899237036705017, 1.898427963256836, 0.9148280024528503], "fit_size": [0.96, 0.9595910407730878, 0.8], "horizontal_scale": 0.5054661326874197, "vertical_scale": 0.8744813209204662}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+godot/assets/maps/meshy6/cover_half_ruins_v6.glb 8100 → 1500 tris
+godot/assets/maps/meshy6/cover_half_ruins_v6_lod1.glb 8100 → 800 tris
+22:53:42 | INFO: Data are loaded, start creating Blender stuff
+22:53:42 | INFO: Blender create Mesh node 0
+22:53:42 | INFO: glTF import finished in 0.08s
+INFO Draco is available, use library at /snap/blender/7803/lib/libbf_intern_draco_bridge.so
+INFO MeshOptimizer is available, use library at /snap/blender/7803/lib/libbf_intern_meshopt_bridge.so
+22:53:43 | INFO: Starting glTF 2.0 export
+22:53:43 | INFO: Extracting primitive: Mesh_0
+22:53:43 | INFO: Primitives created: 1
+22:53:43 | INFO: Finished glTF 2.0 export in 0.26815366744995117 s
+
+FIT {"input": "docs/godot/meshy6/tasks/caves.A.raw.glb", "output": "docs/godot/meshy6/tasks/caves.fitted.glb", "original_size": [1.8981549739837646, 0.9171450138092041, 0.7888690233230591], "fit_size": [0.96, 0.46385001505381124, 0.8], "horizontal_scale": 0.5057542788433096, "vertical_scale": 1.0141100440603592}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+godot/assets/maps/meshy6/cover_half_caves_v6.glb 7813 → 1500 tris
+godot/assets/maps/meshy6/cover_half_caves_v6_lod1.glb 7813 → 800 tris
+22:53:49 | INFO: Data are loaded, start creating Blender stuff
+22:53:49 | INFO: Blender create Mesh node 0
+22:53:49 | INFO: glTF import finished in 0.07s
+INFO Draco is available, use library at /snap/blender/7803/lib/libbf_intern_draco_bridge.so
+INFO MeshOptimizer is available, use library at /snap/blender/7803/lib/libbf_intern_meshopt_bridge.so
+22:53:50 | INFO: Starting glTF 2.0 export
+22:53:50 | INFO: Extracting primitive: Mesh_0
+22:53:50 | INFO: Primitives created: 1
+22:53:50 | INFO: Finished glTF 2.0 export in 0.21662473678588867 s
+
+FIT {"input": "docs/godot/meshy6/tasks/jungle.B.raw.glb", "output": "docs/godot/meshy6/tasks/jungle.fitted.glb", "original_size": [1.8870899677276611, 1.8309500217437744, 1.0716220140457153], "fit_size": [0.96, 0.9314404988282418, 0.8], "horizontal_scale": 0.5087197835914435, "vertical_scale": 0.7465318829908547}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+godot/assets/maps/meshy6/cover_half_jungle_v6.glb 8238 → 1476 tris
+godot/assets/maps/meshy6/cover_half_jungle_v6_lod1.glb 8238 → 791 tris
