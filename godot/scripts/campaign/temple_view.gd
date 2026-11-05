@@ -5,6 +5,7 @@ signal room_hovered(description: String)
 const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 const Rooms = preload("res://scripts/campaign/temple_rooms.gd")
 const Geometry = preload("res://scripts/campaign/temple_geometry.gd")
+const Plates = preload("res://scripts/campaign/home13_room_plates.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
 var viewport: SubViewport
@@ -170,3 +171,4 @@ func _project_rooms() -> void:
 		var ratio := size / Vector2(viewport.size)
 		buttons[id].position = a * ratio
 		buttons[id].size = (b - a) * ratio
+		Plates.layout(buttons[id], info, Phone.narrow(Phone.window_size()))

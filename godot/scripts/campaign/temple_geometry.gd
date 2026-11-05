@@ -70,9 +70,13 @@ func room(parent: Node3D, info: Dictionary) -> Node3D:
 	var height := 1.8 if info.kind == "vault" else 2.5
 	var wall := Color("283c44") if built else Color("172329")
 	box(cell, Vector3(0, height / 2, -1.55), Vector3(width, height, 0.18), wall)
+	# Recessed wall and lit threshold make the open face read as a room, not a flat plate.
+	box(cell, Vector3(0, height * 0.52, -1.43), Vector3(width - 0.4, height - 0.3, 0.05), Color("182a31") if built else Color("0c171c"))
 	box(cell, Vector3(0, 0, 0), Vector3(width, 0.16, 3.3), Color("55616a") if built else wall)
+	box(cell, Vector3(0, 0.09, 0.3), Vector3(width - 0.34, 0.025, 2.35), Color("344f55") if built else Color("1a2528"))
 	for x in [-width / 2, width / 2]:
 		box(cell, Vector3(x, height / 2, 0.0), Vector3(0.12, height, 3.3), Color("637177") if built else Color("3e484b"))
+		box(cell, Vector3(x * 0.86, height * 0.56, -1.33), Vector3(0.1, height * 0.72, 0.08), color if built else Color("886b44"), 0.6 if built else 0.0)
 	box(cell, Vector3(0, height, 0), Vector3(width, 0.13, 3.3), Color("5a6567"))
 	box(cell, Vector3(0, 0.13, 1.7), Vector3(width - 0.2, 0.045, 0.04), color if built else Color("76634d"), 1.1 if built else 0.15)
 	if not built:
