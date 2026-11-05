@@ -5,6 +5,7 @@ uniform vec4 land : source_color = vec4(0.2, 0.6, 0.4, 1.0);
 uniform float seed = 1.0;
 uniform float biome = 0.0;
 uniform bool low_mode = false;
+uniform float phone_boost = 1.0;
 uniform sampler2D cloud_noise : filter_linear, repeat_enable;
 float grain(vec3 p) { return texture(cloud_noise, p.xy * 0.075 + p.z * 0.027).r; }
 void fragment() {
@@ -22,7 +23,7 @@ void fragment() {
 	color = mix(color, vec3(0.78, 0.88, 0.92), cloud * 0.25);
 	float day = dot(normalize(NORMAL), normalize(vec3(-0.6, 0.7, 0.8)));
 	float light = 0.12 + 0.88 * max(0.0, day);
-	ALBEDO = color * light;
+	ALBEDO = color * light * phone_boost;
 	ROUGHNESS = 1.0;
 	EMISSION = color * 0.035;
 	if (biome > 2.5) {

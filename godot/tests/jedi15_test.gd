@@ -88,6 +88,18 @@ func run() -> void:
 		var player := find_type(model, "AnimationPlayer") as AnimationPlayer
 		check(player != null, id + " animation player")
 		if player:
+			if skeleton and player.has_animation("idle"):
+				var bind_poses: Dictionary = {}
+				for bone in ["pelvis", "spine_01", "upperarm_l", "upperarm_r", "thigh_l", "thigh_r"]:
+					var index := skeleton.find_bone(bone)
+					if index >= 0: bind_poses[index] = skeleton.get_bone_pose(index)
+				player.play("idle"); player.advance(0.37)
+				var pose_delta := 0.0
+				for index in bind_poses:
+					var before: Transform3D = bind_poses[index]
+					var after: Transform3D = skeleton.get_bone_pose(index)
+					pose_delta += before.origin.distance_to(after.origin) + before.basis.get_rotation_quaternion().angle_to(after.basis.get_rotation_quaternion())
+				check(pose_delta > 0.01, id + " idle differs from bind pose")
 			for clip in ["idle", "run", "swing"]:
 				check(player.has_animation(clip), id + " clip " + clip)
 				if player.has_animation(clip): player.play(clip); player.advance(0.08)
@@ -107,7 +119,8 @@ func capture(phase: String) -> void:
 	var game = load("res://scenes/rescue.tscn").instantiate()
 	root.add_child(game)
 	for i in 18: await process_frame
-	var names := ["Kira Venn", "Tor Saalen", "Satele Shan"]
+	var intfix := "--intfix" in OS.get_cmdline_user_args()
+	var names := ["Knight Sava Orrin", "Tem Ruhl", "Lord Ressa Vaun"] if intfix else ["Kira Venn", "Tor Saalen", "Satele Shan"]
 	var players: Array = game.mission.living("player")
 	check(players.size() >= 3, "three players available")
 	for i in 3:
@@ -132,7 +145,7 @@ func capture(phase: String) -> void:
 		var image := root.get_texture().get_image()
 		check(image.get_size() == size, "native capture size")
 		var label := "phone" if size.x == 844 else "desktop"
-		var path := "res://../docs/godot/shots/wave15-jedi-%s-%s.png" % [phase, label]
+		var path := "res://../docs/godot/shots/wave15-intfix-battle-%s-%s.png" % [phase, label] if intfix else "res://../docs/godot/shots/wave15-jedi-%s-%s.png" % [phase, label]
 		check(image.save_png(path) == OK, "capture saved")
 	game.sound.player.stop(); game.sound.player.stream = null
 	game.queue_free()

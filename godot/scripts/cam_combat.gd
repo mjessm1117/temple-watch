@@ -64,9 +64,9 @@ func preview(actor: Dictionary, target: Dictionary) -> void:
 		preview_shoulder = preview_source_model.duplicate()
 		preview_shoulder.name = "AimShoulder"
 		g.camera.add_child(preview_shoulder)
-		preview_shoulder.position = Vector3(-2.0, -1.3, -2.6)
+		preview_shoulder.position = Vector3(-1.65, -0.94, -2.9)
 		preview_shoulder.rotation = Vector3(-0.16, PI, 0.0)
-		preview_shoulder.scale *= 1.15
+		preview_shoulder.scale *= 0.96
 		var pose: AnimationPlayer = actor_view._find_animation(preview_shoulder)
 		var clip := "swing" if actor_view.base_clip == "saberIdle" else "shoot"
 		if pose != null and pose.has_animation(clip):

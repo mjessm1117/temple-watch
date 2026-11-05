@@ -61,7 +61,8 @@ func setup(game, root: Control, on_phone: bool) -> void:
 	row.add_child(_button("›", 44, func() -> void: g._cycle_target(1)))
 	confirm = _button("FIRE", 190, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
 	details = _button("ODDS", 64, _details); row.add_child(details)
-	cine_toggle = _button("CINE ON", 76, _toggle_cine); cine_toggle.name = "Cine15Toggle"; row.add_child(cine_toggle)
+	cine_toggle = _button("Cinematics: On", 116 if phone else 142, _toggle_cine); cine_toggle.name = "Cine15Toggle"; row.add_child(cine_toggle)
+	cine_toggle.add_theme_font_size_override("font_size", 11 if phone else 13)
 	row.add_child(_button("CANCEL", 76, g._cancel_order))
 	panel.hide()
 
@@ -78,7 +79,7 @@ func refresh() -> void:
 	var active: bool = g.action != "move" and g.action != "free" and g.action != "overwatch" and g.action != "hunker" and g.target_id >= 0 and not actor.is_empty() and g.mission.phase == "player" and g.mission.result == ""
 	panel.visible = active
 	sight.visible = active
-	cine_toggle.text = "CINE ON" if g.action_camera else "CINE OFF"
+	cine_toggle.text = "Cinematics: On" if g.action_camera else "Cinematics: Off"
 	if phone and g.hud_controls.phone != null:
 		g.hud_controls.phone.ability_tray.visible = not active
 		g.hud_controls.phone.ability_tray.offset_top = 0.0 if active else -76.0
@@ -124,7 +125,7 @@ func _confirm() -> void:
 func _toggle_cine() -> void:
 	g.action_camera = not g.action_camera
 	preload("res://scripts/campaign/strat_preferences.gd").set_value("cine", g.action_camera)
-	cine_toggle.text = "CINE ON" if g.action_camera else "CINE OFF"
+	cine_toggle.text = "Cinematics: On" if g.action_camera else "Cinematics: Off"
 
 func _details() -> void:
 	if phone and g.hud_controls.phone != null:

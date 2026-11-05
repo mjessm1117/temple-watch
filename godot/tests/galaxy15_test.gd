@@ -58,7 +58,7 @@ func run() -> void:
 		await RenderingServer.frame_post_draw
 		var stage := "before" if "--before" in args else "after"
 		var size_name := "phone" if phone else "desktop"
-		var path := "res://../docs/godot/shots/wave15-galaxy-%s-%s.png" % [stage,size_name]
+		var path := "res://../docs/godot/shots/wave15-intfix-galaxy-%s-%s.png" % [stage,size_name] if "--intfix" in args else "res://../docs/godot/shots/wave15-galaxy-%s-%s.png" % [stage,size_name]
 		check(root.get_texture().get_image().save_png(path) == OK, "Overview capture")
 		print("GALAXY15 SHOT " + path)
 	view._select(0)
@@ -71,7 +71,7 @@ func run() -> void:
 		if more != null: more.pressed.emit(); check(view.phone_more, "MORE opens full briefing")
 	if "--capture" in args:
 		await RenderingServer.frame_post_draw
-		var selected_path := "res://../docs/godot/shots/wave15-galaxy-selected-%s.png" % ("phone" if phone else "desktop")
+		var selected_path := "res://../docs/godot/shots/wave15-intfix-galaxy-selected-%s.png" % ("phone" if phone else "desktop") if "--intfix" in args else "res://../docs/godot/shots/wave15-galaxy-selected-%s.png" % ("phone" if phone else "desktop")
 		check(root.get_texture().get_image().save_png(selected_path) == OK, "Selected planet capture")
 		print("GALAXY15 SHOT " + selected_path)
 	if FileAccess.file_exists(flow.save_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(flow.save_path))

@@ -84,6 +84,10 @@ func _build_terrain() -> void:
 		g.terrain.add_child(art)
 	g.terrain.get_child(0).build(g.mission, g.model_cache)
 	g.terrain.get_child(0).apply_environment(world,sun,str(g.mission.spec.get("theme","temple")))
+	if str(g.get_node("/root/Graphics").effective) != "low":
+		var mood := preload("res://scripts/env_art.gd").new()
+		mood.apply_environment(world,sun,str(g.mission.spec.get("theme","temple")))
+		mood.free()
 
 func _sync_terrain() -> void:
 	if g.mission.terrain_revision == g.terrain_seen_revision: return

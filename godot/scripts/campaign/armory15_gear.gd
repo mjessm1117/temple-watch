@@ -29,7 +29,7 @@ static func _plate(skeleton: Skeleton3D, bone: String, name: String, center: Vec
 	mesh.mesh = _armor_mesh()
 	var finish := Actor.material(tone); finish.metallic = 0.25; finish.roughness = 0.52
 	finish.cull_mode = BaseMaterial3D.CULL_DISABLED
-	finish.emission_enabled = true; finish.emission = tone; finish.emission_energy_multiplier = 0.8
+	finish.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mesh.material_override = finish
 	var side := signf(center.x)
 	var facing := Basis(Vector3.UP, -side * deg_to_rad(18.0))
@@ -44,16 +44,20 @@ static func attach(model: Node3D, r: Dictionary, jedi: bool) -> void:
 	var armor := str(gear.armor)
 	var armored := armor in ["medium", "heavy", "armoredRobes", "beskar", "masterRobes"] or mark > 1
 	var heavy := armor in ["heavy", "armoredRobes", "beskar"]
-	var tone := Color("696b65") if jedi else Color("7293a0")
+	var tone := Color("596760") if jedi else Color("7293a0")
 	if armor == "beskar": tone = Color("a7b8ae")
-	if mark >= 2: tone = tone.lerp(Color("d3dfdc"), 0.22 * (mark - 1))
+	if mark >= 2: tone = tone.lerp(Color("a7aaa0") if jedi else Color("d3dfdc"), 0.22 * (mark - 1))
 	var skeleton := _skeleton(model)
 	if skeleton == null: return
-	var width := 0.13 if jedi else 0.145 if heavy else 0.12
-	for side in [-1, 1]:
-		var chest := _plate(skeleton, "spine_03", "ArmorPlate" if side < 0 else "ArmorPlateRight",
-			Vector3(side * 0.078, 1.42 if jedi else 1.25, 0.22 if jedi else 0.12), Vector3(width, 0.16 if jedi else 0.19, 0.038), tone)
+	var width := 0.145 if heavy else 0.12
+	if jedi:
+		var chest := _plate(skeleton, "spine_03", "ArmorPlate", Vector3(0, 1.42, 0.20), Vector3(0.25, 0.14, 0.022), tone)
 		chest.visible = armored
+	for side in [-1, 1]:
+		if not jedi:
+			var chest := _plate(skeleton, "spine_03", "ArmorPlate" if side < 0 else "ArmorPlateRight",
+				Vector3(side * 0.078, 1.25, 0.12), Vector3(width, 0.19, 0.038), tone)
+			chest.visible = armored
 		var shoulder := _plate(skeleton, "upperarm_l" if side < 0 else "upperarm_r", "ShoulderPlate",
 			Vector3(side * (0.145 if jedi else 0.14), 1.36 if jedi else 1.38, 0.055 if jedi else 0.02), Vector3(0.11 if jedi else 0.10, 0.06, 0.05), tone.darkened(0.1))
 		shoulder.visible = heavy

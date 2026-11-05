@@ -49,6 +49,9 @@ static func planet(parent: Node3D, title: String, index: int) -> Node3D:
 	var sphere := SphereMesh.new(); sphere.radius = 0.83; sphere.height = 1.66
 	# Small Low-tier planets do not need the desktop tessellation in either map view.
 	var low := RenderingServer.get_current_rendering_method() == "gl_compatibility"
+	if low and preload("res://scripts/phone_layout.gd").narrow(preload("res://scripts/phone_layout.gd").window_size()):
+		sphere.radius = 1.12; sphere.height = 2.24
+		surface.set_shader_parameter("phone_boost", 1.28)
 	sphere.radial_segments = 32 if low else 48; sphere.rings = 16 if low else 24
 	var body := mesh(root, sphere, surface); body.name = "Surface"; body.rotation.z = 0.2
 	var halo := material("atmosphere"); halo.set_shader_parameter("tint", Color(appearance[2]).lightened(0.22))

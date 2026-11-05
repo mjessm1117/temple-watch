@@ -211,7 +211,8 @@ func _build_ui() -> void:
 	command_row.add_child(_button("INFO",func():
 		g.Prefs.set_value("numbers",not bool(g.Prefs.get_value("numbers"))); _refresh()))
 	var spacer := Control.new(); spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL; command_row.add_child(spacer)
-	var cine_button := _button("CAM ON", func() -> void: g.action_camera = not g.action_camera; _refresh())
+	var cine_button := _button("Cinematics: On", func() -> void: g.action_camera = not g.action_camera; _refresh())
+	cine_button.custom_minimum_size.x = 150
 	cine_button.name = "CineButton"; command_row.add_child(cine_button)
 	var mute_button := _button("SOUND", func() -> void: g.sound.muted = not g.sound.muted)
 	command_row.add_child(mute_button)
@@ -292,7 +293,7 @@ func _refresh() -> void:
 		if charges != "": button.tooltip_text += detail
 	g.result_panel.visible = g.mission.result != ""
 	var cine_button: Button = g.overlay.find_child("CineButton", true, false)
-	if cine_button != null: cine_button.text = "CAM %s" % ("ON" if g.action_camera else "OFF")
+	if cine_button != null: cine_button.text = "Cinematics: %s" % ("On" if g.action_camera else "Off")
 	if g.mission.result != "":
 		var wounded: Array[String] = []
 		for member in g.mission.units:

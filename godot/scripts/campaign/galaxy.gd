@@ -68,7 +68,7 @@ func _build() -> void:
 	if compact: map_view.custom_minimum_size = Vector2(260, 130)
 	map_view.field_selected.connect(_field); map_view.mission_selected.connect(_select); map_view.planet_selected.connect(_planet); map_view.region_selected.connect(_region)
 	var right := UI.panel(Color("15232a")); right.custom_minimum_size.x = 228 if compact else 330; body.add_child(right)
-	var column := UI.column(7); column.custom_minimum_size.x = 212 if compact else 304; right.add_child(column)
+	var column := UI.column(4 if compact else 7); column.custom_minimum_size.x = 212 if compact else 304; right.add_child(column)
 	tabs = HBoxContainer.new()
 	if compact:
 		var tab_row := HBoxContainer.new(); column.add_child(tab_row)

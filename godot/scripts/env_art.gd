@@ -42,6 +42,14 @@ func apply_environment(world: WorldEnvironment, key: DirectionalLight3D, theme_n
 	key.directional_shadow_max_distance = 60
 	key.light_angular_distance = 1.7
 	key.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
+	var graphics := key.get_node_or_null("/root/Graphics")
+	if graphics != null and str(graphics.effective) != "low":
+		var warm: bool = theme_name in ["temple", "ruins", "plains"]
+		var cold: bool = theme_name == "snow"
+		key.light_energy = 2.25 if warm else 2.05 if cold else 1.85
+		env.ambient_light_color = Color("504959") if warm else Color("45617d") if cold else Color("284d62")
+		env.ambient_light_energy = 0.38 if warm else 0.34 if cold else 0.40
+		env.adjustment_contrast = 1.20
 	_apply_mood(key, theme_name, preset)
 
 func _apply_mood(key: DirectionalLight3D, theme_name: String, preset: Dictionary) -> void:
@@ -52,10 +60,10 @@ func _apply_mood(key: DirectionalLight3D, theme_name: String, preset: Dictionary
 	var old := game.get_node_or_null("Cine15PropPools")
 	if old != null: game.remove_child(old); old.queue_free()
 	var pools := Node3D.new(); pools.name = "Cine15PropPools"; game.add_child(pools)
-	var tint := Color("78cbdc") if theme_name in ["city", "dock", "caves"] else Color("ffb471") if theme_name in ["temple", "ruins", "plains"] else Color("a8d9f5") if theme_name == "snow" else Color("a9d28c")
+	var tint := Color("36b1ce") if theme_name in ["city", "dock", "caves"] else Color("d18d76") if theme_name in ["temple", "ruins", "plains"] else Color("5d93ce") if theme_name == "snow" else Color("92c078")
 	if not low:
 		var fill := DirectionalLight3D.new(); fill.name = "Cine15ColorFill"
-		fill.light_color = tint; fill.light_energy = 0.27
+		fill.light_color = tint; fill.light_energy = 0.72 if theme_name == "snow" else 0.58
 		fill.rotation_degrees = Vector3(-34, 125, 0); fill.shadow_enabled = false
 		pools.add_child(fill)
 	var squad: Array[Dictionary] = game.mission.living("player")

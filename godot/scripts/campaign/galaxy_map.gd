@@ -233,8 +233,10 @@ func _draw_labels(overlay: Control) -> void:
 		overlay.draw_string(font,card.position+Vector2(10,19),focused.to_upper(),HORIZONTAL_ALIGNMENT_LEFT,int(card_width-20),14,Color("dbe7e4"))
 		var biome := str(Art.BIOMES.get(focused,["Uncharted"])[0])
 		overlay.draw_string(font,card.position+Vector2(10,39),biome,HORIZONTAL_ALIGNMENT_LEFT,int(card_width-20),11,Color("79d3e2"))
+		var risk: Dictionary = offers[selected].risk if selected < offers.size() and str(offers[selected].planet) == focused else {}
 		var threat := preload("res://scripts/campaign/events11_engine.gd").threat(campaign.state,focused)
-		overlay.draw_string(font,card.position+Vector2(10,57),"THREAT %d / 5  ·  HOLO SCAN" % threat,HORIZONTAL_ALIGNMENT_LEFT,int(card_width-20),10,Color("ef6a5d") if threat > 1 else Color("8aa2a5"))
+		var scan := "RISK %d / 4  ·  %s" % [int(risk.level), str(risk.name).to_upper()] if not risk.is_empty() else "REGION THREAT %d / 5" % threat
+		overlay.draw_string(font,card.position+Vector2(10,57),scan,HORIZONTAL_ALIGNMENT_LEFT,int(card_width-20),10,risk.color if not risk.is_empty() else Color("8aa2a5"))
 	overlay.draw_string(font,Vector2(18,25),"LIVE HOLOMAP  /  " + (focused.to_upper() if not focused.is_empty() else "REPUBLIC SPACE"),HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("79d3e2"))
 	overlay.draw_string(font,Vector2(18,size.y-15),"DRAG to pan · TAP a signal" if compact else "SCROLL zoom   ·   DRAG / WASD pan   ·   CLICK inspect",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("8aa2a5"))
 
