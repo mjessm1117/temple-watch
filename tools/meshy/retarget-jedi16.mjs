@@ -50,6 +50,7 @@ function bodyFrame(bones, restWorld) {
 const alignment = bodyFrame(D, dw).multiply(bodyFrame(S, sw).invert());
 const heightScale = position(dw(D.Head)).distanceTo(position(dw(D.pelvis))) /
   position(sw(S.Head)).distanceTo(position(sw(S.pelvis)));
+const restFootFloor = Math.min(position(dw(D.foot_l)).y, position(dw(D.foot_r)).y);
 const joints = targetRoot.listSkins()[0].listJoints().filter(n => S[n.getName()]);
 // An animated parent must be solved before its child for local rotation output.
 const depth = (n, parents) => parents.has(n) ? 1 + depth(parents.get(n), parents) : 0;
@@ -62,6 +63,19 @@ const decode = accessor => {
 };
 const arrays = new Map();
 const values = a => { if (!arrays.has(a)) arrays.set(a, decode(a)); return arrays.get(a); };
+const channelsOf = clip => {
+  const result = {};
+  for (const channel of clip.listChannels()) {
+    const bone = channel.getTargetNode().getName();
+    (result[bone] ||= {})[channel.getTargetPath()] = channel.getSampler();
+  }
+  return result;
+};
+const idleSource = sourceRoot.listAnimations().find(a => a.getName() === 'idle');
+const idleChannels = channelsOf(idleSource);
+const idleLength = Math.max(...idleSource.listSamplers().map(s => {
+  const keys = values(s.getInput()); return keys[keys.length - 1];
+}));
 function sample(sampler, time, path) {
   const input = values(sampler.getInput()), output = values(sampler.getOutput());
   const width = path === 'rotation' ? 4 : 3;
@@ -78,24 +92,33 @@ for (const old of targetRoot.listAnimations()) old.dispose();
 const buffer = targetRoot.listBuffers()[0];
 for (const original of sourceRoot.listAnimations()) {
   const name = original.getName(); if (!wanted.has(name)) continue;
-  const channels = {};
-  for (const channel of original.listChannels()) {
-    const bone = channel.getTargetNode().getName();
-    (channels[bone] ||= {})[channel.getTargetPath()] = channel.getSampler();
-  }
+  const channels = channelsOf(original);
   const duration = Math.max(...original.listSamplers().map(s => {
     const keys = values(s.getInput()); return keys[keys.length - 1];
   }));
-  const count = Math.max(2, Math.round(duration * 30) + 1);
-  const times = Float32Array.from({length: count}, (_, i) => duration * i / (count - 1));
+  // UnitView returns to idle after 0.52s. Preserve the original full strike,
+  // including its recovery, inside that action window.
+  const outputDuration = name === 'swing' ? 0.5 : duration;
+  const count = Math.max(2, Math.round(outputDuration * 30) + 1);
+  const times = Float32Array.from({length: count}, (_, i) => outputDuration * i / (count - 1));
   const tracks = Object.fromEntries(joints.map(n => [n.getName(), new Float32Array(count * 4)]));
   const hips = new Float32Array(count * 3);
   for (let frame = 0; frame < count; frame++) {
-    const time = times[frame], sourceCache = new Map(), targetCache = new Map();
+    const time = times[frame] * duration / outputDuration;
+    const sourceCache = new Map(), targetCache = new Map();
     const animatedSource = n => {
-      const c = channels[n.getName()] || {};
-      return matrix(c.translation ? sample(c.translation, time, 'translation') : n.getTranslation(),
-        c.rotation ? sample(c.rotation, time, 'rotation') : n.getRotation(), n.getScale());
+      // The source saber guard has a deep crouch that folds the named Meshy
+      // robes. Keep its original upper-body guard over the original idle gait.
+      const lower = name === 'saberIdle' && /^(pelvis|thigh_[lr]|calf_[lr]|foot_[lr]|ball_[lr])$/.test(n.getName());
+      const c = (lower ? idleChannels : channels)[n.getName()] || {};
+      const sampleTime = lower ? time * idleLength / duration : time;
+      let poseRotation = c.rotation ? sample(c.rotation, sampleTime, 'rotation') : n.getRotation();
+      if (name === 'saberIdle' && !lower && c.rotation && idleChannels[n.getName()]?.rotation) {
+        const idlePose = sample(idleChannels[n.getName()].rotation, time * idleLength / duration, 'rotation');
+        poseRotation = new T.Quaternion(...idlePose).slerp(new T.Quaternion(...poseRotation), 0.22).toArray();
+      }
+      return matrix(c.translation ? sample(c.translation, sampleTime, 'translation') : n.getTranslation(),
+        poseRotation, n.getScale());
     };
     const sourceWorld = n => world(n, sp, animatedSource, sourceCache);
     const targetLocal = new Map();
@@ -119,6 +142,16 @@ for (const original of sourceRoot.listAnimations()) {
       tracks[bone.getName()].set(localRotation.toArray(), frame * 4);
       targetLocal.set(bone, new T.Matrix4().compose(localPosition, localRotation, new T.Vector3(...bone.getScale())));
       targetCache.clear();
+    }
+    if (name !== 'death') {
+      const floor = Math.min(position(targetWorld(D.foot_l)).y, position(targetWorld(D.foot_r)).y);
+      const lift = restFootFloor - floor;
+      if (Math.abs(lift) > 0.0001) {
+        const pelvis = D.pelvis, p = dp.get(pelvis);
+        const corrected = position(targetWorld(pelvis)); corrected.y += lift;
+        const local = p ? corrected.applyMatrix4(targetWorld(p).clone().invert()) : corrected;
+        hips.set(local.toArray(), frame * 3);
+      }
     }
   }
   const clip = target.createAnimation(name);

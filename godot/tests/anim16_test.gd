@@ -53,11 +53,15 @@ func run() -> void:
 		for clip in ["idle", "run", "swing", "cast", "hit", "death"]:
 			if not player.has_animation(clip): continue
 			var bones: Array[String] = ["pelvis", "spine_01", "upperarm_l", "upperarm_r", "thigh_l", "thigh_r"]
+			player.stop(); skeleton.reset_bone_poses()
 			var initial: Dictionary = {}
 			for bone in bones: initial[bone] = skeleton.get_bone_pose(skeleton.find_bone(bone))
-			player.play(clip)
-			player.seek(player.get_animation(clip).length * 0.55, true)
-			check(pose_distance(skeleton, bones, initial) > 0.025, id + " moving bones " + clip)
+			player.play(clip, 0.0)
+			var maximum := 0.0
+			for fraction in [0.2, 0.45, 0.7]:
+				player.seek(player.get_animation(clip).length * fraction, true)
+				maximum = maxf(maximum, pose_distance(skeleton, bones, initial))
+			check(maximum > 0.025, id + " moving bones " + clip)
 		for pair in [["saberIdle", "run"], ["run", "saberIdle"], ["saberIdle", "swing"], ["swing", "saberIdle"]]:
 			check(player.get_blend_time(pair[0], pair[1]) > 0.0, id + " blend " + pair[0] + " to " + pair[1])
 		for clip in ["idle", "saberIdle", "run", "walk"]:
@@ -85,13 +89,22 @@ func capture_strip() -> void:
 		stage.add_child(model); model.position.x = (i - 1) * 2.1; model.scale = Vector3.ONE * 1.2
 		var player := find(model, "AnimationPlayer") as AnimationPlayer
 		Lookup.configure_animation(player); players.append(player)
-	for clip in ["idle", "run", "swing"]:
+	for clip in ["idle", "saberIdle", "run", "swing"]:
+		var strip := Image.create_empty(1320, 1260, false, Image.FORMAT_RGBA8)
+		strip.fill(Color("142334"))
 		for i in 6:
 			for player in players:
-				player.play(clip)
+				player.play(clip, 0.0)
 				player.seek(player.get_animation(clip).length * float(i) / 5.0, true)
 			for frame in 3: await process_frame
 			await RenderingServer.frame_post_draw
-			var path := "res://../docs/godot/shots/wave16-anim-strip-%s-%02d.png" % [clip, i]
-			check(root.get_texture().get_image().save_png(path) == OK, path)
+			var frame_image := root.get_texture().get_image()
+			for actor in 3:
+				var center_x := frame_image.get_width() / 2 + int((actor - 1) * 2.1 * frame_image.get_height() / 3.7)
+				var crop := frame_image.get_region(Rect2i(center_x - 160, 55, 320, frame_image.get_height() - 105))
+				crop.resize(220, 420, Image.INTERPOLATE_LANCZOS)
+				crop.convert(Image.FORMAT_RGBA8)
+				strip.blit_rect(crop, Rect2i(0, 0, 220, 420), Vector2i(i * 220, actor * 420))
+		var path := "res://../docs/godot/shots/wave16-anim-strip-%s.png" % clip
+		check(strip.save_png(path) == OK, path)
 	stage.queue_free()
