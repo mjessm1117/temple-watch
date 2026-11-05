@@ -1,6 +1,7 @@
 extends Node3D
 ## One roster identity, shared by the hangar and portrait viewports.
 const Progression = preload("res://scripts/campaign/progression.gd")
+const Gear15 = preload("res://scripts/campaign/armory15_gear.gd")
 var soldier_id := ""
 var model: Node3D
 var animation: AnimationPlayer
@@ -30,6 +31,7 @@ func setup(r: Dictionary, portrait: bool = false) -> void:
 	model.scale = Vector3.ONE * 1.12
 	# Retain the textured armor/robes, with a subtle per-soldier and gear tint.
 	_tint_meshes(model, r)
+	Gear15.attach(self, r, jedi)
 	animation = _find_type(model, "AnimationPlayer") as AnimationPlayer
 	if animation:
 		var clip := "idle"
@@ -85,7 +87,8 @@ static func block(parent: Node3D, at: Vector3, size: Vector3, color: Color, glow
 	m.mesh = mesh; m.position = at; m.material_override = material(color, glow); parent.add_child(m); return m
 
 func _saber(r: Dictionary) -> void:
-	block(equipment, Vector3.ZERO, Vector3(0.055, 0.055, 0.22), Color("a8b7bc"))
+	var mark := int(r.gear.mk.get("s", 1))
+	block(equipment, Vector3.ZERO, Vector3(0.06 + mark * 0.008, 0.06 + mark * 0.008, 0.22 + mark * 0.035), Color("d1cba7") if mark >= 2 else Color("a8b7bc"))
 	var blade := MeshInstance3D.new(); var mesh := CylinderMesh.new()
 	mesh.top_radius = 0.016; mesh.bottom_radius = 0.023; mesh.height = 1.03
 	blade.mesh = mesh; blade.rotation.x = PI / 2; blade.position.z = 0.62

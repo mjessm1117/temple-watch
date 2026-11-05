@@ -1,5 +1,6 @@
 extends Node3D
 const Actor = preload("res://scripts/campaign/loadout_actor.gd")
+const Hangar15 = preload("res://scripts/campaign/armory15_hangar.gd")
 var actors: Array = []
 var camera: Camera3D
 var focused := -1
@@ -15,7 +16,7 @@ func _ready() -> void:
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color("9dbdc9"); env.ambient_light_energy = 0.4
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	env.glow_enabled = true; env.glow_intensity = 0.7
+	env.glow_enabled = get_node("/root/Graphics").effective != "low"; env.glow_intensity = 0.7
 	env.fog_enabled = true; env.fog_light_color = Color("355867"); env.fog_density = 0.012
 	world.environment = env; add_child(world)
 	camera = Camera3D.new(); camera.fov = 30; camera.position = home; add_child(camera); camera.look_at(gaze)
@@ -42,36 +43,7 @@ func _ready() -> void:
 		glow_mat.emission_enabled = true; glow_mat.emission = Color("58b7d5")
 		glow_mat.emission_energy_multiplier = 1.0
 		glow.material_override = glow_mat; add_child(glow)
-	Actor.block(self, Vector3(0, -0.15, 0), Vector3(38, 0.25, 25), Color("18272e"))
-	# Temple ribs, recessed hangar door and an illuminated clerestory.
-	Actor.block(self, Vector3(0, 3.5, -4.7), Vector3(32, 8, 0.6), Color("111f29"))
-	Actor.block(self, Vector3(0, 2.6, -4.33), Vector3(8, 4.8, 0.12), Color("09141c"))
-	for side in [-1, 1]:
-		Actor.block(self, Vector3(side * 0.95, 1.15, -3.94), Vector3(0.42, 2.2, 0.25), Color("263b45"))
-		Actor.block(self, Vector3(side * 0.95, 1.95, -3.78), Vector3(0.3, 0.08, 0.04), Color("78c6d3"), 2.0)
-		Actor.block(self, Vector3(side * 0.95, 0.75, -3.73), Vector3(0.3, 0.04, 0.04), Color("d6b57b"), 1.2)
-	for side in [-1, 1]:
-		for x in [4.3, 7.7, 11.1]:
-			Actor.block(self, Vector3(side * x, 2.6, -3.8), Vector3(0.55, 5.5, 1.1), Color("24333e"))
-			Actor.block(self, Vector3(side * (x - 0.3), 2.65, -3.2), Vector3(0.035, 4.5, 0.05), Color("75b7c9"), 2.0)
-		Actor.block(self, Vector3(side * 4.0, 2.7, -4.1), Vector3(0.08, 5, 0.07), Color("93d5dc"), 3.0)
-	Actor.block(self, Vector3(0, 5.0, -3.8), Vector3(8.5, 0.45, 1.1), Color("4b5f68"))
-	for x in range(-9, 10, 3):
-		Actor.block(self, Vector3(x, 0.005, -0.6), Vector3(0.025, 0.02, 9), Color("4c6d79"))
-		Actor.block(self, Vector3(x, 4.2, -2), Vector3(1.2, 0.06, 0.2), Color("a8cde1"), 3.0)
-		var lamp := SpotLight3D.new(); lamp.position = Vector3(x, 4.0, 1.2)
-		lamp.rotation_degrees.x = -65; lamp.light_color = Color("9ed8f2"); lamp.light_energy = 1.5
-		lamp.spot_range = 10; lamp.spot_angle = 28; add_child(lamp)
-		# Subtle luminous shafts; particles travel through them.
-		var shaft := Actor.block(self, Vector3(x, 2.2, -1.1), Vector3(0.7, 4.1, 0.035), Color("73bad4"))
-		var mat := Actor.material(Color(0.4, 0.7, 0.9, 0.035), 0.3)
-		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		shaft.material_override = mat; shaft.rotation.z = -0.13
-	for z in [-3.0, 1.0, 3.0]:
-		Actor.block(self, Vector3(0, 0.012, z), Vector3(28, 0.02, 0.025), Color("3a5a67"))
-	var emblem := Label3D.new(); emblem.text = "J E D I   T E M P L E\nH A N G A R   0 7"
-	emblem.position = Vector3(0, 2.75, -4.15); emblem.font_size = 54; emblem.pixel_size = 0.006
-	emblem.modulate = Color("73939e"); add_child(emblem)
+	Hangar15.build(self, get_node("/root/Graphics").effective == "low")
 	_make_dust()
 
 func show_squad(roster: Array) -> void:
@@ -118,6 +90,8 @@ func _process(delta: float) -> void:
 	camera.position = camera.position.lerp(target, 1.0 - exp(-delta * 4.0))
 	gaze = gaze.lerp(look if focused >= 0 else Vector3(0, 1.06, 0), 1.0 - exp(-delta * 4.0))
 	camera.look_at(gaze)
+	if get_viewport().get_visible_rect().size.x >= 600.0:
+		camera.rotate_y(sin(time * 0.12) * deg_to_rad(3.0))
 	for i in dust_points.size():
 		var p := dust_points[i]; p.y = fmod(p.y + time * 0.045, 5.0); p.x += sin(time * 0.3 + i) * 0.12
 		dust.multimesh.set_instance_transform(i, Transform3D(Basis(), p))
