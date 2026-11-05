@@ -1,0 +1,9 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+     at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6347)
+MESA: info: vulkan: No DRI3 support detected - required for presentation
+Note: you can probably enable DRI3 in your Xorg config
+Vulkan 1.4.329 - Forward+ - Using Device #1: NVIDIA - NVIDIA GeForce RTX 4090 Laptop GPU
+
+PERF draw_calls=157.0 primitives=42774.0 fps=3.0
+CAPTURE /home/jess/projects/tw-w13/armory/godot/../docs/godot/shots/wave13-armory-after-desktop.png 0

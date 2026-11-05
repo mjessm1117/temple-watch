@@ -1,4 +1,5 @@
 extends RefCounted
+const Theme13 = preload("res://scripts/armory13_theme.gd")
 const BG = Color("0a1113")
 const PANEL = Color("0f191cf5")
 const EDGE = Color("304b53")
@@ -10,9 +11,8 @@ const GREEN = Color("7fd99a")
 const RED = Color("ef8e80")
 
 static func box(color: Color = PANEL, edge: Color = EDGE, padding: int = 12) -> StyleBoxFlat:
-	var s := StyleBoxFlat.new()
+	var s := Theme13.panel_style(padding)
 	s.bg_color = color; s.border_color = edge
-	s.set_border_width_all(1); s.set_corner_radius_all(3); s.set_content_margin_all(padding)
 	return s
 
 static func panel() -> PanelContainer:
@@ -29,9 +29,7 @@ static func column(gap: int = 6) -> VBoxContainer:
 static func button(text: String, action: Callable, enabled: bool = true) -> Button:
 	var b := Button.new(); b.text = text; b.disabled = not enabled
 	b.custom_minimum_size.y = 36; b.add_theme_font_size_override("font_size", 14)
-	b.add_theme_color_override("font_color", TEXT); b.add_theme_color_override("font_disabled_color", MUTED.darkened(0.25))
-	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
-		b.add_theme_stylebox_override(state, box(Color("1e343c") if state in ["hover", "pressed"] else Color("14232a"), CYAN if state in ["hover", "focus", "pressed"] else EDGE, 7))
+	Theme13.style_button(b)
 	b.pressed.connect(action); return b
 
 static func icon(key: String) -> Texture2D:

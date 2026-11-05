@@ -40,3 +40,4 @@ run_suite gfx_night1_test --rendering-method forward_plus -- --graphics=high
 run_suite gfx13_test --rendering-method gl_compatibility -- --graphics=low
 run_suite gfx13_test --rendering-method forward_plus -- --graphics=medium
 run_suite gfx13_test --rendering-method forward_plus -- --graphics=high
+run_suite armory13_test

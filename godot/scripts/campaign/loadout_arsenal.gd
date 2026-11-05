@@ -106,7 +106,7 @@ func _build_slots(r: Dictionary, jedi: bool) -> void:
 	var tier := int(r.gear.saber if jedi else r.gear.w)
 	_slot("weapon", primary, str(pool[tier].n), int(r.gear.mk.get(base_kind, 1)), "strike" if jedi else "shoot")
 	var armor: Dictionary = Data.get_table("gear", "ARMOR").get(str(r.gear.armor), {})
-	_slot("armor", "ARMOR", str(armor.get("n", "Empty")), int(r.gear.mk.get("armor:" + str(r.gear.armor), 1)), "st_armor")
+	_slot("armor", "ARMOR", str(armor.get("n", "Empty")), int(r.gear.mk.get("armor:" + str(r.gear.armor), 1)), "armor_jedi" if jedi else "armor_troop")
 	_slot("utility", "UTILITY", str(Data.get_table("gear", "UTIL").get(str(r.gear.get("util", "none")), {}).get("n", "Empty")), 1, "st_hp")
 	var mods: Array = r.gear.smods if jedi else r.gear.mods
 	var mod_name := "Empty"
@@ -132,21 +132,44 @@ func _build_slots(r: Dictionary, jedi: bool) -> void:
 	_slot("evolution", "PATH", "Rank %d" % int(r.rank), 1, "st_will")
 
 func _slot(key: String, title: String, value: String, mark: int, icon: String) -> void:
-	var compact := Phone.narrow(Phone.window_size())
+	var compact := Phone.narrow(get_tree().root.size)
 	var b := S.button("", _select_slot.bind(key)); b.name = "Slot_" + key
-	b.custom_minimum_size = Vector2(116 if compact else 112, 44 if compact else 53)
+	b.custom_minimum_size = Vector2(116, 68 if compact else 96)
 	b.size_flags_horizontal = SIZE_EXPAND_FILL
-	var glyph := TextureRect.new(); glyph.texture = S.icon(icon)
-	glyph.position = Vector2(5, 8); glyph.size = Vector2(25, 25)
-	glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; glyph.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	b.tooltip_text = value
+	var art_key: String = str({"weapon":"saber" if icon == "strike" else "blaster", "armor":icon, "utility":"utility", "base_mod":"module", "armor_mod":"armor_mod", "form":"form", "color":"crystal", "evolution":"path"}.get(key, "module"))
+	var glyph := TextureRect.new(); glyph.name = "GearArt"
+	var source: Texture2D = load("res://assets/loadout/icons13/%s.png" % art_key)
+	var cropped := AtlasTexture.new()
+	cropped.atlas = source
+	cropped.region = source.get_image().get_used_rect()
+	glyph.texture = cropped
+	glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; glyph.stretch_mode = TextureRect.STRETCH_SCALE
+	var art_height := 51.0 if compact else 61.0
+	var art_width := minf(art_height * cropped.region.size.x / cropped.region.size.y, 42.0 if compact else 48.0)
+	glyph.position = Vector2(2.0 + ((42.0 if compact else 48.0) - art_width) * 0.5, 8 if compact else 16)
+	glyph.size = Vector2(art_width, art_height)
 	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(glyph)
-	var name_label := S.label(title, 10 if compact else 11, S.CYAN)
-	name_label.position = Vector2(34, 4); name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
-	var item_label := S.label(value, 10 if compact else 11)
-	item_label.position = Vector2(34, 19); item_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	item_label.size = Vector2(73 if compact else 69, 17); item_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; b.add_child(item_label)
-	var tier := S.label("Mk " + _mark(mark), 10, _tier_color(mark))
-	tier.position = Vector2(34, 33 if not compact else 32); tier.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(tier)
+	var name_label := S.label(title, 7, S.CYAN)
+	name_label.position = Vector2(54 if compact else 53, 4 if compact else 10)
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
+	var display_value := value.get_slice(" (", 0) if key == "form" else value
+	display_value = display_value.trim_suffix(" saber").trim_suffix(" robes")
+	var item_label := S.label(display_value, 8)
+	item_label.name = "ItemName"; item_label.position = Vector2(54 if compact else 53, 20 if compact else 31)
+	item_label.clip_text = true
+	item_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	item_label.size = Vector2(62 if compact else 52, 17)
+	b.add_child(item_label)
+	var tier := S.label("Mk " + _mark(mark), 9, _tier_color(mark))
+	tier.name = "Tier"; tier.position = Vector2(54 if compact else 53, 45 if compact else 73)
+	tier.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(tier)
+	for i in 3:
+		var pip := ColorRect.new(); pip.name = "TierPip%d" % i
+		pip.color = _tier_color(mark) if i < mark else Color("2b3d44")
+		pip.position = Vector2((54 if compact else 53) + i * 14, 63 if compact else 90)
+		pip.size = Vector2(10, 3); pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(pip)
 	slot_row.add_child(b); host.wire_button(b)
 
 func _tier_color(mark: int) -> Color:
@@ -157,7 +180,12 @@ func _mark(level: int) -> String:
 
 func _select_slot(slot: String) -> void:
 	active_slot = slot; host.armory_slot = slot; skill_view = false; _filter()
-	if get_parent() is ScrollContainer: get_parent().set_deferred("scroll_vertical", 0)
+	if get_parent() is ScrollContainer:
+		var scroll := get_parent() as ScrollContainer
+		var target := maxi(0, int(picker.position.y) - 20) if Phone.narrow(get_tree().root.size) else 0
+		await get_tree().process_frame
+		scroll.scroll_vertical = target
+		position.y = -target
 
 func _show_gear() -> void:
 	skill_view = false; _filter()
@@ -217,7 +245,7 @@ func lock_reason(c, item: Dictionary, cost: int, kyber: int = 0) -> String:
 
 func offer(action: String, kind: String, key: String, title: String, reason: String, cost: int, kyber: int = 0, tip: String = "") -> void:
 	var slot := _offer_slot(action, kind)
-	var compact := Phone.narrow(Phone.window_size())
+	var compact := Phone.narrow(get_tree().root.size)
 	var equipped := reason == "Equipped"
 	var card := S.panel(); card.add_theme_stylebox_override("panel", S.box(Color("14232a"), S.EDGE, 3 if compact else 5))
 	picker.add_child(card); offer_cards.append({"slot":slot, "node":card})

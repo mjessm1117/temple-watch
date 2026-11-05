@@ -3,12 +3,13 @@ const UI = preload("res://scripts/campaign/ui.gd")
 const Settings = preload("res://scripts/settings.gd")
 const World = preload("res://scripts/ui_world.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
+const Theme13 = preload("res://scripts/armory13_theme.gd")
 var picked := "normal"
 var buttons: Dictionary = {}
 
 func _ready() -> void:
 	if Phone.narrow(Phone.window_size()):
-		_build_phone(); return
+		_build_phone(); Theme13.apply_tree(self); return
 	var backdrop := World.new()
 	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(backdrop)
@@ -74,6 +75,7 @@ func _ready() -> void:
 	column.add_child(UI.button("Direct Rescue Mission",_start))
 	column.add_child(UI.label("THE ARCHIVE REMEMBERS EVERY CHOICE",12,UI.MUTED))
 	UI.slide(outer)
+	Theme13.apply_tree(self)
 
 func _build_phone() -> void:
 	var backdrop := World.new(); backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); add_child(backdrop)
@@ -115,6 +117,7 @@ func _phone_settings(body: VBoxContainer) -> void:
 		body.get_node("PhoneGraphics").queue_free(); return
 	var settings := preload("res://scripts/graphics_options.gd").new()
 	settings.name = "PhoneGraphics"; body.add_child(settings)
+	Theme13.apply_tree(settings)
 
 func _pick(id: String) -> void:
 	picked = id
