@@ -18,6 +18,27 @@ func settle() -> void:
 	for i in 8: await process_frame
 	await create_timer(0.5).timeout
 
+func check_room_plates(view: Control) -> void:
+	var plates: Array = []
+	for id in view.rooms:
+		var button: Button = view.buttons[id]
+		for node_name in ["RoomName", "RoomDetail", "BattleBonus", "RoomAlert"]:
+			if not button.has_node(node_name): continue
+			var label: Label = button.get_node(node_name)
+			if not label.is_visible_in_tree(): continue
+			var rect := label.get_global_rect()
+			var font := label.get_theme_font("font")
+			var font_size := label.get_theme_font_size("font_size")
+			var text_width := font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+			var fits := text_width <= rect.size.x - 2.0 and font.get_height(font_size) <= rect.size.y
+			if label.autowrap_mode != TextServer.AUTOWRAP_OFF:
+				fits = label.get_line_count() <= 2 and label.get_line_count() * font.get_height(font_size) <= rect.size.y
+			check(fits, "%s text fits its own rect in room %s: %s (%s)" % [node_name, id, label.text, rect])
+			for previous in plates:
+				if previous.id != id:
+					check(not rect.intersects(previous.rect), "%s %s overlaps %s %s: %s / %s" % [id, node_name, previous.id, previous.name, rect, previous.rect])
+			plates.append({"id": id, "name": node_name, "rect": rect})
+
 func capture(label: String) -> void:
 	if not ("--capture" in OS.get_cmdline_user_args() or "--before" in OS.get_cmdline_user_args()): return
 	await settle()
@@ -60,6 +81,7 @@ func run() -> void:
 				else:
 					check(text_width <= button.size.x + 1.0, "%s fits room %s" % [node_name, id])
 		check(built > 0 and empty > 0, "Built and empty rooms visible")
+		check_room_plates(home.temple_view)
 		if not phone:
 			for id in ["war", "archives", "sp0", "sp1"]:
 				print("HOME13 ROOM %s: button %s label %s" % [id, home.temple_view.buttons[id].get_global_rect(), home.temple_view.buttons[id].get_node("RoomName").get_global_rect()])
@@ -80,6 +102,12 @@ func run() -> void:
 		check(map_rect.size.x >= panel_rect.size.x * 1.7 and map_rect.size.y >= root.size.y * 0.5, "Full strategy map has priority")
 		check(galaxy.map_view.planets.size() == 14 and galaxy.map_view.offers.size() > 0, "Regions and mission markers exist")
 		check(galaxy.launch_button != null and galaxy.launch_button.visible, "Mission briefing remains reachable")
+		if phone:
+			check(galaxy.tab_scroll != null, "Phone briefing has a scrollable tab row")
+			galaxy.tab_scroll.scroll_horizontal = 120
+			await process_frame
+			check(galaxy.tab_scroll.scroll_horizontal > 0, "Phone briefing tabs scroll to the right")
+			galaxy.tab_scroll.scroll_horizontal = 0
 	await capture("%s-galaxy-%s" % [phase, size_name])
 	if phase == "after":
 		galaxy._back()

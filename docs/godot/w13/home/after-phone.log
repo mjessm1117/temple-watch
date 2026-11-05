@@ -1,11 +1,11 @@
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
      at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6347)
-WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
-     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
-OpenGL API 4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 21.1.8, 256 bits)
+MESA: info: vulkan: No DRI3 support detected - required for presentation
+Note: you can probably enable DRI3 in your Xorg config
+Vulkan 1.4.329 - Forward+ - Using Device #1: NVIDIA - NVIDIA GeForce RTX 4090 Laptop GPU
 
-HOME13 PERF after-temple-phone: draw calls 257, triangles 174960, fps estimate 12.0 (llvmpipe (LLVM 21.1.8, 256 bits))
+HOME13 PERF after-temple-phone: draw calls 257, triangles 208128, fps estimate 11.0 (NVIDIA GeForce RTX 4090 Laptop GPU)
 HOME13 LAYOUT phone: map [P: (8.0, 74.0), S: (434.0, 246.0)] briefing [P: (468.0, 143.0), S: (213.0, 116.0)]
-HOME13 PERF after-galaxy-phone: draw calls 98, triangles 43203, fps estimate 42.0 (llvmpipe (LLVM 21.1.8, 256 bits))
-HOME13 TEST RESULTS: 17 checks, 0 failures
+HOME13 PERF after-galaxy-phone: draw calls 102, triangles 80587, fps estimate 23.0 (NVIDIA GeForce RTX 4090 Laptop GPU)
+HOME13 TEST RESULTS: 19 checks, 0 failures

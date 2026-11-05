@@ -28,14 +28,23 @@ static func layout(button: Button, info: Dictionary, phone: bool) -> void:
 	else:
 		name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 		fit(name_label, button.size.x, preferred)
-	name_label.offset_bottom = 23
+	# Keep all three lines in the upper part of each target. Adjacent floors
+	# project only about 57 pixels apart at desktop resolution.
+	name_label.offset_top = 2
+	name_label.offset_bottom = 28
 	name_label.clip_text = false
 	fit(detail, button.size.x, 9)
+	detail.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	detail.offset_top = 30
+	detail.offset_bottom = 43
 	name_label.visible = not phone
 	detail.visible = not phone
 	if button.has_node("BattleBonus"):
 		var bonus: Label = button.get_node("BattleBonus")
 		fit(bonus, button.size.x, 8)
+		bonus.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+		bonus.offset_top = 44
+		bonus.offset_bottom = 57
 		bonus.visible = not phone
 	if button.has_node("RoomAlert"):
 		# Desktop names own the top strip; the command bar and teaser show alerts.

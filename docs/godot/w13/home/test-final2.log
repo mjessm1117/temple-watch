@@ -61,14 +61,16 @@ STRATEGY TEST RESULTS: 119 checks, 0 failures
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 COMBAT7 TEST RESULTS: 118 checks, 0 failures
-Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
-
-HUD NIGHT1 TEST RESULTS: 401 checks, 0 failures
-WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+WARNING: 22 ObjectDB instances were leaked at exit (run with `--verbose` for details).
    at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
+HUD NIGHT1 TEST RESULTS: 401 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
 BATTLE11 TEST RESULTS: 394 checks, 0 failures
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 MAP relay 26x26 routes=2 cover=[5, 5, 4, 5] high=239 sight=289/76
@@ -152,6 +154,8 @@ HOME UI TEST RESULTS: 162 checks, 0 failures
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 LOADOUT TEST RESULTS: 75 checks, 0 failures
+WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 GALAXY VIEWPORT: window (0, 0), root (1366, 768), map (920.0, 639.0), 3D (920, 639)
@@ -283,6 +287,8 @@ ART WINDOW: (0, 0) viewport (1366.0, 768.0)
 ART WINDOW: (0, 0) viewport (1366.0, 768.0)
 ART WINDOW: (0, 0) viewport (1366.0, 768.0)
 gfx_night1 low: 222 checks, 0 failures
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 ART WINDOW: (0, 0) viewport (1366.0, 768.0)
@@ -294,19 +300,21 @@ ART WINDOW: (0, 0) viewport (1366.0, 768.0)
 ART WINDOW: (0, 0) viewport (1366.0, 768.0)
 ART WINDOW: (0, 0) viewport (1366.0, 768.0)
 gfx_night1 high: 222 checks, 0 failures
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 HOME13 LAYOUT phone: map [P: (8.0, 74.0), S: (434.0, 246.0)] briefing [P: (468.0, 143.0), S: (213.0, 116.0)]
-HOME13 TEST RESULTS: 12 checks, 0 failures
+HOME13 TEST RESULTS: 15 checks, 0 failures
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
-HOME13 ROOM war: button [P: (559.8452, 296.8264), S: (119.4666, 58.80518)] label [P: (559.8452, 298.8264), S: (119.4666, 21.0)]
-HOME13 ROOM archives: button [P: (686.6261, 296.85), S: (119.4667, 58.80518)] label [P: (686.6261, 298.85), S: (119.4667, 21.0)]
-HOME13 ROOM sp0: button [P: (386.7405, 238.0112), S: (85.33331, 58.79877)] label [P: (386.7405, 240.0112), S: (85.33331, 21.0)]
-HOME13 ROOM sp1: button [P: (513.5214, 238.0349), S: (85.33331, 58.7988)] label [P: (513.5214, 240.0349), S: (85.33331, 21.0)]
+HOME13 ROOM war: button [P: (559.8467, 296.8263), S: (119.4667, 58.80432)] label [P: (559.8467, 298.8263), S: (119.4667, 26.0)]
+HOME13 ROOM archives: button [P: (686.6277, 296.8488), S: (119.4667, 58.80429)] label [P: (686.6277, 298.8488), S: (119.4667, 26.0)]
+HOME13 ROOM sp0: button [P: (386.742, 238.0125), S: (85.33331, 58.79825)] label [P: (386.742, 240.0125), S: (85.33331, 26.0)]
+HOME13 ROOM sp1: button [P: (513.5229, 238.0349), S: (85.33331, 58.79828)] label [P: (513.5229, 240.0349), S: (85.33331, 26.0)]
 HOME13 LAYOUT desktop: map [P: (22.0, 96.0), S: (920.0, 639.0)] briefing [P: (968.0, 275.0), S: (362.0, 399.0)]
-HOME13 TEST RESULTS: 56 checks, 0 failures
+HOME13 TEST RESULTS: 1111 checks, 0 failures
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 HOME13 LAYOUT phone: map [P: (8.0, 74.0), S: (434.0, 246.0)] briefing [P: (468.0, 143.0), S: (213.0, 116.0)]
-HOME13 TEST RESULTS: 13 checks, 0 failures
+HOME13 TEST RESULTS: 16 checks, 0 failures

@@ -1,15 +1,15 @@
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
      at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6347)
-WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
-     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
-OpenGL API 4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 21.1.8, 256 bits)
+MESA: info: vulkan: No DRI3 support detected - required for presentation
+Note: you can probably enable DRI3 in your Xorg config
+Vulkan 1.4.329 - Forward+ - Using Device #1: NVIDIA - NVIDIA GeForce RTX 4090 Laptop GPU
 
-HOME13 ROOM war: button [P: (466.4866, 247.356), S: (99.58466, 72.0)] label [P: (466.4866, 249.356), S: (99.58466, 21.0)]
-HOME13 ROOM archives: button [P: (572.1683, 247.3919), S: (99.58466, 72.0)] label [P: (572.1683, 249.3919), S: (99.58466, 21.0)]
-HOME13 ROOM sp0: button [P: (322.1905, 198.3252), S: (71.13187, 72.00002)] label [P: (322.1905, 200.3252), S: (71.13187, 27.0)]
-HOME13 ROOM sp1: button [P: (427.8722, 198.361), S: (71.13187, 72.0)] label [P: (427.8722, 200.361), S: (71.13187, 21.0)]
-HOME13 PERF after-temple-desktop: draw calls 425, triangles 188578, fps estimate 8.0 (llvmpipe (LLVM 21.1.8, 256 bits))
+HOME13 ROOM war: button [P: (466.5012, 247.3555), S: (99.58472, 72.0)] label [P: (466.5012, 249.3555), S: (99.58472, 26.0)]
+HOME13 ROOM archives: button [P: (572.1829, 247.3802), S: (99.58466, 72.0)] label [P: (572.1829, 249.3802), S: (99.58466, 26.0)]
+HOME13 ROOM sp0: button [P: (322.205, 198.3373), S: (71.13187, 72.0)] label [P: (322.205, 200.3373), S: (71.13187, 27.0)]
+HOME13 ROOM sp1: button [P: (427.8867, 198.362), S: (71.13193, 72.0)] label [P: (427.8867, 200.362), S: (71.13193, 26.0)]
+HOME13 PERF after-temple-desktop: draw calls 425, triangles 241214, fps estimate 21.0 (NVIDIA GeForce RTX 4090 Laptop GPU)
 HOME13 LAYOUT desktop: map [P: (22.0, 117.0), S: (692.0, 490.0)] briefing [P: (740.0, 328.0), S: (362.0, 186.0)]
-HOME13 PERF after-galaxy-desktop: draw calls 144, triangles 46135, fps estimate 12.0 (llvmpipe (LLVM 21.1.8, 256 bits))
-HOME13 TEST RESULTS: 61 checks, 0 failures
+HOME13 PERF after-galaxy-desktop: draw calls 144, triangles 82871, fps estimate 19.0 (NVIDIA GeForce RTX 4090 Laptop GPU)
+HOME13 TEST RESULTS: 1115 checks, 0 failures

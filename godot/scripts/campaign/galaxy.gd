@@ -15,6 +15,7 @@ var map_view: Control
 var message: Label
 var status: Label
 var tabs: HBoxContainer
+var tab_scroll: ScrollContainer
 var chips: HFlowContainer
 var scroll: ScrollContainer
 var page := "Briefing"
@@ -68,8 +69,14 @@ func _build() -> void:
 	var column := UI.column(7); column.custom_minimum_size.x = 212 if compact else 304; right.add_child(column)
 	tabs = HBoxContainer.new()
 	if compact:
-		var tab_scroll := ScrollContainer.new(); tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-		tab_scroll.custom_minimum_size.y = 39; column.add_child(tab_scroll); tab_scroll.add_child(tabs)
+		var tab_row := HBoxContainer.new(); column.add_child(tab_row)
+		var previous := UI.button("‹", func(): tab_scroll.scroll_horizontal = maxi(0, tab_scroll.scroll_horizontal - 120))
+		previous.tooltip_text = "Scroll tabs left"; tab_row.add_child(previous)
+		tab_scroll = ScrollContainer.new(); tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		tab_scroll.custom_minimum_size.y = 39; tab_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tab_row.add_child(tab_scroll); tab_scroll.add_child(tabs)
+		var next := UI.button("›", func(): tab_scroll.scroll_horizontal += 120)
+		next.tooltip_text = "Scroll tabs right"; tab_row.add_child(next)
 	else: column.add_child(tabs)
 	for tab in ["Briefing","Regions","Field ops","Teams","Sith ops"]:
 		var button := UI.button(tab,_tab.bind(tab)); button.add_theme_font_size_override("font_size",12 if compact else 11)

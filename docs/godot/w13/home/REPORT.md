@@ -5,6 +5,7 @@
 - Galaxy opens from the live teaser on the Temple home screen. The starfield and planet map now occupy the full height of the strategy view, with threat and mission markers on the map and a narrower briefing panel beside it. The Temple button and Escape return to home.
 - The Temple cutaway has deeper recessed room faces and lit thresholds. Room plates now show **BUILT**, **BUILDING**, or **EMPTY**. Longer desktop names wrap at word boundaries or scale to fit; alerts stay in the command bar and galaxy teaser rather than covering room names. Phone room details remain available through the Rooms drawer.
 - Compatibility renders the small galaxy planets with fewer triangles. No Low-tier post effect or project quality setting changed.
+- Follow-up: desktop room names, state, and battle bonus now occupy separate lines inside their own room targets. This removes the WAR ROOM / ARCHIVES clipping and collisions with neighboring floor labels. Phone keeps room names in the Rooms drawer. The phone galaxy briefing has visible left and right tab scroll controls.
 
 ## Visual evidence
 
@@ -32,7 +33,8 @@ The geoscape still uses a stylized orbital map rather than detailed planet surfa
 
 ## Gate
 
-- Import: passed, no script errors (`import-final.log`).
-- `home13_test`: layout, labels, room states, map markers, Low renderer setting, navigation at both sizes; captures passed.
-- Full `./godot/test.sh`: exit 0, zero `SCRIPT ERROR` lines, every suite zero failures (`test-final.log`). Normal rescue was 9/20; Wave 11 families were 8/20, 16/20, and 16/20.
+- Fix follow-up: desktop room plates now stack name, state and bonus inside the upper part of each room target, so "WAR ROOM" and "ARCHIVES" show in full and no plate touches another room's. The phone briefing tab row scrolls, with ‹ › buttons and a scrollbar.
+- `home13_test` collects the global rects of every visible room name, state, bonus and alert plate, fails if two from different rooms intersect, and checks each text fits its rect, at both sizes. Captures: desktop 1,115 checks, phone 19 checks, zero failures (`after-desktop.log`, `after-phone.log`).
+- Import: passed, no script errors (`import-final2.log`).
+- Full `./godot/test.sh`: exit 0, zero `SCRIPT ERROR` lines, every suite zero failures (`test-final2.log`). Normal rescue was 9/20.
 - `git diff --check`: clean.
