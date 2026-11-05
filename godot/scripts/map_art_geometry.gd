@@ -148,6 +148,10 @@ func cover(m: RefCounted, tile: Vector2i) -> void:
 	b.end_record()
 
 func backdrop(width: int, height: int) -> void:
+	var seed := float(posmod(hash(r.mission.spec),10000))
+	r.palette.floor.set_shader_parameter("map_seed",seed)
+	r.palette.ground.set_shader_parameter("map_seed",seed)
+	preload("res://scripts/map14_detail.gd").build(r,r.mission)
 	preload("res://scripts/map_art_edges.gd").new(self).build(width,height)
 
 func rock(at: Vector3, size: Vector3) -> void:
