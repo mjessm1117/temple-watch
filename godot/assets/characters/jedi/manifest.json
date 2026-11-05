@@ -10,7 +10,7 @@
         "preview": "kira/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 365532,
+      "glb_bytes": 621636,
       "lod_tris": 1400,
       "lod_glb_bytes": 168300,
       "height_m": 1.8,
@@ -18,14 +18,19 @@
       "animation_clips": [
         "idle",
         "saberIdle",
+        "gunIdle",
         "run",
         "walk",
         "swing",
+        "swing2",
         "cast",
+        "channel",
+        "throw",
         "shoot",
         "hit",
         "death",
-        "block"
+        "block",
+        "aim"
       ],
       "saber_color": "#62b3ff",
       "mesh_task_ids": {
@@ -51,7 +56,7 @@
         "preview": "tor/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 355256,
+      "glb_bytes": 611360,
       "lod_tris": 1400,
       "lod_glb_bytes": 164180,
       "height_m": 1.8,
@@ -59,14 +64,19 @@
       "animation_clips": [
         "idle",
         "saberIdle",
+        "gunIdle",
         "run",
         "walk",
         "swing",
+        "swing2",
         "cast",
+        "channel",
+        "throw",
         "shoot",
         "hit",
         "death",
-        "block"
+        "block",
+        "aim"
       ],
       "saber_color": "#8fe3ff",
       "mesh_task_ids": {
@@ -92,7 +102,7 @@
         "preview": "satele/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 358772,
+      "glb_bytes": 614876,
       "lod_tris": 1400,
       "lod_glb_bytes": 170544,
       "height_m": 1.8,
@@ -100,14 +110,19 @@
       "animation_clips": [
         "idle",
         "saberIdle",
+        "gunIdle",
         "run",
         "walk",
         "swing",
+        "swing2",
         "cast",
+        "channel",
+        "throw",
         "shoot",
         "hit",
         "death",
-        "block"
+        "block",
+        "aim"
       ],
       "saber_color": "#62b3ff",
       "mesh_task_ids": {
@@ -133,7 +148,7 @@
         "preview": "ressa/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 368820,
+      "glb_bytes": 624928,
       "lod_tris": 1400,
       "lod_glb_bytes": 172044,
       "height_m": 1.8,
@@ -141,14 +156,19 @@
       "animation_clips": [
         "idle",
         "saberIdle",
+        "gunIdle",
         "run",
         "walk",
         "swing",
+        "swing2",
         "cast",
+        "channel",
+        "throw",
         "shoot",
         "hit",
         "death",
-        "block"
+        "block",
+        "aim"
       ],
       "saber_color": "#ffd166",
       "mesh_task_ids": {
@@ -178,7 +198,7 @@
         "preview": "kell/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 350100,
+      "glb_bytes": 606208,
       "lod_tris": 1400,
       "lod_glb_bytes": 159836,
       "height_m": 1.8,
@@ -186,14 +206,19 @@
       "animation_clips": [
         "idle",
         "saberIdle",
+        "gunIdle",
         "run",
         "walk",
         "swing",
+        "swing2",
         "cast",
+        "channel",
+        "throw",
         "shoot",
         "hit",
         "death",
-        "block"
+        "block",
+        "aim"
       ],
       "saber_color": "#8fe3ff",
       "mesh_task_ids": {
@@ -223,7 +248,7 @@
         "preview": "sava/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 327772,
+      "glb_bytes": 583880,
       "lod_tris": 1400,
       "lod_glb_bytes": 151880,
       "height_m": 1.8,
@@ -231,14 +256,19 @@
       "animation_clips": [
         "idle",
         "saberIdle",
+        "gunIdle",
         "run",
         "walk",
         "swing",
+        "swing2",
         "cast",
+        "channel",
+        "throw",
         "shoot",
         "hit",
         "death",
-        "block"
+        "block",
+        "aim"
       ],
       "saber_color": "#62b3ff",
       "mesh_task_ids": {
@@ -270,7 +300,7 @@
         "preview": "tem/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 342316,
+      "glb_bytes": 598420,
       "lod_tris": 1400,
       "lod_glb_bytes": 162148,
       "height_m": 1.8,
@@ -278,14 +308,19 @@
       "animation_clips": [
         "idle",
         "saberIdle",
+        "gunIdle",
         "run",
         "walk",
         "swing",
+        "swing2",
         "cast",
+        "channel",
+        "throw",
         "shoot",
         "hit",
         "death",
-        "block"
+        "block",
+        "aim"
       ],
       "saber_color": "#72e0a4",
       "mesh_task_ids": {
