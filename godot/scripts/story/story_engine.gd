@@ -9,6 +9,7 @@ const Arcs = preload("res://scripts/story/arc_night1.gd")
 const Journal = preload("res://scripts/story/journal_night1.gd")
 const Villain11 = preload("res://scripts/story/villain11_arc.gd")
 const Scenes11 = preload("res://scripts/story/scenes11_squad.gd")
+const Beats14 = preload("res://scripts/story/story14_beats.gd")
 var state: Dictionary
 var data: Dictionary = {}
 
@@ -154,6 +155,7 @@ func start_debrief(result: Dictionary) -> Dictionary:
 	var scene := {"kind":"debrief","id":id,"title":aftermath.get("t",m.get("n",id)),"eyebrow":"Mission complete" if won else "Mission lost","text":text + ("\n\n" + _saga_text(state,str(aftermath.get("text","")),aftermath.get("who","")) if not aftermath.is_empty() else ""),"choices":choices,"who":aftermath.get("who","")}
 	Callbacks.apply(state,scene,table("N1_CALLBACKS"))
 	Villain11.debrief(state,scene)
+	scene.text += "\n\n" + Beats14.debrief(state,result)
 	state.pending = scene
 	return scene
 

@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "godot"
 RASTER = {".png", ".webp", ".jpg", ".jpeg"}
 # Raster folders the game loads at runtime by path; kept in the web copy.
-RUNTIME_RASTER_DIRS = ("assets/loadout/icons13/",)
+RUNTIME_RASTER_DIRS = ("assets/loadout/icons13/", "assets/story/portraits14/")
 
 
 def glb_images_embedded(path: Path) -> bool:

@@ -45,3 +45,4 @@ run_suite home13_test --resolution 844x390 -- --phone
 run_suite home13_test --resolution 1366x768
 run_suite home13_test --rendering-method gl_compatibility --resolution 844x390 -- --phone --graphics=low
 run_suite battle13_test --rendering-method gl_compatibility -- --graphics=low
+run_suite story14_test --rendering-method gl_compatibility -- --graphics=low

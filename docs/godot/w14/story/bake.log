@@ -1,0 +1,33 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+     at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6347)
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 26.0.8-1ubuntu0.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 21.1.8, 256 bits)
+
+PORTRAIT kira 0
+PORTRAIT tor 0
+PORTRAIT rhal 0
+PORTRAIT ilsa 0
+PORTRAIT bren 0
+PORTRAIT grak 0
+PORTRAIT satele 0
+PORTRAIT jace 0
+PORTRAIT varra 0
+PORTRAIT council 0
+PORTRAIT ressa 0
+PORTRAIT kell 0
+PORTRAIT bo 0
+PORTRAIT mira 0
+PORTRAIT ilo 0
+PORTRAIT rusk 0
+PORTRAIT sava 0
+PORTRAIT tem 0
+PORTRAIT dace 0
+PORTRAIT kiri 0
+PORTRAIT halden 0
+PORTRAIT bruk 0
+PORTRAIT malgus 0
+PORTRAIT kaan 0
+PORTRAIT bane 0
+PORTRAIT ro 0

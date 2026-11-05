@@ -4,6 +4,7 @@ signal completed
 const StoryEngine = preload("res://scripts/story/story_engine.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const World = preload("res://scripts/ui_world.gd")
+const Portraits14 = preload("res://scripts/story14_portraits.gd")
 @export_enum("briefing", "dialogue", "codex") var mode := "briefing"
 var engine: RefCounted
 var campaign_state: Dictionary = {}
@@ -22,6 +23,10 @@ var typed := 0.0
 var decision_recorded := false
 var completed_once := false
 var portrait_count := 0
+var dialogue_lines: PackedStringArray
+var dialogue_index := 0
+var speaker_plate: Label
+var speaker_portrait: TextureRect
 
 func set_campaign_state(value: Dictionary) -> void:
 	demo_mode = false
@@ -75,8 +80,9 @@ func _build() -> void:
 	var outer := MarginContainer.new()
 	outer_frame = outer
 	outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for side in ["left","right"]: outer.add_theme_constant_override("margin_"+side,36)
-	for side in ["top","bottom"]: outer.add_theme_constant_override("margin_"+side,24)
+	var phone := get_viewport_rect().size.x < 900
+	for side in ["left","right"]: outer.add_theme_constant_override("margin_"+side,10 if phone else 36)
+	for side in ["top","bottom"]: outer.add_theme_constant_override("margin_"+side,8 if phone else 24)
 	add_child(outer)
 	body = UI.column(16)
 	outer.add_child(body)
@@ -88,7 +94,7 @@ func _header(title: String, detail: String) -> void:
 	var head := HBoxContainer.new()
 	body.add_child(head)
 	head.add_child(UI.icon("holocron",32))
-	var mark := UI.label(title,24,UI.ACCENT)
+	var mark := UI.label(title,18 if get_viewport_rect().size.x < 900 else 24,UI.ACCENT)
 	mark.size_flags_horizontal = SIZE_EXPAND_FILL
 	head.add_child(mark)
 	var date := UI.label(detail,14,UI.GOLD)
@@ -99,39 +105,41 @@ func _header(title: String, detail: String) -> void:
 func _build_story() -> void:
 	var kind: String = scene_data.get("kind","briefing")
 	var is_talk := kind in ["talk","beat","grief","scene11"]
+	var phone := get_viewport_rect().size.x < 900
 	_header("TEMPLE WATCH", "%s  /  %s BBY" % ["OLD REPUBLIC" if int(campaign_state.era)==1 else "RUUSAN" if int(campaign_state.era)==2 else "HIGH REPUBLIC",str(campaign_state.story.bby)])
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation",20)
 	row.size_flags_vertical = SIZE_EXPAND_FILL
 	body.add_child(row)
-	var visual := UI.column(12)
-	visual.custom_minimum_size.x = 330
-	row.add_child(visual)
-	# --- wave10 story ---
-	visual.add_child(UI.label("BATTLE COMMS" if kind == "beat" else "TEMPLE CONVERSATION" if is_talk else "HOLOLINK  /  MISSION CONTROL",13,UI.GOLD))
 	var who: String = scene_data.get("who","")
 	var speaker: String = scene_data.get("name",engine.table("CAST").get(who,{}).get("n","Jedi Council"))
 	if speaker.is_empty(): speaker = "Jedi Council"
-	if is_talk:
-		var portraits := HBoxContainer.new()
-		portraits.add_theme_constant_override("separation",8)
-		visual.add_child(portraits)
+	if speaker.contains(" & "): speaker = speaker.get_slice(" & ",0)
+	if not phone:
+		var visual := UI.column(12)
+		visual.custom_minimum_size.x = 330
+		row.add_child(visual)
 		# --- wave10 story ---
-		var pair_names: PackedStringArray = str(scene_data.get("name","")).split(" & ") if scene_data.has("pair") or kind == "scene11" else PackedStringArray()
-		_portrait(portraits,str(pair_names[0]) if pair_names.size() >= 2 else speaker,1.0,Vector2(158,230))
-		_portrait(portraits,str(pair_names[1]) if pair_names.size() >= 2 else "COMMANDER",-1.0,Vector2(158,230))
-		if who != "" or scene_data.has("pair") or kind == "scene11": _bond(visual,who)
-	else:
-		var holo_frame := UI.panel()
-		visual.add_child(holo_frame)
-		var holo := World.new()
-		holo.stage = "holo"
-		holo.planet_key = str(engine.mission(scene_data.get("id","")).get("where",scene_data.get("eyebrow","coruscant")))
-		holo.custom_minimum_size = Vector2(290,225)
-		holo_frame.add_child(holo)
-		visual.add_child(UI.label(str(engine.mission(scene_data.get("id","")).get("where",scene_data.get("eyebrow","TARGET PROJECTION"))).to_upper(),14,UI.ACCENT))
-		_portrait(visual,speaker,1.0,Vector2(290,180))
-	visual.add_child(UI.label("TEMPLE RECORD\nJEDI ARCHIVE · SQUAD 06" if kind == "scene11" else "SECURE TRANSMISSION\nJEDI ARCHIVE · CHANNEL 06",12,UI.MUTED))
+		visual.add_child(UI.label("BATTLE COMMS" if kind == "beat" else "TEMPLE CONVERSATION" if is_talk else "HOLOLINK  /  MISSION CONTROL",13,UI.GOLD))
+		if is_talk:
+			var portraits := HBoxContainer.new()
+			portraits.add_theme_constant_override("separation",8)
+			visual.add_child(portraits)
+			var pair_names: PackedStringArray = str(scene_data.get("name","")).split(" & ") if scene_data.has("pair") or kind == "scene11" else PackedStringArray()
+			_portrait(portraits,str(pair_names[0]) if pair_names.size() >= 2 else speaker,1.0,Vector2(158,230))
+			_portrait(portraits,str(pair_names[1]) if pair_names.size() >= 2 else "COMMANDER",-1.0,Vector2(158,230))
+			if who != "" or scene_data.has("pair") or kind == "scene11": _bond(visual,who)
+		else:
+			var holo_frame := UI.panel()
+			visual.add_child(holo_frame)
+			var holo := World.new()
+			holo.stage = "holo"
+			holo.planet_key = str(engine.mission(scene_data.get("id","")).get("where",scene_data.get("eyebrow","coruscant")))
+			holo.custom_minimum_size = Vector2(290,225)
+			holo_frame.add_child(holo)
+			visual.add_child(UI.label(str(engine.mission(scene_data.get("id","")).get("where",scene_data.get("eyebrow","TARGET PROJECTION"))).to_upper(),14,UI.ACCENT))
+			_portrait(visual,speaker,1.0,Vector2(290,180))
+		visual.add_child(UI.label("TEMPLE RECORD\nJEDI ARCHIVE · SQUAD 06" if kind == "scene11" else "SECURE TRANSMISSION\nJEDI ARCHIVE · CHANNEL 06",12,UI.MUTED))
 	var frame := UI.panel(Color(0.04,0.075,0.085,0.96))
 	frame.size_flags_horizontal = SIZE_EXPAND_FILL
 	row.add_child(frame)
@@ -141,21 +149,39 @@ func _build_story() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	frame.add_child(scroll)
 	scroll.add_child(content)
+	var speaking := HBoxContainer.new()
+	speaking.add_theme_constant_override("separation",12)
+	content.add_child(speaking)
+	speaker_portrait = Portraits14.picture(speaker,Vector2(54,68) if phone else Vector2(62,78))
+	speaking.add_child(speaker_portrait)
+	speaker_plate = UI.label("SPEAKER  " + speaker.to_upper(),14,UI.ACCENT)
+	speaker_plate.size_flags_horizontal = SIZE_EXPAND_FILL
+	speaking.add_child(speaker_plate)
+	if phone:
+		var skip := UI.button("SKIP",_skip_dialogue)
+		skip.custom_minimum_size = Vector2(64,34)
+		skip.add_theme_font_size_override("font_size",11)
+		speaking.add_child(skip)
 	content.add_child(UI.label(str(scene_data.get("eyebrow","TEMPLE")).to_upper(),13,UI.GOLD))
-	content.add_child(UI.label(scene_data.get("title","The Temple"),32,UI.ACCENT))
-	narrative = UI.label(scene_data.get("text",""),18)
+	content.add_child(UI.label(scene_data.get("title","The Temple"),23 if phone else 32,UI.ACCENT))
+	dialogue_lines = str(scene_data.get("text","")).split("\n",false)
+	if dialogue_lines.is_empty(): dialogue_lines = PackedStringArray([""])
+	dialogue_index = 0
+	narrative = UI.label(_dialogue_text(dialogue_lines[0]),16 if phone else 18)
 	content.add_child(narrative)
 	typed = 0
 	narrative.visible_characters = 0
-	var reveal := UI.button("Read conversation" if kind == "scene11" else "Review vision" if kind == "villain11" and int(campaign_state.era) != 2 else "Reveal transmission",_reveal)
+	var reveal := UI.button("TAP TO ADVANCE  ›",_advance_dialogue)
 	reveal.custom_minimum_size.y = 30
 	reveal.add_theme_font_size_override("font_size",12)
 	content.add_child(reveal)
+	if not phone: content.add_child(UI.button("SKIP DIALOGUE",_skip_dialogue))
 	if scene_data.get("goal","") != "":
 		content.add_child(UI.label("OBJECTIVE  /  " + str(scene_data.goal),16,UI.GOLD))
 	content.add_child(UI.label("YOUR DECISION",13,UI.MUTED))
 	choices_box = UI.column(8)
 	content.add_child(choices_box)
+	choices_box.visible = false
 	for choice in scene_data.get("choices",[]):
 		var card := UI.column(3)
 		choices_box.add_child(card)
@@ -189,11 +215,7 @@ func _portrait(parent: Node, caption: String, facing: float, dimensions: Vector2
 	parent.add_child(frame)
 	var column := UI.column(6)
 	frame.add_child(column)
-	var portrait := World.new()
-	portrait.stage = "portrait"
-	portrait.facing = facing
-	portrait.unit_kind = "scout" if (facing < 0 and not scene_data.has("pair")) or caption in ["Doc Bren","Sgt. Rhal Dax","Ilsa Myr","Grak Ordo"] else "jedi"
-	portrait.custom_minimum_size = dimensions
+	var portrait := Portraits14.picture(caption,dimensions)
 	column.add_child(portrait)
 	column.add_child(UI.label(caption.to_upper(),12,UI.ACCENT))
 	portrait_count += 1
@@ -253,6 +275,35 @@ func _process(delta: float) -> void:
 
 func _reveal() -> void:
 	if is_instance_valid(narrative): narrative.visible_characters = -1
+
+func _dialogue_text(line: String) -> String:
+	var cut := line.find(": ")
+	return line.substr(cut+2) if cut > 0 and cut < 40 else line
+
+func _advance_dialogue() -> void:
+	if narrative.visible_characters != -1:
+		_reveal()
+		return
+	if dialogue_index + 1 >= dialogue_lines.size():
+		choices_box.visible = true
+		return
+	dialogue_index += 1
+	var line := dialogue_lines[dialogue_index]
+	var cut := line.find(": ")
+	if cut > 0 and cut < 40:
+		var name := line.substr(0,cut)
+		speaker_plate.text = "SPEAKER  " + name.to_upper()
+		speaker_portrait.texture = Portraits14.texture(name)
+	narrative.text = _dialogue_text(line)
+	narrative.visible_characters = 0
+	typed = 0
+	if dialogue_index + 1 == dialogue_lines.size(): choices_box.visible = true
+
+func _skip_dialogue() -> void:
+	dialogue_index = dialogue_lines.size()-1
+	narrative.text = _dialogue_text(dialogue_lines[dialogue_index])
+	_reveal()
+	choices_box.visible = true
 
 func _choose(id: String, animate: bool = false) -> void:
 	if decision_recorded: return

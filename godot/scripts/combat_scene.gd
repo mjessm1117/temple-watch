@@ -12,6 +12,7 @@ func _setup_scene() -> void:
 	g.get_node("/root/Graphics").battle = true
 	g.get_node("/root/Graphics").apply_all.call_deferred()
 	g.tree_exiting.connect(_restore_render_quality)
+	g.get_tree().process_frame.connect(preload("res://scripts/story14_comms.gd").new(g).sample)
 	g.terrain = Node3D.new(); g.terrain.name = "Terrain"; g.add_child(g.terrain)
 	g.figures = Node3D.new(); g.figures.name = "Units"; g.add_child(g.figures)
 	# Position anchor for the shared renderer’s escort model; prevents the legacy cube.
