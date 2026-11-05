@@ -59,9 +59,9 @@ func preview(actor: Dictionary, target: Dictionary) -> void:
 	direction = direction.normalized()
 	var side := Vector3(-direction.z, 0.0, direction.x)
 	var phone: bool = g.hud_controls != null and g.hud_controls.phone != null
-	var shoulder := origin - direction * (7.8 if phone else 3.0) + side * (0.75 if phone else 1.0) + Vector3.UP * (3.0 if phone else 2.2)
+	var shoulder := origin - direction * (0.4 if phone else 0.6) + side * (14.0 if phone else 10.0) + Vector3.UP * (2.7 if phone else 2.6)
 	shoulder = preload("res://scripts/battle11_camera.gd").aim_position(g.mission, shoulder)
-	var look := destination + Vector3.UP * (-0.05 if phone else 0.75)
+	var look := origin.lerp(destination, 0.5) + Vector3.UP * (-0.35 if phone else 0.75)
 	g.cinematic = true
 	preview_tween = g.create_tween().set_parallel(true)
 	preview_tween.tween_property(g.camera, "position", shoulder, AIM_BLEND).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)

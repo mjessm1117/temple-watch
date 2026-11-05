@@ -146,12 +146,12 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 	glyph.texture = cropped
 	glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; glyph.stretch_mode = TextureRect.STRETCH_SCALE
 	var art_height := 51.0 if compact else 61.0
-	var art_width := minf(art_height * cropped.region.size.x / cropped.region.size.y, 42.0 if compact else 48.0)
-	glyph.position = Vector2(2.0 + ((42.0 if compact else 48.0) - art_width) * 0.5, 8 if compact else 16)
+	var art_width := minf(art_height * cropped.region.size.x / cropped.region.size.y, 30.0 if compact else 48.0)
+	glyph.position = Vector2(2.0 + ((32.0 if compact else 48.0) - art_width) * 0.5, 8 if compact else 16)
 	glyph.size = Vector2(art_width, art_height)
 	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(glyph)
-	var name_label := S.label(title, 7, S.CYAN)
-	name_label.position = Vector2(54 if compact else 53, 4 if compact else 10)
+	var name_label := S.label(title, 6 if compact else 7, S.CYAN)
+	name_label.position = Vector2(35 if compact else 53, 4 if compact else 10)
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
 	var display_value := value.get_slice(" (", 0) if key == "form" else value
 	display_value = display_value.trim_suffix(" saber").trim_suffix(" robes")

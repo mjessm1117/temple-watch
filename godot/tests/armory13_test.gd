@@ -16,9 +16,17 @@ func check_slots(screen: Control, size_name: String) -> void:
 	var bounds := Rect2(Vector2.ZERO, root.size)
 	for tile in screen.arsenal.slot_row.get_children():
 		var art: TextureRect = tile.get_node("GearArt")
+		var heading: Label = null
+		for child in tile.get_children():
+			if child is Label and child != tile.get_node("ItemName") and child != tile.get_node("Tier"):
+				heading = child; break
 		var item: Label = tile.get_node("ItemName")
 		var tier: Label = tile.get_node("Tier")
 		check(bounds.encloses(tile.get_global_rect()), size_name + " slot fits screen: " + tile.name)
+		check(heading != null, size_name + " slot heading exists: " + tile.name)
+		if heading != null:
+			var heading_width: float = heading.get_theme_font("font").get_string_size(heading.text, HORIZONTAL_ALIGNMENT_LEFT, -1, heading.get_theme_font_size("font_size")).x
+			check(heading.position.x >= 4.0 and heading.position.x + heading_width <= tile.size.x - 4.0, size_name + " heading has four pixel side padding: " + tile.name + " (%.1f + %.1f / %.1f)" % [heading.position.x, heading_width, tile.size.x])
 		if size_name == "phone":
 			check(tile.size.y <= 70, size_name + " uses compact card height: " + tile.name)
 			check(screen.arsenal.get_parent().get_global_rect().encloses(tile.get_global_rect()), size_name + " slot is visible without scrolling: " + tile.name)
@@ -45,7 +53,9 @@ func run() -> void:
 	var graphics = root.get_node("Graphics")
 	var original_tier: String = graphics.effective
 	for dimensions in [Vector2i(1366, 768), Vector2i(844, 390)]:
+		DisplayServer.window_set_size(dimensions)
 		root.size = dimensions
+		root.content_scale_size = dimensions
 		graphics.effective = "low"
 		var expected_mark := 3 if dimensions.x == 844 else 2
 		flow.campaign.soldier("u1").gear.mk.s = expected_mark
@@ -54,6 +64,15 @@ func run() -> void:
 		screen.inspect(0); await process_frame
 		var size_name := "phone" if dimensions.x == 844 else "desktop"
 		check_slots(screen, size_name)
+		if size_name == "phone":
+			await create_timer(1.1).timeout
+			var actor = screen.stage.actors[screen.focus_index]
+			var hero_bottom := -INF
+			for x in [-0.55, 0.55]:
+				for z in [-0.55, 0.55]:
+					var point: Vector2 = screen.stage.camera.unproject_position(actor.global_position + Vector3(x, 0.0, z))
+					hero_bottom = maxf(hero_bottom, screen.stage_container.global_position.y + point.y)
+			check(hero_bottom <= screen.card_scroll.get_global_rect().position.y - 8.0, "phone hero feet clear roster: %.1f" % hero_bottom)
 		var weapon: Button = screen.arsenal.slot_row.get_node("Slot_weapon")
 		check(weapon.get_node("Tier").text == ("Mk III" if expected_mark == 3 else "Mk II"), size_name + " upgraded mark is explicit")
 		check(weapon.get_node("TierPip2").color == (Theme13.GOLD if expected_mark == 3 else Color("2b3d44")), size_name + " three tier pips track mark")

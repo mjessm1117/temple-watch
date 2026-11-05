@@ -25,7 +25,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	var heading := HBoxContainer.new(); strip.add_child(heading)
 	g.objective_label.reparent(heading); g.objective_label.add_theme_font_size_override("font_size", 12)
 	g.objective_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	g.objective_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	g.objective_label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	g.objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
 	unit_card.custom_minimum_size = Vector2(155, 44)
@@ -165,6 +165,10 @@ func _update_actions(from_game: bool) -> void:
 		for button in ability_buttons:
 			if button.ability_id == mode and bool(button.get_meta("battle12_available", false)):
 				primary.append(mode); break
+	for button in ability_buttons:
+		if primary.size() >= 5: break
+		if bool(button.get_meta("battle12_available", false)) and button.ability_id not in primary:
+			primary.append(button.ability_id)
 	for button in ability_buttons:
 		button.visible = bool(button.get_meta("battle12_available", false)) and button.ability_id in primary
 	var overflow := 0

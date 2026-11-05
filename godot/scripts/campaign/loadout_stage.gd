@@ -109,7 +109,7 @@ func _process(delta: float) -> void:
 	var look := gaze
 	if focused >= 0 and focused < actors.size():
 		look = Vector3(0, 1.2, 0)
-		target = look + Vector3(0.0, 0.25, 3.1)
+		target = look + Vector3(0.0, 0.25, 5.5 if get_viewport().get_visible_rect().size.x < 250.0 else 3.1)
 	target += Vector3(sin(time * 0.18) * 0.06, sin(time * 0.23) * 0.025, cos(time * 0.16) * 0.04)
 	camera.position = camera.position.lerp(target, 1.0 - exp(-delta * 4.0))
 	gaze = gaze.lerp(look if focused >= 0 else Vector3(0, 1.06, 0), 1.0 - exp(-delta * 4.0))

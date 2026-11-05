@@ -244,7 +244,11 @@ func _refresh() -> void:
 			u = survivors[0]
 	var objective: Dictionary = g.mission.objective_status()
 	var clock_note := " · %d turns left" % int(objective.turns_left) if int(objective.turns_left) >= 0 else " · clock starts on reveal" if objective.get("clock_trigger", "") == "concealment" else ""
-	g.objective_label.text = "TURN %d · %s%s · %s" % [g.mission.turn,objective.label,clock_note,str(objective.phase).to_upper()]
+	if phone != null:
+		var brief: String = str(objective.label).replace("Rescue Mira and escort to evac", "Rescue Mira → evac")
+		g.objective_label.text = "T%d · %s · %d left" % [g.mission.turn, brief, int(objective.turns_left)] if int(objective.turns_left) >= 0 else "T%d · %s" % [g.mission.turn, brief]
+	else:
+		g.objective_label.text = "TURN %d · %s%s · %s" % [g.mission.turn,objective.label,clock_note,str(objective.phase).to_upper()]
 	g.selected_label.text = "%s\n%s%s\nHP %s\nAP %s\nFOCUS %d  •  MEDPACS %d%s" % [u.get("name", ""), u.get("class_name", ""), "  WOUNDED" if bool(u.get("wounded", false)) else "", "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), ap_pips(u), int(u.get("focus_left", 0)), int(u.get("medpacs", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
 	if u.has("ammo"): g.selected_label.text += "\nAMMO %d/%d" % [int(u.ammo), int(u.clip)]
 	# --- wave10 story ---
