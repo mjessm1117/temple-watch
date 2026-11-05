@@ -85,6 +85,10 @@ func room(parent: Node3D, info: Dictionary) -> Node3D:
 			brace.rotation.z = 0.55 if x < 0 else -0.55
 		for y in [0.6, 1.4]: box(cell, Vector3(0, y, -0.7), Vector3(width, 0.05, 0.05), Color("4c514b"))
 		return cell
+	# Recessed practicals and a worn floor strip give each occupied bay depth.
+	box(cell, Vector3(0, height * 0.66, -1.36), Vector3(width * 0.46, 0.52, 0.035), Color("10242d"))
+	box(cell, Vector3(0, height * 0.66, -1.32), Vector3(width * 0.32, 0.025, 0.04), color, 1.4)
+	box(cell, Vector3(0, 0.105, 0.84), Vector3(width * 0.48, 0.018, 1.12), color.darkened(0.72))
 	for x in [-width * 0.34, width * 0.34]:
 		box(cell, Vector3(x, height - 0.15, 0.3), Vector3(0.85, 0.04, 0.28), color, 1.4)
 	for x in [-1.0, 0.0, 1.0]:

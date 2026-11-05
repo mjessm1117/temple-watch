@@ -18,6 +18,7 @@ var tabs: HBoxContainer
 var tab_scroll: ScrollContainer
 var chips: HFlowContainer
 var scroll: ScrollContainer
+var excerpt: Label
 var page := "Briefing"
 var region := "outer"
 var planet := ""
@@ -91,6 +92,13 @@ func _build() -> void:
 	offer_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(offer_scroll)
 	if compact: offer_scroll.hide()
 	chips = HFlowContainer.new(); chips.size_flags_horizontal = Control.SIZE_EXPAND_FILL; offer_scroll.add_child(chips)
+	if compact:
+		var summary := HBoxContainer.new(); column.add_child(summary)
+		excerpt = UI.label("", 12, UI.TEXT); excerpt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		excerpt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		summary.add_child(excerpt)
+		var more := UI.button("MORE", func(): scroll.scroll_vertical = 92)
+		more.name = "BriefingMore"; more.custom_minimum_size = Vector2(52, 40); summary.add_child(more)
 	scroll = ScrollContainer.new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
 	detail = UI.column(10); detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(detail)
@@ -112,6 +120,13 @@ func _show_details() -> void:
 	if transition and transition.is_running(): transition.kill()
 	detail.position.x = 0; detail.modulate.a = 1
 	UI.clear(detail); scroll.scroll_vertical = 0
+	if excerpt != null:
+		excerpt.get_parent().visible = page == "Briefing" and not campaign.state.options.is_empty()
+		if not campaign.state.options.is_empty():
+			var offer: Dictionary = campaign.state.options[clampi(selected, 0, campaign.state.options.size() - 1)]
+			var mission: Dictionary = campaign.story.mission(str(offer.mission))
+			var copy := str(offer.get("text", mission.get("brief", "Awaiting briefing."))).replace("\n", " ")
+			excerpt.text = copy.substr(0, 34).strip_edges() + ("…" if copy.length() > 34 else "")
 	launch_button.visible = page == "Briefing"
 	launch_button.disabled = campaign.state.options.is_empty() or not campaign.state.pending_mission.is_empty()
 	if not campaign.state.options.is_empty(): launch_button.disabled = launch_button.disabled or campaign.default_squad(campaign.state.options[selected]).is_empty()
