@@ -14,15 +14,16 @@ All captures were opened and inspected at their native sizes. Additional [Ressa]
 
 | View | Before draws / tris | After draws / tris | Change |
 | --- | ---: | ---: | ---: |
-| 844 × 390 Compatibility/Low, Kira Mk II | [113 / 26,261](../../shots/wave16-armory-before-phone-low-u1-mk2.png) | [117 / 19,602](../../shots/wave16-armory-after-phone-low-u1-mk2.png) | +3.5% / −25.4% |
-| 1366 × 768 Forward+/High, Kira Mk II | [153 / 47,702](../../shots/wave16-armory-before-desktop-high-u1-mk2.png) | [161 / 34,866](../../shots/wave16-armory-after-desktop-high-u1-mk2.png) | +5.2% / −26.9% |
-| 844 × 390 Compatibility/Low, armored trooper | — | [113 / 25,085](../../shots/wave16-armory-after-phone-low-u3-mk2.png) | — |
+| 844 × 390 Compatibility/Low, Kira Mk II | [113 / 26,201](../../shots/wave16-armory-before-phone-low-u1-mk2.png) | [117 / 19,602](../../shots/wave16-armory-after-phone-low-u1-mk2.png) | +3.5% / −25.2% |
+| 1366 × 768 Forward+/High, Kira Mk II | [153 / 47,632](../../shots/wave16-armory-before-desktop-high-u1-mk2.png) | [161 / 34,866](../../shots/wave16-armory-after-desktop-high-u1-mk2.png) | +5.2% / −26.8% |
+| 844 × 390 Compatibility/Low, armored trooper | [110 / 24,385](../../shots/wave16-armory-before-phone-low-u3-mk2.png) | [113 / 25,085](../../shots/wave16-armory-after-phone-low-u3-mk2.png) | +2.7% / +2.9% |
+| 1366 × 768 Forward+/High, armored trooper | [154 / 44,346](../../shots/wave16-armory-before-desktop-high-u3-mk2.png) | [160 / 46,178](../../shots/wave16-armory-after-desktop-high-u3-mk2.png) | +3.9% / +4.1% |
 
-The Low Kira view stays under the +15% draw and +20% triangle ceilings. Low adds no post effect. Source GLBs and PNGs total 1,140,281 bytes; their imported cache totals 539,276 bytes, together below the +3 MB web pack allowance. Xvfb software-rendered FPS samples vary with concurrent host load; the 60 FPS phone target needs a device run.
+Both Low views stay under the +15% draw and +20% triangle ceilings. Low adds no post effect. Source GLBs and PNGs total 1,140,281 bytes; their imported cache totals 539,276 bytes, together below the +3 MB web pack allowance. Xvfb software-rendered FPS samples vary with concurrent host load; the 60 FPS phone target needs a device run.
 
 ## Gate
 
-- Headless import: exit 0.
+- Final headless import: exit 0; [log](import.log).
 - `armory16_test`: 155 checks, 0 failures; `armory15_test`: 50 checks, 0 failures; `armory13_test`: 253 checks, 0 failures.
-- Full `./godot/test.sh`: pending final result; Normal rescue **9/20**.
+- Full `./godot/test.sh`: exit 0; 62 zero-failure lines, 0 `SCRIPT ERROR`, 0 `ERROR:` or nonzero failure matches; Normal rescue **9/20**. [Log](test.log).
 - `git diff --check`: clean.
