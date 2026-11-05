@@ -157,7 +157,7 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 	b.tooltip_text = value
 	var art_key: String = str({"weapon":"saber" if icon == "strike" else "blaster", "armor":icon, "utility":"utility", "base_mod":"module", "armor_mod":"armor_mod", "form":"form", "color":"crystal", "evolution":"path"}.get(key, "module"))
 	var glyph := TextureRect.new(); glyph.name = "GearArt"
-	var source: Texture2D = Art16.texture_for(key, jedi_actor, mark, actor_color, art_key)
+	var source: Texture2D = Art16.tile_for(key, jedi_actor, mark, actor_color, art_key)
 	var cropped := AtlasTexture.new()
 	cropped.atlas = source
 	cropped.region = source.get_image().get_used_rect()

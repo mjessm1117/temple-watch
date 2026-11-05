@@ -67,7 +67,7 @@ static func attach(model: Node3D, r: Dictionary, jedi: bool) -> void:
 	var tint := Color("705b47") if mark == 1 else Color("587e84") if mark == 2 else Color("907344")
 	if not jedi: tint = tint.lerp(Color("b1c4c6"), 0.28)
 	if armor == "beskar": tint = tint.lerp(Color("c9d3cb"), 0.38)
-	var front := float(JEDI_DEPTH.get(str(r.get("n", "")), 0.40)) if jedi else 0.17
+	var front := float(JEDI_DEPTH.get(str(r.get("n", "")), 0.40)) if jedi else 0.35
 	_piece(sk, chest, "spine_03", "ArmorPlate", spine + Vector3(0, 0, span * front), Vector3(span * 0.76, torso_height * 0.78, span * 0.58), tint, show, low)
 	for side in ["l", "r"]:
 		var arm := _position(sk, "upperarm_" + side)

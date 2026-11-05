@@ -1,6 +1,8 @@
 extends RefCounted
 const S = preload("res://scripts/campaign/loadout_style.gd")
 const Gear = preload("res://scripts/campaign/gear.gd")
+const Art16 = preload("res://scripts/campaign/armory16_art.gd")
+const Progression = preload("res://scripts/campaign/progression.gd")
 
 static func make(c, r: Dictionary, slot: Button, phone: bool) -> PanelContainer:
 	var card := S.panel(); card.name = "Armory15Preview"
@@ -15,7 +17,15 @@ static func make(c, r: Dictionary, slot: Button, phone: bool) -> PanelContainer:
 	var stat_line := S.label(stat_text, 9 if phone else 11, S.GOLD)
 	stat_line.clip_text = true; col.add_child(stat_line)
 	var icon := TextureRect.new(); icon.name = "LargeGearArt"
+	var slot_key := slot.name.trim_prefix("Slot_")
+	var mark := ["Mk I", "Mk II", "Mk III"].find(slot.get_node("Tier").text) + 1
 	icon.texture = slot.get_node("GearArt").texture
+	if slot_key in ["weapon", "armor", "color", "base_mod", "armor_mod"]:
+		var source: Texture2D = Art16.texture_for(slot_key, Progression.is_jedi(r), mark, str(r.get("col", "#62b3ff")), "saber")
+		var cropped := AtlasTexture.new()
+		cropped.atlas = source
+		cropped.region = source.get_image().get_used_rect()
+		icon.texture = cropped
 	icon.custom_minimum_size = Vector2(120, 120) if phone else Vector2(200, 200)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED

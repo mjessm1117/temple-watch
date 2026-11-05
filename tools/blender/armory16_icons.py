@@ -5,6 +5,8 @@ from pathlib import Path
 
 OUT = Path(__file__).resolve().parents[2] / "godot/assets/ui/armory16"
 OUT.mkdir(parents=True, exist_ok=True)
+TILES = OUT / "tiles"
+TILES.mkdir(exist_ok=True)
 
 
 def mat(name, color, metal=0.0, rough=0.42, emit=0.0):
@@ -176,4 +178,10 @@ for CURRENT, create in ITEMS:
     clear()
     create()
     studio()
+    thumb = bpy.data.images.load(str(OUT / f"{CURRENT}.png"), check_existing=False)
+    thumb.scale(128, 128)
+    thumb.filepath_raw = str(TILES / f"{CURRENT}.png")
+    thumb.file_format = 'PNG'
+    thumb.save()
+    bpy.data.images.remove(thumb)
     print("ARMORY16 ICON", CURRENT)

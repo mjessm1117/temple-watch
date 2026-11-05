@@ -82,6 +82,8 @@ func run() -> void:
 		for slot in ["weapon", "armor"]:
 			var art: Texture2D = Art.texture_for(slot, true, mark, "#62b3ff", "saber")
 			check(art.get_width() >= 256 and art.get_height() >= 256, "Mk%d %s art is card size" % [mark, slot])
+			var tile: Texture2D = Art.tile_for(slot, true, mark, "#62b3ff", "saber")
+			check(tile.get_width() == 128 and tile.get_height() == 128, "Mk%d %s tile remains 128 pixels" % [mark, slot])
 	for color in ["#62b3ff", "#72e0a4", "#f2d36b", "#c58cff", "#e6eef6"]:
 		var art: Texture2D = Art.texture_for("color", true, 1, color, "crystal")
 		check(art.get_width() >= 256, "%s crystal art exists" % color)
