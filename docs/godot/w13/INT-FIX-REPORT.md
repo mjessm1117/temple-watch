@@ -24,3 +24,10 @@ The one edit outside the file lease is `godot/scripts/campaign/loadout_stage.gd`
 ## Captures inspected
 
 All four were overwritten in `/home/jess/projects/tw-logs/w13/shots/` and inspected: `int-battle-tactical-phone.png` (844×390), `int-battle-aim-phone.png` (844×390), `int-battle-aim-desktop.png` (1366×768), and `int-armory-phone.png` (844×390).
+
+## Aim framing follow-up
+
+- Moved only the phone preview camera closer and lower (side offset 14 → 10, height 2.7 → 2.0) and raised its look point to 0.58. The desktop branch is unchanged.
+- `battle13_test` now checks both phone bodies are at least 55 px tall, both full unit bounds clear the header and action panel by 8 px, and the hit-chance badge covers neither body. The tighter body-height checks fail on 8c32bb5 (48 px each); after the fix they measure about 67 px each. The existing separation and desktop checks remain green.
+- Headless import and `./godot/test.sh` exited 0. Every suite reported 0 failures, there were 0 `SCRIPT ERROR` lines, Normal rescue was 9/20, and `git diff --check` was clean.
+- Recaptured and inspected `int-battle-aim-phone.png` (844×390, Compatibility/Low) and `int-battle-aim-desktop.png` (1366×768, Forward+/Medium) in `/home/jess/projects/tw-logs/w13/shots/` with `battle13_capture.gd` under Xvfb.

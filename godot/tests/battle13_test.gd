@@ -29,9 +29,9 @@ func aim_body_bounds(game, unit: Dictionary) -> Rect2:
 	var at: Vector3 = game.views[int(unit.id)].global_position
 	var bounds := Rect2()
 	var first := true
-	for x in [-0.35, 0.35]:
-		for y in [0.0, 2.3]:
-			for z in [-0.35, 0.35]:
+	for x in [-0.3, 0.3]:
+		for y in [0.2, 1.85]:
+			for z in [-0.3, 0.3]:
 				var point: Vector2 = game.camera.unproject_position(at + Vector3(x, y, z))
 				if first: bounds = Rect2(point, Vector2.ZERO); first = false
 				else: bounds = bounds.expand(point)
@@ -114,6 +114,25 @@ func exercise(size: Vector2i) -> void:
 	var shooter_bounds := aim_body_bounds(game, actor)
 	var target_bounds := aim_body_bounds(game, target)
 	check(not shooter_bounds.intersects(target_bounds), "shooter and target screen bounds do not overlap at %s: %s / %s" % [size, shooter_bounds, target_bounds])
+	if size.x < 1000:
+		var phone = game.hud_controls.phone
+		var header_bottom: float = phone.overlay.get_child(0).get_global_rect().end.y
+		var hud_top: float = minf(aim.panel.get_global_rect().position.y, phone.overlay.find_child("AbilityTray", true, false).get_global_rect().position.y)
+		for bounds in [shooter_bounds, target_bounds]:
+			check(bounds.size.y >= 55.0, "phone aim unit height is at least 55 px: %s" % bounds)
+		for unit in [actor, target]:
+			var bounds := unit_bounds(game, unit)
+			check(bounds.position.y >= header_bottom + 8.0 and bounds.end.y <= hud_top - 8.0 and bounds.position.x >= 8.0 and bounds.end.x <= size.x - 8.0, "phone aim unit fits between header and action panel: %s" % bounds)
+		game.hud_controls.night.update_chips()
+		await process_frame
+		var chips: Control = game.hud_controls.night.chips
+		var hit_chip: Control = null
+		for chip in chips.get_children():
+			if "HIT" in chip.text: hit_chip = chip; break
+		check(hit_chip != null, "phone hit-chance badge is visible")
+		if hit_chip != null:
+			var chip_bounds := hit_chip.get_global_rect()
+			check(not chip_bounds.intersects(shooter_bounds) and not chip_bounds.intersects(target_bounds), "phone hit-chance badge clears both units: %s" % chip_bounds)
 	var origin := Vector3(float(actor.x), Shot.elevation(game.mission, Shot.pos(actor)) * 0.7, float(actor.y))
 	var destination := Vector3(float(target.x), Shot.elevation(game.mission, Shot.pos(target)) * 0.7, float(target.y))
 	var shot_direction := destination - origin; shot_direction.y = 0.0
