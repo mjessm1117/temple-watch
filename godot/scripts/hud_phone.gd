@@ -10,6 +10,7 @@ var popup: PanelContainer
 var popup_body: VBoxContainer
 var open_card := ""
 var more_button: Button
+var ability_tray: PanelContainer
 var ability_buttons: Array[Button] = []
 var end_confirm := false
 
@@ -38,6 +39,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	target_card = _button("TARGET", _toggle.bind("target")); target_card.name = "TargetCard"
 	target_card.visible = false; overlay.add_child(target_card)
 	var tray := PanelContainer.new(); tray.name = "AbilityTray"
+	ability_tray = tray
 	tray.anchor_left = 0.5; tray.anchor_right = 0.5
 	tray.anchor_top = 1.0; tray.anchor_bottom = 1.0
 	tray.offset_left = -minf(340.0, root.size.x * 0.47)

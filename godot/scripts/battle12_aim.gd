@@ -9,6 +9,7 @@ var confirm: Button
 var details: Button
 var summary: Label
 var phone := false
+var sight: Control
 
 static func phone_frame_point(game, midpoint: Vector3) -> Vector3:
 	var size: Vector2i = preload("res://scripts/phone_layout.gd").window_size()
@@ -27,14 +28,19 @@ func setup(game, root: Control, on_phone: bool) -> void:
 	panel.offset_right = minf(350.0, root.size.x * 0.47)
 	if phone:
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
-		panel.offset_top = -126; panel.offset_bottom = -78
+		panel.offset_top = -62; panel.offset_bottom = -4
 	else:
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
-		panel.offset_top = -260; panel.offset_bottom = -174
+		panel.offset_top = -114; panel.offset_bottom = -8
 	var style := StyleBoxFlat.new(); style.bg_color = Color("101b26ee")
 	style.border_color = Color("d2aa65"); style.set_border_width_all(1)
 	style.set_content_margin_all(4); panel.add_theme_stylebox_override("panel", style)
 	root.add_child(panel)
+	sight = preload("res://scripts/battle14_sight.gd").new()
+	sight.name = "AimSight"; sight.game = g
+	sight.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	root.add_child(sight)
+	root.move_child(sight, panel.get_index())
 	var body := VBoxContainer.new(); body.add_theme_constant_override("separation", 2); panel.add_child(body)
 	summary = Label.new(); summary.name = "TargetSummary"; summary.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	summary.add_theme_font_size_override("font_size", 14); summary.add_theme_color_override("font_color", Color("f2d99a"))
@@ -62,6 +68,12 @@ func refresh() -> void:
 	var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var active: bool = g.action != "move" and g.action != "free" and g.action != "overwatch" and g.action != "hunker" and g.target_id >= 0 and not actor.is_empty() and g.mission.phase == "player" and g.mission.result == ""
 	panel.visible = active
+	sight.visible = active
+	if phone and g.hud_controls.phone != null:
+		g.hud_controls.phone.ability_tray.visible = not active
+		g.hud_controls.phone.ability_tray.offset_top = 0.0 if active else -76.0
+	elif g.hud_controls.desktop_bottom != null:
+		g.hud_controls.desktop_bottom.visible = not active
 	if not active:
 		g.cam.end_preview()
 		return
@@ -76,7 +88,7 @@ func refresh() -> void:
 		var label := str(enemy.name)
 		if g.action in ["shoot", "strike"]:
 			var info: Dictionary = Shot.calculate(g.mission, actor, enemy, g.action == "strike")
-			label += ("\nHP %d/%d · %d%%" % [int(enemy.hp), int(enemy.max_hp), int(info.hit)]) if phone else ("\n%d%% HIT" % int(info.hit))
+			label += (" · %d/%d" % [int(enemy.hp), int(enemy.max_hp)]) if phone else ("\n%d%% HIT" % int(info.hit))
 		var chip := _button(label, 104 if not phone else 130, func() -> void: g.target_id = id; g._frame_target(); g._show_shot())
 		chip.add_theme_color_override("font_color", Color("f6d28a") if id == g.target_id else Color("e3edf0"))
 		targets.add_child(chip)

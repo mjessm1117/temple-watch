@@ -14,6 +14,7 @@ var phone
 var bar
 var left_panel: PanelContainer
 var right_panel: PanelContainer
+var desktop_bottom: PanelContainer
 var aim_ui
 
 static func ap_pips(unit: Dictionary) -> String:
@@ -178,6 +179,7 @@ func _build_ui() -> void:
 	right_box.add_child(_label("COMBAT LOG", 17))
 	g.log_label = _label("", 14); g.log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.log_label)
 	var bottom := PanelContainer.new(); bottom.anchor_left = 0.5; bottom.anchor_right = 0.5
+	desktop_bottom = bottom
 	bottom.anchor_top = 1.0; bottom.anchor_bottom = 1.0
 	bottom.offset_left = -380; bottom.offset_right = 380; bottom.offset_top = -164
 	root.add_child(bottom); _style_panel(bottom)

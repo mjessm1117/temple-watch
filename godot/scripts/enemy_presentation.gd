@@ -138,6 +138,8 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 			else: victim.fall(); game.views.erase(int(event.target))
 	if damage > 0: game.sound.play("hit")
 	if not game.cam.skip_requested and (outcome == "crits" or bool(event.killed)): game.fx.hit_stop()
+	if not game.cam.skip_requested and (outcome == "crits" or bool(event.killed)):
+		await game.cam.impact_beat(to)
 	if victim != null and not bool(event.killed): victim.set_status(game.mission.unit_by_id(int(event.target)))
 	if actor != null: actor.set_status(game.mission.unit_by_id(int(event.actor)))
 	game.cam.trace.append("impact_%d" % int(event.actor))

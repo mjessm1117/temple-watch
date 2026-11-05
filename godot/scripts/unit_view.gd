@@ -16,6 +16,7 @@ var _action_serial := 0
 var _cover_level := 0
 var downed := false
 var enemy_side := false
+var aim_ready := false
 
 func setup(u: Dictionary, scene: PackedScene, at: Vector3) -> void:
 	unit_id = int(u.id)
@@ -121,6 +122,16 @@ func face(point: Vector3) -> void:
 	if turn_motion != null and turn_motion.is_running(): turn_motion.kill()
 	turn_motion = _paced_tween()
 	turn_motion.tween_property(self, "rotation:y", rotation.y + wrapf(goal - rotation.y, -PI, PI), 0.12).set_trans(Tween.TRANS_SINE)
+
+func set_aim_ready(value: bool, point: Vector3) -> void:
+	if model == null or not alive or downed: return
+	if value: face(point)
+	if aim_ready == value: return
+	aim_ready = value
+	if pose_motion != null and pose_motion.is_running(): pose_motion.kill()
+	pose_motion = _paced_tween().set_parallel(true)
+	pose_motion.tween_property(model, "rotation:x", -0.16 if value else 0.0, 0.17)
+	pose_motion.tween_property(model, "rotation:z", -0.08 if value and base_clip == "saberIdle" else 0.0, 0.17)
 
 func travel(route: Array) -> void:
 	if motion != null and motion.is_running(): motion.kill()
