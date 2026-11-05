@@ -7,6 +7,7 @@ const Base = preload("res://scripts/campaign/strat_base.gd")
 const Preview = preload("res://scripts/campaign/armory12_preview.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
 const Preview15 = preload("res://scripts/campaign/armory15_preview.gd")
+const Art16 = preload("res://scripts/campaign/armory16_art.gd")
 var host: Control
 var soldier_id := ""
 var offers: Array[Dictionary] = []
@@ -19,12 +20,15 @@ var preview_card: PanelContainer
 var hangar_sign: Label
 var feature_row: HBoxContainer
 var skill_view := false
+var jedi_actor := false
+var actor_color := "#62b3ff"
 
 func setup(owner_screen: Control, id: String) -> void:
 	host = owner_screen; soldier_id = id; active_slot = host.armory_slot
 	add_theme_constant_override("separation", 7)
 	var c = host.flow.session(); var r: Dictionary = c.soldier(id)
 	var jedi := Progression.is_jedi(r)
+	jedi_actor = jedi; actor_color = str(r.get("col", actor_color))
 	feature_row = HBoxContainer.new(); feature_row.add_theme_constant_override("separation", 6); add_child(feature_row)
 	slot_row = GridContainer.new(); slot_row.columns = 4
 	slot_row.size_flags_horizontal = SIZE_EXPAND_FILL
@@ -153,7 +157,7 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 	b.tooltip_text = value
 	var art_key: String = str({"weapon":"saber" if icon == "strike" else "blaster", "armor":icon, "utility":"utility", "base_mod":"module", "armor_mod":"armor_mod", "form":"form", "color":"crystal", "evolution":"path"}.get(key, "module"))
 	var glyph := TextureRect.new(); glyph.name = "GearArt"
-	var source: Texture2D = load("res://assets/loadout/icons13/%s.png" % art_key)
+	var source: Texture2D = Art16.texture_for(key, jedi_actor, mark, actor_color, art_key)
 	var cropped := AtlasTexture.new()
 	cropped.atlas = source
 	cropped.region = source.get_image().get_used_rect()
