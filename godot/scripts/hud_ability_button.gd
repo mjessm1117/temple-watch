@@ -42,10 +42,14 @@ func _draw() -> void:
 	var blue := Color("7ecde7") if not disabled else Color("67737d")
 	draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), Color("111d29"), true)
 	draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), gold, false, 2.0 if active else 1.0)
-	var c := Vector2(size.x * 0.5, size.y * 0.40) if compact else Vector2(29, size.y * 0.55)
+	var c := Vector2(size.x * 0.5, minf(25.0, size.y * 0.35)) if compact else Vector2(29, size.y * 0.55)
 	if compact:
-		draw_string(ThemeDB.fallback_font, Vector2(4, 12), hotkey, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, gold)
-		draw_string(ThemeDB.fallback_font, Vector2(3, size.y - 4), display_name.left(11), HORIZONTAL_ALIGNMENT_CENTER, size.x - 6, 11, Color("edf3f4") if not disabled else Color("87919b"))
+		var font := ThemeDB.fallback_font
+		var label := display_name
+		while label.length() > 1 and font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x > size.x - 6:
+			label = label.left(label.length() - 1)
+		if label != display_name: label = label.left(maxi(1, label.length() - 1)) + "…"
+		draw_string(font, Vector2(3, minf(size.y - 10.0, 46.0)), label, HORIZONTAL_ALIGNMENT_CENTER, size.x - 6, 10, Color("edf3f4") if not disabled else Color("87919b"))
 	else:
 		draw_rect(Rect2(6, 5, 19, 17), Color("30404b"), true)
 		draw_string(ThemeDB.fallback_font, Vector2(9, 18), hotkey, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)

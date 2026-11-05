@@ -68,6 +68,8 @@ func handle_event(event: InputEvent) -> void:
 			if event.pressed and (g.action != "move" or g.preview_tile.x >= 0): g._cancel_order(); return
 			g.drag_button = MOUSE_BUTTON_RIGHT if event.pressed else 0
 		elif event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			if g.cam.preview_active and g.cam.preview_tween != null and g.cam.preview_tween.is_running():
+				g.cam.skip_preview_transition(); return
 			if g.cinematic: g._skip_cinematic()
 			var p: Vector2i = g._screen_tile(event.position)
 			if p.x < 0: return
