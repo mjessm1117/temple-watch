@@ -8,6 +8,8 @@ var vignette: TextureRect
 var target_id := -1
 var rimmed: Dictionary = {}
 var rim_material: ShaderMaterial
+var sun_energy := -1.0
+var ambient_energy := -1.0
 
 func _ready() -> void:
 	process_priority = 10
@@ -26,16 +28,23 @@ func sync(actor: Dictionary, target: Dictionary) -> void:
 	var direction := (destination - source).normalized()
 	var side := Vector3(-direction.z, 0.0, direction.x)
 	if _tier() == "low":
+		if sun_energy < 0.0 and game.scene_view.sun != null:
+			sun_energy = game.scene_view.sun.light_energy
+			game.scene_view.sun.light_energy = sun_energy * 0.58
+		if ambient_energy < 0.0 and game.scene_view.world != null:
+			ambient_energy = game.scene_view.world.environment.ambient_light_energy
+			game.scene_view.world.environment.ambient_light_energy = ambient_energy * 0.7
 		if rim != null: rim.queue_free(); rim = null
 		if key == null:
 			key = OmniLight3D.new(); key.name = "Cine16LowAimKey"; key.shadow_enabled = false; game.add_child(key)
 		key.shadow_enabled = false
 		key.position = source.lerp(destination, 0.5) + side * 1.2 + Vector3.UP * 1.5
 		key.omni_range = maxf(6.0, source.distance_to(destination) * 0.6 + 3.0)
-		key.light_color = Color("ffe3b7"); key.light_energy = 1.35
+		key.light_color = Color("ffd097"); key.light_energy = 2.4
 		if rim_material == null:
 			rim_material = ShaderMaterial.new()
 			rim_material.shader = preload("res://assets/env/unit_rim.gdshader")
+			rim_material.set_shader_parameter("rim_color", Color(0.24, 0.78, 1.0, 0.7))
 		for id in [int(actor.id), int(target.id)]:
 			var view: Node3D = game.views.get(id)
 			if view != null: _rim_model(view.model)
@@ -49,6 +58,7 @@ func sync(actor: Dictionary, target: Dictionary) -> void:
 			game.overlay.move_child(background_tint, 0)
 		_clear_vignette()
 		return
+	_restore_low_mood()
 	_clear_tint()
 	if key == null:
 		key = OmniLight3D.new(); key.name = "Cine15AimKey"; key.omni_range = 7.0
@@ -96,6 +106,7 @@ func _process(_delta: float) -> void:
 func reset() -> void:
 	target_id = -1
 	_clear_rim()
+	_restore_low_mood()
 	_clear_lights(); _clear_tint(); _clear_vignette()
 	if is_instance_valid(game) and game.camera != null and game.camera.attributes is CameraAttributesPractical:
 		game.camera.attributes.dof_blur_far_enabled = false
@@ -116,6 +127,14 @@ func _clear_rim() -> void:
 	for mesh in rimmed:
 		if is_instance_valid(mesh): mesh.material_overlay = rimmed[mesh]
 	rimmed.clear()
+
+func _restore_low_mood() -> void:
+	if sun_energy >= 0.0 and is_instance_valid(game) and game.scene_view.sun != null:
+		game.scene_view.sun.light_energy = sun_energy
+	if ambient_energy >= 0.0 and is_instance_valid(game) and game.scene_view.world != null:
+		game.scene_view.world.environment.ambient_light_energy = ambient_energy
+	sun_energy = -1.0
+	ambient_energy = -1.0
 
 func _clear_tint() -> void:
 	if background_tint != null: background_tint.queue_free(); background_tint = null

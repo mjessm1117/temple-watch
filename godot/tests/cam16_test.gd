@@ -88,6 +88,7 @@ func run() -> void:
 		check(light.key != null and light.rim == null, "Low uses one aim light")
 		check(light.key != null and not light.key.shadow_enabled, "Low aim has no shadow")
 		check(light.rimmed.size() >= 2, "Low rim material covers shooter and target")
+		check(light.sun_energy > game.scene_view.sun.light_energy, "Low aim dims ambient battle light")
 		check(game.camera.attributes == null or not game.camera.attributes.dof_blur_far_enabled, "Low aim has no DOF")
 	var event := {"actor": game.selected_id, "to": Vector2i(game.mission.unit_by_id(game.target_id).x, game.mission.unit_by_id(game.target_id).y), "killed": true}
 	check(Killcam.eligible(game, event), "Jedi killing blow is eligible")
@@ -100,6 +101,7 @@ func run() -> void:
 		check(await wait_trace(game, "jedi_killcam_close", 5.0), "actual Jedi kill reaches close-up")
 		check(await wait_done(game, 2.0), "close-up returns to tactical")
 		check("jedi_killcam_return" in game.cam.trace and not game.cinematic, "camera returns after kill")
+		check(light.sun_energy < 0.0 and light.key == null, "aim light resets after attack")
 		game.queue_free()
 		for i in range(3): await process_frame
 		game = await fixture()
