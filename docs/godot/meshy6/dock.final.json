@@ -1,0 +1,12 @@
+{
+ "model": "godot/assets/maps/meshy6/cover_half_dock_v6.glb",
+ "triangles": 1499,
+ "size_m": [
+  0.96,
+  0.96,
+  0.78
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

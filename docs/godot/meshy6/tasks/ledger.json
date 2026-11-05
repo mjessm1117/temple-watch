@@ -1,0 +1,269 @@
+{
+  "start": 15150,
+  "tasks": [
+    {
+      "asset": "temple",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 15150,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-791e-71f0-9907-c7331fdc6451",
+      "after": 15130,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "temple",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 15130,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-819d-7297-a941-b33d02a8c6a4",
+      "after": 15110,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "dock",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 15110,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-8a62-72a6-b508-aa380c982f18",
+      "after": 15090,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "dock",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 15090,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-958b-77d3-8dd6-667a5f39d22c",
+      "after": 15070,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "plains",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 15070,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-9f45-760f-8007-8ef66aa53846",
+      "after": 15050,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "plains",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 15050,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-a90f-750a-b5e0-754b1724d3b0",
+      "after": 15030,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "city",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 15030,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-b1e0-7241-9999-3a1099395dfe",
+      "after": 15010,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "city",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 15010,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-bda3-760e-a361-c515787850d8",
+      "after": 14990,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "ruins",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14990,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-c76d-7194-a6dc-c0911f212a3a",
+      "after": 14970,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "ruins",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14970,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-d114-77dc-b1f8-8210eadc42d0",
+      "after": 14950,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "caves",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14950,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-dc15-70a0-bc5c-6afc082a8269",
+      "after": 14930,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "caves",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14930,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-e50f-7219-8859-76c91feb3f0e",
+      "after": 14910,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "jungle",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14910,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-f067-7155-be7a-0de118372efa",
+      "after": 14890,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "jungle",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14890,
+      "status": "SUCCEEDED",
+      "id": "01a1aa6d-f951-7738-a0c1-165246a2bf36",
+      "after": 14870,
+      "completion_balance": 14870
+    },
+    {
+      "asset": "temple",
+      "letter": "C",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14870,
+      "status": "SUCCEEDED",
+      "id": "01a1aa70-f7ca-73da-8c1d-1547167d34c0",
+      "after": 14850,
+      "completion_balance": 14850
+    },
+    {
+      "asset": "dock",
+      "letter": "C",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14850,
+      "status": "SUCCEEDED",
+      "id": "01a1aa73-f941-73c0-ad2d-317fa295dcf3",
+      "after": 14830,
+      "completion_balance": 14810
+    },
+    {
+      "asset": "city",
+      "letter": "C",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14830,
+      "status": "SUCCEEDED",
+      "id": "01a1aa74-083b-72a5-ac10-cc500e8d361d",
+      "after": 14810,
+      "completion_balance": 14810
+    },
+    {
+      "asset": "temple",
+      "letter": "C",
+      "mode": "refine",
+      "cost": 10,
+      "before": 14810,
+      "status": "SUCCEEDED",
+      "id": "01a1aa77-6a03-73c5-85ff-b4bb708b9bd7",
+      "after": 14800,
+      "completion_balance": 14740
+    },
+    {
+      "asset": "dock",
+      "letter": "C",
+      "mode": "refine",
+      "cost": 10,
+      "before": 14800,
+      "status": "SUCCEEDED",
+      "id": "01a1aa77-7242-70a7-bd4b-b8cec4a25e06",
+      "after": 14790,
+      "completion_balance": 14740
+    },
+    {
+      "asset": "plains",
+      "letter": "A",
+      "mode": "refine",
+      "cost": 10,
+      "before": 14790,
+      "status": "SUCCEEDED",
+      "id": "01a1aa77-7b77-733b-8a77-1b8bc0cf7af3",
+      "after": 14780,
+      "completion_balance": 14740
+    },
+    {
+      "asset": "city",
+      "letter": "C",
+      "mode": "refine",
+      "cost": 10,
+      "before": 14780,
+      "status": "SUCCEEDED",
+      "id": "01a1aa77-85a8-76ea-9238-0cd1e482c9d8",
+      "after": 14770,
+      "completion_balance": 14740
+    },
+    {
+      "asset": "ruins",
+      "letter": "A",
+      "mode": "refine",
+      "cost": 10,
+      "before": 14770,
+      "status": "SUCCEEDED",
+      "id": "01a1aa77-8ea3-7146-b1cf-ffdf301ce825",
+      "after": 14760,
+      "completion_balance": 14740
+    },
+    {
+      "asset": "caves",
+      "letter": "A",
+      "mode": "refine",
+      "cost": 10,
+      "before": 14760,
+      "status": "SUCCEEDED",
+      "id": "01a1aa77-99e4-7391-a064-e16010611e89",
+      "after": 14750,
+      "completion_balance": 14740
+    },
+    {
+      "asset": "jungle",
+      "letter": "B",
+      "mode": "refine",
+      "cost": 10,
+      "before": 14750,
+      "status": "SUCCEEDED",
+      "id": "01a1aa77-a80f-7491-9d80-42cbbceaa715",
+      "after": 14740,
+      "completion_balance": 14740
+    }
+  ]
+}

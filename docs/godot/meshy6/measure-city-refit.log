@@ -1,0 +1,7 @@
+23:05:58 | INFO: Data are loaded, start creating Blender stuff
+23:05:58 | INFO: Blender create Mesh node Mesh_0
+23:05:58 | INFO: glTF import finished in 0.02s
+MEASURE {"path": "godot/assets/maps/meshy6/cover_half_city_v6.glb", "dimensions": [0.8909059166908264, 0.9599999785423279, 0.800000011920929], "min": [-0.4454529583454132, -0.47999998927116394, 0.0], "triangles": 1478}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit

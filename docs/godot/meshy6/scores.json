@@ -1,0 +1,9 @@
+{
+  "temple": {"C": [3, 3, 3, 4, "Winner: irregular rocks; inspect ground lip"]},
+  "dock": {"C": [3, 4, 3, 4, "Winner: tilted salvage heap"]},
+  "plains": {"A": [4, 4, 4, 4, "Winner: loose angular stones"]},
+  "city": {"C": [4, 4, 4, 4, "Winner: torn metal debris"]},
+  "ruins": {"A": [4, 4, 3, 4, "Winner: fractured rubble"]},
+  "caves": {"A": [4, 4, 4, 4, "Winner: jagged cluster"]},
+  "jungle": {"B": [4, 4, 4, 4, "Winner: slumped bags"]}
+}

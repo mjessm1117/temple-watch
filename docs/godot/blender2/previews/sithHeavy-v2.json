@@ -1,0 +1,12 @@
+{
+ "model": "godot/assets/models_v2/sithHeavy_v2.glb",
+ "triangles": 4925,
+ "size_m": [
+  0.95,
+  0.859,
+  1.698
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

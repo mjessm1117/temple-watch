@@ -1,0 +1,12 @@
+{
+ "model": "docs/godot/meshy6/tasks/dock.C.preview.glb",
+ "triangles": 8175,
+ "size_m": [
+  1.899,
+  1.899,
+  0.773
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

@@ -1,0 +1,7 @@
+node_modules/
+test-tmp/
+tasks/*.glb
+contact-source/
+*.preview.png
+*.final.png
+winner-previews.png

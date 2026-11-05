@@ -1,0 +1,12 @@
+{
+ "model": "godot/assets/maps/gantry.glb",
+ "triangles": 8164,
+ "size_m": [
+  0.638,
+  0.591,
+  1.896
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

@@ -1,0 +1,12 @@
+{
+ "model": "docs/godot/meshy6/tasks/plains.B.preview.glb",
+ "triangles": 8156,
+ "size_m": [
+  1.846,
+  1.508,
+  1.385
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

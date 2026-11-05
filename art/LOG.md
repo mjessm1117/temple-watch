@@ -162,3 +162,19 @@ Applied meshy-art-director and the 150-credit cap. Live balance **9,625 → 9,47
 Only the accepted snow half and jungle full paths changed in `props.json`; no gameplay, LOS, renderer, or other theme paths changed. Before/after Ilum and h_roots captures and three stage close-ups are in `docs/godot/shots/meshy5-*.png`. Full decisions, dimensions and render counters: `docs/godot/meshy5/REPORT.md`.
 
 Final validation: headless Godot import before tests; `./godot/test.sh` exit **0**, every suite 0 failures, 0 SCRIPT ERROR/ERROR lines, Normal rescue **10/20**. The focused map-art check passed **179,392 checks across 62 maps**; the full suite repeated that pass. The initial 1.446-high jungle candidate failed the full-cover height gate; corrected v3 passed. `git diff --check` passed. Local commit on `meshy/batch5`; no push.
+
+## Blender 1 Godot model audit (2026-11-04)
+
+Audited all 97 GLBs under `godot/assets` with headless Blender. The 13 apparent untextured Icospheres are import-only Blender helpers absent from the GLBs. Godot's map and Meshy stage loaders already center and floor-fit props; flying vehicles use centered origins. Sith Heavy's off-center scan result is an animated pose, while its rest geometry is centered. No safe model edit or `_v2` export was warranted. Baseline battle-camera captures at desktop and phone sizes and the complete decision table are in `docs/godot/blender1/REPORT.md`. The Web export excludes the future v2 staging folder and the test-only capture script; the PCK measured 65,037,544 → 65,035,628 bytes.
+
+## Blender 2 — phone staging and blocky prop quote (2026-11-04)
+
+Staged nine Blender-only `_v2.glb` copies under `godot/assets/models_v2`; no gameplay swap. Five units are 4,925 triangles each. Relay and shuttle meet 1,500; gantry and statue needed gentler 4,082 and 3,999 to preserve their battle-size silhouettes. Four-view previews, desktop/phone A/B captures, LOD findings, 59,209-triangle representative-scene saving, and measured 1,275,196-byte Web PCK saving are in `docs/godot/blender2/REPORT.md`. Seven blocky props are quoted at 350 Meshy credits (210–490 range); read-only balance was 15,150. No Meshy generation call, credit spend, asset swap, or push.
+
+## Meshy batch 6 — seven half-cover candidates (2026-11-04)
+
+Submitted **410/490 authorized credits**: seventeen 20-credit previews and seven 10-credit successful refines. Read-only opening balance **15,150**; last observed balance **14,740**. Exact task IDs and preview decisions are in `docs/godot/meshy6/ledger.md` and `preview-review.md`. No additional generation after the seventh refine.
+
+Staged seven one-tile v6 GLBs and separate 786–800-triangle LOD1s without changing shipped paths. Desktop and phone battle-camera A/B captures for every theme and `docs/godot/shots/meshy6-before-after.jpg` show six visual passes: temple, dock, plains, city, ruins and caves. Jungle fails because the candidate reads as yellow plant debris instead of a bag stack; it remains staged only. The city fit was corrected to 0.8 m after the restart and both city captures were refreshed. Dimensions, triangle counts, exact future wiring points and validation are in `docs/godot/meshy6/REPORT.md`.
+
+Gate: headless import passed; `./godot/test.sh` exited 0, every suite had 0 failures, 0 SCRIPT ERROR/ERROR lines, and Normal rescue was 9/20. `git diff --check` passed. Local commit only; no push.

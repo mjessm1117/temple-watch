@@ -1,0 +1,12 @@
+{
+ "model": "godot/assets/maps/meshy6/cover_half_temple_v6.glb",
+ "triangles": 1494,
+ "size_m": [
+  0.96,
+  0.951,
+  0.798
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

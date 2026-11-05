@@ -1,0 +1,12 @@
+{
+ "model": "godot/assets/models/units/trooper.glb",
+ "triangles": 10305,
+ "size_m": [
+  0.692,
+  0.655,
+  1.672
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

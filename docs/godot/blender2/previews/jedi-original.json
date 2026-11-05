@@ -1,0 +1,12 @@
+{
+ "model": "godot/assets/models/units/jedi.glb",
+ "triangles": 10323,
+ "size_m": [
+  0.664,
+  0.664,
+  1.724
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}

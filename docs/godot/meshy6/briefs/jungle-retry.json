@@ -1,0 +1,10 @@
+{
+  "credit_cap": 40,
+  "preview_cap": 1,
+  "refine_cap": 1,
+  "reference": "Earlier jungle v6 read as a yellow heap of foliage; procedural old cover is a three-course sandbag stack.",
+  "texture": "Desaturated olive drab and grey-brown heavy canvas, dark stitched seams and restrained dirt. Each bag has a distinct dark edge. Matte cloth. No yellow, lime green, leaves, vines, or broad moss patches.",
+  "variants": {
+    "A": "Low man-made defensive wall of six large military sandbags in two staggered horizontal courses: three broad bags on the ground, three offset bags across the top. Each sack is a distinct long flattened pillow with visible seams, compressed corners and dark gaps between sacks. Wide solid waist-high barricade, irregular stepped top but an unmistakable stacked wall silhouette, fits one square tile. Desaturated olive drab canvas and grey-brown dirt. Stylized low-poly tactics game prop viewed from a distant elevated camera. No foliage, leaves, vines, plants, yellow-green color, loose debris, crate, base plate or ground plane."
+  }
+}

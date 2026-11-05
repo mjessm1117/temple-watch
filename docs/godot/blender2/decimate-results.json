@@ -1,0 +1,112 @@
+[
+  {
+    "source": "models/units/agent.glb",
+    "v2": "godot/assets/models_v2/agent_v2.glb",
+    "before": 11997,
+    "after": 4925,
+    "ratio": 0.41051929649078933,
+    "mesh_count": 1,
+    "animations": 29,
+    "skins": 1,
+    "source_bytes": 1540400,
+    "v2_bytes": 2046948
+  },
+  {
+    "source": "models/units/jedi.glb",
+    "v2": "godot/assets/models_v2/jedi_v2.glb",
+    "before": 10323,
+    "after": 4925,
+    "ratio": 0.4770899932190255,
+    "mesh_count": 1,
+    "animations": 29,
+    "skins": 1,
+    "source_bytes": 2336556,
+    "v2_bytes": 3319788
+  },
+  {
+    "source": "models/units/scout.glb",
+    "v2": "godot/assets/models_v2/scout_v2.glb",
+    "before": 10411,
+    "after": 4925,
+    "ratio": 0.4730573431946979,
+    "mesh_count": 1,
+    "animations": 29,
+    "skins": 1,
+    "source_bytes": 2609588,
+    "v2_bytes": 4342728
+  },
+  {
+    "source": "models/units/sithHeavy.glb",
+    "v2": "godot/assets/models_v2/sithHeavy_v2.glb",
+    "before": 10244,
+    "after": 4925,
+    "ratio": 0.4807692307692308,
+    "mesh_count": 1,
+    "animations": 29,
+    "skins": 1,
+    "source_bytes": 1966508,
+    "v2_bytes": 4552100
+  },
+  {
+    "source": "models/units/trooper.glb",
+    "v2": "godot/assets/models_v2/trooper_v2.glb",
+    "before": 10305,
+    "after": 4925,
+    "ratio": 0.47792333818534694,
+    "mesh_count": 1,
+    "animations": 29,
+    "skins": 1,
+    "source_bytes": 2410388,
+    "v2_bytes": 6290784
+  },
+  {
+    "source": "maps/relay.glb",
+    "v2": "godot/assets/models_v2/relay_v2.glb",
+    "before": 8890,
+    "after": 1477,
+    "ratio": 0.16619797525309335,
+    "mesh_count": 1,
+    "animations": 0,
+    "skins": 0,
+    "source_bytes": 754712,
+    "v2_bytes": 184968
+  },
+  {
+    "source": "maps/gantry.glb",
+    "v2": "godot/assets/models_v2/gantry_v2.glb",
+    "before": 8164,
+    "after": 4082,
+    "ratio": 0.5,
+    "mesh_count": 1,
+    "animations": 0,
+    "skins": 0,
+    "source_bytes": 673992,
+    "v2_bytes": 398060,
+    "note": "1500 target rejected; gentle 4082 accepted"
+  },
+  {
+    "source": "maps/statue.glb",
+    "v2": "godot/assets/models_v2/statue_v2.glb",
+    "before": 7999,
+    "after": 3999,
+    "ratio": 0.5,
+    "mesh_count": 1,
+    "animations": 0,
+    "skins": 0,
+    "source_bytes": 478304,
+    "v2_bytes": 277528,
+    "note": "1500 target rejected; gentle 4000 accepted"
+  },
+  {
+    "source": "maps/shuttle.glb",
+    "v2": "godot/assets/models_v2/shuttle_v2.glb",
+    "before": 6360,
+    "after": 1477,
+    "ratio": 0.23231132075471697,
+    "mesh_count": 1,
+    "animations": 0,
+    "skins": 0,
+    "source_bytes": 569060,
+    "v2_bytes": 201700
+  }
+]

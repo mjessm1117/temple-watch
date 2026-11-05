@@ -1,0 +1,9 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Failed to create wd.xic as the input method or its xim server may not have started yet.
+     at: _create_xic (platform/linuxbsd/x11/display_server_x11.cpp:6347)
+MESA: info: vulkan: No DRI3 support detected - required for presentation
+Note: you can probably enable DRI3 in your Xorg config
+Vulkan 1.4.329 - Forward+ - Using Device #1: NVIDIA - NVIDIA GeForce RTX 4090 Laptop GPU
+
+MESHY6 CLEAR TILES ruins [(11, 16), (14, 16)]
+MESHY6 CAPTURE ruins (1366, 768) 0

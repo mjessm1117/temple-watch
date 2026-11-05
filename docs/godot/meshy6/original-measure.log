@@ -1,0 +1,28 @@
+22:44:24 | INFO: Data are loaded, start creating Blender stuff
+22:44:24 | INFO: Blender create Mesh node 0
+22:44:24 | INFO: glTF import finished in 0.04s
+MEASURE {"path": "godot/assets/maps/meshy1/cover_half_temple_v3.glb", "dimensions": [0.977272629737854, 0.8500666618347168, 0.7885099053382874], "min": [-0.48833024501800537, -0.4280126690864563, 0.0], "triangles": 3000}
+22:44:24 | INFO: Data are loaded, start creating Blender stuff
+22:44:24 | INFO: Blender create Mesh node 0
+22:44:25 | INFO: glTF import finished in 0.03s
+MEASURE {"path": "godot/assets/maps/meshy3/cover_half_dock_v1.glb", "dimensions": [0.9765304327011108, 0.9190446734428406, 0.7940940856933594], "min": [-0.4897601306438446, -0.4662114381790161, 0.0001504161482444033], "triangles": 2992}
+22:44:25 | INFO: Data are loaded, start creating Blender stuff
+22:44:25 | INFO: Blender create Mesh node 0
+22:44:25 | INFO: glTF import finished in 0.02s
+MEASURE {"path": "godot/assets/maps/meshy3/cover_half_plains_v1.glb", "dimensions": [0.9799236059188843, 0.9797667264938354, 0.7209571003913879], "min": [-0.48993396759033203, -0.48991692066192627, 0.0], "triangles": 2986}
+22:44:25 | INFO: Data are loaded, start creating Blender stuff
+22:44:25 | INFO: Blender create Mesh node 0
+22:44:25 | INFO: Blender create Mesh node inset light strip
+22:44:25 | INFO: glTF import finished in 0.02s
+MEASURE {"path": "godot/assets/maps/meshy2/cover_half_city_v1.glb", "dimensions": [0.999975323677063, 0.4112979769706726, 0.7996765375137329], "min": [-0.4999752938747406, -0.20900000631809235, 9.363889694213867e-05], "triangles": 2992}
+22:44:25 | INFO: Data are loaded, start creating Blender stuff
+22:44:25 | INFO: Blender create Mesh node 0
+22:44:25 | INFO: glTF import finished in 0.02s
+MEASURE {"path": "godot/assets/maps/meshy3/cover_half_ruins_v1.glb", "dimensions": [0.9676462411880493, 0.7849265336990356, 0.7999999523162842], "min": [-0.48382312059402466, -0.39236900210380554, 0.0], "triangles": 2999}
+22:44:25 | INFO: Data are loaded, start creating Blender stuff
+22:44:25 | INFO: Blender create Mesh node 0
+22:44:25 | INFO: glTF import finished in 0.03s
+MEASURE {"path": "godot/assets/maps/meshy3/cover_half_caves_v1.glb", "dimensions": [0.9999620914459229, 0.9994945526123047, 0.7615505456924438], "min": [-0.49996209144592285, -0.49974727630615234, 4.476308822631836e-05], "triangles": 2992}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit

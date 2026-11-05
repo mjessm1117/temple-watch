@@ -1,0 +1,98 @@
+file,triangles,height_m,width_m,depth_m,base_z,stray_parts,materials,issues
+galaxy/shuttle.glb,6360,0.485,1.895,1.559,-0.243,,1,not standing on floor
+loadout/models/heavy.glb,10351,1.771,0.845,0.797,-0.084,Icosphere,1,stray helper mesh
+loadout/models/jedi.glb,10323,1.724,0.664,0.664,-0.05,Icosphere,1,stray helper mesh
+loadout/models/medic.glb,10411,1.625,0.64,0.663,-0.034,Icosphere,1,stray helper mesh
+loadout/models/scout.glb,10411,1.675,0.787,0.643,-0.016,Icosphere,1,stray helper mesh
+loadout/models/trooper.glb,10305,1.672,0.692,0.655,-0.029,Icosphere,1,stray helper mesh
+maps/airtaxi.glb,4351,1.025,1.899,1.737,-0.515,,1,not standing on floor
+maps/barrel.glb,2997,1.899,1.209,1.207,-0.951,,1,not standing on floor
+maps/brazier.glb,3000,1.417,1.883,1.496,-0.713,,1,not standing on floor
+maps/console.glb,2820,1.898,1.504,1.49,-0.95,,1,not standing on floor
+maps/container.glb,2136,0.966,1.9,1.273,-0.484,,1,not standing on floor
+maps/crate.glb,2947,1.868,1.898,1.897,-0.935,,1,not standing on floor
+maps/door_caves.glb,3005,1.899,1.291,1.04,-0.951,,1,not standing on floor
+maps/door_city.glb,1499,1.9,0.983,0.266,-0.951,,1,not standing on floor
+maps/door_dock.glb,3136,1.198,1.898,1.257,-0.598,,1,not standing on floor
+maps/door_jungle.glb,2831,1.899,1.163,0.702,-0.951,,1,not standing on floor
+maps/door_plains.glb,3353,1.897,1.426,0.896,-0.95,,1,not standing on floor
+maps/door_ruins.glb,3890,1.115,1.898,1.039,-0.562,,1,not standing on floor
+maps/door_snow.glb,3341,1.896,1.549,1.51,-0.951,,1,not standing on floor
+maps/door_temple.glb,3178,1.899,1.899,0.987,-0.95,,1,not standing on floor
+maps/gantry.glb,8164,1.896,0.638,0.591,-0.947,,1,not standing on floor
+maps/meshy1/cover_half_temple_v1.glb,2997,0.8,0.96,0.49,0.0,,2,
+maps/meshy1/cover_half_temple_v2.glb,3000,0.239,0.98,0.484,0.0,,1,
+maps/meshy1/cover_half_temple_v2_lod1.glb,800,0.239,0.98,0.481,0.0,,1,
+maps/meshy1/cover_half_temple_v3.glb,3000,0.789,0.977,0.85,0.0,,1,
+maps/meshy1/cover_half_temple_v3_lod1.glb,800,0.786,0.964,0.85,0.0,,1,
+maps/meshy1/obj_terminal_v1.glb,3996,1.899,1.232,0.967,-0.95,,1,not standing on floor
+maps/meshy2/cover_full_dock_v1.glb,3000,1.849,0.983,0.998,0.0,,1,
+maps/meshy2/cover_full_dock_v1_lod1.glb,795,1.849,0.979,0.981,0.0,,1,
+maps/meshy2/cover_half_city_v1.glb,2992,0.8,1.0,0.411,0.0,,2,
+maps/meshy2/cover_half_city_v1_lod1.glb,789,0.8,0.997,0.411,0.0,,2,
+maps/meshy2/obj_relay_v1.glb,3995,1.8,0.95,0.528,0.0,,1,
+maps/meshy2/obj_relay_v1_lod1.glb,998,1.643,0.902,0.512,0.0,,1,
+maps/meshy3/cover_full_caves_v1.glb,3000,1.85,0.645,0.615,0.0,,1,
+maps/meshy3/cover_full_caves_v1_lod1.glb,800,1.85,0.645,0.615,0.0,,1,
+maps/meshy3/cover_full_city_v1.glb,2987,1.85,0.58,0.58,0.0,,1,
+maps/meshy3/cover_full_city_v1_lod1.glb,798,1.85,0.558,0.558,0.0,,1,
+maps/meshy3/cover_full_jungle_v1.glb,3000,1.85,0.887,0.887,0.0,,2,
+maps/meshy3/cover_full_jungle_v1_lod1.glb,797,1.85,0.886,0.886,0.0,,2,
+maps/meshy3/cover_full_plains_v1.glb,2994,1.85,0.611,0.712,0.0,,1,
+maps/meshy3/cover_full_plains_v1_lod1.glb,798,1.85,0.611,0.71,0.0,,1,
+maps/meshy3/cover_full_ruins_v1.glb,3000,1.85,0.692,0.691,-0.0,,1,
+maps/meshy3/cover_full_ruins_v1_lod1.glb,800,1.85,0.692,0.691,-0.0,,1,
+maps/meshy3/cover_full_snow_v1.glb,2985,1.85,0.72,0.745,0.0,,1,
+maps/meshy3/cover_full_snow_v1_lod1.glb,800,1.85,0.711,0.72,0.0,,1,
+maps/meshy3/cover_full_temple_v1.glb,3000,1.845,0.951,1.0,0.0,,1,
+maps/meshy3/cover_full_temple_v1_lod1.glb,800,1.845,0.951,1.0,0.0,,1,
+maps/meshy3/cover_half_caves_v1.glb,2992,0.762,1.0,0.999,0.0,,2,
+maps/meshy3/cover_half_caves_v1_lod1.glb,791,0.761,0.999,0.999,0.0,,2,
+maps/meshy3/cover_half_dock_v1.glb,2992,0.794,0.977,0.919,0.0,,1,
+maps/meshy3/cover_half_dock_v1_lod1.glb,797,0.738,0.97,0.89,0.001,,1,
+maps/meshy3/cover_half_plains_v1.glb,2986,0.721,0.98,0.98,0.0,,1,
+maps/meshy3/cover_half_plains_v1_lod1.glb,798,0.72,0.98,0.98,0.0,,1,
+maps/meshy3/cover_half_ruins_v1.glb,2999,0.8,0.968,0.785,0.0,,1,
+maps/meshy3/cover_half_ruins_v1_lod1.glb,799,0.8,0.968,0.781,0.0,,1,
+maps/meshy3/cover_half_snow_v1.glb,2999,0.8,0.977,0.977,0.0,,1,
+maps/meshy3/cover_half_snow_v1_lod1.glb,799,0.8,0.977,0.972,0.0,,1,
+maps/meshy3/obj_beacon_v1.glb,3998,1.6,0.927,0.939,0.0,,1,
+maps/meshy3/obj_beacon_v1_lod1.glb,1000,1.6,0.926,0.937,0.0,,1,
+maps/meshy3/obj_charge_v1.glb,3997,0.74,0.98,0.825,0.001,,1,
+maps/meshy3/obj_charge_v1_lod1.glb,996,0.729,0.98,0.82,0.005,,1,
+maps/meshy3/obj_restraint_v1.glb,3999,1.599,0.736,0.501,0.001,,1,
+maps/meshy3/obj_restraint_v1_lod1.glb,1000,1.597,0.736,0.501,0.001,,1,
+maps/meshy4/cover_full_snow_v1.glb,3000,1.85,0.996,0.953,0.0,,1,
+maps/meshy4/cover_full_snow_v1_lod1.glb,800,1.85,0.972,0.924,0.0,,1,
+maps/meshy4/cover_full_temple_v1.glb,2998,1.899,0.556,0.627,-0.951,,1,not standing on floor
+maps/meshy4/cover_full_temple_v1_lod1.glb,800,1.898,0.556,0.627,-0.951,,1,not standing on floor
+maps/meshy4/obj_relay_v1.glb,2936,1.928,0.568,0.67,-0.951,,2,not standing on floor
+maps/meshy4/obj_relay_v1_lod1.glb,748,1.928,0.553,0.664,-0.951,,2,not standing on floor
+maps/meshy5/cover_full_jungle_v3.glb,2999,1.85,0.98,0.98,0.0,,1,
+maps/meshy5/cover_full_jungle_v3_lod1.glb,799,1.85,0.98,0.98,0.0,,1,
+maps/meshy5/cover_half_snow_v1.glb,2998,0.798,0.98,0.98,0.0,,3,
+maps/meshy5/cover_half_snow_v1_lod1.glb,800,0.781,0.98,0.98,0.0,,3,
+maps/pillar.glb,2997,1.9,0.593,0.59,-0.951,,1,not standing on floor
+maps/relay.glb,8890,1.897,0.562,0.562,-0.951,,1,not standing on floor
+maps/rubble.glb,2551,0.589,1.827,1.847,-0.304,,1,not standing on floor
+maps/shuttle.glb,6360,0.485,1.895,1.559,-0.243,,1,not standing on floor
+maps/statue.glb,7999,1.898,0.683,0.668,-0.951,,1,not standing on floor
+maps/terminal.glb,2993,1.898,0.343,0.343,-0.951,,1,not standing on floor
+maps/wall.glb,2991,1.898,1.584,0.649,-0.95,,1,not standing on floor
+maps/wall_caves.glb,3828,1.032,1.848,1.251,-0.517,,1,not standing on floor
+maps/wall_jungle.glb,3670,0.93,1.68,1.893,-0.467,,1,not standing on floor
+maps/wall_metal.glb,2883,0.894,1.892,1.627,-0.449,,1,not standing on floor
+maps/wall_plains.glb,2782,0.886,1.877,0.944,-0.444,,1,not standing on floor
+maps/wall_ruins.glb,3258,1.256,1.898,1.898,-0.629,,1,not standing on floor
+maps/wall_snow.glb,3212,0.695,1.781,1.806,-0.348,,1,not standing on floor
+models/props/crate.glb,2947,1.868,1.898,1.897,-0.935,,1,not standing on floor
+models/props/terminal.glb,2993,1.898,0.343,0.343,-0.951,,1,not standing on floor
+models/units/agent.glb,11997,1.696,0.717,0.648,-0.025,Icosphere,1,stray helper mesh
+models/units/jedi.glb,10323,1.724,0.664,0.664,-0.05,Icosphere,1,stray helper mesh
+models/units/scout.glb,10411,1.675,0.787,0.643,-0.016,Icosphere,1,stray helper mesh
+models/units/sithHeavy.glb,10244,1.656,0.771,0.752,-0.067,Icosphere,1,stray helper mesh; pivot off-center
+models/units/trooper.glb,10305,1.672,0.692,0.655,-0.029,Icosphere,1,stray helper mesh
+temple/human.glb,13743,1.781,0.756,0.693,-0.0,Icosphere,2,stray helper mesh
+ui/airtaxi.glb,4351,1.025,1.899,1.737,-0.515,,1,not standing on floor
+ui/jedi.glb,10323,1.724,0.664,0.664,-0.05,Icosphere,1,stray helper mesh
+ui/scout.glb,10411,1.675,0.787,0.643,-0.016,Icosphere,1,stray helper mesh

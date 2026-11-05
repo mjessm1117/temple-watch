@@ -1,0 +1,12 @@
+{
+ "model": "docs/godot/meshy6/tasks/caves.A.preview.glb",
+ "triangles": 7813,
+ "size_m": [
+  1.898,
+  0.917,
+  0.789
+ ],
+ "parts": 1,
+ "suspect_parts": [],
+ "layout": "top-left front, top-right side, bottom-left top, bottom-right 3/4"
+}
