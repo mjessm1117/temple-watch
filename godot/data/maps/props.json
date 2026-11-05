@@ -22,22 +22,22 @@
   "meshy_themes": {
     "temple": {
       "full_cover": "res://assets/maps/meshy4/cover_full_temple_v1.glb",
-      "half_cover": "res://assets/maps/meshy1/cover_half_temple_v3.glb"
+      "half_cover": "res://assets/maps/meshy6/cover_half_temple_v6.glb"
     },
     "ruins": {
       "full_cover": "res://assets/maps/meshy3/cover_full_ruins_v1.glb",
-      "half_cover": "res://assets/maps/meshy3/cover_half_ruins_v1.glb"
+      "half_cover": "res://assets/maps/meshy6/cover_half_ruins_v6.glb"
     },
     "caves": {
       "full_cover": "res://assets/maps/meshy3/cover_full_caves_v1.glb",
-      "half_cover": "res://assets/maps/meshy3/cover_half_caves_v1.glb"
+      "half_cover": "res://assets/maps/meshy6/cover_half_caves_v6.glb"
     },
     "jungle": {
       "full_cover": "res://assets/maps/meshy5/cover_full_jungle_v3.glb"
     },
     "plains": {
       "full_cover": "res://assets/maps/meshy3/cover_full_plains_v1.glb",
-      "half_cover": "res://assets/maps/meshy3/cover_half_plains_v1.glb"
+      "half_cover": "res://assets/maps/meshy6/cover_half_plains_v6.glb"
     },
     "snow": {
       "full_cover": "res://assets/maps/meshy4/cover_full_snow_v1.glb",
@@ -45,11 +45,11 @@
     },
     "city": {
       "full_cover": "res://assets/maps/meshy3/cover_full_city_v1.glb",
-      "half_cover": "res://assets/maps/meshy2/cover_half_city_v1.glb"
+      "half_cover": "res://assets/maps/meshy6/cover_half_city_v6.glb"
     },
     "dock": {
       "full_cover": "res://assets/maps/meshy2/cover_full_dock_v1.glb",
-      "half_cover": "res://assets/maps/meshy3/cover_half_dock_v1.glb"
+      "half_cover": "res://assets/maps/meshy6/cover_half_dock_v6.glb"
     }
   },
   "meshy_objectives": {
@@ -67,11 +67,19 @@
     "evac": "beacon"
   },
   "meshy_lod_distance": 26.0,
+  "meshy_lod_assets": [
+    "res://assets/maps/meshy6/cover_half_temple_v6_lod1.glb",
+    "res://assets/maps/meshy6/cover_half_ruins_v6_lod1.glb",
+    "res://assets/maps/meshy6/cover_half_caves_v6_lod1.glb",
+    "res://assets/maps/meshy6/cover_half_plains_v6_lod1.glb",
+    "res://assets/maps/meshy6/cover_half_city_v6_lod1.glb",
+    "res://assets/maps/meshy6/cover_half_dock_v6_lod1.glb"
+  ],
   "meshy1_models": {
     "objective": "res://assets/maps/meshy1/obj_terminal_v1.glb"
   },
   "meshy_material_lift": {
     "res://assets/maps/meshy3/cover_full_caves_v1.glb": 0.22,
-    "res://assets/maps/meshy3/cover_half_caves_v1.glb": 0.14
+    "res://assets/maps/meshy6/cover_half_caves_v6.glb": 0.30
   }
 }
