@@ -1,6 +1,7 @@
 extends RefCounted
 ## Short player-shot camera beats around the existing lit bolt and impact effects.
 const Presentation = preload("res://scripts/enemy_presentation.gd")
+const JediKillcam = preload("res://scripts/battle16_killcam.gd")
 
 static func play(game: Node3D, event: Dictionary) -> void:
 	var camera_on: bool = game.action_camera and not game.cam.skip_requested
@@ -26,18 +27,21 @@ static func play(game: Node3D, event: Dictionary) -> void:
 		game.cam.trace.append("cine15_push")
 	await Presentation.show_event(game, event)
 	if camera_on and bool(event.get("killed", false)) and not game.cam.skip_requested:
-		var tile: Vector2i = event.to
-		var at := Vector3(float(tile.x), 1.0, float(tile.y))
-		var previous_position: Vector3 = game.camera.position
-		var previous_fov: float = game.camera.fov
-		game.cinematic = true
-		game.camera.position = at + Vector3(2.2, 1.8, 2.6)
-		game.camera.look_at(at, Vector3.UP)
-		game.camera.fov = 46.0
-		game.cam.trace.append("cine15_fall_frame")
-		await game.cam.wait(0.22)
-		game.camera.position = previous_position
-		game.camera.fov = previous_fov
+		if JediKillcam.eligible(game, event):
+			await JediKillcam.play(game, event)
+		else:
+			var tile: Vector2i = event.to
+			var at := Vector3(float(tile.x), 1.0, float(tile.y))
+			var previous_position: Vector3 = game.camera.position
+			var previous_fov: float = game.camera.fov
+			game.cinematic = true
+			game.camera.position = at + Vector3(2.2, 1.8, 2.6)
+			game.camera.look_at(at, Vector3.UP)
+			game.camera.fov = 46.0
+			game.cam.trace.append("cine15_fall_frame")
+			await game.cam.wait(0.22)
+			game.camera.position = previous_position
+			game.camera.fov = previous_fov
 		game.cam.finish()
 	for view in hidden:
 		if is_instance_valid(view): view.show()

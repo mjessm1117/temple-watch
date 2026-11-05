@@ -3,6 +3,7 @@ extends Node
 const Shot = preload("res://scripts/shot.gd")
 const BLEND := 0.42
 const AIM_BLEND := 0.28
+const TACTICAL_V_OFFSET := -0.5
 var g
 var skip_requested := false
 var return_pivot := Vector3.ZERO
@@ -18,9 +19,29 @@ var preview_hidden: Array[Node3D] = []
 var preview_fov := 45.0
 var preview_shoulder: Node3D
 var preview_source_model: Node3D
+var close_pitch := deg_to_rad(53.0)
+var overhead := false
 
 func _ready() -> void:
 	touch.g = g
+
+func _process(_delta: float) -> void:
+	if g == null or g.camera == null or g.cinematic or preview_active: return
+	if g.zoom < 26.0:
+		if overhead:
+			overhead = false
+			g.pitch = close_pitch
+			g._update_camera()
+		else:
+			close_pitch = g.pitch
+		return
+	if not overhead:
+		overhead = true
+		close_pitch = g.pitch
+	var pitch: float = lerpf(close_pitch, deg_to_rad(78.0), smoothstep(26.0, 42.0, g.zoom))
+	if absf(g.pitch - pitch) > 0.002:
+		g.pitch = pitch
+		g._update_camera()
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
@@ -54,6 +75,7 @@ func preview(actor: Dictionary, target: Dictionary) -> void:
 	if not preview_active: return_pivot = g.pivot
 	if not preview_active: preview_fov = g.camera.fov
 	preview_active = true
+	g.camera.v_offset = 0.0
 	preview_actor = actor_id
 	preview_target = target_id
 	var actor_view = g.views.get(actor_id)
@@ -113,6 +135,7 @@ func end_preview() -> void:
 	g.pivot = return_pivot
 	g.cinematic = false
 	g.camera.fov = preview_fov
+	g.camera.v_offset = TACTICAL_V_OFFSET
 	g._update_camera()
 
 func _clear_preview_visuals() -> void:
@@ -145,6 +168,7 @@ func frame(from: Vector3, to: Vector3, style: String = "shoot") -> void:
 	_clear_preview_visuals()
 	if preview_active: g.camera.fov = preview_fov
 	if not g.action_camera or skip_requested: return
+	g.camera.v_offset = 0.0
 	if preview_tween != null and preview_tween.is_running(): preview_tween.kill()
 	preview_active = false
 	preview_actor = -1
@@ -185,4 +209,5 @@ func finish() -> void:
 	if g.action_tween != null and g.action_tween.is_running(): g.action_tween.kill()
 	if g.cinematic: g.pivot = return_pivot
 	g.cinematic = false
+	g.camera.v_offset = TACTICAL_V_OFFSET
 	g._update_camera()

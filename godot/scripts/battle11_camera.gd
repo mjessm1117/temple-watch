@@ -12,8 +12,8 @@ static func start_zoom(m: RefCounted) -> float:
 
 static func selected_zoom(m: RefCounted) -> float:
 	if _phone_view():
-		return clampf(start_zoom(m) / 3.0, 9.0, 12.0)
-	return clampf(start_zoom(m) / 2.5, 6.0, 13.0)
+		return clampf(start_zoom(m) / 3.25, 9.0, 10.5)
+	return clampf(start_zoom(m) / 2.35, 8.0, 12.0)
 
 static func target_zoom(m: RefCounted, separation: float) -> float:
 	return clampf(maxf(selected_zoom(m), separation * 1.25), 6.0, 22.0)
