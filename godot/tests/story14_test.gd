@@ -3,6 +3,7 @@ extends SceneTree
 const Story = preload("res://scripts/story/story_engine.gd")
 const Portraits = preload("res://scripts/story14_portraits.gd")
 const Comms = preload("res://scripts/story14_comms.gd")
+const Bake = preload("res://scripts/story14_bake.gd")
 var checks := 0
 var failures := 0
 
@@ -27,6 +28,18 @@ func run() -> void:
 		check(not hashes.has(hash),"portrait md5 unique: " + id)
 		hashes[hash] = id
 	check(hashes.size() == 26,"26 unique portrait files")
+	var villains := ["bane", "kaan", "malgus"]
+	var models := {}
+	for id in villains: models[Bake.PROFILES[id].model] = true
+	check(models.size() == 3, "three villain base silhouettes")
+	var trooper_angles := {}
+	var trooper_crops := {}
+	for id in ["bo", "bren", "dace", "grak", "halden", "ilo", "jace", "rhal", "varra"]:
+		var profile: Dictionary = Bake.PROFILES[id]
+		trooper_angles[signf(float(profile.angle))] = true
+		trooper_crops[roundi(float(profile.distance) * 10.0)] = true
+		check(profile.has("helmet") and profile.has("shoulder"), "trooper material accents: " + id)
+	check(trooper_angles.size() == 2 and trooper_crops.size() >= 4, "trooper angle and crop variety")
 	var barks: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/story/story14-barks.json")).heroes
 	for name in heroes:
 		for event in ["contact","ally_down","objective_done","villain","last_enemy"]:

@@ -12,7 +12,7 @@ static func start_zoom(m: RefCounted) -> float:
 
 static func selected_zoom(m: RefCounted) -> float:
 	if _phone_view():
-		return clampf(start_zoom(m) / 2.2, 13.0, 20.0)
+		return clampf(start_zoom(m) / 3.0, 9.0, 12.0)
 	return clampf(start_zoom(m) / 2.5, 6.0, 13.0)
 
 static func target_zoom(m: RefCounted, separation: float) -> float:
@@ -27,7 +27,7 @@ static func clamp_pivot(m: RefCounted, point: Vector3) -> Vector3:
 
 static func safe_position(m: RefCounted, point: Vector3) -> Vector3:
 	if _phone_view():
-		return Vector3(clampf(point.x, -8.0, float(m.spec.width) + 7.0), maxf(5.0, point.y), clampf(point.z, -8.0, float(m.spec.height) + 7.0))
+		return Vector3(point.x, maxf(5.0, point.y), point.z)
 	return Vector3(clampf(point.x, 0.5, float(m.spec.width) - 1.5), maxf(5.0, point.y), clampf(point.z, 0.5, float(m.spec.height) - 1.5))
 
 static func aim_position(m: RefCounted, point: Vector3) -> Vector3:

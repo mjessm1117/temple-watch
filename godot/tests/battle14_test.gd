@@ -25,6 +25,13 @@ func body_bounds(game, unit: Dictionary) -> Rect2:
 				else: bounds = bounds.expand(screen)
 	return bounds
 
+func check_tactical(game, unit: Dictionary, size: Vector2i, label: String) -> void:
+	var bounds := body_bounds(game, unit)
+	var center := bounds.get_center()
+	check(center.x >= size.x * 0.2 and center.x <= size.x * 0.8 and center.y >= size.y * 0.2 and center.y <= size.y * 0.8, label + " selected unit in middle 60%: " + str(center))
+	check(bounds.size.y >= 40.0, label + " selected unit at least 40 px tall: " + str(bounds.size.y))
+	check(bounds.position.y > 55 and bounds.end.y < 305, label + " selected unit clears phone HUD")
+
 func run() -> void:
 	check(Quality.effective_tier("high", "gl_compatibility") == "low", "Compatibility remains Low")
 	for size in [Vector2i(844, 390), Vector2i(1366, 768)]: await exercise(size)
@@ -42,13 +49,27 @@ func exercise(size: Vector2i) -> void:
 	game.demo_mode = true
 	game.set_process(false)
 	var phone := size.x < 1000
+	if phone:
+		var first: Dictionary = game.mission.unit_by_id(game.selected_id)
+		check_tactical(game, first, size, "phone start")
+		var squad: Array[Dictionary] = game.mission.living("player")
+		if squad.size() > 1:
+			game._select(int(squad[1].id))
+			if game.camera_tween != null and game.camera_tween.is_running(): game.camera_tween.kill()
+			game.pivot = Vector3(squad[1].x, 0, squad[1].y)
+			game.zoom = preload("res://scripts/battle11_camera.gd").selected_zoom(game.mission)
+			game._update_camera()
+			check_tactical(game, squad[1], size, "phone second")
 	var actor: Dictionary = {}
 	for unit in game.mission.living("player"):
 		if "shoot" in unit.get("kit", []): actor = unit; break
 	check(not actor.is_empty(), "shooter exists at %s" % size)
 	if actor.is_empty(): game.queue_free(); return
 	game._select(int(actor.id))
-	for i in range(24): await process_frame
+	if game.camera_tween != null and game.camera_tween.is_running(): game.camera_tween.kill()
+	game.pivot = Vector3(actor.x, 0, actor.y)
+	game.zoom = preload("res://scripts/battle11_camera.gd").selected_zoom(game.mission)
+	game._update_camera()
 	if phone:
 		var cover_visible := false
 		for y in range(game.mission.spec.height):
