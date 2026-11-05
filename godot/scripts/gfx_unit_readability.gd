@@ -43,15 +43,15 @@ static func update_selection(game: Node) -> void:
 			marker = MeshInstance3D.new()
 			marker.name = "GfxSelectionRing"
 			var torus := TorusMesh.new()
-			torus.inner_radius = 0.51
-			torus.outer_radius = 0.57
+			torus.inner_radius = 0.52
+			torus.outer_radius = 0.59
 			marker.mesh = torus
 			marker.position.y = 0.045
 			var mat := StandardMaterial3D.new()
 			mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-			mat.albedo_color = Color("ffdb8e")
+			mat.albedo_color = Color("fff0bc")
 			mat.emission_enabled = true
-			mat.emission = Color("ffbe54")
+			mat.emission = Color("ffcf60")
 			marker.material_override = mat
 			unit.add_child(marker)
 		marker.visible = selected

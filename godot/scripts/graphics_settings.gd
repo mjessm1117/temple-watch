@@ -7,6 +7,7 @@ const OVERRIDE := "user://override.cfg"
 const Resources = preload("res://scripts/graphics_resources.gd")
 const BattleArt = preload("res://scripts/env_art.gd")
 const Readability = preload("res://scripts/gfx_unit_readability.gd")
+const Materials13 = preload("res://scripts/gfx13_materials.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
 var requested := "high"
 var effective := "high"
@@ -188,15 +189,15 @@ func apply_globals() -> void:
 	var high := effective == "high"
 	var shadows := "rendering/lights_and_shadows/directional_shadow/"
 	RenderingServer.directional_shadow_atlas_set_size((2048 if battle else int(ProjectSettings.get_setting(shadows+"size"))) if high else 1024,true if battle or not high else bool(ProjectSettings.get_setting(shadows+"16_bits")))
-	RenderingServer.directional_soft_shadow_filter_set_quality((RenderingServer.SHADOW_QUALITY_SOFT_LOW if battle else int(ProjectSettings.get_setting(shadows+"soft_shadow_filter_quality"))) if high else RenderingServer.SHADOW_QUALITY_HARD)
+	RenderingServer.directional_soft_shadow_filter_set_quality((RenderingServer.SHADOW_QUALITY_SOFT_LOW if battle else int(ProjectSettings.get_setting(shadows+"soft_shadow_filter_quality"))) if high else RenderingServer.SHADOW_QUALITY_HARD if effective == "low" else RenderingServer.SHADOW_QUALITY_SOFT_LOW)
 	if RenderingServer.get_current_rendering_method() == "gl_compatibility": return
 	var ao := "rendering/environment/ssao/"
 	RenderingServer.environment_set_ssao_quality(RenderingServer.ENV_SSAO_QUALITY_LOW if battle or not high else int(ProjectSettings.get_setting(ao+"quality")),true if battle or not high else bool(ProjectSettings.get_setting(ao+"half_size")),0.5 if battle or not high else float(ProjectSettings.get_setting(ao+"adaptive_target")),2 if battle or not high else int(ProjectSettings.get_setting(ao+"blur_passes")),40 if battle or not high else float(ProjectSettings.get_setting(ao+"fadeout_from")),80 if battle or not high else float(ProjectSettings.get_setting(ao+"fadeout_to")))
 
 func apply_environment(env: Environment) -> void:
-	for property in ["ssao_enabled","ssil_enabled","glow_enabled","volumetric_fog_enabled"]:
+	for property in ["ssao_enabled","ssil_enabled","glow_enabled","volumetric_fog_enabled","adjustment_enabled"]:
 		var baseline = original(env,property)
-		env.set(property,baseline if (effective == "high" or property == "glow_enabled" and effective == "medium") else false)
+		env.set(property,baseline if (effective == "high" or property in ["glow_enabled","adjustment_enabled"] and effective == "medium") else false)
 	for property in ["ssao_intensity","ssil_intensity","glow_intensity","volumetric_fog_density"]:
 		env.set(property,float(original(env,property))*(0.65 if effective == "medium" else 1.0))
 	for property in ["fog_enabled","fog_height_density"]:
@@ -238,6 +239,7 @@ func apply_node(reference: WeakRef) -> void:
 			var art = BattleArt.new()
 			art.apply_environment(node,owner.scene_view.sun,str(owner.mission.spec.get("theme","temple")))
 			art.free()
+			if owner.terrain.get_child_count() > 0: Materials13.apply(owner.terrain.get_child(0),low)
 		apply_environment(node.environment)
 	if node is Light3D:
 		original(node,"shadow_enabled")

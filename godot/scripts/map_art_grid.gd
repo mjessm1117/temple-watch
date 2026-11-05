@@ -11,7 +11,7 @@ func bind(original: Node3D, owner_game: Node = null) -> void:
 	source = original; source.visible = false
 	source.child_entered_tree.connect(changed); source.child_exiting_tree.connect(changed)
 	view = MultiMeshInstance3D.new(); add_child(view)
-	var mat := StandardMaterial3D.new(); mat.vertex_color_use_as_albedo = true; mat.albedo_color = Color(1,1,1,0.34)
+	var mat := StandardMaterial3D.new(); mat.vertex_color_use_as_albedo = true; mat.albedo_color = Color(1,1,1,0.39)
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	view.material_override = mat; view.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
@@ -19,6 +19,7 @@ func changed(_child: Node) -> void: dirty = true
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(game): visible = not game.cinematic
+	style_hover()
 	if not dirty or not is_instance_valid(source): return
 	dirty = false
 	var mm := MultiMesh.new(); mm.transform_format = MultiMesh.TRANSFORM_3D; mm.use_colors = true
@@ -35,5 +36,22 @@ func _process(_delta: float) -> void:
 		transform.origin.y -= 0.095
 		mm.set_instance_transform(index,transform)
 		var tint: Color = child.material_override.albedo_color
-		tint.a = 1.0; mm.set_instance_color(index,tint); index += 1
+		tint.a = 0.28 if child.mesh.size.x > 0.7 and child.mesh.size.z > 0.7 else 1.0
+		mm.set_instance_color(index,tint); index += 1
 	mm.visible_instance_count = index; view.multimesh = mm
+
+func style_hover() -> void:
+	if not is_instance_valid(game) or not is_instance_valid(game.hover_highlights): return
+	for node in game.hover_highlights.get_children():
+		if not node is MeshInstance3D or node.has_meta("gfx13_styled"): continue
+		node.set_meta("gfx13_styled",true)
+		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		if node.mesh is BoxMesh and node.material_override is StandardMaterial3D:
+			var size: Vector3 = node.mesh.size
+			if size.y > 0.065 or size.y < 0.035: continue
+			# Existing route dots and line remain rule-owned; only their material changes.
+			var mat: StandardMaterial3D = node.material_override
+			mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			mat.emission_enabled = true
+			mat.emission = Color("71e4ff")
+			mat.emission_energy_multiplier = 0.65
