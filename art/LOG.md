@@ -162,3 +162,7 @@ Applied meshy-art-director and the 150-credit cap. Live balance **9,625 → 9,47
 Only the accepted snow half and jungle full paths changed in `props.json`; no gameplay, LOS, renderer, or other theme paths changed. Before/after Ilum and h_roots captures and three stage close-ups are in `docs/godot/shots/meshy5-*.png`. Full decisions, dimensions and render counters: `docs/godot/meshy5/REPORT.md`.
 
 Final validation: headless Godot import before tests; `./godot/test.sh` exit **0**, every suite 0 failures, 0 SCRIPT ERROR/ERROR lines, Normal rescue **10/20**. The focused map-art check passed **179,392 checks across 62 maps**; the full suite repeated that pass. The initial 1.446-high jungle candidate failed the full-cover height gate; corrected v3 passed. `git diff --check` passed. Local commit on `meshy/batch5`; no push.
+
+## Blender 1 Godot model audit (2026-11-04)
+
+Audited all 97 GLBs under `godot/assets` with headless Blender. The 13 apparent untextured Icospheres are import-only Blender helpers absent from the GLBs. Godot's map and Meshy stage loaders already center and floor-fit props; flying vehicles use centered origins. Sith Heavy's off-center scan result is an animated pose, while its rest geometry is centered. No safe model edit or `_v2` export was warranted. Baseline battle-camera captures at desktop and phone sizes and the complete decision table are in `docs/godot/blender1/REPORT.md`. The Web export excludes the future v2 staging folder and the test-only capture script; the PCK measured 65,037,544 → 65,035,628 bytes.
