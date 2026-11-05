@@ -1,0 +1,27 @@
+{
+  "start": 14395,
+  "tasks": [
+    {
+      "asset": "cover_half_jungle",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14395,
+      "status": "SUCCEEDED",
+      "id": "01a1ade5-f0fe-72d4-8c1a-d9cbb4d3305f",
+      "after": 14375,
+      "completion_balance": 14315
+    },
+    {
+      "asset": "cover_half_jungle",
+      "letter": "A",
+      "mode": "refine",
+      "cost": 10,
+      "before": 14315,
+      "status": "SUCCEEDED",
+      "id": "01a1ade7-85b0-7511-88d3-b1cb82a90c60",
+      "after": 14305,
+      "completion_balance": 14285
+    }
+  ]
+}
