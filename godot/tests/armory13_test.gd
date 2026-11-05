@@ -19,11 +19,22 @@ func check_slots(screen: Control, size_name: String) -> void:
 		var item: Label = tile.get_node("ItemName")
 		var tier: Label = tile.get_node("Tier")
 		check(bounds.encloses(tile.get_global_rect()), size_name + " slot fits screen: " + tile.name)
-		check(art.texture != null and art.texture.get_size() == Vector2(128, 128), size_name + " baked gear art: " + tile.name)
+		if size_name == "phone":
+			check(tile.size.y <= 70, size_name + " uses compact card height: " + tile.name)
+			check(screen.arsenal.get_parent().get_global_rect().encloses(tile.get_global_rect()), size_name + " slot is visible without scrolling: " + tile.name)
+		var cropped := art.texture as AtlasTexture
+		check(cropped != null and cropped.atlas.get_size() == Vector2(128, 128), size_name + " baked gear art: " + tile.name)
+		check(cropped.region == Rect2(cropped.atlas.get_image().get_used_rect()), size_name + " transparent padding is removed: " + tile.name)
 		check(Rect2(Vector2.ZERO, tile.size).encloses(art.get_rect()), size_name + " art fits card: " + tile.name)
+		var visible_height: float = art.size.y
+		check(visible_height >= (40 if size_name == "phone" else 48), size_name + " visible gear art is large enough: " + tile.name)
 		var text_width := item.get_theme_font("font").get_string_size(item.text, HORIZONTAL_ALIGNMENT_LEFT, -1, item.get_theme_font_size("font_size")).x
 		check(text_width <= item.size.x + 1, size_name + " item name is not clipped: " + tile.name)
+		check(tile.get_global_rect().encloses(item.get_global_rect()), size_name + " item label fits card: " + tile.name)
 		check(tier.text.begins_with("Mk ") and tile.has_node("TierPip2"), size_name + " tier is legible: " + tile.name)
+		check(tile.get_global_rect().encloses(tier.get_global_rect()), size_name + " Mk label fits card: " + tile.name)
+		for i in 3:
+			check(tile.get_global_rect().encloses(tile.get_node("TierPip%d" % i).get_global_rect()), size_name + " tier pip %d fits card: %s" % [i, tile.name])
 	var form: Button = screen.arsenal.slot_row.get_node("Slot_form")
 	check(form.get_node("ItemName").text == "Shii-Cho" and "Form I" in form.tooltip_text, size_name + " full form name is accessible")
 
