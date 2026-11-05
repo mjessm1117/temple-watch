@@ -1,5 +1,5 @@
 extends SceneTree
-## Deterministic Wave 15 battle captures and renderer counts.
+## Deterministic battle captures and renderer counts.
 const InputControls = preload("res://scripts/input_controls.gd")
 
 func _initialize() -> void:
@@ -55,7 +55,7 @@ func run() -> void:
 		print("CINE15 MID FIRE pending=%s cinematic=%s trace=%s" % [game.player_attack_pending, game.cinematic, game.cam.trace])
 	await RenderingServer.frame_post_draw
 	var label := "%s-%s-%s-%s" % [phase, "phone-low" if phone else "desktop-medium" if "--medium" in args else "desktop-high", theme, view]
-	var path := ProjectSettings.globalize_path("res://../docs/godot/shots/wave15-" + ("intfix-" if "--intfix" in args else "cine-") + label + ".png")
+	var path := ProjectSettings.globalize_path("res://../docs/godot/shots/wave16-cam-" + label + ".png")
 	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
 	var result := root.get_texture().get_image().save_png(path)
 	var draws := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)

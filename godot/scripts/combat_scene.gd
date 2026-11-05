@@ -6,6 +6,8 @@ var sun: DirectionalLight3D
 var prior_mesh_lod := 1.0
 
 func _setup_scene() -> void:
+	g.pitch = deg_to_rad(53.0)
+	g.yaw = PI / 4.0
 	# Native-resolution HUD/3D; imported meshes choose a cheaper distant LOD.
 	prior_mesh_lod = g.get_viewport().mesh_lod_threshold
 	g.get_viewport().mesh_lod_threshold = 4.0
@@ -24,7 +26,7 @@ func _setup_scene() -> void:
 	g.fx = g.Effects.new(); g.fx.name = "CombatEffects"; g.add_child(g.fx)
 	g.reinforcement_view = preload("res://scripts/reinforcement_marker.gd").new(); g.add_child(g.reinforcement_view)
 	g.sound = g.Audio.new(); g.add_child(g.sound)
-	g.camera = Camera3D.new(); g.camera.current = true; g.camera.fov = 45; g.add_child(g.camera)
+	g.camera = Camera3D.new(); g.camera.current = true; g.camera.fov = 49; g.camera.v_offset = -0.5; g.add_child(g.camera)
 	world = WorldEnvironment.new()
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
