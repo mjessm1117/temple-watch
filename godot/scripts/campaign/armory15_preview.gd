@@ -4,13 +4,14 @@ const Gear = preload("res://scripts/campaign/gear.gd")
 
 static func make(c, r: Dictionary, slot: Button, phone: bool) -> PanelContainer:
 	var card := S.panel(); card.name = "Armory15Preview"
-	card.custom_minimum_size.x = 136 if phone else 220
+	card.custom_minimum_size.x = 128 if phone else 220
 	card.add_theme_stylebox_override("panel", S.box(Color("172b34"), S.CYAN, 4 if phone else 8))
 	var col := S.column(3); card.add_child(col)
-	var title := S.label("SELECTED  /  " + slot.name.trim_prefix("Slot_").to_upper(), 10, S.CYAN)
+	var title := S.label(slot.name.trim_prefix("Slot_").replace("_", " ").to_upper() if phone else "SELECTED  /  " + slot.name.trim_prefix("Slot_").to_upper(), 10, S.CYAN)
 	title.clip_text = true; col.add_child(title)
 	var stats: Dictionary = Gear.battle_stats(c, str(r.id))
-	var stat_text := "DMG %s  ·  ARM %d" % [str(stats.get("dmg", [0, 0])), int(stats.get("armor", 0))]
+	var damage: Array = stats.get("dmg", [0, 0])
+	var stat_text := "DMG %d-%d · A%d" % [int(damage[0]), int(damage[1]), int(stats.get("armor", 0))] if phone else "DMG %s  ·  ARM %d" % [str(damage), int(stats.get("armor", 0))]
 	var stat_line := S.label(stat_text, 9 if phone else 11, S.GOLD)
 	stat_line.clip_text = true; col.add_child(stat_line)
 	var icon := TextureRect.new(); icon.name = "LargeGearArt"

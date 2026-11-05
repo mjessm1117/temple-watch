@@ -1,5 +1,6 @@
 extends SceneTree
 const Campaign = preload("res://scripts/campaign/state.gd")
+const Actor = preload("res://scripts/campaign/loadout_actor.gd")
 var checks := 0
 var failures := 0
 
@@ -42,6 +43,8 @@ func run() -> void:
 	check(not actor.find_child("ArmorPlate", true, false).visible, "armor equip changes visible plate")
 	var art: TextureRect = screen.arsenal.preview_card.find_child("LargeGearArt", true, false)
 	check(art != null and art.size.x >= 120 and art.size.y >= 120, "phone preview art is at least 120 pixels")
+	for tile in screen.arsenal.slot_row.get_children():
+		check(not tile.get_node("SlotLabel").get_global_rect().intersects(tile.get_node("GearArt").get_global_rect()), "%s label clears icon" % tile.name)
 	var hero_bottom := -INF
 	for x in [-0.55, 0.55]:
 		for z in [-0.55, 0.55]:
@@ -61,6 +64,20 @@ func run() -> void:
 	check(room != null and room.get_children().filter(func(n): return n is SpotLight3D).size() == 2, "High has two ceiling light pools")
 	art = screen.arsenal.preview_card.find_child("LargeGearArt", true, false)
 	check(art != null and art.size.x >= 200 and art.size.y >= 200, "desktop preview art is at least 200 pixels")
+	var upgrade_button: Button = screen.arsenal.offers[0].button
+	check(upgrade_button.get_global_rect().end.y <= screen.drawer.get_global_rect().end.y - 8, "desktop Upgrade clears drawer bottom")
+	for id in ["u1", "u3"]:
+		for armor in (["none", "robes", "armoredRobes", "masterRobes"] if id == "u1" else ["none", "light", "medium", "heavy", "beskar"]):
+			for mark in [1, 2, 3]:
+				var soldier: Dictionary = flow.campaign.soldier(id).duplicate(true)
+				soldier.gear.armor = armor
+				soldier.gear.mk["armor:" + armor] = mark
+				var fitted := Actor.new(); fitted.setup(soldier, true)
+				var fitted_plate: MeshInstance3D = fitted.find_child("ArmorPlate", true, false)
+				var shoulder_plate: MeshInstance3D = fitted.find_child("ShoulderPlate", true, false)
+				var has_armor: bool = armor in ["medium", "heavy", "armoredRobes", "beskar", "masterRobes"] or mark > 1
+				check(fitted_plate != null and fitted_plate.visible == has_armor and fitted_plate.get_parent() is BoneAttachment3D and shoulder_plate.get_parent() is BoneAttachment3D, "%s %s Mk %d plates follow bones" % [id, armor, mark])
+				fitted.free()
 	screen.queue_free(); await process_frame
 	graphics.effective = old_tier
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(flow.save_path))

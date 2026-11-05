@@ -32,17 +32,17 @@ func _ready() -> void:
 		rim.position = Vector3(1.7, 2.8, -2.0); add_child(rim); rim.look_at(Vector3(0, 1.1, 0))
 		rim.light_color = Color("6ecce9"); rim.light_energy = 4.0
 		rim.spot_range = 6; rim.spot_angle = 42
-		var glow := MeshInstance3D.new(); glow.name = "ShowroomFloorGlow"
-		var disc := CylinderMesh.new(); disc.top_radius = 1.05; disc.bottom_radius = 1.05
-		disc.height = 0.012; disc.radial_segments = 32; glow.mesh = disc
-		glow.position = Vector3(0, -0.008, 0)
-		var glow_mat := StandardMaterial3D.new()
-		glow_mat.albedo_color = Color(0.11, 0.51, 0.67, 0.24)
-		glow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		glow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		glow_mat.emission_enabled = true; glow_mat.emission = Color("58b7d5")
-		glow_mat.emission_energy_multiplier = 1.0
-		glow.material_override = glow_mat; add_child(glow)
+	var glow := MeshInstance3D.new(); glow.name = "Hangar15FloorPool" if get_node("/root/Graphics").effective == "low" else "ShowroomFloorGlow"
+	var disc := CylinderMesh.new(); disc.top_radius = 1.05; disc.bottom_radius = 1.05
+	disc.height = 0.012; disc.radial_segments = 32; glow.mesh = disc
+	glow.position = Vector3(0, -0.008, 0)
+	var glow_mat := StandardMaterial3D.new()
+	glow_mat.albedo_color = Color(0.17, 0.6, 0.75, 0.4 if get_node("/root/Graphics").effective == "low" else 0.24)
+	glow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	glow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	glow_mat.emission_enabled = true; glow_mat.emission = Color("58b7d5")
+	glow_mat.emission_energy_multiplier = 1.0
+	glow.material_override = glow_mat; add_child(glow)
 	Hangar15.build(self, get_node("/root/Graphics").effective == "low")
 	_make_dust()
 

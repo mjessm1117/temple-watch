@@ -63,8 +63,6 @@ STRATEGY TEST RESULTS: 119 checks, 0 failures
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 COMBAT7 TEST RESULTS: 118 checks, 0 failures
-WARNING: 22 ObjectDB instances were leaked at exit (run with `--verbose` for details).
-   at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 HUD NIGHT1 TEST RESULTS: 401 checks, 0 failures
@@ -158,7 +156,7 @@ HOME UI TEST RESULTS: 162 checks, 0 failures
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 LOADOUT TEST RESULTS: 75 checks, 0 failures
-WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).
    at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
@@ -170,6 +168,8 @@ SCREENS TEST RESULTS: 38 checks, 0 failures
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 INTEGRATION TEST RESULTS: 61 checks, 0 failures
+WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 MAP ART: 62 maps; largest res://data/maps/cache.json (1156 tiles)
@@ -231,8 +231,6 @@ BATTLE12 TEST RESULTS: 21 checks, 0 failures
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 Mobile Web 1: 35 checks, 0 failures
-WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
-   at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 RULES12 RESULTS: 179 checks, 0 failures
@@ -291,6 +289,8 @@ ART WINDOW: (0, 0) viewport (1366.0, 768.0)
 ART WINDOW: (0, 0) viewport (1366.0, 768.0)
 ART WINDOW: (0, 0) viewport (1366.0, 768.0)
 gfx_night1 low: 222 checks, 0 failures
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 ART WINDOW: (0, 0) viewport (1366.0, 768.0)
@@ -302,6 +302,8 @@ ART WINDOW: (0, 0) viewport (1366.0, 768.0)
 ART WINDOW: (0, 0) viewport (1366.0, 768.0)
 ART WINDOW: (0, 0) viewport (1366.0, 768.0)
 gfx_night1 high: 222 checks, 0 failures
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 GFX13 PERF after (844, 390): {"adapter":"","draw_calls_max":0,"fps_estimate":144.9,"triangles_max":0}
@@ -320,7 +322,7 @@ WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for deta
    at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
-ARMORY15 TEST RESULTS: 14 checks, 0 failures; Low draw monitor=0
+ARMORY15 TEST RESULTS: 50 checks, 0 failures; Low draw monitor=0
 WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
    at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
@@ -329,10 +331,10 @@ HOME13 LAYOUT phone: map [P: (8.0, 74.0), S: (434.0, 246.0)] briefing [P: (468.0
 HOME13 TEST RESULTS: 15 checks, 0 failures
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
-HOME13 ROOM war: button [P: (559.8467, 296.8263), S: (119.4667, 58.80435)] label [P: (559.8467, 298.8263), S: (119.4667, 15.0)]
-HOME13 ROOM archives: button [P: (686.6276, 296.8488), S: (119.4666, 58.80435)] label [P: (686.6276, 298.8488), S: (119.4666, 26.0)]
-HOME13 ROOM sp0: button [P: (386.742, 238.0124), S: (85.33331, 58.79828)] label [P: (386.742, 240.0124), S: (85.33331, 26.0)]
-HOME13 ROOM sp1: button [P: (513.5229, 238.0349), S: (85.33331, 58.79829)] label [P: (513.5229, 240.0349), S: (85.33331, 26.0)]
+HOME13 ROOM war: button [P: (559.8465, 296.8263), S: (119.4667, 58.80444)] label [P: (559.8465, 298.8263), S: (119.4667, 15.0)]
+HOME13 ROOM archives: button [P: (686.6274, 296.849), S: (119.4667, 58.80444)] label [P: (686.6274, 298.849), S: (119.4667, 26.0)]
+HOME13 ROOM sp0: button [P: (386.7418, 238.0122), S: (85.33331, 58.79834)] label [P: (386.7418, 240.0122), S: (85.33331, 26.0)]
+HOME13 ROOM sp1: button [P: (513.5227, 238.0349), S: (85.33331, 58.79836)] label [P: (513.5227, 240.0349), S: (85.33331, 26.0)]
 HOME13 LAYOUT desktop: map [P: (22.0, 96.0), S: (920.0, 639.0)] briefing [P: (968.0, 275.0), S: (362.0, 399.0)]
 HOME13 TEST RESULTS: 1024 checks, 0 failures
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
@@ -345,8 +347,6 @@ BATTLE13 TEST RESULTS: 69 checks, 0 failures
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 BATTLE14 TEST RESULTS: 52 checks, 0 failures
-WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
-   at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 MAP14 PERF after temple (844, 390): draws=0 triangles=0
@@ -399,6 +399,8 @@ HOME14 TEST RESULTS: 101 checks, 0 failures
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 HOME14 TEST RESULTS: 59 checks, 0 failures
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 Story14: 188 checks, 0 failures

@@ -25,10 +25,13 @@ func capture() -> void:
 	if "different" in args:
 		flow.campaign.soldier("u1").col = "#c58cff"
 		flow.campaign.soldier("u1").gear.armor = "armoredRobes"
+	if "trooper" in args:
+		flow.campaign.soldier("u3").gear.armor = "heavy"
+		flow.campaign.soldier("u3").gear.mk["armor:heavy"] = 2
 	var screen = load("res://scenes/squad.tscn").instantiate()
 	root.add_child(screen)
 	await process_frame
-	screen.inspect(0)
+	screen.inspect(2 if "trooper" in args else 0)
 	screen.arsenal._select_slot("weapon")
 	await create_timer(1.5).timeout
 	await RenderingServer.frame_post_draw
@@ -36,7 +39,7 @@ func capture() -> void:
 	var tris := Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)
 	var fps := Engine.get_frames_per_second()
 	var suffix := "phone-low" if phone else "desktop-high"
-	var variant := "-different" if "different" in args else ""
+	var variant := "-different" if "different" in args else "-trooper" if "trooper" in args else ""
 	var path := ProjectSettings.globalize_path("res://../docs/godot/shots/wave15-armory-%s-%s%s.png" % [phase, suffix, variant])
 	print("ARMORY15 PERF %s %s%s draws=%d triangles=%d fps=%d" % [phase, suffix, variant, draws, tris, fps])
 	print("ARMORY15 SHOT %s result=%d" % [path, root.get_texture().get_image().save_png(path)])

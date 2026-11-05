@@ -16,6 +16,7 @@ var picker: VBoxContainer
 var slot_row: GridContainer
 var slot_prompt: Label
 var preview_card: PanelContainer
+var hangar_sign: Label
 var feature_row: HBoxContainer
 var skill_view := false
 
@@ -25,12 +26,19 @@ func setup(owner_screen: Control, id: String) -> void:
 	var c = host.flow.session(); var r: Dictionary = c.soldier(id)
 	var jedi := Progression.is_jedi(r)
 	feature_row = HBoxContainer.new(); feature_row.add_theme_constant_override("separation", 6); add_child(feature_row)
-	slot_row = GridContainer.new(); slot_row.columns = 3 if Phone.narrow(get_tree().root.size) else 4
+	slot_row = GridContainer.new(); slot_row.columns = 4
 	slot_row.size_flags_horizontal = SIZE_EXPAND_FILL
 	slot_row.add_theme_constant_override("h_separation", 5); slot_row.add_theme_constant_override("v_separation", 4)
 	feature_row.add_child(slot_row)
 	_build_slots(r, jedi)
 	_update_preview()
+	hangar_sign = S.label("HANGAR 07", 12, S.CYAN)
+	hangar_sign.add_theme_color_override("font_shadow_color", Color("00131b"))
+	hangar_sign.add_theme_constant_override("shadow_offset_x", 1)
+	hangar_sign.add_theme_constant_override("shadow_offset_y", 2)
+	hangar_sign.position = Vector2(10 if Phone.narrow(get_tree().root.size) else host.size.x - 676, 8)
+	hangar_sign.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	host.stage_container.add_child(hangar_sign)
 	picker = S.column(6); add_child(picker)
 	slot_prompt = S.label("SELECT A GEAR SLOT TO COMPARE EQUIPMENT", 12, S.CYAN); picker.add_child(slot_prompt)
 	var color_row := HBoxContainer.new(); picker.add_child(color_row)
@@ -140,7 +148,7 @@ func _build_slots(r: Dictionary, jedi: bool) -> void:
 func _slot(key: String, title: String, value: String, mark: int, icon: String) -> void:
 	var compact := Phone.narrow(get_tree().root.size)
 	var b := S.button("", _select_slot.bind(key)); b.name = "Slot_" + key
-	b.custom_minimum_size = Vector2(106 if compact else 116, 50 if compact else 96)
+	b.custom_minimum_size = Vector2(87 if compact else 116, 68)
 	b.size_flags_horizontal = SIZE_EXPAND_FILL
 	b.tooltip_text = value
 	var art_key: String = str({"weapon":"saber" if icon == "strike" else "blaster", "armor":icon, "utility":"utility", "base_mod":"module", "armor_mod":"armor_mod", "form":"form", "color":"crystal", "evolution":"path"}.get(key, "module"))
@@ -151,31 +159,33 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 	cropped.region = source.get_image().get_used_rect()
 	glyph.texture = cropped
 	glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; glyph.stretch_mode = TextureRect.STRETCH_SCALE
-	var art_height := 40.0 if compact else 61.0
-	var art_width := minf(art_height * cropped.region.size.x / cropped.region.size.y, 30.0 if compact else 48.0)
-	glyph.position = Vector2(2.0 + ((32.0 if compact else 48.0) - art_width) * 0.5, 5 if compact else 16)
+	var art_height := 40.0 if compact else 48.0
+	var art_width := minf(art_height * cropped.region.size.x / cropped.region.size.y, 24.0 if compact else 42.0)
+	glyph.position = Vector2(3.0 + ((30.0 if compact else 42.0) - art_width) * 0.5, 26 if compact else 10)
 	glyph.size = Vector2(art_width, art_height)
 	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(glyph)
-	var name_label := S.label(title, 12 if compact else 7, S.CYAN)
-	name_label.position = Vector2(6 if compact else 53, 2 if compact else 10)
-	name_label.size = Vector2(106 if compact else 62, 16)
+	var name_label := S.label(title, 9 if compact else 7, S.CYAN)
+	name_label.name = "SlotLabel"
+	name_label.position = Vector2(6 if compact else 51, 2 if compact else 5)
+	name_label.size = Vector2(81 if compact else 62, 16)
 	name_label.clip_text = true
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
 	var display_value := value.get_slice(" (", 0) if key == "form" else value
 	display_value = display_value.trim_suffix(" saber").trim_suffix(" robes")
-	var item_label := S.label(display_value, 7 if compact else 8)
-	item_label.name = "ItemName"; item_label.position = Vector2(42 if compact else 53, 17 if compact else 31)
+	var item_label := S.label(display_value, 6 if compact else 8)
+	item_label.name = "ItemName"; item_label.position = Vector2(31 if compact else 51, 18 if compact else 24)
 	item_label.clip_text = true
 	item_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	item_label.size = Vector2(70 if compact else 52, 17)
+	item_label.size = Vector2(51 if compact else 62, 17)
+	if compact: item_label.scale.x = 0.8
 	b.add_child(item_label)
 	var tier := S.label("Mk " + _mark(mark), 9, _tier_color(mark))
-	tier.name = "Tier"; tier.position = Vector2(42 if compact else 53, 33 if compact else 73)
+	tier.name = "Tier"; tier.position = Vector2(31 if compact else 51, 33 if compact else 45)
 	tier.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(tier)
 	for i in 3:
 		var pip := ColorRect.new(); pip.name = "TierPip%d" % i
 		pip.color = _tier_color(mark) if i < mark else Color("2b3d44")
-		pip.position = Vector2((42 if compact else 53) + i * 14, 47 if compact else 90)
+		pip.position = Vector2((31 if compact else 51) + i * 14, 47 if compact else 61)
 		pip.size = Vector2(10, 3); pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b.add_child(pip)
 	slot_row.add_child(b); host.wire_button(b)
@@ -216,6 +226,7 @@ func _update_preview() -> void:
 func _exit_tree() -> void:
 	if is_instance_valid(preview_card) and preview_card.get_parent() != self:
 		preview_card.queue_free()
+	if is_instance_valid(hangar_sign): hangar_sign.queue_free()
 
 func _show_gear() -> void:
 	skill_view = false; _filter()
