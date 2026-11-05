@@ -64,7 +64,7 @@ func setup(save_state: Dictionary) -> void:
 		cell_nodes[info.id] = art.room(temple, info)
 		_make_button(info)
 	if Phone.narrow(Phone.window_size()):
-		phone_names = PhoneNames.new(); phone_names.buttons = buttons; add_child(phone_names)
+		phone_names = PhoneNames.new(); phone_names.buttons = buttons; phone_names.rooms = rooms; add_child(phone_names)
 	art.batch_static(temple)
 	sound = AudioStreamPlayer.new(); sound.volume_db = -30; add_child(sound)
 	var synth := preload("res://scripts/audio.gd").new()
@@ -176,4 +176,4 @@ func _project_rooms() -> void:
 		buttons[id].position = a * ratio
 		buttons[id].size = (b - a) * ratio
 		Plates.layout(buttons[id], info, Phone.narrow(Phone.window_size()))
-	if phone_names != null: phone_names.queue_redraw()
+	if phone_names != null: phone_names.layout()

@@ -42,3 +42,27 @@ The galaxy still uses a stylized orbital view rather than a textured geographic 
 ## Gate
 
 Import completed. `godot/test.sh` exited 0, with 0 `SCRIPT ERROR` lines, 49 zero-failure suite lines and no failed suite; Normal rescue was 9/20. `home14_test`: phone 63 checks, desktop 59 checks, zero failures. `armory13_test`: 253 checks, zero failures. `git diff --check` is clean. Full output is in `test-final.log`.
+
+## Review fix pass — 2026-11-05
+
+Phone room names now use short 16 px type in a single batched canvas. The rendered uppercase ink measures 14 px tall in the 844×390 capture. All seven initially built rooms have labels; the empty rooms keep their outlines and full names in Rooms. `home14_test` checks type height, all built labels, pairwise overlap, and the hidden phone state plates. Built rooms have brighter recessed walls and shared flickering monitors; larger figures from `human.glb` and the room props show through the opened middle band. Unbuilt rooms remain dark. The phone galaxy initially shows the mission category and title; MORE reveals the full detail, so no line is cut by the briefing button.
+
+The four recaptured after shots were inspected at native size:
+
+| Screen | Phone | Desktop |
+| --- | --- | --- |
+| Temple | [after](../../shots/wave14-home-after-temple-phone.png) | [after](../../shots/wave14-home-after-temple-desktop.png) |
+| Galaxy | [after](../../shots/wave14-home-after-galaxy-phone.png) | [after](../../shots/wave14-home-after-galaxy-desktop.png) |
+
+Compatibility/Low capture totals (draw calls / triangles):
+
+| View | Wave 13 baseline → fix pass draws | Wave 13 baseline → fix pass triangles |
+| --- | ---: | ---: |
+| Temple phone | 257 → 278 (+8.2%) | 174,960 → 174,377 |
+| Temple desktop | 425–426 → 427 | 188,578–188,580 → 193,845 |
+| Galaxy phone | 98 → 102 | 43,203 → 43,696 |
+| Galaxy desktop | 144 → 145 | 46,135 → 46,142 |
+
+No Meshy credits used.
+
+Fix pass gate: headless import succeeded; `./godot/test.sh` exited 0 with 49 zero-failure suite lines, 0 `SCRIPT ERROR`, and Normal rescue 9/20. Phone `home14_test` passed 101 checks; desktop passed 59. `git diff --check` is clean. Logs: `import-fix.log`, `test-fix.log`, and the four `capture-*-fix.log` files in this folder.

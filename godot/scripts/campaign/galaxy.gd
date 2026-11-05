@@ -19,6 +19,7 @@ var tab_scroll: ScrollContainer
 var chips: HFlowContainer
 var scroll: ScrollContainer
 var excerpt: Label
+var phone_more := false
 var page := "Briefing"
 var region := "outer"
 var planet := ""
@@ -97,7 +98,7 @@ func _build() -> void:
 		excerpt = UI.label("", 12, UI.TEXT); excerpt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		excerpt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		summary.add_child(excerpt)
-		var more := UI.button("MORE", func(): scroll.scroll_vertical = 92)
+		var more := UI.button("MORE", func(): phone_more = true; _show_details())
 		more.name = "BriefingMore"; more.custom_minimum_size = Vector2(52, 40); summary.add_child(more)
 	scroll = ScrollContainer.new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)

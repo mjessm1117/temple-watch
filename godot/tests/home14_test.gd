@@ -34,6 +34,20 @@ func run() -> void:
 		var name_label: Label = button.get_node("RoomName")
 		check(name_label.visible or phone and temple.temple_view.phone_names != null, "Room name visible: " + id)
 		check(button.get_global_rect().intersects(Rect2(Vector2.ZERO, root.size)), "Room target on screen: " + id)
+	if phone:
+		var names: Control = temple.temple_view.phone_names
+		var glyph_font: Font = names.get_theme_default_font()
+		var cap_height: float = glyph_font.get_glyph_size(0, Vector2i(names.FONT_SIZE, names.FONT_SIZE), glyph_font.get_glyph_index(names.FONT_SIZE, 65, 0)).y
+		# 16 px face produces 14 px uppercase ink in the 844x390 capture.
+		check(names.FONT_SIZE >= 16 and cap_height >= 11, "Phone room type keeps 11 px minimum")
+		check(names.labels.size() == built, "Every built room has a phone name")
+		for i in names.labels.size():
+			var row: Dictionary = names.labels[i]
+			check(cap_height >= 11.0, "Phone caps at least 11 px: " + str(row.id))
+			for j in range(i + 1, names.labels.size()):
+				check(not row.area.intersects(names.labels[j].area), "Phone names do not overlap: " + str(row.id) + "/" + str(names.labels[j].id))
+			var target: Button = temple.temple_view.buttons[row.id]
+			check(not target.get_node("RoomDetail").visible, "Phone name clear of state plate: " + str(row.id))
 	check(built > 0 and empty > 0, "Built and empty rooms both appear")
 	check(temple.temple_view.temple.find_children("*", "MeshInstance3D", true, false).size() > 0, "Lit cutaway geometry exists")
 	var galaxy: Control = load("res://scenes/galaxy.tscn").instantiate()
@@ -45,6 +59,7 @@ func run() -> void:
 	if phone:
 		check(galaxy.excerpt != null and galaxy.excerpt.visible, "Phone briefing excerpt visible")
 		check(galaxy.excerpt.text.length() <= 55, "Phone excerpt is short")
+		check(galaxy.detail.get_child_count() == 2, "Phone mission title has no clipped detail below")
 		check(galaxy.excerpt.get_parent().get_global_rect().end.y <= root.size.y, "Excerpt fits height")
 	else: check(galaxy.excerpt == null, "Desktop keeps full briefing")
 	if RenderingServer.get_current_rendering_method() == "gl_compatibility":

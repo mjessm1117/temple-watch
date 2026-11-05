@@ -31,12 +31,12 @@ static func layout(button: Button, info: Dictionary, phone: bool) -> void:
 	# Keep all three lines in the upper part of each target. Adjacent floors
 	# project only about 57 pixels apart at desktop resolution.
 	name_label.offset_top = 2
-	name_label.offset_bottom = 28
+	name_label.offset_bottom = 17 if info.built else 28
 	name_label.clip_text = false
 	fit(detail, button.size.x, 9)
 	detail.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	detail.offset_top = 30
-	detail.offset_bottom = 43
+	detail.offset_top = 44 if info.built else 30
+	detail.offset_bottom = 57 if info.built else 43
 	name_label.visible = not phone
 	detail.visible = not phone
 	if button.has_node("BattleBonus"):
@@ -45,7 +45,7 @@ static func layout(button: Button, info: Dictionary, phone: bool) -> void:
 		bonus.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 		bonus.offset_top = 44
 		bonus.offset_bottom = 57
-		bonus.visible = not phone
+		bonus.visible = false if info.built else not phone
 	if button.has_node("RoomAlert"):
 		# Desktop names own the top strip; the command bar and teaser show alerts.
 		button.get_node("RoomAlert").visible = phone
