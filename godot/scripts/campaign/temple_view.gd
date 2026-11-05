@@ -67,7 +67,19 @@ func setup(save_state: Dictionary) -> void:
 	if Phone.narrow(Phone.window_size()):
 		phone_names = PhoneNames.new(); phone_names.buttons = buttons; phone_names.rooms = rooms; add_child(phone_names)
 	art.batch_static(temple)
-	Show16Rooms.populate(cell_nodes, rooms, state, RenderingServer.get_current_rendering_method() == "gl_compatibility")
+	var jedi_actors: Array[Node3D] = Show16Rooms.populate(cell_nodes, rooms, state, RenderingServer.get_current_rendering_method() == "gl_compatibility")
+	if Phone.narrow(Phone.window_size()):
+		for actor in jedi_actors:
+			var room_id := actor.get_parent().name
+			var portrait := TextureRect.new()
+			portrait.name = "JediFace_" + str(actor.get_meta("show16_jedi"))
+			portrait.texture = load("res://assets/portraits/jedi/%s.png" % actor.get_meta("show16_jedi"))
+			portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			portrait.position = Vector2(2, 0)
+			portrait.size = Vector2(19, 23)
+			buttons[room_id].add_child(portrait)
 	sound = AudioStreamPlayer.new(); sound.volume_db = -30; add_child(sound)
 	var synth := preload("res://scripts/audio.gd").new()
 	sound.stream = synth._synthesize("click"); synth.free()
