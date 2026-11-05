@@ -19,8 +19,8 @@ All linked captures are native 844×390 Compatibility/Low or 1366×768 Forward+/
 | Phone overhead | — → 85 | — → 109,160 |
 | Phone Jedi kill, frames 1/2/3 | — → 45/45/43 | — → 47,931/62,205/62,193 |
 
-The matching High tactical view measured 120 → 123 draws and 211,634 → 217,710 triangles. High aim measured 99 → 162 draws and 133,361 → 417,875 triangles; the added shadow pass accounts for much of this increase. Low tactical and aim stay within the +15% draw and +20% triangle limits. No new binary game assets were added. The Low 60 fps target still needs a physical phone measurement; software-renderer captures are not that measurement.
+The matching High tactical view measured 120 → 123 draws and 211,634 → 217,710 triangles. High aim measured 99 → 162 draws and 133,361 → 417,875 triangles; the added shadow pass accounts for much of this increase. Low tactical and aim stay within the +15% draw and +20% triangle limits. No binary game assets were added; all touched game `.gd` files total 42,496 bytes, well below the +3 MB Web PCK allowance even if all were new. The Low 60 fps target still needs a physical phone measurement; software-renderer captures are not that measurement.
 
 ## Gate
 
-Pending final full-suite result.
+Final headless import exited 0 with 0 script, parse or import errors. `./godot/test.sh` exited 0: 63 zero-failure suite results, 0 `SCRIPT ERROR`, 0 parse errors and 0 error matches. Normal rescue won 9/20. `cam16_test` passed 24 Low and 13 Medium checks; the existing `cine15_test` passed 19 Low and 4 Medium checks. `git diff --check` is clean. The phone tactical and aim captures measured 74 and 95 draws, within the +15% limit; their triangle counts are 100,026 and 63,833, within the +20% limit.
