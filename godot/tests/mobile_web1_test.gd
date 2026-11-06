@@ -34,6 +34,12 @@ func run() -> void:
 	check(game.hud_controls.phone != null, "battle creates compact HUD on phone")
 	if game.hud_controls.phone != null:
 		var hud = game.hud_controls.phone
+		var end_button: Button = hud.overlay.find_child("PhoneEndTurn", true, false)
+		check(end_button != null, "phone HUD has a dedicated End Turn button")
+		if end_button != null:
+			var bounds := end_button.get_global_rect()
+			var visible: Rect2 = hud.overlay.get_global_rect()
+			check(visible.encloses(bounds) and bounds.size.x >= 44 and bounds.size.y >= 38, "End Turn fits and is tappable in landscape")
 		for member in game.mission.living("player"):
 			if member.has("ammo"): game.selected_id = int(member.id); break
 		game._refresh()
@@ -57,6 +63,13 @@ func run() -> void:
 			check(unit_text.contains(field), "compact card shows readable " + field)
 		check(not actor.is_empty(), "selected actor remains available")
 	game.queue_free(); await process_frame
+	root.size = Vector2i(390,844); await process_frame
+	var portrait = load("res://scenes/rescue.tscn").instantiate(); root.add_child(portrait)
+	await process_frame
+	if portrait.hud_controls.phone != null:
+		var end_portrait: Button = portrait.hud_controls.phone.overlay.find_child("PhoneEndTurn", true, false)
+		check(end_portrait != null and portrait.hud_controls.phone.overlay.get_global_rect().encloses(end_portrait.get_global_rect()), "End Turn fits in portrait")
+	portrait.queue_free(); await process_frame
 	root.size = Vector2i(1366,768); await process_frame
 	var desktop = load("res://scenes/rescue.tscn").instantiate(); root.add_child(desktop)
 	await process_frame
