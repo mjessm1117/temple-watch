@@ -318,8 +318,8 @@ func _skip_dialogue() -> void:
 
 func _set_speaker(name: String) -> void:
 	speaker_plate.text = "SPEAKER  " + name.to_upper()
-	if is_instance_valid(speaker_portrait): speaker_portrait.texture = Portraits14.texture(name)
-	if is_instance_valid(big_speaker_portrait): big_speaker_portrait.texture = Portraits14.texture(name)
+	if is_instance_valid(speaker_portrait): speaker_portrait.texture = Portraits14.display_texture(name)
+	if is_instance_valid(big_speaker_portrait): big_speaker_portrait.texture = Portraits14.display_texture(name)
 	if is_instance_valid(big_speaker_caption): big_speaker_caption.text = name.to_upper()
 
 func _choose(id: String, animate: bool = false) -> void:

@@ -15,17 +15,22 @@ static func texture(name: String) -> Texture2D:
 	var key: String = NAMES.get(name,"council")
 	if key in ["kira", "tor", "satele", "ressa", "kell", "sava", "tem"]:
 		var jedi_path := "res://assets/portraits/jedi/%s.png" % key
-		if ResourceLoader.exists(jedi_path):
-			var crop := AtlasTexture.new()
-			crop.atlas = load(jedi_path)
-			crop.region = Rect2(78, 38, 100, 126)
-			return crop
+		if ResourceLoader.exists(jedi_path): return load(jedi_path)
 	var path := "res://assets/story/portraits14/%s.png" % key
 	return load(path) if ResourceLoader.exists(path) else null
 
+static func display_texture(name: String) -> Texture2D:
+	var source := texture(name)
+	if source == null: return null
+	if not source.resource_path.begins_with("res://assets/portraits/jedi/"): return source
+	var crop := AtlasTexture.new()
+	crop.atlas = source
+	crop.region = Rect2(78, 38, 100, 126)
+	return crop
+
 static func picture(name: String, dimensions: Vector2) -> TextureRect:
 	var node := TextureRect.new()
-	node.texture = texture(name)
+	node.texture = display_texture(name)
 	node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	node.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	node.custom_minimum_size = dimensions

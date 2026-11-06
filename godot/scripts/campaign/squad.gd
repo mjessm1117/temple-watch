@@ -235,7 +235,7 @@ func _roster_row(parent: VBoxContainer, r: Dictionary) -> void:
 
 func _portrait_texture(r: Dictionary) -> Texture2D:
 	if JediModels.id_for({"name":str(r.n)}) != "" and Progression.is_jedi(r):
-		return StoryPortraits.texture(str(r.n))
+		return StoryPortraits.display_texture(str(r.n))
 	return portraits[str(r.id)].get_texture()
 
 func swap_soldier(id: String) -> bool:
