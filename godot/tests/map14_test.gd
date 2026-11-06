@@ -7,7 +7,7 @@ const PATHS := {
 	"temple":"res://data/rescue.json", "dock":"res://data/maps/dock.json",
 	"city":"res://data/maps/envoy.json", "ruins":"res://data/maps/cache.json",
 	"snow":"res://data/maps/ilum.json", "jungle":"res://data/maps/h_grove.json",
-	"plains":"res://data/maps/relay.json", "caves":"res://data/maps/w11_holocron.json"
+	"plains":"res://data/maps/blockade.json", "caves":"res://data/maps/w11_holocron.json"
 }
 var checks := 0
 var failures := 0

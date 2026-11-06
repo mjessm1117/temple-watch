@@ -94,14 +94,14 @@
     },
     "MISSIONS": {
       "relay": {
-        "n": "Relay Aurek-7",
-        "where": "Outpost Aurek-7 · Sith frontier",
+        "n": "Temple Outer Gate",
+        "where": "Jedi Temple · outer gate",
         "type": "defend",
         "story": 1,
-        "theme": "plains",
-        "turns": 8,
+        "theme": "temple",
+        "turns": 6,
         "obj": 20,
-        "objName": "Relay",
+        "objName": "Outer gate",
         "lastWave": 5,
         "map": [
           "^^......^^",
@@ -160,18 +160,18 @@
             8
           ]
         ],
-        "brief": "Imperial Sith troopers are closing on a frontier hyperspace relay. Hold it for 8 turns until the fleet arrives. Three waves are expected.",
-        "goal": "Hold the relay for 8 turns. The fleet is coming.",
-        "win": "The Republic fleet drops out of hyperspace. The relay held.",
-        "lose": "The relay fell. The Sith now hold the hyperlane toward the Core.",
+        "brief": "Imperial troops are closing on the Temple’s outer gate. Hold the approach for 6 turns while the guard seals the breach.",
+        "goal": "Hold the Temple’s outer gate for 6 turns.",
+        "win": "The gate held. The Temple guard seals the breach.",
+        "lose": "The outer gate fell. The Temple is exposed.",
         "reward": {
           "credits": 80
         },
         "bonus": {
           "credits": 40
         },
-        "bonusTxt": "Relay above 75%",
-        "quote": "“Hold the relay. The fleet needs the lane open.” — Grand Master Zym"
+        "bonusTxt": "Gate above 75%",
+        "quote": "“Hold the gate. The Temple needs time.” — Grand Master Zym"
       },
       "envoy": {
         "n": "The Envoy's Trail",

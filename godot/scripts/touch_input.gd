@@ -24,7 +24,7 @@ static func pinched_zoom(current: float, before: float, after: float) -> float:
 
 static func snap_twist(yaw: float, accumulated: float) -> float:
 	if absf(accumulated) < TWIST_DEAD_ZONE: return yaw
-	return roundf(yaw / (PI * 0.5)) * (PI * 0.5) + signf(accumulated) * PI * 0.5
+	return yaw + signf(accumulated) * PI * 0.5
 
 func handle(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:

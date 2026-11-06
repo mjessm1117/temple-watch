@@ -55,6 +55,7 @@ static func player_start(m: RefCounted) -> void:
 			m._spawn_near(str(kind),Maps.point(wave.at),1000+int(wave.serial)*20+int(wave.spawned)/2)
 			if m.units.size() == count: blocked.append(kind); continue
 			landed += 1; wave.spawned += 1; m.units[-1].spotted = true; m.units[-1].detected = true
+			if m.spec.family == "defend" and int(m.spec.objective.get("hold_turns",0)) > 0: m.units[-1].awake = true
 			m.action_events.append({"kind":"reinforcement","actor":m.units[-1].id,"at":Shot.pos(m.units[-1])})
 		if not blocked.is_empty():
 			wave.kinds = blocked; wave.turn = m.turn+1; wave.announced = m.turn; later.append(wave)

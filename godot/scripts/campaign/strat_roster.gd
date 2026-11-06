@@ -53,7 +53,7 @@ static func hire(c, id: String) -> bool:
 	return false
 
 static func squad_capacity(s: Dictionary) -> int:
-	return 4 + clampi(int(s.get("strategy", {}).get("squad_upgrades", 0)), 0, 2)
+	return 5 + clampi(int(s.get("strategy", {}).get("squad_upgrades", 0)), 0, 2)
 
 static func upgrade_squad(c) -> bool:
 	var level := int(c.state.strategy.squad_upgrades)

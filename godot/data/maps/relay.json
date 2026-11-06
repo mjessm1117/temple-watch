@@ -1,8 +1,8 @@
 {
   "id": "relay",
-  "name": "Relay Aurek-7",
+  "name": "Temple Outer Gate",
   "family": "defend",
-  "theme": "plains",
+  "theme": "temple",
   "plot": {
     "width": 26,
     "height": 26,
@@ -118,8 +118,8 @@
         13
       ]
     ],
-    "hp": 18,
-    "waves": 4,
+    "hp": 42,
+    "waves": 3,
     "civilians": [
       [
         4,
@@ -146,38 +146,44 @@
         7
       ]
     ],
-    "save": 4
+    "save": 4,
+    "name": "Temple outer gate",
+    "blurb": "Hold the Temple approach until the guard seals the breach.",
+    "zone_prop": "res://assets/maps/door_temple.glb",
+    "hold_turns": 6,
+    "zone_radius": 2,
+    "hold_hp": 42
   },
   "squad": [
     [
       "guardian",
       11,
-      21
+      17
     ],
     [
       "consular",
       12,
-      21
+      16
     ],
     [
       "soldier",
       13,
-      21
+      16
     ],
     [
       "scout",
       14,
-      21
+      16
     ],
     [
       "medic",
       15,
-      21
+      16
     ],
     [
       "soldier",
       16,
-      21
+      17
     ]
   ],
   "groups": [
@@ -203,18 +209,6 @@
         "trooper",
         18,
         11
-      ]
-    ],
-    [
-      [
-        "agent",
-        10,
-        5
-      ],
-      [
-        "trooper",
-        16,
-        5
       ]
     ]
   ],
@@ -322,5 +316,22 @@
     "00000000000000000111100000",
     "00000000000000000000000000",
     "00000000000000000000000000"
+  ],
+  "wave_roster": [
+    [
+      "trooper",
+      "trooper"
+    ],
+    [
+      "trooper",
+      "heavy"
+    ],
+    [
+      "trooper",
+      "trooper",
+      "heavy",
+      "trooper",
+      "trooper"
+    ]
   ]
 }

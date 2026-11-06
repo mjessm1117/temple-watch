@@ -19,7 +19,7 @@ func run() -> void:
 	check(Touch.pinched_zoom(20.0, 100.0, 500.0) == 9.0, "pinch clamps near")
 	check(Touch.pinched_zoom(20.0, 500.0, 10.0) == 65.0, "pinch clamps far")
 	check(is_equal_approx(Touch.snap_twist(0.3, 0.2), 0.3), "small twist stays in dead zone")
-	check(is_equal_approx(Touch.snap_twist(0.3, 0.4), PI * 0.5), "two finger twist snaps clockwise 90 degrees")
+	check(is_equal_approx(Touch.snap_twist(0.3, 0.4), 0.3 + PI * 0.5), "two finger twist snaps clockwise 90 degrees")
 	check(is_equal_approx(Touch.snap_twist(PI * 0.5, -0.4), 0.0), "two finger twist snaps counterclockwise 90 degrees")
 	check(Quality.default_tier("Linux", true, false, false) == "low", "web defaults Low")
 	check(Quality.default_tier("Linux", false, false, false) == "high", "desktop defaults High")
@@ -43,10 +43,19 @@ func run() -> void:
 			var bounds := end_button.get_global_rect()
 			var visible: Rect2 = hud.overlay.get_global_rect()
 			check(visible.encloses(bounds) and bounds.size.x >= 44 and bounds.size.y >= 38, "End Turn fits and is tappable in landscape")
+			for control in hud.overlay.get_child(0).find_children("*","Button",true,false):
+				check(visible.encloses(control.get_global_rect()), "phone header control fits in landscape")
 		for member in game.mission.living("player"):
 			if member.has("ammo"): game.selected_id = int(member.id); break
 		game._refresh()
 		check(hud.unit_card != null and hud.target_card != null and hud.action_name != null, "compact cards and ability name are available")
+		var first := InputEventScreenTouch.new(); first.index = 0; first.pressed = true; first.position = Vector2(250,190)
+		var second := InputEventScreenTouch.new(); second.index = 1; second.pressed = true; second.position = Vector2(350,190)
+		var before_yaw: float = game.yaw
+		game.cam.touch.handle(first); game.cam.touch.handle(second)
+		var twist := InputEventScreenDrag.new(); twist.index = 1; twist.position = Vector2(327,254)
+		game.cam.touch.handle(twist)
+		check(is_equal_approx(game.yaw,before_yaw+PI*0.5), "actual two finger twist snaps without free spin")
 		check(hud.unit_card.custom_minimum_size.y >= 38 and hud.target_card.custom_minimum_size.y >= 38, "compact cards have touch targets")
 		var night = game.hud_controls.night
 		for field in ["FOCUS", "MEDPACS", "AMMO", "MOMENTUM"]:
@@ -84,11 +93,27 @@ func run() -> void:
 	if portrait.hud_controls.phone != null:
 		var end_portrait: Button = portrait.hud_controls.phone.overlay.find_child("PhoneEndTurn", true, false)
 		check(end_portrait != null and portrait.hud_controls.phone.overlay.get_global_rect().encloses(end_portrait.get_global_rect()), "End Turn fits in portrait")
+		for control in portrait.hud_controls.phone.overlay.get_child(0).find_children("*","Button",true,false):
+			check(portrait.hud_controls.phone.overlay.get_global_rect().encloses(control.get_global_rect()), "phone header control fits in portrait")
 	portrait.queue_free(); await process_frame
 	root.size = Vector2i(1366,768); await process_frame
 	var desktop = load("res://scenes/rescue.tscn").instantiate(); root.add_child(desktop)
 	await process_frame
 	check(desktop.hud_controls.phone == null, "desktop battle keeps original HUD")
 	desktop.queue_free(); await process_frame
+	root.size = Vector2i(844,390); await process_frame
+	var flow = root.get_node("CampaignFlow")
+	var campaign = preload("res://scripts/campaign/state.gd").new()
+	var seventh: Dictionary = campaign.state.roster[-1].duplicate(true)
+	seventh.id = "u7"; seventh.n = "Seventh Guard"
+	campaign.state.roster.append(seventh)
+	campaign.state.strategy.squad_upgrades = 2
+	flow.campaign = campaign; flow.story = campaign.story; flow.active = true
+	var deploy = load("res://scenes/squad.tscn").instantiate(); root.add_child(deploy)
+	await process_frame
+	check(deploy.capacity == 7 and deploy.selected.size() == 7, "deploy screen offers seven slots after both upgrades")
+	var final_card = deploy.cards["u7"]
+	check(final_card.get_global_rect().end.x <= deploy.card_scroll.get_global_rect().end.x, "seven deploy cards fit 844x390")
+	deploy.queue_free(); await process_frame
 	print("Mobile Web 1: %d checks, %d failures" % [checks,failures])
 	quit(1 if failures else 0)

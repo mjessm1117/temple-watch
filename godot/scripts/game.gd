@@ -94,6 +94,10 @@ func _ready() -> void:
 	_build_ui()
 	selected_id = int(mission.living("player")[0].id)
 	pivot = BattleCamera.clamp_pivot(mission, Vector3(mission.living("player")[0].x, 0, mission.living("player")[0].y))
+	if mission.modern and int(mission.spec.objective.get("hold_turns",0)) > 0:
+		var gate := Vector3(float(mission.spec.objective.points[0][0]),0,float(mission.spec.objective.points[0][1]))
+		pivot = BattleCamera.clamp_pivot(mission,gate + Vector3(0,0,-2.5))
+		zoom = maxf(zoom,25.0)
 	_update_camera()
 	_refresh()
 	var demo := ""

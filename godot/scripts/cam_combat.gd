@@ -9,7 +9,6 @@ var skip_requested := false
 var return_pivot := Vector3.ZERO
 var trace: Array[String] = []
 var touch = preload("res://scripts/touch_input.gd").new()
-var touch_angle := 0.0
 var preview_active := false
 var preview_actor := -1
 var preview_target := -1
@@ -47,16 +46,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
 		g.set_process_unhandled_input(false)
 	if event is InputEventScreenTouch or event is InputEventScreenDrag:
-		var prior_angle := touch_angle
-		var had_pair: bool = touch.fingers.size() == 2
 		touch.handle(event)
-		if touch.fingers.size() == 2:
-			var points: Array = touch.fingers.values()
-			touch_angle = (points[1] - points[0]).angle()
-			if had_pair and event is InputEventScreenDrag:
-				var turn := wrapf(touch_angle - prior_angle, -PI, PI)
-				if absf(turn) < 0.35:
-					g.yaw -= turn; g._update_camera()
 
 func wait(seconds: float) -> void:
 	seconds /= float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if g.playing_enemy_events else 1.0)

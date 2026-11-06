@@ -38,8 +38,16 @@ func run() -> void:
 		check(not geometry.has(signature),"distinct geometry: " + str(m.spec.id)); geometry[signature] = true
 		var report := Validator.validate(m)
 		check(report.ok, "%s: %s" % [m.spec.id,report.errors])
+		m.units = m.units.filter(func(u): return u.side != "player")
+		check(preload("res://scripts/campaign/strat_deployment.gd").spawn_tiles(m,7).size() == 7,"seven spawn tiles: " + str(m.spec.id))
 		families[m.spec.family] = true
 		print("MAP %s %dx%d routes=%d cover=%s high=%d sight=%d/%d" % [m.spec.id,m.spec.width,m.spec.height,report.routes,report.cover,report.high,report.long_sight,report.blocked_sight])
+	for filename in DirAccess.get_files_at("res://data/maps"):
+		var path := "res://data/maps/" + filename
+		if not filename.ends_with(".json") or path in paths or not Maps.read(path).has("squad"): continue
+		var extra_map = Mission.new(11,path)
+		extra_map.units = extra_map.units.filter(func(u): return u.side != "player")
+		check(preload("res://scripts/campaign/strat_deployment.gd").spawn_tiles(extra_map,7).size() == 7,"seven spawn tiles: " + str(extra_map.spec.id))
 	check(Maps.layouts("archive").size() == 5,"archive selects own plot plus all four web variants")
 	check(Maps.select_layout("archive",3) == Maps.select_layout("archive",3),"seeded layout selection reproducible")
 	check(Maps.read(Maps.select_layout("archive",1)).web_source.base == "archive","selected web variant belongs to mission")
@@ -122,11 +130,24 @@ func _rules() -> void:
 	defense.turn = 200; Objectives.player_start(defense); check(defense.result == "","defense has no global timer")
 	defense.damage_objective(99); check(defense.result == "loss","defense relay loss fails")
 	defense = mission("relay")
-	for turn in [2,4,6,8]: defense.turn = turn; Pressure.player_start(defense)
-	check(defense.pressure_state.waves == 4,"four defense waves queued")
+	check(defense.pressure_state.pending.size() == 1 and defense.living("enemy").all(func(e): return bool(e.awake) and bool(e.spotted)),"gate announces the first wave and shows all attackers")
+	for turn in [2,4]: defense.turn = turn; Pressure.player_start(defense)
+	check(defense.pressure_state.waves == 3,"three defense waves queued")
+	check(defense.living("enemy").filter(func(e): return int(e.group) >= 1000).all(func(e): return bool(e.awake) and bool(e.spotted)),"gate waves arrive awake and visible")
 	var sizes: Array = defense.pressure_state.pending.map(func(w): return w.kinds.size())
-	# Previous waves landed on later calls; final wave remains largest.
-	check(sizes[-1] == 5 and defense.living("enemy").size() > 6,"defense waves escalate")
+	check(sizes[-1] == 5 and defense.living("enemy").size() > 4,"defense waves escalate")
+	var hold = mission("relay")
+	hold.units = hold.units.filter(func(u): return u.side == "player")
+	for i in 6:
+		hold.turn = i + 1; Objectives.enemy_end(hold)
+	check(hold.result == "win" and int(hold.objective_state.held) == 6 and hold.objective_status().label.begins_with("HOLD 6/6"),"gate wins after six held turns")
+	var overrun = mission("relay")
+	var gate_at := Maps.point(overrun.spec.objective.points[0])
+	for i in 2:
+		var invader: Dictionary = overrun.living("enemy")[i]
+		invader.x = gate_at.x + i - 1; invader.y = gate_at.y
+	Objectives.enemy_end(overrun)
+	check(overrun.result == "loss","two attackers overrun an empty gate zone")
 	var pods := {}
 	for enemy in defense.living("enemy"):
 		if int(enemy.group) >= 1000: pods[enemy.group] = int(pods.get(enemy.group,0))+1
@@ -134,8 +155,7 @@ func _rules() -> void:
 	defense.units = defense.units.filter(func(u): return u.side == "player")
 	Objectives.enemy_end(defense); check(defense.objective_state.phase == "primary","defense waits for announced wave")
 	defense.pressure_state.pending.clear(); Objectives.enemy_end(defense)
-	check(defense.objective_state.phase == "evac","defense final clear leads to evac")
-	extract(defense); check(defense.result == "win","defense extracts")
+	check(defense.objective_state.phase == "primary" and defense.result == "","gate hold continues after attackers fall")
 	var raid = mission("h_valo")
 	raid.objective_state.lost = 3; raid._check_win(); check(raid.result == "loss","retaliation impossible quota fails")
 	var escort = mission("escort")

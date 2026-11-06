@@ -51,15 +51,16 @@ static func modules_text(r: Dictionary) -> String:
 static func card(c, r: Dictionary, action: Callable, portrait: Texture2D = null) -> PanelContainer:
 	var compact := S.panel(); compact.name = "Card_" + str(r.id)
 	compact.add_theme_stylebox_override("panel", S.box(S.PANEL, S.EDGE, 4))
-	compact.custom_minimum_size = Vector2(166, 62); compact.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var phone := Phone.narrow(Phone.window_size())
+	compact.custom_minimum_size = Vector2(90 if phone else 166, 62); compact.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var content := S.column(2); compact.add_child(content)
 	var select := S.button(str(r.n), action); select.alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	select.custom_minimum_size.y = 44; select.clip_text = true
-	select.add_theme_font_size_override("font_size", 11); content.add_child(select)
+	select.add_theme_font_size_override("font_size", 9 if phone else 11); content.add_child(select)
 	if portrait != null:
 		var face := Sprite2D.new(); face.texture = portrait; face.position = Vector2(21, 21)
 		face.scale = Vector2(0.26, 0.26); select.add_child(face)
-	content.add_child(S.label("%s · R%d · HP %d" % [r.cls, int(r.rank), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 10, S.GOLD))
+	content.add_child(S.label("R%d · HP %d" % [int(r.rank), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))] if phone else "%s · R%d · HP %d" % [r.cls, int(r.rank), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 9 if phone else 10, S.GOLD))
 	if not fit(r): compact.modulate = Color("899194")
 	return compact
 

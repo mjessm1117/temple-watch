@@ -31,7 +31,7 @@ func run() -> void:
 	capture = "--capture-strategy" in OS.get_cmdline_user_args()
 	var c = fresh()
 	check(c.state.facility.workers.size() == 3 and c.state.cands.size() == 3, "three staff and monthly candidate pool")
-	check(c.squad_capacity() == 4 and c.darkness_segments() == 2 and int(c.state.orderDark) == 0, "initial capacity and darkness")
+	check(c.squad_capacity() == 5 and c.darkness_segments() == 2 and int(c.state.orderDark) == 0, "initial capacity and darkness")
 	check(Base.power(c.state) == {"used":3,"capacity":8}, "starting room power")
 	check(Base.adjacent("b1", "b2") and not Base.adjacent("b0", "b2"), "wall-sharing adjacency")
 	check(int(Base.effects(c.state).stress) == 8, "staff doubles Infirmary Bunks adjacency")
@@ -82,10 +82,10 @@ func run() -> void:
 	check(Roster.ready(c.soldier("u3")), "bench recovery restores readiness")
 	c.state.wings.training = 2
 	c.soldier("u3").rank = 4; c.soldier("u3").xp = 200
-	check(Roster.upgrade_squad(c) and c.squad_capacity() == 5, "first squad capacity upgrade")
+	check(Roster.upgrade_squad(c) and c.squad_capacity() == 6, "first squad capacity upgrade")
 	check(not Roster.upgrade_squad(c), "second upgrade requires Barracks II")
 	c.state.wings.barracks = 2
-	check(Roster.upgrade_squad(c) and c.squad_capacity() == 6, "second squad capacity upgrade")
+	check(Roster.upgrade_squad(c) and c.squad_capacity() == 7, "second squad capacity upgrade")
 	check(c.select_mission(0, ["u1","u1"]).is_empty(), "duplicate deployment rejected")
 	check(Roster.train(c, "u1", "retrain"), "retraining reserves a soldier")
 	check(not c.assign("u1", ""), "training cannot be evaded through assignments")
@@ -207,14 +207,14 @@ func run() -> void:
 	check(Progression.battle_abilities(c.soldier("u1")).has("saberThrow"), "active rank choices exposed for tactical kit integration")
 	var deployment = preload("res://scripts/campaign/strat_deployment.gd")
 	check(deployment.validate(c, ["u1","u2","u3","u4"]), "shared launch validator accepts available squad")
-	check(not deployment.validate(c, ["u1","u2","u3","u4","u5"]), "shared launch validator enforces capacity")
+	check(not deployment.validate(c, ["u1","u2","u3","u4","u5","u6","u7","u8"]), "shared launch validator enforces capacity")
 	var mission = preload("res://scripts/mission.gd").new(1)
 	mission.units = mission.units.filter(func(u): return u.side != "player")
-	var tiles: Array[Vector2i] = deployment.spawn_tiles(mission, 6)
-	check(tiles.size() == 6, "six distinct legal deployment tiles available")
+	var tiles: Array[Vector2i] = deployment.spawn_tiles(mission, 7)
+	check(tiles.size() == 7, "seven distinct legal deployment tiles available")
 	var positions := {}
 	for tile in tiles: positions[tile] = true; check(mission.passable(tile) and not mission.occupied(tile), "expanded spawn is passable and vacant")
-	check(positions.size() == 6, "upgraded squad does not overlap spawn positions")
+	check(positions.size() == 7, "upgraded squad does not overlap spawn positions")
 	var tactical := {"kit":[]}
 	deployment.apply_identity(c, tactical, c.soldier("u1"))
 	check(tactical.kit.has("saberThrow") and tactical.voice != "", "bridge adapter carries abilities and voice")

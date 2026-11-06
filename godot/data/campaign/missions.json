@@ -45,21 +45,21 @@
   },
   "MISSIONS": {
     "relay": {
-      "n": "Relay Aurek-7",
-      "where": "Outpost Aurek-7 · Sith frontier",
+      "n": "Temple Outer Gate",
+      "where": "Jedi Temple · outer gate",
       "type": "defend",
-      "brief": "Imperial Sith troopers are closing on a frontier hyperspace relay. Hold it for 8 turns until the fleet arrives. Three waves are expected.",
+      "brief": "Imperial troops are closing on the Temple’s outer gate. Hold the approach for 6 turns while the guard seals the breach.",
       "reward": {
         "credits": 80
       },
       "bonus": {
         "credits": 40
       },
-      "bonusTxt": "Relay above 75%",
+      "bonusTxt": "Gate above 75%",
       "story": 1,
       "map": "res://data/maps/relay.json",
       "family": "defend",
-      "theme": "plains"
+      "theme": "temple"
     },
     "shrine": {
       "n": "Dantooine Shrine",

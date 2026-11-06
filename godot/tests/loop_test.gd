@@ -92,14 +92,14 @@ func run() -> void:
 	await frames()
 	check(int(flow.campaign.state.approach.get("aim", 0)) == 5, "briefing choice persists Dig in")
 	check(current_scene.scene_file_path.ends_with("squad.tscn"), "briefing opens squad selection")
-	current_scene._toggle("u3"); current_scene._toggle("u5")
-	check(current_scene.selected.size() == 4 and current_scene.selected.has("u5"), "Medic selectable among exactly four")
+	current_scene._toggle("u3"); current_scene._toggle("u6")
+	check(current_scene.selected.size() == 5 and current_scene.selected.has("u5"), "Medic selectable among five")
 	await shot("squad")
 	current_scene._deploy()
 	await frames()
 	var game = current_scene
 	var m = game.mission
-	check(m.living("player").size() == 4, "campaign battle uses four roster soldiers")
+	check(m.living("player").size() == 5, "campaign battle uses five roster soldiers")
 	var medic: Dictionary = m.living("player").filter(func(u): return u.get("rid") == "u5")[0]
 	check(medic.class_name == "Medic" and medic.kit.has("reviveStim"), "campaign Medic brings correct kit")
 	var stats: Dictionary = preload("res://scripts/campaign/gear.gd").battle_stats(flow.campaign, "u5")

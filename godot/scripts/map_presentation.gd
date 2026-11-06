@@ -229,6 +229,10 @@ func refresh_markers(m: RefCounted) -> void:
 			var step: Dictionary = preload("res://scripts/mission_objectives.gd").current_step(m)
 			if step.has("at"): objective(markers,m,Maps.point(step.at),"operation")
 	if m.modern:
+		if int(m.spec.objective.get("hold_turns",0)) > 0:
+			for entry in m.spec.entries:
+				var approach := Maps.point(entry)
+				ring(markers,Vector3(approach.x,Shot.elevation(m,approach)*0.7+0.03,approach.y),palette.danger,0.62)
 		for wave in m.pressure_state.pending:
 			var tile := Maps.point(wave.at)
 			ring(markers,Vector3(tile.x,Shot.elevation(m,tile)*0.7+0.02,tile.y),palette.danger)
@@ -240,6 +244,15 @@ func refresh_markers(m: RefCounted) -> void:
 					for x in range(tile.x-radius,tile.x+radius+1):
 						if m.passable(Vector2i(x,y)): ring(markers,Vector3(x,Shot.elevation(m,Vector2i(x,y))*0.7+0.02,y),palette.objective,0.36)
 	batch.records.append_array(markers.records); markers.flush(marker_root)
+	if m.modern and int(m.spec.objective.get("hold_turns",0)) > 0:
+		var gate_tile := Maps.point(m.spec.objective.points[0])
+		overwatch_arc({"at":gate_tile,"side":"zone","range":float(m.spec.objective.zone_radius),"height":0.28})
+		var gate_at := Vector3(gate_tile.x,Shot.elevation(m,gate_tile)*0.7,gate_tile.y)
+		var hold_text := Label3D.new(); hold_text.text = "HOLD ZONE"
+		hold_text.billboard = BaseMaterial3D.BILLBOARD_ENABLED; hold_text.font_size = 18
+		hold_text.pixel_size = 0.0022; hold_text.fixed_size = true
+		hold_text.modulate = Color("a8f5a9"); hold_text.outline_size = 5
+		hold_text.position = gate_at + Vector3(0,1.6,0); marker_root.add_child(hold_text)
 	for zone in overwatch_zones(m): overwatch_arc(zone)
 
 func objective(b, m: RefCounted, tile: Vector2i, family: String) -> void:
@@ -247,7 +260,9 @@ func objective(b, m: RefCounted, tile: Vector2i, family: String) -> void:
 	var at := Vector3(tile.x,Shot.elevation(m,tile)*0.7,tile.y)
 	var done: bool = m.objective_state.get("done",{}).has(tile)
 	b.begin_record({"tile":tile,"floor":at.y,"kind":family,"role":"objective"})
-	if b.pair(Meshy.objective_path(props,Meshy.action(props,family)),at,0.72,1.18):
+	if family == "defend" and m.spec.objective.has("zone_prop"):
+		b.model(str(m.spec.objective.zone_prop),at,0.72,1.18)
+	elif b.pair(Meshy.objective_path(props,Meshy.action(props,family)),at,0.72,1.18):
 		pass
 	elif family == "hack_terminal" and props.get("meshy1_enabled",false) and not str(props.get("meshy1_models",{}).get("objective","")).is_empty():
 		# Batch 1 terminal has no explicit LOD1 in the shipped assets; preserve existing art.
@@ -273,14 +288,15 @@ func overwatch_arc(zone: Dictionary) -> void:
 	# Overwatch fires in every direction, so a single full arc shows its actual rule.
 	var center: Vector2i = zone.at
 	var radius: float = minf(float(zone.range), 8.0)
-	var color := Color("70d3ee") if zone.side == "player" else Color("ef8e72")
-	var fill := StandardMaterial3D.new(); fill.albedo_color = Color(color.r,color.g,color.b,0.16)
+	var color := Color("98ee9b") if zone.side == "zone" else Color("70d3ee") if zone.side == "player" else Color("ef8e72")
+	var fill := StandardMaterial3D.new(); fill.albedo_color = Color(color.r,color.g,color.b,0.52 if zone.side == "zone" else 0.16)
 	fill.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; fill.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	fill.cull_mode = BaseMaterial3D.CULL_DISABLED
 	var edge := StandardMaterial3D.new(); edge.albedo_color = Color(color.r,color.g,color.b,0.85)
 	edge.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; edge.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	edge.cull_mode = BaseMaterial3D.CULL_DISABLED
 	var mesh := ImmediateMesh.new()
-	var at := Vector3(center.x,Shot.elevation(mission,center)*0.7+0.09,center.y)
+	var at := Vector3(center.x,Shot.elevation(mission,center)*0.7+float(zone.get("height",0.09)),center.y)
 	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES,fill)
 	for i in 48:
 		var a := TAU*float(i)/48.0; var b := TAU*float(i+1)/48.0
@@ -288,10 +304,15 @@ func overwatch_arc(zone: Dictionary) -> void:
 		mesh.surface_add_vertex(at+Vector3(cos(a)*radius,0,sin(a)*radius))
 		mesh.surface_add_vertex(at+Vector3(cos(b)*radius,0,sin(b)*radius))
 	mesh.surface_end()
-	mesh.surface_begin(Mesh.PRIMITIVE_LINE_STRIP,edge)
-	for i in 49:
-		var a := TAU*float(i)/48.0
-		mesh.surface_add_vertex(at+Vector3(cos(a)*radius,0.02,sin(a)*radius))
+	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES,edge)
+	var width := 0.18 if zone.side == "zone" else 0.08
+	for i in 48:
+		var a := TAU*float(i)/48.0; var b := TAU*float(i+1)/48.0
+		var inner_a := at+Vector3(cos(a)*(radius-width),0.03,sin(a)*(radius-width))
+		var outer_a := at+Vector3(cos(a)*(radius+width),0.03,sin(a)*(radius+width))
+		var inner_b := at+Vector3(cos(b)*(radius-width),0.03,sin(b)*(radius-width))
+		var outer_b := at+Vector3(cos(b)*(radius+width),0.03,sin(b)*(radius+width))
+		for point in [inner_a,outer_a,inner_b,outer_a,outer_b,inner_b]: mesh.surface_add_vertex(point)
 	mesh.surface_end()
 	var visual := MeshInstance3D.new(); visual.mesh = mesh
 	visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

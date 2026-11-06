@@ -47,6 +47,14 @@ func run() -> void:
 			watch_dest = tile; break
 	check(watch_dest.x >= 0 and watch.move(int(watcher.id), watch_dest) and int(watcher.ap) == 1, "one action move leaves one action")
 	check(watch.overwatch(int(watcher.id)) and bool(watcher.overwatch), "overwatch remains available after one action move")
+	var ability_move = Mission.new(1)
+	var adept: Dictionary = ability_move.living("player")[0]
+	adept.kit.append("hunker")
+	var adept_reach: Dictionary = ability_move.reach_tiles(adept,1)
+	for tile in adept_reach.costs:
+		if tile != Vector2i(int(adept.x),int(adept.y)):
+			check(ability_move.move(int(adept.id),tile) and ability_move.hunker(int(adept.id)) and bool(adept.hunkered), "one action move leaves an ability available")
+			break
 	var reload = Mission.new(1)
 	var r: Dictionary = reload.living("player")[0]
 	r.ammo = 0; r.clip = 4; r.kit.append_array(["reload", "hunker"])
