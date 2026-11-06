@@ -69,5 +69,24 @@ func run() -> void:
 	touch(center, true); touch(center, false); await process_frame
 	check(screen.focus_index == 1, "roster short tap inspects")
 	screen.queue_free(); await process_frame
+	# Battle abilities use the same scroll owner as armory and roster.
+	var battle = load("res://scenes/rescue.tscn").instantiate()
+	root.add_child(battle); await process_frame
+	var abilities: ScrollContainer = battle.hud_controls.phone.overlay.find_child("Abilities", true, false)
+	var action_button: Button = battle.hud_controls.phone.ability_buttons[0]
+	check(abilities.scroll_deadzone == 10 and action_button.mouse_filter == Control.MOUSE_FILTER_PASS, "battle ability passes touch to 10 px scroll")
+	battle.hud_controls.phone.ability_tray.offset_left = -100
+	battle.hud_controls.phone.ability_tray.offset_right = 100
+	await process_frame
+	center = action_button.get_global_rect().get_center()
+	var action_before: String = battle.action
+	touch(center, true); last = center
+	for step in 8:
+		var next := center + Vector2(-12 * (step + 1), 0)
+		drag(last, next); last = next; await process_frame
+	touch(last, false); await process_frame
+	check(abilities.scroll_horizontal > 0, "battle ability button drag scrolls")
+	check(battle.action == action_before, "battle ability button drag does not activate")
+	battle.queue_free(); await process_frame
 	print("SCROLL16 TEST RESULTS: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)

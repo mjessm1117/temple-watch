@@ -65,3 +65,4 @@ run_suite cam16_test --rendering-method gl_compatibility --resolution 844x390 --
 run_suite cam16_test --rendering-method forward_plus --resolution 844x390 -- --graphics=medium --medium
 run_suite armory16_test
 run_suite scroll16_test --resolution 844x390
+run_suite tap16_test --resolution 844x390

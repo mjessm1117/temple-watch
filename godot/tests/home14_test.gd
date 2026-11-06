@@ -73,10 +73,12 @@ func run() -> void:
 	check(squad.card_scroll.get_global_rect().end.y <= root.size.y + 1, "Roster fits height")
 	if phone: check(squad.card_scroll.position.y >= squad.stage_container.position.y + squad.stage_container.size.y - 1, "Roster sits below hero stage")
 	for title in ["SABER MOD", "ARMOR MOD"]:
+		var expected: String = {"SABER MOD":"SAB MOD", "ARMOR MOD":"ARM MOD"}.get(title, title) if phone else title
 		var found := false
 		for label in squad.arsenal.find_children("*", "Label", true, false):
-			if label.text != title: continue
+			if label.text != expected: continue
 			found = true
+			if phone: check(label.get_theme_font_size("font_size") >= 14, title + " phone heading is readable")
 			var text_width: float = label.get_theme_font("font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x
 			check(label.position.x + text_width <= label.get_parent().size.x - 4, title + " heading fits")
 		check(found, title + " heading exists")

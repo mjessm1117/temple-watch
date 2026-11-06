@@ -32,7 +32,8 @@ func setup(owner_screen: Control, id: String) -> void:
 	feature_row = HBoxContainer.new(); feature_row.add_theme_constant_override("separation", 6); add_child(feature_row)
 	slot_row = GridContainer.new(); slot_row.columns = 4
 	slot_row.size_flags_horizontal = SIZE_EXPAND_FILL
-	slot_row.add_theme_constant_override("h_separation", 5); slot_row.add_theme_constant_override("v_separation", 4)
+	slot_row.add_theme_constant_override("h_separation", 8 if Phone.narrow(Phone.window_size()) else 5)
+	slot_row.add_theme_constant_override("v_separation", 8 if Phone.narrow(Phone.window_size()) else 4)
 	feature_row.add_child(slot_row)
 	_build_slots(r, jedi)
 	_update_preview()
@@ -156,7 +157,7 @@ func _build_slots(r: Dictionary, jedi: bool) -> void:
 func _slot(key: String, title: String, value: String, mark: int, icon: String) -> void:
 	var compact := Phone.narrow(get_tree().root.size)
 	var b := S.button("", _select_slot.bind(key)); b.name = "Slot_" + key
-	b.custom_minimum_size = Vector2(87 if compact else 116, 68)
+	b.custom_minimum_size = Vector2(84 if compact else 116, 68)
 	b.size_flags_horizontal = SIZE_EXPAND_FILL
 	b.tooltip_text = value
 	var art_key: String = str({"weapon":"saber" if icon == "strike" else "blaster", "armor":icon, "utility":"utility", "base_mod":"module", "armor_mod":"armor_mod", "form":"form", "color":"crystal", "evolution":"path"}.get(key, "module"))
@@ -172,10 +173,11 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 	glyph.position = Vector2(3.0 + ((30.0 if compact else 42.0) - art_width) * 0.5, 26 if compact else 10)
 	glyph.size = Vector2(art_width, art_height)
 	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(glyph)
-	var name_label := S.label(title, 9 if compact else 7, S.CYAN)
+	var short_title: String = {"SABER MOD":"SAB MOD", "WEAPON MOD":"WPN MOD", "ARMOR MOD":"ARM MOD", "SABER FORM":"FORM"}.get(title, title) if compact else title
+	var name_label := S.label(short_title, 14 if compact else 7, S.CYAN)
 	name_label.name = "SlotLabel"
-	name_label.position = Vector2(6 if compact else 51, 2 if compact else 5)
-	name_label.size = Vector2(81 if compact else 62, 16)
+	name_label.position = Vector2(4 if compact else 51, 2 if compact else 5)
+	name_label.size = Vector2(76 if compact else 62, 19 if compact else 16)
 	name_label.clip_text = true
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
 	var display_value := value.get_slice(" (", 0) if key == "form" else value

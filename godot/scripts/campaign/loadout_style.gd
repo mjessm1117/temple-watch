@@ -28,7 +28,8 @@ static func column(gap: int = 6) -> VBoxContainer:
 
 static func button(text: String, action: Callable, enabled: bool = true) -> Button:
 	var b := Button.new(); b.text = text; b.disabled = not enabled
-	b.custom_minimum_size.y = 36; b.add_theme_font_size_override("font_size", 14)
+	b.custom_minimum_size.y = 44 if preload("res://scripts/phone_layout.gd").narrow(preload("res://scripts/phone_layout.gd").window_size()) else 36
+	b.add_theme_font_size_override("font_size", 14)
 	Theme13.style_button(b)
 	b.pressed.connect(action); return b
 

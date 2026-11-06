@@ -194,7 +194,7 @@ func _build_ui() -> void:
 	info_row.add_child(_label("LMB PREVIEW/CONFIRM  •  RMB CANCEL/PAN  •  TAB / Q-E TARGET  •  WASD PAN  •  SPACE SKIP", 12))
 	g.warning_label = _label("", 15); g.warning_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; g.warning_label.add_theme_color_override("font_color", Color("ffd37a")); bottom_box.add_child(g.warning_label)
 	g.warning_label.visible = false
-	var ability_scroll := ScrollContainer.new(); ability_scroll.name = "DesktopAbilities"
+	var ability_scroll := preload("res://scripts/touch_scroll.gd").new(); ability_scroll.name = "DesktopAbilities"
 	ability_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	ability_scroll.custom_minimum_size.y = 60; ability_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom_box.add_child(ability_scroll)

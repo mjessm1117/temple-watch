@@ -163,9 +163,9 @@ func _build_story() -> void:
 	speaker_plate.size_flags_horizontal = SIZE_EXPAND_FILL
 	speaking.add_child(speaker_plate)
 	var skip := UI.button("SKIP",_skip_dialogue)
-	skip.custom_minimum_size = Vector2(64,34)
+	skip.custom_minimum_size = Vector2(64,44 if phone else 34)
 	skip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	skip.add_theme_font_size_override("font_size",11)
+	skip.add_theme_font_size_override("font_size",14 if phone else 11)
 	speaking.add_child(skip)
 	content.add_child(UI.label(str(scene_data.get("eyebrow","TEMPLE")).to_upper(),13,UI.GOLD))
 	content.add_child(UI.label(scene_data.get("title","The Temple"),23 if phone else 32,UI.ACCENT))
@@ -177,8 +177,8 @@ func _build_story() -> void:
 	typed = 0
 	narrative.visible_characters = 0
 	var reveal := UI.button("TAP TO ADVANCE  ›",_advance_dialogue)
-	reveal.custom_minimum_size.y = 30
-	reveal.add_theme_font_size_override("font_size",12)
+	reveal.custom_minimum_size.y = 56 if phone else 30
+	reveal.add_theme_font_size_override("font_size",14 if phone else 12)
 	content.add_child(reveal)
 	if scene_data.get("goal","") != "":
 		var goal := str(scene_data.goal)
@@ -196,7 +196,7 @@ func _build_story() -> void:
 		var button := UI.button(label,_choose.bind(choice.get("id",""),true))
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		button.custom_minimum_size.y = 64 if kind == "arc_resolution" else 44
+		button.custom_minimum_size.y = 64 if kind == "arc_resolution" else 56 if phone else 44
 		card.add_child(button)
 		choice_buttons.append(button)
 		var preview := _preview(choice)

@@ -88,6 +88,7 @@ func setup(save_state: Dictionary) -> void:
 
 func _make_button(info: Dictionary) -> void:
 	var b := Button.new(); b.name = "Room_" + str(info.id); b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	if Phone.narrow(Phone.window_size()): b.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.tooltip_text = "%s\n%s%s\nOpen %s" % [info.name, info.detail, " · " + str(info.module) if info.module != "" else "", info.tab]
 	if not Prefs.get_value("tips"): b.tooltip_text = ""
 	for style_name in ["normal", "hover", "pressed", "focus"]:

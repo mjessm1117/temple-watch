@@ -54,6 +54,20 @@ static func next_squad(m: RefCounted, current_id: int, direction: int = 1, only_
 		if not only_ready or int(candidate.ap) > 0: return int(candidate.id)
 	return -1
 
+static func near_unit(game, point: Vector2, candidates: Array[Dictionary]) -> Dictionary:
+	if not preload("res://scripts/phone_layout.gd").narrow(preload("res://scripts/phone_layout.gd").window_size()): return {}
+	var closest := 28.0
+	var picked: Dictionary = {}
+	for unit in candidates:
+		var distance := unit_screen_distance(game, point, unit)
+		if distance < closest: closest = distance; picked = unit
+	return picked
+
+static func unit_screen_distance(game, point: Vector2, unit: Dictionary) -> float:
+	var tile := Shot.pos(unit)
+	var center: Vector2 = game.camera.unproject_position(Vector3(tile.x, Shot.elevation(game.mission, tile) * 0.7 + 1.0, tile.y))
+	return center.distance_to(point)
+
 var g
 
 func handle_event(event: InputEvent) -> void:
@@ -72,12 +86,23 @@ func handle_event(event: InputEvent) -> void:
 				g.cam.skip_preview_transition(); return
 			if g.cinematic: g._skip_cinematic()
 			var p: Vector2i = g._screen_tile(event.position)
-			if p.x < 0: return
+			var nearby_player := near_unit(g, event.position, g.mission.living("player"))
+			var nearby_attack_target: Dictionary = {}
+			if g.action in ["shoot", "strike", "push"]:
+				nearby_attack_target = near_unit(g, event.position, valid_targets(g.mission, g.mission.unit_by_id(g.selected_id), g.action))
+				if not nearby_attack_target.is_empty() and not nearby_player.is_empty():
+					if unit_screen_distance(g, event.position, nearby_player) < unit_screen_distance(g, event.position, nearby_attack_target): nearby_attack_target = {}
+					else: nearby_player = {}
 			if g.action not in ["move", "shoot", "strike", "push", "free", "overwatch", "hunker"]:
 				var def: Dictionary = g.mission.abilities.get(g.action, {})
 				if str(def.get("target", "")).begins_with("ally") or str(def.get("target", "")).begins_with("enemy"):
-					for target in valid_targets(g.mission, g.mission.unit_by_id(g.selected_id), g.action):
-						if Shot.pos(target) == p:
+					var targets := valid_targets(g.mission, g.mission.unit_by_id(g.selected_id), g.action)
+					var nearby_target := near_unit(g, event.position, targets)
+					if not nearby_target.is_empty() and not nearby_player.is_empty():
+						if unit_screen_distance(g, event.position, nearby_player) < unit_screen_distance(g, event.position, nearby_target): nearby_target = {}
+						else: nearby_player = {}
+					for target in targets:
+						if (not nearby_target.is_empty() and int(target.id) == int(nearby_target.id)) or (nearby_target.is_empty() and nearby_player.is_empty() and Shot.pos(target) == p):
 							if g.target_id == int(target.id): g._use_ability(int(target.id))
 							else: g.target_id = int(target.id); g._refresh_highlights(); g._show_shot()
 							return
@@ -85,8 +110,9 @@ func handle_event(event: InputEvent) -> void:
 					if g.preview_tile == p: g._use_ability(-1, p)
 					else: g.preview_tile = p; g._refresh_highlights(); g._show_shot()
 					return
+			if not nearby_player.is_empty(): g._select(int(nearby_player.id)); return
 			for u in g.mission.living("player"):
-				if Shot.pos(u) == p: g._select(int(u.id)); return
+				if nearby_attack_target.is_empty() and Shot.pos(u) == p: g._select(int(u.id)); return
 			if g.action == "move":
 				var preview: Dictionary = move_preview(g.mission, g.mission.unit_by_id(g.selected_id), p)
 				if preview.is_empty(): return
@@ -95,10 +121,12 @@ func handle_event(event: InputEvent) -> void:
 					g.preview_tile = p
 					g._refresh_highlights()
 			elif g.action == "free":
-				if g.mission.free_prisoner(g.selected_id): g._after_action(); g._refresh()
+				if p.x >= 0 and g.mission.free_prisoner(g.selected_id): g._after_action(); g._refresh()
 			elif g.action in ["shoot", "strike", "push"]:
-				for target in valid_targets(g.mission, g.mission.unit_by_id(g.selected_id), g.action):
-					if Shot.pos(target) == p:
+				var targets := valid_targets(g.mission, g.mission.unit_by_id(g.selected_id), g.action)
+				var nearby_target := nearby_attack_target
+				for target in targets:
+					if (not nearby_target.is_empty() and int(target.id) == int(nearby_target.id)) or (nearby_target.is_empty() and nearby_player.is_empty() and Shot.pos(target) == p):
 						if g.target_id == int(target.id): g._attack(g.target_id, g.action)
 						else: g.target_id = int(target.id); g._frame_target(); g._refresh_highlights(); g._show_shot()
 						return

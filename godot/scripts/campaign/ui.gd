@@ -49,7 +49,7 @@ static func button(message: String, action: Callable, enabled: bool = true) -> B
 	var b := Button.new()
 	b.text = message
 	b.disabled = not enabled
-	b.custom_minimum_size.y = 40
+	b.custom_minimum_size.y = 44 if preload("res://scripts/phone_layout.gd").narrow(preload("res://scripts/phone_layout.gd").window_size()) else 40
 	style_button(b)
 	b.pressed.connect(action)
 	return b
@@ -65,8 +65,9 @@ static func clear(node: Node) -> void:
 		child.queue_free()
 
 static func style_button(b: Button) -> void:
+	var phone := preload("res://scripts/phone_layout.gd").narrow(preload("res://scripts/phone_layout.gd").window_size())
 	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
-		var s := style(PANEL_ALT if state in ["hover", "pressed"] else PANEL, ACCENT if state in ["hover", "pressed", "focus"] else BORDER)
+		var s := style(Color("315c68") if phone and state == "pressed" else PANEL_ALT if state in ["hover", "pressed"] else PANEL, GOLD if phone and state == "pressed" else ACCENT if state in ["hover", "pressed", "focus"] else BORDER)
 		s.set_content_margin_all(10)
 		if state == "hover":
 			s.shadow_color = Color(0.47, 0.83, 0.89, 0.14)
@@ -76,7 +77,7 @@ static func style_button(b: Button) -> void:
 	b.add_theme_font_size_override("font_size", 16)
 	b.add_theme_color_override("font_color", TEXT)
 	b.add_theme_color_override("font_hover_color", ACCENT)
-	b.add_theme_color_override("font_pressed_color", ACCENT)
+	b.add_theme_color_override("font_pressed_color", GOLD if phone else ACCENT)
 	b.add_theme_color_override("font_disabled_color", Color("52676a"))
 	if not b.has_node("UIFeedback"):
 		var motion := Motion.new()

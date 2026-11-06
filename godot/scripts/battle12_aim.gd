@@ -36,7 +36,7 @@ func setup(game, root: Control, on_phone: bool) -> void:
 	panel.offset_right = minf(350.0, root.size.x * 0.47)
 	if phone:
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
-		panel.offset_top = -62; panel.offset_bottom = -4
+		panel.offset_top = -68; panel.offset_bottom = -4
 	else:
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
 		panel.offset_top = -114; panel.offset_bottom = -8
@@ -54,22 +54,23 @@ func setup(game, root: Control, on_phone: bool) -> void:
 	summary.add_theme_font_size_override("font_size", 14); summary.add_theme_color_override("font_color", Color("f2d99a"))
 	summary.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; body.add_child(summary)
 	summary.visible = not phone
-	var row := HBoxContainer.new(); row.add_theme_constant_override("separation", 3); body.add_child(row)
+	var row := HBoxContainer.new(); row.add_theme_constant_override("separation", 8 if phone else 3); body.add_child(row)
 	row.add_child(_button("‹", 44, func() -> void: g._cycle_target(-1)))
 	targets = HBoxContainer.new(); targets.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	targets.add_theme_constant_override("separation", 3); row.add_child(targets)
+	targets.add_theme_constant_override("separation", 8 if phone else 3); row.add_child(targets)
 	row.add_child(_button("›", 44, func() -> void: g._cycle_target(1)))
-	confirm = _button("FIRE", 190, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
+	confirm = _button("FIRE", 96 if phone else 190, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
 	details = _button("ODDS", 64, _details); row.add_child(details)
 	cine_toggle = _button("Cinematics: On", 116 if phone else 142, _toggle_cine); cine_toggle.name = "Cine15Toggle"; row.add_child(cine_toggle)
-	cine_toggle.add_theme_font_size_override("font_size", 11 if phone else 13)
+	cine_toggle.visible = not phone
+	cine_toggle.add_theme_font_size_override("font_size", 14 if phone else 13)
 	row.add_child(_button("CANCEL", 76, g._cancel_order))
 	panel.hide()
 
 func _button(value: String, width: float, action: Callable) -> Button:
 	var b := Button.new(); b.text = value; b.focus_mode = Control.FOCUS_NONE
-	b.custom_minimum_size = Vector2(width, 44 if phone else 50)
-	b.add_theme_font_size_override("font_size", 13)
+	b.custom_minimum_size = Vector2(width, 56 if phone and value in ["FIRE", "CANCEL"] else 44 if phone else 50)
+	b.add_theme_font_size_override("font_size", 14 if phone else 13)
 	b.pressed.connect(action)
 	return b
 
@@ -82,7 +83,7 @@ func refresh() -> void:
 	cine_toggle.text = "Cinematics: On" if g.action_camera else "Cinematics: Off"
 	if phone and g.hud_controls.phone != null:
 		g.hud_controls.phone.ability_tray.visible = not active
-		g.hud_controls.phone.ability_tray.offset_top = 0.0 if active else -76.0
+		g.hud_controls.phone.ability_tray.offset_top = 0.0 if active else -80.0
 	elif g.hud_controls.desktop_bottom != null:
 		g.hud_controls.desktop_bottom.visible = not active
 	if not active:

@@ -6,6 +6,9 @@ var status: Label
 func _ready() -> void:
 	var title := Label.new(); title.text = "GRAPHICS"; add_child(title)
 	choices = OptionButton.new(); choices.name = "GraphicsTier"
+	if preload("res://scripts/phone_layout.gd").narrow(preload("res://scripts/phone_layout.gd").window_size()):
+		choices.custom_minimum_size.y = 44
+		choices.add_theme_font_size_override("font_size", 14)
 	for tier in ["Low", "Medium", "High"]: choices.add_item(tier)
 	add_child(choices)
 	status = Label.new(); status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

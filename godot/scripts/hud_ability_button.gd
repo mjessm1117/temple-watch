@@ -8,6 +8,10 @@ var cooldown := 0
 var active := false
 var compact := false
 
+func _ready() -> void:
+	button_down.connect(queue_redraw)
+	button_up.connect(queue_redraw)
+
 static func name_layout(value: String, button_width: float) -> Dictionary:
 	var font := ThemeDB.fallback_font
 	var available := button_width - 49.0
@@ -40,16 +44,17 @@ func configure(id: String, name: String, key: String, ap_cost: String, turns: in
 func _draw() -> void:
 	var gold := Color("f5d68b") if active else Color("b69b65") if not disabled else Color("67737d")
 	var blue := Color("7ecde7") if not disabled else Color("67737d")
-	draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), Color("111d29"), true)
-	draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), gold, false, 2.0 if active else 1.0)
+	var touch_down := compact and button_pressed
+	draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), Color("32566b") if touch_down else Color("111d29"), true)
+	draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), Color("f5d68b") if touch_down else gold, false, 3.0 if touch_down else 2.0 if active else 1.0)
 	var c := Vector2(size.x * 0.5, minf(25.0, size.y * 0.35)) if compact else Vector2(29, size.y * 0.55)
 	if compact:
 		var font := ThemeDB.fallback_font
 		var label := display_name
-		while label.length() > 1 and font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x > size.x - 6:
+		while label.length() > 1 and font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x > size.x - 6:
 			label = label.left(label.length() - 1)
 		if label != display_name: label = label.left(maxi(1, label.length() - 1)) + "…"
-		draw_string(font, Vector2(3, minf(size.y - 10.0, 46.0)), label, HORIZONTAL_ALIGNMENT_CENTER, size.x - 6, 10, Color("edf3f4") if not disabled else Color("87919b"))
+		draw_string(font, Vector2(3, minf(size.y - 8.0, 48.0)), label, HORIZONTAL_ALIGNMENT_CENTER, size.x - 6, 14, Color("edf3f4") if not disabled else Color("87919b"))
 	else:
 		draw_rect(Rect2(6, 5, 19, 17), Color("30404b"), true)
 		draw_string(ThemeDB.fallback_font, Vector2(9, 18), hotkey, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)

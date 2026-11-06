@@ -13,7 +13,7 @@ func setup(rooms: Dictionary, state: Dictionary) -> void:
 	var column := UI.column(4); add_child(column)
 	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	galaxy_button = UI.button("GALAXY MAP  ·  %d missions and threats  →" % state.options.size(), func(): galaxy_selected.emit())
-	galaxy_button.name = "GalaxyOverview"; galaxy_button.custom_minimum_size.y = 44
+	galaxy_button.name = "GalaxyOverview"; galaxy_button.custom_minimum_size.y = 56
 	galaxy_button.add_theme_font_size_override("font_size", 15)
 	column.add_child(galaxy_button)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.name = "RoomScroll"
@@ -22,8 +22,8 @@ func setup(rooms: Dictionary, state: Dictionary) -> void:
 	column.add_child(scroll)
 	var grid := GridContainer.new(); grid.name = "RoomGrid"; grid.columns = 4
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	grid.add_theme_constant_override("h_separation", 4)
-	grid.add_theme_constant_override("v_separation", 4)
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 8)
 	scroll.add_child(grid)
 	for id in rooms:
 		var info: Dictionary = rooms[id]
@@ -36,7 +36,7 @@ func setup(rooms: Dictionary, state: Dictionary) -> void:
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.clip_text = true
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		button.add_theme_font_size_override("font_size", 11)
+		button.add_theme_font_size_override("font_size", 14)
 		button.add_theme_color_override("font_color", Color("e7c88d") if not info.built else Color("d7f1ee"))
 		button.tooltip_text = str(info.detail)
 		grid.add_child(button); room_buttons[id] = button

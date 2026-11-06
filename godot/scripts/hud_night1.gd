@@ -155,8 +155,16 @@ func build_pause() -> void:
 	pause_back.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); pause_back.mouse_filter = Control.MOUSE_FILTER_STOP; add_child(pause_back)
 	pause_panel = PanelContainer.new(); pause_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	pause_panel.offset_left = -210; pause_panel.offset_right = 210; pause_panel.offset_top = -190; pause_panel.offset_bottom = 190
+	var phone := preload("res://scripts/phone_layout.gd").narrow(preload("res://scripts/phone_layout.gd").window_size())
+	if phone:
+		pause_panel.offset_top = -150; pause_panel.offset_bottom = 150
 	pause_panel.add_theme_stylebox_override("panel", panel_style()); pause_back.add_child(pause_panel)
-	var box := VBoxContainer.new(); pause_panel.add_child(box)
+	var box := VBoxContainer.new(); box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if phone:
+		var scroll := preload("res://scripts/touch_scroll.gd").new()
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; pause_panel.add_child(scroll)
+		box.add_theme_constant_override("separation", 8); scroll.add_child(box)
+	else: pause_panel.add_child(box)
 	box.add_child(label("BATTLE PAUSED", 25, Color("e9c77b")))
 	var resume := Button.new(); resume.text = "RESUME  ·  ESC"; resume.pressed.connect(func() -> void: pause_back.visible = false); box.add_child(resume)
 	var settings := Button.new(); settings.text = "SETTINGS"; settings.pressed.connect(func() -> void: settings_box.visible = not settings_box.visible); box.add_child(settings)
@@ -172,3 +180,7 @@ func build_pause() -> void:
 	var auto_select := CheckButton.new(); auto_select.text = "Auto-select next ready unit"; auto_select.button_pressed = RescueSettings.battle_value("auto_select"); settings_box.add_child(auto_select)
 	auto_select.toggled.connect(func(value: bool) -> void: RescueSettings.set_battle_value("auto_select", value))
 	var menu := Button.new(); menu.text = "MAIN MENU"; menu.pressed.connect(func() -> void: g.get_node("/root/CampaignFlow").go("menu")); box.add_child(menu)
+	if phone:
+		for control in pause_panel.find_children("*", "BaseButton", true, false):
+			control.custom_minimum_size.y = 44
+			control.add_theme_font_size_override("font_size", 14)

@@ -261,6 +261,25 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and not event.pressed and not pointer_inside: dragging = false
 
 func _pick(point: Vector2) -> void:
+	# The map is a single touch surface; choose the closest marker inside a thumb radius.
+	if Phone.narrow(Phone.window_size()):
+		var nearest := 28.0
+		var choice: Callable
+		for ship in ships:
+			var distance := projected(ship.position).distance_to(point)
+			if distance < nearest: nearest = distance; choice = field_selected.emit.bind(str(ship.get_meta("key")))
+		for op in operations:
+			var distance := (projected(planets[op.planet].position) + Vector2(-26, -25)).distance_to(point)
+			if distance < nearest:
+				nearest = distance
+				choice = region_selected.emit.bind(str(Data.get_table("galaxy", "PLANETS")[op.planet].reg))
+		for offer in offers:
+			var distance := marker_position(offer.index).distance_to(point)
+			if distance < nearest: nearest = distance; choice = mission_selected.emit.bind(offer.index)
+		for title in planets:
+			var distance := projected(planets[title].position).distance_to(point)
+			if distance < nearest: nearest = distance; choice = planet_selected.emit.bind(title)
+		if choice.is_valid(): choice.call(); return
 	for ship in ships:
 		if projected(ship.position).distance_to(point) < 14: field_selected.emit(str(ship.get_meta("key"))); return
 	for op in operations:

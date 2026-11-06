@@ -39,7 +39,7 @@ func setup(game, root: Control, action_row: HFlowContainer, action_buttons: Dict
 	style.border_color = Color("79c7d9"); style.set_border_width_all(1)
 	style.set_content_margin_all(8); popup.add_theme_stylebox_override("panel", style)
 	root.add_child(popup)
-	var scroll := ScrollContainer.new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	popup.add_child(scroll)
 	list = VBoxContainer.new(); list.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(list)
 

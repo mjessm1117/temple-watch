@@ -92,7 +92,7 @@ func _build_footer() -> void:
 	notice = S.label("Click a soldier to inspect  ·  Esc returns to the lineup", 12, S.MUTED); text.add_child(notice)
 	if Phone.narrow(Phone.window_size()): notice.hide()
 	deploy = S.button("DEPLOY →", _deploy); deploy.custom_minimum_size = Vector2(210, 48)
-	if Phone.narrow(Phone.window_size()): deploy.custom_minimum_size = Vector2(100, 44)
+	if Phone.narrow(Phone.window_size()): deploy.custom_minimum_size = Vector2(100, 56)
 	deploy.add_theme_font_size_override("font_size", 19)
 	deploy.add_theme_stylebox_override("normal", S.box(Color("254651"), S.CYAN, 12)); footer.add_child(deploy); wire_button(deploy)
 
@@ -103,7 +103,7 @@ func _layout() -> void:
 		compact_layout = compact; _draw_cards()
 	card_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	if compact:
-		card_row.add_theme_constant_override("separation",4)
+		card_row.add_theme_constant_override("separation",8)
 		header.visible = focus_index < 0; footer.visible = focus_index < 0
 		header.position = Vector2(6, 5); header.size = Vector2(size.x - 12, 56)
 		_footer_rect(6, -78, -6)
@@ -168,7 +168,7 @@ func _draw_cards() -> void:
 		var r: Dictionary = c.soldier(str(selected[i]))
 		var card := Details.card(c, r, inspect.bind(i), _portrait_texture(r)); card_row.add_child(card); cards[str(r.id)] = card
 		if Phone.narrow(Phone.window_size()) and size.x > 700.0:
-			card.custom_minimum_size.x = minf(166.0,(size.x-12.0-6.0*6.0)/7.0)
+			card.custom_minimum_size.x = minf(166.0,(size.x-26.0-8.0*6.0)/7.0)
 		if focus_index == i: card.add_theme_stylebox_override("panel", S.box(Color("213a42"), S.CYAN, 8))
 		var button: Button = card.get_child(0).get_child(0); wire_button(button)
 		button.mouse_entered.connect(func(): stage.highlight(i))
@@ -195,7 +195,7 @@ func _build_drawer() -> void:
 		var close := S.button("×", close_inspector); close.custom_minimum_size = Vector2(44, 44)
 		close.tooltip_text = "Return to lineup (Esc)"; top.add_child(close); wire_button(close)
 	var stats := Gear.battle_stats(flow.session(), str(r.id))
-	var tabs := HBoxContainer.new(); drawer_content.add_child(tabs)
+	var tabs := HBoxContainer.new(); tabs.add_theme_constant_override("separation", 8 if compact else 4); drawer_content.add_child(tabs)
 	for tab in ["roster", "arsenal", "skills"]:
 		var label := "SWAP" if tab == "roster" and compact else "SWAP SOLDIER" if tab == "roster" else "SKILLS" if tab == "skills" else "GEAR" if compact else "ARMORY"
 		var b := S.button(label, _tab_armory_skills if tab == "skills" else _tab.bind(tab)); b.size_flags_horizontal = SIZE_EXPAND_FILL

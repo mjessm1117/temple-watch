@@ -28,22 +28,27 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 		overlay.offset_top = clampf(float(safe.position.y)*scale.y,0.0,root.size.y*0.2)
 		overlay.offset_right = -clampf(float(physical.x-safe.end.x)*scale.x,0.0,root.size.x*0.2)
 		overlay.offset_bottom = -clampf(float(physical.y-safe.end.y)*scale.y,0.0,root.size.y*0.2)
-	var strip := PanelContainer.new(); strip.anchor_right = 1.0; strip.offset_bottom = 88
+	var strip := PanelContainer.new(); strip.anchor_right = 1.0; strip.offset_bottom = 108
 	var strip_style: StyleBoxFlat = night.panel_style(); strip_style.set_content_margin_all(2)
+	strip_style.content_margin_top = 0; strip_style.content_margin_bottom = 0
 	strip.add_theme_stylebox_override("panel", strip_style); overlay.add_child(strip)
-	var rows := VBoxContainer.new(); rows.add_theme_constant_override("separation", 0); strip.add_child(rows)
-	var heading := HBoxContainer.new(); rows.add_child(heading)
+	var rows := VBoxContainer.new(); rows.add_theme_constant_override("separation", 8); strip.add_child(rows)
+	var heading := HBoxContainer.new(); heading.add_theme_constant_override("separation", 8); rows.add_child(heading)
 	g.objective_label.reparent(heading); g.objective_label.add_theme_font_size_override("font_size", 12)
 	g.objective_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	g.objective_label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	g.objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	var end_button := _button("END TURN", _end_turn); end_button.name = "PhoneEndTurn"
-	end_button.custom_minimum_size = Vector2(110, 42); heading.add_child(end_button)
-	var controls := HBoxContainer.new(); rows.add_child(controls)
+	end_button.custom_minimum_size = Vector2(110, 56); heading.add_child(end_button)
+	var controls := HBoxContainer.new(); controls.add_theme_constant_override("separation", 8); rows.add_child(controls)
 	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
-	unit_card.custom_minimum_size = Vector2(105 if physical.x < 500 else 155, 42)
+	unit_card.custom_minimum_size = Vector2(105 if physical.x < 500 else 155, 44)
 	unit_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	unit_card.add_theme_font_size_override("font_size", 12); controls.add_child(unit_card)
+	unit_card.add_theme_font_size_override("font_size", 14); controls.add_child(unit_card)
+	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+		var card_style: StyleBox = unit_card.get_theme_stylebox(state).duplicate()
+		card_style.content_margin_top = 0; card_style.content_margin_bottom = 0
+		unit_card.add_theme_stylebox_override(state, card_style)
 	controls.add_child(_button("◀", func() -> void: _cycle_unit(-1)))
 	controls.add_child(_button("▶", func() -> void: _cycle_unit(1)))
 	if physical.x >= 500: controls.add_child(_button("CENTER", g._recenter))
@@ -56,38 +61,41 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	tray.anchor_top = 1.0; tray.anchor_bottom = 1.0
 	tray.offset_left = -minf(340.0, root.size.x * 0.47)
 	tray.offset_right = minf(340.0, root.size.x * 0.47)
-	tray.offset_top = -76
+	tray.offset_top = -80
 	var tray_style: StyleBoxFlat = night.panel_style(); tray_style.set_content_margin_all(2)
 	tray.add_theme_stylebox_override("panel", tray_style); overlay.add_child(tray)
 	var tray_box := VBoxContainer.new(); tray_box.add_theme_constant_override("separation", 0); tray.add_child(tray_box)
 	action_name = night.label("Tap or hold an ability for its name", 12, Color("e9ca83"))
 	action_name.custom_minimum_size.y = 17; tray_box.add_child(action_name)
-	var scroll := ScrollContainer.new(); scroll.name = "Abilities"
+	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.name = "Abilities"
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 55; tray_box.add_child(scroll)
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 56; tray_box.add_child(scroll)
 	scroll.get_h_scroll_bar().modulate.a = 0.0
-	var track := HBoxContainer.new(); track.add_theme_constant_override("separation", 3); scroll.add_child(track)
+	var track := HBoxContainer.new(); track.add_theme_constant_override("separation", 8); scroll.add_child(track)
 	for node in abilities.get_children():
 		var button: Button = node
-		button.reparent(track); button.custom_minimum_size = Vector2(83, 55)
+		button.reparent(track); button.custom_minimum_size = Vector2(83, 56)
 		ability_buttons.append(button)
-		button.set_meta("graphics_custom_minimum_size", Vector2(83, 55))
+		button.set_meta("graphics_custom_minimum_size", Vector2(83, 56))
 		button.set("compact", true); button.button_down.connect(_show_ability.bind(button))
 		button.pressed.connect(_show_ability.bind(button))
 		button.gui_input.connect(_ability_input.bind(button))
 	more_button = _button("MORE ▴", _toggle.bind("more")); more_button.custom_minimum_size = Vector2(84, 55); track.add_child(more_button)
 	popup = PanelContainer.new(); popup.name = "PhoneDetails"; popup.visible = false
 	popup.anchor_left = 0.5; popup.anchor_right = 0.5; popup.anchor_bottom = 1.0
-	popup.offset_left = -250; popup.offset_right = 250; popup.offset_top = 96; popup.offset_bottom = -80
+	var popup_half := minf(250.0, (root.size.x - 16.0) * 0.5)
+	popup.offset_left = -popup_half; popup.offset_right = popup_half; popup.offset_top = 96; popup.offset_bottom = -80
 	popup.add_theme_stylebox_override("panel", night.panel_style()); overlay.add_child(popup)
-	var detail_scroll := ScrollContainer.new(); detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var detail_scroll := preload("res://scripts/touch_scroll.gd").new(); detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	popup.add_child(detail_scroll)
 	popup_body = VBoxContainer.new(); popup_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	popup_body.add_theme_constant_override("separation", 8)
 	detail_scroll.add_child(popup_body)
 
 func _button(title: String, action: Callable) -> Button:
 	var button := Button.new(); button.text = title; button.focus_mode = Control.FOCUS_NONE
-	button.custom_minimum_size.y = 46; button.pressed.connect(action)
+	button.add_theme_font_size_override("font_size", 14)
+	button.custom_minimum_size = Vector2(44, 56 if title in ["END TURN", "MOVE", "FIRE", "OVERWATCH", "CANCEL"] else 44); button.pressed.connect(action)
 	return button
 
 func _show_ability(button: Button) -> void:
@@ -145,7 +153,7 @@ func refresh(from_game: bool = false) -> void:
 			item.disabled = button.disabled; popup_body.add_child(item)
 	elif open_card == "unit":
 		popup_body.add_child(night.label("SQUAD  ·  tap a name to select", 14, Color("efd49b")))
-		var squad := HFlowContainer.new(); popup_body.add_child(squad)
+		var squad := HFlowContainer.new(); squad.add_theme_constant_override("h_separation", 8); squad.add_theme_constant_override("v_separation", 8); popup_body.add_child(squad)
 		for member in g.mission.living("player"):
 			var id: int = int(member.id)
 			squad.add_child(_button(str(member.name), func() -> void: g._select(id); refresh()))
@@ -219,9 +227,12 @@ func _show_settings() -> void:
 	popup_body.add_child(_button("BACK", _show_menu))
 	popup_body.add_child(preload("res://scripts/graphics_options.gd").new())
 	var tips := CheckButton.new(); tips.text = "Tips"; tips.button_pressed = bool(g.Prefs.get_value("tips"))
+	tips.custom_minimum_size.y = 44; tips.add_theme_font_size_override("font_size", 14)
 	tips.toggled.connect(func(value: bool) -> void: g.Prefs.set_value("tips", value)); popup_body.add_child(tips)
 	var speed := CheckButton.new(); speed.text = "Fast enemy turns"; speed.button_pressed = RescueSettings.battle_value("fast_enemy")
+	speed.custom_minimum_size.y = 44; speed.add_theme_font_size_override("font_size", 14)
 	speed.toggled.connect(func(value: bool) -> void: RescueSettings.set_battle_value("fast_enemy", value)); popup_body.add_child(speed)
 	var auto_select := CheckButton.new(); auto_select.text = "Auto-select next ready unit"
+	auto_select.custom_minimum_size.y = 44; auto_select.add_theme_font_size_override("font_size", 14)
 	auto_select.button_pressed = RescueSettings.battle_value("auto_select")
 	auto_select.toggled.connect(func(value: bool) -> void: RescueSettings.set_battle_value("auto_select", value)); popup_body.add_child(auto_select)

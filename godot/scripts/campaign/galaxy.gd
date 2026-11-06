@@ -51,13 +51,17 @@ func _build() -> void:
 	var outer := UI.column(6); outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	outer.offset_left = 8 if compact else 22; outer.offset_top = 5 if compact else 16
 	outer.offset_right = -8 if compact else -22; outer.offset_bottom = -5 if compact else -12; add_child(outer)
-	var head := HBoxContainer.new(); outer.add_child(head)
+	var head := HBoxContainer.new(); head.add_theme_constant_override("separation", 8 if compact else 4); outer.add_child(head)
 	var title := UI.column(0); title.size_flags_horizontal = Control.SIZE_EXPAND_FILL; head.add_child(title)
 	if not compact: title.add_child(UI.label("J E D I   T E M P L E   /   W A R   R O O M",12,Color("79d3e2")))
 	title.add_child(UI.label("Galaxy command",20 if compact else 30,Color("dbe7e4")))
 	back_button = UI.button("←  GALAXY", _overview); back_button.visible = false; head.add_child(back_button)
-	head.add_child(UI.button("SITH INTELLIGENCE",func(): get_node("/root/CampaignFlow").open_intelligence()))
-	head.add_child(UI.button("←  TEMPLE",_temple))
+	var intelligence := UI.button("SITH INTELLIGENCE",func(): get_node("/root/CampaignFlow").open_intelligence())
+	if compact: intelligence.custom_minimum_size.y = 56
+	head.add_child(intelligence)
+	var temple_button := UI.button("←  TEMPLE",_temple)
+	if compact: temple_button.custom_minimum_size.y = 56
+	head.add_child(temple_button)
 	status = UI.label("",14,Color("8aa2a5")); outer.add_child(status)
 	var body := HBoxContainer.new(); body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation",12); outer.add_child(body)
@@ -68,21 +72,24 @@ func _build() -> void:
 	if compact: map_view.custom_minimum_size = Vector2(260, 130)
 	map_view.field_selected.connect(_field); map_view.mission_selected.connect(_select); map_view.planet_selected.connect(_planet); map_view.region_selected.connect(_region)
 	var right := UI.panel(Color("15232a")); right.custom_minimum_size.x = 228 if compact else 330; body.add_child(right)
-	var column := UI.column(4 if compact else 7); column.custom_minimum_size.x = 212 if compact else 304; right.add_child(column)
+	var column := UI.column(8 if compact else 7); column.custom_minimum_size.x = 212 if compact else 304; right.add_child(column)
 	tabs = HBoxContainer.new()
 	if compact:
-		var tab_row := HBoxContainer.new(); column.add_child(tab_row)
+		var tab_row := HBoxContainer.new(); tab_row.add_theme_constant_override("separation", 8); column.add_child(tab_row)
 		var previous := UI.button("‹", func(): tab_scroll.scroll_horizontal = maxi(0, tab_scroll.scroll_horizontal - 120))
+		previous.custom_minimum_size.x = 44
 		previous.tooltip_text = "Scroll tabs left"; tab_row.add_child(previous)
 		tab_scroll = preload("res://scripts/touch_scroll.gd").new(); tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 		tab_scroll.custom_minimum_size.y = 39; tab_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		tab_row.add_child(tab_scroll); tab_scroll.add_child(tabs)
 		var next := UI.button("›", func(): tab_scroll.scroll_horizontal += 120)
+		next.custom_minimum_size.x = 44
 		next.tooltip_text = "Scroll tabs right"; tab_row.add_child(next)
 	else: column.add_child(tabs)
 	for tab in ["Briefing","Regions","Field ops","Teams","Sith ops"]:
-		var button := UI.button(tab,_tab.bind(tab)); button.add_theme_font_size_override("font_size",12 if compact else 11)
+		var button := UI.button(tab,_tab.bind(tab)); button.add_theme_font_size_override("font_size",14 if compact else 11)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL; tabs.add_child(button)
+	if compact: tabs.add_theme_constant_override("separation", 8)
 	var legend := HFlowContainer.new(); legend.add_theme_constant_override("h_separation",14); column.add_child(legend)
 	legend.add_child(UI.label("RISK",12,UI.MUTED))
 	for i in 4: legend.add_child(UI.label("● " + str(Data.get_table("galaxy","RISK")[i][1]),12,Intel.COLORS[i]))
@@ -99,11 +106,13 @@ func _build() -> void:
 		excerpt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		summary.add_child(excerpt)
 		var more := UI.button("MORE", func(): phone_more = true; _show_details())
-		more.name = "BriefingMore"; more.custom_minimum_size = Vector2(52, 40); summary.add_child(more)
+		more.name = "BriefingMore"; more.custom_minimum_size = Vector2(52, 44); summary.add_child(more)
 	scroll = preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
 	detail = UI.column(10); detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(detail)
-	launch_button = UI.button("MISSION BRIEFING  →",_launch); column.add_child(launch_button)
+	launch_button = UI.button("MISSION BRIEFING  →",_launch)
+	if compact: launch_button.custom_minimum_size.y = 56
+	column.add_child(launch_button)
 	message = UI.label("Select a world or a signal.  ↑ ↓ offers  ·  Enter briefing  ·  Esc back  ·  T Temple",12,Color("8aa2a5")); outer.add_child(message)
 	if compact: message.hide()
 	_refresh_chips()

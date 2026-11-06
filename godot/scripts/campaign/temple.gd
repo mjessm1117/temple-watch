@@ -74,7 +74,7 @@ func _build_shell() -> void:
 	var title := HBoxContainer.new(); rows.add_child(title)
 	var brand := UI.label("TEMPLE WATCH", 22 if compact else 27, Color("78d2df")); brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL; title.add_child(brand)
 	if compact:
-		var rooms_button := UI.button("ROOMS", _toggle_rooms); rooms_button.custom_minimum_size.y = 44
+		var rooms_button := UI.button("ROOMS", _toggle_rooms); rooms_button.custom_minimum_size.y = 56
 		title.add_child(rooms_button)
 	status_label = UI.label("", 15, UI.GOLD); title.add_child(status_label)
 	var resources := HBoxContainer.new(); resources.add_theme_constant_override("separation", 8 if compact else 18)
@@ -91,35 +91,35 @@ func _build_shell() -> void:
 		for child in row.get_children():
 			if child is Label: child.autowrap_mode = TextServer.AUTOWRAP_OFF
 	var foot_bg := ColorRect.new(); add_child(foot_bg); foot_bg.color = Color(0.02, 0.05, 0.065, 0.84)
-	foot_bg.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); foot_bg.offset_top = -55 if compact else -97
+	foot_bg.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); foot_bg.offset_top = -64 if compact else -97
 	foot_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var footer := UI.column(7); add_child(footer); footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	footer.offset_left = 8 if compact else 20; footer.offset_right = -8 if compact else -20
-	footer.offset_top = -51 if compact else -88; footer.offset_bottom = -4 if compact else -14
+	footer.offset_top = -60 if compact else -88; footer.offset_bottom = -4 if compact else -14
 	notice_label = UI.label("Select a room to manage the Order.  •  Gold: module ready  •  Dark: awaiting construction", 14, UI.MUTED)
 	if compact: notice_label.hide()
 	notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; footer.add_child(notice_label)
 	var nav := GridContainer.new(); nav.columns = 6 if compact else 10
-	nav.add_theme_constant_override("h_separation", 4 if compact else 7)
+	nav.add_theme_constant_override("h_separation", 8 if compact else 7)
 	nav.add_theme_constant_override("v_separation", 4); footer.add_child(nav)
 	var names := ["Galaxy", "Arsenal", "Roster", "Research", "Build", "Command", "Legacy", "Teams", "Codex"]
 	var titles := {"Galaxy":"Galaxy", "Arsenal":"Armory", "Roster":"Squad", "Research":"Archives", "Build":"Build", "Command":"Council", "Legacy":"Memorial", "Teams":"Teams", "Codex":"Journal"}
 	for name in names:
 		var target: String = "Council" if name == "Command" else name
 		var button := UI.button(name, _change_page.bind(target)); button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.custom_minimum_size.y = 48 if compact else 44
+		button.custom_minimum_size.y = 56 if compact else 44
 		HomeTabs.decorate(button, name)
 		button.text = "   " + str(titles[name])
-		if compact: button.add_theme_font_size_override("font_size", 11)
+		if compact: button.add_theme_font_size_override("font_size", 14)
 		button.mouse_entered.connect(func(): temple_view.sound.play())
 		if not compact or name in ["Galaxy", "Arsenal", "Research", "Build", "Command"]: nav.add_child(button)
 		nav_buttons[name] = button
 	var menu_button := UI.button("Menu", func(): get_node("/root/CampaignFlow").go("menu"))
 	menu_button.name = "MenuCommand"
-	menu_button.custom_minimum_size.y = 44; menu_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	menu_button.custom_minimum_size.y = 56 if compact else 44; menu_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if compact:
 		var more := UI.button("⋯  More", _toggle_more); more.name = "MoreCommands"
-		more.custom_minimum_size.y = 48; more.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		more.custom_minimum_size.y = 56; more.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		nav.add_child(more)
 		more_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.98)); add_child(more_panel)
 		more_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
@@ -174,7 +174,7 @@ func _build_room_picker() -> void:
 	add_child(room_picker)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	room_picker.add_child(scroll)
-	var list := UI.column(5); list.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(list)
+	var list := UI.column(8); list.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(list)
 	var close := UI.button("CLOSE ROOMS", _toggle_rooms); close.custom_minimum_size.y = 44; list.add_child(close)
 	for id in temple_view.rooms:
 		var info: Dictionary = temple_view.rooms[id]

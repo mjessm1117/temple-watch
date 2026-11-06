@@ -56,7 +56,7 @@ static func card(c, r: Dictionary, action: Callable, portrait: Texture2D = null)
 	var content := S.column(2); compact.add_child(content)
 	var select := S.button(str(r.n), action); select.alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	select.custom_minimum_size.y = 44; select.clip_text = true
-	select.add_theme_font_size_override("font_size", 9 if phone else 11); content.add_child(select)
+	select.add_theme_font_size_override("font_size", 14 if phone else 11); content.add_child(select)
 	if portrait != null:
 		var face := Sprite2D.new(); face.texture = portrait; face.position = Vector2(21, 21)
 		face.scale = Vector2(0.26, 0.26); select.add_child(face)

@@ -103,11 +103,11 @@ func preview(actor: Dictionary, target: Dictionary) -> void:
 	var side := Vector3(-direction.z, 0.0, direction.x)
 	var shoulder := origin - direction * 0.7 + side * 4.5 + Vector3.UP * (2.2 if phone else 2.55)
 	shoulder = preload("res://scripts/battle11_camera.gd").aim_position(g.mission, shoulder)
-	var look := origin.lerp(destination, 0.8) + Vector3.UP * (1.3 if phone else 1.25)
+	var look := origin.lerp(destination, 0.8) + Vector3.UP * (1.4 if phone else 1.25)
 	g.cinematic = true
 	preview_tween = g.create_tween().set_parallel(true)
 	preview_tween.tween_property(g.camera, "position", shoulder, AIM_BLEND).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	preview_tween.tween_property(g.camera, "fov", 64.0 if phone else 52.0, AIM_BLEND)
+	preview_tween.tween_property(g.camera, "fov", 74.0 if phone else 52.0, AIM_BLEND)
 	var initial_look: Vector3 = g.camera.position - g.camera.global_basis.z * 8.0
 	preview_tween.tween_method(func(value: Vector3) -> void: g.camera.look_at(value, Vector3.UP), initial_look, look, AIM_BLEND)
 
