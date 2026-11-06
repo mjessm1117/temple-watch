@@ -1,5 +1,6 @@
 extends RefCounted
 const ROOT := "res://assets/ui/armory16/"
+const MESHY_ROOT := "res://assets/ui/armory16/meshy/"
 
 static func _key(slot: String, jedi: bool, mark: int, color: String) -> String:
 	var key := ""
@@ -15,12 +16,12 @@ static func _key(slot: String, jedi: bool, mark: int, color: String) -> String:
 
 static func texture_for(slot: String, jedi: bool, mark: int, color: String, fallback: String) -> Texture2D:
 	var key := _key(slot, jedi, mark, color)
-	var path := ROOT + key + ".png"
+	var path := (MESHY_ROOT if slot == "armor" and jedi else ROOT) + key + ".png"
 	if not key.is_empty() and ResourceLoader.exists(path): return load(path)
 	return load("res://assets/loadout/icons13/%s.png" % fallback)
 
 static func tile_for(slot: String, jedi: bool, mark: int, color: String, fallback: String) -> Texture2D:
 	var key := _key(slot, jedi, mark, color)
-	var path := ROOT + "tiles/" + key + ".png"
+	var path := (MESHY_ROOT if slot == "armor" and jedi else ROOT) + "tiles/" + key + ".png"
 	if not key.is_empty() and ResourceLoader.exists(path): return load(path)
 	return load("res://assets/loadout/icons13/%s.png" % fallback)
