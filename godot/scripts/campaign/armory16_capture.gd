@@ -46,6 +46,7 @@ func capture() -> void:
 	var tris := int(Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME))
 	var suffix := "phone-low" if phone else "desktop-high"
 	var filename := "wave16-armory-%s-%s-%s%s-mk%d.png" % [phase, suffix, id, "-" + guest if guest != "" else "", mark]
+	if "intfix" in args: filename = "w16-intfix-%s-armory-%s-mk%d.png" % [suffix, id, mark]
 	var path := ProjectSettings.globalize_path("res://../docs/godot/shots/" + filename)
 	print("ARMORY16 PERF %s %s %s mk%d draws=%d triangles=%d fps=%d" % [phase, suffix, id, mark, draws, tris, Engine.get_frames_per_second()])
 	print("ARMORY16 SHOT %s result=%d" % [path, root.get_texture().get_image().save_png(path)])

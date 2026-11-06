@@ -67,7 +67,11 @@ func setup(owner_screen: Control, id: String) -> void:
 		var action := "saber" if jedi else "weapon"
 		offer(action, "", "", "Craft " + str(item.n), lock_reason(c, item, cost, kyber), cost, kyber, Gear.preview(c, id, action))
 	section("ARMOR")
-	for key in Data.get_table("gear", "ARMOR"):
+	var armor_keys: Array = Data.get_table("gear", "ARMOR").keys()
+	if str(r.gear.armor) in armor_keys:
+		armor_keys.erase(str(r.gear.armor))
+		armor_keys.push_front(str(r.gear.armor))
+	for key in armor_keys:
 		var item: Dictionary = Data.get_table("gear", "ARMOR")[key]
 		if item.get("who", "any") not in ["any", "jedi" if jedi else "troop"]: continue
 		var cost := Gear.price(c, int(item.get("cost", 0)))
