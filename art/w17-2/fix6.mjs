@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import sharp from 'sharp';
 import {NodeIO, PropertyType} from '@gltf-transform/core';
@@ -7,7 +6,7 @@ import {copyToDocument, createDefaultPropertyResolver, dedup, prune, simplify, u
 import {MeshoptDecoder, MeshoptSimplifier} from 'meshoptimizer';
 
 // Run from the repository root: node art/w17-2/fix6.mjs
-// Then run: python3 art/w17-2/fix7-compact.py
+// This invokes Blender to generate Fix 8 gear. Then run fix7-compact.py.
 await MeshoptDecoder.ready;
 await MeshoptSimplifier.ready;
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.decoder': MeshoptDecoder});
@@ -17,18 +16,7 @@ const colors = {
   sniper: [.30, .38, .20], heavy: [.70, .33, .10], tech: [.10, .45, .48],
   droid: [.80, .66, .15], officer: [.55, .10, .12],
 };
-// Shoot-pose barrel direction and desired forward direction in the Trooper
-// hand attachment's local space, measured with w17_art4_test.gd.
-const aim = {
-  sniper:[[-.674930,.324510,.662694],[.759833,-.442442,-.476339]],
-  heavy:[[-.725629,.387963,.568285],[.786323,-.420037,-.453063]],
-  tech:[[-.338233,.393474,.854855],[.776532,-.428134,-.462277]],
-  droid:[[-.430777,.429436,.793735],[.786578,-.420528,-.452162]],
-  officer:[[-.442912,.474092,.760964],[.786312,-.420017,-.453099]],
-};
-const dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0);
 const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
-const norm=v=>{const n=Math.hypot(...v);return v.map(x=>x/n);};
 const mul=(a,b)=>[
   a[3]*b[0]+a[0]*b[3]+a[1]*b[2]-a[2]*b[1],
   a[3]*b[1]-a[0]*b[2]+a[1]*b[3]+a[2]*b[0],
@@ -36,7 +24,6 @@ const mul=(a,b)=>[
   a[3]*b[3]-a[0]*b[0]-a[1]*b[1]-a[2]*b[2],
 ];
 const rotate=(q,v)=>{const t=cross(q.slice(0,3),v).map(x=>2*x);return v.map((x,i)=>x+q[3]*t[i]+cross(q.slice(0,3),t)[i]);};
-const between=(a,b)=>norm([...cross(a,b),1+dot(a,b)]);
 
 async function recolorTexture(doc, kind, lod) {
   const texture = doc.getRoot().listTextures()[0];
@@ -92,41 +79,38 @@ async function recolorTexture(doc, kind, lod) {
   }
 }
 
-function attachGear(target, source, kind) {
-  const dstRoot=target.getRoot(), srcRoot=source.getRoot();
-  const resolver=createDefaultPropertyResolver(target,source);
-  const joints=new Map(dstRoot.listSkins()[0].listJoints().map(n=>[n.getName(),n]));
+// Fix 8 gear is authored in the final hand frame: +Z along the barrel.
+// These anchors are the approved Fix 7 receiver transforms, so the new grip
+// stays in the same palm while the body, skin, and clips remain untouched.
+const gearAnchor = {
+  sniper:{p:[-.012,.041,.005],q:[.620,-.594,.497,-.120]},
+  heavy:{p:[-.020,.041,-.010],q:[.784,-.334,.521,.046]},
+  tech:{p:[-.018,.029,.009],q:[.764,-.384,.518,.020]},
+  droid:{p:[-.015,.031,.006],q:[.808,-.272,.516,.087]},
+  officer:{p:[-.014,.032,.005],q:[.835,-.171,.501,.149]},
+};
+function attachGear(target, weapon, pack, kind) {
+  const joints=new Map(target.getRoot().listSkins()[0].listJoints().map(n=>[n.getName(),n]));
   const counts={weapon:0,pack:0};
-  const correction=between(...aim[kind]);
-  const grip=srcRoot.listNodes().find(n=>n.getMesh() && n.getName().endsWith('__hand_r') && (n.getName().includes('receiver') || n.getName().includes('repeater body')))?.getTranslation().map(v=>v*.01) || [0,0,0];
-  for (const srcNode of srcRoot.listNodes()) {
-    if (!srcNode.getMesh()) continue;
-    const match=srcNode.getName().match(/__(hand_r|spine_03)(?:\.\d+)?$/);
-    if (!match) continue;
-    const bone=match[1];
-    if (bone==='spine_03' && !['heavy','tech'].includes(kind)) continue;
-    const name=srcNode.getName();
-    // Exclude the old Officer's cape/back slab; only its sidearm transfers.
-    if (kind==='officer' && bone!=='hand_r') continue;
-    const mesh=copyToDocument(target,source,[srcNode.getMesh()],resolver).get(srcNode.getMesh());
-    const node=target.createNode(name).setMesh(mesh);
-    // Fix-4 accessories were authored on a rig with a 0.01 armature scale.
-    // Bake that scale into their bone-local transforms for the Trooper rig.
-    let position=srcNode.getTranslation().map(v=>v*.01);
-    let rotation=srcNode.getRotation();
-    if (bone==='hand_r') {
-      position=rotate(correction,position.map((v,i)=>v-grip[i])).map((v,i)=>v+grip[i]);
-      rotation=mul(correction,rotation);
-    } else if (kind==='tech') {
-      // The spine attachment is nearly vertical in shoot; 15 cm drops all
-      // battery pieces below HeadTop_End without changing their grouping.
-      position=[position[0]+.006,position[1]-.15,position[2]+.014];
+  for (const [source,bone] of [[weapon,'hand_r'],[pack,'spine_03']]) {
+    if (!source) continue;
+    const resolver=createDefaultPropertyResolver(target,source);
+    for (const srcNode of source.getRoot().listNodes()) {
+      if (!srcNode.getMesh()) continue;
+      const mesh=copyToDocument(target,source,[srcNode.getMesh()],resolver).get(srcNode.getMesh());
+      const node=target.createNode(`${srcNode.getName()}__${bone}`).setMesh(mesh);
+      if (bone==='hand_r') {
+        const {p,q}=gearAnchor[kind];
+        node.setTranslation(rotate(q,srcNode.getTranslation()).map((v,i)=>v+p[i]));
+        node.setRotation(mul(q,srcNode.getRotation()));
+      } else {
+        node.setTranslation(srcNode.getTranslation());
+        node.setRotation(srcNode.getRotation());
+      }
+      node.setScale(srcNode.getScale());
+      joints.get(bone).addChild(node);
+      counts[bone==='hand_r'?'weapon':'pack']+=mesh.listPrimitives().reduce((s,p)=>s+(p.getIndices()?.getCount()||p.getAttribute('POSITION').getCount())/3,0);
     }
-    node.setTranslation(position);
-    node.setRotation(rotation);
-    node.setScale(srcNode.getScale().map(v=>v*.01));
-    joints.get(bone).addChild(node);
-    counts[bone==='hand_r'?'weapon':'pack']+=mesh.listPrimitives().reduce((s,p)=>s+(p.getIndices()?.getCount()||p.getAttribute('POSITION').getCount())/3,0);
   }
   return counts;
 }
@@ -147,14 +131,16 @@ function removeBindPoseTracks(doc) {
   }
 }
 
+execFileSync('blender',['-b','--factory-startup','--python','art/w17-2/fix8_gear.py'],{stdio:'inherit'});
 for (const kind of Object.keys(colors)) {
-  const sourceBytes=execFileSync('git',['show',`6798e64:godot/assets/units/w17/${kind}.glb`],{maxBuffer:64*1024*1024});
-  const gear=await io.readBinary(new Uint8Array(sourceBytes));
   for (const lod of [false,true]) {
+    const level=lod?1:0;
+    const weapon=await io.read(`/tmp/w17-fix8-gear/${kind}-weapon-lod${level}.glb`);
+    const pack=['heavy','tech'].includes(kind) ? await io.read(`/tmp/w17-fix8-gear/${kind}-pack-lod${level}.glb`) : null;
     const doc=await io.read(sourceBody);
     await recolorTexture(doc,kind,lod);
     if (lod) await doc.transform(simplify({simplifier:MeshoptSimplifier,ratio:.42,error:.025}));
-    const counts=attachGear(doc,gear,kind);
+    const counts=attachGear(doc,weapon,pack,kind);
     removeBindPoseTracks(doc);
     await doc.transform(prune(), dedup({propertyTypes:[PropertyType.ACCESSOR]}), unpartition());
     const path=`${output}/${kind}${lod?'_lod1':''}.glb`;

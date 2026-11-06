@@ -143,3 +143,31 @@ The three `w17-art6-*.png` review sheets were recaptured at the original camera 
 The direct `w17_art4_test` passed all ten Full/Low models after the size change, including accent, aim, and pack placement assertions.
 
 Final gate: `./godot/test.sh` exited 0 with zero `SCRIPT ERROR` lines and zero failures; Normal rescue was 9/20. `git diff --check` was clean. Two Wave 16 camera screenshots changed by the test runner were restored.
+
+## Fix 8 — original low-poly weapons and packs
+
+Blender 5.2 generated five class weapons and two spine packs from beveled primitives. They replace the transferred 6798e64 gear; the Trooper body, UVs, class texture bytes, skin and all 29 clips are unchanged. Each piece uses matte gunmetal, lighter metal edges, a single small stripe matching the Fix 6 RGB, and limited emitter/indicator light. `fix6.mjs` generates the gear via `fix8_gear.py`, binds the weapon parts to `hand_r` and the two packs to `spine_03`; `fix7-compact.py` repacks the result. No Meshy API call or credit was used.
+
+| Piece | LOD0 tris | LOD1 tris |
+|---|---:|---:|
+| Sniper long rifle, scope, folded bipod | 552 | 228 |
+| Heavy repeater, shroud vents, box magazine, carry handle | 532 | 204 |
+| Heavy twin rocket pack, frame and straps | 312 | 168 |
+| Tech carbine, tool emitter | 376 | 144 |
+| Tech cell pack, indicator and cable loop | 224 | 176 |
+| Droid coil blaster | 500 | 172 |
+| Officer long-barrel pistol | 296 | 144 |
+
+| Class | Unit LOD0 / LOD1 tris | LOD0 GLB bytes | LOD1 GLB bytes |
+|---|---:|---:|---:|
+| Sniper | 5,477 / 2,296 | 1,274,496 | 909,744 |
+| Heavy | 5,769 / 2,440 | 1,286,220 | 916,896 |
+| Tech | 5,525 / 2,388 | 1,281,728 | 916,312 |
+| Droid | 5,425 / 2,240 | 1,271,508 | 906,668 |
+| Officer | 5,221 / 2,212 | 1,263,360 | 905,356 |
+
+`w17-art8-weapons.png` compares the seven old pieces above the new ones. `w17-art8-classes.png` retains the Fix 6 front and three-quarter framing; `w17-art8-shoot.png` shows the five firing poses; `w17-art8-small.png` shows all seven soldiers at 64 px. The direct Full/Low aim and pack check passed all ten models. Largest measured barrel elevation: 11.19° (Tech LOD0). Heavy pack top: 1.533 below head end 1.610; Tech pack top: 1.428 below head end 1.611. The body attribute and texture bytes match Fix 7 across all ten LOD0/LOD1 files. LOD0 animation sampler data hashes also match exactly; all files retain 29 clips.
+
+Remaining gaps: the Droid still shares the Trooper body silhouette. The Tech pack cable is a short molded loop toward the weapon side, so it does not stretch with the animated hand. W17 assets remain staged for later armory/battle wiring.
+
+Final gate: headless import exited 0; the direct `w17_art4_test` passed all ten Full/Low models; the full `./godot/test.sh` retry exited 0 with zero `SCRIPT ERROR` lines, zero failures, 368 main checks, and Normal rescue 9/20. The first full attempt hit a transient phone HUD position assertion in `battle13_test`; that suite passed 69/69 both in isolation and in the full retry. `git diff --check` was clean. Two Wave 16 camera screenshots changed by the runner were restored.
