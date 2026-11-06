@@ -38,6 +38,12 @@ func run() -> void:
 			view.own_world_3d = true; root.add_child(view)
 			var m = Mission.new(17,PATHS[theme])
 			var art = Art.new(); view.add_child(art); art.build(m)
+			if theme == "plains" and not m.living("player").is_empty():
+				var guard: Dictionary = m.living("player")[0]
+				guard.overwatch = true; guard.range = 8.0
+				check(art.overwatch_zones(m).size() == 1, "overwatch uses one arc per guard")
+				art.refresh_markers(m)
+				check(art.marker_root.get_children().any(func(node): return node is MeshInstance3D and node.mesh is ImmediateMesh and node.mesh.get_surface_count() == 2), "overwatch arc has fill and edge")
 			var world := WorldEnvironment.new(); view.add_child(world)
 			var sun := DirectionalLight3D.new(); view.add_child(sun)
 			art.apply_environment(world,sun,theme)
@@ -104,7 +110,7 @@ func run() -> void:
 			check(grid.view.multimesh.visible_instance_count == 2,"grid source fits %s" % size)
 			var near: float = grid.focus_alpha(Vector3(1,0,1),grid.focus)
 			var far: float = grid.focus_alpha(Vector3(10,0,1),grid.focus)
-			check(near > far*4.0,"grid fades away from selection %s" % size)
+			check(near > far and far >= 0.6,"grid keeps distant move tiles visible %s" % size)
 			grid.queue_free(); source.queue_free(); await process_frame
 	print("map14: %d checks, %d failures" % [checks,failures])
 	quit(1 if failures else 0)

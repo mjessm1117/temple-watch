@@ -228,9 +228,6 @@ func refresh_markers(m: RefCounted) -> void:
 		if m.spec.family == "operation":
 			var step: Dictionary = preload("res://scripts/mission_objectives.gd").current_step(m)
 			if step.has("at"): objective(markers,m,Maps.point(step.at),"operation")
-	for zone in overwatch_zones(m):
-		var tile: Vector2i = zone.at
-		ring(markers,Vector3(tile.x,Shot.elevation(m,tile)*0.7+0.01,tile.y),palette.objective if zone.side == "player" else palette.danger,0.34)
 	if m.modern:
 		for wave in m.pressure_state.pending:
 			var tile := Maps.point(wave.at)
@@ -243,6 +240,7 @@ func refresh_markers(m: RefCounted) -> void:
 					for x in range(tile.x-radius,tile.x+radius+1):
 						if m.passable(Vector2i(x,y)): ring(markers,Vector3(x,Shot.elevation(m,Vector2i(x,y))*0.7+0.02,y),palette.objective,0.36)
 	batch.records.append_array(markers.records); markers.flush(marker_root)
+	for zone in overwatch_zones(m): overwatch_arc(zone)
 
 func objective(b, m: RefCounted, tile: Vector2i, family: String) -> void:
 	if not m.in_bounds(tile): return
@@ -268,11 +266,36 @@ func overwatch_zones(m: RefCounted) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for u in m.units:
 		if int(u.hp) <= 0 or float(u.range) < 2.0 or not bool(u.overwatch) or (u.side == "enemy" and not bool(u.spotted)): continue
-		for y in int(m.spec.height):
-			for x in int(m.spec.width):
-				var p := Vector2i(x,y)
-				if p != Shot.pos(u) and m.passable(p) and Shot.distance(Shot.pos(u),p) <= float(u.range) and Shot.los(m,Shot.pos(u),p): out.append({"at":p,"side":u.side,"unit":u.id})
+		out.append({"at":Shot.pos(u),"side":u.side,"range":float(u.range)})
 	return out
+
+func overwatch_arc(zone: Dictionary) -> void:
+	# Overwatch fires in every direction, so a single full arc shows its actual rule.
+	var center: Vector2i = zone.at
+	var radius: float = minf(float(zone.range), 8.0)
+	var color := Color("70d3ee") if zone.side == "player" else Color("ef8e72")
+	var fill := StandardMaterial3D.new(); fill.albedo_color = Color(color.r,color.g,color.b,0.16)
+	fill.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; fill.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	fill.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var edge := StandardMaterial3D.new(); edge.albedo_color = Color(color.r,color.g,color.b,0.85)
+	edge.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; edge.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	var mesh := ImmediateMesh.new()
+	var at := Vector3(center.x,Shot.elevation(mission,center)*0.7+0.09,center.y)
+	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES,fill)
+	for i in 48:
+		var a := TAU*float(i)/48.0; var b := TAU*float(i+1)/48.0
+		mesh.surface_add_vertex(at)
+		mesh.surface_add_vertex(at+Vector3(cos(a)*radius,0,sin(a)*radius))
+		mesh.surface_add_vertex(at+Vector3(cos(b)*radius,0,sin(b)*radius))
+	mesh.surface_end()
+	mesh.surface_begin(Mesh.PRIMITIVE_LINE_STRIP,edge)
+	for i in 49:
+		var a := TAU*float(i)/48.0
+		mesh.surface_add_vertex(at+Vector3(cos(a)*radius,0.02,sin(a)*radius))
+	mesh.surface_end()
+	var visual := MeshInstance3D.new(); visual.mesh = mesh
+	visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	marker_root.add_child(visual)
 
 
 func weather(settings: Dictionary, width: int, height: int) -> void:
