@@ -25,7 +25,7 @@ static func populate(cells: Dictionary, rooms: Dictionary, state: Dictionary, lo
 		actor.set_meta("show16_jedi", id)
 		actor.position = Vector3(-0.9 if room_id != "council" else 0.82, 0.12, 1.45)
 		actor.rotation.y = -0.24 if room_id != "council" else 0.20
-		actor.scale = Vector3.ONE * 1.05
+		actor.scale = Vector3.ONE * 1.5
 		cells[room_id].add_child(actor)
 		var animator: AnimationPlayer = null
 		for candidate in actor.find_children("*", "AnimationPlayer", true, false):
