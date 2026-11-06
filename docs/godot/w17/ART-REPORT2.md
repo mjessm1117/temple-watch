@@ -35,3 +35,21 @@ Sniper's rifle and Heavy's repeater were reparented from the spine to `hand_r` i
 - `git diff --check`: clean. Test-run Wave 16 screenshot side effects were restored.
 
 All models remain staged in `godot/assets/units/w17/`. No roster, armory or battle wiring was changed.
+
+## Fix 3 — free local repaint and shoot aim
+
+The `HEAVY-REPAINT` marker was present when the Heavy repaint step ran. No Meshy calls or credits were used. Flat matte material regions replaced the mottled body texture on both Full and Low Sniper and Heavy models; their armor now uses broad cream and tan plates over deep navy cloth. Officer's near-black bodysuit and leg undersuit became deep navy, and its large yellow-gold armor regions became warm tan and cream. The blue sash and small accessory trim remain. Tech and Droid body palettes were unchanged.
+
+| Class | Before | After at `shoot` frame |
+|---|---|---|
+| Sniper | Camo-blotch body; rifle barrel about 86° above level | Flat cream/tan/navy body; rifle about 5° below level |
+| Heavy | Mottled body; repeater about 80° above level | Flat cream/tan/navy body; repeater about 1° below level |
+| Tech | Flat body; carbine about 86° above level | Body unchanged; carbine about 1° below level |
+| Droid | Flat body; blaster about 83° above level | Body unchanged; blaster about 3° below level |
+| Officer | Near-black undersuit and bright gold armor; pistol about 77° above level | Navy undersuit, tan/cream armor, sash intact; pistol about 1° below level |
+
+The aim correction changes only the `hand_r` rotation keys in each `shoot` clip, for Full and Low. Idle and run clips retain their previous grip and orientation. The new five-class shoot contact sheet is `docs/godot/shots/w17-art3-shoot-poses.png`; `docs/godot/shots/w17-art-classes2.png` was reshot with all seven classes, front and three-quarter. The staged models remain outside game data. Full and Low triangle counts remain 12,570/1,913 Sniper, 13,072/2,281 Heavy, 12,592/1,879 Tech, 12,629/1,877 Droid and 12,493/1,835 Officer. Each GLB retains 29 animation clips. Painted body materials use no image texture; retained texture images are at most 1024².
+
+Low models use broad helmet/shoulder, torso, cloth and boot color bands. Their existing simplified geometry gives those boundaries coarse edges in close-up portraits; the armor and navy cloth remain distinct at battle distance.
+
+Final gate: binary repack and headless import exited 0; `./godot/test.sh` exited 0 with zero `SCRIPT ERROR` lines and zero failures, including Normal rescue 9/20. The isolated animation smoke passed 50/50 checks, and the Full/Low shoot aim check passed 10/10 barrels within 15° of forward level. `git diff --check` was clean. Wave 16 camera screenshots changed by the test runner were restored.

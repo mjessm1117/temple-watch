@@ -3,7 +3,7 @@ const base='art/w17-2/',shot='docs/godot/shots/';
 const names=['trooper','scout','sniper','heavy','tech','droid','officer'];
 const W=2100,H=1150,parts=[];
 const label=(s,x,y,size=20)=>parts.push({input:Buffer.from(`<svg width="285" height="38"><text x="0" y="27" font-family="sans-serif" font-weight="bold" font-size="${size}" fill="#f2e9d7">${s}</text></svg>`),left:x,top:y});
-parts.push({input:Buffer.from('<svg width="1800" height="42"><text x="0" y="30" font-family="sans-serif" font-weight="bold" font-size="30" fill="#f2e9d7">TEMPLE WATCH / W17 TECH · DROID · OFFICER</text></svg>'),left:24,top:5});
+parts.push({input:Buffer.from('<svg width="1800" height="42"><text x="0" y="30" font-family="sans-serif" font-weight="bold" font-size="30" fill="#f2e9d7">TEMPLE WATCH / W17 ART FIX 3</text></svg>'),left:24,top:5});
 for(let i=0;i<names.length;i++){
  const name=names[i],x=12+i*298;label(name.toUpperCase(),x,47);
  for(const [view,y] of [['front',82],['three-quarter',402]]){
