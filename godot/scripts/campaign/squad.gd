@@ -6,6 +6,9 @@ const Actor = preload("res://scripts/campaign/loadout_actor.gd")
 const Arsenal = preload("res://scripts/campaign/loadout_arsenal.gd")
 const Gear = preload("res://scripts/campaign/gear.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
+const JediModels = preload("res://scripts/characters/jedi_models.gd")
+const StoryPortraits = preload("res://scripts/story14_portraits.gd")
+const Progression = preload("res://scripts/campaign/progression.gd")
 var capacity := 4
 var flow: Node
 var selected: Array = []
@@ -161,7 +164,7 @@ func _draw_cards() -> void:
 	S.clear(card_row); cards.clear()
 	for i in selected.size():
 		var r: Dictionary = c.soldier(str(selected[i]))
-		var card := Details.card(c, r, inspect.bind(i), portraits[str(r.id)].get_texture()); card_row.add_child(card); cards[str(r.id)] = card
+		var card := Details.card(c, r, inspect.bind(i), _portrait_texture(r)); card_row.add_child(card); cards[str(r.id)] = card
 		if focus_index == i: card.add_theme_stylebox_override("panel", S.box(Color("213a42"), S.CYAN, 8))
 		var button: Button = card.get_child(0).get_child(0); wire_button(button)
 		button.mouse_entered.connect(func(): stage.highlight(i))
@@ -218,7 +221,7 @@ func _tab_armory_skills() -> void:
 func _roster_row(parent: VBoxContainer, r: Dictionary) -> void:
 	var id := str(r.id); var fit := Details.fit(r)
 	var row := HBoxContainer.new(); parent.add_child(row)
-	var portrait := TextureRect.new(); portrait.texture = portraits[id].get_texture()
+	var portrait := TextureRect.new(); portrait.texture = _portrait_texture(r)
 	portrait.custom_minimum_size = Vector2(56, 70); portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED; row.add_child(portrait)
 	if not fit: portrait.modulate = Color("69747a")
@@ -229,6 +232,11 @@ func _roster_row(parent: VBoxContainer, r: Dictionary) -> void:
 	col.add_child(S.label("%s · R%d · %s" % [r.cls, int(r.rank), Details.nickname(r)], 11, S.MUTED))
 	var status := S.label(Details.status(flow.session(), r), 11, S.GREEN if fit else S.RED)
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; col.add_child(status)
+
+func _portrait_texture(r: Dictionary) -> Texture2D:
+	if JediModels.id_for({"name":str(r.n)}) != "" and Progression.is_jedi(r):
+		return StoryPortraits.texture(str(r.n))
+	return portraits[str(r.id)].get_texture()
 
 func swap_soldier(id: String) -> bool:
 	if focus_index < 0 or selected.has(id) or not Details.fit(flow.session().soldier(id)): return false
