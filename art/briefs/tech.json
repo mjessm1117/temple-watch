@@ -1,0 +1,10 @@
+{
+  "credit_cap": 150,
+  "preview_cap": 5,
+  "refine_cap": 3,
+  "texture": "Temple Security engineer. Clean flat large sandstone tan, warm cream and deep blue color panels; no noise, no mottling, no camouflage, no grunge. Matte ceramic armor and navy utility cloth, tiny gold Jedi Order badge. Friendly ally, strong readable color grouping at 844x390.",
+  "variants": {
+    "A": "Single full-body stylized low-poly Temple Security combat engineer, medium human armor, A-pose arms apart, front-facing. Distinct rectangular tool-and-battery backpack high behind shoulders, broad blue utility harness with visible pouches and tools, cream shoulder plates, tan chest armor, wrist computer on left forearm. Practical compact silhouette, clear separated legs, small Jedi Order chest badge. Matte clean tan cream deep blue flat color blocks. Friendly Republic/Jedi ally, no camouflage, no black or red Sith, no base, no weapon in hand.",
+    "B": "Single full-body stylized low-poly Temple Security field technician, human A-pose facing front, arms away from torso. Medium angular tan and cream armor over deep navy cloth, prominent squared backpack with two battery cartridges, diagonal tool harness, oversized blue wrist computer, visible cable and repair tool on belt, subtle Jedi Order badge. Compact engineer silhouette and separated limbs for humanoid rig. Clean flat color panels, no visual noise, no camouflage, no Sith black/red, no base, no weapon in hand."
+  }
+}

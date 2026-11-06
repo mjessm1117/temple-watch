@@ -1,0 +1,2 @@
+# Droid brief
+Humanoid allied Temple sentry seen at 844×390 Low battle distance, 15K triangles full and about 1.5K–3K Low. References: `godot/assets/models/units/trooper.glb`, `godot/assets/models/units/scout.glb`, `docs/godot/shots/w17-art-classes.png`. Human-proportion limbs for shared rig, friendly helmet, plated chest, visible shoulder module socket. The hand-held blaster will be built locally and parented to the right hand. Avoid thin Separatist or black/red Sith shape language.

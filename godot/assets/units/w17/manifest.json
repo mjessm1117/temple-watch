@@ -115,6 +115,201 @@
           "status": "SUCCEEDED"
         }
       ]
+    },
+    "tech": {
+      "selected": "A",
+      "files": {
+        "full": "tech.glb",
+        "low": "tech_lod1.glb"
+      },
+      "triangles": 12592,
+      "lod_triangles": 1879,
+      "texture_pixels": [
+        1024,
+        1024
+      ],
+      "animation_clips": 29,
+      "prompt": "Single full-body stylized low-poly Temple Security combat engineer, medium human armor, A-pose arms apart, front-facing. Distinct rectangular tool-and-battery backpack high behind shoulders, broad blue utility harness with visible pouches and tools, cream shoulder plates, tan chest armor, wrist computer on left forearm. Practical compact silhouette, clear separated legs, small Jedi Order chest badge. Matte clean tan cream deep blue flat color blocks. Friendly Republic/Jedi ally, no camouflage, no black or red Sith, no base, no weapon in hand.",
+      "texture_prompt": "Temple Security engineer. Clean flat large sandstone tan, warm cream and deep blue color panels; no noise, no mottling, no camouflage, no grunge. Matte ceramic armor and navy utility cloth, tiny gold Jedi Order badge. Friendly ally, strong readable color grouping at 844x390.",
+      "preview_variants": {
+        "A": "Single full-body stylized low-poly Temple Security combat engineer, medium human armor, A-pose arms apart, front-facing. Distinct rectangular tool-and-battery backpack high behind shoulders, broad blue utility harness with visible pouches and tools, cream shoulder plates, tan chest armor, wrist computer on left forearm. Practical compact silhouette, clear separated legs, small Jedi Order chest badge. Matte clean tan cream deep blue flat color blocks. Friendly Republic/Jedi ally, no camouflage, no black or red Sith, no base, no weapon in hand.",
+        "B": "Single full-body stylized low-poly Temple Security field technician, human A-pose facing front, arms away from torso. Medium angular tan and cream armor over deep navy cloth, prominent squared backpack with two battery cartridges, diagonal tool harness, oversized blue wrist computer, visible cable and repair tool on belt, subtle Jedi Order badge. Compact engineer silhouette and separated limbs for humanoid rig. Clean flat color panels, no visual noise, no camouflage, no Sith black/red, no base, no weapon in hand."
+      },
+      "tasks": [
+        {
+          "asset": "tech",
+          "letter": "A",
+          "mode": "preview",
+          "cost": 20,
+          "before": 14175,
+          "status": "SUCCEEDED",
+          "id": "01a1af5a-d51d-7474-82ec-3d80654b1faa",
+          "after": 14155,
+          "completion_balance": 14075
+        },
+        {
+          "asset": "tech",
+          "letter": "B",
+          "mode": "preview",
+          "cost": 20,
+          "before": 14155,
+          "status": "SUCCEEDED",
+          "id": "01a1af5a-df25-73a9-b0cb-51e397b4f2ee",
+          "after": 14135,
+          "completion_balance": 14075
+        },
+        {
+          "asset": "tech",
+          "letter": "A",
+          "mode": "refine",
+          "cost": 10,
+          "before": 14075,
+          "status": "SUCCEEDED",
+          "id": "01a1af5d-c7d8-76de-a3d8-d48c48131725",
+          "after": 14065,
+          "completion_balance": 14045
+        },
+        {
+          "asset": "tech",
+          "letter": "A",
+          "mode": "rig",
+          "cost": 5,
+          "before": 14045,
+          "status": "SUCCEEDED",
+          "id": "01a1af60-1da4-730d-b610-bfc801a2acbd",
+          "after": 14040,
+          "completion_balance": 14030
+        }
+      ]
+    },
+    "droid": {
+      "selected": "B",
+      "files": {
+        "full": "droid.glb",
+        "low": "droid_lod1.glb"
+      },
+      "triangles": 12629,
+      "lod_triangles": 1877,
+      "texture_pixels": [
+        1024,
+        1024
+      ],
+      "animation_clips": 29,
+      "prompt": "Single full-body armored humanoid Temple Security droid soldier, stylized low-poly, A-pose facing front, arms separated and human-like limb proportions for humanoid rig. Boxy cream helmet with friendly blue horizontal visor, broad tan torso plates, navy articulated elbows and knees, visible circular module docking mount over left shoulder, golden Jedi Order crest. Strong allied soldier silhouette, matte clean flat cream tan deep blue panels, no skeletal thin battle droid, no Sith black/red, no base, no weapon in hand.",
+      "texture_prompt": "Friendly Temple Security sentry droid. Clean flat large sandstone tan and warm cream armored panels around deep blue joints, tiny gold Jedi Order crest. Matte hard surfaces, no dirt noise, no camouflage, no black or red Sith, no Separatist battle droid colors. Readable at 844x390.",
+      "preview_variants": {
+        "A": "Single full-body humanoid Temple Security ally sentry droid, stylized low-poly, front-facing A-pose arms apart for a human animation rig. Human proportions, sturdy squared cream chest and shoulder armor over deep blue mechanical joints, tan leg plates, compact friendly visor head, obvious raised module hardpoint socket on left shoulder. Small Jedi Order badge on chest. Friendly Republic/Jedi guardian, clean flat tan cream navy blocks, no thin beaked Separatist battle droid, no black/red Sith, no base, no weapon in hand.",
+        "B": "Single full-body armored humanoid Temple Security droid soldier, stylized low-poly, A-pose facing front, arms separated and human-like limb proportions for humanoid rig. Boxy cream helmet with friendly blue horizontal visor, broad tan torso plates, navy articulated elbows and knees, visible circular module docking mount over left shoulder, golden Jedi Order crest. Strong allied soldier silhouette, matte clean flat cream tan deep blue panels, no skeletal thin battle droid, no Sith black/red, no base, no weapon in hand."
+      },
+      "tasks": [
+        {
+          "asset": "droid",
+          "letter": "A",
+          "mode": "preview",
+          "cost": 20,
+          "before": 14135,
+          "status": "SUCCEEDED",
+          "id": "01a1af5a-ec4b-7159-9cbb-2f154d45bc0a",
+          "after": 14115,
+          "completion_balance": 14075
+        },
+        {
+          "asset": "droid",
+          "letter": "B",
+          "mode": "preview",
+          "cost": 20,
+          "before": 14115,
+          "status": "SUCCEEDED",
+          "id": "01a1af5a-f964-759a-8455-dd115eb498cd",
+          "after": 14095,
+          "completion_balance": 14075
+        },
+        {
+          "asset": "droid",
+          "letter": "B",
+          "mode": "refine",
+          "cost": 10,
+          "before": 14065,
+          "status": "SUCCEEDED",
+          "id": "01a1af5d-d107-7682-8fe0-3aa8598f6675",
+          "after": 14055,
+          "completion_balance": 14045
+        },
+        {
+          "asset": "droid",
+          "letter": "B",
+          "mode": "rig",
+          "cost": 5,
+          "before": 14040,
+          "status": "SUCCEEDED",
+          "id": "01a1af60-2bdd-7372-8cc0-1582aad20ee7",
+          "after": 14035,
+          "completion_balance": 14030
+        }
+      ]
+    },
+    "officer": {
+      "selected": "A",
+      "files": {
+        "full": "officer.glb",
+        "low": "officer_lod1.glb"
+      },
+      "triangles": 12493,
+      "lod_triangles": 1835,
+      "texture_pixels": [
+        1024,
+        1024
+      ],
+      "animation_clips": 29,
+      "prompt": "Single full-body stylized low-poly Temple Security officer commander, front-facing human A-pose arms apart, light cream armor over deep blue uniform, distinct short dark-blue shoulder cape over left shoulder and diagonal command sash, open visored cream officer helmet, restrained gold Jedi Order badge, comlink on left wrist. Commanding upright silhouette, separated legs, tan cream navy clean flat color blocks. Friendly Jedi ally, no long cape obscuring legs, no black/red Sith, no base, no weapon in hand.",
+      "texture_prompt": "Temple Security officer. Large clean flat sandstone tan, warm cream and deep blue panels, navy sash, subtle gold Jedi Order crest. Matte, no noisy camouflage or blotches, no black or red Sith. Friendly allied commander readable at 844x390.",
+      "preview_variants": {
+        "A": "Single full-body stylized low-poly Temple Security officer commander, front-facing human A-pose arms apart, light cream armor over deep blue uniform, distinct short dark-blue shoulder cape over left shoulder and diagonal command sash, open visored cream officer helmet, restrained gold Jedi Order badge, comlink on left wrist. Commanding upright silhouette, separated legs, tan cream navy clean flat color blocks. Friendly Jedi ally, no long cape obscuring legs, no black/red Sith, no base, no weapon in hand.",
+        "B": "Single full-body stylized low-poly Temple Security commander, human front-facing A-pose arms apart. Light tan armor, distinctive cream peaked officer cap, deep blue short cape attached one shoulder and bright diagonal sash, small Jedi Order crest, wrist comlink, holstered sidearm. Slim authoritative posture, clean flat large tan cream navy panels, friendly Republic ally. No military black/red Sith, no long cloak covering legs, no base, no weapon in hand."
+      },
+      "tasks": [
+        {
+          "asset": "officer",
+          "letter": "A",
+          "mode": "preview",
+          "cost": 20,
+          "before": 14095,
+          "status": "SUCCEEDED",
+          "id": "01a1af5b-088d-730d-b449-b6a25af5b85f",
+          "after": 14075,
+          "completion_balance": 14075
+        },
+        {
+          "asset": "officer",
+          "letter": "A",
+          "mode": "refine",
+          "cost": 10,
+          "before": 14055,
+          "status": "SUCCEEDED",
+          "id": "01a1af5d-dae9-77e1-bd02-b2ac2484d09b",
+          "after": 14045,
+          "completion_balance": 14045
+        },
+        {
+          "asset": "officer",
+          "letter": "A",
+          "mode": "rig",
+          "cost": 5,
+          "before": 14035,
+          "status": "SUCCEEDED",
+          "id": "01a1af60-706d-7477-8f2b-83873fe5ccbc",
+          "after": 14030,
+          "completion_balance": 14030
+        }
+      ]
     }
+  },
+  "lane2": {
+    "lane": "tw-w17-art2",
+    "status": "staged_only",
+    "credits_spent": 145,
+    "hard_cap": 150,
+    "account_balance_at_start": 14175,
+    "account_balance_after_last_call": 14030
   }
 }

@@ -182,3 +182,6 @@ Gate: headless import passed; `./godot/test.sh` exited 0, every suite had 0 fail
 ## W17 Sniper and Heavy staged classes (2026-11-05)
 
 Spent **90/100 credits**: Sniper A/B and Heavy A previews (20 each), selected Sniper A and Heavy A refinements (10 each), and two rigs (5 each). Sniper B was rejected for a bulkier silhouette without a rifle. The winners use locally built signature weapons and were staged only under `godot/assets/units/w17/`, with lettered source GLBs retained in `art/w17/`. The exact task IDs, prompts, scores, triangle counts, Low captures and limitations are in `docs/godot/w17/ART-REPORT.md` and the staged manifest.
+
+## W17 Tech, Droid, Officer (tw-w17-art2)
+2026-11-05: Tech A (2 previews, 1 refine, 1 rig; 55 credits), Droid B (2 previews, 1 refine, 1 rig; 55), Officer A (1 preview, 1 refine, 1 rig; 35). Total 145/150. Tasks and before/after balance: `art/w17-2/ledger.json`. Winners staged at `godot/assets/units/w17/`; rejected Tech B and Droid A previews retained in `art/w17-2/`. Tech/Droid body textures were locally replaced with flat tan, cream, navy panels after 844×390 critique. Officer sash/cape and all weapons built locally. See `docs/godot/w17/ART-REPORT2.md`.

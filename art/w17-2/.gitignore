@@ -1,0 +1,7 @@
+# Keep Meshy candidates and render intermediates on disk without adding them to the game repository.
+*.glb
+*.png
+*.webp
+*.log
+*.preview.json
+*.raw.json
