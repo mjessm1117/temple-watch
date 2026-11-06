@@ -49,6 +49,11 @@ func run() -> void:
 		for field in ["FOCUS", "MEDPACS", "AMMO", "MOMENTUM"]:
 			check(night.vitals_label.text.contains(field), "compact unit detail keeps " + field)
 		var actor: Dictionary = game.mission.unit_by_id(game.selected_id)
+		game._choose_action("move")
+		await process_frame
+		var range_grid: Node3D = game.highlights.get_child(1)
+		check(game.range_highlights.get_child_count() > 0, "Move supplies reachable tiles")
+		check(range_grid.get_child(0).multimesh.visible_instance_count > 0, "Compatibility renderer draws the Move range")
 		var enemy: Dictionary = game.mission.living("enemy")[0]
 		game.action = "shoot"; game.target_id = int(enemy.id); game._refresh()
 		night.detail_open = true; night.refresh_target()
