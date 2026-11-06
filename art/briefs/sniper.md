@@ -1,0 +1,2 @@
+# Sniper brief
+Temple Security marksman for a small isometric battle view, 15K triangle ceiling. References: `godot/assets/models/units/scout.glb` (lean allied body), `trooper.glb` (soldier armor), and `docs/godot/blender2/previews/sithHeavy-v2.png` (enemy palette to avoid). A slim hood or visor, long scoped blaster and readable hip sidearm should distinguish the silhouette. Matte tan and cream plates with deep blue cloth and Jedi Order emblem.

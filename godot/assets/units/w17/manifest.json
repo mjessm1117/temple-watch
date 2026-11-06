@@ -1,0 +1,120 @@
+{
+  "wave": 17,
+  "lane": "tw-w17-art",
+  "status": "staged_only",
+  "credits": {
+    "spent": 90,
+    "hard_cap": 100,
+    "account_balance_at_start": 14265,
+    "account_balance_after_last_call": 14175
+  },
+  "assets": {
+    "sniper": {
+      "selected": "A",
+      "files": {
+        "full": "sniper.glb",
+        "low": "sniper_lod1.glb"
+      },
+      "triangles": 12570,
+      "lod_triangles": 1913,
+      "texture_pixels": [
+        1024,
+        1024
+      ],
+      "animation_clips": 29,
+      "prompt": "Single full-body stylized low-poly Temple Security sniper soldier, slim lean human silhouette, standing in A-pose with arms slightly away from body, facing forward. Deep blue hood over a cream visor helmet, light angular tan shoulder and shin armor, long scoped science-fiction blaster rifle slung vertically behind shoulder, compact blaster pistol holstered at hip, small Jedi Order emblem on chest. Matte tan cream deep blue palette, friendly Republic/Jedi guard, clear separated legs and arms, no base, no cloak covering legs, no black or red Sith armor.",
+      "texture_prompt": "Temple Security uniform: matte sandstone tan light armor over deep navy blue cloth, warm cream helmet and shoulder plates, small subtle golden Jedi Order emblem on the chest, worn edges, no black or red Sith colors, no glow, crisp stylized game texture",
+      "preview_variants": {
+        "A": "Single full-body stylized low-poly Temple Security sniper soldier, slim lean human silhouette, standing in A-pose with arms slightly away from body, facing forward. Deep blue hood over a cream visor helmet, light angular tan shoulder and shin armor, long scoped science-fiction blaster rifle slung vertically behind shoulder, compact blaster pistol holstered at hip, small Jedi Order emblem on chest. Matte tan cream deep blue palette, friendly Republic/Jedi guard, clear separated legs and arms, no base, no cloak covering legs, no black or red Sith armor.",
+        "B": "Single full-body stylized low-poly Temple Security marksman, lean athletic soldier in A-pose facing forward. Narrow visored cream helmet and short deep blue hood, sparse tan ceramic plates, long precision blaster with large scope diagonally on back, visible sidearm holster on right hip, Jedi Order badge on cream chest plate. Bright friendly tan navy cream armor, angular practical shapes, no cape, no base, no enemy black red armor."
+      },
+      "tasks": [
+        {
+          "letter": "A",
+          "mode": "preview",
+          "cost": 20,
+          "id": "01a1af16-afd1-71df-a0dc-9c9b347ea847",
+          "before": 14265,
+          "after": 14245,
+          "status": "SUCCEEDED"
+        },
+        {
+          "letter": "B",
+          "mode": "preview",
+          "cost": 20,
+          "id": "01a1af18-3fae-74c7-a4f5-1a75e97a7109",
+          "before": 14225,
+          "after": 14205,
+          "status": "SUCCEEDED"
+        },
+        {
+          "letter": "A",
+          "mode": "refine",
+          "cost": 10,
+          "id": "01a1af19-b2c1-71c4-ab90-f92ff808df66",
+          "before": 14195,
+          "after": 14185,
+          "status": "SUCCEEDED"
+        },
+        {
+          "letter": "A",
+          "mode": "rig",
+          "cost": 5,
+          "id": "01a1af1a-e282-7727-8f51-016da93390d9",
+          "before": 14180,
+          "after": 14175,
+          "status": "SUCCEEDED"
+        }
+      ]
+    },
+    "heavy": {
+      "selected": "A",
+      "files": {
+        "full": "heavy.glb",
+        "low": "heavy_lod1.glb"
+      },
+      "triangles": 13072,
+      "lod_triangles": 2281,
+      "texture_pixels": [
+        1024,
+        1024
+      ],
+      "animation_clips": 29,
+      "prompt": "Single full-body stylized low-poly Temple Security heavy trooper, huge broad armored human silhouette, standing wide-legged in A-pose with arms away from torso, facing forward. Massive squared cream shoulder plates and tan chest armor, deep blue flexible joints, rotary repeater blaster with clear multi-barrel cylinder carried beside body, rectangular rocket backpack visible above shoulders, Jedi Order emblem on chest. Friendly tan cream navy palette, largest soldier in squad, no black and red Sith armor, no base.",
+      "texture_prompt": "Temple Security heavy uniform: matte sandstone tan and warm cream thick armored plates, deep navy blue cloth at joints, small golden Jedi Order emblem on broad chest, practical worn edges, clearly friendly, no black or red Sith colors, no glow",
+      "preview_variants": {
+        "A": "Single full-body stylized low-poly Temple Security heavy trooper, huge broad armored human silhouette, standing wide-legged in A-pose with arms away from torso, facing forward. Massive squared cream shoulder plates and tan chest armor, deep blue flexible joints, rotary repeater blaster with clear multi-barrel cylinder carried beside body, rectangular rocket backpack visible above shoulders, Jedi Order emblem on chest. Friendly tan cream navy palette, largest soldier in squad, no black and red Sith armor, no base.",
+        "B": "Single full-body stylized low-poly Temple Security heavy gunner, broad wide stance, thick angular armored boots, oversized tan and cream pauldrons and chest plates, deep navy underarmor, visor helmet, six-barrel rotary blaster held at side, two rocket tubes on armored backpack, Jedi Order badge. A-pose facing forward, arms apart, human anatomy readable for rigging, friendly bright palette, no cape, no black or red Sith colors, no base."
+      },
+      "tasks": [
+        {
+          "letter": "A",
+          "mode": "preview",
+          "cost": 20,
+          "id": "01a1af16-d1db-7417-9802-31ffcaa48b0a",
+          "before": 14245,
+          "after": 14225,
+          "status": "SUCCEEDED"
+        },
+        {
+          "letter": "A",
+          "mode": "refine",
+          "cost": 10,
+          "id": "01a1af18-d4d9-771c-b760-73e247c48792",
+          "before": 14205,
+          "after": 14195,
+          "status": "SUCCEEDED"
+        },
+        {
+          "letter": "A",
+          "mode": "rig",
+          "cost": 5,
+          "id": "01a1af1a-06c1-7555-8a76-15971813a8e2",
+          "before": 14185,
+          "after": 14180,
+          "status": "SUCCEEDED"
+        }
+      ]
+    }
+  }
+}

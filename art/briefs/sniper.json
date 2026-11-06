@@ -1,0 +1,10 @@
+{
+  "credit_cap": 100,
+  "preview_cap": 3,
+  "refine_cap": 2,
+  "texture": "Temple Security uniform: matte sandstone tan light armor over deep navy blue cloth, warm cream helmet and shoulder plates, small subtle golden Jedi Order emblem on the chest, worn edges, no black or red Sith colors, no glow, crisp stylized game texture",
+  "variants": {
+    "A": "Single full-body stylized low-poly Temple Security sniper soldier, slim lean human silhouette, standing in A-pose with arms slightly away from body, facing forward. Deep blue hood over a cream visor helmet, light angular tan shoulder and shin armor, long scoped science-fiction blaster rifle slung vertically behind shoulder, compact blaster pistol holstered at hip, small Jedi Order emblem on chest. Matte tan cream deep blue palette, friendly Republic/Jedi guard, clear separated legs and arms, no base, no cloak covering legs, no black or red Sith armor.",
+    "B": "Single full-body stylized low-poly Temple Security marksman, lean athletic soldier in A-pose facing forward. Narrow visored cream helmet and short deep blue hood, sparse tan ceramic plates, long precision blaster with large scope diagonally on back, visible sidearm holster on right hip, Jedi Order badge on cream chest plate. Bright friendly tan navy cream armor, angular practical shapes, no cape, no base, no enemy black red armor."
+  }
+}

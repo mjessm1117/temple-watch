@@ -1,0 +1,82 @@
+{
+  "start": 14265,
+  "tasks": [
+    {
+      "asset": "sniper",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14265,
+      "status": "SUCCEEDED",
+      "id": "01a1af16-afd1-71df-a0dc-9c9b347ea847",
+      "after": 14245,
+      "completion_balance": 14225
+    },
+    {
+      "asset": "heavy",
+      "letter": "A",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14245,
+      "status": "SUCCEEDED",
+      "id": "01a1af16-d1db-7417-9802-31ffcaa48b0a",
+      "after": 14225,
+      "completion_balance": 14225
+    },
+    {
+      "asset": "sniper",
+      "letter": "B",
+      "mode": "preview",
+      "cost": 20,
+      "before": 14225,
+      "status": "SUCCEEDED",
+      "id": "01a1af18-3fae-74c7-a4f5-1a75e97a7109",
+      "after": 14205,
+      "completion_balance": 14195
+    },
+    {
+      "asset": "heavy",
+      "letter": "A",
+      "mode": "refine",
+      "cost": 10,
+      "before": 14205,
+      "status": "SUCCEEDED",
+      "id": "01a1af18-d4d9-771c-b760-73e247c48792",
+      "after": 14195,
+      "completion_balance": 14185
+    },
+    {
+      "asset": "sniper",
+      "letter": "A",
+      "mode": "refine",
+      "cost": 10,
+      "before": 14195,
+      "status": "SUCCEEDED",
+      "id": "01a1af19-b2c1-71c4-ab90-f92ff808df66",
+      "after": 14185,
+      "completion_balance": 14180
+    },
+    {
+      "asset": "heavy",
+      "letter": "A",
+      "mode": "rig",
+      "cost": 5,
+      "before": 14185,
+      "status": "SUCCEEDED",
+      "id": "01a1af1a-06c1-7555-8a76-15971813a8e2",
+      "after": 14180,
+      "completion_balance": 14175
+    },
+    {
+      "asset": "sniper",
+      "letter": "A",
+      "mode": "rig",
+      "cost": 5,
+      "before": 14180,
+      "status": "SUCCEEDED",
+      "id": "01a1af1a-e282-7727-8f51-016da93390d9",
+      "after": 14175,
+      "completion_balance": 14175
+    }
+  ]
+}
