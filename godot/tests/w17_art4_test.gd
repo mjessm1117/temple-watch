@@ -3,9 +3,11 @@ extends SceneTree
 func _initialize() -> void:
 	run.call_deferred()
 
-func _is_pack(node: Node) -> bool:
+func _is_pack(node: Node, kind: String) -> bool:
 	while node != null:
-		if node.name.begins_with("rocket backpack") or node.name.begins_with("rocket tube"):
+		if kind == "heavy" and (node.name.begins_with("rocket backpack") or node.name.begins_with("rocket tube")):
+			return true
+		if kind == "tech" and (node.name.begins_with("tool battery backpack") or node.name.begins_with("pack battery")):
 			return true
 		node = node.get_parent()
 	return false
@@ -51,7 +53,7 @@ func run() -> void:
 			var direction: Vector3 = (muzzle.global_position - receiver.global_position).normalized()
 			var elevation := rad_to_deg(asin(direction.y))
 			assert(absf(elevation) <= 15.0 and direction.z > 0.0, "barrel aim outside 15 degrees: " + name)
-			if kind == "heavy":
+			if kind == "heavy" or kind == "tech":
 				var skeleton: Skeleton3D = model.find_child("Skeleton3D", true, false)
 				assert(skeleton != null, "missing skeleton: " + name)
 				var head_end := skeleton.find_bone("head_end")
@@ -59,7 +61,7 @@ func run() -> void:
 				var head_top := skeleton.to_global(skeleton.get_bone_global_pose(head_end).origin).y
 				var pack_top := -INF
 				for mesh in model.find_children("*", "MeshInstance3D", true, false):
-					if _is_pack(mesh):
+					if _is_pack(mesh, kind):
 						assert(mesh.get_parent() is BoneAttachment3D and (mesh.get_parent() as BoneAttachment3D).bone_name == "spine_03", "pack detached from spine: " + name)
 						pack_top = maxf(pack_top, _world_top(mesh))
 				print("W17_ART4_PACK ", name, " top=", pack_top, " head_end=", head_top)

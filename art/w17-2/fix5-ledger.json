@@ -1,0 +1,74 @@
+{
+  "before": 14030,
+  "cap": 190,
+  "tasks": [
+    {
+      "kind": "sniper",
+      "prompt": "Star Wars Republic trooper armor, hard painted armor plates in warm tan and cream with worn edges, dark navy fabric undersuit visible at elbows knees neck and waist, olive shoulder pauldrons and helmet stripe, matte, hand-painted stylized game texture, no camouflage, no skin showing",
+      "before": 14030,
+      "estimate": 10,
+      "status": "SUCCEEDED",
+      "id": "01a1b18b-fe5a-760f-94a9-ea71613fdca7",
+      "after_submission": 14020,
+      "cost": 10,
+      "after": 14020
+    },
+    {
+      "kind": "heavy",
+      "prompt": "Star Wars Republic trooper armor, hard painted armor plates in warm tan and cream with worn edges, dark navy fabric undersuit visible at elbows knees neck and waist, burnt orange shoulder pauldrons and helmet stripe, matte, hand-painted stylized game texture, no camouflage, no skin showing",
+      "before": 14020,
+      "estimate": 10,
+      "status": "SUCCEEDED",
+      "id": "01a1b18e-6918-70f4-ba92-329c5cb6de96",
+      "after_submission": 14020,
+      "cost": 10,
+      "after": 14010
+    },
+    {
+      "kind": "tech",
+      "prompt": "Star Wars Republic trooper armor, hard painted armor plates in warm tan and cream with worn edges, dark navy fabric undersuit visible at elbows knees neck and waist, teal shoulder pauldrons and helmet stripe, matte, hand-painted stylized game texture, no camouflage, no skin showing",
+      "before": 14010,
+      "estimate": 10,
+      "status": "SUCCEEDED",
+      "id": "01a1b18f-d507-7537-aac3-89a7a347ae50",
+      "after_submission": 14000,
+      "cost": 10,
+      "after": 14000
+    },
+    {
+      "kind": "droid",
+      "prompt": "Star Wars Republic battle droid plating, hard painted armor plates in warm tan and cream with worn edges, dark navy fabric undersuit visible at elbows knees neck and waist, signal yellow shoulder pauldrons and helmet stripe, matte, hand-painted stylized game texture, no camouflage, no skin showing",
+      "before": 14000,
+      "estimate": 10,
+      "status": "SUCCEEDED",
+      "id": "01a1b191-5f9e-74d2-a953-3ec9b1afb172",
+      "after_submission": 13990,
+      "cost": 10,
+      "after": 13990
+    },
+    {
+      "kind": "officer",
+      "prompt": "Star Wars Republic trooper armor, hard painted armor plates in warm tan and cream with worn edges, dark navy fabric undersuit visible at elbows knees neck and waist, crimson shoulder pauldrons and helmet stripe, matte, hand-painted stylized game texture, no camouflage, no skin showing",
+      "before": 13990,
+      "estimate": 10,
+      "status": "SUCCEEDED",
+      "id": "01a1b192-ea4a-77b2-8406-f2550b559dcf",
+      "after_submission": 13980,
+      "cost": 10,
+      "after": 13980
+    },
+    {
+      "kind": "sniper",
+      "retry": true,
+      "prompt": "Fully sealed Republic trooper, every arm and leg covered by opaque rigid ceramic armor plates, thick cream gauntlets and thigh guards, warm tan chest and shin plates, crisp dark seams and scraped pale edges, dark navy woven undersuit ONLY at elbow knee neck and waist gaps, bold olive shoulder pauldrons and helmet stripe, stylized hand-painted game texture, no exposed flesh, no beige fabric limbs, no camouflage or mottled pattern",
+      "before": 13980,
+      "estimate": 10,
+      "status": "SUCCEEDED",
+      "id": "01a1b19a-9982-711e-827a-93606c298dab",
+      "after_submission": 13970,
+      "cost": 10,
+      "after": 13970
+    }
+  ],
+  "after": 13970
+}
