@@ -54,6 +54,13 @@ func run() -> void:
 		var range_grid: Node3D = game.highlights.get_child(1)
 		check(game.range_highlights.get_child_count() > 0, "Move supplies reachable tiles")
 		check(range_grid.get_child(0).multimesh.visible_instance_count > 0, "Compatibility renderer draws the Move range")
+		var short_reach: Dictionary = game.mission.reach_tiles(actor, 1)
+		for tile in short_reach.costs:
+			if tile != Vector2i(int(actor.x), int(actor.y)):
+				game.preview_tile = tile; game._refresh_highlights()
+				break
+		check(hud.action_name.text.contains("1 action"), "phone path preview names one action cost")
+		game.preview_tile = Vector2i(-1,-1)
 		var enemy: Dictionary = game.mission.living("enemy")[0]
 		game.action = "shoot"; game.target_id = int(enemy.id); game._refresh()
 		night.detail_open = true; night.refresh_target()

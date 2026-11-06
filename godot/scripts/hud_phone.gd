@@ -117,6 +117,7 @@ func refresh(from_game: bool = false) -> void:
 	elif g.warning_label.text != "": action_name.text = g.warning_label.text
 	elif end_confirm: action_name.text = "End the squad turn? Tap END TURN again."
 	elif g.path_label.text != "": action_name.text = g.path_label.text
+	elif g.action == "move": action_name.text = "Blue: 1 action  ·  Amber: DASH ends turn"
 	else: action_name.text = "Choose an action · tap the map to preview"
 	_update_actions(from_game)
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)

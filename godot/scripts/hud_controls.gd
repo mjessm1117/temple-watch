@@ -85,7 +85,8 @@ func _refresh_highlights(force: bool = false) -> void:
 					var line: MeshInstance3D = g._box(g.hover_highlights, (here + next_at) * 0.5, Vector3(0.08, 0.04, here.distance_to(next_at)), Color("70dfff"))
 					line.look_at(next_at, Vector3.UP)
 					cursor = next
-				g.path_label.text = "%d AP  •  %d tiles%s" % [int(preview.ap), int(preview.tiles), "  •  ⚠ FLANKED BY %s" % ", ".join(preview.flanks) if not preview.flanks.is_empty() else ""]
+				var cost_label := "1 action · 1 action remains" if int(preview.ap) == 1 and int(u.ap) == 2 else "1 action" if int(preview.ap) == 1 else "DASH: ends turn"
+				g.path_label.text = "%s  ·  %d tiles%s" % [cost_label, int(preview.tiles), "  ·  FLANKED BY %s" % ", ".join(preview.flanks) if not preview.flanks.is_empty() else ""]
 				g.path_label.add_theme_color_override("font_color", Color("ff746b") if not preview.flanks.is_empty() else Color("91d6fa"))
 			else: g.path_label.text = ""
 		else: g.path_label.text = ""
@@ -95,6 +96,9 @@ func _refresh_highlights(force: bool = false) -> void:
 			shields += "%s%s " % [entry[0], "⬟" if value == 40 else "◐" if value == 20 else "○"]
 			if g.action == "move" and value > 0: _shield(g.hover_highlights, shown, entry[1], value == 40)
 		g.path_label.text += shields
+	if phone != null and g.warning_label.text == "" and g.action == "move":
+		var path_text: String = g.path_label.text.get_slice("  •  COVER", 0)
+		phone.action_name.text = path_text if path_text != "" else "Blue: 1 action  ·  Amber: DASH ends turn"
 
 func _shield(parent: Node3D, tile: Vector2i, direction: Vector2i, full: bool) -> void:
 	var center := Vector3(tile.x + direction.x * 0.36, Shot.elevation(g.mission, tile) * 0.7 + 1.45, tile.y + direction.y * 0.36)
