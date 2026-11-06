@@ -53,3 +53,21 @@ The aim correction changes only the `hand_r` rotation keys in each `shoot` clip,
 Low models use broad helmet/shoulder, torso, cloth and boot color bands. Their existing simplified geometry gives those boundaries coarse edges in close-up portraits; the armor and navy cloth remain distinct at battle distance.
 
 Final gate: binary repack and headless import exited 0; `./godot/test.sh` exited 0 with zero `SCRIPT ERROR` lines and zero failures, including Normal rescue 9/20. The isolated animation smoke passed 50/50 checks, and the Full/Low shoot aim check passed 10/10 barrels within 15° of forward level. `git diff --check` was clean. Wave 16 camera screenshots changed by the test runner were restored.
+
+## Fix 4 — class accents and clean panels
+
+No Meshy calls or credits were used. `art/w17-2/fix4.mjs` replaces height-band painting with dominant skin-bone assignment. Compact disconnected armor pieces receive one color across the whole island. This removes the horizontal saw-tooth cuts through the chest and arms visible after Fix 3. All five classes now use the same tan `[.59,.46,.31]`, cream `[.83,.77,.65]`, navy `[.045,.105,.19]` and steel `[.16,.22,.28]` base. Accents are matte with roughness 0.8 and metallic 0. Existing blue/gold accessory trim was changed to the class accent, leaving one accent family per model.
+
+| Class | Before Fix 4 | After Fix 4 |
+|---|---|---|
+| Sniper | Jagged cream/tan chest bands; torso could read as exposed skin | Olive `[.30,.38,.20]` shoulders, tan chest plate over navy midsection; no cream material on the torso front |
+| Heavy | Tan/cream horizontal bands; rocket tubes floated above the helmet in shoot | Burnt orange `[.70,.33,.10]` shoulders; backpack and tubes lowered on the `spine_03` attachment, with their top below the head end bone in shoot |
+| Tech | Same palette as Droid at phone size | Teal `[.10,.45,.48]` shoulder panels and former trim; clean tan/cream/navy bone regions |
+| Droid | Same palette as Tech at phone size | Signal yellow `[.80,.66,.15]` shoulder panels and module trim; clean tan/cream/navy bone regions |
+| Officer | Broad tan/cream bands and blue sash | Crimson `[.55,.10,.12]` shoulders and sash/cape trim; navy undersuit retained |
+
+Both Full and Low GLBs have matching panel assignments and accents. Body accent triangles are about 8–12% of the painted body, with accessory accents adding visible area. Triangle counts are unchanged: Full/Low 12,570/1,913 Sniper, 13,072/2,281 Heavy, 12,592/1,879 Tech, 12,629/1,877 Droid and 12,493/1,835 Officer. All 29 clips remain in each GLB. The Fix 3 hand-bound weapons and level shoot barrels remain intact.
+
+Review images: `docs/godot/shots/w17-art4-classes.png` shows all seven soldiers front and three-quarter; `w17-art4-shoot.png` shows the five shoot frames; `w17-art4-small.png` compares all seven at 64 px portrait height. At that size, the five class accents remain distinct. The Heavy pack is seated against the upper back in the shoot portrait. The Officer's rigid cape, Sniper's flat chest silhouette and tiny emblems remain visual gaps; the new paint does not add geometry.
+
+Final gate: headless import exited 0 with zero `SCRIPT ERROR` or `ERROR:` lines. The isolated Fix 3 aim test and Fix 4 accent/pack test passed all ten Full/Low models; Heavy pack top measured 1.371 versus head end 1.426–1.428 in shoot. `./godot/test.sh` exited 0 with zero script errors and zero failures; Normal rescue was 9/20. `git diff --check` was clean. Two Wave 16 camera screenshots changed by the test runner were restored.
