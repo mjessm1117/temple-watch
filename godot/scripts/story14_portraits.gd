@@ -15,7 +15,11 @@ static func texture(name: String) -> Texture2D:
 	var key: String = NAMES.get(name,"council")
 	if key in ["kira", "tor", "satele", "ressa", "kell", "sava", "tem"]:
 		var jedi_path := "res://assets/portraits/jedi/%s.png" % key
-		if ResourceLoader.exists(jedi_path): return load(jedi_path)
+		if ResourceLoader.exists(jedi_path):
+			var crop := AtlasTexture.new()
+			crop.atlas = load(jedi_path)
+			crop.region = Rect2(78, 38, 100, 126)
+			return crop
 	var path := "res://assets/story/portraits14/%s.png" % key
 	return load(path) if ResourceLoader.exists(path) else null
 
