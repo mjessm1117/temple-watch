@@ -47,7 +47,10 @@ func run() -> void:
 	game._update_camera()
 	for i in range(24): await process_frame
 	if view == "tactical":
-		game.pivot = Vector3(float(actor.x), 0.0, float(actor.y))
+		var squad: Array = game.mission.living("player")
+		var center := Vector3.ZERO
+		for unit in squad: center += Vector3(float(unit.x), 0.0, float(unit.y))
+		game.pivot = center / float(squad.size())
 		game._update_camera()
 	game.phase_banner.hide()
 	game.hud_controls.night.phase_plate.hide()
