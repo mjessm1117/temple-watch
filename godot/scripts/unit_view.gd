@@ -203,8 +203,28 @@ func fall() -> void:
 	tween.chain().tween_callback(queue_free)
 
 var status_label: Label3D
+var watch_eye: Sprite3D
+static var watch_eye_texture: Texture2D
+
+static func eye_texture() -> Texture2D:
+	if watch_eye_texture != null: return watch_eye_texture
+	var image := Image.create(32,20,false,Image.FORMAT_RGBA8)
+	for y in 20:
+		for x in 32:
+			var dx := absf((float(x)-15.5)/15.5)
+			var dy := absf((float(y)-9.5)/9.5)
+			var outline := absf(dy - (1.0-dx*dx)*0.7) < 0.13
+			var pupil := Vector2(float(x)-15.5,float(y)-9.5).length() < 3.8
+			if outline or pupil: image.set_pixel(x,y,Color("9beaff"))
+	watch_eye_texture = ImageTexture.create_from_image(image)
+	return watch_eye_texture
 
 func set_status(u: Dictionary) -> void:
+	if watch_eye == null:
+		watch_eye = Sprite3D.new(); watch_eye.texture = eye_texture(); watch_eye.pixel_size = 0.025
+		watch_eye.billboard = BaseMaterial3D.BILLBOARD_ENABLED; watch_eye.no_depth_test = true
+		watch_eye.position.y = 2.35; add_child(watch_eye)
+	watch_eye.visible = bool(u.get("overwatch",false))
 	if status_label == null:
 		status_label = Label3D.new(); status_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		status_label.position.y = 2.0; status_label.font_size = 15; status_label.pixel_size = 0.0012; status_label.fixed_size = true

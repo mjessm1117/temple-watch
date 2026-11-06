@@ -120,7 +120,7 @@ static func exit_distance(m: RefCounted, p: Vector2i) -> float:
 
 static func player_start(m: RefCounted) -> void:
 	if m.spec.family == "evacuation" and m.result == "" and m.turn % 2 == 0:
-		m.queue_reinforcement(["trooper","assassin11"] if m.turn >= 6 else ["trooper"],1,"Brotherhood sweep")
+		m.queue_reinforcement(["trooper","assassin11"] if m.turn >= 4 else ["trooper"],1,"Brotherhood sweep")
 
 static func status(m: RefCounted) -> String:
 	match str(m.spec.family):

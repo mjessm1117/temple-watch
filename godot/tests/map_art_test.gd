@@ -99,7 +99,7 @@ func run() -> void:
 	var border := art.box(Vector3(1,0.12,1),Vector3(0.08,0.05,0.86),art.material(Color("399ef2")),source)
 	await process_frame; await process_frame
 	check(source.get_child_count() == 1 and not source.visible,"range art preserves rule-owned HUD nodes")
-	check(grid.view.multimesh.visible_instance_count == 1 and grid.view.material_override.albedo_color.a < 0.4,"range grid batched and faint")
+	check(grid.view.multimesh.visible_instance_count == 1 and grid.view.material_override.albedo_color.a > 0.9 and grid.view.multimesh.get_instance_color(0).a > 0.9,"range grid batched and visible")
 	source.remove_child(border); border.queue_free(); await process_frame; await process_frame
 	check(grid.view.multimesh.visible_instance_count == 0,"range art follows cleared HUD nodes")
 	grid.queue_free(); source.queue_free(); await process_frame

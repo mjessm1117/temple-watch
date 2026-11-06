@@ -37,6 +37,24 @@ func run() -> void:
 	var target: Dictionary = shot.units[1]
 	check(shot.move(int(shooter.id), Vector2i(3, 2)) and int(shooter.ap) == 1, "normal move spends one action")
 	check(shot.shot(int(shooter.id), int(target.id)) and int(shooter.ap) == 0, "shot after move ends turn")
+	var watch = Mission.new(1)
+	var watcher: Dictionary = watch.living("player")[0]
+	watcher.kit.append("overwatch")
+	var watch_reach: Dictionary = watch.reach_tiles(watcher, 1)
+	var watch_dest := Vector2i(-1,-1)
+	for tile in watch_reach.costs:
+		if tile != Vector2i(int(watcher.x), int(watcher.y)):
+			watch_dest = tile; break
+	check(watch_dest.x >= 0 and watch.move(int(watcher.id), watch_dest) and int(watcher.ap) == 1, "one action move leaves one action")
+	check(watch.overwatch(int(watcher.id)) and bool(watcher.overwatch), "overwatch remains available after one action move")
+	var ability_move = Mission.new(1)
+	var adept: Dictionary = ability_move.living("player")[0]
+	adept.kit.append("hunker")
+	var adept_reach: Dictionary = ability_move.reach_tiles(adept,1)
+	for tile in adept_reach.costs:
+		if tile != Vector2i(int(adept.x),int(adept.y)):
+			check(ability_move.move(int(adept.id),tile) and ability_move.hunker(int(adept.id)) and bool(adept.hunkered), "one action move leaves an ability available")
+			break
 	var reload = Mission.new(1)
 	var r: Dictionary = reload.living("player")[0]
 	r.ammo = 0; r.clip = 4; r.kit.append_array(["reload", "hunker"])

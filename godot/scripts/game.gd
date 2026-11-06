@@ -94,6 +94,11 @@ func _ready() -> void:
 	_build_ui()
 	selected_id = int(mission.living("player")[0].id)
 	pivot = BattleCamera.clamp_pivot(mission, Vector3(mission.living("player")[0].x, 0, mission.living("player")[0].y))
+	if mission.modern and int(mission.spec.objective.get("hold_turns",0)) > 0:
+		var gate := Vector3(float(mission.spec.objective.points[0][0]),0,float(mission.spec.objective.points[0][1]))
+		pivot = BattleCamera.clamp_pivot(mission,gate + Vector3(0,0,-2.5))
+		zoom = maxf(zoom,25.0)
+	pivot = BattleCamera.phone_focus(pivot,yaw)
 	_update_camera()
 	_refresh()
 	var demo := ""
@@ -218,7 +223,7 @@ func _select(id: int) -> void:
 	sound.play("click")
 	var u: Dictionary = mission.unit_by_id(id)
 	if mission.identity != null: mission.identity.voice(mission,u,"select")
-	if not u.is_empty(): _glide_to(Vector3(int(u.x), 0, int(u.y)), 0.38, BattleCamera.selected_zoom(mission))
+	if not u.is_empty(): _glide_to(BattleCamera.phone_focus(Vector3(int(u.x), 0, int(u.y)),yaw), 0.38, BattleCamera.selected_zoom(mission))
 	_refresh()
 
 func _after_action() -> void:
@@ -267,7 +272,7 @@ func _cancel_order() -> void:
 func _recenter() -> void:
 	var unit: Dictionary = mission.unit_by_id(selected_id)
 	if unit.is_empty(): return
-	_glide_to(Vector3(unit.x, 0, unit.y), 0.38, BattleCamera.selected_zoom(mission))
+	_glide_to(BattleCamera.phone_focus(Vector3(unit.x, 0, unit.y),yaw), 0.38, BattleCamera.selected_zoom(mission))
 
 func _glide_to(point: Vector3, seconds: float, target_zoom: float = -1.0) -> void:
 	if Prefs.get_value("motion"):

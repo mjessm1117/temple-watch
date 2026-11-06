@@ -42,7 +42,7 @@ func check_phone_tactical(game, unit: Dictionary, context: String) -> void:
 	var bounds := unit_bounds(game, unit)
 	var header_bottom: float = phone.overlay.get_child(0).get_global_rect().end.y
 	var tray_top: float = phone.overlay.find_child("AbilityTray", true, false).get_global_rect().position.y
-	check(bounds.position.y >= header_bottom + 8.0 and bounds.end.y <= tray_top - 8.0, context + " selected unit clears phone HUD: " + str(bounds))
+	check(bounds.position.y >= header_bottom + 8.0 and bounds.end.y <= tray_top - 8.0, context + " selected unit clears phone HUD: %s header=%.1f tray=%.1f" % [bounds,header_bottom,tray_top])
 	check(bounds.position.x >= 8.0 and bounds.end.x <= 836.0, context + " selected unit stays on screen")
 	var at: Vector3 = game.views[int(unit.id)].global_position
 	var tile_width: float = game.camera.unproject_position(at + Vector3(0.5, 0, 0)).distance_to(game.camera.unproject_position(at + Vector3(-0.5, 0, 0)))
@@ -122,7 +122,7 @@ func exercise(size: Vector2i) -> void:
 			check(bounds.size.y >= 55.0, "phone aim unit height is at least 55 px: %s" % bounds)
 		for unit in [actor, target]:
 			var bounds := unit_bounds(game, unit)
-			check(bounds.position.y >= header_bottom + 8.0 and bounds.end.y <= hud_top - 8.0 and bounds.position.x >= 8.0 and bounds.end.x <= size.x - 8.0, "phone aim unit fits between header and action panel: %s" % bounds)
+			check(bounds.position.y >= header_bottom + 8.0 and bounds.end.y <= hud_top - 8.0 and bounds.position.x >= 8.0 and bounds.end.x <= size.x - 8.0, "phone aim unit fits between header and action panel: %s header=%.1f hud=%.1f" % [bounds,header_bottom,hud_top])
 		game.hud_controls.night.update_chips()
 		await process_frame
 		var chips: Control = game.hud_controls.night.chips
@@ -154,7 +154,7 @@ func exercise(size: Vector2i) -> void:
 		var hud_top: float = minf(aim.panel.get_global_rect().position.y, phone.overlay.find_child("AbilityTray", true, false).get_global_rect().position.y)
 		var header_bottom: float = phone.overlay.get_child(0).get_global_rect().end.y
 		var screen_width: float = game.camera.get_viewport().get_visible_rect().size.x
-		check(actor_bounds.position.y >= header_bottom + 8.0 and actor_bounds.end.y <= hud_top - 8.0 and actor_bounds.position.x >= 8.0 and actor_bounds.end.x <= screen_width - 8.0, "selected unit fits between phone header and bottom HUD")
+		check(actor_bounds.position.y >= header_bottom + 8.0 and actor_bounds.end.y <= hud_top - 8.0 and actor_bounds.position.x >= 8.0 and actor_bounds.end.x <= screen_width - 8.0, "selected unit fits between phone header and bottom HUD: %s header=%.1f hud=%.1f" % [actor_bounds,header_bottom,hud_top])
 	check(viewport.encloses(aim.panel.get_global_rect()), "aim card fits at %s" % size)
 	check(viewport.encloses(aim.confirm.get_global_rect()) and aim.confirm.size.y >= 44.0, "FIRE is reachable at %s" % size)
 	check(aim.confirm.text.contains("HIT") and aim.confirm.text.contains("DMG"), "hit and damage remain readable at %s" % size)

@@ -3,7 +3,7 @@
     "relay": {
       "path": "res://data/maps/relay.json",
       "family": "defend",
-      "theme": "plains"
+      "theme": "temple"
     },
     "shrine": {
       "path": "res://data/maps/shrine.json",

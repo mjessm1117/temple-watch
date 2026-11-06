@@ -52,6 +52,7 @@ func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") ->
 		for key in tuning:
 			if key == "objective": spec.objective.merge(tuning.objective,true)
 			else: spec[key] = tuning[key]
+		if int(spec.objective.get("hold_turns",0)) > 0: spec.objective.hp = maxi(int(spec.objective.hp),int(spec.objective.get("hold_hp",0)))
 	catalog = _json("res://data/units.json")
 	abilities = _json("res://data/abilities.json")
 	if modern: Pressure.setup(self)

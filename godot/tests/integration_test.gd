@@ -48,15 +48,15 @@ func run() -> void:
 	flow.prepare_briefing(project_index); await frames()
 	flow.story_finished(); await frames()
 	var ids: Array = c.default_squad()
-	check(ids.size() == 5 and current_scene.scene_file_path.ends_with("squad.tscn"),"five soldiers reach real loadout")
-	check(flow.launch_squad(ids),"real launch accepts five soldiers")
+	check(ids.size() == 6 and current_scene.scene_file_path.ends_with("squad.tscn"),"six soldiers reach real loadout after upgrade I")
+	check(flow.launch_squad(ids),"real launch accepts six soldiers")
 	await frames()
 	var game = current_scene
 	var m = game.mission
-	check(m.living("player").size() == 5 and m.combat_initialized,"battle bridge creates five combat soldiers")
+	check(m.living("player").size() == 6 and m.combat_initialized,"battle bridge creates six combat soldiers")
 	var positions := {}
 	for u in m.living("player"): positions[Shot.pos(u)] = true
-	check(positions.size() == 5,"all five spawns are distinct")
+	check(positions.size() == 6,"all six spawns are distinct")
 	check(game.terrain.get_child(0).get_script().resource_path.ends_with("map_presentation.gd"),"battle uses the mission map renderer")
 	check(m.squad_concealed and m.spec.family == "sabotage","mission concealment and family survive adoption")
 	# Position fixture isolates the UI -> Interact -> mission boundary from bot strategy.
@@ -76,7 +76,7 @@ func run() -> void:
 	var old_day := int(c.state.elapsed_days)
 	var saved: bool = c.save(flow.save_path)
 	var restored = Campaign.new(); restored.load_save(flow.save_path)
-	check(saved and restored.sith.s.day == old_day and restored.state.pending_mission.squad.size() == 5,"save roundtrip preserves Sith clock and deployment")
+	check(saved and restored.sith.s.day == old_day and restored.state.pending_mission.squad.size() == 6,"save roundtrip preserves Sith clock and deployment")
 	var legacy: Dictionary = c.state.duplicate(true); legacy.erase("sith")
 	restored.state = legacy; restored._migrate()
 	check(restored.sith != null and restored.sith.s.day == old_day,"old saves acquire date-aligned Sith defaults")

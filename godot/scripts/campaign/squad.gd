@@ -9,7 +9,7 @@ const Phone = preload("res://scripts/phone_layout.gd")
 const JediModels = preload("res://scripts/characters/jedi_models.gd")
 const StoryPortraits = preload("res://scripts/story14_portraits.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
-var capacity := 4
+var capacity := 5
 var flow: Node
 var selected: Array = []
 var deploy: Button
@@ -103,6 +103,7 @@ func _layout() -> void:
 		compact_layout = compact; _draw_cards()
 	card_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	if compact:
+		card_row.add_theme_constant_override("separation",4)
 		header.visible = focus_index < 0; footer.visible = focus_index < 0
 		header.position = Vector2(6, 5); header.size = Vector2(size.x - 12, 56)
 		_footer_rect(6, -78, -6)
@@ -117,6 +118,7 @@ func _layout() -> void:
 		card_scroll.visible = true; stage_container.visible = true
 		card_row.reset_size()
 		return
+	card_row.add_theme_constant_override("separation",6)
 	header.position = Vector2(24, 16); header.size = Vector2(size.x - 48, 100)
 	_footer_rect(24, -80, -8)
 	var width := size.x - (536 if focus_index >= 0 else 0)
@@ -165,6 +167,8 @@ func _draw_cards() -> void:
 	for i in selected.size():
 		var r: Dictionary = c.soldier(str(selected[i]))
 		var card := Details.card(c, r, inspect.bind(i), _portrait_texture(r)); card_row.add_child(card); cards[str(r.id)] = card
+		if Phone.narrow(Phone.window_size()) and size.x > 700.0:
+			card.custom_minimum_size.x = minf(166.0,(size.x-12.0-6.0*6.0)/7.0)
 		if focus_index == i: card.add_theme_stylebox_override("panel", S.box(Color("213a42"), S.CYAN, 8))
 		var button: Button = card.get_child(0).get_child(0); wire_button(button)
 		button.mouse_entered.connect(func(): stage.highlight(i))

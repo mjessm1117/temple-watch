@@ -8,7 +8,10 @@ var start := Vector2.ZERO
 var moved := false
 var pinching := false
 var pinch_distance := 0.0
+var twist_angle := 0.0
+var twist_accum := 0.0
 var board_start := false
+const TWIST_DEAD_ZONE := 0.35
 
 static func is_tap(distance: float) -> bool:
 	return distance <= THRESHOLD
@@ -19,18 +22,23 @@ static func should_click(from: Vector2, to: Vector2, was_dragged: bool, was_pinc
 static func pinched_zoom(current: float, before: float, after: float) -> float:
 	return CameraRules.clamp_zoom(current * before / after) if before > 1.0 and after > 1.0 else current
 
+static func snap_twist(yaw: float, accumulated: float) -> float:
+	if absf(accumulated) < TWIST_DEAD_ZONE: return yaw
+	return yaw + signf(accumulated) * PI * 0.5
+
 func handle(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		if event.pressed:
 			fingers[event.index] = event.position
 			if fingers.size() == 1:
 				start = event.position; moved = false; pinching = false
-				board_start = _empty_board(event.position)
+				board_start = g._screen_tile(event.position).x >= 0
 				# The board input owner must not see the emulated press.
 				g.set_process_unhandled_input(false)
 			elif fingers.size() == 2:
 				pinching = true; moved = true
 				pinch_distance = _distance()
+				twist_angle = _angle(); twist_accum = 0.0
 		else:
 			var tap := fingers.size() == 1 and should_click(start, event.position, moved, pinching)
 			fingers.erase(event.index)
@@ -58,6 +66,12 @@ func handle(event: InputEvent) -> void:
 		fingers[event.index] = event.position
 		if fingers.size() == 2:
 			var next_distance := _distance()
+			var next_angle := _angle()
+			twist_accum += wrapf(next_angle - twist_angle, -PI, PI)
+			twist_angle = next_angle
+			if absf(twist_accum) >= TWIST_DEAD_ZONE:
+				g.yaw = snap_twist(g.yaw, twist_accum)
+				twist_accum = 0.0
 			if pinch_distance > 0.0:
 				g.zoom = pinched_zoom(g.zoom, pinch_distance, next_distance)
 				g._update_camera()
@@ -74,6 +88,10 @@ func handle(event: InputEvent) -> void:
 func _distance() -> float:
 	var positions := fingers.values()
 	return positions[0].distance_to(positions[1])
+
+func _angle() -> float:
+	var positions := fingers.values()
+	return (positions[1] - positions[0]).angle()
 
 func _empty_board(position: Vector2) -> bool:
 	var tile: Vector2i = g._screen_tile(position)

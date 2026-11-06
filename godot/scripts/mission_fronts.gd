@@ -22,7 +22,7 @@ static func available(state: Dictionary, plan: Array) -> bool:
 
 static func squad_rule(state: Dictionary) -> Dictionary:
 	var second: bool = state.get("twin",{}).get("stage","") == "b"
-	return {"max":4 if second else 6,"jmin":0,"jmax":2 if second else 6,"used":state.get("twin",{}).get("used",[])}
+	return {"max":4 if second else 7,"jmin":0,"jmax":2 if second else 7,"used":state.get("twin",{}).get("used",[])}
 
 static func launch(state: Dictionary, option: Dictionary, ids: Array, plan: Array) -> Dictionary:
 	if not state.options.has(option): return {"ok":false,"reason":"Unknown crisis"}

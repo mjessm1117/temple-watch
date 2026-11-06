@@ -6,7 +6,7 @@ const Families11 = preload("res://scripts/mission11_families.gd")
 static func setup(m: RefCounted) -> void:
 	var f := str(m.spec.family)
 	m.objective_state = {"phase":"primary","done":{},"held":0,"step":0,"clock_start":1 if m.spec.clock_trigger == "start" else 0,
-		"relay_hp":int(m.spec.objective.hp),"saved":0,"lost":0,"civilians":[],"runner_id":-1,"evac_start":0}
+		"relay_hp":int(m.spec.objective.hp),"overrun":0,"saved":0,"lost":0,"civilians":[],"runner_id":-1,"evac_start":0}
 	if f == "retaliation":
 		for at in m.spec.objective.civilians: m.objective_state.civilians.append({"at":at,"state":"waiting"})
 	if not bool(m.prisoner.get("active", false)): m.prisoner.x = -99; m.prisoner.y = -99
@@ -16,6 +16,10 @@ static func setup(m: RefCounted) -> void:
 	if f == "ambush": spawn_runner(m,m.spec.objective)
 	if f == "operation": begin_step(m)
 	if Families11.applies(m): Families11.setup(m)
+	if f == "defend" and int(m.spec.objective.get("hold_turns",0)) > 0:
+		for enemy in m.living("enemy"): enemy.awake = true; enemy.spotted = true; enemy.detected = true
+		m.queue_reinforcement(m.spec.wave_roster[0],1,"Gate assault 1")
+		m.pressure_state.waves = 1
 	m.message("%s — %s" % [m.spec.name,status(m).label])
 
 static func targets(m: RefCounted) -> Array[Vector2i]:
@@ -66,7 +70,7 @@ static func damage_relay(m: RefCounted, amount: int) -> void:
 	m.objective_state.relay_hp = maxi(0,int(m.objective_state.relay_hp)-amount)
 	m.message("Relay integrity %d" % int(m.objective_state.relay_hp))
 	if int(m.objective_state.relay_hp) > 0: return
-	if m.spec.family == "defend": fail(m,"The protected relay is destroyed.")
+	if m.spec.family == "defend": fail(m,"%s is lost." % str(m.spec.objective.get("name","The protected relay")))
 	elif m.spec.family == "destroy_relay": primary_done(m)
 
 static func primary_done(m: RefCounted) -> void:
@@ -124,7 +128,18 @@ static func enemy_end(m: RefCounted) -> void:
 			m.action_events.append({"kind":"vip_attack","actor":e.id,"to":vip,"damage":2})
 			break
 	if f == "defend" and m.objective_state.phase == "primary":
-		if int(m.pressure_state.get("waves",0)) >= int(m.spec.objective.waves) and m.pressure_state.pending.is_empty() and m.living("enemy").is_empty(): primary_done(m)
+		if int(m.spec.objective.get("hold_turns",0)) > 0:
+			var at := Maps.point(m.spec.objective.points[0])
+			var radius := float(m.spec.objective.get("zone_radius",2))
+			var allies: int = m.living("player").filter(func(u): return Shot.distance(Shot.pos(u),at) <= radius).size()
+			var hostiles: int = m.living("enemy").filter(func(u): return Shot.distance(Shot.pos(u),at) <= radius).size()
+			m.objective_state.overrun = int(m.objective_state.overrun) + 1 if hostiles >= 2 and hostiles >= allies else 0
+			if int(m.objective_state.overrun) >= 2 or hostiles >= 2 and hostiles > allies: fail(m,"The gate zone is overrun.")
+			else:
+				m.objective_state.held += 1
+				if int(m.objective_state.held) >= int(m.spec.objective.hold_turns):
+					m.result = "win"; m.message("%s held." % str(m.spec.objective.name))
+		elif int(m.pressure_state.get("waves",0)) >= int(m.spec.objective.waves) and m.pressure_state.pending.is_empty() and m.living("enemy").is_empty(): primary_done(m)
 	if f == "retaliation" and m.turn % int(m.spec.objective.get("civilian_interval",2)) == 0 and m.objective_state.phase == "primary":
 		for c in m.objective_state.civilians:
 			if c.state != "waiting": continue
@@ -211,7 +226,8 @@ static func status(m: RefCounted) -> Dictionary:
 			"rescue": label = "Free the prisoner, then escort to evac"
 			"vip_extract": label = "Escort the VIP to the far evac"
 			"hack_terminal", "sabotage": label += " %d/%d" % [s.done.size(),int(m.spec.objective.required)]
-			"destroy_relay", "defend": label += " · Relay %d HP" % int(s.relay_hp)
+			"destroy_relay": label += " · Relay %d HP" % int(s.relay_hp)
+			"defend": label = "HOLD %d/%d · %s %d HP" % [int(s.held),int(m.spec.objective.hold_turns),str(m.spec.objective.name),int(s.relay_hp)] if int(m.spec.objective.get("hold_turns",0)) > 0 else label + " · Relay %d HP" % int(s.relay_hp)
 			"retaliation": label = "Save civilians %d/%d · %d lost" % [int(s.saved),int(m.spec.objective.save),int(s.lost)]
 			"operation": label = str(current_step(m).get("name","Extract"))
 	if m.spec.has("rival_required") and s.phase == "primary": label += " · Defeat the rival"

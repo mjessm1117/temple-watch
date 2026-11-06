@@ -5,6 +5,7 @@ const Targeting = preload("res://scripts/combat_targeting.gd")
 var g
 var name_label: Label
 var vitals_label: Label
+var vitals_pips: Control
 var status_row: HBoxContainer
 var target_details: Label
 var details_button: Button
@@ -33,6 +34,7 @@ func setup(left_box: VBoxContainer, right_box: VBoxContainer) -> void:
 	var body := VBoxContainer.new(); plate.add_child(body)
 	name_label = label("", 17, Color("efd49b")); name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; body.add_child(name_label)
 	vitals_label = label("", 12); vitals_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; body.add_child(vitals_label)
+	vitals_pips = preload("res://scripts/hud_pips.gd").new(); body.add_child(vitals_pips)
 	status_row = HBoxContainer.new(); body.add_child(status_row)
 	details_button = Button.new(); details_button.text = "ODDS BREAKDOWN ▸"; details_button.focus_mode = Control.FOCUS_NONE
 	details_button.pressed.connect(func() -> void: detail_open = not detail_open; refresh_target())
@@ -68,7 +70,8 @@ func refresh() -> void:
 		for mate_id in u.get("bondmates", {}):
 			var mate: Dictionary = g.mission.unit_by_id(int(mate_id))
 			if not mate.is_empty(): bond = str(mate.get("name", "")); break
-		var rows: Array[String] = [str(u.get("class_name", "Jedi")), "HP %s" % ("●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))))]
+		vitals_pips.update(u)
+		var rows: Array[String] = [str(u.get("class_name", "Jedi")), "HP %d/%d" % [int(u.get("hp",0)),int(u.get("max_hp",0))]]
 		var ap_pips: String = g.hud_controls.ap_pips(u)
 		rows.append(("WILL %s   " % str(u.will) if u.has("will") else "") + "AP %s" % ap_pips)
 		rows.append("FOCUS %d  ·  MEDPACS %d" % [int(u.get("focus_left", 0)), int(u.get("medpacs", 0))])
@@ -80,7 +83,7 @@ func refresh() -> void:
 		for child in status_row.get_children(): child.queue_free()
 		for key in ["hunkered", "overwatch", "concealed", "stunned", "rooted", "disarmed", "wounded"]:
 			if not bool(u.get(key, false)): continue
-			var icon := label("◆", 16, Color("80d5e9") if key in ["overwatch","concealed"] else Color("eeae79"))
+			var icon := label("WATCH" if key == "overwatch" else key.to_upper(), 12, Color("80d5e9") if key in ["overwatch","concealed"] else Color("eeae79"))
 			icon.tooltip_text = key.capitalize(); icon.mouse_filter = Control.MOUSE_FILTER_STOP; status_row.add_child(icon)
 	refresh_target()
 

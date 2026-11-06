@@ -9,7 +9,6 @@ var skip_requested := false
 var return_pivot := Vector3.ZERO
 var trace: Array[String] = []
 var touch = preload("res://scripts/touch_input.gd").new()
-var touch_angle := 0.0
 var preview_active := false
 var preview_actor := -1
 var preview_target := -1
@@ -47,16 +46,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
 		g.set_process_unhandled_input(false)
 	if event is InputEventScreenTouch or event is InputEventScreenDrag:
-		var prior_angle := touch_angle
-		var had_pair: bool = touch.fingers.size() == 2
 		touch.handle(event)
-		if touch.fingers.size() == 2:
-			var points: Array = touch.fingers.values()
-			touch_angle = (points[1] - points[0]).angle()
-			if had_pair and event is InputEventScreenDrag:
-				var turn := wrapf(touch_angle - prior_angle, -PI, PI)
-				if absf(turn) < 0.35:
-					g.yaw -= turn; g._update_camera()
 
 func wait(seconds: float) -> void:
 	seconds /= float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if g.playing_enemy_events else 1.0)
@@ -113,11 +103,11 @@ func preview(actor: Dictionary, target: Dictionary) -> void:
 	var side := Vector3(-direction.z, 0.0, direction.x)
 	var shoulder := origin - direction * 0.7 + side * 4.5 + Vector3.UP * (2.2 if phone else 2.55)
 	shoulder = preload("res://scripts/battle11_camera.gd").aim_position(g.mission, shoulder)
-	var look := origin.lerp(destination, 0.8) + Vector3.UP * (1.1 if phone else 1.25)
+	var look := origin.lerp(destination, 0.8) + Vector3.UP * (1.3 if phone else 1.25)
 	g.cinematic = true
 	preview_tween = g.create_tween().set_parallel(true)
 	preview_tween.tween_property(g.camera, "position", shoulder, AIM_BLEND).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	preview_tween.tween_property(g.camera, "fov", 58.0 if phone else 52.0, AIM_BLEND)
+	preview_tween.tween_property(g.camera, "fov", 64.0 if phone else 52.0, AIM_BLEND)
 	var initial_look: Vector3 = g.camera.position - g.camera.global_basis.z * 8.0
 	preview_tween.tween_method(func(value: Vector3) -> void: g.camera.look_at(value, Vector3.UP), initial_look, look, AIM_BLEND)
 

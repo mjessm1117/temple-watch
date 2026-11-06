@@ -65,7 +65,7 @@ func run() -> void:
 	var game := await fixture()
 	check(is_equal_approx(game.pitch, deg_to_rad(53.0)), "opening pitch is 53 degrees")
 	check(is_equal_approx(game.yaw, PI / 4.0), "opening yaw is three-quarter")
-	check(game.zoom <= 10.5, "phone starts close to the squad")
+	check(game.zoom >= 11.0 and game.zoom <= 13.0, "phone starts with the squad clear of the taller HUD")
 	game.cam.end_preview()
 	game.zoom = 44.0
 	for i in range(4): await process_frame

@@ -1,5 +1,5 @@
 extends Node3D
-## Render the HUD's rule-owned range borders as one faint instanced grid.
+## Render the HUD's rule-owned range borders as one visible instanced grid.
 ## Source nodes remain intact for the HUD's existing refresh/clear contract.
 var source: Node3D
 var dirty := true
@@ -9,14 +9,14 @@ var focus := Vector2i(-999,-999)
 
 static func focus_alpha(position: Vector3, selected: Vector2i) -> float:
 	var d := Vector2(position.x-selected.x,position.z-selected.y).length()
-	return lerpf(0.08,0.63,1.0-smoothstep(2.0,7.0,d))
+	return lerpf(0.65,1.0,1.0-smoothstep(2.0,7.0,d))
 
 func bind(original: Node3D, owner_game: Node = null) -> void:
 	game = owner_game
 	source = original; source.visible = false
 	source.child_entered_tree.connect(changed); source.child_exiting_tree.connect(changed)
 	view = MultiMeshInstance3D.new(); add_child(view)
-	var mat := StandardMaterial3D.new(); mat.vertex_color_use_as_albedo = true; mat.albedo_color = Color(1,1,1,0.39)
+	var mat := StandardMaterial3D.new(); mat.vertex_color_use_as_albedo = true; mat.albedo_color = Color.WHITE
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	view.material_override = mat; view.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
@@ -39,14 +39,12 @@ func _process(_delta: float) -> void:
 	for child in source.get_children():
 		if not child is MeshInstance3D or not child.mesh is BoxMesh: continue
 		var size: Vector3 = child.mesh.size
-		if size.x < size.z: size.x *= 0.25
-		else: size.z *= 0.25
-		size.y = 0.012
+		var fill := size.x > 0.7 and size.z > 0.7
+		size.y = 0.02 if fill else 0.04
 		var transform: Transform3D = child.transform*Transform3D(Basis.from_scale(size),Vector3.ZERO)
-		transform.origin.y -= 0.095
 		mm.set_instance_transform(index,transform)
 		var tint: Color = child.material_override.albedo_color
-		tint.a = 0.28 if child.mesh.size.x > 0.7 and child.mesh.size.z > 0.7 else 1.0
+		tint.a = 0.47 if fill else 0.95
 		if focus.x > -900:
 			tint.a *= focus_alpha(child.position,focus)
 		mm.set_instance_color(index,tint); index += 1

@@ -26,7 +26,7 @@ static func mission_panel(view) -> void:
 	box.add_child(UI.label(str(o.get("text",m.get("brief","Awaiting briefing."))),15))
 	if o.has("text") and o.text != m.get("brief",""): box.add_child(UI.label(str(m.get("brief","")),14,UI.MUTED))
 	fact(box,"Goal",Intel.goal(m))
-	fact(box,"Risk","%s%s %s · strength %d / squad %d" % ["▮".repeat(risk.level),"▯".repeat(4-risk.level),risk.name,risk.enemy,risk.squad],risk.color)
+	fact(box,"Risk","%d/4 %s · strength %d / squad %d" % [risk.level,risk.name,risk.enemy,risk.squad],risk.color)
 	box.add_child(UI.label("Estimate against your available %d. Gear and roster changes affect risk." % risk.count,12,UI.MUTED))
 	fact(box,"Expected",risk.expected+(" · start hidden" if m.get("stealth",false) else "")+(" · front B: %d fewer rank-and-file" % int(o.fewer) if o.has("fewer") else ""))
 	if Data.get_table("galaxy","RISK_W").clock.has(m.get("type","")):
@@ -90,7 +90,7 @@ static func region_panel(view) -> void:
 		fact(box,"Planet threat","%d / 5" % preload("res://scripts/campaign/events11_engine.gd").threat(c.state,view.planet),UI.DANGER)
 	box.add_child(UI.label(str(row[1]),21,UI.ACCENT)); box.add_child(UI.label(str(row[3]),15))
 	var unrest := Intel.unrest(c,key); var rules: Dictionary = Data.get_table("galaxy","UNREST")
-	fact(box,"Unrest","%s%s %d · %s" % ["▮".repeat(unrest),"▯".repeat(5-unrest),unrest,Data.get_table("galaxy","UNREST_WORD")[unrest]],UI.DANGER if unrest >= 3 else UI.ACCENT)
+	fact(box,"Unrest","%d/5 · %s" % [unrest,Data.get_table("galaxy","UNREST_WORD")[unrest]],UI.DANGER if unrest >= 3 else UI.ACCENT)
 	fact(box,"Darkness","Order %d / 100 · regional haze reflects Darkness and unrest" % Intel.darkness(c),UI.DANGER)
 	var effects := PackedStringArray()
 	if unrest >= int(rules.hostile): effects.append("Enemy aim +%d · field ops %d%% here" % [rules.aimAt3,rules.fieldAt3])

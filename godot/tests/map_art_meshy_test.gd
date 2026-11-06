@@ -17,7 +17,7 @@ func run(suite, art) -> void:
 		for lod in 2:
 			var file := path if lod == 0 else path.trim_suffix(".glb")+"_lod1.glb"
 			audit(file,(3000 if lod == 0 else 800) if assets[path] == "cover" else (4000 if lod == 0 else 1000))
-	var examples := {"temple":"res://data/rescue.json","ruins":Maps.resolve("archive"),"caves":Maps.resolve("r_caves"),"jungle":Maps.resolve("h_grove"),"plains":Maps.resolve("relay"),"snow":Maps.resolve("ilum"),"city":Maps.resolve("envoy"),"dock":Maps.resolve("rescue")}
+	var examples := {"temple":"res://data/rescue.json","ruins":Maps.resolve("archive"),"caves":Maps.resolve("r_caves"),"jungle":Maps.resolve("h_grove"),"plains":Maps.resolve("blockade"),"snow":Maps.resolve("ilum"),"city":Maps.resolve("envoy"),"dock":Maps.resolve("rescue")}
 	for theme: String in examples:
 		var m = Mission.new(17,examples[theme]); var before: PackedByteArray = t.state(m)
 		art.props = original.duplicate(true); art.build(m)

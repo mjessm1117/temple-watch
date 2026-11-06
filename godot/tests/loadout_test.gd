@@ -16,11 +16,12 @@ func check(ok: bool, message: String) -> void:
 func run() -> void:
 	root.size = Vector2i(1366, 768)
 	var flow = root.get_node("CampaignFlow")
-	flow.save_path = "user://loadout-test.json"; flow.campaign = Campaign.new(); flow.active = true
+	flow.save_path = "user://loadout-test.json"; flow.campaign = Campaign.new(); flow.story = flow.campaign.story; flow.active = true
 	var c = flow.campaign; c.state.launch_index = 0
 	var screen = load("res://scenes/squad.tscn").instantiate(); root.add_child(screen)
 	await process_frame
-	check(screen.selected.size() == 4 and screen.stage.actors.size() == 4, "four selected soldiers have full 3D actors")
+	check(screen.selected.size() == 5 and screen.stage.actors.size() == 5, "five selected soldiers have full 3D actors")
+	screen._toggle("u5") # Keep the later swap/gear fixture on its original four positions.
 	check(screen.portraits.size() == c.state.roster.size(), "every roster soldier has a portrait model")
 	for r in c.state.roster:
 		check(ResourceLoader.exists(Actor.model_path(r)), "model resolves: " + str(r.cls))

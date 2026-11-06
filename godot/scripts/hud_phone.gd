@@ -20,22 +20,34 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	overlay = Control.new(); overlay.name = "PhoneBattleHUD"
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE; root.add_child(overlay)
-	var strip := PanelContainer.new(); strip.anchor_right = 1.0; strip.offset_bottom = 48
+	var physical := DisplayServer.window_get_size()
+	var safe := DisplayServer.get_display_safe_area()
+	if physical.x > 0 and physical.y > 0 and safe.size.x > 0 and safe.size.y > 0:
+		var scale := Vector2(root.size.x/float(physical.x),root.size.y/float(physical.y))
+		overlay.offset_left = clampf(float(safe.position.x)*scale.x,0.0,root.size.x*0.2)
+		overlay.offset_top = clampf(float(safe.position.y)*scale.y,0.0,root.size.y*0.2)
+		overlay.offset_right = -clampf(float(physical.x-safe.end.x)*scale.x,0.0,root.size.x*0.2)
+		overlay.offset_bottom = -clampf(float(physical.y-safe.end.y)*scale.y,0.0,root.size.y*0.2)
+	var strip := PanelContainer.new(); strip.anchor_right = 1.0; strip.offset_bottom = 88
 	var strip_style: StyleBoxFlat = night.panel_style(); strip_style.set_content_margin_all(2)
 	strip.add_theme_stylebox_override("panel", strip_style); overlay.add_child(strip)
-	var heading := HBoxContainer.new(); strip.add_child(heading)
+	var rows := VBoxContainer.new(); rows.add_theme_constant_override("separation", 0); strip.add_child(rows)
+	var heading := HBoxContainer.new(); rows.add_child(heading)
 	g.objective_label.reparent(heading); g.objective_label.add_theme_font_size_override("font_size", 12)
 	g.objective_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	g.objective_label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	g.objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	var end_button := _button("END TURN", _end_turn); end_button.name = "PhoneEndTurn"
+	end_button.custom_minimum_size = Vector2(110, 42); heading.add_child(end_button)
+	var controls := HBoxContainer.new(); rows.add_child(controls)
 	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
-	unit_card.custom_minimum_size = Vector2(155, 44)
-	unit_card.add_theme_font_size_override("font_size", 12); heading.add_child(unit_card)
-	heading.add_child(_button("◀", func() -> void: _cycle_unit(-1)))
-	heading.add_child(_button("▶", func() -> void: _cycle_unit(1)))
-	heading.add_child(_button("CENTER", g._recenter))
-	heading.add_child(_button("END TURN", _end_turn))
-	heading.add_child(_button("☰", _show_menu))
+	unit_card.custom_minimum_size = Vector2(105 if physical.x < 500 else 155, 42)
+	unit_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	unit_card.add_theme_font_size_override("font_size", 12); controls.add_child(unit_card)
+	controls.add_child(_button("◀", func() -> void: _cycle_unit(-1)))
+	controls.add_child(_button("▶", func() -> void: _cycle_unit(1)))
+	if physical.x >= 500: controls.add_child(_button("CENTER", g._recenter))
+	controls.add_child(_button("☰", _show_menu))
 	target_card = _button("TARGET", _toggle.bind("target")); target_card.name = "TargetCard"
 	target_card.visible = false; overlay.add_child(target_card)
 	var tray := PanelContainer.new(); tray.name = "AbilityTray"
@@ -112,11 +124,12 @@ func refresh(from_game: bool = false) -> void:
 	if g.warning_label.text.contains("TAB / SHIFT+TAB"): action_name.text = "Tap a target · FIRE to confirm · CANCEL to back"
 	elif g.warning_label.text != "": action_name.text = g.warning_label.text
 	elif end_confirm: action_name.text = "End the squad turn? Tap END TURN again."
-	elif g.path_label.text != "": action_name.text = g.path_label.text
+	elif g.path_label.text != "": action_name.text = g.path_label.text.get_slice("  •  COVER",0)
+	elif g.action == "move": action_name.text = "Blue: 1 action  ·  Amber: DASH ends turn"
 	else: action_name.text = "Choose an action · tap the map to preview"
 	_update_actions(from_game)
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
-	unit_card.text = "%s\nHP %s  %s  ▾" % [str(unit.get("name", "UNIT")), str(unit.get("hp", "?")), g.hud_controls.ap_pips(unit)]
+	unit_card.text = "%s\nHP %s  AP %s  ▾" % [str(unit.get("name", "UNIT")), str(unit.get("hp", "?")), g.hud_controls.ap_pips(unit)]
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	target_card.text = "%s  %s  ▾" % [str(target.get("name", "TARGET")), g.hit_big_label.text]
 	popup.visible = open_card != ""
