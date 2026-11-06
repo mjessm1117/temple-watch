@@ -27,7 +27,7 @@ func run() -> void:
 	check(game.hud_controls.aim_ui != null, "aim strip exists")
 	var actor: Dictionary = m.unit_by_id(game.selected_id)
 	check(Rules12.ACTIONS_PER_TURN == 2, "rules grant two actions")
-	check(HudControls.ap_pips(actor).length() == Rules12.ACTIONS_PER_TURN, "action pip count follows the rules maximum")
+	check(HudControls.ap_pips(actor) == "%d/%d" % [int(actor.ap),Rules12.ACTIONS_PER_TURN], "action count follows the rules maximum")
 	check(game.hud_controls.night.vitals_label.text.contains("AP " + HudControls.ap_pips(actor)), "desktop plate uses the shared action pips")
 	var blue: Dictionary = m.reach_tiles(actor, 1)
 	var yellow: Dictionary = m.reach_tiles(actor, 2)

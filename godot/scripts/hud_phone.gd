@@ -121,7 +121,7 @@ func refresh(from_game: bool = false) -> void:
 	else: action_name.text = "Choose an action · tap the map to preview"
 	_update_actions(from_game)
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
-	unit_card.text = "%s\nHP %s  %s  ▾" % [str(unit.get("name", "UNIT")), str(unit.get("hp", "?")), g.hud_controls.ap_pips(unit)]
+	unit_card.text = "%s\nHP %s  AP %s  ▾" % [str(unit.get("name", "UNIT")), str(unit.get("hp", "?")), g.hud_controls.ap_pips(unit)]
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	target_card.text = "%s  %s  ▾" % [str(target.get("name", "TARGET")), g.hit_big_label.text]
 	popup.visible = open_card != ""

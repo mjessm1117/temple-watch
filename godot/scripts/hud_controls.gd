@@ -20,7 +20,7 @@ var aim_ui
 static func ap_pips(unit: Dictionary) -> String:
 	var maximum: int = int(unit.get("max_ap", Rules12.ACTIONS_PER_TURN))
 	var available: int = clampi(int(unit.get("ap", 0)), 0, maximum)
-	return "◆".repeat(available) + "◇".repeat(maximum - available)
+	return "%d/%d" % [available,maximum]
 
 static func move_color(ap_cost: int) -> Color:
 	return Color("60b9ff") if ap_cost == 1 else Color("ffd16a")
@@ -256,7 +256,7 @@ func _refresh() -> void:
 		g.objective_label.text = "T%d · %s · %d left" % [g.mission.turn, brief, int(objective.turns_left)] if int(objective.turns_left) >= 0 else "T%d · %s" % [g.mission.turn, brief]
 	else:
 		g.objective_label.text = "TURN %d · %s%s · %s" % [g.mission.turn,objective.label,clock_note,str(objective.phase).to_upper()]
-	g.selected_label.text = "%s\n%s%s\nHP %s\nAP %s\nFOCUS %d  •  MEDPACS %d%s" % [u.get("name", ""), u.get("class_name", ""), "  WOUNDED" if bool(u.get("wounded", false)) else "", "●".repeat(int(u.get("hp", 0))) + "○".repeat(maxi(0, int(u.get("max_hp", 0)) - int(u.get("hp", 0)))), ap_pips(u), int(u.get("focus_left", 0)), int(u.get("medpacs", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
+	g.selected_label.text = "%s\n%s%s\nHP %d/%d\nAP %s\nFOCUS %d  •  MEDPACS %d%s" % [u.get("name", ""), u.get("class_name", ""), "  WOUNDED" if bool(u.get("wounded", false)) else "", int(u.get("hp",0)), int(u.get("max_hp",0)), ap_pips(u), int(u.get("focus_left", 0)), int(u.get("medpacs", 0)), "\nHUNKERED  +30 DEF" if bool(u.get("hunkered", false)) else ""]
 	if u.has("ammo"): g.selected_label.text += "\nAMMO %d/%d" % [int(u.ammo), int(u.clip)]
 	# --- wave10 story ---
 	var flow = g.get_node_or_null("/root/CampaignFlow")
