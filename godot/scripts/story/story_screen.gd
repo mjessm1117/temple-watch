@@ -149,7 +149,7 @@ func _build_story() -> void:
 	row.add_child(frame)
 	var content := UI.column(6 if phone else 12)
 	content.size_flags_horizontal = SIZE_EXPAND_FILL
-	var scroll := ScrollContainer.new()
+	var scroll := preload("res://scripts/touch_scroll.gd").new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	frame.add_child(scroll)
 	scroll.add_child(content)
@@ -373,7 +373,7 @@ func _build_codex() -> void:
 	var panel := UI.panel(Color(0.04,0.075,0.085,0.88))
 	panel.size_flags_vertical = SIZE_EXPAND_FILL
 	body.add_child(panel)
-	var scroll := ScrollContainer.new()
+	var scroll := preload("res://scripts/touch_scroll.gd").new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	panel.add_child(scroll)
 	var list := UI.column(12)

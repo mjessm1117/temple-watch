@@ -16,7 +16,7 @@ func setup(rooms: Dictionary, state: Dictionary) -> void:
 	galaxy_button.name = "GalaxyOverview"; galaxy_button.custom_minimum_size.y = 44
 	galaxy_button.add_theme_font_size_override("font_size", 15)
 	column.add_child(galaxy_button)
-	var scroll := ScrollContainer.new(); scroll.name = "RoomScroll"
+	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.name = "RoomScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	column.add_child(scroll)

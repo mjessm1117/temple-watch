@@ -64,7 +64,7 @@ func show_page(value: String) -> void:
 		button.custom_minimum_size.x = 240
 		if key == page: button.add_theme_stylebox_override("normal", UI.style(Color("29212e"), RED))
 		tabs.add_child(button)
-	var scroll := ScrollContainer.new()
+	var scroll := preload("res://scripts/touch_scroll.gd").new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	body.add_child(scroll)

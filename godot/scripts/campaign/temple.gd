@@ -160,7 +160,7 @@ func _build_shell() -> void:
 	var top := HBoxContainer.new(); column.add_child(top)
 	var heading := UI.label("TEMPLE STATION", 13, UI.MUTED); heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top.add_child(heading)
 	top.add_child(UI.button("← Temple view", _close_station))
-	var scroll := ScrollContainer.new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
 	page_content = UI.column(13); page_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(page_content)
 	if compact:
@@ -172,7 +172,7 @@ func _build_room_picker() -> void:
 	room_picker.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	room_picker.offset_left = 8; room_picker.offset_right = -8; room_picker.offset_top = 98; room_picker.offset_bottom = -57
 	add_child(room_picker)
-	var scroll := ScrollContainer.new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	room_picker.add_child(scroll)
 	var list := UI.column(5); list.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(list)
 	var close := UI.button("CLOSE ROOMS", _toggle_rooms); close.custom_minimum_size.y = 44; list.add_child(close)

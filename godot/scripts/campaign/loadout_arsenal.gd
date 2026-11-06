@@ -207,12 +207,13 @@ func _mark(level: int) -> String:
 func _select_slot(slot: String) -> void:
 	active_slot = slot; host.armory_slot = slot; skill_view = false; _filter()
 	_update_preview()
+	# One owner for the list position: the container's scroll value, set once per tap.
 	if get_parent() is ScrollContainer:
 		var scroll := get_parent() as ScrollContainer
-		var target := maxi(0, int(picker.position.y) - 20) if Phone.narrow(get_tree().root.size) else 0
 		await get_tree().process_frame
-		scroll.scroll_vertical = target
-		position.y = -target
+		if not is_instance_valid(scroll): return
+		scroll.scroll_vertical = maxi(0, int(picker.position.y) - 20) if Phone.narrow(get_tree().root.size) else 0
+		scroll.notification(Container.NOTIFICATION_SORT_CHILDREN)
 
 func _update_preview() -> void:
 	if is_instance_valid(preview_card):

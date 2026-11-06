@@ -125,7 +125,7 @@ func _adapt_phone_report(reference: WeakRef) -> void:
 	var title: VBoxContainer = heading.get_child(0)
 	(title.get_child(1) as Label).add_theme_font_size_override("font_size", 23)
 	var tabs: HBoxContainer = body.get_child(2)
-	var tab_scroll := ScrollContainer.new(); tab_scroll.name = "PhoneTabScroll"
+	var tab_scroll := preload("res://scripts/touch_scroll.gd").new(); tab_scroll.name = "PhoneTabScroll"
 	tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	tab_scroll.custom_minimum_size.y = 40; body.add_child(tab_scroll); body.move_child(tab_scroll, 2)
 	tabs.reparent(tab_scroll)

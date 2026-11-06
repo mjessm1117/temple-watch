@@ -74,7 +74,7 @@ func _build() -> void:
 		var tab_row := HBoxContainer.new(); column.add_child(tab_row)
 		var previous := UI.button("‹", func(): tab_scroll.scroll_horizontal = maxi(0, tab_scroll.scroll_horizontal - 120))
 		previous.tooltip_text = "Scroll tabs left"; tab_row.add_child(previous)
-		tab_scroll = ScrollContainer.new(); tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		tab_scroll = preload("res://scripts/touch_scroll.gd").new(); tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 		tab_scroll.custom_minimum_size.y = 39; tab_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		tab_row.add_child(tab_scroll); tab_scroll.add_child(tabs)
 		var next := UI.button("›", func(): tab_scroll.scroll_horizontal += 120)
@@ -89,7 +89,7 @@ func _build() -> void:
 	legend.add_child(UI.label("◇ Field op   /   Red haze: Darkness + unrest",12,UI.MUTED))
 	for item in legend.get_children(): item.autowrap_mode = TextServer.AUTOWRAP_OFF
 	if compact: legend.hide()
-	var offer_scroll := ScrollContainer.new(); offer_scroll.custom_minimum_size.y = 44 if compact else 70
+	var offer_scroll := preload("res://scripts/touch_scroll.gd").new(); offer_scroll.custom_minimum_size.y = 44 if compact else 70
 	offer_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(offer_scroll)
 	if compact: offer_scroll.hide()
 	chips = HFlowContainer.new(); chips.size_flags_horizontal = Control.SIZE_EXPAND_FILL; offer_scroll.add_child(chips)
@@ -100,7 +100,7 @@ func _build() -> void:
 		summary.add_child(excerpt)
 		var more := UI.button("MORE", func(): phone_more = true; _show_details())
 		more.name = "BriefingMore"; more.custom_minimum_size = Vector2(52, 40); summary.add_child(more)
-	scroll = ScrollContainer.new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll = preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
 	detail = UI.column(10); detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(detail)
 	launch_button = UI.button("MISSION BRIEFING  →",_launch); column.add_child(launch_button)

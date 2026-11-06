@@ -42,7 +42,7 @@ func _ready() -> void:
 	var frame := UI.panel(Color(0.04,0.075,0.09,0.96))
 	frame.custom_minimum_size.x = 490
 	row.add_child(frame)
-	var scroll := ScrollContainer.new()
+	var scroll := preload("res://scripts/touch_scroll.gd").new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	frame.add_child(scroll)
 	var column := UI.column(12)
@@ -105,7 +105,7 @@ func _build_phone() -> void:
 	var continuing := UI.button("CONTINUE", flow.continue_campaign, saved.load_save(flow.save_path))
 	continuing.name = "ContinueButton"; actions.add_child(continuing)
 	actions.add_child(UI.button("DIRECT RESCUE", _start))
-	var scroll := ScrollContainer.new(); scroll.size_flags_vertical = SIZE_EXPAND_FILL
+	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; body.add_child(scroll)
 	var lore := UI.column(5); lore.size_flags_horizontal = SIZE_EXPAND_FILL; scroll.add_child(lore)
 	lore.add_child(UI.label("A VISION OF FIRE", 18, UI.GOLD))

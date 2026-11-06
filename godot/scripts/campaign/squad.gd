@@ -51,7 +51,7 @@ func _ready() -> void:
 	var bg := ColorRect.new(); bg.color = S.BG; bg.set_anchors_and_offsets_preset(PRESET_FULL_RECT); add_child(bg)
 	_build_stage(); _build_header(); _build_footer()
 	card_row = HBoxContainer.new(); card_row.add_theme_constant_override("separation", 6)
-	card_scroll = ScrollContainer.new(); card_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	card_scroll = preload("res://scripts/touch_scroll.gd").new(); card_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	add_child(card_scroll); card_scroll.add_child(card_row)
 	drawer = S.panel(); add_child(drawer); drawer.hide()
 	for r in c.state.roster: _portrait(r)
@@ -201,7 +201,7 @@ func _build_drawer() -> void:
 	if compact:
 		var close := S.button("×", close_inspector); close.custom_minimum_size = Vector2(44, 44)
 		tabs.add_child(close); wire_button(close)
-	var scroll := ScrollContainer.new(); scroll.size_flags_vertical = SIZE_EXPAND_FILL
+	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; drawer_content.add_child(scroll)
 	if drawer_tab == "arsenal":
 		arsenal = Arsenal.new(); arsenal.size_flags_horizontal = SIZE_EXPAND_FILL; scroll.add_child(arsenal); arsenal.setup(self, str(r.id))
