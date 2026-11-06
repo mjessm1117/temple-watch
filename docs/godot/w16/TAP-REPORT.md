@@ -58,3 +58,12 @@ All six screenshots are 844×390 Xvfb captures. The before images use the unchan
 ## Gate
 
 Headless import: PASS, exit 0. `tap16_test`: PASS at both phone orientations. `scroll16_test`: PASS, 11 checks. Full `./godot/test.sh`: PASS, exit 0, 0 `SCRIPT ERROR`, 0 failures, Normal rescue 9/20. `git diff --check`: PASS. Runner side-effect camera screenshots restored.
+
+## Fix 2
+
+- Squad and armory cards now put a left-aligned 14 px name label to the right of each portrait. The label shows the full name when it fits, otherwise the first name or an end ellipsis. Swap roster rows use the same fit rule.
+- The turn plate starts at y=116, below the 108 px phone header, and sizes to the portrait viewport. Its 54 px height leaves the bottom action strip clear.
+- Compact ability buttons draw the full name on one or two lines at 12–14 px. The 56 px button height and 8 px spacing remain.
+- `tap16_test` checks every selected card and swap roster name, plus banner separation from the header, action strip, and viewport. The after captures include [banner](../shots/w16-tap-after-banner.png), [battle bar](../shots/w16-tap-after-battle-bar.png), [armory](../shots/w16-tap-after-armory.png), and [temple home](../shots/w16-tap-after-temple-home.png).
+
+Fix 2 gate: headless import exit 0; full `./godot/test.sh` exit 0 with 0 `SCRIPT ERROR`, 0 failures, Normal rescue 9/20; landscape `tap16_test` 140 checks, 0 failures; portrait `tap16_test` 138 checks, 0 failures. Runner camera screenshot churn restored.

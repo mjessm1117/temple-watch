@@ -232,7 +232,13 @@ func _roster_row(parent: VBoxContainer, r: Dictionary) -> void:
 	var col := S.column(3); col.size_flags_horizontal = SIZE_EXPAND_FILL; row.add_child(col)
 	var label := str(r.n) + ("  ✓" if selected.has(id) else "")
 	var b := S.button(label, swap_soldier.bind(id), fit and not selected.has(id))
-	b.alignment = HORIZONTAL_ALIGNMENT_LEFT; b.icon = S.icon(str(r.cls).to_lower()); col.add_child(b); choices[id] = b; wire_button(b)
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT; b.icon = S.icon(str(r.cls).to_lower()); b.clip_text = true
+	col.add_child(b); choices[id] = b; wire_button(b)
+	var update_name := func() -> void:
+		var suffix := "  ✓" if selected.has(id) else ""
+		b.text = Details.visible_name(str(r.n), maxf(12.0, b.size.x - 50.0 - ThemeDB.fallback_font.get_string_size(suffix, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x)) + suffix
+	b.resized.connect(update_name)
+	update_name.call_deferred()
 	col.add_child(S.label("%s · R%d · %s" % [r.cls, int(r.rank), Details.nickname(r)], 11, S.MUTED))
 	var status := S.label(Details.status(flow.session(), r), 11, S.GREEN if fit else S.RED)
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; col.add_child(status)

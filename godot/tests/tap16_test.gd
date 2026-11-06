@@ -71,6 +71,50 @@ func _visible_rect(control: Control, viewport_rect: Rect2) -> Rect2:
 		parent = parent.get_parent()
 	return area
 
+func check_card_names(squad: Node, title: String) -> void:
+	for id in squad.cards:
+		var card: PanelContainer = squad.cards[id]
+		var button: Button = card.get_child(0).get_child(0)
+		var label: Label = button.get_node("SoldierName")
+		var full_name := str(squad.flow.session().soldier(str(id)).n)
+		var shown := label.text
+		checks += 3
+		if label.horizontal_alignment != HORIZONTAL_ALIGNMENT_LEFT or label.position.x < 42.0:
+			fail(str(label.get_path()), "%s name does not start right of portrait" % title)
+		if not full_name.begins_with(shown.trim_suffix("…")):
+			fail(str(label.get_path()), "%s name clipped at start: %s / %s" % [title, shown, full_name])
+		var width := ThemeDB.fallback_font.get_string_size(shown, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x
+		if width > label.size.x + 0.5 and not shown.ends_with("…"):
+			fail(str(label.get_path()), "%s name exceeds label: %s > %s" % [title, width, label.size.x])
+
+func check_roster_rows(squad: Node) -> void:
+	for id in squad.choices:
+		var button: Button = squad.choices[id]
+		var full_name := str(squad.flow.session().soldier(str(id)).n)
+		var shown := button.text.trim_suffix("  ✓")
+		checks += 2
+		if button.alignment != HORIZONTAL_ALIGNMENT_LEFT or not full_name.begins_with(shown.trim_suffix("…")):
+			fail(str(button.get_path()), "swap roster name clipped at start: %s / %s" % [shown, full_name])
+		var available := button.size.x - 50.0
+		var width := ThemeDB.fallback_font.get_string_size(shown, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+		if width > available + 0.5 and not shown.ends_with("…"):
+			fail(str(button.get_path()), "swap roster name exceeds width: %s > %s" % [width, available])
+
+func check_banner(game: Node) -> void:
+	var banner: PanelContainer = game.hud_controls.night.phase_plate
+	var header: Control = game.hud_controls.phone.overlay.get_child(0)
+	var action_strip: Control = game.hud_controls.phone.ability_tray
+	banner.visible = true
+	banner.position.y = 116.0
+	await process_frame
+	checks += 3
+	if banner.get_global_rect().intersects(header.get_global_rect()):
+		fail(str(banner.get_path()), "turn banner intersects phone header")
+	if banner.get_global_rect().intersects(action_strip.get_global_rect()):
+		fail(str(banner.get_path()), "turn banner intersects action strip")
+	if banner.get_global_rect().intersection(Rect2(Vector2.ZERO, Vector2(root.size))) != banner.get_global_rect():
+		fail(str(banner.get_path()), "turn banner outside viewport: %s / %s" % [banner.get_global_rect(), root.size])
+
 func shot(name: String) -> void:
 	if not capture: return
 	await RenderingServer.frame_post_draw
@@ -91,6 +135,9 @@ func run() -> void:
 	root.add_child(game)
 	for i in 5: await process_frame
 	await scan(game, "battle")
+	await check_banner(game)
+	await shot("banner")
+	game.hud_controls.night.phase_plate.hide()
 	var phone_hud = game.hud_controls.phone
 	for card in ["unit", "target", "more", "menu"]:
 		phone_hud._toggle(card)
@@ -133,10 +180,15 @@ func run() -> void:
 	root.add_child(squad)
 	for i in 5: await process_frame
 	await scan(squad, "roster")
+	check_card_names(squad, "roster")
 	squad.inspect(0)
 	for i in 5: await process_frame
 	await scan(squad, "armory")
+	check_card_names(squad, "armory")
 	await shot("after-armory")
+	squad._tab("roster")
+	for i in 2: await process_frame
+	check_roster_rows(squad)
 	squad.queue_free(); await process_frame
 	var story = load("res://scenes/briefing.tscn").instantiate()
 	root.add_child(story)

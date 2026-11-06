@@ -45,14 +45,21 @@ func setup(left_box: VBoxContainer, right_box: VBoxContainer) -> void:
 	log_heading = right_box.get_child(5)
 	chips = Control.new(); chips.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); chips.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(chips)
 	phase_plate = PanelContainer.new(); phase_plate.visible = false; phase_plate.anchor_left = 0.5; phase_plate.anchor_right = 0.5
-	phase_plate.offset_left = -170; phase_plate.offset_right = 170; phase_plate.offset_top = 72; phase_plate.offset_bottom = 126
+	phase_plate.offset_left = -170; phase_plate.offset_right = 170; phase_plate.offset_top = 116; phase_plate.offset_bottom = 170
 	phase_plate.add_theme_stylebox_override("panel", panel_style()); add_child(phase_plate)
+	resized.connect(_layout_phase_plate)
+	_layout_phase_plate.call_deferred()
 	phase_text = label("JEDI TURN", 26, Color("f0cf86")); phase_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; phase_plate.add_child(phase_text)
 	activity_plate = PanelContainer.new(); activity_plate.anchor_left = 0.5; activity_plate.anchor_right = 0.5
 	activity_plate.offset_left = -260; activity_plate.offset_right = 260; activity_plate.offset_top = 128; activity_plate.offset_bottom = 158
 	activity_plate.add_theme_stylebox_override("panel", panel_style()); add_child(activity_plate)
 	activity = label("", 16, Color("f4dfb3")); activity.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; activity_plate.add_child(activity)
 	build_pause()
+
+func _layout_phase_plate() -> void:
+	var half_width := minf(170.0, maxf(100.0, size.x * 0.5 - 8.0))
+	phase_plate.offset_left = -half_width
+	phase_plate.offset_right = half_width
 
 func panel_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new(); style.bg_color = Color("101b26ee"); style.border_color = Color("be9d5b")
@@ -130,8 +137,8 @@ func _process(_delta: float) -> void:
 	if phase != last_phase:
 		last_phase = phase
 		phase_text.text = "ENEMY ACTIVITY" if phase == "enemy" else "JEDI TURN"
-		phase_plate.visible = true; phase_plate.modulate.a = 1.0; phase_plate.position.y = 54
-		var tween := create_tween(); tween.tween_property(phase_plate, "position:y", 72.0, 0.22).set_trans(Tween.TRANS_SINE)
+		phase_plate.visible = true; phase_plate.modulate.a = 1.0; phase_plate.position.y = 116
+		var tween := create_tween(); tween.tween_property(phase_plate, "position:y", 124.0, 0.22).set_trans(Tween.TRANS_SINE)
 		tween.tween_interval(1.0); tween.tween_property(phase_plate, "modulate:a", 0.0, 0.3)
 		tween.tween_callback(func() -> void: phase_plate.visible = false)
 	if g.phase_banner.visible and g.phase_banner.text == "YOUR TURN": phase_plate.visible = false

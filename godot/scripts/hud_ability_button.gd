@@ -50,11 +50,22 @@ func _draw() -> void:
 	var c := Vector2(size.x * 0.5, minf(25.0, size.y * 0.35)) if compact else Vector2(29, size.y * 0.55)
 	if compact:
 		var font := ThemeDB.fallback_font
-		var label := display_name
-		while label.length() > 1 and font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x > size.x - 6:
-			label = label.left(label.length() - 1)
-		if label != display_name: label = label.left(maxi(1, label.length() - 1)) + "…"
-		draw_string(font, Vector2(3, minf(size.y - 8.0, 48.0)), label, HORIZONTAL_ALIGNMENT_CENTER, size.x - 6, 14, Color("edf3f4") if not disabled else Color("87919b"))
+		var lines: Array[String] = [display_name]
+		var font_size := 14
+		if font.get_string_size(display_name, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x > size.x - 6:
+			var words := display_name.split(" ")
+			var best_width := INF
+			for split_at in range(1, words.size()):
+				var first := " ".join(words.slice(0, split_at))
+				var second := " ".join(words.slice(split_at))
+				var widest := maxf(font.get_string_size(first, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x, font.get_string_size(second, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
+				if widest < best_width: best_width = widest; lines = [first, second]
+			while font_size > 12 and best_width > size.x - 6:
+				font_size -= 1
+				best_width = 0.0
+				for line in lines: best_width = maxf(best_width, font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
+		for i in range(lines.size()):
+			draw_string(font, Vector2(3, 47.0 if lines.size() == 1 else 38.0 + i * 14.0), lines[i], HORIZONTAL_ALIGNMENT_CENTER, size.x - 6, font_size, Color("edf3f4") if not disabled else Color("87919b"))
 	else:
 		draw_rect(Rect2(6, 5, 19, 17), Color("30404b"), true)
 		draw_string(ThemeDB.fallback_font, Vector2(9, 18), hotkey, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)

@@ -48,15 +48,35 @@ static func modules_text(r: Dictionary) -> String:
 			modules.append("%s Mk %s" % [item.get("n", key), ["I", "II", "III"][clampi(int(r.gear.mk.get(kind + "." + key, 1)) - 1, 0, 2)]])
 	return " · ".join(modules) if not modules.is_empty() else "MODULES  —"
 
+static func visible_name(full_name: String, available: float) -> String:
+	var font := ThemeDB.fallback_font
+	var first := full_name.get_slice(" ", 0)
+	for candidate in [full_name, first]:
+		if font.get_string_size(candidate, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x <= available:
+			return candidate
+	var shortened := first
+	while shortened.length() > 1 and font.get_string_size(shortened + "…", HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x > available:
+		shortened = shortened.left(shortened.length() - 1)
+	return shortened + "…"
+
 static func card(c, r: Dictionary, action: Callable, portrait: Texture2D = null) -> PanelContainer:
 	var compact := S.panel(); compact.name = "Card_" + str(r.id)
 	compact.add_theme_stylebox_override("panel", S.box(S.PANEL, S.EDGE, 4))
 	var phone := Phone.narrow(Phone.window_size())
 	compact.custom_minimum_size = Vector2(90 if phone else 166, 62); compact.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var content := S.column(2); compact.add_child(content)
-	var select := S.button(str(r.n), action); select.alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	select.custom_minimum_size.y = 44; select.clip_text = true
-	select.add_theme_font_size_override("font_size", 14 if phone else 11); content.add_child(select)
+	var select := S.button("", action); select.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	select.custom_minimum_size.y = 44; content.add_child(select)
+	var name := S.label("", 14 if phone else 11); name.name = "SoldierName"
+	name.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	name.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	name.offset_left = 43 if portrait != null else 4
+	name.offset_right = -2; name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	select.add_child(name)
+	var update_name := func() -> void:
+		name.text = visible_name(str(r.n), name.size.x) if phone else str(r.n)
+	select.resized.connect(update_name)
+	update_name.call_deferred()
 	if portrait != null:
 		var face := Sprite2D.new(); face.texture = portrait; face.position = Vector2(21, 21)
 		face.scale = Vector2(0.26, 0.26); select.add_child(face)
