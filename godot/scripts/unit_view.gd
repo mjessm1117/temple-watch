@@ -31,6 +31,7 @@ func setup(u: Dictionary, scene: PackedScene, at: Vector3) -> void:
 	set_selected(false, str(u.side) == "enemy")
 	animation = _find_animation(model)
 	base_clip = "saberIdle" if str(u.class_name) in ["Guardian", "Consular"] else "gunIdle"
+	if base_clip == "saberIdle" and str(u.get("model", "")) == "jedi": _attach_saber(u)
 	play(base_clip)
 	foot = AudioStreamPlayer.new()
 	foot.volume_db = -22.0
@@ -46,6 +47,41 @@ func _find_animation(node: Node) -> AnimationPlayer:
 		var found := _find_animation(child)
 		if found != null: return found
 	return null
+
+func _find_skeleton(node: Node) -> Skeleton3D:
+	if node is Skeleton3D: return node
+	for child in node.get_children():
+		var found := _find_skeleton(child)
+		if found != null: return found
+	return null
+
+func _attach_saber(u: Dictionary) -> void:
+	var skeleton := _find_skeleton(model)
+	if skeleton == null or skeleton.find_bone("hand_r") < 0: return
+	var hand := BoneAttachment3D.new()
+	hand.bone_name = "hand_r"
+	skeleton.add_child(hand)
+	var grip := Node3D.new()
+	# Imported armature carries a 0.01 scale; restore world-sized equipment.
+	grip.scale = Vector3.ONE * 80.0
+	grip.rotation.x = PI
+	grip.position.y = 0.07
+	hand.add_child(grip)
+	var hilt := MeshInstance3D.new()
+	var hilt_mesh := CylinderMesh.new()
+	hilt_mesh.top_radius = 0.045; hilt_mesh.bottom_radius = 0.045; hilt_mesh.height = 0.24
+	hilt.mesh = hilt_mesh; grip.add_child(hilt)
+	var steel := StandardMaterial3D.new(); steel.albedo_color = Color("a8b7bc")
+	hilt.material_override = steel
+	var blade := MeshInstance3D.new()
+	var blade_mesh := CylinderMesh.new()
+	blade_mesh.top_radius = 0.014; blade_mesh.bottom_radius = 0.022; blade_mesh.height = 1.02
+	blade.mesh = blade_mesh; blade.position.y = 0.62
+	var color := Color(str(u.get("col", "#79d3e2")))
+	var glow := StandardMaterial3D.new()
+	glow.albedo_color = color; glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	glow.emission_enabled = true; glow.emission = color; glow.emission_energy_multiplier = 2.0
+	blade.material_override = glow; grip.add_child(blade)
 
 func play(clip: String) -> void:
 	if animation == null: return

@@ -25,11 +25,11 @@ static func play(game: Node3D, event: Dictionary) -> void:
 		if tween.is_running(): tween.kill()
 		await game.cam.wait(0.17)
 		game.cam.trace.append("cine15_push")
+	var jedi_close := camera_on and JediKillcam.eligible(game, event)
+	if jedi_close: await JediKillcam.play(game, event)
 	await Presentation.show_event(game, event)
 	if camera_on and bool(event.get("killed", false)) and not game.cam.skip_requested:
-		if JediKillcam.eligible(game, event):
-			await JediKillcam.play(game, event)
-		else:
+		if not jedi_close:
 			var tile: Vector2i = event.to
 			var at := Vector3(float(tile.x), 1.0, float(tile.y))
 			var previous_position: Vector3 = game.camera.position

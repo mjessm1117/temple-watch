@@ -50,9 +50,9 @@ func run() -> void:
 		push_error("Jedi killing blow did not start close-up: %s" % str(game.cam.trace)); quit(4); return
 	var prefix := "phone-low" if phone else "desktop-high"
 	for index in range(3):
-		await create_timer(0.08 if index == 0 else 0.20 if index == 1 else 0.24).timeout
+		await create_timer(0.04 if index == 0 else 0.12 if index == 1 else 0.22).timeout
 		await RenderingServer.frame_post_draw
-		var path := ProjectSettings.globalize_path("res://../docs/godot/shots/wave16-cam-after-%s-temple-kill-%d.png" % [prefix, index + 1])
+		var path := ProjectSettings.globalize_path("res://../docs/godot/shots/w16-intfix-%s-kill-%d.png" % [prefix, index + 1])
 		var result := root.get_texture().get_image().save_png(path)
 		var draws := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
 		var triangles := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)
