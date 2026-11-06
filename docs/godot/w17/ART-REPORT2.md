@@ -120,3 +120,26 @@ Remaining gaps: the Droid deliberately shares the Trooper humanoid silhouette; i
 Review sheets: `docs/godot/shots/w17-art6-classes.png` (seven soldiers, front and three-quarter), `w17-art6-shoot.png` (five shoot poses), and `w17-art6-small.png` (seven soldiers at 64 px). All ten Full/Low models passed the isolated accent, aim and pack assertions. The largest measured barrel elevation was 2.09°; Heavy pack top was 1.285 below `HeadTop_End` 1.610, and Tech pack top was 1.525 below `HeadTop_End` 1.610 in the shoot pose. The final headless import exited 0 with no script errors.
 
 Final gate: `./godot/test.sh` exited 0 with zero `SCRIPT ERROR` lines and zero failures across all suites; its main `run.gd` segment reported 368 checks and Normal rescue 9/20. `git diff --check` was clean. Two Wave 16 camera screenshots changed by the test runner were restored.
+
+## Fix 7 — phone GLB size
+
+No Meshy call or credit was used. The Fix 6 atlas is now embedded as `EXT_texture_webp` at quality 90: 1024×1024 for LOD0 and 512×512 for LOD1. The generator also removes animation channels whose values equal the node's bind pose and compacts the unreferenced accessor data. These channels had no effect on the pose. Mesh triangles, skin, the 29 named clips, hand weapons, spine packs, material settings, and accent zones remain the same. The gear brings no additional image textures.
+
+| File | Before (bytes) | After (bytes) | Texture format |
+|---|---:|---:|---|
+| `sniper.glb` | 6,232,500 | 1,345,872 | WebP |
+| `sniper_lod1.glb` | 5,954,988 | 907,360 | WebP |
+| `heavy.glb` | 6,269,120 | 1,355,500 | WebP |
+| `heavy_lod1.glb` | 5,991,656 | 914,836 | WebP |
+| `tech.glb` | 6,230,740 | 1,344,472 | WebP |
+| `tech_lod1.glb` | 5,953,432 | 903,672 | WebP |
+| `droid.glb` | 6,223,876 | 1,341,180 | WebP |
+| `droid_lod1.glb` | 5,946,548 | 900,112 | WebP |
+| `officer.glb` | 6,215,376 | 1,337,376 | WebP |
+| `officer_lod1.glb` | 5,938,040 | 899,288 | WebP |
+
+The three `w17-art6-*.png` review sheets were recaptured at the original camera settings. Mean absolute RGB difference from Fix 6 is 0.056 for classes, 0.043 for shoot, and 0.032 for small on a 0–255 scale; they retain the approved review appearance. Godot 4.7.2 headless import exited 0 with no import error.
+
+The direct `w17_art4_test` passed all ten Full/Low models after the size change, including accent, aim, and pack placement assertions.
+
+Final gate: `./godot/test.sh` exited 0 with zero `SCRIPT ERROR` lines and zero failures; Normal rescue was 9/20. `git diff --check` was clean. Two Wave 16 camera screenshots changed by the test runner were restored.

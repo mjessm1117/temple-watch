@@ -1,12 +1,13 @@
 import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import sharp from 'sharp';
-import {NodeIO} from '@gltf-transform/core';
-import {ALL_EXTENSIONS} from '@gltf-transform/extensions';
-import {copyToDocument, createDefaultPropertyResolver, simplify, unpartition} from '@gltf-transform/functions';
+import {NodeIO, PropertyType} from '@gltf-transform/core';
+import {ALL_EXTENSIONS, EXTTextureWebP} from '@gltf-transform/extensions';
+import {copyToDocument, createDefaultPropertyResolver, dedup, prune, simplify, unpartition} from '@gltf-transform/functions';
 import {MeshoptDecoder, MeshoptSimplifier} from 'meshoptimizer';
 
 // Run from the repository root: node art/w17-2/fix6.mjs
+// Then run: python3 art/w17-2/fix7-compact.py
 await MeshoptDecoder.ready;
 await MeshoptSimplifier.ready;
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.decoder': MeshoptDecoder});
@@ -37,7 +38,7 @@ const mul=(a,b)=>[
 const rotate=(q,v)=>{const t=cross(q.slice(0,3),v).map(x=>2*x);return v.map((x,i)=>x+q[3]*t[i]+cross(q.slice(0,3),t)[i]);};
 const between=(a,b)=>norm([...cross(a,b),1+dot(a,b)]);
 
-async function recolorTexture(doc, kind) {
+async function recolorTexture(doc, kind, lod) {
   const texture = doc.getRoot().listTextures()[0];
   const {data, info} = await sharp(texture.getImage()).ensureAlpha().raw().toBuffer({resolveWithObject:true});
   const rgb = colors[kind];
@@ -83,7 +84,9 @@ async function recolorTexture(doc, kind) {
     }
   }
   console.log(kind,'helmet stripe texels',stripePixels);
-  texture.setImage(await sharp(data,{raw:info}).png().toBuffer()).setMimeType('image/png');
+  const image = sharp(data,{raw:info});
+  texture.setImage(await (lod ? image.resize(512, 512) : image).webp({quality:90}).toBuffer()).setMimeType('image/webp');
+  doc.createExtension(EXTTextureWebP).setRequired(true);
   for (const material of doc.getRoot().listMaterials()) {
     material.setName(`${kind} accent armor`).setMetallicFactor(0).setRoughnessFactor(.8);
   }
@@ -128,15 +131,32 @@ function attachGear(target, source, kind) {
   return counts;
 }
 
+function removeBindPoseTracks(doc) {
+  for (const animation of doc.getRoot().listAnimations()) {
+    for (const channel of animation.listChannels()) {
+      const node=channel.getTargetNode(), path=channel.getTargetPath();
+      const rest=path==='translation'?node.getTranslation():path==='rotation'?node.getRotation():path==='scale'?node.getScale():null;
+      if (!rest) continue;
+      const values=channel.getSampler().getOutput().getArray();
+      if (values.every((value,i)=>Math.abs(value-rest[i%rest.length])<1e-6)) {
+        const sampler=channel.getSampler();
+        animation.removeChannel(channel);
+        if (!animation.listChannels().some(other=>other.getSampler()===sampler)) animation.removeSampler(sampler);
+      }
+    }
+  }
+}
+
 for (const kind of Object.keys(colors)) {
   const sourceBytes=execFileSync('git',['show',`6798e64:godot/assets/units/w17/${kind}.glb`],{maxBuffer:64*1024*1024});
   const gear=await io.readBinary(new Uint8Array(sourceBytes));
   for (const lod of [false,true]) {
     const doc=await io.read(sourceBody);
-    await recolorTexture(doc,kind);
+    await recolorTexture(doc,kind,lod);
     if (lod) await doc.transform(simplify({simplifier:MeshoptSimplifier,ratio:.42,error:.025}));
     const counts=attachGear(doc,gear,kind);
-    await doc.transform(unpartition());
+    removeBindPoseTracks(doc);
+    await doc.transform(prune(), dedup({propertyTypes:[PropertyType.ACCESSOR]}), unpartition());
     const path=`${output}/${kind}${lod?'_lod1':''}.glb`;
     await io.write(path,doc);
     const tris=doc.getRoot().listMeshes().reduce((s,m)=>s+m.listPrimitives().reduce((t,p)=>t+(p.getIndices()?.getCount()||p.getAttribute('POSITION').getCount())/3,0),0);
