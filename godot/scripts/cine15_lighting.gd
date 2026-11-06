@@ -44,7 +44,7 @@ func sync(actor: Dictionary, target: Dictionary) -> void:
 		if rim_material == null:
 			rim_material = ShaderMaterial.new()
 			rim_material.shader = preload("res://assets/env/unit_rim.gdshader")
-			rim_material.set_shader_parameter("rim_color", Color(0.24, 0.78, 1.0, 0.7))
+			rim_material.set_shader_parameter("rim_color", Color(0.12, 0.72, 1.0, 1.0))
 		for id in [int(actor.id), int(target.id)]:
 			var view: Node3D = game.views.get(id)
 			if view != null: _rim_model(view.model)

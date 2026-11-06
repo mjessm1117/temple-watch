@@ -85,6 +85,9 @@ func _ready() -> void:
 	input_controls = InputControls.new()
 	input_controls.g = self
 	_setup_scene()
+	if preload("res://scripts/phone_layout.gd").narrow(get_tree().root.size):
+		camera.fov = 45.0
+		camera.v_offset = 0.5
 	_load_models()
 	_build_terrain()
 	terrain_seen_revision = mission.terrain_revision

@@ -46,6 +46,9 @@ func run() -> void:
 	if view == "overhead": game.zoom = 44.0
 	game._update_camera()
 	for i in range(24): await process_frame
+	if view == "tactical":
+		game.pivot = Vector3(float(actor.x), 0.0, float(actor.y))
+		game._update_camera()
 	game.phase_banner.hide()
 	game.hud_controls.night.phase_plate.hide()
 	if view == "impact":
@@ -57,6 +60,7 @@ func run() -> void:
 	await RenderingServer.frame_post_draw
 	var label := "%s-%s-%s-%s" % [phase, "phone-low" if phone else "desktop-medium" if "--medium" in args else "desktop-high", theme, view]
 	var path := ProjectSettings.globalize_path("res://../docs/godot/shots/wave16-cam-" + label + ".png")
+	if "--intfix" in args: path = ProjectSettings.globalize_path("res://../docs/godot/shots/w16-intfix-" + ("phone-low" if phone else "desktop-high") + "-" + view + ".png")
 	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
 	var result := root.get_texture().get_image().save_png(path)
 	var draws := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)

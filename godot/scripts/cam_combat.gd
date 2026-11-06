@@ -4,6 +4,9 @@ const Shot = preload("res://scripts/shot.gd")
 const BLEND := 0.42
 const AIM_BLEND := 0.28
 const TACTICAL_V_OFFSET := -0.5
+
+func tactical_offset() -> float:
+	return 0.5 if preload("res://scripts/phone_layout.gd").narrow(g.get_tree().root.size) else TACTICAL_V_OFFSET
 var g
 var skip_requested := false
 var return_pivot := Vector3.ZERO
@@ -135,7 +138,7 @@ func end_preview() -> void:
 	g.pivot = return_pivot
 	g.cinematic = false
 	g.camera.fov = preview_fov
-	g.camera.v_offset = TACTICAL_V_OFFSET
+	g.camera.v_offset = tactical_offset()
 	g._update_camera()
 
 func _clear_preview_visuals() -> void:
@@ -209,5 +212,5 @@ func finish() -> void:
 	if g.action_tween != null and g.action_tween.is_running(): g.action_tween.kill()
 	if g.cinematic: g.pivot = return_pivot
 	g.cinematic = false
-	g.camera.v_offset = TACTICAL_V_OFFSET
+	g.camera.v_offset = tactical_offset()
 	g._update_camera()
