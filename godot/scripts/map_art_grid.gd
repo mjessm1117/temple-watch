@@ -1,5 +1,5 @@
 extends Node3D
-## Render the HUD's rule-owned range borders as one faint instanced grid.
+## Render the HUD's rule-owned range borders as one visible instanced grid.
 ## Source nodes remain intact for the HUD's existing refresh/clear contract.
 var source: Node3D
 var dirty := true
