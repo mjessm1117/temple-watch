@@ -98,3 +98,25 @@ Meshy repacked its output geometry but kept every source UV coordinate. `fix5-ap
 The five new accents are distinct in `w17-art5-small.png` at 64 px. `w17-art5-classes.png` compares all seven soldiers front and three-quarter; `w17-art5-shoot.png` shows the five shoot poses. The added face count is 26–32 triangles per GLB, within the ±5% limit. The arm undersuit pass repartitions existing triangles without adding any. The plate borders are visibly angular in close-up because these remain phone-scale models.
 
 Final gate: headless import and `./godot/test.sh` exited 0, with zero `SCRIPT ERROR`, `ERROR:` or nonzero failure lines. Normal rescue was 9/20. The isolated Fix 4 aim/pack test passed all ten Full/Low models; shoot barrel elevations were within 5.4° of level. Heavy pack top measured 1.371 below head end 1.424–1.426; Tech pack top measured 1.243 below head end 1.286. `git diff --check` was clean. Two Wave 16 camera screenshots changed by the test runner were restored.
+
+## Fix 6 — Trooper body and original armor texture
+
+No Meshy API call or credit was used. All five classes now copy the battle Trooper body from `godot/assets/models/units/trooper.glb`, its skin and its 29 animation clips. Body paint replaces red pixels on the Trooper texture's existing armor UV islands and paints a narrow helmet stripe on the original helmet UVs. Each class atlas is embedded as a lossless 1024×1024 PNG, preserving decoded source pixels outside those accent zones, including the white shell, black undersuit, and texture shading. The copied material is matte (roughness 0.8, metallic 0). Fix 4 contributes only hand weapons and the Heavy/Tech spine packs. No Fix 5 body, texture, plate, or undersuit code is used; there are no floating plates. LOD1 decimates the Trooper body while retaining its UVs and class texture.
+
+Source audit: 4,925 triangles; one material, `BakedMaterial.003`; one embedded 1024×1024 WebP base-color texture, `texture_0`; 66 skin bones; 29 clips. Bone names: `pelvis`, `spine_01`, `spine_02`, `spine_03`, `clavicle_l`, `upperarm_l`, `lowerarm_l`, `hand_l`, `LeftHandIndex1`, `LeftHandIndex2`, `LeftHandIndex3`, `LeftHandIndex4`, `LeftHandMiddle1`, `LeftHandMiddle2`, `LeftHandMiddle3`, `LeftHandMiddle4`, `LeftHandPinky1`, `LeftHandPinky2`, `LeftHandPinky3`, `LeftHandPinky4`, `LeftHandRing1`, `LeftHandRing2`, `LeftHandRing3`, `LeftHandRing4`, `LeftHandThumb1`, `LeftHandThumb2`, `LeftHandThumb3`, `LeftHandThumb4`, `clavicle_r`, `upperarm_r`, `lowerarm_r`, `hand_r`, `RightHandIndex1`, `RightHandIndex2`, `RightHandIndex3`, `RightHandIndex4`, `RightHandMiddle1`, `RightHandMiddle2`, `RightHandMiddle3`, `RightHandMiddle4`, `RightHandPinky1`, `RightHandPinky2`, `RightHandPinky3`, `RightHandPinky4`, `RightHandRing1`, `RightHandRing2`, `RightHandRing3`, `RightHandRing4`, `RightHandThumb1`, `RightHandThumb2`, `RightHandThumb3`, `RightHandThumb4`, `neck_01`, `Head`, `headfront`, `HeadTop_End`, `thigh_l`, `calf_l`, `foot_l`, `ball_l`, `LeftToe_End`, `thigh_r`, `calf_r`, `foot_r`, `ball_r`, `RightToe_End`. The rig retains `hand_r` and `spine_03`; its head end is `HeadTop_End` instead of Fix 4's `head_end`. All 29 expected clip names, including `idle`, `run`, `aim`, and `shoot`, already exist; no clip mapping gap remains.
+
+The separate `godot/assets/loadout/models/trooper.glb` is 10,305 triangles. The armory's `loadout_actor.gd` loads from `assets/loadout/models/`, selecting its Trooper for default non-Jedi classes, its Heavy for Heavy, and its Scout for Sniper. These staged W17 files do not alter that selection.
+
+| Class | Matte accent RGB | Fix 4 gear transferred | LOD0 / LOD1 triangles |
+|---|---|---|---:|
+| Sniper | Olive `[.30,.38,.20]` | Precision rifle and scope | 5,129 / 2,272 |
+| Heavy | Burnt orange `[.70,.33,.10]` | Rotary repeater and rocket backpack/tubes on `spine_03` | 5,561 / 2,704 |
+| Tech | Teal `[.10,.45,.48]` | Carbine and battery backpack on `spine_03` | 5,037 / 2,180 |
+| Droid | Signal yellow `[.80,.66,.15]` | Droid blaster | 4,977 / 2,120 |
+| Officer | Crimson `[.55,.10,.12]` | Pistol; no cape or back slab | 4,977 / 2,120 |
+
+Remaining gaps: the Droid deliberately shares the Trooper humanoid silhouette; its color and blaster carry the distinction. The W17 files remain staged and are not wired into the roster or armory. The rigid packs do not deform with the torso.
+
+Review sheets: `docs/godot/shots/w17-art6-classes.png` (seven soldiers, front and three-quarter), `w17-art6-shoot.png` (five shoot poses), and `w17-art6-small.png` (seven soldiers at 64 px). All ten Full/Low models passed the isolated accent, aim and pack assertions. The largest measured barrel elevation was 2.09°; Heavy pack top was 1.285 below `HeadTop_End` 1.610, and Tech pack top was 1.525 below `HeadTop_End` 1.610 in the shoot pose. The final headless import exited 0 with no script errors.
+
+Final gate: `./godot/test.sh` exited 0 with zero `SCRIPT ERROR` lines and zero failures across all suites; its main `run.gd` segment reported 368 checks and Normal rescue 9/20. `git diff --check` was clean. Two Wave 16 camera screenshots changed by the test runner were restored.

@@ -56,15 +56,15 @@ func run() -> void:
 			if kind == "heavy" or kind == "tech":
 				var skeleton: Skeleton3D = model.find_child("Skeleton3D", true, false)
 				assert(skeleton != null, "missing skeleton: " + name)
-				var head_end := skeleton.find_bone("head_end")
-				assert(head_end >= 0, "missing head_end: " + name)
+				var head_end := skeleton.find_bone("HeadTop_End")
+				assert(head_end >= 0, "missing HeadTop_End: " + name)
 				var head_top := skeleton.to_global(skeleton.get_bone_global_pose(head_end).origin).y
 				var pack_top := -INF
 				for mesh in model.find_children("*", "MeshInstance3D", true, false):
 					if _is_pack(mesh, kind):
 						assert(mesh.get_parent() is BoneAttachment3D and (mesh.get_parent() as BoneAttachment3D).bone_name == "spine_03", "pack detached from spine: " + name)
 						pack_top = maxf(pack_top, _world_top(mesh))
-				print("W17_ART4_PACK ", name, " top=", pack_top, " head_end=", head_top)
+				print("W17_ART4_PACK ", name, " top=", pack_top, " HeadTop_End=", head_top)
 				assert(pack_top > -INF and pack_top < head_top, "pack above helmet: " + name)
 			print("W17_ART4 ", name, " accent and aim ", snappedf(elevation, .01))
 			model.queue_free()
