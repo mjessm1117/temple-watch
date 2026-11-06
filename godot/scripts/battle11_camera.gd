@@ -12,11 +12,15 @@ static func start_zoom(m: RefCounted) -> float:
 
 static func selected_zoom(m: RefCounted) -> float:
 	if _phone_view():
-		return clampf(start_zoom(m) / 3.25, 9.0, 10.5)
+		return clampf(start_zoom(m) / 2.3, 11.0, 13.0)
 	return clampf(start_zoom(m) / 2.35, 8.0, 12.0)
 
 static func target_zoom(m: RefCounted, separation: float) -> float:
 	return clampf(maxf(selected_zoom(m), separation * 1.25), 6.0, 22.0)
+
+static func phone_focus(point: Vector3, yaw: float, distance: float = 0.8) -> Vector3:
+	if not _phone_view(): return point
+	return point - Vector3(sin(yaw),0.0,cos(yaw)) * distance
 
 static func clamp_zoom(value: float) -> float:
 	return clampf(value, 9.0, 65.0)

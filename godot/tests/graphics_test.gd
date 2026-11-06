@@ -28,7 +28,7 @@ func run() -> void:
 	await persistence()
 	await resource_checks()
 	var seen: Dictionary = {}
-	for id in ["sabotage","envoy","h_grove","ilum","fixture","archive","relay","h_husks","cache"]:
+	for id in ["sabotage","envoy","h_grove","ilum","fixture","archive","blockade","h_husks","cache"]:
 		await show_battle(id)
 		await frames()
 		graphics.apply_all()
