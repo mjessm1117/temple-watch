@@ -251,6 +251,17 @@
                 "amount": 2
               }
             ]
+          },
+          {
+            "tag": "MARKED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
           }
         ],
         "apply": [
