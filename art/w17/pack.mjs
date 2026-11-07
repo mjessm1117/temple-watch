@@ -1,0 +1,3 @@
+import fs from 'fs';import {NodeIO} from '@gltf-transform/core';import {ALL_EXTENSIONS} from '@gltf-transform/extensions';import {MeshoptDecoder} from 'meshoptimizer';await MeshoptDecoder.ready;
+const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.decoder':MeshoptDecoder});
+for(const name of ['sniper','heavy','sniper_lod1','heavy_lod1']){const path=`godot/assets/units/w17/${name}.glb`;const doc=await io.read(path);await io.write(path+'.tmp.glb',doc);fs.renameSync(path+'.tmp.glb',path);console.log(name,fs.readFileSync(path).subarray(0,4).toString(),fs.statSync(path).size)}

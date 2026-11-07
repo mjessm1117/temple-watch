@@ -52,7 +52,7 @@ async function one(kind,out){const prop=!!PROPS[kind],[p,t]=PROPS[kind]||PROMPTS
 // or --refine-preview TASK_ID. --submit-only queues; --resume polls a saved task.
 // Single-writer ledger: do not run these commands concurrently. These modes never rig.
 const args=process.argv.slice(2);
-if(args.includes('--preview-only')||args.includes('--refine-preview')){
+if(args.includes('--preview-only')||args.includes('--refine-preview')||args.includes('--rig-refine')){
  const value=f=>args[args.indexOf(f)+1],out=args[0],asset=args[1],letter=value('--letter');
  if(!/^[A-D]$/.test(letter))throw Error('--letter A–D required');
  fs.mkdirSync(out,{recursive:true});
@@ -61,7 +61,7 @@ if(args.includes('--preview-only')||args.includes('--refine-preview')){
  const balance=async()=>{const r=await fetch(API+'/v1/balance',{headers:H()});if(!r.ok)throw Error('balance '+r.status);return (await r.json()).balance};
  const before=await balance();
  const ledger=fs.existsSync(ledgerPath)?JSON.parse(fs.readFileSync(ledgerPath)): {start:before,tasks:[]};
- const refine=args.includes('--refine-preview'),cost=refine?10:20,mode=refine?'refine':'preview';
+ const rig=args.includes('--rig-refine'),refine=args.includes('--refine-preview'),cost=rig?5:refine?10:20,mode=rig?'rig':refine?'refine':'preview';
  const save=()=>fs.writeFileSync(ledgerPath,JSON.stringify(ledger,null,2)+'\n');
  let entry=ledger.tasks.find(t=>t.asset===asset&&t.letter===letter&&t.mode===mode);
  if(args.includes('--resume')){
@@ -71,15 +71,15 @@ if(args.includes('--preview-only')||args.includes('--refine-preview')){
   const reserved=ledger.tasks.reduce((sum,t)=>sum+t.cost,0);
   // Shared accounts may have unrelated work running; cap this durable batch ledger (per-brief caps).
   if(reserved+cost>cap)throw Error(cap+' credit cap: stopped');
-  if(ledger.tasks.filter(t=>t.mode===mode).length>=(refine?refineCap:previewCap))throw Error('Task count cap');
+  if(ledger.tasks.filter(t=>t.mode===mode).length>=(rig?(spec.rig_cap??2):refine?refineCap:previewCap))throw Error('Task count cap');
   if(entry)throw Error('Task already submitted; use --resume');
-  const body=refine?{mode,preview_task_id:value('--refine-preview'),texture_prompt:spec.texture,enable_pbr:false}:{mode,prompt:spec.variants[letter],ai_model:'meshy-6',should_remesh:true,target_polycount:8000,topology:'triangle'};
+  const body=rig?{input_task_id:value('--rig-refine'),height_meters:asset==='heavy'?2.05:1.8}:refine?{mode,preview_task_id:value('--refine-preview'),texture_prompt:spec.texture,enable_pbr:false}:{mode,prompt:spec.variants[letter],ai_model:'meshy-6',pose_mode:'a-pose',should_remesh:true,target_polycount:12000,topology:'triangle'};
   entry={asset,letter,mode,cost,before,status:'SUBMITTING'};ledger.tasks.push(entry);save();
-  entry.id=await post('/v2/text-to-3d',body);entry.after=await balance();entry.status='SUBMITTED';save();console.log(asset,letter,mode,entry.id,before,entry.after);
+  entry.id=await post(rig?'/v1/rigging':'/v2/text-to-3d',body);entry.after=await balance();entry.status='SUBMITTED';save();console.log(asset,letter,mode,entry.id,before,entry.after);
  }
  if(args.includes('--submit-only'))process.exit(0);
- const result=await wait('/v2/text-to-3d/'+entry.id);
- await get(result.model_urls.glb,`${out}/${asset}.${letter}.${refine?'raw':'preview'}.glb`);
+ const result=await wait((rig?'/v1/rigging/':'/v2/text-to-3d/')+entry.id);
+ await get(rig?result.result.rigged_character_glb_url:result.model_urls.glb,`${out}/${asset}.${letter}.${rig?'rig':refine?'raw':'preview'}.glb`);
  entry.status=result.status;entry.completion_balance=await balance();save();
  console.log('completed',asset,letter,mode,entry.after);
 }else{

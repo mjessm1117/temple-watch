@@ -1,0 +1,10 @@
+{
+  "credit_cap": 150,
+  "preview_cap": 5,
+  "refine_cap": 3,
+  "texture": "Friendly Temple Security sentry droid. Clean flat large sandstone tan and warm cream armored panels around deep blue joints, tiny gold Jedi Order crest. Matte hard surfaces, no dirt noise, no camouflage, no black or red Sith, no Separatist battle droid colors. Readable at 844x390.",
+  "variants": {
+    "A": "Single full-body humanoid Temple Security ally sentry droid, stylized low-poly, front-facing A-pose arms apart for a human animation rig. Human proportions, sturdy squared cream chest and shoulder armor over deep blue mechanical joints, tan leg plates, compact friendly visor head, obvious raised module hardpoint socket on left shoulder. Small Jedi Order badge on chest. Friendly Republic/Jedi guardian, clean flat tan cream navy blocks, no thin beaked Separatist battle droid, no black/red Sith, no base, no weapon in hand.",
+    "B": "Single full-body armored humanoid Temple Security droid soldier, stylized low-poly, A-pose facing front, arms separated and human-like limb proportions for humanoid rig. Boxy cream helmet with friendly blue horizontal visor, broad tan torso plates, navy articulated elbows and knees, visible circular module docking mount over left shoulder, golden Jedi Order crest. Strong allied soldier silhouette, matte clean flat cream tan deep blue panels, no skeletal thin battle droid, no Sith black/red, no base, no weapon in hand."
+  }
+}

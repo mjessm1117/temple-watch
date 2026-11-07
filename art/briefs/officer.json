@@ -1,0 +1,11 @@
+{
+  "credit_cap": 150,
+  "preview_cap": 5,
+  "refine_cap": 3,
+  "rig_cap": 3,
+  "texture": "Temple Security officer. Large clean flat sandstone tan, warm cream and deep blue panels, navy sash, subtle gold Jedi Order crest. Matte, no noisy camouflage or blotches, no black or red Sith. Friendly allied commander readable at 844x390.",
+  "variants": {
+    "A": "Single full-body stylized low-poly Temple Security officer commander, front-facing human A-pose arms apart, light cream armor over deep blue uniform, distinct short dark-blue shoulder cape over left shoulder and diagonal command sash, open visored cream officer helmet, restrained gold Jedi Order badge, comlink on left wrist. Commanding upright silhouette, separated legs, tan cream navy clean flat color blocks. Friendly Jedi ally, no long cape obscuring legs, no black/red Sith, no base, no weapon in hand.",
+    "B": "Single full-body stylized low-poly Temple Security commander, human front-facing A-pose arms apart. Light tan armor, distinctive cream peaked officer cap, deep blue short cape attached one shoulder and bright diagonal sash, small Jedi Order crest, wrist comlink, holstered sidearm. Slim authoritative posture, clean flat large tan cream navy panels, friendly Republic ally. No military black/red Sith, no long cloak covering legs, no base, no weapon in hand."
+  }
+}

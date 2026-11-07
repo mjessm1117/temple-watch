@@ -1,0 +1,10 @@
+{
+  "credit_cap": 100,
+  "preview_cap": 3,
+  "refine_cap": 2,
+  "texture": "Temple Security heavy uniform: matte sandstone tan and warm cream thick armored plates, deep navy blue cloth at joints, small golden Jedi Order emblem on broad chest, practical worn edges, clearly friendly, no black or red Sith colors, no glow",
+  "variants": {
+    "A": "Single full-body stylized low-poly Temple Security heavy trooper, huge broad armored human silhouette, standing wide-legged in A-pose with arms away from torso, facing forward. Massive squared cream shoulder plates and tan chest armor, deep blue flexible joints, rotary repeater blaster with clear multi-barrel cylinder carried beside body, rectangular rocket backpack visible above shoulders, Jedi Order emblem on chest. Friendly tan cream navy palette, largest soldier in squad, no black and red Sith armor, no base.",
+    "B": "Single full-body stylized low-poly Temple Security heavy gunner, broad wide stance, thick angular armored boots, oversized tan and cream pauldrons and chest plates, deep navy underarmor, visor helmet, six-barrel rotary blaster held at side, two rocket tubes on armored backpack, Jedi Order badge. A-pose facing forward, arms apart, human anatomy readable for rigging, friendly bright palette, no cape, no black or red Sith colors, no base."
+  }
+}

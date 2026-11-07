@@ -1,0 +1,14 @@
+{
+  "scale": "1–5, untextured preview sheets plus 844x390 target read",
+  "tech": {
+    "A": {"silhouette": 4, "style": 4, "cleanliness": 4, "poly_fit": 5, "decision": "selected; compact pack and clear engineer armor"},
+    "B": {"silhouette": 3, "style": 3, "cleanliness": 3, "poly_fit": 5, "decision": "rejected; thin body and side tool appears detached"}
+  },
+  "droid": {
+    "A": {"silhouette": 2, "style": 3, "cleanliness": 4, "poly_fit": 5, "decision": "rejected; reads as a human helmeted soldier"},
+    "B": {"silhouette": 4, "style": 4, "cleanliness": 4, "poly_fit": 5, "decision": "selected; mechanical joints and raised shoulder form"}
+  },
+  "officer": {
+    "A": {"silhouette": 3, "style": 4, "cleanliness": 4, "poly_fit": 5, "decision": "selected; only candidate within cap; cape and sash missing, local addition required"}
+  }
+}

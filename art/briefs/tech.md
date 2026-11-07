@@ -1,0 +1,2 @@
+# Tech brief
+Temple Security engineer seen at 844×390 Low battle distance, 15K triangles full and about 1.5K–3K Low. References: `godot/assets/models/units/trooper.glb`, `godot/assets/models/units/scout.glb`, and `docs/godot/shots/w17-art-classes.png` for the allied lineup and tan/cream/deep blue Sniper/Heavy language. Medium armor, utility harness, high battery/tool pack, wrist computer; hand-held compact carbine will be built locally on the right-hand bone. No tiny drone within this lane's credit cap.

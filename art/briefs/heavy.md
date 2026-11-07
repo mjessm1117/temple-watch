@@ -1,0 +1,2 @@
+# Heavy brief
+Temple Security heavy trooper for a small isometric battle view, 15K triangle ceiling. References: `godot/assets/models/units/trooper.glb` (allied armor family), `scout.glb` (size contrast), and `sithHeavy.glb` (black and red enemy to avoid). Broad shoulders, wide stance, oversized armor, rotary repeater and visible rocket pack make the largest allied silhouette. Matte tan, cream and deep blue with a Jedi Order emblem.

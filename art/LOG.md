@@ -178,3 +178,10 @@ Submitted **410/490 authorized credits**: seventeen 20-credit previews and seven
 Staged seven one-tile v6 GLBs and separate 786–800-triangle LOD1s without changing shipped paths. Desktop and phone battle-camera A/B captures for every theme and `docs/godot/shots/meshy6-before-after.jpg` show six visual passes: temple, dock, plains, city, ruins and caves. Jungle fails because the candidate reads as yellow plant debris instead of a bag stack; it remains staged only. The city fit was corrected to 0.8 m after the restart and both city captures were refreshed. Dimensions, triangle counts, exact future wiring points and validation are in `docs/godot/meshy6/REPORT.md`.
 
 Gate: headless import passed; `./godot/test.sh` exited 0, every suite had 0 failures, 0 SCRIPT ERROR/ERROR lines, and Normal rescue was 9/20. `git diff --check` passed. Local commit only; no push.
+
+## W17 Sniper and Heavy staged classes (2026-11-05)
+
+Spent **90/100 credits**: Sniper A/B and Heavy A previews (20 each), selected Sniper A and Heavy A refinements (10 each), and two rigs (5 each). Sniper B was rejected for a bulkier silhouette without a rifle. The winners use locally built signature weapons and were staged only under `godot/assets/units/w17/`, with lettered source GLBs retained in `art/w17/`. The exact task IDs, prompts, scores, triangle counts, Low captures and limitations are in `docs/godot/w17/ART-REPORT.md` and the staged manifest.
+
+## W17 Tech, Droid, Officer (tw-w17-art2)
+2026-11-05: Tech A (2 previews, 1 refine, 1 rig; 55 credits), Droid B (2 previews, 1 refine, 1 rig; 55), Officer A (1 preview, 1 refine, 1 rig; 35). Total 145/150. Tasks and before/after balance: `art/w17-2/ledger.json`. Winners staged at `godot/assets/units/w17/`; rejected Tech B and Droid A previews retained in `art/w17-2/`. Tech/Droid body textures were locally replaced with flat tan, cream, navy panels after 844×390 critique. Officer sash/cape and all weapons built locally. See `docs/godot/w17/ART-REPORT2.md`.

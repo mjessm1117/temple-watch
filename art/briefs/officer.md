@@ -1,0 +1,2 @@
+# Officer brief
+Temple Security leader seen at 844×390 Low battle distance, 15K triangles full and about 1.5K–3K Low. References: `godot/assets/models/units/trooper.glb`, `godot/assets/models/units/scout.glb`, `docs/godot/shots/w17-art-classes.png`. Lighter armor, officer cap or open visor, diagonal sash and short shoulder cape for leader silhouette; wrist comlink and a pistol built locally on the right-hand bone.
