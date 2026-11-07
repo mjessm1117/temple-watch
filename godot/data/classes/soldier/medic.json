@@ -51,10 +51,10 @@
           "shieldDrone"
         ],
         "6": [
-          "scan"
+          "shoot"
         ],
         "7": [
-          "shoot"
+          "medBeacon"
         ]
       },
       "combat_medic": {
@@ -64,13 +64,13 @@
           "protocol"
         ],
         "5": [
-          "hackDroid"
+          "scan"
         ],
         "6": [
-          "medBeacon"
+          "overwatch"
         ],
         "7": [
-          "overwatch"
+          "hackDroid"
         ]
       }
     }
@@ -153,7 +153,8 @@
       "revive": 2,
       "charges": "medpacs",
       "cost": 1,
-      "ends_turn": false
+      "ends_turn": false,
+      "rank": 2
     },
     "reviveStim": {
       "name": "Revive Stim",
@@ -164,7 +165,8 @@
       "revive": 2,
       "charges": "medpacs",
       "cost": 1,
-      "ends_turn": false
+      "ends_turn": false,
+      "rank": 2
     },
     "medic_toxin_dart": {
       "name": "Toxin Dart",
@@ -240,7 +242,8 @@
       "duration": 2,
       "charges": "smoke",
       "cost": 1,
-      "ends_turn": true
+      "ends_turn": true,
+      "rank": 3
     },
     "hack": {
       "name": "Hack",
@@ -249,7 +252,8 @@
       "target": "tile_console",
       "effect": "hack",
       "cost": 1,
-      "ends_turn": true
+      "ends_turn": true,
+      "rank": 4
     },
     "protocol": {
       "name": "Combat Protocol",
@@ -265,7 +269,8 @@
       "no_los": true,
       "ignore_cover": true,
       "cost": 1,
-      "ends_turn": true
+      "ends_turn": true,
+      "rank": 4
     },
     "shieldDrone": {
       "name": "Shield Drone",
@@ -276,18 +281,8 @@
       "shield": 4,
       "charges": "shield_drone",
       "cost": 1,
-      "ends_turn": false
-    },
-    "hackDroid": {
-      "name": "Hack Droid",
-      "ap": 1,
-      "range": 4,
-      "target": "enemy_droid",
-      "effect": "status",
-      "status": "stunned",
-      "chance": 60,
-      "cost": 1,
-      "ends_turn": true
+      "ends_turn": false,
+      "rank": 5
     },
     "scan": {
       "name": "Scan Clue",
@@ -296,18 +291,8 @@
       "target": "tile_scan",
       "effect": "scan",
       "cost": 1,
-      "ends_turn": false
-    },
-    "medBeacon": {
-      "name": "Med Beacon",
-      "ap": 1,
-      "target": "self",
-      "effect": "mass_heal",
-      "range": 3,
-      "heal": 2,
-      "charges": "med_beacon",
-      "cost": 1,
-      "ends_turn": false
+      "ends_turn": false,
+      "rank": 5
     },
     "shoot": {
       "name": "Shoot",
@@ -326,6 +311,32 @@
       "effect": "overwatch",
       "cost": 1,
       "ends_turn": true
+    },
+    "medBeacon": {
+      "name": "Med Beacon",
+      "ap": 1,
+      "target": "self",
+      "effect": "mass_heal",
+      "range": 3,
+      "heal": 2,
+      "charges": "med_beacon",
+      "cost": 1,
+      "ends_turn": false,
+      "rank": 7,
+      "capstone": true
+    },
+    "hackDroid": {
+      "name": "Hack Droid",
+      "ap": 1,
+      "range": 4,
+      "target": "enemy_droid",
+      "effect": "status",
+      "status": "stunned",
+      "chance": 60,
+      "cost": 1,
+      "ends_turn": true,
+      "rank": 7,
+      "capstone": true
     }
   },
   "base_stats": {
