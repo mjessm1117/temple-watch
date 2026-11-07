@@ -131,7 +131,7 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 			if str(ally.get("side", "")) == "player" and int(ally.get("hp", 0)) > 0 and int(ally.get("id", -1)) != int(target.get("id", -2)) and "defLine" in ally.get("passives", []) and distance(pos(ally), t) <= 1.5:
 				defense += 15
 				break
-	if defense > 0: lines.append(["Defense", -defense])
+	if defense != 0: lines.append(["Defense", -defense])
 	if modifier != 0: lines.append(["Ability", modifier])
 	var raw := 0
 	for item in lines: raw += int(item[1])
