@@ -4,7 +4,7 @@
   "name": "Droid",
   "side": "soldier",
   "role": "Modules",
-  "signature": "shieldDrone",
+  "signature": "droid_rebuild",
   "branches": [
     "Repeater",
     "Shield",
@@ -16,58 +16,519 @@
   "implemented": true,
   "unit_kind": "droid",
   "kit": [
-    "shoot",
-    "overwatch",
-    "shieldDrone",
-    "rapidFire"
+    "droid_rebuild",
+    "droid_repeater_module",
+    "droid_shield_module",
+    "droid_sensor_module"
   ],
   "passives": [],
   "bonus_kit": [],
   "bonus_passives": [],
-  "tree": {},
-  "abilities": {
-    "shoot": {
-      "name": "Shoot",
-      "ap": 1,
-      "target": "enemy",
-      "effect": "attack",
-      "weapon": true,
-      "range": "weapon",
-      "cost": 1,
-      "ends_turn": true
+  "tree": {
+    "trunk": {
+      "1": [
+        "droid_rebuild"
+      ],
+      "2": [
+        "droid_repeater_module",
+        "droid_shield_module"
+      ]
     },
-    "overwatch": {
-      "name": "Overwatch",
+    "specs": {
+      "repeater": {
+        "n": "Repeater",
+        "sig": "droid_sensor_module",
+        "4": [
+          "droid_flamer_module"
+        ],
+        "5": [
+          "droid_targeting_protocol"
+        ],
+        "6": [
+          "droid_reactive_plate"
+        ],
+        "7": [
+          "droid_omni_frame"
+        ]
+      },
+      "shield": {
+        "n": "Shield",
+        "sig": "droid_jetpack_module",
+        "4": [
+          "droid_med_module"
+        ],
+        "5": [
+          "droid_servo_lock"
+        ],
+        "6": [
+          "droid_ion_relay"
+        ],
+        "7": [
+          "droid_core_overload"
+        ]
+      }
+    }
+  },
+  "abilities": {
+    "droid_rebuild": {
+      "name": "Rebuild",
       "ap": 1,
+      "cost": 1,
+      "rank": 1,
       "target": "self",
       "effect": "overwatch",
-      "cost": 1,
-      "ends_turn": true
+      "range": 8,
+      "ends_turn": false,
+      "cooldown": 3,
+      "effects": [
+        {
+          "type": "heal",
+          "target": "self",
+          "amount": 4
+        },
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 2
+        }
+      ],
+      "chain": {
+        "consume": [
+          {
+            "tag": "SHIELDED",
+            "target": "self",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "ATTUNED",
+            "target": "self",
+            "amount": 1
+          }
+        ]
+      }
     },
-    "shieldDrone": {
-      "name": "Shield Drone",
+    "droid_repeater_module": {
+      "name": "Repeater Module",
       "ap": 1,
-      "range": 1.5,
-      "target": "ally",
-      "effect": "buff",
-      "shield": 4,
-      "charges": "shield_drone",
       "cost": 1,
-      "ends_turn": false
-    },
-    "rapidFire": {
-      "name": "Rapid Fire",
-      "ap": 1,
-      "range": "weapon",
+      "rank": 2,
       "target": "enemy",
       "effect": "attack",
+      "range": 8,
+      "ends_turn": true,
       "damage": "weapon",
-      "shots": 2,
-      "aim_mod": -15,
-      "cooldown": 1,
-      "ammo_cost": 2,
+      "damage_mod": 1,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "STAGGERED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "MARKED",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "droid_shield_module": {
+      "name": "Shield Module",
+      "ap": 1,
       "cost": 1,
-      "ends_turn": true
+      "rank": 2,
+      "target": "ally",
+      "effect": "buff",
+      "range": 5,
+      "ends_turn": false,
+      "shield": 2,
+      "chain": {
+        "consume": [
+          {
+            "tag": "READY",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "SHIELDED",
+            "target": "target",
+            "amount": 1
+          }
+        ]
+      }
+    },
+    "droid_sensor_module": {
+      "name": "Sensor Module",
+      "ap": 1,
+      "cost": 1,
+      "rank": 3,
+      "target": "enemy",
+      "effect": "status",
+      "range": 12,
+      "ends_turn": true,
+      "status": "stunned",
+      "chance": 73,
+      "chain": {
+        "consume": [
+          {
+            "tag": "PINNED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "IONIZED",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "droid_jetpack_module": {
+      "name": "Jetpack Module",
+      "ap": 1,
+      "cost": 1,
+      "rank": 3,
+      "target": "self",
+      "effect": "overwatch",
+      "range": 8,
+      "ends_turn": false,
+      "chain": {
+        "consume": [
+          {
+            "tag": "SHIELDED",
+            "target": "self",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "ATTUNED",
+            "target": "self",
+            "amount": 2
+          }
+        ]
+      }
+    },
+    "droid_flamer_module": {
+      "name": "Flamer Module",
+      "ap": 1,
+      "cost": 1,
+      "rank": 4,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "damage": [
+        3,
+        4
+      ],
+      "cover_damage": 4,
+      "cooldown": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "LIFTED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "PINNED",
+            "target": "area_enemies"
+          }
+        ]
+      }
+    },
+    "droid_med_module": {
+      "name": "Med Module",
+      "ap": 1,
+      "cost": 1,
+      "rank": 4,
+      "target": "ally",
+      "effect": "buff",
+      "range": 5,
+      "ends_turn": false,
+      "shield": 4,
+      "effects": [
+        {
+          "type": "heal",
+          "target": "target",
+          "amount": 3
+        }
+      ],
+      "chain": {
+        "consume": [
+          {
+            "tag": "READY",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "SHIELDED",
+            "target": "target",
+            "amount": 2
+          }
+        ]
+      }
+    },
+    "droid_targeting_protocol": {
+      "name": "Targeting Protocol",
+      "ap": 1,
+      "cost": 1,
+      "rank": 5,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 8,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 3,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "STAGGERED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "MARKED",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "droid_servo_lock": {
+      "name": "Servo Lock",
+      "ap": 1,
+      "cost": 1,
+      "rank": 5,
+      "target": "enemy",
+      "effect": "status",
+      "range": 9,
+      "ends_turn": true,
+      "status": "suppressed",
+      "chance": 78,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "STAGGERED",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "droid_reactive_plate": {
+      "name": "Reactive Plate",
+      "ap": 1,
+      "cost": 1,
+      "rank": 6,
+      "target": "self",
+      "effect": "overwatch",
+      "range": 8,
+      "ends_turn": false,
+      "chain": {
+        "consume": [
+          {
+            "tag": "ATTUNED",
+            "target": "self",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "INSPIRED",
+            "target": "self",
+            "amount": 3
+          }
+        ]
+      }
+    },
+    "droid_ion_relay": {
+      "name": "Ion Relay",
+      "ap": 1,
+      "cost": 1,
+      "rank": 6,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 8,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 4,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "EXPOSED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "EXPOSED",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "droid_omni_frame": {
+      "name": "Omni Frame",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "self",
+      "effect": "aura",
+      "range": 5,
+      "ends_turn": false,
+      "capstone": true,
+      "cooldown": 3,
+      "aim": 8,
+      "chain": {
+        "consume": [
+          {
+            "tag": "INSPIRED",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "READY",
+            "target": "all_allies",
+            "amount": 3
+          }
+        ]
+      }
+    },
+    "droid_core_overload": {
+      "name": "Core Overload",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "capstone": true,
+      "cooldown": 3,
+      "damage": [
+        5,
+        6
+      ],
+      "cover_damage": 8,
+      "chain": {
+        "consume": [
+          {
+            "tag": "MARKED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 4
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "BURNING",
+            "target": "area_enemies"
+          }
+        ]
+      }
     }
   },
   "base_stats": {
@@ -97,6 +558,41 @@
     "armor": 2,
     "model": "trooper",
     "medpacs": 2,
-    "clip": 4
+    "clip": 4,
+    "droid": true
+  },
+  "modules": {
+    "slots": 3,
+    "default": [
+      "repeater",
+      "shield",
+      "sensor"
+    ],
+    "choices": {
+      "repeater": {
+        "name": "Repeater",
+        "ability": "droid_repeater_module"
+      },
+      "shield": {
+        "name": "Shield",
+        "ability": "droid_shield_module"
+      },
+      "sensor": {
+        "name": "Sensor",
+        "ability": "droid_sensor_module"
+      },
+      "jetpack": {
+        "name": "Jetpack",
+        "ability": "droid_jetpack_module"
+      },
+      "flamer": {
+        "name": "Flamer",
+        "ability": "droid_flamer_module"
+      },
+      "med": {
+        "name": "Med",
+        "ability": "droid_med_module"
+      }
+    }
   }
 }
