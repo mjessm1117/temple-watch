@@ -99,7 +99,8 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "chance": 80
     },
     "tech_emp_burst": {
       "name": "EMP Burst",
