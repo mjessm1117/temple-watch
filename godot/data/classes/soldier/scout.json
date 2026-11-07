@@ -12,12 +12,23 @@
   "implemented": true,
   "unit_kind": "scout",
   "kit": [
-    "scout_concealment",
+    "shoot",
+    "overwatch",
     "mark",
-    "runGun"
+    "runGun",
+    "deadeye",
+    "scout_concealment",
+    "scout_vanish",
+    "scout_ambush"
   ],
-  "passives": [],
-  "bonus_kit": [],
+  "passives": [
+    "spotter",
+    "ghost"
+  ],
+  "bonus_kit": [
+    "snipe",
+    "hunker"
+  ],
   "bonus_passives": [],
   "tree": {
     "trunk": {
