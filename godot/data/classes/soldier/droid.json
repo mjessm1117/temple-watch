@@ -76,7 +76,7 @@
       "cost": 1,
       "rank": 1,
       "target": "self",
-      "effect": "overwatch",
+      "effect": "ap",
       "range": 8,
       "ends_turn": false,
       "cooldown": 3,
@@ -113,7 +113,8 @@
             "amount": 5
           }
         ]
-      }
+      },
+      "amount": 0
     },
     "droid_repeater_module": {
       "name": "Repeater Module",
