@@ -175,7 +175,7 @@
         ],
         "apply": [
           {
-            "tag": "INSPIRED",
+            "tag": "SHIELDED",
             "target": "target",
             "amount": 6
           }
@@ -220,32 +220,32 @@
       "ap": 1,
       "cost": 1,
       "rank": 3,
-      "target": "self",
-      "effect": "overwatch",
-      "range": 8,
+      "target": "tile",
+      "effect": "leap",
+      "range": 5,
       "ends_turn": false,
       "chain": {
         "consume": [
           {
-            "tag": "READY",
-            "target": "self",
+            "tag": "PINNED",
+            "target": "area_enemies",
             "bonus": [
               {
-                "type": "shield",
+                "type": "damage",
                 "target": "target",
-                "amount": 6
+                "amount": 2
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "READY",
-            "target": "self",
-            "amount": 6
+            "tag": "EXPOSED",
+            "target": "area_enemies"
           }
         ]
-      }
+      },
+      "next_strike_aim": 10
     },
     "droid_flamer_module": {
       "name": "Flamer Module",
@@ -265,7 +265,7 @@
       "chain": {
         "consume": [
           {
-            "tag": "STAGGERED",
+            "tag": "IONIZED",
             "target": "area_enemies",
             "bonus": [
               {
@@ -278,7 +278,7 @@
         ],
         "apply": [
           {
-            "tag": "IONIZED",
+            "tag": "BURNING",
             "target": "area_enemies"
           }
         ]
