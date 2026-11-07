@@ -4,19 +4,125 @@
   "name": "Sage",
   "side": "jedi",
   "role": "Force damage",
-  "signature": "",
+  "signature": "sage_telekinetic_throw",
   "branches": [
     "Telekinetic",
     "Seer"
   ],
-  "implemented": false,
-  "unit_kind": "",
-  "kit": [],
+  "implemented": true,
+  "unit_kind": "sage",
+  "kit": [
+    "strike",
+    "guard"
+  ],
   "passives": [],
   "bonus_kit": [],
   "bonus_passives": [],
-  "tree": {},
-  "abilities": {},
-  "base_stats": {},
-  "unit_stats": {}
+  "tree": {
+    "trunk": {
+      "1": [
+        "sage_telekinetic_throw"
+      ],
+      "2": [
+        "sage_lift",
+        "sage_insight_mark"
+      ]
+    },
+    "specs": {
+      "a": {
+        "n": "Telekinetic",
+        "ic": "sp_sage_a",
+        "desc": "Telekinetic training.",
+        "sig": "sage_force_cascade",
+        "4": [
+          "sage_crushing_grip"
+        ],
+        "5": [
+          "sage_shatterpoint"
+        ],
+        "6": [
+          "sage_gravity_well"
+        ],
+        "7": [
+          "sage_singular_focus"
+        ],
+        "8": [
+          "sage_grand_maelstrom"
+        ]
+      },
+      "b": {
+        "n": "Seer",
+        "ic": "sp_sage_b",
+        "desc": "Seer training.",
+        "sig": "sage_seer_sight",
+        "4": [
+          "sage_premonition"
+        ],
+        "5": [
+          "sage_foresight"
+        ],
+        "6": [
+          "sage_psychic_lance"
+        ],
+        "7": [
+          "sage_far_seeing"
+        ],
+        "8": [
+          "sage_grand_maelstrom"
+        ]
+      }
+    }
+  },
+  "base_stats": {
+    "jedi": 1,
+    "hp": 5,
+    "aim": 72,
+    "mob": 5,
+    "dmg": [
+      3,
+      4
+    ],
+    "range": 1.5,
+    "deflect": 25,
+    "dodge": 8,
+    "guardDef": 55,
+    "maxF": 4,
+    "init": 14,
+    "will": 75,
+    "desc": "Force damage Jedi path."
+  },
+  "unit_stats": {
+    "hp": 5,
+    "aim": 72,
+    "mob": 5,
+    "damage": [
+      3,
+      4
+    ],
+    "range": 1.5,
+    "focus": 4,
+    "armor": 0,
+    "model": "jedi",
+    "medpacs": 2,
+    "deflect": 25,
+    "guard_deflect": 55
+  },
+  "abilities": {
+    "strike": {"name":"Strike","ap":1,"target":"enemy","effect":"attack","melee":true,"weapon":true,"range":1.5,"cost":1,"ends_turn":true},
+    "guard": {"name":"Guard","ap":1,"target":"self","effect":"guard","defense":25,"cost":1,"ends_turn":false},
+    "sage_telekinetic_throw": {"name":"Telekinetic Throw","rank":1,"ap":1,"target":"enemy","effect":"attack","cost":1,"ends_turn":true,"range":4.3,"damage":[1,3],"chance":75,"focus":0,"ignore_cover":true,"chain":{"consume":[{"tag":"PINNED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"EXPOSED","target":"target"}]}},
+    "sage_lift": {"name":"Lift","rank":2,"ap":1,"target":"enemy","effect":"status","cost":1,"ends_turn":true,"range":4,"chance":68,"focus":1,"status":"stunned","chain":{"consume":[{"tag":"PINNED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"LIFTED","target":"target"}]}},
+    "sage_insight_mark": {"name":"Insight Mark","rank":2,"ap":1,"target":"enemy","effect":"status","cost":1,"ends_turn":true,"range":4,"chance":68,"focus":1,"status":"marked","chain":{"consume":[{"tag":"EXPOSED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"MARKED","target":"target"}]}},
+    "sage_force_cascade": {"name":"Force Cascade","rank":3,"ap":1,"target":"enemy","effect":"wave","cost":1,"ends_turn":true,"range":3.7,"damage":[3,4],"chance":53,"focus":1,"chain":{"consume":[{"tag":"LIFTED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"EXPOSED","target":"target"}]}},
+    "sage_seer_sight": {"name":"Seer Sight","rank":3,"ap":1,"target":"ally","effect":"buff","cost":1,"ends_turn":false,"range":4,"aim":13,"defense":14,"duration":1,"focus":1,"chain":{"consume":[{"tag":"SHIELDED","target":"target","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"ATTUNED","target":"target"}]}},
+    "sage_crushing_grip": {"name":"Crushing Grip","rank":4,"ap":1,"target":"enemy","effect":"attack","cost":1,"ends_turn":true,"range":5.2,"damage":[5,8],"chance":84,"focus":1,"chain":{"consume":[{"tag":"LIFTED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"PINNED","target":"target"}]}},
+    "sage_premonition": {"name":"Premonition","rank":4,"ap":1,"target":"self","effect":"aura","cost":1,"ends_turn":false,"range":5,"aim":11,"enemy_aim":-6,"duration":1,"focus":2,"chain":{"consume":[{"tag":"READY","target":"self","bonus":[{"type":"focus","target":"self","amount":2}]}],"apply":[{"tag":"INSPIRED","target":"all_allies"}]}},
+    "sage_shatterpoint": {"name":"Shatterpoint","rank":5,"ap":1,"target":"enemy","effect":"attack","cost":1,"ends_turn":true,"range":5.5,"damage":[6,8],"chance":87,"focus":1,"chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"EXPOSED","target":"target"}]}},
+    "sage_foresight": {"name":"Foresight","rank":5,"ap":1,"target":"enemy","effect":"status","cost":1,"ends_turn":true,"range":5,"chance":83,"focus":2,"status":"marked","chain":{"consume":[{"tag":"STAGGERED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"MARKED","target":"target"}]}},
+    "sage_gravity_well": {"name":"Gravity Well","rank":6,"ap":1,"target":"tile_area","effect":"blast","cost":1,"ends_turn":true,"range":6,"damage":[5,7],"cover_damage":7,"focus":3,"chain":{"consume":[{"tag":"PINNED","target":"area_enemies","bonus":[{"type":"damage","target":"target","amount":3}]}],"apply":[{"tag":"LIFTED","target":"area_enemies"}]}},
+    "sage_psychic_lance": {"name":"Psychic Lance","rank":6,"ap":1,"target":"enemy","effect":"attack","cost":1,"ends_turn":true,"range":5.8,"damage":[6,9],"chance":90,"focus":2,"chain":{"consume":[{"tag":"IONIZED","target":"target","bonus":[{"type":"damage","target":"target","amount":3}]}],"apply":[{"tag":"STAGGERED","target":"target"}]}},
+    "sage_singular_focus": {"name":"Singular Focus","rank":7,"ap":1,"target":"enemy","effect":"attack","cost":1,"ends_turn":true,"capstone":true,"range":6.1,"damage":[8,11],"chance":93,"focus":2,"chain":{"consume":[{"tag":"LIFTED","target":"target","bonus":[{"type":"damage","target":"target","amount":3}]}],"apply":[{"tag":"PINNED","target":"target"}]}},
+    "sage_far_seeing": {"name":"Far Seeing","rank":7,"ap":1,"target":"self","effect":"aura","cost":1,"ends_turn":false,"capstone":true,"range":6,"aim":17,"enemy_aim":-9,"duration":1,"focus":3,"chain":{"consume":[{"tag":"INSPIRED","target":"self","bonus":[{"type":"focus","target":"self","amount":3}]}],"apply":[{"tag":"ATTUNED","target":"all_allies"}]}},
+    "sage_grand_maelstrom": {"name":"Grand Master Force Maelstrom","rank":8,"ap":1,"target":"tile_area","effect":"blast","cost":1,"ends_turn":true,"capstone":true,"cooldown":99,"range":7,"damage":[7,9],"cover_damage":9,"focus":4,"chain":{"consume":[{"tag":"PINNED","target":"area_enemies","bonus":[{"type":"damage","target":"target","amount":4}]}],"apply":[{"tag":"LIFTED","target":"area_enemies"}]}}
+  }
 }
