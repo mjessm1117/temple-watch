@@ -83,7 +83,7 @@ static func damage_amount(m: RefCounted, target: Dictionary, amount: int, source
 			for other in m.units:
 				if other != target and int(other.get("hp", 0)) > 0 and Vector2i(int(other.x), int(other.y)).distance_to(Vector2i(int(target.x), int(target.y))) <= 1.5:
 					apply_tag(other, "BURNING", int(source.get("id", -1)))
-	return amount
+	return preload("res://scripts/effects_soldier.gd").damage_amount(target, amount)
 
 static func claim_momentum_strike(m: RefCounted, actor: Dictionary) -> bool:
 	if str(m.phase) != "player" or str(actor.get("side", "")) != "player" or int(actor.get("hp", 0)) <= 0: return false

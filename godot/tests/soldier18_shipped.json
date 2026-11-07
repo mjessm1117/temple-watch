@@ -1,0 +1,285 @@
+{
+  "trooper": {
+    "shoot": {
+      "name": "Shoot",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "overwatch": {
+      "name": "Overwatch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "hunker": {
+      "name": "Hunker Down",
+      "ap": 1,
+      "target": "self",
+      "effect": "hunker",
+      "defense": 30,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "suppress": {
+      "name": "Suppress",
+      "ap": 1,
+      "range": "weapon",
+      "target": "enemy",
+      "effect": "status",
+      "status": "suppressed",
+      "aim": -30,
+      "reaction": true,
+      "ammo_cost": 1,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "rapidFire": {
+      "name": "Rapid Fire",
+      "ap": 1,
+      "range": "weapon",
+      "target": "enemy",
+      "effect": "attack",
+      "damage": "weapon",
+      "shots": 2,
+      "aim_mod": -15,
+      "cooldown": 1,
+      "ammo_cost": 2,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "rally": {
+      "name": "Rally",
+      "ap": 1,
+      "range": 4,
+      "target": "self",
+      "effect": "aura",
+      "clear_status": true,
+      "cost": 1,
+      "ends_turn": false
+    }
+  },
+  "scout": {
+    "shoot": {
+      "name": "Shoot",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "overwatch": {
+      "name": "Overwatch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "mark": {
+      "name": "Mark",
+      "ap": 1,
+      "range": 11,
+      "target": "enemy",
+      "effect": "status",
+      "status": "marked",
+      "ally_aim": 15,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "runGun": {
+      "name": "Run & Gun",
+      "ap": 0,
+      "target": "self",
+      "effect": "ap",
+      "amount": 1,
+      "cooldown": 1,
+      "cost": 0,
+      "ends_turn": false
+    },
+    "deadeye": {
+      "name": "Deadeye",
+      "ap": 1,
+      "range": "weapon",
+      "target": "enemy",
+      "effect": "attack",
+      "damage": "weapon",
+      "damage_mod": 3,
+      "aim_mod": -20,
+      "ammo_cost": 1,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "spotter": {
+      "name": "Spotter",
+      "passive": true,
+      "effect": "squadsight",
+      "range": 11,
+      "cost": 0,
+      "ap": 0,
+      "ends_turn": false
+    },
+    "ghost": {
+      "name": "Ghost",
+      "passive": true,
+      "effect": "reconceal",
+      "charges": 1,
+      "cost": 0,
+      "ap": 0,
+      "ends_turn": false
+    },
+    "snipe": {
+      "name": "Snipe",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "range": "weapon",
+      "damage_mod": 2,
+      "aim_mod": 15,
+      "crit_mod": 20,
+      "ammo_cost": 1,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "hunker": {
+      "name": "Hunker Down",
+      "ap": 1,
+      "target": "self",
+      "effect": "hunker",
+      "defense": 30,
+      "cost": 1,
+      "ends_turn": false
+    }
+  },
+  "medic": {
+    "shoot": {
+      "name": "Shoot",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "overwatch": {
+      "name": "Overwatch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "heal": {
+      "name": "Medkit",
+      "ap": 1,
+      "range": 1.5,
+      "target": "ally_injured",
+      "effect": "heal",
+      "heal": 4,
+      "revive": 2,
+      "charges": "medpacs",
+      "cost": 1,
+      "ends_turn": false
+    },
+    "smoke": {
+      "name": "Smoke",
+      "ap": 1,
+      "range": 6,
+      "target": "tile",
+      "effect": "area_buff",
+      "radius": 1,
+      "defense": 20,
+      "duration": 2,
+      "charges": "smoke",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "hack": {
+      "name": "Hack",
+      "ap": 1,
+      "range": 4,
+      "target": "tile_console",
+      "effect": "hack",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "reviveStim": {
+      "name": "Revive Stim",
+      "ap": 1,
+      "range": 2,
+      "target": "ally_down",
+      "effect": "heal",
+      "revive": 2,
+      "charges": "medpacs",
+      "cost": 1,
+      "ends_turn": false
+    },
+    "protocol": {
+      "name": "Combat Protocol",
+      "ap": 1,
+      "range": 8,
+      "target": "enemy_droid",
+      "effect": "attack",
+      "damage": [
+        3,
+        3
+      ],
+      "chance": 100,
+      "no_los": true,
+      "ignore_cover": true,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "shieldDrone": {
+      "name": "Shield Drone",
+      "ap": 1,
+      "range": 1.5,
+      "target": "ally",
+      "effect": "buff",
+      "shield": 4,
+      "charges": "shield_drone",
+      "cost": 1,
+      "ends_turn": false
+    },
+    "hackDroid": {
+      "name": "Hack Droid",
+      "ap": 1,
+      "range": 4,
+      "target": "enemy_droid",
+      "effect": "status",
+      "status": "stunned",
+      "chance": 60,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "scan": {
+      "name": "Scan Clue",
+      "ap": 1,
+      "range": 1.5,
+      "target": "tile_scan",
+      "effect": "scan",
+      "cost": 1,
+      "ends_turn": false
+    },
+    "medBeacon": {
+      "name": "Med Beacon",
+      "ap": 1,
+      "target": "self",
+      "effect": "mass_heal",
+      "range": 3,
+      "heal": 2,
+      "charges": "med_beacon",
+      "cost": 1,
+      "ends_turn": false
+    }
+  }
+}
