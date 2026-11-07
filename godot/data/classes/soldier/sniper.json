@@ -4,7 +4,7 @@
   "name": "Sniper",
   "side": "soldier",
   "role": "Long range",
-  "signature": "snipe",
+  "signature": "sniper_squadsight",
   "branches": [
     "Marksman",
     "Gunslinger"
@@ -12,57 +12,513 @@
   "implemented": true,
   "unit_kind": "sniper",
   "kit": [
-    "shoot",
-    "overwatch",
-    "mark",
-    "deadeye"
+    "sniper_squadsight",
+    "sniper_spotter_round",
+    "sniper_quickdraw"
   ],
   "passives": [],
   "bonus_kit": [],
   "bonus_passives": [],
-  "tree": {},
+  "tree": {
+    "trunk": {
+      "1": [
+        "sniper_squadsight"
+      ],
+      "2": [
+        "sniper_spotter_round",
+        "sniper_quickdraw"
+      ]
+    },
+    "specs": {
+      "marksman": {
+        "n": "Marksman",
+        "sig": "sniper_dead_eye",
+        "4": [
+          "sniper_eagle_perch"
+        ],
+        "5": [
+          "sniper_gravity_sight"
+        ],
+        "6": [
+          "sniper_execution_order"
+        ],
+        "7": [
+          "sniper_one_shot"
+        ]
+      },
+      "gunslinger": {
+        "n": "Gunslinger",
+        "sig": "sniper_cover_splitter",
+        "4": [
+          "sniper_crossfire"
+        ],
+        "5": [
+          "sniper_ricochet"
+        ],
+        "6": [
+          "sniper_duel_trigger"
+        ],
+        "7": [
+          "sniper_hail_of_lead"
+        ]
+      }
+    }
+  },
   "abilities": {
-    "shoot": {
-      "name": "Shoot",
+    "sniper_squadsight": {
+      "name": "Squadsight",
       "ap": 1,
+      "cost": 1,
+      "rank": 1,
       "target": "enemy",
       "effect": "attack",
-      "weapon": true,
-      "range": "weapon",
-      "cost": 1,
-      "ends_turn": true
+      "range": 16,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 2,
+      "ammo_cost": 1,
+      "aim_mod": 15,
+      "no_los": true,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "STAGGERED",
+            "target": "target"
+          }
+        ]
+      }
     },
-    "overwatch": {
-      "name": "Overwatch",
+    "sniper_spotter_round": {
+      "name": "Spotter Round",
       "ap": 1,
-      "target": "self",
-      "effect": "overwatch",
       "cost": 1,
-      "ends_turn": true
-    },
-    "mark": {
-      "name": "Mark",
-      "ap": 1,
-      "range": 11,
+      "rank": 2,
       "target": "enemy",
       "effect": "status",
+      "range": 9,
+      "ends_turn": true,
       "status": "marked",
-      "ally_aim": 15,
-      "cost": 1,
-      "ends_turn": true
+      "chance": 71,
+      "chain": {
+        "consume": [
+          {
+            "tag": "PINNED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "IONIZED",
+            "target": "target"
+          }
+        ]
+      }
     },
-    "deadeye": {
-      "name": "Deadeye",
+    "sniper_quickdraw": {
+      "name": "Quickdraw",
       "ap": 1,
-      "range": "weapon",
+      "cost": 1,
+      "rank": 2,
       "target": "enemy",
       "effect": "attack",
+      "range": 12,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 1,
+      "ammo_cost": 1,
+      "aim_mod": 11,
+      "chain": {
+        "consume": [
+          {
+            "tag": "EXPOSED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "EXPOSED",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "sniper_dead_eye": {
+      "name": "Dead Eye",
+      "ap": 1,
+      "cost": 1,
+      "rank": 3,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 12,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 2,
+      "ammo_cost": 1,
+      "aim_mod": 11,
+      "chain": {
+        "consume": [
+          {
+            "tag": "LIFTED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "PINNED",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "sniper_cover_splitter": {
+      "name": "Cover Splitter",
+      "ap": 1,
+      "cost": 1,
+      "rank": 3,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 12,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 2,
+      "ammo_cost": 1,
+      "aim_mod": 12,
+      "chain": {
+        "consume": [
+          {
+            "tag": "MARKED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "BURNING",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "sniper_eagle_perch": {
+      "name": "Eagle Perch",
+      "ap": 1,
+      "cost": 1,
+      "rank": 4,
+      "target": "self",
+      "effect": "overwatch",
+      "range": 8,
+      "ends_turn": false,
+      "chain": {
+        "consume": [
+          {
+            "tag": "ATTUNED",
+            "target": "self",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "INSPIRED",
+            "target": "self",
+            "amount": 2
+          }
+        ]
+      }
+    },
+    "sniper_crossfire": {
+      "name": "Crossfire",
+      "ap": 1,
+      "cost": 1,
+      "rank": 4,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 12,
+      "ends_turn": true,
       "damage": "weapon",
       "damage_mod": 3,
-      "aim_mod": -20,
       "ammo_cost": 1,
+      "aim_mod": 13,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "STAGGERED",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "sniper_gravity_sight": {
+      "name": "Gravity Sight",
+      "ap": 1,
       "cost": 1,
-      "ends_turn": true
+      "rank": 5,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 12,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 3,
+      "ammo_cost": 1,
+      "aim_mod": 13,
+      "chain": {
+        "consume": [
+          {
+            "tag": "PINNED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "IONIZED",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "sniper_ricochet": {
+      "name": "Ricochet",
+      "ap": 1,
+      "cost": 1,
+      "rank": 5,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 12,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 3,
+      "ammo_cost": 1,
+      "aim_mod": 14,
+      "chain": {
+        "consume": [
+          {
+            "tag": "EXPOSED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "EXPOSED",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "sniper_execution_order": {
+      "name": "Execution Order",
+      "ap": 1,
+      "cost": 1,
+      "rank": 6,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 12,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 4,
+      "ammo_cost": 1,
+      "aim_mod": 14,
+      "chain": {
+        "consume": [
+          {
+            "tag": "LIFTED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "PINNED",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "sniper_duel_trigger": {
+      "name": "Duel Trigger",
+      "ap": 1,
+      "cost": 1,
+      "rank": 6,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 12,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 4,
+      "ammo_cost": 1,
+      "aim_mod": 15,
+      "chain": {
+        "consume": [
+          {
+            "tag": "MARKED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "BURNING",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "sniper_one_shot": {
+      "name": "One Shot",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 12,
+      "ends_turn": true,
+      "capstone": true,
+      "cooldown": 3,
+      "damage": "weapon",
+      "damage_mod": 4,
+      "ammo_cost": 1,
+      "aim_mod": 15,
+      "chain": {
+        "consume": [
+          {
+            "tag": "STAGGERED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "MARKED",
+            "target": "target"
+          }
+        ]
+      }
+    },
+    "sniper_hail_of_lead": {
+      "name": "Hail of Lead",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 12,
+      "ends_turn": true,
+      "capstone": true,
+      "cooldown": 3,
+      "damage": "weapon",
+      "damage_mod": 5,
+      "ammo_cost": 1,
+      "aim_mod": 16,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 4
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "STAGGERED",
+            "target": "target"
+          }
+        ]
+      }
     }
   },
   "base_stats": {
