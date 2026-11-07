@@ -4,7 +4,7 @@
   "name": "Guardian",
   "side": "jedi",
   "role": "Tank",
-  "signature": "guard",
+  "signature": "guardian_deflect",
   "branches": [
     "Soresu Bulwark",
     "Djem So Breaker"
@@ -36,251 +36,56 @@
   "tree": {
     "trunk": {
       "1": [
-        "saberThrow",
-        "defLine",
-        "gChallenge"
+        "guardian_deflect"
       ],
       "2": [
-        "leap",
-        "reflectM",
-        "gStalwart"
+        "guardian_challenging_glare",
+        "guardian_brace"
       ]
     },
     "specs": {
-      "protector": {
+      "a": {
+        "n": "Soresu Bulwark",
+        "ic": "sp_guardian_a",
+        "desc": "Soresu Bulwark training.",
+        "sig": "guardian_soresu_circle",
         "4": [
-          "gIron",
-          "gBulwark",
-          "gpBastion"
+          "guardian_interpose"
         ],
         "5": [
-          "collapse",
-          "gWarden",
-          "gpBeacon"
+          "guardian_living_rampart"
         ],
         "6": [
-          "forceWave",
-          "gAegis",
-          "gpUndying"
+          "guardian_bastion_wave"
         ],
         "7": [
-          "gUnbreakable",
-          "gLastStand",
-          "gpLiving"
+          "guardian_citadel_oath"
         ],
-        "n": "Protector",
-        "ic": "sp_protector",
-        "desc": "Shields the squad and holds the line.",
-        "sig": "barrier"
+        "8": [
+          "guardian_grand_aegis"
+        ]
       },
-      "weaponMaster": {
+      "b": {
+        "n": "Djem So Breaker",
+        "ic": "sp_guardian_b",
+        "desc": "Djem So Breaker training.",
+        "sig": "guardian_djem_so_riposte",
         "4": [
-          "gDuelist",
-          "gVanguard",
-          "gwForm"
+          "guardian_breaking_parry"
         ],
         "5": [
-          "mightyBlow",
-          "flurry",
-          "gwWind"
+          "guardian_hammer_return"
         ],
         "6": [
-          "precisionStrike",
-          "gWMFocus",
-          "gwCounter"
+          "guardian_sundering_counter"
         ],
         "7": [
-          "gMasterBlade",
-          "gWMStorm",
-          "gwRampage"
+          "guardian_unyielding_judgment"
         ],
-        "n": "Weapon Master",
-        "ic": "sp_weaponMaster",
-        "desc": "Lives in melee and cuts through crowds.",
-        "sig": "sweep"
+        "8": [
+          "guardian_grand_aegis"
+        ]
       }
-    }
-  },
-  "abilities": {
-    "strike": {
-      "name": "Strike",
-      "ap": 1,
-      "target": "enemy",
-      "effect": "attack",
-      "melee": true,
-      "weapon": true,
-      "range": 1.5,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "guard": {
-      "name": "Guard",
-      "ap": 1,
-      "target": "self",
-      "effect": "guard",
-      "defense": 25,
-      "cost": 1,
-      "ends_turn": false
-    },
-    "push": {
-      "name": "Push",
-      "ap": 1,
-      "focus": 2,
-      "range": 4,
-      "target": "enemy",
-      "effect": "displace",
-      "distance": 2,
-      "collision_damage": 3,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "meditate": {
-      "name": "Meditate",
-      "ap": 1,
-      "target": "self",
-      "effect": "focus",
-      "amount": 2,
-      "cost": 1,
-      "ends_turn": false
-    },
-    "saberThrow": {
-      "name": "Saber Throw",
-      "ap": 1,
-      "focus": 2,
-      "range": 5,
-      "target": "enemy",
-      "effect": "attack",
-      "damage": [
-        4,
-        5
-      ],
-      "chance": 85,
-      "ignore_cover": true,
-      "pierce": true,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "leap": {
-      "name": "Force Leap",
-      "ap": 1,
-      "focus": 1,
-      "range": 6,
-      "target": "tile",
-      "effect": "leap",
-      "next_strike_aim": 15,
-      "cost": 1,
-      "ends_turn": false
-    },
-    "sweep": {
-      "name": "Saber Sweep",
-      "ap": 1,
-      "focus": 2,
-      "range": 1.5,
-      "target": "self",
-      "effect": "area_attack",
-      "damage": "weapon",
-      "aim_mod": -10,
-      "melee": true,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "choke": {
-      "name": "Choke",
-      "ap": 1,
-      "focus": 2,
-      "range": 5,
-      "target": "enemy",
-      "effect": "attack",
-      "damage": [
-        5,
-        6
-      ],
-      "chance": 90,
-      "ignore_cover": true,
-      "darkness": 2,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "subdue": {
-      "name": "Subdue",
-      "ap": 1,
-      "range": 1.5,
-      "target": "enemy_subdue",
-      "effect": "capture",
-      "chance": 60,
-      "stunned_chance": 85,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "collapse": {
-      "name": "Collapse",
-      "ap": 1,
-      "focus": 3,
-      "range": 5,
-      "target": "tile_wall",
-      "effect": "collapse",
-      "damage": [
-        4,
-        4
-      ],
-      "cost": 1,
-      "ends_turn": true
-    },
-    "defLine": {
-      "name": "Defensive Line",
-      "passive": true,
-      "effect": "adjacent_defense",
-      "defense": 15,
-      "cost": 0,
-      "ap": 0,
-      "ends_turn": false
-    },
-    "reflectM": {
-      "name": "Reflect Mastery",
-      "passive": true,
-      "effect": "reflect",
-      "chance": 65,
-      "cost": 0,
-      "ap": 0,
-      "ends_turn": false
-    },
-    "flurry": {
-      "name": "Flurry",
-      "ap": 1,
-      "target": "enemy",
-      "effect": "attack",
-      "range": 1.5,
-      "melee": true,
-      "shots": 2,
-      "aim_mod": -10,
-      "focus": 1,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "mightyBlow": {
-      "name": "Mighty Blow",
-      "ap": 1,
-      "target": "enemy",
-      "effect": "attack",
-      "range": 1.5,
-      "melee": true,
-      "damage_mod": 2,
-      "focus": 2,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "precisionStrike": {
-      "name": "Precision Strike",
-      "ap": 1,
-      "target": "enemy",
-      "effect": "attack",
-      "range": 1.5,
-      "melee": true,
-      "damage_mod": 1,
-      "aim_mod": 20,
-      "focus": 2,
-      "cost": 1,
-      "ends_turn": true
     }
   },
   "base_stats": {
@@ -316,5 +121,36 @@
     "medpacs": 2,
     "deflect": 35,
     "guard_deflect": 70
+  },
+  "abilities": {
+    "strike": {"name":"Strike","ap":1,"target":"enemy","effect":"attack","melee":true,"weapon":true,"range":1.5,"cost":1,"ends_turn":true},
+    "guard": {"name":"Guard","ap":1,"target":"self","effect":"guard","defense":25,"cost":1,"ends_turn":false},
+    "push": {"name":"Push","ap":1,"focus":2,"range":4,"target":"enemy","effect":"displace","distance":2,"collision_damage":3,"cost":1,"ends_turn":true},
+    "meditate": {"name":"Meditate","ap":1,"target":"self","effect":"focus","amount":2,"cost":1,"ends_turn":false},
+    "saberThrow": {"name":"Saber Throw","ap":1,"focus":2,"range":5,"target":"enemy","effect":"attack","damage":[4,5],"chance":85,"ignore_cover":true,"pierce":true,"cost":1,"ends_turn":true},
+    "leap": {"name":"Force Leap","ap":1,"focus":1,"range":6,"target":"tile","effect":"leap","next_strike_aim":15,"cost":1,"ends_turn":false},
+    "sweep": {"name":"Saber Sweep","ap":1,"focus":2,"range":1.5,"target":"self","effect":"area_attack","damage":"weapon","aim_mod":-10,"melee":true,"cost":1,"ends_turn":true},
+    "choke": {"name":"Choke","ap":1,"focus":2,"range":5,"target":"enemy","effect":"attack","damage":[5,6],"chance":90,"ignore_cover":true,"darkness":2,"cost":1,"ends_turn":true},
+    "subdue": {"name":"Subdue","ap":1,"range":1.5,"target":"enemy_subdue","effect":"capture","chance":60,"stunned_chance":85,"cost":1,"ends_turn":true},
+    "collapse": {"name":"Collapse","ap":1,"focus":3,"range":5,"target":"tile_wall","effect":"collapse","damage":[4,4],"cost":1,"ends_turn":true},
+    "defLine": {"name":"Defensive Line","passive":true,"effect":"adjacent_defense","defense":15,"cost":0,"ap":0,"ends_turn":false},
+    "reflectM": {"name":"Reflect Mastery","passive":true,"effect":"reflect","chance":65,"cost":0,"ap":0,"ends_turn":false},
+    "flurry": {"name":"Flurry","ap":1,"target":"enemy","effect":"attack","range":1.5,"melee":true,"shots":2,"aim_mod":-10,"focus":1,"cost":1,"ends_turn":true},
+    "mightyBlow": {"name":"Mighty Blow","ap":1,"target":"enemy","effect":"attack","range":1.5,"melee":true,"damage_mod":2,"focus":2,"cost":1,"ends_turn":true},
+    "precisionStrike": {"name":"Precision Strike","ap":1,"target":"enemy","effect":"attack","range":1.5,"melee":true,"damage_mod":1,"aim_mod":20,"focus":2,"cost":1,"ends_turn":true},
+    "guardian_deflect": {"name":"Deflect","rank":1,"ap":1,"target":"self","effect":"guard","cost":1,"ends_turn":false,"defense":12,"chain":{"consume":[{"tag":"READY","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"SHIELDED","target":"self","amount":1}]}},
+    "guardian_challenging_glare": {"name":"Challenging Glare","rank":2,"ap":1,"target":"enemy","effect":"status","cost":1,"ends_turn":true,"range":4,"chance":68,"focus":1,"status":"suppressed","chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"TAUNTED","target":"target"}]}},
+    "guardian_brace": {"name":"Brace","rank":2,"ap":1,"target":"self","effect":"guard","cost":1,"ends_turn":false,"defense":16,"chain":{"consume":[{"tag":"INSPIRED","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"SHIELDED","target":"self","amount":1}]}},
+    "guardian_soresu_circle": {"name":"Soresu Circle","rank":3,"ap":1,"target":"self","effect":"aura","cost":1,"ends_turn":false,"range":4,"aim":9,"enemy_aim":-5,"duration":1,"focus":1,"chain":{"consume":[{"tag":"SHIELDED","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"SHIELDED","target":"all_allies","amount":1}]}},
+    "guardian_djem_so_riposte": {"name":"Djem So Riposte","rank":3,"ap":1,"target":"enemy","effect":"attack","cost":1,"ends_turn":true,"range":1.5,"damage":[3,6],"chance":81,"focus":1,"chain":{"consume":[{"tag":"PINNED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"STAGGERED","target":"target"}]}},
+    "guardian_interpose": {"name":"Interpose","rank":4,"ap":1,"target":"ally","effect":"buff","cost":1,"ends_turn":false,"range":5,"aim":16,"defense":17,"duration":1,"focus":1,"chain":{"consume":[{"tag":"SHIELDED","target":"target","bonus":[{"type":"focus","target":"self","amount":2}]}],"apply":[{"tag":"SHIELDED","target":"target","amount":2}]}},
+    "guardian_breaking_parry": {"name":"Breaking Parry","rank":4,"ap":1,"target":"enemy","effect":"attack","cost":1,"ends_turn":true,"range":1.5,"damage":[4,6],"chance":84,"focus":1,"chain":{"consume":[{"tag":"TAUNTED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"EXPOSED","target":"target"}]}},
+    "guardian_living_rampart": {"name":"Living Rampart","rank":5,"ap":1,"target":"self","effect":"aura","cost":1,"ends_turn":false,"range":5,"aim":13,"enemy_aim":-7,"duration":1,"focus":2,"chain":{"consume":[{"tag":"READY","target":"self","bonus":[{"type":"focus","target":"self","amount":2}]}],"apply":[{"tag":"INSPIRED","target":"all_allies"}]}},
+    "guardian_hammer_return": {"name":"Hammer Return","rank":5,"ap":1,"target":"enemy","effect":"attack","cost":1,"ends_turn":true,"range":1.5,"damage":[5,9],"chance":87,"focus":1,"chain":{"consume":[{"tag":"EXPOSED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"STAGGERED","target":"target"}]}},
+    "guardian_bastion_wave": {"name":"Bastion Wave","rank":6,"ap":1,"target":"enemy","effect":"wave","cost":1,"ends_turn":true,"range":4.9,"damage":[6,7],"chance":71,"focus":3,"chain":{"consume":[{"tag":"LIFTED","target":"target","bonus":[{"type":"damage","target":"target","amount":3}]}],"apply":[{"tag":"STAGGERED","target":"target"}]}},
+    "guardian_sundering_counter": {"name":"Sundering Counter","rank":6,"ap":1,"target":"enemy","effect":"attack","cost":1,"ends_turn":true,"range":1.5,"damage":[6,9],"chance":90,"focus":2,"chain":{"consume":[{"tag":"STAGGERED","target":"target","bonus":[{"type":"damage","target":"target","amount":3}]}],"apply":[{"tag":"PINNED","target":"target"}]}},
+    "guardian_citadel_oath": {"name":"Citadel Oath","rank":7,"ap":1,"target":"self","effect":"aura","cost":1,"ends_turn":false,"capstone":true,"range":6,"aim":17,"enemy_aim":-9,"duration":1,"focus":3,"chain":{"consume":[{"tag":"INSPIRED","target":"self","bonus":[{"type":"focus","target":"self","amount":3}]}],"apply":[{"tag":"SHIELDED","target":"all_allies","amount":3}]}},
+    "guardian_unyielding_judgment": {"name":"Unyielding Judgment","rank":7,"ap":1,"target":"enemy","effect":"attack","cost":1,"ends_turn":true,"capstone":true,"range":1.5,"damage":[7,9],"chance":93,"focus":2,"chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":3}]}],"apply":[{"tag":"TAUNTED","target":"target"}]}},
+    "guardian_grand_aegis": {"name":"Grand Master Aegis","rank":8,"ap":1,"target":"self","effect":"aura","cost":1,"ends_turn":false,"capstone":true,"cooldown":99,"range":7,"aim":19,"enemy_aim":-10,"duration":1,"focus":4,"chain":{"consume":[{"tag":"SHIELDED","target":"self","bonus":[{"type":"focus","target":"self","amount":4}]}],"apply":[{"tag":"SHIELDED","target":"all_allies","amount":4}]}}
   }
 }
