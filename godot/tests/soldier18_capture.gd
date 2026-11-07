@@ -41,20 +41,22 @@ func capture() -> void:
 		await process_frame
 	var battle = load("res://scenes/rescue.tscn").instantiate()
 	root.add_child(battle)
-	await process_frame
-	var actor: Dictionary = battle.mission.living("player")[0]
+	await create_timer(1.0).timeout
+	var actor: Dictionary = battle.mission.living("player")[2]
 	var enemy: Dictionary = battle.mission.living("enemy")[0]
 	actor.class_name = "Sniper"
+	actor.name = "Republic Sniper"
 	actor.kit.append("sniper_squadsight")
 	actor.range = 16
 	enemy.x = int(actor.x) + 3
 	enemy.y = int(actor.y)
 	enemy.awake = true
 	enemy.spotted = true
-	battle.selected_id = int(actor.id)
+	battle._select(int(actor.id))
 	battle.action = "sniper_squadsight"
+	battle._refresh()
 	battle._use_ability(int(enemy.id))
-	await create_timer(1.0).timeout
-	await _shot("battle-sniper-squadsight-844x390")
+	await create_timer(0.6).timeout
+	await _shot("battle-sniper-squadsight-844x390", 0.05)
 	battle.queue_free()
 	quit()

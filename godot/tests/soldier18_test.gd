@@ -3,6 +3,7 @@ const Classes = preload("res://scripts/class_registry.gd")
 const Modules = preload("res://scripts/effects_soldier.gd")
 const Chains = preload("res://scripts/ability_chains.gd")
 const Mission = preload("res://scripts/mission.gd")
+const Campaign = preload("res://scripts/campaign/state.gd")
 const TAGS = ["ATTUNED", "BURNING", "EXPOSED", "INSPIRED", "IONIZED", "LIFTED", "MARKED", "PINNED", "READY", "SHIELDED", "STAGGERED", "TAUNTED"]
 const PROXY_KITS = ["shoot", "overwatch", "mark", "deadeye", "hack", "scan", "shieldDrone", "rapidFire", "rally", "barrage", "holdLine"]
 const PROXY_CLASSES = ["heavy", "sniper", "tech", "droid", "officer"]
@@ -68,7 +69,13 @@ func run() -> void:
 		if shipped.has(class_id):
 			check(SHIPPED_KITS[class_id].all(func(id): return row.kit.has(id)), class_id + " keeps every shipped tactical button")
 			for id in shipped[class_id]:
-				check(abilities.has(id) and abilities[id] == shipped[class_id][id], class_id + " keeps shipped " + id)
+				var preserved := abilities.has(id)
+				if preserved:
+					for field in shipped[class_id][id]:
+						if not abilities[id].has(field) or abilities[id][field] != shipped[class_id][id][field]: preserved = false
+				check(preserved, class_id + " keeps shipped values for " + id)
+		for branch in row.tree.specs.values():
+			for id in branch["7"]: check(bool(abilities[id].get("capstone", false)), class_id + " rank 7 capstone " + id)
 	check(total == 104, "104 soldier abilities")
 	var droid: Dictionary = Classes.class_data("droid")
 	var data: Dictionary = droid.get("modules", {})
@@ -79,6 +86,14 @@ func run() -> void:
 	check(Modules.selected_modules(unit) == ["repeater", "flamer", "sensor"], "module swap stored")
 	check(Modules.module_abilities(unit).has("droid_flamer_module") and not Modules.module_abilities(unit).has("droid_shield_module"), "swapped module changes kit")
 	check(not Modules.swap_module(unit, 0, "sensor"), "duplicate module rejected")
+	var campaign = Campaign.new()
+	var saved_droid: Dictionary = campaign.soldier("u1")
+	saved_droid.cls = "Droid"
+	check(Modules.swap_module(saved_droid, 1, "flamer"), "campaign Droid swaps a module")
+	var save_path := "user://soldier18-modules.json"
+	var restored = Campaign.new()
+	check(campaign.save(save_path) and restored.load_save(save_path), "Droid module save loads")
+	check(Modules.selected_modules(restored.soldier("u1")) == ["repeater", "flamer", "sensor"], "Droid module load preserves swap")
 	var body := {"class_name":"Droid", "hp":5, "shield":2, "ap":2, "overwatch":true}
 	check(Modules.damage_amount(body, 10) == 6 and body.wrecked and body.ap == 0, "lethal damage wrecks recoverable droid")
 	check(Classes.power("soldier", 1) > Classes.power("jedi", 1) and Classes.power("soldier", 1) > Classes.power("jedi", 3), "fresh soldier beats Padawan and under-trained Knight")
