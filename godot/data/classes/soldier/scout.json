@@ -78,22 +78,22 @@
       "chain": {
         "consume": [
           {
-            "tag": "ATTUNED",
+            "tag": "SHIELDED",
             "target": "self",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 1
+                "amount": 3
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "INSPIRED",
+            "tag": "READY",
             "target": "self",
-            "amount": 1
+            "amount": 3
           }
         ]
       }
@@ -132,13 +132,13 @@
       "chain": {
         "consume": [
           {
-            "tag": "SHIELDED",
+            "tag": "INSPIRED",
             "target": "self",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 1
+                "amount": 3
               }
             ]
           }
@@ -147,7 +147,7 @@
           {
             "tag": "ATTUNED",
             "target": "self",
-            "amount": 1
+            "amount": 3
           }
         ]
       }
@@ -226,14 +226,14 @@
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 3
+                "amount": 2
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "BURNING",
+            "tag": "EXPOSED",
             "target": "target"
           }
         ]
@@ -266,20 +266,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "IONIZED",
+            "tag": "STAGGERED",
             "target": "area_enemies",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 3
+                "amount": 2
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "STAGGERED",
+            "tag": "PINNED",
             "target": "area_enemies"
           }
         ]
