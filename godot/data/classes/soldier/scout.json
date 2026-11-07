@@ -16,10 +16,7 @@
     "overwatch",
     "mark",
     "runGun",
-    "deadeye",
-    "scout_concealment",
-    "scout_vanish",
-    "scout_ambush"
+    "deadeye"
   ],
   "passives": [
     "spotter",
