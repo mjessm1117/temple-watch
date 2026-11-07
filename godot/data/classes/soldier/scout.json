@@ -51,7 +51,7 @@
           "snipe"
         ],
         "6": [
-          "scout_ambush"
+          "shoot"
         ],
         "7": [
           "scout_saboteur_trap"
@@ -70,7 +70,7 @@
           "overwatch"
         ],
         "7": [
-          "shoot"
+          "scout_ambush"
         ]
       }
     }
@@ -118,7 +118,8 @@
       "status": "marked",
       "ally_aim": 15,
       "cost": 1,
-      "ends_turn": true
+      "ends_turn": true,
+      "rank": 2
     },
     "runGun": {
       "name": "Run & Gun",
@@ -128,7 +129,8 @@
       "amount": 1,
       "cooldown": 1,
       "cost": 0,
-      "ends_turn": false
+      "ends_turn": false,
+      "rank": 2
     },
     "scout_vanish": {
       "name": "Vanish",
@@ -174,7 +176,8 @@
       "aim_mod": -20,
       "ammo_cost": 1,
       "cost": 1,
-      "ends_turn": true
+      "ends_turn": true,
+      "rank": 3
     },
     "spotter": {
       "name": "Spotter",
@@ -183,7 +186,8 @@
       "range": 11,
       "cost": 0,
       "ap": 0,
-      "ends_turn": false
+      "ends_turn": false,
+      "rank": 4
     },
     "ghost": {
       "name": "Ghost",
@@ -192,7 +196,8 @@
       "charges": 1,
       "cost": 0,
       "ap": 0,
-      "ends_turn": false
+      "ends_turn": false,
+      "rank": 4
     },
     "snipe": {
       "name": "Snipe",
@@ -205,7 +210,8 @@
       "crit_mod": 20,
       "ammo_cost": 1,
       "cost": 1,
-      "ends_turn": true
+      "ends_turn": true,
+      "rank": 5
     },
     "hunker": {
       "name": "Hunker Down",
@@ -216,11 +222,67 @@
       "cost": 1,
       "ends_turn": false
     },
+    "shoot": {
+      "name": "Shoot",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "overwatch": {
+      "name": "Overwatch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "scout_saboteur_trap": {
+      "name": "Saboteur Trap",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "capstone": true,
+      "cooldown": 3,
+      "damage": [
+        4,
+        5
+      ],
+      "cover_damage": 7,
+      "chain": {
+        "consume": [
+          {
+            "tag": "STAGGERED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "MARKED",
+            "target": "area_enemies"
+          }
+        ]
+      }
+    },
     "scout_ambush": {
       "name": "Ambush",
       "ap": 1,
       "cost": 1,
-      "rank": 6,
+      "rank": 7,
       "target": "enemy",
       "effect": "attack",
       "range": 8,
@@ -270,63 +332,8 @@
             "target": "target"
           }
         ]
-      }
-    },
-    "overwatch": {
-      "name": "Overwatch",
-      "ap": 1,
-      "target": "self",
-      "effect": "overwatch",
-      "cost": 1,
-      "ends_turn": true
-    },
-    "scout_saboteur_trap": {
-      "name": "Saboteur Trap",
-      "ap": 1,
-      "cost": 1,
-      "rank": 7,
-      "target": "tile_area",
-      "effect": "blast",
-      "range": 7,
-      "ends_turn": true,
-      "capstone": true,
-      "cooldown": 3,
-      "damage": [
-        4,
-        5
-      ],
-      "cover_damage": 7,
-      "chain": {
-        "consume": [
-          {
-            "tag": "STAGGERED",
-            "target": "area_enemies",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 2
-              }
-            ]
-          }
-        ],
-        "apply": [
-          {
-            "tag": "MARKED",
-            "target": "area_enemies"
-          }
-        ]
-      }
-    },
-    "shoot": {
-      "name": "Shoot",
-      "ap": 1,
-      "target": "enemy",
-      "effect": "attack",
-      "weapon": true,
-      "range": "weapon",
-      "cost": 1,
-      "ends_turn": true
+      },
+      "capstone": true
     }
   },
   "base_stats": {
