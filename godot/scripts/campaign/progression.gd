@@ -87,13 +87,15 @@ static func battle_abilities(r: Dictionary) -> Array:
 
 static func cross_options(r: Dictionary) -> Array:
 	var out := []
+	var primary: Dictionary = Classes.class_data(str(r.get("cls", "")))
+	var known: Array = primary.get("kit", []) + primary.get("bonus_kit", []) + r.get("picks", []) + r.get("extra_picks", []) + r.get("cross_picks", [])
 	for path_name in r.get("classes", []):
 		if Classes.class_id(str(path_name)) == Classes.class_id(str(r.get("cls", ""))): continue
 		var row := Classes.class_data(str(path_name))
-		for id in row.get("kit", []) + row.get("bonus_kit", []):
+		for id in row.get("abilities", {}):
 			var def: Dictionary = row.get("abilities", {}).get(id, {})
-			if def.is_empty() or int(def.get("rank", 1)) > Classes.ability_cap(r, str(path_name)) or bool(def.get("capstone", false)): continue
-			if id not in r.get("cross_picks", []) and id not in out: out.append(id)
+			if def.is_empty() or int(def.get("rank", 1)) > mini(int(r.get("rank", 1)), Classes.ability_cap(r, str(path_name))) or bool(def.get("capstone", false)): continue
+			if id not in known and id not in out: out.append(id)
 	return out
 
 static func choose_cross(r: Dictionary, id: String) -> bool:
