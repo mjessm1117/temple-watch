@@ -82,7 +82,7 @@
       "cost": 1,
       "rank": 1,
       "target": "self",
-      "effect": "overwatch",
+      "effect": "ap",
       "range": 8,
       "ends_turn": false,
       "cooldown": 0,
@@ -107,7 +107,15 @@
             "amount": 3
           }
         ]
-      }
+      },
+      "amount": 0,
+      "effects": [
+        {
+          "type": "status",
+          "target": "self",
+          "status": "concealed"
+        }
+      ]
     },
     "mark": {
       "name": "Mark",
@@ -138,7 +146,7 @@
       "cost": 1,
       "rank": 3,
       "target": "self",
-      "effect": "overwatch",
+      "effect": "ap",
       "range": 8,
       "ends_turn": false,
       "cooldown": 2,
@@ -163,7 +171,15 @@
             "amount": 3
           }
         ]
-      }
+      },
+      "amount": 0,
+      "effects": [
+        {
+          "type": "status",
+          "target": "self",
+          "status": "concealed"
+        }
+      ]
     },
     "deadeye": {
       "name": "Deadeye",
