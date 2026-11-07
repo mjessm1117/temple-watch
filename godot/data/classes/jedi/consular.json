@@ -4,7 +4,7 @@
   "name": "Consular",
   "side": "jedi",
   "role": "Healer and buffs",
-  "signature": "battleMed",
+  "signature": "consular_battle_meditation",
   "branches": [
     "Healer",
     "Diplomat"
@@ -35,256 +35,56 @@
   "tree": {
     "trunk": {
       "1": [
-        "stun",
-        "forceHeal",
-        "cSerene"
+        "consular_battle_meditation"
       ],
       "2": [
-        "barrier",
-        "battleMed",
-        "cPresence"
+        "consular_gentle_touch",
+        "consular_open_mind"
       ]
     },
     "specs": {
-      "sage": {
+      "a": {
+        "n": "Healer",
+        "ic": "sp_consular_a",
+        "desc": "Healer training.",
+        "sig": "consular_renewal",
         "4": [
-          "massHeal",
-          "cResolve",
-          "csTouch"
+          "consular_healing_current"
         ],
         "5": [
-          "cWellspring",
-          "cSageLight",
-          "csCalm"
+          "consular_force_sanctuary"
         ],
         "6": [
-          "cSeer",
-          "cSageEmpathy",
-          "csWard"
+          "consular_life_weave"
         ],
         "7": [
-          "cMaster",
-          "cSageAvatar",
-          "csEternal"
+          "consular_circle_of_life"
         ],
-        "n": "Sage",
-        "ic": "sp_sage",
-        "desc": "Healer. Keeps everyone standing.",
-        "sig": "forceRevive"
+        "8": [
+          "consular_grand_living_force"
+        ]
       },
-      "shadow": {
+      "b": {
+        "n": "Diplomat",
+        "ic": "sp_consular_b",
+        "desc": "Diplomat training.",
+        "sig": "consular_mind_trick",
         "4": [
-          "pull",
-          "shadowStep",
-          "chUnseen"
+          "consular_diplomatic_pressure"
         ],
         "5": [
-          "forceWave",
-          "cShWhisper",
-          "chFade"
+          "consular_persuasion"
         ],
         "6": [
-          "stasisField",
-          "cShVeil",
-          "chFeed"
+          "consular_pacifying_word"
         ],
         "7": [
-          "cShMaster",
-          "disarm",
-          "chCascade"
+          "consular_accord_of_minds"
         ],
-        "n": "Shadow",
-        "ic": "sp_shadow",
-        "desc": "Controls minds and strikes unseen.",
-        "sig": "mindTrick"
+        "8": [
+          "consular_grand_living_force"
+        ]
       }
-    }
-  },
-  "abilities": {
-    "strike": {
-      "name": "Strike",
-      "ap": 1,
-      "target": "enemy",
-      "effect": "attack",
-      "melee": true,
-      "weapon": true,
-      "range": 1.5,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "push": {
-      "name": "Push",
-      "ap": 1,
-      "focus": 2,
-      "range": 4,
-      "target": "enemy",
-      "effect": "displace",
-      "distance": 2,
-      "collision_damage": 3,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "meditate": {
-      "name": "Meditate",
-      "ap": 1,
-      "target": "self",
-      "effect": "focus",
-      "amount": 2,
-      "cost": 1,
-      "ends_turn": false
-    },
-    "stun": {
-      "name": "Stun",
-      "ap": 1,
-      "focus": 2,
-      "range": 5,
-      "target": "enemy",
-      "effect": "status",
-      "status": "stunned",
-      "chance": 85,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "forceHeal": {
-      "name": "Force Heal",
-      "ap": 1,
-      "focus": 2,
-      "range": 3,
-      "cooldown": 1,
-      "target": "ally_injured",
-      "effect": "heal",
-      "heal": 4,
-      "revive": 2,
-      "cost": 1,
-      "ends_turn": false
-    },
-    "barrier": {
-      "name": "Force Barrier",
-      "ap": 1,
-      "focus": 2,
-      "range": 4,
-      "target": "ally",
-      "effect": "buff",
-      "defense": 40,
-      "duration": 1,
-      "cost": 1,
-      "ends_turn": false
-    },
-    "battleMed": {
-      "name": "Battle Meditation",
-      "ap": 1,
-      "focus": 3,
-      "range": 6,
-      "target": "self",
-      "effect": "aura",
-      "aim": 10,
-      "enemy_aim": -10,
-      "duration": 1,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "mindTrick": {
-      "name": "Mind Trick",
-      "ap": 1,
-      "focus": 3,
-      "range": 5,
-      "target": "enemy",
-      "effect": "status",
-      "status": "tricked",
-      "chance": 70,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "forceRevive": {
-      "name": "Force Revive",
-      "ap": 1,
-      "focus": 4,
-      "range": 1.5,
-      "target": "ally_down",
-      "effect": "heal",
-      "revive": 4,
-      "charges": "force_revive",
-      "cost": 1,
-      "ends_turn": false
-    },
-    "choke": {
-      "name": "Choke",
-      "ap": 1,
-      "focus": 2,
-      "range": 5,
-      "target": "enemy",
-      "effect": "attack",
-      "damage": [
-        5,
-        6
-      ],
-      "chance": 90,
-      "ignore_cover": true,
-      "darkness": 2,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "subdue": {
-      "name": "Subdue",
-      "ap": 1,
-      "range": 1.5,
-      "target": "enemy_subdue",
-      "effect": "capture",
-      "chance": 60,
-      "stunned_chance": 85,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "massHeal": {
-      "name": "Mass Heal",
-      "ap": 1,
-      "target": "self",
-      "effect": "mass_heal",
-      "focus": 3,
-      "range": 4,
-      "heal": 2,
-      "cost": 1,
-      "ends_turn": false
-    },
-    "forceWave": {
-      "name": "Force Wave",
-      "ap": 1,
-      "target": "self",
-      "effect": "wave",
-      "focus": 3,
-      "range": 2.9,
-      "damage": [
-        2,
-        2
-      ],
-      "chance": 40,
-      "status": "stunned",
-      "cost": 1,
-      "ends_turn": true
-    },
-    "stasisField": {
-      "name": "Stasis Field",
-      "ap": 1,
-      "target": "self",
-      "effect": "wave",
-      "focus": 4,
-      "range": 3.2,
-      "chance": 60,
-      "status": "stunned",
-      "cost": 1,
-      "ends_turn": true
-    },
-    "disarm": {
-      "name": "Disarm",
-      "ap": 1,
-      "target": "enemy",
-      "effect": "status",
-      "focus": 2,
-      "range": 5,
-      "chance": 80,
-      "status": "disarmed",
-      "cost": 1,
-      "ends_turn": true
     }
   },
   "base_stats": {
@@ -320,5 +120,36 @@
     "medpacs": 2,
     "deflect": 25,
     "guard_deflect": 50
+  },
+  "abilities": {
+    "strike": {"name":"Strike","ap":1,"target":"enemy","effect":"attack","melee":true,"weapon":true,"range":1.5,"cost":1,"ends_turn":true},
+    "push": {"name":"Push","ap":1,"focus":2,"range":4,"target":"enemy","effect":"displace","distance":2,"collision_damage":3,"cost":1,"ends_turn":true},
+    "meditate": {"name":"Meditate","ap":1,"target":"self","effect":"focus","amount":2,"cost":1,"ends_turn":false},
+    "stun": {"name":"Stun","ap":1,"focus":2,"range":5,"target":"enemy","effect":"status","status":"stunned","chance":85,"cost":1,"ends_turn":true},
+    "forceHeal": {"name":"Force Heal","ap":1,"focus":2,"range":3,"cooldown":1,"target":"ally_injured","effect":"heal","heal":4,"revive":2,"cost":1,"ends_turn":false},
+    "barrier": {"name":"Force Barrier","ap":1,"focus":2,"range":4,"target":"ally","effect":"buff","defense":40,"duration":1,"cost":1,"ends_turn":false},
+    "battleMed": {"name":"Battle Meditation","ap":1,"focus":3,"range":6,"target":"self","effect":"aura","aim":10,"enemy_aim":-10,"duration":1,"cost":1,"ends_turn":true},
+    "mindTrick": {"name":"Mind Trick","ap":1,"focus":3,"range":5,"target":"enemy","effect":"status","status":"tricked","chance":70,"cost":1,"ends_turn":true},
+    "forceRevive": {"name":"Force Revive","ap":1,"focus":4,"range":1.5,"target":"ally_down","effect":"heal","revive":4,"charges":"force_revive","cost":1,"ends_turn":false},
+    "choke": {"name":"Choke","ap":1,"focus":2,"range":5,"target":"enemy","effect":"attack","damage":[5,6],"chance":90,"ignore_cover":true,"darkness":2,"cost":1,"ends_turn":true},
+    "subdue": {"name":"Subdue","ap":1,"range":1.5,"target":"enemy_subdue","effect":"capture","chance":60,"stunned_chance":85,"cost":1,"ends_turn":true},
+    "massHeal": {"name":"Mass Heal","ap":1,"target":"self","effect":"mass_heal","focus":3,"range":4,"heal":2,"cost":1,"ends_turn":false},
+    "forceWave": {"name":"Force Wave","ap":1,"target":"self","effect":"wave","focus":3,"range":2.9,"damage":[2,2],"chance":40,"status":"stunned","cost":1,"ends_turn":true},
+    "stasisField": {"name":"Stasis Field","ap":1,"target":"self","effect":"wave","focus":4,"range":3.2,"chance":60,"status":"stunned","cost":1,"ends_turn":true},
+    "disarm": {"name":"Disarm","ap":1,"target":"enemy","effect":"status","focus":2,"range":5,"chance":80,"status":"disarmed","cost":1,"ends_turn":true},
+    "consular_battle_meditation": {"name":"Battle Meditation","rank":1,"ap":1,"target":"self","effect":"aura","cost":1,"ends_turn":false,"range":3,"aim":5,"enemy_aim":-3,"duration":1,"focus":1,"chain":{"consume":[{"tag":"READY","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"INSPIRED","target":"all_allies"}]}},
+    "consular_gentle_touch": {"name":"Gentle Touch","rank":2,"ap":1,"target":"ally_injured","effect":"heal","cost":1,"ends_turn":false,"range":4,"heal":3,"revive":2,"focus":1,"chain":{"consume":[{"tag":"BURNING","target":"all_enemies","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"SHIELDED","target":"target","amount":1}]}},
+    "consular_open_mind": {"name":"Open Mind","rank":2,"ap":1,"target":"ally","effect":"buff","cost":1,"ends_turn":false,"range":4,"aim":10,"defense":11,"duration":1,"focus":0,"chain":{"consume":[{"tag":"SHIELDED","target":"target","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"ATTUNED","target":"target"}]}},
+    "consular_renewal": {"name":"Renewal","rank":3,"ap":1,"target":"ally_injured","effect":"heal","cost":1,"ends_turn":false,"range":4,"heal":4,"revive":2,"focus":1,"chain":{"consume":[{"tag":"BURNING","target":"all_enemies","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"INSPIRED","target":"target"}]}},
+    "consular_mind_trick": {"name":"Mind Trick","rank":3,"ap":1,"target":"enemy","effect":"status","cost":1,"ends_turn":true,"range":4,"chance":73,"focus":1,"status":"stunned","chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"STAGGERED","target":"target"}]}},
+    "consular_healing_current": {"name":"Healing Current","rank":4,"ap":1,"target":"self","effect":"mass_heal","cost":1,"ends_turn":false,"range":5,"heal":5,"focus":2,"chain":{"consume":[{"tag":"INSPIRED","target":"self","bonus":[{"type":"focus","target":"self","amount":2}]}],"apply":[{"tag":"SHIELDED","target":"all_allies","amount":2}]}},
+    "consular_diplomatic_pressure": {"name":"Diplomatic Pressure","rank":4,"ap":1,"target":"enemy","effect":"status","cost":1,"ends_turn":true,"range":5,"chance":78,"focus":2,"status":"suppressed","chain":{"consume":[{"tag":"STAGGERED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"EXPOSED","target":"target"}]}},
+    "consular_force_sanctuary": {"name":"Force Sanctuary","rank":5,"ap":1,"target":"self","effect":"aura","cost":1,"ends_turn":false,"range":5,"aim":13,"enemy_aim":-7,"duration":1,"focus":2,"chain":{"consume":[{"tag":"READY","target":"self","bonus":[{"type":"focus","target":"self","amount":2}]}],"apply":[{"tag":"SHIELDED","target":"all_allies","amount":2}]}},
+    "consular_persuasion": {"name":"Persuasion","rank":5,"ap":1,"target":"enemy","effect":"status","cost":1,"ends_turn":true,"range":5,"chance":83,"focus":2,"status":"suppressed","chain":{"consume":[{"tag":"EXPOSED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"TAUNTED","target":"target"}]}},
+    "consular_life_weave": {"name":"Life Weave","rank":6,"ap":1,"target":"ally_injured","effect":"heal","cost":1,"ends_turn":false,"range":6,"heal":7,"revive":4,"focus":3,"chain":{"consume":[{"tag":"SHIELDED","target":"target","bonus":[{"type":"focus","target":"self","amount":3}]}],"apply":[{"tag":"ATTUNED","target":"target"}]}},
+    "consular_pacifying_word": {"name":"Pacifying Word","rank":6,"ap":1,"target":"enemy","effect":"status","cost":1,"ends_turn":true,"range":6,"chance":88,"focus":3,"status":"stunned","chain":{"consume":[{"tag":"STAGGERED","target":"target","bonus":[{"type":"damage","target":"target","amount":3}]}],"apply":[{"tag":"PINNED","target":"target"}]}},
+    "consular_circle_of_life": {"name":"Circle of Life","rank":7,"ap":1,"target":"self","effect":"mass_heal","cost":1,"ends_turn":false,"capstone":true,"range":6,"heal":8,"focus":3,"chain":{"consume":[{"tag":"ATTUNED","target":"self","bonus":[{"type":"focus","target":"self","amount":3}]}],"apply":[{"tag":"INSPIRED","target":"all_allies"}]}},
+    "consular_accord_of_minds": {"name":"Accord of Minds","rank":7,"ap":1,"target":"self","effect":"aura","cost":1,"ends_turn":false,"capstone":true,"range":6,"aim":17,"enemy_aim":-9,"duration":1,"focus":3,"chain":{"consume":[{"tag":"INSPIRED","target":"self","bonus":[{"type":"focus","target":"self","amount":3}]}],"apply":[{"tag":"ATTUNED","target":"all_allies"}]}},
+    "consular_grand_living_force": {"name":"Grand Master Living Force","rank":8,"ap":1,"target":"self","effect":"mass_heal","cost":1,"ends_turn":false,"capstone":true,"cooldown":99,"range":7,"heal":9,"focus":4,"chain":{"consume":[{"tag":"BURNING","target":"all_enemies","bonus":[{"type":"damage","target":"target","amount":4}]}],"apply":[{"tag":"SHIELDED","target":"all_allies","amount":4}]}}
   }
 }
