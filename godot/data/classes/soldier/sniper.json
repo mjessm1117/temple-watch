@@ -82,7 +82,7 @@
       "chain": {
         "consume": [
           {
-            "tag": "IONIZED",
+            "tag": "LIFTED",
             "target": "target",
             "bonus": [
               {
@@ -95,7 +95,7 @@
         ],
         "apply": [
           {
-            "tag": "STAGGERED",
+            "tag": "MARKED",
             "target": "target"
           }
         ]
@@ -115,7 +115,7 @@
       "chain": {
         "consume": [
           {
-            "tag": "PINNED",
+            "tag": "EXPOSED",
             "target": "target",
             "bonus": [
               {
@@ -128,7 +128,7 @@
         ],
         "apply": [
           {
-            "tag": "IONIZED",
+            "tag": "MARKED",
             "target": "target"
           }
         ]
@@ -163,7 +163,7 @@
         ],
         "apply": [
           {
-            "tag": "EXPOSED",
+            "tag": "STAGGERED",
             "target": "target"
           }
         ]
@@ -185,7 +185,7 @@
       "chain": {
         "consume": [
           {
-            "tag": "LIFTED",
+            "tag": "EXPOSED",
             "target": "target",
             "bonus": [
               {
@@ -198,7 +198,7 @@
         ],
         "apply": [
           {
-            "tag": "PINNED",
+            "tag": "IONIZED",
             "target": "target"
           }
         ]
@@ -220,20 +220,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "MARKED",
+            "tag": "LIFTED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 2
+                "amount": 1
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "BURNING",
+            "tag": "EXPOSED",
             "target": "target"
           }
         ]
@@ -264,7 +264,7 @@
         ],
         "apply": [
           {
-            "tag": "INSPIRED",
+            "tag": "ATTUNED",
             "target": "self",
             "amount": 2
           }
@@ -287,20 +287,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "IONIZED",
+            "tag": "LIFTED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 2
+                "amount": 1
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "STAGGERED",
+            "tag": "BURNING",
             "target": "target"
           }
         ]
@@ -322,20 +322,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "PINNED",
+            "tag": "LIFTED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 2
+                "amount": 1
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "IONIZED",
+            "tag": "MARKED",
             "target": "target"
           }
         ]
@@ -357,20 +357,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "EXPOSED",
+            "tag": "LIFTED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 3
+                "amount": 1
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "EXPOSED",
+            "tag": "STAGGERED",
             "target": "target"
           }
         ]
@@ -398,14 +398,14 @@
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 3
+                "amount": 1
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "PINNED",
+            "tag": "IONIZED",
             "target": "target"
           }
         ]
@@ -433,14 +433,14 @@
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 3
+                "amount": 2
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "BURNING",
+            "tag": "EXPOSED",
             "target": "target"
           }
         ]
@@ -464,20 +464,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "STAGGERED",
+            "tag": "MARKED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 3
+                "amount": 2
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "MARKED",
+            "tag": "PINNED",
             "target": "target"
           }
         ]
@@ -501,20 +501,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "IONIZED",
+            "tag": "MARKED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 4
+                "amount": 2
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "STAGGERED",
+            "tag": "BURNING",
             "target": "target"
           }
         ]
