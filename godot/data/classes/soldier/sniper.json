@@ -64,5 +64,36 @@
       "cost": 1,
       "ends_turn": true
     }
+  },
+  "base_stats": {
+    "hp": 7,
+    "armor": 1,
+    "aim": 82,
+    "mob": 5,
+    "dmg": [
+      4,
+      7
+    ],
+    "range": 12,
+    "crit": 15,
+    "init": 13,
+    "will": 55,
+    "desc": "Long-range soldier. Marks targets and fires precise shots."
+  },
+  "unit_stats": {
+    "hp": 7,
+    "aim": 82,
+    "mob": 5,
+    "damage": [
+      4,
+      7
+    ],
+    "range": 12,
+    "focus": 0,
+    "armor": 1,
+    "crit": 15,
+    "model": "trooper",
+    "medpacs": 2,
+    "clip": 4
   }
 }

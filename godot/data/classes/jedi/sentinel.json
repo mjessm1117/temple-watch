@@ -187,5 +187,40 @@
       "ap": 0,
       "ends_turn": false
     }
+  },
+  "base_stats": {
+    "jedi": 1,
+    "hp": 5,
+    "aim": 75,
+    "mob": 6,
+    "dmg": [
+      4,
+      5
+    ],
+    "range": 1.5,
+    "deflect": 30,
+    "dodge": 10,
+    "guardDef": 60,
+    "maxF": 4,
+    "crit": 10,
+    "init": 15,
+    "will": 70,
+    "desc": "Skirmisher Jedi. Fast, precise, finishes wounded enemies."
+  },
+  "unit_stats": {
+    "hp": 5,
+    "aim": 75,
+    "mob": 6,
+    "damage": [
+      4,
+      5
+    ],
+    "range": 1.5,
+    "focus": 4,
+    "armor": 0,
+    "model": "jedi",
+    "medpacs": 2,
+    "deflect": 35,
+    "guard_deflect": 70
   }
 }

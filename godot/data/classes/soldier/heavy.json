@@ -156,5 +156,21 @@
       "ap": 0,
       "ends_turn": false
     }
-  }
+  },
+  "base_stats": {
+    "hp": 8,
+    "armor": 2,
+    "aim": 60,
+    "mob": 4,
+    "dmg": [
+      3,
+      6
+    ],
+    "range": 7,
+    "nades": 2,
+    "init": 7,
+    "will": 60,
+    "desc": "Heavy weapons. Grenades, rockets and armor-shredding fire."
+  },
+  "unit_stats": {}
 }

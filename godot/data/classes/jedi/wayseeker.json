@@ -205,5 +205,40 @@
       "ap": 0,
       "ends_turn": false
     }
+  },
+  "base_stats": {
+    "jedi": 1,
+    "hp": 5,
+    "aim": 72,
+    "mob": 6,
+    "dmg": [
+      3,
+      5
+    ],
+    "range": 1.5,
+    "deflect": 30,
+    "dodge": 10,
+    "guardDef": 55,
+    "maxF": 5,
+    "init": 13,
+    "will": 75,
+    "lockEra": 3,
+    "desc": "Wandering Jedi who reshape the battlefield. Unlocks in the High Republic era."
+  },
+  "unit_stats": {
+    "hp": 5,
+    "aim": 75,
+    "mob": 6,
+    "damage": [
+      3,
+      5
+    ],
+    "range": 1.5,
+    "focus": 5,
+    "armor": 0,
+    "model": "jedi",
+    "medpacs": 2,
+    "deflect": 35,
+    "guard_deflect": 70
   }
 }

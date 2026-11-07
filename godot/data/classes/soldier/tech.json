@@ -70,5 +70,34 @@
       "cost": 1,
       "ends_turn": false
     }
+  },
+  "base_stats": {
+    "hp": 7,
+    "armor": 1,
+    "aim": 68,
+    "mob": 5,
+    "dmg": [
+      3,
+      5
+    ],
+    "range": 7,
+    "init": 11,
+    "will": 60,
+    "desc": "Engineer and slicer. Hacks devices and deploys shield support."
+  },
+  "unit_stats": {
+    "hp": 7,
+    "aim": 68,
+    "mob": 5,
+    "damage": [
+      3,
+      5
+    ],
+    "range": 7,
+    "focus": 0,
+    "armor": 1,
+    "model": "trooper",
+    "medpacs": 2,
+    "clip": 4
   }
 }

@@ -69,5 +69,34 @@
       "cost": 1,
       "ends_turn": true
     }
+  },
+  "base_stats": {
+    "hp": 9,
+    "armor": 2,
+    "aim": 72,
+    "mob": 5,
+    "dmg": [
+      3,
+      6
+    ],
+    "range": 8,
+    "init": 9,
+    "will": 65,
+    "desc": "Armored droid soldier with support modules."
+  },
+  "unit_stats": {
+    "hp": 9,
+    "aim": 72,
+    "mob": 5,
+    "damage": [
+      3,
+      6
+    ],
+    "range": 8,
+    "focus": 0,
+    "armor": 2,
+    "model": "trooper",
+    "medpacs": 2,
+    "clip": 4
   }
 }

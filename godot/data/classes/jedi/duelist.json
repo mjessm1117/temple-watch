@@ -16,5 +16,7 @@
   "bonus_kit": [],
   "bonus_passives": [],
   "tree": {},
-  "abilities": {}
+  "abilities": {},
+  "base_stats": {},
+  "unit_stats": {}
 }

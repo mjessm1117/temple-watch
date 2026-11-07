@@ -45,7 +45,7 @@ static func choose(r: Dictionary, pick: String) -> bool:
 	return true
 
 static func battle_stats(r: Dictionary) -> Dictionary:
-	var base: Dictionary = Data.get_table("core", "CLASS").get(str(r.get("cls", "")), {}).duplicate(true)
+	var base: Dictionary = Classes.class_data(str(r.get("cls", ""))).get("base_stats", Data.get_table("core", "CLASS").get(str(r.get("cls", "")), {})).duplicate(true)
 	if base.is_empty(): return {}
 	for rank in range(2, int(r.get("rank", 1)) + 1):
 		var gain: Dictionary = Data.get_table("core", "RANK_GAIN").get(str(rank), {})

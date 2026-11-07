@@ -188,5 +188,35 @@
       "cost": 1,
       "ends_turn": false
     }
+  },
+  "base_stats": {
+    "hp": 6,
+    "aim": 80,
+    "mob": 6,
+    "dmg": [
+      4,
+      7
+    ],
+    "range": 11,
+    "crit": 15,
+    "init": 15,
+    "will": 50,
+    "desc": "Long-range marksman. Marks targets and lands critical hits."
+  },
+  "unit_stats": {
+    "hp": 6,
+    "aim": 80,
+    "mob": 6,
+    "damage": [
+      4,
+      7
+    ],
+    "range": 11,
+    "focus": 0,
+    "armor": 0,
+    "crit": 15,
+    "model": "scout",
+    "medpacs": 2,
+    "clip": 4
   }
 }

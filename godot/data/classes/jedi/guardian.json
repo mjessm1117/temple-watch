@@ -282,5 +282,39 @@
       "cost": 1,
       "ends_turn": true
     }
+  },
+  "base_stats": {
+    "jedi": 1,
+    "hp": 6,
+    "aim": 75,
+    "mob": 5,
+    "dmg": [
+      4,
+      6
+    ],
+    "range": 1.5,
+    "deflect": 35,
+    "dodge": 5,
+    "guardDef": 70,
+    "maxF": 4,
+    "init": 14,
+    "will": 70,
+    "desc": "Front-line Jedi. Tough, protects allies, best at holding ground."
+  },
+  "unit_stats": {
+    "hp": 6,
+    "aim": 75,
+    "mob": 5,
+    "damage": [
+      4,
+      6
+    ],
+    "range": 1.5,
+    "focus": 4,
+    "armor": 0,
+    "model": "jedi",
+    "medpacs": 2,
+    "deflect": 35,
+    "guard_deflect": 70
   }
 }

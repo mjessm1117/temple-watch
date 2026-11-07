@@ -218,5 +218,34 @@
       "cost": 1,
       "ends_turn": false
     }
+  },
+  "base_stats": {
+    "hp": 7,
+    "aim": 65,
+    "mob": 5,
+    "dmg": [
+      2,
+      4
+    ],
+    "range": 6,
+    "kits": 2,
+    "init": 9,
+    "will": 55,
+    "desc": "Field medic and tech. Revives the fallen and hacks consoles."
+  },
+  "unit_stats": {
+    "hp": 7,
+    "aim": 65,
+    "mob": 5,
+    "damage": [
+      2,
+      4
+    ],
+    "range": 6,
+    "focus": 0,
+    "armor": 0,
+    "model": "trooper",
+    "medpacs": 2,
+    "clip": 4
   }
 }

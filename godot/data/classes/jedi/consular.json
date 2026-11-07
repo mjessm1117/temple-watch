@@ -286,5 +286,39 @@
       "cost": 1,
       "ends_turn": true
     }
+  },
+  "base_stats": {
+    "jedi": 1,
+    "hp": 5,
+    "aim": 75,
+    "mob": 5,
+    "dmg": [
+      3,
+      4
+    ],
+    "range": 1.5,
+    "deflect": 25,
+    "dodge": 5,
+    "guardDef": 50,
+    "maxF": 4,
+    "init": 12,
+    "will": 75,
+    "desc": "Force support. Heals, shields and controls the fight."
+  },
+  "unit_stats": {
+    "hp": 5,
+    "aim": 75,
+    "mob": 5,
+    "damage": [
+      3,
+      4
+    ],
+    "range": 1.5,
+    "focus": 4,
+    "armor": 0,
+    "model": "jedi",
+    "medpacs": 2,
+    "deflect": 25,
+    "guard_deflect": 50
   }
 }

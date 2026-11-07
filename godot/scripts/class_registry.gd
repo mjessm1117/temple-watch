@@ -73,9 +73,12 @@ static func ability_catalog() -> Dictionary:
 static func apply_to_units(catalog: Dictionary) -> void:
 	for row in classes().values():
 		var kind := str(row.get("unit_kind", ""))
-		if kind != "" and catalog.has(kind) and str(catalog[kind].get("side", "")) == "player":
-			catalog[kind].kit = row.get("kit", []).duplicate()
-			catalog[kind].passives = row.get("passives", []).duplicate()
+		if kind == "" or row.get("unit_stats", {}).is_empty(): continue
+		if not catalog.has(kind): catalog[kind] = {"name":str(row.name), "class_name":str(row.name), "side":"player"}
+		if str(catalog[kind].get("side", "")) != "player": continue
+		for key in row.unit_stats: catalog[kind][key] = row.unit_stats[key]
+		catalog[kind].kit = row.get("kit", []).duplicate()
+		catalog[kind].passives = row.get("passives", []).duplicate()
 
 static func validate() -> Array[String]:
 	var errors: Array[String] = []
@@ -85,8 +88,9 @@ static func validate() -> Array[String]:
 			var row := class_data(id)
 			if row.is_empty(): errors.append("Missing " + id); continue
 			if row.get("schema") != 1 or row.get("id") != id or row.get("side") != side_name: errors.append("Identity " + id)
-			for key in ["name", "role", "signature", "branches", "implemented", "unit_kind", "kit", "passives", "bonus_kit", "bonus_passives", "tree", "abilities"]:
+			for key in ["name", "role", "signature", "branches", "implemented", "unit_kind", "base_stats", "unit_stats", "kit", "passives", "bonus_kit", "bonus_passives", "tree", "abilities"]:
 				if not row.has(key): errors.append("%s lacks %s" % [id, key])
+			if not row.get("base_stats", {}) is Dictionary or not row.get("unit_stats", {}) is Dictionary: errors.append("Invalid stats " + id)
 			if not row.get("kit", []) is Array or not row.get("abilities", {}) is Dictionary: errors.append("Invalid kit/abilities " + id); continue
 			for ability in row.get("kit", []) + row.get("bonus_kit", []):
 				if not row.get("abilities", {}).has(ability): errors.append("%s lacks ability %s" % [id, ability])
