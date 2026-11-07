@@ -100,7 +100,10 @@
           }
         ]
       },
-      "chance": 85
+      "chance": 85,
+      "pierce": true,
+      "ignore_cover": true,
+      "description": "Fire beyond sight through one enemy; a lifted target takes bonus damage."
     },
     "sniper_spotter_round": {
       "name": "Spotter Round",
@@ -108,7 +111,7 @@
       "cost": 1,
       "rank": 2,
       "target": "enemy",
-      "effect": "status",
+      "effect": "attack",
       "range": 9,
       "ends_turn": true,
       "status": "marked",
@@ -117,14 +120,7 @@
         "consume": [
           {
             "tag": "EXPOSED",
-            "target": "target",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 1
-              }
-            ]
+            "target": "target"
           }
         ],
         "apply": [
@@ -133,7 +129,22 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "ally_aim": 25,
+      "effects": [
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
+        }
+      ],
+      "description": "Mark a target and call one ally into a squadsight follow-up shot.",
+      "damage": [
+        1,
+        1
+      ],
+      "no_los": true,
+      "ammo_cost": 1
     },
     "sniper_quickdraw": {
       "name": "Quickdraw",
@@ -143,11 +154,11 @@
       "target": "enemy",
       "effect": "attack",
       "range": 12,
-      "ends_turn": true,
+      "ends_turn": false,
       "damage": "weapon",
       "damage_mod": 1,
       "ammo_cost": 1,
-      "aim_mod": 11,
+      "aim_mod": -10,
       "chain": {
         "consume": [
           {
@@ -168,7 +179,9 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "shots": 2,
+      "description": "Two quick shots without ending the turn."
     },
     "sniper_dead_eye": {
       "name": "Dead Eye",
@@ -203,7 +216,10 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "ignore_cover": true,
+      "crit_mod": 35,
+      "description": "A precision shot ignores cover and raises critical chance."
     },
     "sniper_cover_splitter": {
       "name": "Cover Splitter",
@@ -238,7 +254,17 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "pierce": true,
+      "cover_damage": 4,
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 1
+        }
+      ],
+      "description": "Pierce a line of targets and brace behind the rifle."
     },
     "sniper_eagle_perch": {
       "name": "Eagle Perch",
@@ -246,7 +272,7 @@
       "cost": 1,
       "rank": 4,
       "target": "self",
-      "effect": "overwatch",
+      "effect": "hold_line",
       "range": 8,
       "ends_turn": false,
       "chain": {
@@ -270,7 +296,15 @@
             "amount": 2
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 3
+        }
+      ],
+      "description": "Hold an overwatch lane from a fortified perch."
     },
     "sniper_crossfire": {
       "name": "Crossfire",
@@ -278,7 +312,7 @@
       "cost": 1,
       "rank": 4,
       "target": "enemy",
-      "effect": "attack",
+      "effect": "backup",
       "range": 12,
       "ends_turn": true,
       "damage": "weapon",
@@ -305,7 +339,15 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "target": "target",
+          "amount": 2
+        }
+      ],
+      "description": "Call another shooter into the target and add a grazing hit."
     },
     "sniper_gravity_sight": {
       "name": "Gravity Sight",
@@ -340,7 +382,18 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "no_los": true,
+      "ignore_cover": true,
+      "effects": [
+        {
+          "type": "status",
+          "target": "target",
+          "amount": 1,
+          "status": "stunned"
+        }
+      ],
+      "description": "Track a target through terrain and suppress its reaction."
     },
     "sniper_ricochet": {
       "name": "Ricochet",
@@ -359,14 +412,7 @@
         "consume": [
           {
             "tag": "LIFTED",
-            "target": "target",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 1
-              }
-            ]
+            "target": "target"
           }
         ],
         "apply": [
@@ -375,7 +421,10 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "shots": 1,
+      "description": "Shot ricochets to exactly one nearby second enemy.",
+      "bounce": 1
     },
     "sniper_execution_order": {
       "name": "Execution Order",
@@ -410,7 +459,17 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "crit_mod": 45,
+      "ignore_cover": true,
+      "effects": [
+        {
+          "type": "damage",
+          "target": "target",
+          "amount": 3
+        }
+      ],
+      "description": "Execute a wounded mark with a cover-piercing critical shot."
     },
     "sniper_duel_trigger": {
       "name": "Duel Trigger",
@@ -420,7 +479,7 @@
       "target": "enemy",
       "effect": "attack",
       "range": 12,
-      "ends_turn": true,
+      "ends_turn": false,
       "damage": "weapon",
       "damage_mod": 4,
       "ammo_cost": 1,
@@ -445,7 +504,20 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
+        },
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 2
+        }
+      ],
+      "description": "Trade a shot and recover an action behind a guard."
     },
     "sniper_one_shot": {
       "name": "One Shot",
@@ -457,9 +529,8 @@
       "range": 12,
       "ends_turn": true,
       "capstone": true,
-      "cooldown": 3,
       "damage": "weapon",
-      "damage_mod": 4,
+      "damage_mod": 6,
       "ammo_cost": 1,
       "aim_mod": 15,
       "chain": {
@@ -482,7 +553,21 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "pierce": true,
+      "ignore_cover": true,
+      "crit_mod": 60,
+      "effects": [
+        {
+          "type": "damage",
+          "target": "target",
+          "amount": 5
+        }
+      ],
+      "description": "Once per mission: a killing line through cover and armor.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "sniper"
     },
     "sniper_hail_of_lead": {
       "name": "Hail of Lead",
@@ -494,11 +579,10 @@
       "range": 12,
       "ends_turn": true,
       "capstone": true,
-      "cooldown": 3,
       "damage": "weapon",
       "damage_mod": 5,
       "ammo_cost": 1,
-      "aim_mod": 16,
+      "aim_mod": -10,
       "chain": {
         "consume": [
           {
@@ -519,7 +603,19 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "shots": 4,
+      "effects": [
+        {
+          "type": "damage",
+          "target": "all_enemies",
+          "amount": 2
+        }
+      ],
+      "description": "Once per mission: four shots and suppressive damage to every foe.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "sniper"
     }
   },
   "base_stats": {
@@ -551,6 +647,7 @@
     "crit": 15,
     "model": "trooper",
     "medpacs": 2,
-    "clip": 4
+    "clip": 4,
+    "soldier_capstone": 1
   }
 }

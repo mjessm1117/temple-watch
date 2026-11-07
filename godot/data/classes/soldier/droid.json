@@ -84,12 +84,12 @@
         {
           "type": "heal",
           "target": "self",
-          "amount": 4
+          "amount": 5
         },
         {
           "type": "shield",
           "target": "self",
-          "amount": 2
+          "amount": 3
         }
       ],
       "chain": {
@@ -114,7 +114,8 @@
           }
         ]
       },
-      "amount": 0
+      "amount": 0,
+      "description": "Rebuild a wrecked chassis in place."
     },
     "droid_repeater_module": {
       "name": "Repeater Module",
@@ -148,7 +149,10 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "shots": 3,
+      "aim_mod": -15,
+      "description": "Repeater module lays three suppressive shots."
     },
     "droid_shield_module": {
       "name": "Shield Module",
@@ -181,7 +185,15 @@
             "amount": 6
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "shield",
+          "target": "all_allies",
+          "amount": 1
+        }
+      ],
+      "description": "Shield module reinforces its target and nearby squad."
     },
     "droid_sensor_module": {
       "name": "Sensor Module",
@@ -192,7 +204,7 @@
       "effect": "status",
       "range": 12,
       "ends_turn": true,
-      "status": "stunned",
+      "status": "marked",
       "chance": 73,
       "chain": {
         "consume": [
@@ -214,7 +226,17 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "ally_aim": 22,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_enemies",
+          "amount": 1,
+          "tag": "MARKED"
+        }
+      ],
+      "description": "Sensor module marks every visible enemy."
     },
     "droid_jetpack_module": {
       "name": "Jetpack Module",
@@ -246,7 +268,15 @@
           }
         ]
       },
-      "next_strike_aim": 10
+      "next_strike_aim": 10,
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 2
+        }
+      ],
+      "description": "Jetpack leap gains a landing shield."
     },
     "droid_flamer_module": {
       "name": "Flamer Module",
@@ -283,7 +313,21 @@
             "target": "area_enemies"
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "BURNING"
+        },
+        {
+          "type": "status",
+          "target": "area_enemies",
+          "status": "panicked"
+        }
+      ],
+      "description": "Flamer blankets an area in lasting fire and panics survivors."
     },
     "droid_med_module": {
       "name": "Med Module",
@@ -299,7 +343,12 @@
         {
           "type": "heal",
           "target": "target",
-          "amount": 3
+          "amount": 5
+        },
+        {
+          "type": "heal",
+          "target": "self",
+          "amount": 2
         }
       ],
       "chain": {
@@ -323,7 +372,8 @@
             "amount": 6
           }
         ]
-      }
+      },
+      "description": "Med module treats its target and self-repairs."
     },
     "droid_targeting_protocol": {
       "name": "Targeting Protocol",
@@ -357,7 +407,17 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "ignore_cover": true,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "target",
+          "amount": 1,
+          "tag": "MARKED"
+        }
+      ],
+      "description": "Targeting computer ignores cover and primes follow-up shots."
     },
     "droid_servo_lock": {
       "name": "Servo Lock",
@@ -368,8 +428,8 @@
       "effect": "status",
       "range": 9,
       "ends_turn": true,
-      "status": "suppressed",
-      "chance": 78,
+      "status": "rooted",
+      "chance": 100,
       "chain": {
         "consume": [
           {
@@ -390,7 +450,15 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "target": "target",
+          "amount": 2
+        }
+      ],
+      "description": "Servo lock immobilizes a target and tears its joints."
     },
     "droid_reactive_plate": {
       "name": "Reactive Plate",
@@ -398,7 +466,7 @@
       "cost": 1,
       "rank": 6,
       "target": "self",
-      "effect": "overwatch",
+      "effect": "hunker",
       "range": 8,
       "ends_turn": false,
       "chain": {
@@ -422,7 +490,17 @@
             "amount": 6
           }
         ]
-      }
+      },
+      "defense": 25,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "self",
+          "amount": 1,
+          "tag": "SHIELDED"
+        }
+      ],
+      "description": "Reactive plate hunkers and charges a shield."
     },
     "droid_ion_relay": {
       "name": "Ion Relay",
@@ -456,7 +534,18 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "tech": true,
+      "pierce": true,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_enemies",
+          "amount": 1,
+          "tag": "IONIZED"
+        }
+      ],
+      "description": "Ion relay pierces a line and ionizes hostiles."
     },
     "droid_omni_frame": {
       "name": "Omni Frame",
@@ -468,7 +557,6 @@
       "range": 5,
       "ends_turn": false,
       "capstone": true,
-      "cooldown": 3,
       "aim": 8,
       "chain": {
         "consume": [
@@ -491,7 +579,24 @@
             "amount": 6
           }
         ]
-      }
+      },
+      "shield": 6,
+      "effects": [
+        {
+          "type": "action",
+          "target": "all_allies",
+          "amount": 1
+        },
+        {
+          "type": "shield",
+          "target": "all_allies",
+          "amount": 3
+        }
+      ],
+      "description": "Once per mission: omni-frame gives each ally an action and reinforced plating.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "droid"
     },
     "droid_core_overload": {
       "name": "Core Overload",
@@ -503,10 +608,9 @@
       "range": 7,
       "ends_turn": true,
       "capstone": true,
-      "cooldown": 3,
       "damage": [
-        5,
-        6
+        8,
+        10
       ],
       "cover_damage": 8,
       "chain": {
@@ -529,7 +633,25 @@
             "target": "area_enemies"
           }
         ]
-      }
+      },
+      "friendly_fire": true,
+      "effects": [
+        {
+          "type": "damage",
+          "target": "self",
+          "amount": 4
+        },
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "BURNING"
+        }
+      ],
+      "description": "Once per mission: sacrifice chassis integrity to ignite a huge blast.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "droid"
     }
   },
   "base_stats": {
@@ -559,7 +681,8 @@
     "armor": 2,
     "model": "trooper",
     "medpacs": 2,
-    "clip": 4
+    "clip": 4,
+    "soldier_capstone": 1
   },
   "modules": {
     "slots": 3,

@@ -25,6 +25,7 @@ func capture() -> void:
 	flow.campaign = Campaign.new()
 	flow.active = true
 	var r: Dictionary = flow.campaign.soldier("u1")
+	r.n = "Rex Vale"
 	for class_id in ["Sniper", "Droid"]:
 		r.cls = class_id
 		r.classes = [class_id.to_lower()]
@@ -48,15 +49,26 @@ func capture() -> void:
 	actor.name = "Republic Sniper"
 	actor.kit.append("sniper_squadsight")
 	actor.range = 16
-	enemy.x = int(actor.x) + 3
+	enemy.x = int(actor.x) + 2
 	enemy.y = int(actor.y)
 	enemy.awake = true
 	enemy.spotted = true
 	battle._select(int(actor.id))
 	battle.action = "sniper_squadsight"
 	battle._refresh_highlights(true)
+	print("SOLDIER18 SHOT reason ", battle.mission.ability_reason(int(actor.id), "sniper_squadsight"), " phase ", battle.mission.phase)
 	battle._use_ability(int(enemy.id))
-	await create_timer(1.0).timeout
+	await create_timer(1.6).timeout
+	print("SOLDIER18 SHOT uses ", battle.mission.ability_uses.get("sniper_squadsight", 0), " enemy hp ", enemy.hp)
+	battle.pivot = Vector3((float(actor.x) + float(enemy.x)) * 0.5, 0, (float(actor.y) + float(enemy.y)) * 0.5)
+	battle.zoom = 15.0
+	battle._update_camera()
+	battle._refresh()
+	if int(battle.mission.ability_uses.get("sniper_squadsight", 0)) > 0:
+		var from := Vector3(float(actor.x), 1.4, float(actor.y))
+		var to := Vector3(float(enemy.x), 1.4, float(enemy.y))
+		battle.fx.bolt(from, to, false, false)
+		battle.fx.float_text(to - Vector3.UP * 0.6, "SQUADSIGHT", Color("f0cf86"), true)
 	await _shot("battle-sniper-squadsight-844x390", 0.05)
 	battle.queue_free()
 	quit()

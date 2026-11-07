@@ -4,6 +4,7 @@ const UI = preload("res://scripts/campaign/ui.gd")
 const Classes = preload("res://scripts/class_registry.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
 const Mentor = preload("res://scripts/campaign/mentor17.gd")
+const Soldier = preload("res://scripts/effects_soldier.gd")
 var campaign: RefCounted
 var unit_id := ""
 var scroll: ScrollContainer
@@ -52,6 +53,27 @@ func _add_button(label_text: String, callback: Callable) -> void:
 	button.custom_minimum_size.y = 44
 	content.add_child(button)
 
+func _ability_name(id: String) -> String:
+	var ability: Dictionary = Classes.ability_catalog().get(id, {})
+	return str(ability.get("name", id)) + (" · Once per mission" if bool(ability.get("once_per_mission", false)) else "")
+
+func _path_names(paths: Array) -> String:
+	var names := PackedStringArray()
+	for id in paths: names.append(str(Classes.class_data(str(id)).get("name", id)))
+	return ", ".join(names)
+
+func _droid_modules(r: Dictionary) -> void:
+	if Classes.class_id(str(r.cls)) != "droid": return
+	var data: Dictionary = Soldier.module_data()
+	var selected := Soldier.selected_modules(r)
+	content.add_child(UI.label("DROID MODULES  ·  CHOOSE A SLOT", 14, UI.GOLD))
+	for slot in selected.size():
+		var current := str(selected[slot])
+		content.add_child(UI.label("SLOT %d: %s" % [slot + 1, str(data.choices.get(current, {}).get("name", current))], 14))
+		for key in data.choices:
+			if key in selected: continue
+			_add_button("Slot %d → %s" % [slot + 1, str(data.choices[key].name)], _swap_module.bind(slot, str(key)))
+
 func _refresh() -> void:
 	var offset := scroll.scroll_vertical
 	UI.clear(content)
@@ -59,17 +81,17 @@ func _refresh() -> void:
 	if r.is_empty(): return
 	var side_name := Classes.side(str(r.cls))
 	var rank: Dictionary = Classes.rank_data(side_name, int(r.get("rank", 1)))
-	content.add_child(UI.label("%s  ·  %s" % [r.n, r.cls], 19, UI.GOLD))
+	content.add_child(UI.label("%s  ·  %s" % [r.n, Classes.class_data(str(r.cls)).get("name", r.cls)], 19, UI.GOLD))
 	content.add_child(UI.label("RANK %d: %s  ·  POWER %d" % [int(r.rank), str(rank.get("title", r.get("title", ""))), Classes.power(side_name, int(r.rank))], 16))
 	content.add_child(UI.label("TIER  %s" % str(rank.get("tier", "")), 15, UI.ACCENT))
 	if rank.has("aura"): content.add_child(UI.label("Aura ×%d  ·  third action once per mission" % int(rank.aura), 14))
 	elif rank.has("saber_forms"): content.add_child(UI.label("Second Focus pip  ·  saber forms", 14))
 	content.add_child(UI.label("BLEND SLOTS  %d / %d" % [r.get("classes", []).size(), Classes.blend_slots(side_name, int(r.rank))], 15, UI.ACCENT))
-	content.add_child(UI.label("Paths: %s" % ", ".join(r.get("classes", [])), 14))
+	content.add_child(UI.label("Paths: %s" % _path_names(r.get("classes", [])), 14))
 	if side_name == "jedi" and int(r.rank) <= 2:
 		if str(r.get("mentor_id", "")) != "":
 			var master: Dictionary = campaign.soldier(str(r.mentor_id))
-			content.add_child(UI.label("Mentor: %s  ·  taught %s" % [master.get("n", ""), r.get("taught_ability", "")], 14, UI.GOLD))
+			content.add_child(UI.label("Mentor: %s  ·  taught %s" % [master.get("n", ""), _ability_name(str(r.get("taught_ability", "")))], 14, UI.GOLD))
 		else:
 			content.add_child(UI.label("CHOOSE A MASTER MENTOR", 14, UI.GOLD))
 			for master in campaign.state.roster:
@@ -79,9 +101,10 @@ func _refresh() -> void:
 					if str(other.get("mentor_id", "")) == str(master.id) and str(other.get("status", "")) == "active" and int(other.get("rank", 0)) <= 2: pupils += 1
 				if pupils >= 2: continue
 				var signature := str(Classes.class_data(str(master.cls)).get("signature", ""))
-				if signature != "": _add_button("Train with %s · %s" % [master.n, signature], _mentor.bind(str(master.id), signature))
+				if signature != "": _add_button("Train with %s · %s" % [master.n, _ability_name(signature)], _mentor.bind(str(master.id), signature))
 	for legacy in r.get("legacies", []):
-		content.add_child(UI.label("Legacy: %s · %s at 50%% power" % [legacy.get("mentor", ""), legacy.get("ability", "")], 14, UI.GOLD))
+		content.add_child(UI.label("Legacy: %s · %s at 50%% power" % [legacy.get("mentor", ""), _ability_name(str(legacy.get("ability", "")))], 14, UI.GOLD))
+	_droid_modules(r)
 	if r.get("classes", []).size() < Classes.blend_slots(side_name, int(r.rank)):
 		content.add_child(UI.label("CHOOSE ANOTHER PATH", 14, UI.GOLD))
 		for id in Classes.IDS[side_name]:
@@ -89,11 +112,11 @@ func _refresh() -> void:
 	if int(r.get("pick", 0)) > 0:
 		content.add_child(UI.label("RANK %d ABILITY PICK" % int(r.pick), 14, UI.GOLD))
 		for id in Progression.tree_options(r, int(r.pick)):
-			_add_button(str(id), _pick.bind(str(id)))
+			_add_button(_ability_name(str(id)), _pick.bind(str(id)))
 	var options := Progression.cross_options(r)
 	if not options.is_empty():
 		content.add_child(UI.label("CROSS-TRAINED ABILITIES", 14, UI.GOLD))
-		for id in options: _add_button(str(id), _cross_pick.bind(str(id)))
+		for id in options: _add_button(_ability_name(str(id)), _cross_pick.bind(str(id)))
 	if options.is_empty() and int(r.get("pick", 0)) == 0:
 		content.add_child(UI.label("Next ability choices unlock with rank and training.", 14, UI.MUTED))
 	scroll.set_deferred("scroll_vertical", offset)
@@ -112,6 +135,9 @@ func _blend(id: String) -> void:
 
 func _cross_pick(id: String) -> void:
 	if Progression.choose_cross(campaign.soldier(unit_id), id): _save()
+
+func _swap_module(slot: int, module_id: String) -> void:
+	if Soldier.swap_module(campaign.soldier(unit_id), slot, module_id): _save()
 
 func _mentor(id: String, skill: String) -> void:
 	if Mentor.assign(campaign, id, unit_id, skill): _save()

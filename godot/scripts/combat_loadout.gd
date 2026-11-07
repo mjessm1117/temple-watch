@@ -1,6 +1,7 @@
 extends RefCounted
 const Data = preload("res://scripts/campaign/data.gd")
 const Classes = preload("res://scripts/class_registry.gd")
+const Soldier = preload("res://scripts/effects_soldier.gd")
 
 static func setup(m: RefCounted, state: Dictionary) -> void:
 	for u in m.living("player"):
@@ -8,6 +9,11 @@ static func setup(m: RefCounted, state: Dictionary) -> void:
 		var passive: Array = u.get("passives", []).duplicate()
 		var class_row := Classes.class_data(str(u.class_name))
 		active = class_row.get("bonus_kit", []).duplicate() if not u.has("rid") or str(u.class_name) in ["Heavy", "Scout"] else []
+		if u.has("rid") and Classes.side(str(u.class_name)) == "soldier":
+			for skill in class_row.get("kit", []):
+				if skill not in u.kit: u.kit.append(skill)
+			u.soldier_capstone = 1
+			if Classes.class_id(str(u.class_name)) == "medic": u.med_beacon = 1
 		passive += class_row.get("bonus_passives", [])
 		match str(u.class_name):
 			"Shieldbearer": active = ["shieldWall","taunt","hunker"]
@@ -17,6 +23,10 @@ static func setup(m: RefCounted, state: Dictionary) -> void:
 		if bool(u.get("master_action_available", false)): active.append("masterAction")
 		for r in state.get("roster", []):
 			if str(r.get("id", "")) != str(u.get("rid", "-")): continue
+			if Classes.class_id(str(r.cls)) == "droid":
+				var module_choices: Dictionary = Soldier.module_data().get("choices", {})
+				for module in module_choices.values(): u.kit.erase(str(module.get("ability", "")))
+				for skill in Soldier.module_abilities(r): u.kit.append(skill)
 			for blend in r.get("classes", []):
 				if Classes.class_id(str(blend)) == Classes.class_id(str(r.cls)): continue
 				for skill in Classes.class_data(str(blend)).get("kit", []):

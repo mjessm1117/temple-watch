@@ -110,9 +110,16 @@
         {
           "type": "status",
           "target": "self",
+          "amount": 1,
           "status": "concealed"
+        },
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 1
         }
-      ]
+      ],
+      "description": "Conceal and set a defensive decoy."
     },
     "mark": {
       "name": "Mark",
@@ -174,9 +181,16 @@
         {
           "type": "status",
           "target": "self",
+          "amount": 1,
           "status": "concealed"
+        },
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
         }
-      ]
+      ],
+      "description": "Vanish and immediately reposition."
     },
     "deadeye": {
       "name": "Deadeye",
@@ -263,7 +277,6 @@
       "range": 7,
       "ends_turn": true,
       "capstone": true,
-      "cooldown": 3,
       "damage": [
         4,
         5
@@ -289,7 +302,25 @@
             "target": "area_enemies"
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "status",
+          "target": "area_enemies",
+          "amount": 1,
+          "status": "rooted"
+        },
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "PINNED"
+        }
+      ],
+      "description": "Once per mission: trap an area, root survivors and pin them.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "scout"
     },
     "scout_ambush": {
       "name": "Ambush",
@@ -346,7 +377,20 @@
           }
         ]
       },
-      "capstone": true
+      "capstone": true,
+      "ignore_cover": true,
+      "crit_mod": 35,
+      "effects": [
+        {
+          "type": "damage",
+          "target": "target",
+          "amount": 4
+        }
+      ],
+      "description": "Once per mission: strike through cover and cash in three primed tags.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "scout"
     }
   },
   "base_stats": {
@@ -377,6 +421,7 @@
     "crit": 15,
     "model": "scout",
     "medpacs": 2,
-    "clip": 4
+    "clip": 4,
+    "soldier_capstone": 1
   }
 }

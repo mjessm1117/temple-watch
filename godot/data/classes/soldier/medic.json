@@ -139,7 +139,15 @@
             "amount": 2
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "target": "all_allies",
+          "amount": 1
+        }
+      ],
+      "description": "Spray and cleanse the squad while restoring health."
     },
     "heal": {
       "name": "Medkit",
@@ -175,7 +183,7 @@
       "effect": "status",
       "range": 8,
       "ends_turn": true,
-      "status": "stunned",
+      "status": "suppressed",
       "chance": 75,
       "chain": {
         "consume": [
@@ -227,7 +235,21 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "tag",
+          "target": "target",
+          "amount": 1,
+          "tag": "BURNING"
+        },
+        {
+          "type": "damage",
+          "target": "target",
+          "amount": 1
+        }
+      ],
+      "description": "Toxin dart poisons its target for damage each turn."
     },
     "smoke": {
       "name": "Smoke",
@@ -321,7 +343,27 @@
       "cost": 1,
       "ends_turn": false,
       "rank": 7,
-      "capstone": true
+      "capstone": true,
+      "once_per_mission": true,
+      "description": "Once per mission: restore the whole squad, shield them, and keep the medic moving.",
+      "capstone_template": "medic",
+      "effects": [
+        {
+          "type": "heal",
+          "target": "all_allies",
+          "amount": 4
+        },
+        {
+          "type": "shield",
+          "target": "all_allies",
+          "amount": 3
+        },
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
+        }
+      ]
     },
     "hackDroid": {
       "name": "Hack Droid",
@@ -334,7 +376,24 @@
       "cost": 1,
       "ends_turn": true,
       "rank": 7,
-      "capstone": true
+      "capstone": true,
+      "once_per_mission": true,
+      "description": "Once per mission: stun a target Droid, ionize every enemy, and shield the squad.",
+      "capstone_template": "medic",
+      "charges": "soldier_capstone",
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_enemies",
+          "tag": "IONIZED",
+          "amount": 1
+        },
+        {
+          "type": "shield",
+          "target": "all_allies",
+          "amount": 2
+        }
+      ]
     }
   },
   "base_stats": {
@@ -364,6 +423,8 @@
     "armor": 0,
     "model": "trooper",
     "medpacs": 2,
-    "clip": 4
+    "clip": 4,
+    "soldier_capstone": 1,
+    "med_beacon": 1
   }
 }

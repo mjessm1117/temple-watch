@@ -100,7 +100,16 @@
           }
         ]
       },
-      "chance": 80
+      "chance": 80,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_enemies",
+          "amount": 1,
+          "tag": "MARKED"
+        }
+      ],
+      "description": "Remote probe marks contacts even beyond line of sight."
     },
     "tech_emp_burst": {
       "name": "EMP Burst",
@@ -137,7 +146,18 @@
             "target": "area_enemies"
           }
         ]
-      }
+      },
+      "status": "stunned",
+      "droid_damage": 5,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "IONIZED"
+        }
+      ],
+      "description": "EMP blast drains shields and stuns droids."
     },
     "tech_remote_shield": {
       "name": "Remote Shield",
@@ -170,7 +190,15 @@
             "amount": 5
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 2
+        }
+      ],
+      "description": "Project a shield to an ally and retain a small reserve."
     },
     "tech_slicer_ping": {
       "name": "Slicer Ping",
@@ -181,7 +209,7 @@
       "effect": "status",
       "range": 9,
       "ends_turn": true,
-      "status": "stunned",
+      "status": "marked",
       "chance": 73,
       "chain": {
         "consume": [
@@ -203,7 +231,22 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "ally_aim": 20,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_enemies",
+          "amount": 1,
+          "tag": "IONIZED"
+        },
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
+        }
+      ],
+      "description": "Ping and ionize enemy signals while recovering the slicer action."
     },
     "tech_turret_pin": {
       "name": "Turret Pin",
@@ -238,7 +281,18 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "shots": 2,
+      "aim_mod": -10,
+      "effects": [
+        {
+          "type": "status",
+          "target": "target",
+          "amount": 1,
+          "status": "rooted"
+        }
+      ],
+      "description": "A turret double-taps and pins its target."
     },
     "tech_override": {
       "name": "Override",
@@ -246,11 +300,11 @@
       "cost": 1,
       "rank": 4,
       "target": "enemy_droid",
-      "effect": "status",
+      "effect": "attack",
       "range": 8,
       "ends_turn": true,
       "status": "stunned",
-      "chance": 90,
+      "chance": 100,
       "chain": {
         "consume": [
           {
@@ -271,7 +325,20 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
+        }
+      ],
+      "description": "Override a droid into the player squad for the rest of the battle.",
+      "damage": [
+        1,
+        1
+      ],
+      "no_los": true
     },
     "tech_field_repair": {
       "name": "Field Repair",
@@ -304,7 +371,20 @@
             "amount": 5
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "target": "target",
+          "amount": 4
+        },
+        {
+          "type": "shield",
+          "target": "target",
+          "amount": 2
+        }
+      ],
+      "description": "Repair a wounded ally and reinforce its plating."
     },
     "tech_ion_spike": {
       "name": "Ion Spike",
@@ -339,7 +419,17 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "ignore_cover": true,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "target",
+          "amount": 1,
+          "tag": "IONIZED"
+        }
+      ],
+      "description": "A cover-proof ion shot that empties shields."
     },
     "tech_barrier_grid": {
       "name": "Barrier Grid",
@@ -372,7 +462,18 @@
             "amount": 5
           }
         ]
-      }
+      },
+      "shield": 3,
+      "defense": 20,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_allies",
+          "amount": 2,
+          "tag": "SHIELDED"
+        }
+      ],
+      "description": "Project a defensive grid over the whole squad."
     },
     "tech_signal_jam": {
       "name": "Signal Jam",
@@ -383,7 +484,7 @@
       "effect": "status",
       "range": 9,
       "ends_turn": true,
-      "status": "stunned",
+      "status": "suppressed",
       "chance": 79,
       "chain": {
         "consume": [
@@ -405,7 +506,17 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "aim": -40,
+      "effects": [
+        {
+          "type": "status",
+          "target": "all_enemies",
+          "amount": 1,
+          "status": "disarmed"
+        }
+      ],
+      "description": "Jam enemy weapons and suppress the marked contact."
     },
     "tech_drone_relay": {
       "name": "Drone Relay",
@@ -438,7 +549,20 @@
             "amount": 5
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "action",
+          "target": "target",
+          "amount": 1
+        },
+        {
+          "type": "shield",
+          "target": "target",
+          "amount": 3
+        }
+      ],
+      "description": "Relay a fresh action and shield to one ally."
     },
     "tech_total_shutdown": {
       "name": "Total Shutdown",
@@ -450,7 +574,6 @@
       "range": 7,
       "ends_turn": true,
       "capstone": true,
-      "cooldown": 3,
       "damage": [
         4,
         5
@@ -476,7 +599,21 @@
             "target": "area_enemies"
           }
         ]
-      }
+      },
+      "droid_damage": 12,
+      "status": "stunned",
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_enemies",
+          "amount": 1,
+          "tag": "IONIZED"
+        }
+      ],
+      "description": "Once per mission: global ion surge with a droid-ending EMP blast.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "tech"
     },
     "tech_engineer_network": {
       "name": "Engineer Network",
@@ -488,8 +625,7 @@
       "range": 5,
       "ends_turn": false,
       "capstone": true,
-      "cooldown": 3,
-      "aim": 9,
+      "aim": 10,
       "chain": {
         "consume": [
           {
@@ -511,7 +647,24 @@
             "amount": 5
           }
         ]
-      }
+      },
+      "shield": 4,
+      "effects": [
+        {
+          "type": "heal",
+          "target": "all_allies",
+          "amount": 3
+        },
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
+        }
+      ],
+      "description": "Once per mission: repair and coordinate the whole squad.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "tech"
     }
   },
   "base_stats": {
@@ -541,6 +694,7 @@
     "armor": 1,
     "model": "trooper",
     "medpacs": 2,
-    "clip": 4
+    "clip": 4,
+    "soldier_capstone": 1
   }
 }

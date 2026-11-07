@@ -186,7 +186,7 @@ func message(value: String) -> void:
 func use_ability(id: int, ability_id: String, target_id: int = -1, target_tile: Vector2i = Vector2i(-1, -1)) -> bool:
 	var ok: bool = Ability.use(self, id, ability_id, target_id, target_tile)
 	if modern and ok:
-		if ability_id not in ["hide", "ghost", "meditate"]: break_concealment("Ability used")
+		if ability_id not in ["hide", "ghost", "meditate", "scout_concealment", "scout_vanish"]: break_concealment("Ability used")
 		if ability_id == "beastCalm" and bool(unit_by_id(target_id).get("stunned",false)): pressure_state.calm_turn = turn
 		_check_win()
 	return ok

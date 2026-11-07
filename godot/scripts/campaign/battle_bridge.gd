@@ -23,7 +23,7 @@ static func create(campaign, seed_value: int) -> RefCounted:
 	var players: Array[Dictionary] = []
 	for i in pending.squad.size():
 		var r: Dictionary = campaign.soldier(str(pending.squad[i]))
-		var kind := str(r.cls).to_lower()
+		var kind := str(Classes.class_data(str(r.cls)).get("unit_kind", str(r.cls).to_lower()))
 		if not m.catalog.has(kind) or m.catalog[kind].side != "player":
 			kind = "guardian" if Progression.is_jedi(r) else "soldier"
 		m._spawn(kind, tiles[i].x, tiles[i].y, -1)

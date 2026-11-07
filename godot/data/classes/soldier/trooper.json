@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "trooper",
-  "name": "Soldier",
+  "name": "Trooper",
   "side": "soldier",
   "role": "Armor and explosives",
   "signature": "trooper_thermal_detonator",
@@ -103,7 +103,16 @@
             "target": "area_enemies"
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "BURNING"
+        }
+      ],
+      "description": "Detonate cover and set the area on fire."
     },
     "suppress": {
       "name": "Suppress",
@@ -169,7 +178,17 @@
             "target": "area_enemies"
           }
         ]
-      }
+      },
+      "clear_overwatch": true,
+      "effects": [
+        {
+          "type": "status",
+          "target": "area_enemies",
+          "amount": 1,
+          "status": "rooted"
+        }
+      ],
+      "description": "Breach cover and root enemies in the debris."
     },
     "hunker": {
       "name": "Hunker Down",
@@ -223,7 +242,10 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "ignore_cover": true,
+      "pierce": true,
+      "description": "Pierce cover and continue through a second target."
     },
     "trooper_firebreak": {
       "name": "Firebreak",
@@ -260,7 +282,21 @@
             "target": "area_enemies"
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "BURNING"
+        },
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 2
+        }
+      ],
+      "description": "Burn an area while the trooper braces behind armor."
     },
     "shoot": {
       "name": "Shoot",
@@ -312,7 +348,16 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "shots": 2,
+      "effects": [
+        {
+          "type": "damage",
+          "target": "target",
+          "amount": 2
+        }
+      ],
+      "description": "Fire two counter rounds and a fragmentation hit."
     },
     "trooper_assault_storm": {
       "name": "Assault Storm",
@@ -324,10 +369,9 @@
       "range": 7,
       "ends_turn": true,
       "capstone": true,
-      "cooldown": 3,
       "damage": [
-        4,
-        5
+        6,
+        8
       ],
       "cover_damage": 7,
       "chain": {
@@ -350,7 +394,24 @@
             "target": "area_enemies"
           }
         ]
-      }
+      },
+      "effects": [
+        {
+          "type": "action",
+          "target": "all_allies",
+          "amount": 1
+        },
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "EXPOSED"
+        }
+      ],
+      "description": "Once per mission: breach an area and release the assault squad.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "trooper"
     },
     "trooper_grenadier_finale": {
       "name": "Grenadier Finale",
@@ -362,10 +423,9 @@
       "range": 7,
       "ends_turn": true,
       "capstone": true,
-      "cooldown": 3,
       "damage": [
-        5,
-        6
+        7,
+        9
       ],
       "cover_damage": 8,
       "chain": {
@@ -388,7 +448,26 @@
             "target": "area_enemies"
           }
         ]
-      }
+      },
+      "friendly_fire": true,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "BURNING"
+        },
+        {
+          "type": "status",
+          "target": "area_enemies",
+          "amount": 1,
+          "status": "rooted"
+        }
+      ],
+      "description": "Once per mission: risky inferno that roots surviving enemies.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "trooper"
     }
   },
   "base_stats": {
@@ -418,6 +497,7 @@
     "armor": 1,
     "model": "trooper",
     "medpacs": 2,
-    "clip": 4
+    "clip": 4,
+    "soldier_capstone": 1
   }
 }
