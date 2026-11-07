@@ -96,7 +96,7 @@
         ],
         "apply": [
           {
-            "tag": "BURNING",
+            "tag": "EXPOSED",
             "target": "area_enemies"
           }
         ]
@@ -147,7 +147,7 @@
       "chain": {
         "consume": [
           {
-            "tag": "PINNED",
+            "tag": "MARKED",
             "target": "area_enemies",
             "bonus": [
               {
@@ -160,7 +160,7 @@
         ],
         "apply": [
           {
-            "tag": "IONIZED",
+            "tag": "MARKED",
             "target": "area_enemies"
           }
         ]
@@ -200,20 +200,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "MARKED",
+            "tag": "STAGGERED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 2
+                "amount": 1
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "BURNING",
+            "tag": "EXPOSED",
             "target": "target"
           }
         ]
@@ -243,14 +243,14 @@
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 2
+                "amount": 1
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "MARKED",
+            "tag": "PINNED",
             "target": "area_enemies"
           }
         ]
@@ -289,20 +289,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "EXPOSED",
+            "tag": "STAGGERED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 3
+                "amount": 1
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "EXPOSED",
+            "tag": "STAGGERED",
             "target": "target"
           }
         ]
@@ -327,20 +327,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "LIFTED",
+            "tag": "STAGGERED",
             "target": "area_enemies",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 3
+                "amount": 1
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "PINNED",
+            "tag": "IONIZED",
             "target": "area_enemies"
           }
         ]
@@ -365,20 +365,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "MARKED",
+            "tag": "IONIZED",
             "target": "area_enemies",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 4
+                "amount": 1
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "BURNING",
+            "tag": "EXPOSED",
             "target": "area_enemies"
           }
         ]
