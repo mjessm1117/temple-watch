@@ -37,7 +37,7 @@ for y in (965,1418):
         bbox=d.textbbox((0,0),name,font=small);w=bbox[2]-bbox[0]
         d.text((x-w/2,y),name,font=small,fill=white)
 d.text((26,1470),'Medic W17 baseline uses the shared Trooper; Scout keeps its existing model.',font=small,fill=muted)
-d.text((26,1503),'New heads: Meshy previews.  Gear: Blender.  Assets staged only; class wiring unchanged.',font=small,fill=muted)
+d.text((26,1503),'Enclosed Blender helmets and rounded gear.  Idle poses.  Assets staged only.',font=small,fill=muted)
 sheet=sheet.crop((0,0,2100,1545))
 sheet.save(root/'2026-11-07-soldier-art-before-after.jpg',quality=92,subsampling=0)
 print(root/'2026-11-07-soldier-art-before-after.jpg')

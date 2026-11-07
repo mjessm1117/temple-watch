@@ -22,13 +22,21 @@ def import_lineup(version):
         elif kind=='medic':file=ROOT/'godot/assets/models/units/trooper.glb'
         else:file=ROOT/f'godot/assets/units/w17/{kind}.glb'
         old=set(bpy.data.objects)
+        old_actions=set(bpy.data.actions)
         bpy.ops.import_scene.gltf(filepath=str(file))
         new=[o for o in bpy.data.objects if o not in old]
+        idle=next((a for a in bpy.data.actions if a not in old_actions and a.name.split('.')[0]=='idle'),None)
         x=(index-3)*1.55
         for o in new:
             if o.type=='MESH' and o.name.startswith('Icosphere'):o.hide_render=True
             if o.parent is None and o.type!='CAMERA' and o.type!='LIGHT':o.location.x+=x
-            if o.type=='ARMATURE':o.data.pose_position='REST';ARMS.append(o)
+            if o.type=='ARMATURE':
+                o.data.pose_position='POSE'
+                if idle:
+                    o.animation_data_create();o.animation_data.action=idle
+                    if idle.slots:o.animation_data.action_slot=idle.slots[0]
+                ARMS.append(o)
+    SC.frame_set(10)
 
 def lights():
     bpy.ops.object.light_add(type='AREA',location=(0,-5,8));bpy.context.object.data.energy=900;bpy.context.object.data.shape='DISK';bpy.context.object.data.size=10

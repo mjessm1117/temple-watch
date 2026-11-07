@@ -28,7 +28,7 @@ for(const kind of process.argv.slice(2))for(const suffix of ['', '_lod1']){
  const resolver=createDefaultPropertyResolver(old,fresh);
  let added=0;
  for(const src of fresh.getRoot().listNodes()){
-   if(!src.getMesh()||src.getName()==='output_unwrapped'||src.getName().includes('__hand_r')||src.getName().includes('__spine_03')&&/rocket|battery|pack|tube|strap|cable/.test(src.getName()))continue;
+   if(!src.getMesh()||src.getName()==='output_unwrapped')continue;
    const parent=src.listParents().find(p=>joints.has(p.getName()));
    if(!parent)continue;
    const mesh=copyToDocument(old,fresh,[src.getMesh()],resolver).get(src.getMesh());

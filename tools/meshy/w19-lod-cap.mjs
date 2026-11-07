@@ -11,7 +11,8 @@ for(const p of process.argv.slice(2)){
  const d=await io.read(p);
  const count=()=>d.getRoot().listMeshes().flatMap(m=>m.listPrimitives()).reduce((n,q)=>n+(q.getIndices()?.getCount()||q.getAttribute('POSITION').getCount())/3,0);
  const before=count();
- if(before>2500)await d.transform(simplify({simplifier:MeshoptSimplifier,ratio:Math.min(.92,2400/before),error:.03}),prune(),unpartition());
+ for(let pass=0;count()>2500&&pass<5;pass++)
+  await d.transform(simplify({simplifier:MeshoptSimplifier,ratio:.62,error:.05}),prune(),unpartition());
  const after=count();if(after>2500)throw Error(`${p}: ${after} triangles > 2500`);
  await io.write(p,d);console.log(p,before,after,fs.statSync(p).size);
 }
