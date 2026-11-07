@@ -4,7 +4,7 @@
   "name": "Droid",
   "side": "soldier",
   "role": "Modules",
-  "signature": "shieldDrone",
+  "signature": "droid_rebuild",
   "branches": [
     "Repeater",
     "Shield",
@@ -16,58 +16,642 @@
   "implemented": true,
   "unit_kind": "droid",
   "kit": [
-    "shoot",
-    "overwatch",
-    "shieldDrone",
-    "rapidFire"
+    "droid_rebuild",
+    "droid_repeater_module",
+    "droid_shield_module",
+    "droid_sensor_module"
   ],
   "passives": [],
   "bonus_kit": [],
   "bonus_passives": [],
-  "tree": {},
+  "tree": {
+    "trunk": {
+      "1": [
+        "droid_rebuild"
+      ],
+      "2": [
+        "droid_repeater_module",
+        "droid_shield_module"
+      ]
+    },
+    "specs": {
+      "repeater": {
+        "n": "Repeater",
+        "sig": "droid_sensor_module",
+        "4": [
+          "droid_flamer_module"
+        ],
+        "5": [
+          "droid_targeting_protocol"
+        ],
+        "6": [
+          "droid_reactive_plate"
+        ],
+        "7": [
+          "droid_omni_frame"
+        ]
+      },
+      "shield": {
+        "n": "Shield",
+        "sig": "droid_jetpack_module",
+        "4": [
+          "droid_med_module"
+        ],
+        "5": [
+          "droid_servo_lock"
+        ],
+        "6": [
+          "droid_ion_relay"
+        ],
+        "7": [
+          "droid_core_overload"
+        ]
+      }
+    }
+  },
   "abilities": {
-    "shoot": {
-      "name": "Shoot",
+    "droid_rebuild": {
+      "name": "Rebuild",
       "ap": 1,
+      "cost": 1,
+      "rank": 1,
+      "target": "self",
+      "effect": "ap",
+      "range": 8,
+      "ends_turn": false,
+      "cooldown": 3,
+      "effects": [
+        {
+          "type": "heal",
+          "target": "self",
+          "amount": 5
+        },
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 3
+        }
+      ],
+      "chain": {
+        "consume": [
+          {
+            "tag": "ATTUNED",
+            "target": "self",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 5
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "READY",
+            "target": "self",
+            "amount": 5
+          }
+        ]
+      },
+      "amount": 0,
+      "description": "Rebuild a wrecked chassis in place."
+    },
+    "droid_repeater_module": {
+      "name": "Repeater Module",
+      "ap": 1,
+      "cost": 1,
+      "rank": 2,
       "target": "enemy",
       "effect": "attack",
-      "weapon": true,
-      "range": "weapon",
-      "cost": 1,
-      "ends_turn": true
+      "range": 8,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 1,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "STAGGERED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "PINNED",
+            "target": "target"
+          }
+        ]
+      },
+      "shots": 3,
+      "aim_mod": -15,
+      "description": "Repeater module lays three suppressive shots."
     },
-    "overwatch": {
-      "name": "Overwatch",
+    "droid_shield_module": {
+      "name": "Shield Module",
       "ap": 1,
-      "target": "self",
-      "effect": "overwatch",
       "cost": 1,
-      "ends_turn": true
-    },
-    "shieldDrone": {
-      "name": "Shield Drone",
-      "ap": 1,
-      "range": 1.5,
+      "rank": 2,
       "target": "ally",
       "effect": "buff",
-      "shield": 4,
-      "charges": "shield_drone",
-      "cost": 1,
-      "ends_turn": false
+      "range": 5,
+      "ends_turn": false,
+      "shield": 2,
+      "chain": {
+        "consume": [
+          {
+            "tag": "READY",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 6
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "SHIELDED",
+            "target": "target",
+            "amount": 6
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "shield",
+          "target": "all_allies",
+          "amount": 1
+        }
+      ],
+      "description": "Shield module reinforces its target and nearby squad."
     },
-    "rapidFire": {
-      "name": "Rapid Fire",
+    "droid_sensor_module": {
+      "name": "Sensor Module",
       "ap": 1,
-      "range": "weapon",
+      "cost": 1,
+      "rank": 3,
+      "target": "enemy",
+      "effect": "status",
+      "range": 12,
+      "ends_turn": true,
+      "status": "marked",
+      "chance": 73,
+      "chain": {
+        "consume": [
+          {
+            "tag": "STAGGERED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "MARKED",
+            "target": "target"
+          }
+        ]
+      },
+      "ally_aim": 22,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_enemies",
+          "amount": 1,
+          "tag": "MARKED"
+        }
+      ],
+      "description": "Sensor module marks every visible enemy."
+    },
+    "droid_jetpack_module": {
+      "name": "Jetpack Module",
+      "ap": 1,
+      "cost": 1,
+      "rank": 3,
+      "target": "tile",
+      "effect": "leap",
+      "range": 5,
+      "ends_turn": false,
+      "chain": {
+        "consume": [
+          {
+            "tag": "PINNED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "EXPOSED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "next_strike_aim": 10,
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 2
+        }
+      ],
+      "description": "Jetpack leap gains a landing shield."
+    },
+    "droid_flamer_module": {
+      "name": "Flamer Module",
+      "ap": 1,
+      "cost": 1,
+      "rank": 4,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "damage": [
+        3,
+        4
+      ],
+      "cover_damage": 4,
+      "cooldown": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "BURNING",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "BURNING"
+        },
+        {
+          "type": "status",
+          "target": "area_enemies",
+          "status": "panicked"
+        }
+      ],
+      "description": "Flamer blankets an area in lasting fire and panics survivors."
+    },
+    "droid_med_module": {
+      "name": "Med Module",
+      "ap": 1,
+      "cost": 1,
+      "rank": 4,
+      "target": "ally",
+      "effect": "buff",
+      "range": 5,
+      "ends_turn": false,
+      "shield": 4,
+      "effects": [
+        {
+          "type": "heal",
+          "target": "target",
+          "amount": 5
+        },
+        {
+          "type": "heal",
+          "target": "self",
+          "amount": 2
+        }
+      ],
+      "chain": {
+        "consume": [
+          {
+            "tag": "INSPIRED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 6
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "INSPIRED",
+            "target": "target",
+            "amount": 6
+          }
+        ]
+      },
+      "description": "Med module treats its target and self-repairs."
+    },
+    "droid_targeting_protocol": {
+      "name": "Targeting Protocol",
+      "ap": 1,
+      "cost": 1,
+      "rank": 5,
       "target": "enemy",
       "effect": "attack",
+      "range": 8,
+      "ends_turn": true,
       "damage": "weapon",
-      "shots": 2,
-      "aim_mod": -15,
-      "cooldown": 1,
-      "ammo_cost": 2,
+      "damage_mod": 3,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "MARKED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "PINNED",
+            "target": "target"
+          }
+        ]
+      },
+      "ignore_cover": true,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "target",
+          "amount": 1,
+          "tag": "MARKED"
+        }
+      ],
+      "description": "Targeting computer ignores cover and primes follow-up shots."
+    },
+    "droid_servo_lock": {
+      "name": "Servo Lock",
+      "ap": 1,
       "cost": 1,
-      "ends_turn": true
+      "rank": 5,
+      "target": "enemy",
+      "effect": "status",
+      "range": 9,
+      "ends_turn": true,
+      "status": "rooted",
+      "chance": 100,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "BURNING",
+            "target": "target"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "target": "target",
+          "amount": 2
+        }
+      ],
+      "description": "Servo lock immobilizes a target and tears its joints."
+    },
+    "droid_reactive_plate": {
+      "name": "Reactive Plate",
+      "ap": 1,
+      "cost": 1,
+      "rank": 6,
+      "target": "self",
+      "effect": "hunker",
+      "range": 8,
+      "ends_turn": false,
+      "chain": {
+        "consume": [
+          {
+            "tag": "INSPIRED",
+            "target": "self",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 6
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "ATTUNED",
+            "target": "self",
+            "amount": 6
+          }
+        ]
+      },
+      "defense": 25,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "self",
+          "amount": 1,
+          "tag": "SHIELDED"
+        }
+      ],
+      "description": "Reactive plate hunkers and charges a shield."
+    },
+    "droid_ion_relay": {
+      "name": "Ion Relay",
+      "ap": 1,
+      "cost": 1,
+      "rank": 6,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 8,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 4,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "STAGGERED",
+            "target": "target"
+          }
+        ]
+      },
+      "tech": true,
+      "pierce": true,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_enemies",
+          "amount": 1,
+          "tag": "IONIZED"
+        }
+      ],
+      "description": "Ion relay pierces a line and ionizes hostiles."
+    },
+    "droid_omni_frame": {
+      "name": "Omni Frame",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "self",
+      "effect": "aura",
+      "range": 5,
+      "ends_turn": false,
+      "capstone": true,
+      "aim": 8,
+      "chain": {
+        "consume": [
+          {
+            "tag": "SHIELDED",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 6
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "SHIELDED",
+            "target": "all_allies",
+            "amount": 6
+          }
+        ]
+      },
+      "shield": 6,
+      "effects": [
+        {
+          "type": "action",
+          "target": "all_allies",
+          "amount": 1
+        },
+        {
+          "type": "shield",
+          "target": "all_allies",
+          "amount": 3
+        }
+      ],
+      "description": "Once per mission: omni-frame gives each ally an action and reinforced plating.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "droid"
+    },
+    "droid_core_overload": {
+      "name": "Core Overload",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "capstone": true,
+      "damage": [
+        8,
+        10
+      ],
+      "cover_damage": 8,
+      "chain": {
+        "consume": [
+          {
+            "tag": "PINNED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "EXPOSED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "friendly_fire": true,
+      "effects": [
+        {
+          "type": "damage",
+          "target": "self",
+          "amount": 4
+        },
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "BURNING"
+        }
+      ],
+      "description": "Once per mission: sacrifice chassis integrity to ignite a huge blast.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "droid"
     }
   },
   "base_stats": {
@@ -97,6 +681,41 @@
     "armor": 2,
     "model": "trooper",
     "medpacs": 2,
-    "clip": 4
+    "clip": 4,
+    "soldier_capstone": 1
+  },
+  "modules": {
+    "slots": 3,
+    "default": [
+      "repeater",
+      "shield",
+      "sensor"
+    ],
+    "choices": {
+      "repeater": {
+        "name": "Repeater",
+        "ability": "droid_repeater_module"
+      },
+      "shield": {
+        "name": "Shield",
+        "ability": "droid_shield_module"
+      },
+      "sensor": {
+        "name": "Sensor",
+        "ability": "droid_sensor_module"
+      },
+      "jetpack": {
+        "name": "Jetpack",
+        "ability": "droid_jetpack_module"
+      },
+      "flamer": {
+        "name": "Flamer",
+        "ability": "droid_flamer_module"
+      },
+      "med": {
+        "name": "Med",
+        "ability": "droid_med_module"
+      }
+    }
   }
 }

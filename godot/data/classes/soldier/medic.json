@@ -4,7 +4,7 @@
   "name": "Medic",
   "side": "soldier",
   "role": "Healer",
-  "signature": "heal",
+  "signature": "medic_bacta_spray",
   "branches": [
     "Field Surgeon",
     "Combat Medic"
@@ -31,72 +31,289 @@
   "tree": {
     "trunk": {
       "1": [
-        "smoke",
-        "mDrilled",
-        "mTriage"
+        "medic_bacta_spray"
       ],
       "2": [
-        "reviveStim",
-        "fieldKit",
-        "mHardy"
+        "heal",
+        "reviveStim"
       ]
     },
     "specs": {
-      "surgeon": {
-        "4": [
-          "traumaBag",
-          "mSurgeon",
-          "mdHands"
-        ],
-        "5": [
-          "mStoic",
-          "mFieldSurgeon",
-          "mdCover"
-        ],
-        "6": [
-          "rally",
-          "mSurgCalm",
-          "mdLast"
-        ],
-        "7": [
-          "mAngel",
-          "mSurgMiracle",
-          "mdMiracle"
-        ],
+      "field_surgeon": {
         "n": "Field Surgeon",
-        "ic": "sp_surgeon",
-        "desc": "Saves lives. More kits, steadier hands.",
-        "sig": "medBeacon"
-      },
-      "tech": {
+        "sig": "medic_toxin_dart",
         "4": [
-          "combatMedic",
-          "mTechArmor",
-          "mtDroid"
+          "hack"
         ],
         "5": [
-          "mMarksman",
-          "mark",
-          "mtPlate"
+          "shieldDrone"
         ],
         "6": [
-          "suppress",
-          "mTechOverclock",
-          "mtOver"
+          "shoot"
         ],
         "7": [
-          "mVeteran",
-          "mTechDrones",
-          "mtNet"
+          "medBeacon"
+        ]
+      },
+      "combat_medic": {
+        "n": "Combat Medic",
+        "sig": "smoke",
+        "4": [
+          "protocol"
         ],
-        "n": "Combat Tech",
-        "ic": "sp_tech",
-        "desc": "Drones, armor and a sharper blaster.",
-        "sig": "shieldDrone"
+        "5": [
+          "scan"
+        ],
+        "6": [
+          "overwatch"
+        ],
+        "7": [
+          "hackDroid"
+        ]
       }
     }
   },
   "abilities": {
+    "medic_bacta_spray": {
+      "name": "Bacta Spray",
+      "ap": 1,
+      "cost": 1,
+      "rank": 1,
+      "target": "self",
+      "effect": "mass_heal",
+      "range": 3,
+      "ends_turn": false,
+      "aim": 3,
+      "heal": 3,
+      "cooldown": 2,
+      "chain": {
+        "consume": [
+          {
+            "tag": "BURNING",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "heal",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "tag": "STAGGERED",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "heal",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          },
+          {
+            "tag": "PINNED",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "heal",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "INSPIRED",
+            "target": "all_allies",
+            "amount": 2
+          },
+          {
+            "tag": "SHIELDED",
+            "target": "all_allies",
+            "amount": 2
+          },
+          {
+            "tag": "READY",
+            "target": "all_allies",
+            "amount": 2
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "target": "all_allies",
+          "amount": 1
+        }
+      ],
+      "description": "Spray and cleanse the squad while restoring health."
+    },
+    "heal": {
+      "name": "Medkit",
+      "ap": 1,
+      "range": 1.5,
+      "target": "ally_injured",
+      "effect": "heal",
+      "heal": 4,
+      "revive": 2,
+      "charges": "medpacs",
+      "cost": 1,
+      "ends_turn": false,
+      "rank": 2
+    },
+    "reviveStim": {
+      "name": "Revive Stim",
+      "ap": 1,
+      "range": 2,
+      "target": "ally_down",
+      "effect": "heal",
+      "revive": 2,
+      "charges": "medpacs",
+      "cost": 1,
+      "ends_turn": false,
+      "rank": 2
+    },
+    "medic_toxin_dart": {
+      "name": "Toxin Dart",
+      "ap": 1,
+      "cost": 1,
+      "rank": 3,
+      "target": "enemy",
+      "effect": "status",
+      "range": 8,
+      "ends_turn": true,
+      "status": "suppressed",
+      "chance": 75,
+      "chain": {
+        "consume": [
+          {
+            "tag": "MARKED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "tag": "PINNED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          },
+          {
+            "tag": "BURNING",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "STAGGERED",
+            "target": "target"
+          },
+          {
+            "tag": "EXPOSED",
+            "target": "target"
+          },
+          {
+            "tag": "IONIZED",
+            "target": "target"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "tag",
+          "target": "target",
+          "amount": 1,
+          "tag": "BURNING"
+        },
+        {
+          "type": "damage",
+          "target": "target",
+          "amount": 1
+        }
+      ],
+      "description": "Toxin dart poisons its target for damage each turn."
+    },
+    "smoke": {
+      "name": "Smoke",
+      "ap": 1,
+      "range": 6,
+      "target": "tile",
+      "effect": "area_buff",
+      "radius": 1,
+      "defense": 20,
+      "duration": 2,
+      "charges": "smoke",
+      "cost": 1,
+      "ends_turn": true,
+      "rank": 3
+    },
+    "hack": {
+      "name": "Hack",
+      "ap": 1,
+      "range": 4,
+      "target": "tile_console",
+      "effect": "hack",
+      "cost": 1,
+      "ends_turn": true,
+      "rank": 4
+    },
+    "protocol": {
+      "name": "Combat Protocol",
+      "ap": 1,
+      "range": 8,
+      "target": "enemy_droid",
+      "effect": "attack",
+      "damage": [
+        3,
+        3
+      ],
+      "chance": 100,
+      "no_los": true,
+      "ignore_cover": true,
+      "cost": 1,
+      "ends_turn": true,
+      "rank": 4
+    },
+    "shieldDrone": {
+      "name": "Shield Drone",
+      "ap": 1,
+      "range": 1.5,
+      "target": "ally",
+      "effect": "buff",
+      "shield": 4,
+      "charges": "shield_drone",
+      "cost": 1,
+      "ends_turn": false,
+      "rank": 5
+    },
+    "scan": {
+      "name": "Scan Clue",
+      "ap": 1,
+      "range": 1.5,
+      "target": "tile_scan",
+      "effect": "scan",
+      "cost": 1,
+      "ends_turn": false,
+      "rank": 5
+    },
     "shoot": {
       "name": "Shoot",
       "ap": 1,
@@ -115,77 +332,38 @@
       "cost": 1,
       "ends_turn": true
     },
-    "heal": {
-      "name": "Medkit",
+    "medBeacon": {
+      "name": "Med Beacon",
       "ap": 1,
-      "range": 1.5,
-      "target": "ally_injured",
-      "effect": "heal",
-      "heal": 4,
-      "revive": 2,
-      "charges": "medpacs",
+      "target": "self",
+      "effect": "mass_heal",
+      "range": 3,
+      "heal": 2,
+      "charges": "med_beacon",
       "cost": 1,
-      "ends_turn": false
-    },
-    "smoke": {
-      "name": "Smoke",
-      "ap": 1,
-      "range": 6,
-      "target": "tile",
-      "effect": "area_buff",
-      "radius": 1,
-      "defense": 20,
-      "duration": 2,
-      "charges": "smoke",
-      "cost": 1,
-      "ends_turn": true
-    },
-    "hack": {
-      "name": "Hack",
-      "ap": 1,
-      "range": 4,
-      "target": "tile_console",
-      "effect": "hack",
-      "cost": 1,
-      "ends_turn": true
-    },
-    "reviveStim": {
-      "name": "Revive Stim",
-      "ap": 1,
-      "range": 2,
-      "target": "ally_down",
-      "effect": "heal",
-      "revive": 2,
-      "charges": "medpacs",
-      "cost": 1,
-      "ends_turn": false
-    },
-    "protocol": {
-      "name": "Combat Protocol",
-      "ap": 1,
-      "range": 8,
-      "target": "enemy_droid",
-      "effect": "attack",
-      "damage": [
-        3,
-        3
-      ],
-      "chance": 100,
-      "no_los": true,
-      "ignore_cover": true,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "shieldDrone": {
-      "name": "Shield Drone",
-      "ap": 1,
-      "range": 1.5,
-      "target": "ally",
-      "effect": "buff",
-      "shield": 4,
-      "charges": "shield_drone",
-      "cost": 1,
-      "ends_turn": false
+      "ends_turn": false,
+      "rank": 7,
+      "capstone": true,
+      "once_per_mission": true,
+      "description": "Once per mission: restore the whole squad, shield them, and keep the medic moving.",
+      "capstone_template": "medic",
+      "effects": [
+        {
+          "type": "heal",
+          "target": "all_allies",
+          "amount": 4
+        },
+        {
+          "type": "shield",
+          "target": "all_allies",
+          "amount": 3
+        },
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
+        }
+      ]
     },
     "hackDroid": {
       "name": "Hack Droid",
@@ -196,27 +374,26 @@
       "status": "stunned",
       "chance": 60,
       "cost": 1,
-      "ends_turn": true
-    },
-    "scan": {
-      "name": "Scan Clue",
-      "ap": 1,
-      "range": 1.5,
-      "target": "tile_scan",
-      "effect": "scan",
-      "cost": 1,
-      "ends_turn": false
-    },
-    "medBeacon": {
-      "name": "Med Beacon",
-      "ap": 1,
-      "target": "self",
-      "effect": "mass_heal",
-      "range": 3,
-      "heal": 2,
-      "charges": "med_beacon",
-      "cost": 1,
-      "ends_turn": false
+      "ends_turn": true,
+      "rank": 7,
+      "capstone": true,
+      "once_per_mission": true,
+      "description": "Once per mission: stun a target Droid, ionize every enemy, and shield the squad.",
+      "capstone_template": "medic",
+      "charges": "soldier_capstone",
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_enemies",
+          "tag": "IONIZED",
+          "amount": 1
+        },
+        {
+          "type": "shield",
+          "target": "all_allies",
+          "amount": 2
+        }
+      ]
     }
   },
   "base_stats": {
@@ -246,6 +423,8 @@
     "armor": 0,
     "model": "trooper",
     "medpacs": 2,
-    "clip": 4
+    "clip": 4,
+    "soldier_capstone": 1,
+    "med_beacon": 1
   }
 }

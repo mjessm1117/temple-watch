@@ -4,7 +4,7 @@
   "name": "Officer",
   "side": "soldier",
   "role": "Command",
-  "signature": "rally",
+  "signature": "officer_take_that_shot",
   "branches": [
     "Commander",
     "Tactician"
@@ -12,54 +12,632 @@
   "implemented": true,
   "unit_kind": "officer",
   "kit": [
-    "shoot",
-    "overwatch",
-    "rally",
-    "mark"
+    "officer_take_that_shot",
+    "officer_command_mark",
+    "officer_rally_line"
   ],
   "passives": [],
   "bonus_kit": [],
   "bonus_passives": [],
-  "tree": {},
+  "tree": {
+    "trunk": {
+      "1": [
+        "officer_take_that_shot"
+      ],
+      "2": [
+        "officer_command_mark",
+        "officer_rally_line"
+      ]
+    },
+    "specs": {
+      "commander": {
+        "n": "Commander",
+        "sig": "officer_coordinated_fire",
+        "4": [
+          "officer_ready_signal"
+        ],
+        "5": [
+          "officer_focus_fire"
+        ],
+        "6": [
+          "officer_battle_plan"
+        ],
+        "7": [
+          "officer_full_assault"
+        ]
+      },
+      "tactician": {
+        "n": "Tactician",
+        "sig": "officer_fallback_order",
+        "4": [
+          "officer_tactical_feint"
+        ],
+        "5": [
+          "officer_hold_fast"
+        ],
+        "6": [
+          "officer_counter_order"
+        ],
+        "7": [
+          "officer_perfect_command"
+        ]
+      }
+    }
+  },
   "abilities": {
-    "shoot": {
-      "name": "Shoot",
+    "officer_take_that_shot": {
+      "name": "Take That Shot",
       "ap": 1,
-      "target": "enemy",
-      "effect": "attack",
-      "weapon": true,
-      "range": "weapon",
       "cost": 1,
-      "ends_turn": true
+      "rank": 1,
+      "target": "ally_other",
+      "effect": "handoff",
+      "range": 8,
+      "ends_turn": false,
+      "cooldown": 2,
+      "chain": {
+        "consume": [
+          {
+            "tag": "SHIELDED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 6
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "ATTUNED",
+            "target": "target",
+            "amount": 6
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "tag",
+          "target": "target",
+          "amount": 1,
+          "tag": "READY"
+        }
+      ],
+      "description": "Give an ally an action and prepare its overwatch."
     },
-    "overwatch": {
-      "name": "Overwatch",
+    "officer_command_mark": {
+      "name": "Command Mark",
       "ap": 1,
-      "target": "self",
-      "effect": "overwatch",
       "cost": 1,
-      "ends_turn": true
-    },
-    "rally": {
-      "name": "Rally",
-      "ap": 1,
-      "range": 4,
-      "target": "self",
-      "effect": "aura",
-      "clear_status": true,
-      "cost": 1,
-      "ends_turn": false
-    },
-    "mark": {
-      "name": "Mark",
-      "ap": 1,
-      "range": 11,
+      "rank": 2,
       "target": "enemy",
       "effect": "status",
+      "range": 9,
+      "ends_turn": true,
       "status": "marked",
-      "ally_aim": 15,
+      "chance": 71,
+      "chain": {
+        "consume": [
+          {
+            "tag": "PINNED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "MARKED",
+            "target": "target"
+          }
+        ]
+      },
+      "ally_aim": 25,
+      "effects": [
+        {
+          "type": "status",
+          "target": "target",
+          "amount": 1,
+          "status": "suppressed"
+        }
+      ],
+      "description": "Mark an enemy for allied accuracy and disrupt its aim."
+    },
+    "officer_rally_line": {
+      "name": "Rally Line",
+      "ap": 1,
       "cost": 1,
-      "ends_turn": true
+      "rank": 2,
+      "target": "self",
+      "effect": "aura",
+      "range": 3,
+      "ends_turn": false,
+      "aim": 8,
+      "chain": {
+        "consume": [
+          {
+            "tag": "ATTUNED",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 6
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "INSPIRED",
+            "target": "all_allies",
+            "amount": 6
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "target": "all_allies",
+          "amount": 2
+        }
+      ],
+      "description": "Rally allies with aim and battlefield first aid."
+    },
+    "officer_coordinated_fire": {
+      "name": "Coordinated Fire",
+      "ap": 1,
+      "cost": 1,
+      "rank": 3,
+      "target": "enemy",
+      "effect": "backup",
+      "range": 8,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 2,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "MARKED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "STAGGERED",
+            "target": "target"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "tag",
+          "target": "target",
+          "amount": 1,
+          "tag": "MARKED"
+        }
+      ],
+      "description": "Call another ally to shoot the marked target."
+    },
+    "officer_fallback_order": {
+      "name": "Fallback Order",
+      "ap": 1,
+      "cost": 1,
+      "rank": 3,
+      "target": "ally",
+      "effect": "handoff",
+      "range": 5,
+      "ends_turn": false,
+      "shield": 3,
+      "chain": {
+        "consume": [
+          {
+            "tag": "ATTUNED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 6
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "ATTUNED",
+            "target": "target",
+            "amount": 6
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "shield",
+          "target": "target",
+          "amount": 3
+        }
+      ],
+      "description": "Order an ally to withdraw with a fresh action and shield."
+    },
+    "officer_ready_signal": {
+      "name": "Ready Signal",
+      "ap": 1,
+      "cost": 1,
+      "rank": 4,
+      "target": "self",
+      "effect": "aura",
+      "range": 4,
+      "ends_turn": false,
+      "aim": 5,
+      "chain": {
+        "consume": [
+          {
+            "tag": "READY",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 7
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "READY",
+            "target": "all_allies",
+            "amount": 7
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "action",
+          "target": "all_allies",
+          "amount": 1
+        }
+      ],
+      "description": "Signal every ally to gain an action."
+    },
+    "officer_tactical_feint": {
+      "name": "Tactical Feint",
+      "ap": 1,
+      "cost": 1,
+      "rank": 4,
+      "target": "enemy",
+      "effect": "status",
+      "range": 9,
+      "ends_turn": true,
+      "status": "suppressed",
+      "chance": 76,
+      "chain": {
+        "consume": [
+          {
+            "tag": "EXPOSED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "PINNED",
+            "target": "target"
+          }
+        ]
+      },
+      "aim": -35,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "target",
+          "amount": 1,
+          "tag": "EXPOSED"
+        }
+      ],
+      "description": "Feint into a suppression that exposes the enemy."
+    },
+    "officer_focus_fire": {
+      "name": "Focus Fire",
+      "ap": 1,
+      "cost": 1,
+      "rank": 5,
+      "target": "enemy",
+      "effect": "backup",
+      "range": 8,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 3,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "EXPOSED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "BURNING",
+            "target": "target"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "damage",
+          "target": "target",
+          "amount": 3
+        },
+        {
+          "type": "tag",
+          "target": "target",
+          "amount": 1,
+          "tag": "MARKED"
+        }
+      ],
+      "description": "Concentrate allied fire on one marked foe."
+    },
+    "officer_hold_fast": {
+      "name": "Hold Fast",
+      "ap": 1,
+      "cost": 1,
+      "rank": 5,
+      "target": "self",
+      "effect": "aura",
+      "range": 4,
+      "ends_turn": false,
+      "aim": 0,
+      "chain": {
+        "consume": [
+          {
+            "tag": "READY",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 7
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "ATTUNED",
+            "target": "all_allies",
+            "amount": 7
+          }
+        ]
+      },
+      "defense": 30,
+      "effects": [
+        {
+          "type": "shield",
+          "target": "all_allies",
+          "amount": 2
+        }
+      ],
+      "description": "Hold a defensive formation and shield the squad."
+    },
+    "officer_battle_plan": {
+      "name": "Battle Plan",
+      "ap": 1,
+      "cost": 1,
+      "rank": 6,
+      "target": "ally",
+      "effect": "handoff",
+      "range": 5,
+      "ends_turn": false,
+      "shield": 5,
+      "chain": {
+        "consume": [
+          {
+            "tag": "INSPIRED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 7
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "INSPIRED",
+            "target": "target",
+            "amount": 7
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
+        },
+        {
+          "type": "tag",
+          "target": "target",
+          "amount": 1,
+          "tag": "INSPIRED"
+        }
+      ],
+      "description": "Give an ally initiative and keep your own command action."
+    },
+    "officer_counter_order": {
+      "name": "Counter Order",
+      "ap": 1,
+      "cost": 1,
+      "rank": 6,
+      "target": "enemy",
+      "effect": "backup",
+      "range": 8,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 4,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "EXPOSED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "IONIZED",
+            "target": "target"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "status",
+          "target": "target",
+          "amount": 1,
+          "status": "stunned"
+        }
+      ],
+      "description": "Order a countershot and stun the foe."
+    },
+    "officer_full_assault": {
+      "name": "Full Assault",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "self",
+      "effect": "aura",
+      "range": 5,
+      "ends_turn": false,
+      "capstone": true,
+      "aim": 15,
+      "chain": {
+        "consume": [
+          {
+            "tag": "INSPIRED",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 7
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "READY",
+            "target": "all_allies",
+            "amount": 7
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "action",
+          "target": "all_allies",
+          "amount": 1
+        },
+        {
+          "type": "tag",
+          "target": "all_allies",
+          "amount": 2,
+          "tag": "READY"
+        }
+      ],
+      "description": "Once per mission: order a squad-wide attack with ready follow-ups.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "officer"
+    },
+    "officer_perfect_command": {
+      "name": "Perfect Command",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "ally_other",
+      "effect": "handoff",
+      "range": 6,
+      "ends_turn": false,
+      "capstone": true,
+      "chain": {
+        "consume": [
+          {
+            "tag": "INSPIRED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 7
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "ATTUNED",
+            "target": "target",
+            "amount": 7
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "action",
+          "target": "target",
+          "amount": 1
+        },
+        {
+          "type": "shield",
+          "target": "all_allies",
+          "amount": 2
+        }
+      ],
+      "description": "Once per mission: double an ally command and guard the squad.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "officer"
     }
   },
   "base_stats": {
@@ -89,6 +667,7 @@
     "armor": 1,
     "model": "trooper",
     "medpacs": 2,
-    "clip": 4
+    "clip": 4,
+    "soldier_capstone": 1
   }
 }

@@ -4,157 +4,653 @@
   "name": "Heavy",
   "side": "soldier",
   "role": "Tank and explosives",
-  "signature": "barrage",
+  "signature": "heavy_rocket",
   "branches": [
     "Demolition",
     "Juggernaut"
   ],
   "implemented": true,
-  "unit_kind": "",
-  "kit": [],
+  "unit_kind": "heavy_soldier",
+  "kit": [
+    "heavy_rocket",
+    "heavy_breaching_shell",
+    "heavy_shield_wall"
+  ],
   "passives": [],
-  "bonus_kit": [
-    "grenade",
-    "ionNade",
-    "barrage",
-    "holdLine"
-  ],
-  "bonus_passives": [
-    "shredder"
-  ],
+  "bonus_kit": [],
+  "bonus_passives": [],
   "tree": {
     "trunk": {
       "1": [
-        "suppress",
-        "shredder",
-        "hCoverMe"
+        "heavy_rocket"
       ],
       "2": [
-        "bandolier",
-        "flakVest",
-        "hPayload"
+        "heavy_breaching_shell",
+        "heavy_shield_wall"
       ]
     },
     "specs": {
-      "demolitionist": {
+      "demolition": {
+        "n": "Demolition",
+        "sig": "heavy_shrapnel_net",
         "4": [
-          "ionNade",
-          "hDemoExtra",
-          "hdHeavy"
+          "heavy_demolition_line"
         ],
         "5": [
-          "hHeavyWeapons",
-          "hDemoBlast",
-          "hdShock"
+          "heavy_ion_buster"
         ],
         "6": [
-          "hGunner",
-          "hDemoSapper",
-          "hdBuster"
+          "heavy_siege_breaker"
         ],
         "7": [
-          "hWarlord",
-          "hDemoBig",
-          "hdArmageddon"
-        ],
-        "n": "Demolitionist",
-        "ic": "sp_demolitionist",
-        "desc": "Explosives expert. Rockets and more grenades.",
-        "sig": "rocket"
+          "heavy_armageddon"
+        ]
       },
-      "bulwark": {
+      "juggernaut": {
+        "n": "Juggernaut",
+        "sig": "heavy_juggernaut_push",
         "4": [
-          "juggernaut",
-          "hBrute",
-          "hbWall"
+          "heavy_armor_lock"
         ],
         "5": [
-          "hBulwark",
-          "hunker",
-          "hbSpite"
+          "heavy_fortress_fire"
         ],
         "6": [
-          "chainShot",
-          "hBulTaunt",
-          "hbIron"
+          "heavy_body_block"
         ],
         "7": [
-          "hTitan",
-          "hBulFort",
-          "hbAnchor"
-        ],
-        "n": "Bulwark",
-        "ic": "sp_bulwark",
-        "desc": "Walking cover. Soaks fire and holds ground.",
-        "sig": "holdLine"
+          "heavy_unbroken"
+        ]
       }
     }
   },
   "abilities": {
-    "grenade": {
-      "name": "Grenade",
+    "heavy_rocket": {
+      "name": "Rocket",
       "ap": 1,
+      "cost": 1,
+      "rank": 1,
       "target": "tile_area",
       "effect": "blast",
-      "range": 6,
+      "range": 9,
+      "ends_turn": true,
       "damage": [
-        3,
+        5,
+        7
+      ],
+      "cover_damage": 6,
+      "cooldown": 2,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "EXPOSED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "droid_damage": 10,
+      "clear_overwatch": true,
+      "description": "Rocket doubles into ionized armor and strips reactions."
+    },
+    "heavy_breaching_shell": {
+      "name": "Breaching Shell",
+      "ap": 1,
+      "cost": 1,
+      "rank": 2,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "damage": [
+        2,
         3
       ],
-      "charges": "grenades",
-      "friendly_fire": true,
-      "cover_damage": 4,
-      "cost": 1,
-      "ends_turn": true
+      "cover_damage": 2,
+      "cooldown": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "BURNING",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "clear_overwatch": true,
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 2
+        }
+      ],
+      "description": "Blast cover, interrupt overwatch, and brace the gunner."
     },
-    "ionNade": {
-      "name": "Ion Grenade",
+    "heavy_shield_wall": {
+      "name": "Shield Wall",
       "ap": 1,
+      "cost": 1,
+      "rank": 2,
+      "target": "self",
+      "effect": "aura",
+      "range": 3,
+      "ends_turn": false,
+      "aim": 0,
+      "chain": {
+        "consume": [
+          {
+            "tag": "ATTUNED",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "SHIELDED",
+            "target": "all_allies",
+            "amount": 1
+          }
+        ]
+      },
+      "shield": 4,
+      "effects": [
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
+        }
+      ],
+      "description": "Shield nearby allies while holding your ground."
+    },
+    "heavy_shrapnel_net": {
+      "name": "Shrapnel Net",
+      "ap": 1,
+      "cost": 1,
+      "rank": 3,
       "target": "tile_area",
       "effect": "blast",
-      "range": 6,
+      "range": 7,
+      "ends_turn": true,
       "damage": [
         1,
-        1
+        2
       ],
-      "droid_damage": 4,
-      "charges": "grenades",
-      "friendly_fire": true,
-      "status": "stunned",
-      "cost": 1,
-      "ends_turn": true
+      "cover_damage": 0,
+      "cooldown": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "PINNED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "status",
+          "target": "area_enemies",
+          "amount": 1,
+          "status": "rooted"
+        }
+      ],
+      "description": "Pin enemies in a shrapnel field so they cannot move."
     },
-    "barrage": {
-      "name": "Barrage",
+    "heavy_juggernaut_push": {
+      "name": "Juggernaut Push",
       "ap": 1,
+      "cost": 1,
+      "rank": 3,
+      "target": "enemy",
+      "effect": "displace",
+      "range": 9,
+      "ends_turn": true,
+      "status": "marked",
+      "chance": 74,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "IONIZED",
+            "target": "target"
+          }
+        ]
+      },
+      "distance": 3,
+      "collision_damage": 4,
+      "description": "Drive one enemy three tiles back and crush it against cover."
+    },
+    "heavy_demolition_line": {
+      "name": "Demolition Line",
+      "ap": 1,
+      "cost": 1,
+      "rank": 4,
       "target": "tile_area",
       "effect": "blast",
-      "range": "weapon",
+      "range": 7,
+      "ends_turn": true,
       "damage": [
         3,
-        5
+        4
       ],
       "cover_damage": 4,
       "cooldown": 1,
-      "ammo_cost": 2,
-      "cost": 1,
-      "ends_turn": true
+      "chain": {
+        "consume": [
+          {
+            "tag": "PINNED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "EXPOSED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "droid_damage": 5,
+      "effects": [
+        {
+          "type": "damage",
+          "target": "area_enemies",
+          "amount": 2
+        }
+      ],
+      "description": "Lay an explosive line with secondary fragmentation."
     },
-    "holdLine": {
-      "name": "Hold the Line",
+    "heavy_armor_lock": {
+      "name": "Armor Lock",
       "ap": 1,
-      "target": "self",
-      "effect": "hold_line",
       "cost": 1,
-      "ends_turn": true
+      "rank": 4,
+      "target": "self",
+      "effect": "hunker",
+      "range": 8,
+      "ends_turn": false,
+      "chain": {
+        "consume": [
+          {
+            "tag": "READY",
+            "target": "self",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "ATTUNED",
+            "target": "self",
+            "amount": 2
+          }
+        ]
+      },
+      "defense": 40,
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 4
+        }
+      ],
+      "description": "Lock armor, hunker down and gain a shield."
     },
-    "shredder": {
-      "name": "Shredder",
-      "passive": true,
-      "effect": "shred",
-      "cost": 0,
-      "ap": 0,
-      "ends_turn": false
+    "heavy_ion_buster": {
+      "name": "Ion Buster",
+      "ap": 1,
+      "cost": 1,
+      "rank": 5,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "damage": [
+        3,
+        4
+      ],
+      "cover_damage": 5,
+      "cooldown": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "PINNED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "BURNING",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "droid_damage": 9,
+      "status": "stunned",
+      "effects": [
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "IONIZED"
+        }
+      ],
+      "description": "Ion shell drains shields, stuns Droids, and interrupts overwatch.",
+      "clear_overwatch": true
+    },
+    "heavy_fortress_fire": {
+      "name": "Fortress Fire",
+      "ap": 1,
+      "cost": 1,
+      "rank": 5,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 8,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 3,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "PINNED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "MARKED",
+            "target": "target"
+          }
+        ]
+      },
+      "shots": 2,
+      "aim_mod": -15,
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 3
+        }
+      ],
+      "description": "Double fire from a reinforced position."
+    },
+    "heavy_siege_breaker": {
+      "name": "Siege Breaker",
+      "ap": 1,
+      "cost": 1,
+      "rank": 6,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "damage": [
+        4,
+        5
+      ],
+      "cover_damage": 6,
+      "cooldown": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "PINNED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "STAGGERED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "clear_overwatch": true,
+      "droid_damage": 7,
+      "effects": [
+        {
+          "type": "status",
+          "target": "area_enemies",
+          "amount": 1,
+          "status": "stunned"
+        }
+      ],
+      "description": "Collapse a siege line and stun enemies inside it."
+    },
+    "heavy_body_block": {
+      "name": "Body Block",
+      "ap": 1,
+      "cost": 1,
+      "rank": 6,
+      "target": "ally",
+      "effect": "taunt",
+      "range": 5,
+      "ends_turn": false,
+      "shield": 6,
+      "chain": {
+        "consume": [
+          {
+            "tag": "INSPIRED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "ATTUNED",
+            "target": "target",
+            "amount": 2
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "shield",
+          "target": "target",
+          "amount": 6
+        },
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 4
+        }
+      ],
+      "description": "Take the threat onto yourself and shield the ally you guard."
+    },
+    "heavy_armageddon": {
+      "name": "Armageddon",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "capstone": true,
+      "damage": [
+        7,
+        9
+      ],
+      "cover_damage": 10,
+      "chain": {
+        "consume": [
+          {
+            "tag": "EXPOSED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "EXPOSED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "friendly_fire": true,
+      "effects": [
+        {
+          "type": "status",
+          "target": "area_enemies",
+          "amount": 1,
+          "status": "stunned"
+        }
+      ],
+      "description": "Once per mission: a devastating blast that risks allies and ruins cover.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "heavy"
+    },
+    "heavy_unbroken": {
+      "name": "Unbroken",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "self",
+      "effect": "aura",
+      "range": 5,
+      "ends_turn": false,
+      "capstone": true,
+      "aim": 9,
+      "chain": {
+        "consume": [
+          {
+            "tag": "SHIELDED",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "SHIELDED",
+            "target": "all_allies",
+            "amount": 2
+          }
+        ]
+      },
+      "shield": 7,
+      "defense": 35,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_allies",
+          "amount": 3,
+          "tag": "SHIELDED"
+        },
+        {
+          "type": "heal",
+          "target": "all_allies",
+          "amount": 2
+        }
+      ],
+      "description": "Once per mission: fortify and heal the whole squad behind a shield wall.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "heavy"
     }
   },
   "base_stats": {
@@ -172,5 +668,20 @@
     "will": 60,
     "desc": "Heavy weapons. Grenades, rockets and armor-shredding fire."
   },
-  "unit_stats": {}
+  "unit_stats": {
+    "hp": 8,
+    "aim": 60,
+    "mob": 4,
+    "damage": [
+      3,
+      6
+    ],
+    "range": 7,
+    "focus": 0,
+    "armor": 2,
+    "model": "heavy",
+    "medpacs": 2,
+    "clip": 4,
+    "soldier_capstone": 1
+  }
 }

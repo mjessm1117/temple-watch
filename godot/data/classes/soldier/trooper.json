@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "id": "trooper",
-  "name": "Soldier",
+  "name": "Trooper",
   "side": "soldier",
   "role": "Armor and explosives",
-  "signature": "suppress",
+  "signature": "trooper_thermal_detonator",
   "branches": [
     "Assault",
     "Grenadier"
@@ -25,72 +25,279 @@
   "tree": {
     "trunk": {
       "1": [
-        "suppress",
-        "hunker",
-        "soBreach"
+        "trooper_thermal_detonator"
       ],
       "2": [
-        "rapidFire",
-        "flakVest",
-        "soAdrenaline"
+        "suppress",
+        "rapidFire"
       ]
     },
     "specs": {
-      "sergeant": {
+      "assault": {
+        "n": "Assault",
+        "sig": "trooper_breach_charge",
         "4": [
-          "holdLine",
-          "soSteel",
-          "sgCover"
+          "rally"
         ],
         "5": [
-          "mark",
-          "soSgtDrill",
-          "sgOrders"
+          "trooper_firebreak"
         ],
         "6": [
-          "smoke",
-          "soTough",
-          "sgStand"
+          "overwatch"
         ],
         "7": [
-          "soCommander",
-          "soSgtHero",
-          "sgVictory"
-        ],
-        "n": "Sergeant",
-        "ic": "sp_sergeant",
-        "desc": "Leader. Rallies and steadies the squad.",
-        "sig": "rally"
+          "trooper_assault_storm"
+        ]
       },
-      "vanguard": {
+      "grenadier": {
+        "n": "Grenadier",
+        "sig": "hunker",
         "4": [
-          "veteran",
-          "soVanCharge",
-          "svRush"
+          "trooper_armor_piercer"
         ],
         "5": [
-          "soMarksman",
-          "soVanPlate",
-          "svBrawl"
+          "shoot"
         ],
         "6": [
-          "runGun",
-          "soVanShred",
-          "svFury"
+          "trooper_counter_barrage"
         ],
         "7": [
-          "soLegend",
-          "soVanStorm",
-          "svRampage"
-        ],
-        "n": "Vanguard",
-        "ic": "sp_vanguard",
-        "desc": "Assault trooper. Closes in and hits hard.",
-        "sig": "chainShot"
+          "trooper_grenadier_finale"
+        ]
       }
     }
   },
   "abilities": {
+    "trooper_thermal_detonator": {
+      "name": "Thermal Detonator",
+      "ap": 1,
+      "cost": 1,
+      "rank": 1,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 6,
+      "ends_turn": true,
+      "damage": [
+        4,
+        5
+      ],
+      "cover_damage": 5,
+      "cooldown": 2,
+      "chain": {
+        "consume": [
+          {
+            "tag": "MARKED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "EXPOSED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "BURNING"
+        }
+      ],
+      "description": "Detonate cover and set the area on fire."
+    },
+    "suppress": {
+      "name": "Suppress",
+      "ap": 1,
+      "range": "weapon",
+      "target": "enemy",
+      "effect": "status",
+      "status": "suppressed",
+      "aim": -30,
+      "reaction": true,
+      "ammo_cost": 1,
+      "cost": 1,
+      "ends_turn": true,
+      "rank": 2
+    },
+    "rapidFire": {
+      "name": "Rapid Fire",
+      "ap": 1,
+      "range": "weapon",
+      "target": "enemy",
+      "effect": "attack",
+      "damage": "weapon",
+      "shots": 2,
+      "aim_mod": -15,
+      "cooldown": 1,
+      "ammo_cost": 2,
+      "cost": 1,
+      "ends_turn": true,
+      "rank": 2
+    },
+    "trooper_breach_charge": {
+      "name": "Breach Charge",
+      "ap": 1,
+      "cost": 1,
+      "rank": 3,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "damage": [
+        2,
+        3
+      ],
+      "cover_damage": 3,
+      "cooldown": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "MARKED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "PINNED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "clear_overwatch": true,
+      "effects": [
+        {
+          "type": "status",
+          "target": "area_enemies",
+          "amount": 1,
+          "status": "rooted"
+        }
+      ],
+      "description": "Breach cover and root enemies in the debris."
+    },
+    "hunker": {
+      "name": "Hunker Down",
+      "ap": 1,
+      "target": "self",
+      "effect": "hunker",
+      "defense": 30,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "rally": {
+      "name": "Rally",
+      "ap": 1,
+      "range": 4,
+      "target": "self",
+      "effect": "aura",
+      "clear_status": true,
+      "cost": 1,
+      "ends_turn": false,
+      "rank": 4
+    },
+    "trooper_armor_piercer": {
+      "name": "Armor Piercer",
+      "ap": 1,
+      "cost": 1,
+      "rank": 4,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 8,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 3,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "STAGGERED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "EXPOSED",
+            "target": "target"
+          }
+        ]
+      },
+      "ignore_cover": true,
+      "pierce": true,
+      "description": "Pierce cover and continue through a second target."
+    },
+    "trooper_firebreak": {
+      "name": "Firebreak",
+      "ap": 1,
+      "cost": 1,
+      "rank": 5,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "damage": [
+        3,
+        4
+      ],
+      "cover_damage": 5,
+      "cooldown": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "STAGGERED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "BURNING",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "BURNING"
+        },
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 2
+        }
+      ],
+      "description": "Burn an area while the trooper braces behind armor."
+    },
     "shoot": {
       "name": "Shoot",
       "ap": 1,
@@ -109,51 +316,158 @@
       "cost": 1,
       "ends_turn": true
     },
-    "hunker": {
-      "name": "Hunker Down",
+    "trooper_counter_barrage": {
+      "name": "Counter Barrage",
       "ap": 1,
-      "target": "self",
-      "effect": "hunker",
-      "defense": 30,
       "cost": 1,
-      "ends_turn": false
-    },
-    "suppress": {
-      "name": "Suppress",
-      "ap": 1,
-      "range": "weapon",
-      "target": "enemy",
-      "effect": "status",
-      "status": "suppressed",
-      "aim": -30,
-      "reaction": true,
-      "ammo_cost": 1,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "rapidFire": {
-      "name": "Rapid Fire",
-      "ap": 1,
-      "range": "weapon",
+      "rank": 6,
       "target": "enemy",
       "effect": "attack",
+      "range": 8,
+      "ends_turn": true,
       "damage": "weapon",
+      "damage_mod": 4,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "STAGGERED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "STAGGERED",
+            "target": "target"
+          }
+        ]
+      },
       "shots": 2,
-      "aim_mod": -15,
-      "cooldown": 1,
-      "ammo_cost": 2,
-      "cost": 1,
-      "ends_turn": true
+      "effects": [
+        {
+          "type": "damage",
+          "target": "target",
+          "amount": 2
+        }
+      ],
+      "description": "Fire two counter rounds and a fragmentation hit."
     },
-    "rally": {
-      "name": "Rally",
+    "trooper_assault_storm": {
+      "name": "Assault Storm",
       "ap": 1,
-      "range": 4,
-      "target": "self",
-      "effect": "aura",
-      "clear_status": true,
       "cost": 1,
-      "ends_turn": false
+      "rank": 7,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "capstone": true,
+      "damage": [
+        6,
+        8
+      ],
+      "cover_damage": 7,
+      "chain": {
+        "consume": [
+          {
+            "tag": "STAGGERED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "IONIZED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "action",
+          "target": "all_allies",
+          "amount": 1
+        },
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "EXPOSED"
+        }
+      ],
+      "description": "Once per mission: breach an area and release the assault squad.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "trooper"
+    },
+    "trooper_grenadier_finale": {
+      "name": "Grenadier Finale",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "capstone": true,
+      "damage": [
+        7,
+        9
+      ],
+      "cover_damage": 8,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "EXPOSED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "friendly_fire": true,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "BURNING"
+        },
+        {
+          "type": "status",
+          "target": "area_enemies",
+          "amount": 1,
+          "status": "rooted"
+        }
+      ],
+      "description": "Once per mission: risky inferno that roots surviving enemies.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "trooper"
     }
   },
   "base_stats": {
@@ -183,6 +497,7 @@
     "armor": 1,
     "model": "trooper",
     "medpacs": 2,
-    "clip": 4
+    "clip": 4,
+    "soldier_capstone": 1
   }
 }

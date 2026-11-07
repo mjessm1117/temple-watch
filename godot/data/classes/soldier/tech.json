@@ -4,7 +4,7 @@
   "name": "Tech",
   "side": "soldier",
   "role": "Engineer",
-  "signature": "hack",
+  "signature": "tech_probe_droid",
   "branches": [
     "Slicer",
     "Engineer"
@@ -12,63 +12,659 @@
   "implemented": true,
   "unit_kind": "tech",
   "kit": [
-    "shoot",
-    "overwatch",
-    "hack",
-    "scan",
-    "shieldDrone"
+    "tech_probe_droid",
+    "tech_emp_burst",
+    "tech_remote_shield"
   ],
   "passives": [],
   "bonus_kit": [],
   "bonus_passives": [],
-  "tree": {},
+  "tree": {
+    "trunk": {
+      "1": [
+        "tech_probe_droid"
+      ],
+      "2": [
+        "tech_emp_burst",
+        "tech_remote_shield"
+      ]
+    },
+    "specs": {
+      "slicer": {
+        "n": "Slicer",
+        "sig": "tech_slicer_ping",
+        "4": [
+          "tech_override"
+        ],
+        "5": [
+          "tech_ion_spike"
+        ],
+        "6": [
+          "tech_signal_jam"
+        ],
+        "7": [
+          "tech_total_shutdown"
+        ]
+      },
+      "engineer": {
+        "n": "Engineer",
+        "sig": "tech_turret_pin",
+        "4": [
+          "tech_field_repair"
+        ],
+        "5": [
+          "tech_barrier_grid"
+        ],
+        "6": [
+          "tech_drone_relay"
+        ],
+        "7": [
+          "tech_engineer_network"
+        ]
+      }
+    }
+  },
   "abilities": {
-    "shoot": {
-      "name": "Shoot",
+    "tech_probe_droid": {
+      "name": "Probe Droid",
       "ap": 1,
+      "cost": 1,
+      "rank": 1,
       "target": "enemy",
       "effect": "attack",
-      "weapon": true,
-      "range": "weapon",
-      "cost": 1,
-      "ends_turn": true
+      "range": 10,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 1,
+      "ammo_cost": 1,
+      "tech": true,
+      "no_los": true,
+      "chain": {
+        "consume": [
+          {
+            "tag": "EXPOSED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "IONIZED",
+            "target": "target"
+          }
+        ]
+      },
+      "chance": 80,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_enemies",
+          "amount": 1,
+          "tag": "MARKED"
+        }
+      ],
+      "description": "Remote probe marks contacts even beyond line of sight."
     },
-    "overwatch": {
-      "name": "Overwatch",
+    "tech_emp_burst": {
+      "name": "EMP Burst",
       "ap": 1,
-      "target": "self",
-      "effect": "overwatch",
       "cost": 1,
-      "ends_turn": true
+      "rank": 2,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "damage": [
+        2,
+        3
+      ],
+      "cover_damage": 2,
+      "cooldown": 1,
+      "chain": {
+        "consume": [
+          {
+            "tag": "LIFTED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "IONIZED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "status": "stunned",
+      "droid_damage": 5,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "area_enemies",
+          "amount": 1,
+          "tag": "IONIZED"
+        }
+      ],
+      "description": "EMP blast drains shields and stuns droids."
     },
-    "hack": {
-      "name": "Hack",
+    "tech_remote_shield": {
+      "name": "Remote Shield",
       "ap": 1,
-      "range": 4,
-      "target": "tile_console",
-      "effect": "hack",
       "cost": 1,
-      "ends_turn": true
-    },
-    "scan": {
-      "name": "Scan Clue",
-      "ap": 1,
-      "range": 1.5,
-      "target": "tile_scan",
-      "effect": "scan",
-      "cost": 1,
-      "ends_turn": false
-    },
-    "shieldDrone": {
-      "name": "Shield Drone",
-      "ap": 1,
-      "range": 1.5,
+      "rank": 2,
       "target": "ally",
       "effect": "buff",
-      "shield": 4,
-      "charges": "shield_drone",
+      "range": 5,
+      "ends_turn": false,
+      "shield": 2,
+      "chain": {
+        "consume": [
+          {
+            "tag": "READY",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 5
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "SHIELDED",
+            "target": "target",
+            "amount": 5
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 2
+        }
+      ],
+      "description": "Project a shield to an ally and retain a small reserve."
+    },
+    "tech_slicer_ping": {
+      "name": "Slicer Ping",
+      "ap": 1,
       "cost": 1,
-      "ends_turn": false
+      "rank": 3,
+      "target": "enemy",
+      "effect": "status",
+      "range": 9,
+      "ends_turn": true,
+      "status": "marked",
+      "chance": 73,
+      "chain": {
+        "consume": [
+          {
+            "tag": "LIFTED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "BURNING",
+            "target": "target"
+          }
+        ]
+      },
+      "ally_aim": 20,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_enemies",
+          "amount": 1,
+          "tag": "IONIZED"
+        },
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
+        }
+      ],
+      "description": "Ping and ionize enemy signals while recovering the slicer action."
+    },
+    "tech_turret_pin": {
+      "name": "Turret Pin",
+      "ap": 1,
+      "cost": 1,
+      "rank": 3,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 9,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 2,
+      "ammo_cost": 1,
+      "tech": true,
+      "chain": {
+        "consume": [
+          {
+            "tag": "LIFTED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "PINNED",
+            "target": "target"
+          }
+        ]
+      },
+      "shots": 2,
+      "aim_mod": -10,
+      "effects": [
+        {
+          "type": "status",
+          "target": "target",
+          "amount": 1,
+          "status": "rooted"
+        }
+      ],
+      "description": "A turret double-taps and pins its target."
+    },
+    "tech_override": {
+      "name": "Override",
+      "ap": 1,
+      "cost": 1,
+      "rank": 4,
+      "target": "enemy_droid",
+      "effect": "attack",
+      "range": 8,
+      "ends_turn": true,
+      "status": "stunned",
+      "chance": 100,
+      "chain": {
+        "consume": [
+          {
+            "tag": "IONIZED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "STAGGERED",
+            "target": "target"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
+        }
+      ],
+      "description": "Override a droid into the player squad for the rest of the battle.",
+      "damage": [
+        1,
+        1
+      ],
+      "no_los": true
+    },
+    "tech_field_repair": {
+      "name": "Field Repair",
+      "ap": 1,
+      "cost": 1,
+      "rank": 4,
+      "target": "ally",
+      "effect": "buff",
+      "range": 5,
+      "ends_turn": false,
+      "shield": 4,
+      "chain": {
+        "consume": [
+          {
+            "tag": "INSPIRED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 5
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "ATTUNED",
+            "target": "target",
+            "amount": 5
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "heal",
+          "target": "target",
+          "amount": 4
+        },
+        {
+          "type": "shield",
+          "target": "target",
+          "amount": 2
+        }
+      ],
+      "description": "Repair a wounded ally and reinforce its plating."
+    },
+    "tech_ion_spike": {
+      "name": "Ion Spike",
+      "ap": 1,
+      "cost": 1,
+      "rank": 5,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 9,
+      "ends_turn": true,
+      "damage": "weapon",
+      "damage_mod": 3,
+      "ammo_cost": 1,
+      "tech": true,
+      "chain": {
+        "consume": [
+          {
+            "tag": "MARKED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "EXPOSED",
+            "target": "target"
+          }
+        ]
+      },
+      "ignore_cover": true,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "target",
+          "amount": 1,
+          "tag": "IONIZED"
+        }
+      ],
+      "description": "A cover-proof ion shot that empties shields."
+    },
+    "tech_barrier_grid": {
+      "name": "Barrier Grid",
+      "ap": 1,
+      "cost": 1,
+      "rank": 5,
+      "target": "self",
+      "effect": "aura",
+      "range": 4,
+      "ends_turn": false,
+      "aim": 7,
+      "chain": {
+        "consume": [
+          {
+            "tag": "SHIELDED",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 5
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "SHIELDED",
+            "target": "all_allies",
+            "amount": 5
+          }
+        ]
+      },
+      "shield": 3,
+      "defense": 20,
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_allies",
+          "amount": 2,
+          "tag": "SHIELDED"
+        }
+      ],
+      "description": "Project a defensive grid over the whole squad."
+    },
+    "tech_signal_jam": {
+      "name": "Signal Jam",
+      "ap": 1,
+      "cost": 1,
+      "rank": 6,
+      "target": "enemy",
+      "effect": "status",
+      "range": 9,
+      "ends_turn": true,
+      "status": "suppressed",
+      "chance": 79,
+      "chain": {
+        "consume": [
+          {
+            "tag": "MARKED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "BURNING",
+            "target": "target"
+          }
+        ]
+      },
+      "aim": -40,
+      "effects": [
+        {
+          "type": "status",
+          "target": "all_enemies",
+          "amount": 1,
+          "status": "disarmed"
+        }
+      ],
+      "description": "Jam enemy weapons and suppress the marked contact."
+    },
+    "tech_drone_relay": {
+      "name": "Drone Relay",
+      "ap": 1,
+      "cost": 1,
+      "rank": 6,
+      "target": "ally",
+      "effect": "buff",
+      "range": 5,
+      "ends_turn": false,
+      "shield": 5,
+      "chain": {
+        "consume": [
+          {
+            "tag": "SHIELDED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 5
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "ATTUNED",
+            "target": "target",
+            "amount": 5
+          }
+        ]
+      },
+      "effects": [
+        {
+          "type": "action",
+          "target": "target",
+          "amount": 1
+        },
+        {
+          "type": "shield",
+          "target": "target",
+          "amount": 3
+        }
+      ],
+      "description": "Relay a fresh action and shield to one ally."
+    },
+    "tech_total_shutdown": {
+      "name": "Total Shutdown",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 7,
+      "ends_turn": true,
+      "capstone": true,
+      "damage": [
+        4,
+        5
+      ],
+      "cover_damage": 7,
+      "chain": {
+        "consume": [
+          {
+            "tag": "MARKED",
+            "target": "area_enemies",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 3
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "STAGGERED",
+            "target": "area_enemies"
+          }
+        ]
+      },
+      "droid_damage": 12,
+      "status": "stunned",
+      "effects": [
+        {
+          "type": "tag",
+          "target": "all_enemies",
+          "amount": 1,
+          "tag": "IONIZED"
+        }
+      ],
+      "description": "Once per mission: global ion surge with a droid-ending EMP blast.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "tech"
+    },
+    "tech_engineer_network": {
+      "name": "Engineer Network",
+      "ap": 1,
+      "cost": 1,
+      "rank": 7,
+      "target": "self",
+      "effect": "aura",
+      "range": 5,
+      "ends_turn": false,
+      "capstone": true,
+      "aim": 10,
+      "chain": {
+        "consume": [
+          {
+            "tag": "ATTUNED",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 5
+              }
+            ]
+          }
+        ],
+        "apply": [
+          {
+            "tag": "SHIELDED",
+            "target": "all_allies",
+            "amount": 5
+          }
+        ]
+      },
+      "shield": 4,
+      "effects": [
+        {
+          "type": "heal",
+          "target": "all_allies",
+          "amount": 3
+        },
+        {
+          "type": "action",
+          "target": "self",
+          "amount": 1
+        }
+      ],
+      "description": "Once per mission: repair and coordinate the whole squad.",
+      "charges": "soldier_capstone",
+      "once_per_mission": true,
+      "capstone_template": "tech"
     }
   },
   "base_stats": {
@@ -98,6 +694,7 @@
     "armor": 1,
     "model": "trooper",
     "medpacs": 2,
-    "clip": 4
+    "clip": 4,
+    "soldier_capstone": 1
   }
 }

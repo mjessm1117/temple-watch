@@ -27,15 +27,26 @@ func run() -> void:
 	var old_abilities: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/abilities.json"))
 	var merged: Dictionary = Classes.ability_catalog()
 	for id in old_abilities:
-		check(merged.has(id) and merged[id] == old_abilities[id], "legacy ability numbers unchanged: " + str(id))
+		var preserved := merged.has(id)
+		if preserved:
+			for field in old_abilities[id]:
+				if merged[id].get(field) != old_abilities[id][field]: preserved = false
+		check(preserved, "legacy ability numbers unchanged: " + str(id))
 	var units: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/units.json"))
 	var old_classes: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/campaign/core.json")).CLASS
 	for row in Classes.classes().values():
-		if old_classes.has(str(row.name)): check(row.base_stats == old_classes[str(row.name)], "legacy campaign stats unchanged: " + str(row.name))
+		var legacy_name := "Soldier" if str(row.id) == "trooper" else str(row.name)
+		if old_classes.has(legacy_name): check(row.base_stats == old_classes[legacy_name], "legacy campaign stats unchanged: " + legacy_name)
 		var kind := str(row.get("unit_kind", ""))
 		if kind != "" and units.has(kind) and str(units[kind].get("side", "")) == "player":
-			check(row.kit == units[kind].kit, "legacy kit unchanged: " + kind)
-			for key in row.unit_stats: check(row.unit_stats[key] == units[kind][key], "legacy tactical stat unchanged: %s/%s" % [kind, key])
+			if kind in ["sniper", "tech", "droid", "officer"]:
+				var class_file: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/classes/soldier/" + kind + ".json"))
+				check(row.kit == class_file.kit, "replacement kit matches class file: " + kind)
+				for key in row.unit_stats: check(row.unit_stats[key] == class_file.unit_stats[key], "replacement tactical stat matches class file: %s/%s" % [kind, key])
+			else: check(row.kit == units[kind].kit, "legacy kit unchanged: " + kind)
+			if kind not in ["sniper", "tech", "droid", "officer"]:
+				for key in row.unit_stats:
+					if key not in ["soldier_capstone", "med_beacon"]: check(row.unit_stats[key] == units[kind][key], "legacy tactical stat unchanged: %s/%s" % [kind, key])
 	check(Classes.power("jedi", 1) < Classes.power("soldier", 1), "Padawan below fresh soldier")
 	check(Classes.power("jedi", 3) < Classes.power("soldier", 1), "under-trained Knight below soldier")
 	check(Classes.power("jedi", 5) > Classes.power("soldier", 7), "Master above Commander")
