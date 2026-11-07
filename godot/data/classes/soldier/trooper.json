@@ -166,7 +166,7 @@
         ],
         "apply": [
           {
-            "tag": "MARKED",
+            "tag": "PINNED",
             "target": "area_enemies"
           }
         ]
@@ -256,7 +256,7 @@
         ],
         "apply": [
           {
-            "tag": "PINNED",
+            "tag": "BURNING",
             "target": "area_enemies"
           }
         ]
