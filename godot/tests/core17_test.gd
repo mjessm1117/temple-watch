@@ -45,6 +45,7 @@ func run() -> void:
 	check(not Classes.cross_train(padawan, "Scout"), "mixed-side third path rejected")
 	padawan.rank = 5
 	check(Classes.cross_train(padawan, "Sentinel") and not Classes.cross_train(padawan, "Wayseeker"), "Master caps at three paths")
+	check(Classes.ability_cap(padawan, "Consular") == 4 and Classes.ability_cap({"cls":"Knight", "rank":5}, "Consular") == 5, "secondary tier cap and Knight exception")
 	var trooper := {"cls":"Soldier", "rank":4, "classes":["trooper"]}
 	check(Classes.cross_train(trooper, "Scout") and not Classes.cross_train(trooper, "Guardian"), "Sergeant soldier blends same-side")
 	var m = Mission.new(17)
