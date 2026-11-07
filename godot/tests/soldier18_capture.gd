@@ -54,9 +54,9 @@ func capture() -> void:
 	enemy.spotted = true
 	battle._select(int(actor.id))
 	battle.action = "sniper_squadsight"
-	battle._refresh()
+	battle._refresh_highlights(true)
 	battle._use_ability(int(enemy.id))
-	await create_timer(0.6).timeout
+	await create_timer(1.0).timeout
 	await _shot("battle-sniper-squadsight-844x390", 0.05)
 	battle.queue_free()
 	quit()

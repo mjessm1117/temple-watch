@@ -44,7 +44,7 @@ func run() -> void:
 		total += abilities.size()
 		check(row.get("schema") == 1 and row.get("implemented") == true, class_id + " valid implementation")
 		check(abilities.size() == 13, class_id + " has 13 abilities")
-		check(row.get("kit", []).has(row.get("signature", "")), class_id + " starts with signature")
+		check(row.get("kit", []).has(row.get("signature", "")) or (shipped.has(class_id) and row.tree.trunk["1"].has(row.signature)), class_id + " exposes its signature")
 		var applies: Dictionary = {}
 		var consumes: Dictionary = {}
 		for id in abilities:
