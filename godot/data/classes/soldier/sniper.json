@@ -265,7 +265,7 @@
         ],
         "apply": [
           {
-            "tag": "ATTUNED",
+            "tag": "READY",
             "target": "self",
             "amount": 2
           }
