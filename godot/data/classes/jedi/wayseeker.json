@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "id": "wayseeker",
+  "name": "Wayseeker",
+  "side": "jedi",
+  "role": "Control",
+  "signature": "tremor",
+  "branches": [
+    "Earthshaper",
+    "Beastcaller"
+  ],
+  "implemented": true,
+  "unit_kind": "wayseeker",
+  "kit": [
+    "strike",
+    "guard",
+    "meditate",
+    "beastCalm",
+    "pull",
+    "push",
+    "breach",
+    "tremor"
+  ],
+  "passives": [
+    "pathfinder",
+    "wildBond"
+  ],
+  "bonus_kit": [],
+  "bonus_passives": [],
+  "tree": {
+    "trunk": {
+      "1": [
+        "pathfinder",
+        "wildBond",
+        "wLiving"
+      ],
+      "2": [
+        "tremor",
+        "barrier",
+        "wWind"
+      ]
+    },
+    "specs": {
+      "beastwarden": {
+        "4": [
+          "wStalker",
+          "forceHeal",
+          "wbPack"
+        ],
+        "5": [
+          "wBond",
+          "wBeastHide",
+          "wbHide"
+        ],
+        "6": [
+          "wSeer",
+          "wBeastPack",
+          "wbHowl"
+        ],
+        "7": [
+          "wPrimal",
+          "wBeastKing",
+          "wbAlpha"
+        ],
+        "n": "Beastwarden",
+        "ic": "sp_beastwarden",
+        "desc": "Tames creatures and horrors.",
+        "sig": "beastCalm"
+      },
+      "earthshaper": {
+        "4": [
+          "saberThrow",
+          "wEarthRoot",
+          "weFault"
+        ],
+        "5": [
+          "forceWave",
+          "wEarthStone",
+          "weStone"
+        ],
+        "6": [
+          "collapse",
+          "wEarthReach",
+          "weAnchor"
+        ],
+        "7": [
+          "stasisField",
+          "wEarthWorld",
+          "weMountain"
+        ],
+        "n": "Earthshaper",
+        "ic": "sp_earthshaper",
+        "desc": "Bends the ground and drags enemies around.",
+        "sig": "pull"
+      }
+    }
+  },
+  "abilities": {
+    "strike": {
+      "name": "Strike",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "melee": true,
+      "weapon": true,
+      "range": 1.5,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "guard": {
+      "name": "Guard",
+      "ap": 1,
+      "target": "self",
+      "effect": "guard",
+      "defense": 25,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "meditate": {
+      "name": "Meditate",
+      "ap": 1,
+      "target": "self",
+      "effect": "focus",
+      "amount": 2,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "beastCalm": {
+      "name": "Beast Calm",
+      "ap": 1,
+      "target": "enemy_creature",
+      "effect": "status",
+      "focus": 2,
+      "range": 5,
+      "chance": 75,
+      "status": "stunned",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "pull": {
+      "name": "Force Pull",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "displace",
+      "focus": 1,
+      "range": 6,
+      "distance": 3,
+      "collision_damage": 2,
+      "pull": true,
+      "chance": 90,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "push": {
+      "name": "Push",
+      "ap": 1,
+      "focus": 2,
+      "range": 4,
+      "target": "enemy",
+      "effect": "displace",
+      "distance": 2,
+      "collision_damage": 3,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "breach": {
+      "name": "Saber Breach",
+      "ap": 1,
+      "target": "tile_wall",
+      "effect": "breach",
+      "range": 1.5,
+      "cover_damage": 8,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "tremor": {
+      "name": "Tremor",
+      "ap": 1,
+      "target": "tile_area",
+      "effect": "blast",
+      "focus": 3,
+      "range": 5,
+      "damage": [
+        2,
+        2
+      ],
+      "cover_damage": 4,
+      "clear_overwatch": true,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "pathfinder": {
+      "name": "Pathfinder",
+      "passive": true,
+      "effect": "mobility",
+      "cost": 0,
+      "ap": 0,
+      "ends_turn": false
+    },
+    "wildBond": {
+      "name": "Wild Bond",
+      "passive": true,
+      "effect": "focus_bonus",
+      "cost": 0,
+      "ap": 0,
+      "ends_turn": false
+    }
+  }
+}

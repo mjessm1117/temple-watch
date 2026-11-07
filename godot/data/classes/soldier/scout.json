@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "id": "scout",
+  "name": "Scout",
+  "side": "soldier",
+  "role": "Sneak and damage",
+  "signature": "mark",
+  "branches": [
+    "Infiltrator",
+    "Saboteur"
+  ],
+  "implemented": true,
+  "unit_kind": "scout",
+  "kit": [
+    "shoot",
+    "overwatch",
+    "mark",
+    "runGun",
+    "deadeye"
+  ],
+  "passives": [
+    "spotter",
+    "ghost"
+  ],
+  "bonus_kit": [
+    "snipe",
+    "hunker"
+  ],
+  "bonus_passives": [],
+  "tree": {
+    "trunk": {
+      "1": [
+        "mark",
+        "scEagle",
+        "scFlanker"
+      ],
+      "2": [
+        "deadeye",
+        "longshot",
+        "scEvasive"
+      ]
+    },
+    "specs": {
+      "sniper": {
+        "4": [
+          "killshot",
+          "scSniper",
+          "ssPerch"
+        ],
+        "5": [
+          "scAssassin",
+          "scSnStill",
+          "ssExposed"
+        ],
+        "6": [
+          "scDeadly",
+          "chainShot",
+          "ssBigGame"
+        ],
+        "7": [
+          "scLegend",
+          "scSnOneShot",
+          "ssStreak"
+        ],
+        "n": "Sniper",
+        "ic": "sp_sniper",
+        "desc": "Long range. One shot, one kill.",
+        "sig": "spotter"
+      },
+      "infiltrator": {
+        "4": [
+          "fieldcraft",
+          "ghost",
+          "siVanish"
+        ],
+        "5": [
+          "scSurvivor",
+          "scInfShadow",
+          "siKnife"
+        ],
+        "6": [
+          "smoke",
+          "scInfKnife",
+          "siHunt"
+        ],
+        "7": [
+          "scInfPhantom",
+          "scInfStrike",
+          "siSabo"
+        ],
+        "n": "Infiltrator",
+        "ic": "sp_infiltrator",
+        "desc": "Moves unseen and strikes first.",
+        "sig": "runGun"
+      }
+    }
+  },
+  "abilities": {
+    "shoot": {
+      "name": "Shoot",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "overwatch": {
+      "name": "Overwatch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "mark": {
+      "name": "Mark",
+      "ap": 1,
+      "range": 11,
+      "target": "enemy",
+      "effect": "status",
+      "status": "marked",
+      "ally_aim": 15,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "runGun": {
+      "name": "Run & Gun",
+      "ap": 0,
+      "target": "self",
+      "effect": "ap",
+      "amount": 1,
+      "cooldown": 1,
+      "cost": 0,
+      "ends_turn": false
+    },
+    "deadeye": {
+      "name": "Deadeye",
+      "ap": 1,
+      "range": "weapon",
+      "target": "enemy",
+      "effect": "attack",
+      "damage": "weapon",
+      "damage_mod": 3,
+      "aim_mod": -20,
+      "ammo_cost": 1,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "spotter": {
+      "name": "Spotter",
+      "passive": true,
+      "effect": "squadsight",
+      "range": 11,
+      "cost": 0,
+      "ap": 0,
+      "ends_turn": false
+    },
+    "ghost": {
+      "name": "Ghost",
+      "passive": true,
+      "effect": "reconceal",
+      "charges": 1,
+      "cost": 0,
+      "ap": 0,
+      "ends_turn": false
+    },
+    "snipe": {
+      "name": "Snipe",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "range": "weapon",
+      "damage_mod": 2,
+      "aim_mod": 15,
+      "crit_mod": 20,
+      "ammo_cost": 1,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "hunker": {
+      "name": "Hunker Down",
+      "ap": 1,
+      "target": "self",
+      "effect": "hunker",
+      "defense": 30,
+      "cost": 1,
+      "ends_turn": false
+    }
+  }
+}

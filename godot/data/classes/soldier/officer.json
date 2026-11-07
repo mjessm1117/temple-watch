@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "id": "officer",
+  "name": "Officer",
+  "side": "soldier",
+  "role": "Command",
+  "signature": "rally",
+  "branches": [
+    "Commander",
+    "Tactician"
+  ],
+  "implemented": true,
+  "unit_kind": "officer",
+  "kit": [
+    "shoot",
+    "overwatch",
+    "rally",
+    "mark"
+  ],
+  "passives": [],
+  "bonus_kit": [],
+  "bonus_passives": [],
+  "tree": {},
+  "abilities": {
+    "shoot": {
+      "name": "Shoot",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "overwatch": {
+      "name": "Overwatch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "rally": {
+      "name": "Rally",
+      "ap": 1,
+      "range": 4,
+      "target": "self",
+      "effect": "aura",
+      "clear_status": true,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "mark": {
+      "name": "Mark",
+      "ap": 1,
+      "range": 11,
+      "target": "enemy",
+      "effect": "status",
+      "status": "marked",
+      "ally_aim": 15,
+      "cost": 1,
+      "ends_turn": true
+    }
+  }
+}

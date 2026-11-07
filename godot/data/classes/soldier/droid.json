@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "id": "droid",
+  "name": "Droid",
+  "side": "soldier",
+  "role": "Modules",
+  "signature": "shieldDrone",
+  "branches": [
+    "Repeater",
+    "Shield",
+    "Sensor",
+    "Jetpack",
+    "Flamer",
+    "Med"
+  ],
+  "implemented": true,
+  "unit_kind": "droid",
+  "kit": [
+    "shoot",
+    "overwatch",
+    "shieldDrone",
+    "rapidFire"
+  ],
+  "passives": [],
+  "bonus_kit": [],
+  "bonus_passives": [],
+  "tree": {},
+  "abilities": {
+    "shoot": {
+      "name": "Shoot",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "overwatch": {
+      "name": "Overwatch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "shieldDrone": {
+      "name": "Shield Drone",
+      "ap": 1,
+      "range": 1.5,
+      "target": "ally",
+      "effect": "buff",
+      "shield": 4,
+      "charges": "shield_drone",
+      "cost": 1,
+      "ends_turn": false
+    },
+    "rapidFire": {
+      "name": "Rapid Fire",
+      "ap": 1,
+      "range": "weapon",
+      "target": "enemy",
+      "effect": "attack",
+      "damage": "weapon",
+      "shots": 2,
+      "aim_mod": -15,
+      "cooldown": 1,
+      "ammo_cost": 2,
+      "cost": 1,
+      "ends_turn": true
+    }
+  }
+}

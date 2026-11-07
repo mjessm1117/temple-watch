@@ -1,0 +1,286 @@
+{
+  "schema": 1,
+  "id": "guardian",
+  "name": "Guardian",
+  "side": "jedi",
+  "role": "Tank",
+  "signature": "guard",
+  "branches": [
+    "Soresu Bulwark",
+    "Djem So Breaker"
+  ],
+  "implemented": true,
+  "unit_kind": "guardian",
+  "kit": [
+    "strike",
+    "guard",
+    "push",
+    "meditate",
+    "saberThrow",
+    "leap",
+    "sweep",
+    "choke",
+    "subdue",
+    "collapse"
+  ],
+  "passives": [
+    "defLine",
+    "reflectM"
+  ],
+  "bonus_kit": [
+    "flurry",
+    "mightyBlow",
+    "precisionStrike"
+  ],
+  "bonus_passives": [],
+  "tree": {
+    "trunk": {
+      "1": [
+        "saberThrow",
+        "defLine",
+        "gChallenge"
+      ],
+      "2": [
+        "leap",
+        "reflectM",
+        "gStalwart"
+      ]
+    },
+    "specs": {
+      "protector": {
+        "4": [
+          "gIron",
+          "gBulwark",
+          "gpBastion"
+        ],
+        "5": [
+          "collapse",
+          "gWarden",
+          "gpBeacon"
+        ],
+        "6": [
+          "forceWave",
+          "gAegis",
+          "gpUndying"
+        ],
+        "7": [
+          "gUnbreakable",
+          "gLastStand",
+          "gpLiving"
+        ],
+        "n": "Protector",
+        "ic": "sp_protector",
+        "desc": "Shields the squad and holds the line.",
+        "sig": "barrier"
+      },
+      "weaponMaster": {
+        "4": [
+          "gDuelist",
+          "gVanguard",
+          "gwForm"
+        ],
+        "5": [
+          "mightyBlow",
+          "flurry",
+          "gwWind"
+        ],
+        "6": [
+          "precisionStrike",
+          "gWMFocus",
+          "gwCounter"
+        ],
+        "7": [
+          "gMasterBlade",
+          "gWMStorm",
+          "gwRampage"
+        ],
+        "n": "Weapon Master",
+        "ic": "sp_weaponMaster",
+        "desc": "Lives in melee and cuts through crowds.",
+        "sig": "sweep"
+      }
+    }
+  },
+  "abilities": {
+    "strike": {
+      "name": "Strike",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "melee": true,
+      "weapon": true,
+      "range": 1.5,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "guard": {
+      "name": "Guard",
+      "ap": 1,
+      "target": "self",
+      "effect": "guard",
+      "defense": 25,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "push": {
+      "name": "Push",
+      "ap": 1,
+      "focus": 2,
+      "range": 4,
+      "target": "enemy",
+      "effect": "displace",
+      "distance": 2,
+      "collision_damage": 3,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "meditate": {
+      "name": "Meditate",
+      "ap": 1,
+      "target": "self",
+      "effect": "focus",
+      "amount": 2,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "saberThrow": {
+      "name": "Saber Throw",
+      "ap": 1,
+      "focus": 2,
+      "range": 5,
+      "target": "enemy",
+      "effect": "attack",
+      "damage": [
+        4,
+        5
+      ],
+      "chance": 85,
+      "ignore_cover": true,
+      "pierce": true,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "leap": {
+      "name": "Force Leap",
+      "ap": 1,
+      "focus": 1,
+      "range": 6,
+      "target": "tile",
+      "effect": "leap",
+      "next_strike_aim": 15,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "sweep": {
+      "name": "Saber Sweep",
+      "ap": 1,
+      "focus": 2,
+      "range": 1.5,
+      "target": "self",
+      "effect": "area_attack",
+      "damage": "weapon",
+      "aim_mod": -10,
+      "melee": true,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "choke": {
+      "name": "Choke",
+      "ap": 1,
+      "focus": 2,
+      "range": 5,
+      "target": "enemy",
+      "effect": "attack",
+      "damage": [
+        5,
+        6
+      ],
+      "chance": 90,
+      "ignore_cover": true,
+      "darkness": 2,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "subdue": {
+      "name": "Subdue",
+      "ap": 1,
+      "range": 1.5,
+      "target": "enemy_subdue",
+      "effect": "capture",
+      "chance": 60,
+      "stunned_chance": 85,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "collapse": {
+      "name": "Collapse",
+      "ap": 1,
+      "focus": 3,
+      "range": 5,
+      "target": "tile_wall",
+      "effect": "collapse",
+      "damage": [
+        4,
+        4
+      ],
+      "cost": 1,
+      "ends_turn": true
+    },
+    "defLine": {
+      "name": "Defensive Line",
+      "passive": true,
+      "effect": "adjacent_defense",
+      "defense": 15,
+      "cost": 0,
+      "ap": 0,
+      "ends_turn": false
+    },
+    "reflectM": {
+      "name": "Reflect Mastery",
+      "passive": true,
+      "effect": "reflect",
+      "chance": 65,
+      "cost": 0,
+      "ap": 0,
+      "ends_turn": false
+    },
+    "flurry": {
+      "name": "Flurry",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 1.5,
+      "melee": true,
+      "shots": 2,
+      "aim_mod": -10,
+      "focus": 1,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "mightyBlow": {
+      "name": "Mighty Blow",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 1.5,
+      "melee": true,
+      "damage_mod": 2,
+      "focus": 2,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "precisionStrike": {
+      "name": "Precision Strike",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "range": 1.5,
+      "melee": true,
+      "damage_mod": 1,
+      "aim_mod": 20,
+      "focus": 2,
+      "cost": 1,
+      "ends_turn": true
+    }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "jedi": [
+    {
+      "level": 1,
+      "title": "Padawan",
+      "tier": "Padawan",
+      "power": 50,
+      "xp": 0
+    },
+    {
+      "level": 2,
+      "title": "Padawan",
+      "tier": "Padawan",
+      "power": 70,
+      "xp": 30
+    },
+    {
+      "level": 3,
+      "title": "Knight",
+      "tier": "Knight",
+      "power": 110,
+      "xp": 80,
+      "blend_slots": 2,
+      "focus_pips": 2,
+      "saber_forms": true
+    },
+    {
+      "level": 4,
+      "title": "Knight",
+      "tier": "Knight",
+      "power": 140,
+      "xp": 160
+    },
+    {
+      "level": 5,
+      "title": "Master",
+      "tier": "Master",
+      "power": 260,
+      "xp": 280,
+      "blend_slots": 3,
+      "aura": 1,
+      "third_action_once": true
+    },
+    {
+      "level": 6,
+      "title": "Master",
+      "tier": "Master",
+      "power": 300,
+      "xp": 450
+    },
+    {
+      "level": 7,
+      "title": "Council Master",
+      "tier": "Council Master",
+      "power": 340,
+      "xp": 700,
+      "aura": 2
+    },
+    {
+      "level": 8,
+      "title": "Grand Master",
+      "tier": "Grand Master",
+      "power": 420,
+      "xp": 1000,
+      "unique_limit": 1
+    }
+  ],
+  "soldier": [
+    {
+      "level": 1,
+      "title": "Recruit",
+      "tier": "Recruit",
+      "power": 100,
+      "xp": 0
+    },
+    {
+      "level": 2,
+      "title": "Private",
+      "tier": "Private",
+      "power": 120,
+      "xp": 30
+    },
+    {
+      "level": 3,
+      "title": "Corporal",
+      "tier": "Corporal",
+      "power": 140,
+      "xp": 80
+    },
+    {
+      "level": 4,
+      "title": "Sergeant",
+      "tier": "Sergeant",
+      "power": 160,
+      "xp": 160,
+      "blend_slots": 2
+    },
+    {
+      "level": 5,
+      "title": "Lieutenant",
+      "tier": "Lieutenant",
+      "power": 180,
+      "xp": 280
+    },
+    {
+      "level": 6,
+      "title": "Captain",
+      "tier": "Captain",
+      "power": 200,
+      "xp": 450,
+      "blend_slots": 3
+    },
+    {
+      "level": 7,
+      "title": "Commander",
+      "tier": "Commander",
+      "power": 220,
+      "xp": 700
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "schema": 1,
+  "id": "heavy",
+  "name": "Heavy",
+  "side": "soldier",
+  "role": "Tank and explosives",
+  "signature": "barrage",
+  "branches": [
+    "Demolition",
+    "Juggernaut"
+  ],
+  "implemented": false,
+  "unit_kind": "",
+  "kit": [],
+  "passives": [],
+  "bonus_kit": [
+    "grenade",
+    "ionNade",
+    "barrage",
+    "holdLine"
+  ],
+  "bonus_passives": [
+    "shredder"
+  ],
+  "tree": {
+    "trunk": {
+      "1": [
+        "suppress",
+        "shredder",
+        "hCoverMe"
+      ],
+      "2": [
+        "bandolier",
+        "flakVest",
+        "hPayload"
+      ]
+    },
+    "specs": {
+      "demolitionist": {
+        "4": [
+          "ionNade",
+          "hDemoExtra",
+          "hdHeavy"
+        ],
+        "5": [
+          "hHeavyWeapons",
+          "hDemoBlast",
+          "hdShock"
+        ],
+        "6": [
+          "hGunner",
+          "hDemoSapper",
+          "hdBuster"
+        ],
+        "7": [
+          "hWarlord",
+          "hDemoBig",
+          "hdArmageddon"
+        ],
+        "n": "Demolitionist",
+        "ic": "sp_demolitionist",
+        "desc": "Explosives expert. Rockets and more grenades.",
+        "sig": "rocket"
+      },
+      "bulwark": {
+        "4": [
+          "juggernaut",
+          "hBrute",
+          "hbWall"
+        ],
+        "5": [
+          "hBulwark",
+          "hunker",
+          "hbSpite"
+        ],
+        "6": [
+          "chainShot",
+          "hBulTaunt",
+          "hbIron"
+        ],
+        "7": [
+          "hTitan",
+          "hBulFort",
+          "hbAnchor"
+        ],
+        "n": "Bulwark",
+        "ic": "sp_bulwark",
+        "desc": "Walking cover. Soaks fire and holds ground.",
+        "sig": "holdLine"
+      }
+    }
+  },
+  "abilities": {
+    "grenade": {
+      "name": "Grenade",
+      "ap": 1,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 6,
+      "damage": [
+        3,
+        3
+      ],
+      "charges": "grenades",
+      "friendly_fire": true,
+      "cover_damage": 4,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "ionNade": {
+      "name": "Ion Grenade",
+      "ap": 1,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": 6,
+      "damage": [
+        1,
+        1
+      ],
+      "droid_damage": 4,
+      "charges": "grenades",
+      "friendly_fire": true,
+      "status": "stunned",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "barrage": {
+      "name": "Barrage",
+      "ap": 1,
+      "target": "tile_area",
+      "effect": "blast",
+      "range": "weapon",
+      "damage": [
+        3,
+        5
+      ],
+      "cover_damage": 4,
+      "cooldown": 1,
+      "ammo_cost": 2,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "holdLine": {
+      "name": "Hold the Line",
+      "ap": 1,
+      "target": "self",
+      "effect": "hold_line",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "shredder": {
+      "name": "Shredder",
+      "passive": true,
+      "effect": "shred",
+      "cost": 0,
+      "ap": 0,
+      "ends_turn": false
+    }
+  }
+}

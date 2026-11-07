@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "sage",
+  "name": "Sage",
+  "side": "jedi",
+  "role": "Force damage",
+  "signature": "",
+  "branches": [
+    "Telekinetic",
+    "Seer"
+  ],
+  "implemented": false,
+  "unit_kind": "",
+  "kit": [],
+  "passives": [],
+  "bonus_kit": [],
+  "bonus_passives": [],
+  "tree": {},
+  "abilities": {}
+}

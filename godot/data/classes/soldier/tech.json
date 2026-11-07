@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "id": "tech",
+  "name": "Tech",
+  "side": "soldier",
+  "role": "Engineer",
+  "signature": "hack",
+  "branches": [
+    "Slicer",
+    "Engineer"
+  ],
+  "implemented": true,
+  "unit_kind": "tech",
+  "kit": [
+    "shoot",
+    "overwatch",
+    "hack",
+    "scan",
+    "shieldDrone"
+  ],
+  "passives": [],
+  "bonus_kit": [],
+  "bonus_passives": [],
+  "tree": {},
+  "abilities": {
+    "shoot": {
+      "name": "Shoot",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "overwatch": {
+      "name": "Overwatch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "hack": {
+      "name": "Hack",
+      "ap": 1,
+      "range": 4,
+      "target": "tile_console",
+      "effect": "hack",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "scan": {
+      "name": "Scan Clue",
+      "ap": 1,
+      "range": 1.5,
+      "target": "tile_scan",
+      "effect": "scan",
+      "cost": 1,
+      "ends_turn": false
+    },
+    "shieldDrone": {
+      "name": "Shield Drone",
+      "ap": 1,
+      "range": 1.5,
+      "target": "ally",
+      "effect": "buff",
+      "shield": 4,
+      "charges": "shield_drone",
+      "cost": 1,
+      "ends_turn": false
+    }
+  }
+}

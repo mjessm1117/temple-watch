@@ -1,0 +1,159 @@
+{
+  "schema": 1,
+  "id": "trooper",
+  "name": "Soldier",
+  "side": "soldier",
+  "role": "Armor and explosives",
+  "signature": "suppress",
+  "branches": [
+    "Assault",
+    "Grenadier"
+  ],
+  "implemented": true,
+  "unit_kind": "soldier",
+  "kit": [
+    "shoot",
+    "overwatch",
+    "hunker",
+    "suppress",
+    "rapidFire",
+    "rally"
+  ],
+  "passives": [],
+  "bonus_kit": [],
+  "bonus_passives": [],
+  "tree": {
+    "trunk": {
+      "1": [
+        "suppress",
+        "hunker",
+        "soBreach"
+      ],
+      "2": [
+        "rapidFire",
+        "flakVest",
+        "soAdrenaline"
+      ]
+    },
+    "specs": {
+      "sergeant": {
+        "4": [
+          "holdLine",
+          "soSteel",
+          "sgCover"
+        ],
+        "5": [
+          "mark",
+          "soSgtDrill",
+          "sgOrders"
+        ],
+        "6": [
+          "smoke",
+          "soTough",
+          "sgStand"
+        ],
+        "7": [
+          "soCommander",
+          "soSgtHero",
+          "sgVictory"
+        ],
+        "n": "Sergeant",
+        "ic": "sp_sergeant",
+        "desc": "Leader. Rallies and steadies the squad.",
+        "sig": "rally"
+      },
+      "vanguard": {
+        "4": [
+          "veteran",
+          "soVanCharge",
+          "svRush"
+        ],
+        "5": [
+          "soMarksman",
+          "soVanPlate",
+          "svBrawl"
+        ],
+        "6": [
+          "runGun",
+          "soVanShred",
+          "svFury"
+        ],
+        "7": [
+          "soLegend",
+          "soVanStorm",
+          "svRampage"
+        ],
+        "n": "Vanguard",
+        "ic": "sp_vanguard",
+        "desc": "Assault trooper. Closes in and hits hard.",
+        "sig": "chainShot"
+      }
+    }
+  },
+  "abilities": {
+    "shoot": {
+      "name": "Shoot",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "overwatch": {
+      "name": "Overwatch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "hunker": {
+      "name": "Hunker Down",
+      "ap": 1,
+      "target": "self",
+      "effect": "hunker",
+      "defense": 30,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "suppress": {
+      "name": "Suppress",
+      "ap": 1,
+      "range": "weapon",
+      "target": "enemy",
+      "effect": "status",
+      "status": "suppressed",
+      "aim": -30,
+      "reaction": true,
+      "ammo_cost": 1,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "rapidFire": {
+      "name": "Rapid Fire",
+      "ap": 1,
+      "range": "weapon",
+      "target": "enemy",
+      "effect": "attack",
+      "damage": "weapon",
+      "shots": 2,
+      "aim_mod": -15,
+      "cooldown": 1,
+      "ammo_cost": 2,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "rally": {
+      "name": "Rally",
+      "ap": 1,
+      "range": 4,
+      "target": "self",
+      "effect": "aura",
+      "clear_status": true,
+      "cost": 1,
+      "ends_turn": false
+    }
+  }
+}

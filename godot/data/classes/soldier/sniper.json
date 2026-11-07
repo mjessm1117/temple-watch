@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "id": "sniper",
+  "name": "Sniper",
+  "side": "soldier",
+  "role": "Long range",
+  "signature": "snipe",
+  "branches": [
+    "Marksman",
+    "Gunslinger"
+  ],
+  "implemented": true,
+  "unit_kind": "sniper",
+  "kit": [
+    "shoot",
+    "overwatch",
+    "mark",
+    "deadeye"
+  ],
+  "passives": [],
+  "bonus_kit": [],
+  "bonus_passives": [],
+  "tree": {},
+  "abilities": {
+    "shoot": {
+      "name": "Shoot",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "overwatch": {
+      "name": "Overwatch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "mark": {
+      "name": "Mark",
+      "ap": 1,
+      "range": 11,
+      "target": "enemy",
+      "effect": "status",
+      "status": "marked",
+      "ally_aim": 15,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "deadeye": {
+      "name": "Deadeye",
+      "ap": 1,
+      "range": "weapon",
+      "target": "enemy",
+      "effect": "attack",
+      "damage": "weapon",
+      "damage_mod": 3,
+      "aim_mod": -20,
+      "ammo_cost": 1,
+      "cost": 1,
+      "ends_turn": true
+    }
+  }
+}

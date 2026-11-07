@@ -1,0 +1,290 @@
+{
+  "schema": 1,
+  "id": "consular",
+  "name": "Consular",
+  "side": "jedi",
+  "role": "Healer and buffs",
+  "signature": "battleMed",
+  "branches": [
+    "Healer",
+    "Diplomat"
+  ],
+  "implemented": true,
+  "unit_kind": "consular",
+  "kit": [
+    "strike",
+    "push",
+    "meditate",
+    "stun",
+    "forceHeal",
+    "barrier",
+    "battleMed",
+    "mindTrick",
+    "forceRevive",
+    "choke",
+    "subdue"
+  ],
+  "passives": [],
+  "bonus_kit": [
+    "massHeal",
+    "forceWave",
+    "stasisField",
+    "disarm"
+  ],
+  "bonus_passives": [],
+  "tree": {
+    "trunk": {
+      "1": [
+        "stun",
+        "forceHeal",
+        "cSerene"
+      ],
+      "2": [
+        "barrier",
+        "battleMed",
+        "cPresence"
+      ]
+    },
+    "specs": {
+      "sage": {
+        "4": [
+          "massHeal",
+          "cResolve",
+          "csTouch"
+        ],
+        "5": [
+          "cWellspring",
+          "cSageLight",
+          "csCalm"
+        ],
+        "6": [
+          "cSeer",
+          "cSageEmpathy",
+          "csWard"
+        ],
+        "7": [
+          "cMaster",
+          "cSageAvatar",
+          "csEternal"
+        ],
+        "n": "Sage",
+        "ic": "sp_sage",
+        "desc": "Healer. Keeps everyone standing.",
+        "sig": "forceRevive"
+      },
+      "shadow": {
+        "4": [
+          "pull",
+          "shadowStep",
+          "chUnseen"
+        ],
+        "5": [
+          "forceWave",
+          "cShWhisper",
+          "chFade"
+        ],
+        "6": [
+          "stasisField",
+          "cShVeil",
+          "chFeed"
+        ],
+        "7": [
+          "cShMaster",
+          "disarm",
+          "chCascade"
+        ],
+        "n": "Shadow",
+        "ic": "sp_shadow",
+        "desc": "Controls minds and strikes unseen.",
+        "sig": "mindTrick"
+      }
+    }
+  },
+  "abilities": {
+    "strike": {
+      "name": "Strike",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "melee": true,
+      "weapon": true,
+      "range": 1.5,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "push": {
+      "name": "Push",
+      "ap": 1,
+      "focus": 2,
+      "range": 4,
+      "target": "enemy",
+      "effect": "displace",
+      "distance": 2,
+      "collision_damage": 3,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "meditate": {
+      "name": "Meditate",
+      "ap": 1,
+      "target": "self",
+      "effect": "focus",
+      "amount": 2,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "stun": {
+      "name": "Stun",
+      "ap": 1,
+      "focus": 2,
+      "range": 5,
+      "target": "enemy",
+      "effect": "status",
+      "status": "stunned",
+      "chance": 85,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "forceHeal": {
+      "name": "Force Heal",
+      "ap": 1,
+      "focus": 2,
+      "range": 3,
+      "cooldown": 1,
+      "target": "ally_injured",
+      "effect": "heal",
+      "heal": 4,
+      "revive": 2,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "barrier": {
+      "name": "Force Barrier",
+      "ap": 1,
+      "focus": 2,
+      "range": 4,
+      "target": "ally",
+      "effect": "buff",
+      "defense": 40,
+      "duration": 1,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "battleMed": {
+      "name": "Battle Meditation",
+      "ap": 1,
+      "focus": 3,
+      "range": 6,
+      "target": "self",
+      "effect": "aura",
+      "aim": 10,
+      "enemy_aim": -10,
+      "duration": 1,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "mindTrick": {
+      "name": "Mind Trick",
+      "ap": 1,
+      "focus": 3,
+      "range": 5,
+      "target": "enemy",
+      "effect": "status",
+      "status": "tricked",
+      "chance": 70,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "forceRevive": {
+      "name": "Force Revive",
+      "ap": 1,
+      "focus": 4,
+      "range": 1.5,
+      "target": "ally_down",
+      "effect": "heal",
+      "revive": 4,
+      "charges": "force_revive",
+      "cost": 1,
+      "ends_turn": false
+    },
+    "choke": {
+      "name": "Choke",
+      "ap": 1,
+      "focus": 2,
+      "range": 5,
+      "target": "enemy",
+      "effect": "attack",
+      "damage": [
+        5,
+        6
+      ],
+      "chance": 90,
+      "ignore_cover": true,
+      "darkness": 2,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "subdue": {
+      "name": "Subdue",
+      "ap": 1,
+      "range": 1.5,
+      "target": "enemy_subdue",
+      "effect": "capture",
+      "chance": 60,
+      "stunned_chance": 85,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "massHeal": {
+      "name": "Mass Heal",
+      "ap": 1,
+      "target": "self",
+      "effect": "mass_heal",
+      "focus": 3,
+      "range": 4,
+      "heal": 2,
+      "cost": 1,
+      "ends_turn": false
+    },
+    "forceWave": {
+      "name": "Force Wave",
+      "ap": 1,
+      "target": "self",
+      "effect": "wave",
+      "focus": 3,
+      "range": 2.9,
+      "damage": [
+        2,
+        2
+      ],
+      "chance": 40,
+      "status": "stunned",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "stasisField": {
+      "name": "Stasis Field",
+      "ap": 1,
+      "target": "self",
+      "effect": "wave",
+      "focus": 4,
+      "range": 3.2,
+      "chance": 60,
+      "status": "stunned",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "disarm": {
+      "name": "Disarm",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "status",
+      "focus": 2,
+      "range": 5,
+      "chance": 80,
+      "status": "disarmed",
+      "cost": 1,
+      "ends_turn": true
+    }
+  }
+}

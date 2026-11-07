@@ -1,0 +1,222 @@
+{
+  "schema": 1,
+  "id": "medic",
+  "name": "Medic",
+  "side": "soldier",
+  "role": "Healer",
+  "signature": "heal",
+  "branches": [
+    "Field Surgeon",
+    "Combat Medic"
+  ],
+  "implemented": true,
+  "unit_kind": "medic",
+  "kit": [
+    "shoot",
+    "overwatch",
+    "heal",
+    "smoke",
+    "hack",
+    "reviveStim",
+    "protocol",
+    "shieldDrone",
+    "hackDroid",
+    "scan"
+  ],
+  "passives": [],
+  "bonus_kit": [
+    "medBeacon"
+  ],
+  "bonus_passives": [],
+  "tree": {
+    "trunk": {
+      "1": [
+        "smoke",
+        "mDrilled",
+        "mTriage"
+      ],
+      "2": [
+        "reviveStim",
+        "fieldKit",
+        "mHardy"
+      ]
+    },
+    "specs": {
+      "surgeon": {
+        "4": [
+          "traumaBag",
+          "mSurgeon",
+          "mdHands"
+        ],
+        "5": [
+          "mStoic",
+          "mFieldSurgeon",
+          "mdCover"
+        ],
+        "6": [
+          "rally",
+          "mSurgCalm",
+          "mdLast"
+        ],
+        "7": [
+          "mAngel",
+          "mSurgMiracle",
+          "mdMiracle"
+        ],
+        "n": "Field Surgeon",
+        "ic": "sp_surgeon",
+        "desc": "Saves lives. More kits, steadier hands.",
+        "sig": "medBeacon"
+      },
+      "tech": {
+        "4": [
+          "combatMedic",
+          "mTechArmor",
+          "mtDroid"
+        ],
+        "5": [
+          "mMarksman",
+          "mark",
+          "mtPlate"
+        ],
+        "6": [
+          "suppress",
+          "mTechOverclock",
+          "mtOver"
+        ],
+        "7": [
+          "mVeteran",
+          "mTechDrones",
+          "mtNet"
+        ],
+        "n": "Combat Tech",
+        "ic": "sp_tech",
+        "desc": "Drones, armor and a sharper blaster.",
+        "sig": "shieldDrone"
+      }
+    }
+  },
+  "abilities": {
+    "shoot": {
+      "name": "Shoot",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "overwatch": {
+      "name": "Overwatch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "heal": {
+      "name": "Medkit",
+      "ap": 1,
+      "range": 1.5,
+      "target": "ally_injured",
+      "effect": "heal",
+      "heal": 4,
+      "revive": 2,
+      "charges": "medpacs",
+      "cost": 1,
+      "ends_turn": false
+    },
+    "smoke": {
+      "name": "Smoke",
+      "ap": 1,
+      "range": 6,
+      "target": "tile",
+      "effect": "area_buff",
+      "radius": 1,
+      "defense": 20,
+      "duration": 2,
+      "charges": "smoke",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "hack": {
+      "name": "Hack",
+      "ap": 1,
+      "range": 4,
+      "target": "tile_console",
+      "effect": "hack",
+      "cost": 1,
+      "ends_turn": true
+    },
+    "reviveStim": {
+      "name": "Revive Stim",
+      "ap": 1,
+      "range": 2,
+      "target": "ally_down",
+      "effect": "heal",
+      "revive": 2,
+      "charges": "medpacs",
+      "cost": 1,
+      "ends_turn": false
+    },
+    "protocol": {
+      "name": "Combat Protocol",
+      "ap": 1,
+      "range": 8,
+      "target": "enemy_droid",
+      "effect": "attack",
+      "damage": [
+        3,
+        3
+      ],
+      "chance": 100,
+      "no_los": true,
+      "ignore_cover": true,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "shieldDrone": {
+      "name": "Shield Drone",
+      "ap": 1,
+      "range": 1.5,
+      "target": "ally",
+      "effect": "buff",
+      "shield": 4,
+      "charges": "shield_drone",
+      "cost": 1,
+      "ends_turn": false
+    },
+    "hackDroid": {
+      "name": "Hack Droid",
+      "ap": 1,
+      "range": 4,
+      "target": "enemy_droid",
+      "effect": "status",
+      "status": "stunned",
+      "chance": 60,
+      "cost": 1,
+      "ends_turn": true
+    },
+    "scan": {
+      "name": "Scan Clue",
+      "ap": 1,
+      "range": 1.5,
+      "target": "tile_scan",
+      "effect": "scan",
+      "cost": 1,
+      "ends_turn": false
+    },
+    "medBeacon": {
+      "name": "Med Beacon",
+      "ap": 1,
+      "target": "self",
+      "effect": "mass_heal",
+      "range": 3,
+      "heal": 2,
+      "charges": "med_beacon",
+      "cost": 1,
+      "ends_turn": false
+    }
+  }
+}
