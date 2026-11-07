@@ -4,7 +4,7 @@
   "name": "Wayseeker",
   "side": "jedi",
   "role": "Control",
-  "signature": "tremor",
+  "signature": "wayseeker_tremor",
   "branches": [
     "Earthshaper",
     "Beastcaller"
@@ -30,180 +30,56 @@
   "tree": {
     "trunk": {
       "1": [
-        "pathfinder",
-        "wildBond",
-        "wLiving"
+        "wayseeker_tremor"
       ],
       "2": [
-        "tremor",
-        "barrier",
-        "wWind"
+        "wayseeker_root_snare",
+        "wayseeker_shelter_stone"
       ]
     },
     "specs": {
-      "beastwarden": {
-        "4": [
-          "wStalker",
-          "forceHeal",
-          "wbPack"
-        ],
-        "5": [
-          "wBond",
-          "wBeastHide",
-          "wbHide"
-        ],
-        "6": [
-          "wSeer",
-          "wBeastPack",
-          "wbHowl"
-        ],
-        "7": [
-          "wPrimal",
-          "wBeastKing",
-          "wbAlpha"
-        ],
-        "n": "Beastwarden",
-        "ic": "sp_beastwarden",
-        "desc": "Tames creatures and horrors.",
-        "sig": "beastCalm"
-      },
-      "earthshaper": {
-        "4": [
-          "saberThrow",
-          "wEarthRoot",
-          "weFault"
-        ],
-        "5": [
-          "forceWave",
-          "wEarthStone",
-          "weStone"
-        ],
-        "6": [
-          "collapse",
-          "wEarthReach",
-          "weAnchor"
-        ],
-        "7": [
-          "stasisField",
-          "wEarthWorld",
-          "weMountain"
-        ],
+      "a": {
         "n": "Earthshaper",
-        "ic": "sp_earthshaper",
-        "desc": "Bends the ground and drags enemies around.",
-        "sig": "pull"
+        "ic": "sp_wayseeker_a",
+        "desc": "Earthshaper training.",
+        "sig": "wayseeker_fault_line",
+        "4": [
+          "wayseeker_grasping_earth"
+        ],
+        "5": [
+          "wayseeker_quake_burst"
+        ],
+        "6": [
+          "wayseeker_rising_shelf"
+        ],
+        "7": [
+          "wayseeker_worldroot"
+        ],
+        "8": [
+          "wayseeker_grand_living_mountain"
+        ]
+      },
+      "b": {
+        "n": "Beastcaller",
+        "ic": "sp_wayseeker_b",
+        "desc": "Beastcaller training.",
+        "sig": "wayseeker_beastcall",
+        "4": [
+          "wayseeker_pack_ward"
+        ],
+        "5": [
+          "wayseeker_wild_pursuit"
+        ],
+        "6": [
+          "wayseeker_guardian_roar"
+        ],
+        "7": [
+          "wayseeker_alpha_bond"
+        ],
+        "8": [
+          "wayseeker_grand_living_mountain"
+        ]
       }
-    }
-  },
-  "abilities": {
-    "strike": {
-      "name": "Strike",
-      "ap": 1,
-      "target": "enemy",
-      "effect": "attack",
-      "melee": true,
-      "weapon": true,
-      "range": 1.5,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "guard": {
-      "name": "Guard",
-      "ap": 1,
-      "target": "self",
-      "effect": "guard",
-      "defense": 25,
-      "cost": 1,
-      "ends_turn": false
-    },
-    "meditate": {
-      "name": "Meditate",
-      "ap": 1,
-      "target": "self",
-      "effect": "focus",
-      "amount": 2,
-      "cost": 1,
-      "ends_turn": false
-    },
-    "beastCalm": {
-      "name": "Beast Calm",
-      "ap": 1,
-      "target": "enemy_creature",
-      "effect": "status",
-      "focus": 2,
-      "range": 5,
-      "chance": 75,
-      "status": "stunned",
-      "cost": 1,
-      "ends_turn": true
-    },
-    "pull": {
-      "name": "Force Pull",
-      "ap": 1,
-      "target": "enemy",
-      "effect": "displace",
-      "focus": 1,
-      "range": 6,
-      "distance": 3,
-      "collision_damage": 2,
-      "pull": true,
-      "chance": 90,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "push": {
-      "name": "Push",
-      "ap": 1,
-      "focus": 2,
-      "range": 4,
-      "target": "enemy",
-      "effect": "displace",
-      "distance": 2,
-      "collision_damage": 3,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "breach": {
-      "name": "Saber Breach",
-      "ap": 1,
-      "target": "tile_wall",
-      "effect": "breach",
-      "range": 1.5,
-      "cover_damage": 8,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "tremor": {
-      "name": "Tremor",
-      "ap": 1,
-      "target": "tile_area",
-      "effect": "blast",
-      "focus": 3,
-      "range": 5,
-      "damage": [
-        2,
-        2
-      ],
-      "cover_damage": 4,
-      "clear_overwatch": true,
-      "cost": 1,
-      "ends_turn": true
-    },
-    "pathfinder": {
-      "name": "Pathfinder",
-      "passive": true,
-      "effect": "mobility",
-      "cost": 0,
-      "ap": 0,
-      "ends_turn": false
-    },
-    "wildBond": {
-      "name": "Wild Bond",
-      "passive": true,
-      "effect": "focus_bonus",
-      "cost": 0,
-      "ap": 0,
-      "ends_turn": false
     }
   },
   "base_stats": {
@@ -240,5 +116,31 @@
     "medpacs": 2,
     "deflect": 35,
     "guard_deflect": 70
+  },
+  "abilities": {
+    "strike": {"name":"Strike","ap":1,"target":"enemy","effect":"attack","melee":true,"weapon":true,"range":1.5,"cost":1,"ends_turn":true},
+    "guard": {"name":"Guard","ap":1,"target":"self","effect":"guard","defense":25,"cost":1,"ends_turn":false},
+    "meditate": {"name":"Meditate","ap":1,"target":"self","effect":"focus","amount":2,"cost":1,"ends_turn":false},
+    "beastCalm": {"name":"Beast Calm","ap":1,"target":"enemy_creature","effect":"status","focus":2,"range":5,"chance":75,"status":"stunned","cost":1,"ends_turn":true},
+    "pull": {"name":"Force Pull","ap":1,"target":"enemy","effect":"displace","focus":1,"range":6,"distance":3,"collision_damage":2,"pull":true,"chance":90,"cost":1,"ends_turn":true},
+    "push": {"name":"Push","ap":1,"focus":2,"range":4,"target":"enemy","effect":"displace","distance":2,"collision_damage":3,"cost":1,"ends_turn":true},
+    "breach": {"name":"Saber Breach","ap":1,"target":"tile_wall","effect":"breach","range":1.5,"cover_damage":8,"cost":1,"ends_turn":true},
+    "tremor": {"name":"Tremor","ap":1,"target":"tile_area","effect":"blast","focus":3,"range":5,"damage":[2,2],"cover_damage":4,"clear_overwatch":true,"cost":1,"ends_turn":true},
+    "pathfinder": {"name":"Pathfinder","passive":true,"effect":"mobility","cost":0,"ap":0,"ends_turn":false},
+    "wildBond": {"name":"Wild Bond","passive":true,"effect":"focus_bonus","cost":0,"ap":0,"ends_turn":false},
+    "wayseeker_tremor": {"name":"Tremor","rank":1,"ap":1,"target":"tile_area","effect":"blast","cost":1,"ends_turn":true,"range":3,"damage":[1,2],"cover_damage":2,"focus":1,"chain":{"consume":[{"tag":"PINNED","target":"area_enemies","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"STAGGERED","target":"area_enemies"}]}},
+    "wayseeker_root_snare": {"name":"Root Snare","rank":2,"ap":1,"target":"enemy","effect":"status","cost":1,"ends_turn":true,"range":4,"chance":68,"focus":1,"status":"stunned","chain":{"consume":[{"tag":"STAGGERED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"PINNED","target":"target"}]}},
+    "wayseeker_shelter_stone": {"name":"Shelter Stone","rank":2,"ap":1,"target":"ally","effect":"buff","cost":1,"ends_turn":false,"range":4,"aim":10,"defense":11,"duration":1,"focus":0,"chain":{"consume":[{"tag":"READY","target":"target","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"SHIELDED","target":"target","amount":1}]}},
+    "wayseeker_fault_line": {"name":"Fault Line","rank":3,"ap":1,"target":"tile_area","effect":"blast","cost":1,"ends_turn":true,"range":4,"damage":[2,4],"cover_damage":4,"focus":1,"chain":{"consume":[{"tag":"PINNED","target":"area_enemies","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"EXPOSED","target":"area_enemies"}]}},
+    "wayseeker_beastcall": {"name":"Beastcall","rank":3,"ap":1,"target":"enemy","effect":"status","cost":1,"ends_turn":true,"range":4,"chance":73,"focus":1,"status":"suppressed","chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"TAUNTED","target":"target"}]}},
+    "wayseeker_grasping_earth": {"name":"Grasping Earth","rank":4,"ap":1,"target":"enemy","effect":"displace","cost":1,"ends_turn":true,"range":5,"focus":2,"distance":2,"collision_damage":4,"chance":80,"chain":{"consume":[{"tag":"LIFTED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"PINNED","target":"target"}]}},
+    "wayseeker_pack_ward": {"name":"Pack Ward","rank":4,"ap":1,"target":"self","effect":"aura","cost":1,"ends_turn":false,"range":5,"aim":11,"enemy_aim":-6,"duration":1,"focus":2,"chain":{"consume":[{"tag":"INSPIRED","target":"self","bonus":[{"type":"focus","target":"self","amount":2}]}],"apply":[{"tag":"SHIELDED","target":"all_allies","amount":2}]}},
+    "wayseeker_quake_burst": {"name":"Quake Burst","rank":5,"ap":1,"target":"enemy","effect":"wave","cost":1,"ends_turn":true,"range":4.5,"damage":[5,6],"chance":65,"focus":2,"chain":{"consume":[{"tag":"BURNING","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"STAGGERED","target":"target"}]}},
+    "wayseeker_wild_pursuit": {"name":"Wild Pursuit","rank":5,"ap":1,"target":"enemy","effect":"attack","cost":1,"ends_turn":true,"range":5.5,"damage":[5,9],"chance":87,"focus":1,"chain":{"consume":[{"tag":"PINNED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"MARKED","target":"target"}]}},
+    "wayseeker_rising_shelf": {"name":"Rising Shelf","rank":6,"ap":1,"target":"enemy","effect":"status","cost":1,"ends_turn":true,"range":6,"chance":88,"focus":3,"status":"stunned","chain":{"consume":[{"tag":"STAGGERED","target":"target","bonus":[{"type":"damage","target":"target","amount":3}]}],"apply":[{"tag":"LIFTED","target":"target"}]}},
+    "wayseeker_guardian_roar": {"name":"Guardian Roar","rank":6,"ap":1,"target":"self","effect":"aura","cost":1,"ends_turn":false,"range":6,"aim":15,"enemy_aim":-8,"duration":1,"focus":3,"chain":{"consume":[{"tag":"SHIELDED","target":"self","bonus":[{"type":"focus","target":"self","amount":3}]}],"apply":[{"tag":"INSPIRED","target":"all_allies"}]}},
+    "wayseeker_worldroot": {"name":"Worldroot","rank":7,"ap":1,"target":"tile_area","effect":"blast","cost":1,"ends_turn":true,"capstone":true,"range":6,"damage":[6,8],"cover_damage":8,"focus":3,"chain":{"consume":[{"tag":"EXPOSED","target":"area_enemies","bonus":[{"type":"damage","target":"target","amount":3}]}],"apply":[{"tag":"PINNED","target":"area_enemies"}]}},
+    "wayseeker_alpha_bond": {"name":"Alpha Bond","rank":7,"ap":1,"target":"self","effect":"aura","cost":1,"ends_turn":false,"capstone":true,"range":6,"aim":17,"enemy_aim":-9,"duration":1,"focus":3,"chain":{"consume":[{"tag":"READY","target":"self","bonus":[{"type":"focus","target":"self","amount":3}]}],"apply":[{"tag":"ATTUNED","target":"all_allies"}]}},
+    "wayseeker_grand_living_mountain": {"name":"Grand Master Living Mountain","rank":8,"ap":1,"target":"tile_area","effect":"blast","cost":1,"ends_turn":true,"capstone":true,"cooldown":99,"range":7,"damage":[7,9],"cover_damage":9,"focus":4,"chain":{"consume":[{"tag":"LIFTED","target":"area_enemies","bonus":[{"type":"damage","target":"target","amount":4}]}],"apply":[{"tag":"STAGGERED","target":"area_enemies"}]}}
   }
 }
