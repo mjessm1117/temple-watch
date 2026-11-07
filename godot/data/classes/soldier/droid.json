@@ -95,22 +95,22 @@
       "chain": {
         "consume": [
           {
-            "tag": "SHIELDED",
+            "tag": "ATTUNED",
             "target": "self",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 1
+                "amount": 5
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "ATTUNED",
+            "tag": "READY",
             "target": "self",
-            "amount": 1
+            "amount": 5
           }
         ]
       }
@@ -136,14 +136,14 @@
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 1
+                "amount": 3
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "MARKED",
+            "tag": "PINNED",
             "target": "target"
           }
         ]
@@ -168,16 +168,16 @@
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 1
+                "amount": 6
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "SHIELDED",
+            "tag": "INSPIRED",
             "target": "target",
-            "amount": 1
+            "amount": 6
           }
         ]
       }
@@ -196,20 +196,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "PINNED",
+            "tag": "STAGGERED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 1
+                "amount": 3
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "IONIZED",
+            "tag": "MARKED",
             "target": "target"
           }
         ]
@@ -227,22 +227,22 @@
       "chain": {
         "consume": [
           {
-            "tag": "SHIELDED",
+            "tag": "READY",
             "target": "self",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 2
+                "amount": 6
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "ATTUNED",
+            "tag": "READY",
             "target": "self",
-            "amount": 2
+            "amount": 6
           }
         ]
       }
@@ -265,20 +265,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "LIFTED",
+            "tag": "STAGGERED",
             "target": "area_enemies",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 2
+                "amount": 3
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "PINNED",
+            "tag": "IONIZED",
             "target": "area_enemies"
           }
         ]
@@ -304,22 +304,22 @@
       "chain": {
         "consume": [
           {
-            "tag": "READY",
+            "tag": "INSPIRED",
             "target": "target",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 2
+                "amount": 6
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "SHIELDED",
+            "tag": "INSPIRED",
             "target": "target",
-            "amount": 2
+            "amount": 6
           }
         ]
       }
@@ -339,20 +339,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "STAGGERED",
+            "tag": "IONIZED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 2
+                "amount": 3
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "MARKED",
+            "tag": "PINNED",
             "target": "target"
           }
         ]
@@ -385,7 +385,7 @@
         ],
         "apply": [
           {
-            "tag": "STAGGERED",
+            "tag": "BURNING",
             "target": "target"
           }
         ]
@@ -403,22 +403,22 @@
       "chain": {
         "consume": [
           {
-            "tag": "ATTUNED",
+            "tag": "INSPIRED",
             "target": "self",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 3
+                "amount": 6
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "INSPIRED",
+            "tag": "ATTUNED",
             "target": "self",
-            "amount": 3
+            "amount": 6
           }
         ]
       }
@@ -438,7 +438,7 @@
       "chain": {
         "consume": [
           {
-            "tag": "EXPOSED",
+            "tag": "IONIZED",
             "target": "target",
             "bonus": [
               {
@@ -451,7 +451,7 @@
         ],
         "apply": [
           {
-            "tag": "EXPOSED",
+            "tag": "STAGGERED",
             "target": "target"
           }
         ]
@@ -472,22 +472,22 @@
       "chain": {
         "consume": [
           {
-            "tag": "INSPIRED",
+            "tag": "SHIELDED",
             "target": "all_allies",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 3
+                "amount": 6
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "READY",
+            "tag": "SHIELDED",
             "target": "all_allies",
-            "amount": 3
+            "amount": 6
           }
         ]
       }
@@ -511,20 +511,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "MARKED",
+            "tag": "PINNED",
             "target": "area_enemies",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 4
+                "amount": 3
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "BURNING",
+            "tag": "EXPOSED",
             "target": "area_enemies"
           }
         ]
@@ -558,8 +558,7 @@
     "armor": 2,
     "model": "trooper",
     "medpacs": 2,
-    "clip": 4,
-    "droid": true
+    "clip": 4
   },
   "modules": {
     "slots": 3,
