@@ -135,7 +135,7 @@ func push(id: int, target_id: int) -> bool:
 
 func move(id: int, dest: Vector2i) -> bool:
 	var u := unit_by_id(id)
-	if u.is_empty() or bool(u.get("rooted", false)): return false
+	if u.is_empty() or bool(u.get("rooted", false)) or preload("res://scripts/ability_chains.gd").has_tag(u, "PINNED") or preload("res://scripts/ability_chains.gd").has_tag(u, "LIFTED"): return false
 	var reach := paths(u, int(u.mob) * 2)
 	if not reach.costs.has(dest): return false
 	var old := Shot.pos(u)
@@ -179,6 +179,7 @@ func _reactions(mover: Dictionary, side: String) -> void:
 		mover.x = q.x; mover.y = q.y
 		for watcher in living(side):
 			if int(mover.hp) <= 0: break
+			if preload("res://scripts/ability_chains.gd").has_tag(watcher, "STAGGERED") or preload("res://scripts/ability_chains.gd").has_tag(watcher, "LIFTED"): continue
 			if str(watcher.side) == "enemy" and not bool(watcher.awake): continue
 			var pinned := int(mover.get("suppressed_by", -1)) == int(watcher.id)
 			var hold: bool = bool(watcher.get("hold_line", false)) and int(mover.id) not in watcher.get("ow_hit", [])
@@ -186,7 +187,8 @@ func _reactions(mover: Dictionary, side: String) -> void:
 			if int(watcher.get("ammo", 1)) <= 0: continue
 			var info := Shot.calculate(self, watcher, mover, false, -15)
 			if not bool(info.los) or not bool(info.range_ok): continue
-			watcher.overwatch = false
+			var ready := preload("res://scripts/ability_chains.gd").consume(self, watcher, "READY") if preload("res://scripts/ability_chains.gd").has_tag(watcher, "READY") else false
+			watcher.overwatch = ready
 			watcher.ow_hit = watcher.get("ow_hit", []) + [int(mover.id)]
 			mover.erase("suppressed_by")
 			resolving_reaction = true
@@ -201,6 +203,10 @@ func overwatch(id: int) -> bool:
 
 func end_turn() -> void:
 	if phase != "player" or result != "": return
+	for unit in units:
+		if preload("res://scripts/ability_chains.gd").has_tag(unit, "BURNING") and int(unit.get("hp", 0)) > 0:
+			if not bool(unit.get("droid", false)) and not preload("res://scripts/ability_chains.gd").has_tag(unit, "INSPIRED"): unit.panicked = true
+			apply_damage(unit, 1)
 	Round.begin(self)
 	var fired: Dictionary = {}
 	for e in living("enemy"):
@@ -218,6 +224,7 @@ func tick_combat_status() -> void:
 		if str(u.side) == "player" and "wildBond" in u.get("passives", []): u.focus_left = maxi(int(u.focus_left), 0)
 
 func enemy_actor(e: Dictionary, fired: Dictionary) -> void:
+	if preload("res://scripts/ability_chains.gd").has_tag(e, "LIFTED"): return
 	preload("res://scripts/campaign/battle_sith.gd").before_actor(self,e)
 	super.enemy_actor(e,fired)
 

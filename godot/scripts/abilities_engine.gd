@@ -11,18 +11,20 @@ static func cost(def: Dictionary, u: Dictionary) -> int:
 	return Rules12.cost(def, u)
 
 static func range_of(def: Dictionary, u: Dictionary) -> float:
-	return float(u.get("range", 0)) if str(def.get("range")) == "weapon" else float(def.get("range", 0))
+	var base := float(u.get("range", 0)) if str(def.get("range")) == "weapon" else float(def.get("range", 0))
+	return base + (1.0 if int(def.get("focus", 0)) > 0 and Chains.has_tag(u, "ATTUNED") else 0.0)
 
 static func reason(m: RefCounted, u: Dictionary, id: String) -> String:
 	if u.is_empty() or not m.abilities.has(id): return "Unavailable"
 	if str(u.get("side", "")) != "player" or str(u.get("status", "ok")) == "down" or int(u.get("hp", 0)) <= 0: return "Downed"
+	if Chains.has_tag(u, "LIFTED"): return "Lifted"
 	if m.result != "" or m.phase != "player": return "Mission inactive"
 	if id != "medpac" and id != "revive" and id != "free" and id != "move" and id != "interact" and id not in u.get("kit", []): return "Not in kit"
 	var def: Dictionary = m.abilities[id]
 	var combat_reason := Combat.reason(m, u, id, def)
 	if combat_reason != "": return combat_reason
 	if int(u.get("ap", 0)) < cost(def, u) or (int(u.get("ap", 0)) == 0 and cost(def, u) > 0): return "Need %d AP" % maxi(1, cost(def, u))
-	if int(u.get("focus_left", 0)) < int(def.get("focus", 0)): return "Need %d Focus" % int(def.focus)
+	if int(u.get("focus_left", 0)) < int(def.get("focus", 0)) and not Chains.has_tag(u, "ATTUNED"): return "Need %d Focus" % int(def.focus)
 	var charge := str(def.get("charges", ""))
 	if charge != "" and int(u.get(charge, 0)) <= 0: return "No charges"
 	var ready: Dictionary = u.get("cooldowns", {})
@@ -61,6 +63,7 @@ static func targets(m: RefCounted, u: Dictionary, id: String) -> Array[Dictionar
 			out.append(t)
 	elif kind.begins_with("enemy"):
 		for t in m.living("enemy"):
+			if Chains.has_tag(u, "TAUNTED") and int(Chains.tags(u).get("TAUNTED", -1)) != int(t.id): continue
 			if preload("res://scripts/enemy11_tactics.gd").hidden(m,t): continue
 			if not bool(t.get("awake", false)) and not bool(t.get("spotted", false)): continue
 			if Shot.distance(Shot.pos(u), Shot.pos(t)) > radius: continue
@@ -129,8 +132,10 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 	var was_concealed := bool(u.get("concealed", false))
 	var ghost_used := bool(u.get("ghost_used", false))
 	var spend := cost(def, u)
+	var attuned := int(def.get("focus", 0)) > 0 and Chains.has_tag(u, "ATTUNED")
+	if attuned: Chains.consume(m, u, "ATTUNED")
 	u.ap = int(u.ap) - spend
-	u.focus_left = int(u.get("focus_left", 0)) - int(def.get("focus", 0))
+	u.focus_left = int(u.get("focus_left", 0)) - (0 if attuned else int(def.get("focus", 0)))
 	var charge := str(def.get("charges", ""))
 	if charge != "": u[charge] = int(u.get(charge, 0)) - 1
 	if int(def.get("cooldown", 0)) > 0:
@@ -139,6 +144,7 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 		u.cooldowns = cds
 	if int(def.get("ammo_cost", 0)) > 0 and u.has("ammo"): u.ammo = int(u.ammo) - int(def.ammo_cost)
 	var effect := str(def.get("effect", ""))
+	u.active_ability = id
 	if effect in Combat.EFFECTS: Combat.effect(m, u, t, tile, id, def)
 	match effect:
 		"heal": _heal(m, u, t, def)
@@ -193,6 +199,7 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 	m.message("%s uses %s." % [u.name, def.name])
 	m.ability_uses[id] = int(m.ability_uses.get(id, 0)) + 1
 	if bool(def.get("ends_turn", false)): u.ap = 0
+	u.erase("active_ability")
 	m._check_lose()
 	return true
 

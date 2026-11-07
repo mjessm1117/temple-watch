@@ -87,11 +87,15 @@ static func in_cover(m: RefCounted, target: Vector2i) -> bool:
 	return false
 
 static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, melee: bool = false, modifier: int = 0) -> Dictionary:
+	var chains = preload("res://scripts/ability_chains.gd")
 	modifier += preload("res://scripts/campaign/battle_sith.gd").aim(attacker,target,melee)
 	if m.get("identity") != null: modifier += m.identity.aim(m,attacker)
 	var a := pos(attacker)
 	var t := pos(target)
 	var lines: Array = [["Base aim", int(attacker.aim) + int(attacker.get("buff_aim", 0)) + int(attacker.get("debuff_aim", 0)) + int(target.get("marked_aim", 0))]]
+	if chains.has_tag(target, "MARKED"): lines.append(["Marked", 20])
+	if chains.has_tag(attacker, "INSPIRED"): lines.append(["Inspired", 15])
+	if chains.has_tag(attacker, "PINNED"): lines.append(["Pinned", -15])
 	if "executioner" in attacker.get("passives", []) and int(target.hp) * 2 <= int(target.max_hp): lines.append(["Executioner", 25])
 	var bond_bonus := 0
 	for ally in m.units:
@@ -109,6 +113,7 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 	if melee: lines.append(["Close quarters", 10])
 	else:
 		cv = cover(m, t, a)
+		if chains.has_tag(target, "EXPOSED") or chains.has_tag(target, "LIFTED"): cv = 0
 		# A two-level vantage sees over one tier of nearby cover.
 		if elevation(m, a) - elevation(m, t) >= 2: cv = maxi(0, cv - 20)
 		lines.append(["Full cover" if cv == 40 else "Half cover" if cv == 20 else "No cover", -cv])
@@ -120,6 +125,7 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 	if bool(target.get("hunkered", false)): defense += 30
 	defense += int(target.get("buff_defense", 0))
 	if bool(target.get("guard", false)): defense += roundi(25 * float(target.get("guard_power", 1.0)))
+	if chains.has_tag(target, "STAGGERED"): defense -= 15
 	if str(target.get("side", "")) == "player":
 		for ally in m.units:
 			if str(ally.get("side", "")) == "player" and int(ally.get("hp", 0)) > 0 and int(ally.get("id", -1)) != int(target.get("id", -2)) and "defLine" in ally.get("passives", []) and distance(pos(ally), t) <= 1.5:
@@ -133,7 +139,7 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 	var flanked := not melee and in_cover(m, t) and cv == 0
 	if flanked: lines.append(["Flanking critical chance", 50])
 	if bool(target.get("hunkered", false)) and flanked: lines.append(["Hunker blocks flank critical", -50])
-	var crit := int(attacker.get("crit", 0)) + (50 if flanked and not bool(target.get("hunkered", false)) else 0)
+	var crit := int(attacker.get("crit", 0)) + (50 if flanked and not bool(target.get("hunkered", false)) else 0) + (10 if chains.has_tag(target, "MARKED") else 0)
 	var sight := melee or los(m, a, t)
 	if not sight and str(attacker.get("side", "")) == "player" and str(target.get("side", "")) == "enemy":
 		for ally in m.units:

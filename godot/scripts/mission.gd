@@ -127,21 +127,17 @@ func _spawn_near(kind: String, anchor: Vector2i, group: int, max_radius: int = 4
 					return
 func in_bounds(p: Vector2i) -> bool:
 	return p.x >= 0 and p.y >= 0 and p.x < int(spec.width) and p.y < int(spec.height)
-
 func tile(p: Vector2i) -> String:
 	if not in_bounds(p): return "#"
 	return board[p.y].substr(p.x, 1)
-
 func set_tile(p: Vector2i, c: String) -> void:
 	if not in_bounds(p): return
 	board[p.y] = board[p.y].substr(0, p.x) + c + board[p.y].substr(p.x + 1)
 	cover_hp.erase(p)
 	if _destructible(p): cover_hp[p] = 8 if c == "#" else 4
-
 func _destructible(p: Vector2i) -> bool:
 	if not in_bounds(p) or p.x == 0 or p.y == 0 or p.x == int(spec.width) - 1 or p.y == int(spec.height) - 1: return false
 	return tile(p) in ["#", "c", "h", "k"]
-
 func damage_cover(p: Vector2i, damage: int) -> String:
 	if not _destructible(p) or damage <= 0: return tile(p)
 	var before := tile(p)
@@ -200,6 +196,7 @@ func ability_reason(id: int, ability_id: String) -> String:
 
 func apply_damage(target: Dictionary, amount: int, _source: Dictionary = {}) -> int:
 	if int(target.hp) <= 0: return 0
+	amount = preload("res://scripts/ability_chains.gd").damage_amount(self, target, amount, _source)
 	if modern: amount = Enemy11.intercept_damage(self,target,amount,_source)
 	if modern and bool(_source.get("horror",false)) and str(target.side) == "player" and str(target.class_name) not in ["Guardian","Consular"]: return 0
 	var shield: int = int(target.get("shield", 0))
@@ -249,6 +246,7 @@ func reach_tiles(unit: Dictionary, actions: int) -> Dictionary:
 	return Rules12.reach(self, unit, actions)
 func move(id: int, dest: Vector2i) -> bool:
 	var u := unit_by_id(id)
+	if preload("res://scripts/ability_chains.gd").has_tag(u, "PINNED") or preload("res://scripts/ability_chains.gd").has_tag(u, "LIFTED"): return false
 	if u.is_empty() or result != "" or phase != str(u.side) or int(u.ap) < 1 or str(u.get("status", "ok")) == "down": return false
 	var reach := reach_tiles(u, 2)
 	if not reach.costs.has(dest) or dest == Shot.pos(u): return false
@@ -299,6 +297,8 @@ func _follow_prisoner(old: Vector2i, dest: Vector2i) -> void:
 func shot(id: int, target_id: int, mode: String = "shoot") -> bool:
 	var a := unit_by_id(id)
 	var t := unit_by_id(target_id)
+	if preload("res://scripts/ability_chains.gd").has_tag(a, "LIFTED"): return false
+	if preload("res://scripts/ability_chains.gd").has_tag(a, "TAUNTED") and int(preload("res://scripts/ability_chains.gd").tags(a).get("TAUNTED", -1)) != target_id: return false
 	if a.is_empty() or t.is_empty() or int(t.hp) <= 0 or a.side == t.side or result != "" or phase != str(a.side) or str(a.get("status", "ok")) == "down": return false
 	if modern and str(a.side) == "player" and Enemy11.hidden(self,t): return false
 	if str(a.side) == "player" and mode not in a.get("kit", []): return false

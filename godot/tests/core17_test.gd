@@ -6,6 +6,7 @@ const Roster = preload("res://scripts/campaign/strat_roster.gd")
 const Mentor = preload("res://scripts/campaign/mentor17.gd")
 const Chains = preload("res://scripts/ability_chains.gd")
 const Mission = preload("res://scripts/mission.gd")
+const Shot = preload("res://scripts/shot.gd")
 const Promotion = preload("res://scripts/campaign/promotion_screen.gd")
 var checks := 0
 var failures := 0
@@ -58,6 +59,35 @@ func run() -> void:
 	Chains.apply_tag(enemy, "LIFTED"); Chains.consume(m, enemy, "LIFTED")
 	check(m.chain_momentum == 3 and Chains.claim_momentum_strike(m, actor) and m.chain_momentum == 0, "three tags grant free action")
 	check(not Chains.claim_momentum_strike(m, actor), "one Momentum strike per turn")
+	enemy.combo_tags.erase("MARKED")
+	var unmarked := Shot.calculate(m, actor, enemy)
+	Chains.apply_tag(enemy, "MARKED")
+	var marked := Shot.calculate(m, actor, enemy)
+	check(int(marked.crit) == int(unmarked.crit) + 10 and marked.lines.any(func(line): return line[0] == "Marked" and line[1] == 20), "MARKED grants aim and crit")
+	Chains.apply_tag(actor, "INSPIRED")
+	check(Shot.calculate(m, actor, enemy).lines.any(func(line): return line[0] == "Inspired" and line[1] == 15), "INSPIRED grants aim")
+	enemy.droid = true
+	Chains.apply_tag(enemy, "IONIZED")
+	enemy.shield = 4
+	Chains.apply_tag(enemy, "IONIZED")
+	check(int(enemy.shield) == 0 and bool(enemy.get("stunned", false)), "IONIZED drops shields and stuns droids")
+	Chains.apply_tag(actor, "SHIELDED", -1, 4)
+	check(int(actor.shield) == 4, "SHIELDED absorbs four")
+	var far_range := preload("res://scripts/abilities_engine.gd").range_of(m.abilities.push, actor)
+	Chains.apply_tag(actor, "ATTUNED")
+	check(preload("res://scripts/abilities_engine.gd").range_of(m.abilities.push, actor) == far_range + 1.0, "ATTUNED extends Force range")
+	Chains.apply_tag(actor, "PINNED")
+	check(not m.move(int(actor.id), Vector2i(int(actor.x) + 1, int(actor.y))), "PINNED blocks movement")
+	var tagged: Dictionary = enemy.duplicate(true)
+	tagged.hp = 20; tagged.max_hp = 20; tagged.shield = 0; tagged.combo_tags = {}
+	actor.active_ability = "grenade"
+	Chains.apply_tag(tagged, "IONIZED")
+	check(m.apply_damage(tagged, 3, actor) == 6, "IONIZED doubles explosive damage")
+	actor.erase("active_ability")
+	tagged.hp = 20; tagged.combo_tags = {}
+	Chains.apply_tag(tagged, "LIFTED")
+	check(m.apply_damage(tagged, 4, actor) == 6, "LIFTED increases incoming damage")
+	check(Chains.consume(m, tagged, "LIFTED") and tagged.hp == 12, "LIFTED deals fall damage when dropped")
 	actor.kit.append("masterAction")
 	check(m.use_ability(int(actor.id), "masterAction") and actor.ap == 4 and not m.use_ability(int(actor.id), "masterAction"), "Master third action once per mission")
 	var game = Campaign.new()
