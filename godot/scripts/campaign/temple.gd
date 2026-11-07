@@ -2,6 +2,7 @@ extends Control
 const Campaign = preload("res://scripts/campaign/state.gd")
 const Data = preload("res://scripts/campaign/data.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
+const PromotionScreen = preload("res://scripts/campaign/promotion_screen.gd")
 const Gear = preload("res://scripts/campaign/gear.gd")
 const Modules = preload("res://scripts/campaign/modules.gd")
 const Legacy = preload("res://scripts/campaign/legacy.gd")
@@ -318,6 +319,7 @@ func _roster() -> void:
 			face.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 			box.add_child(face)
 		StrategyUI.soldier(self, box, r)
+		if str(r.status) == "active": box.add_child(UI.button("Training & promotion", _open_promotion.bind(str(r.id))))
 		if Progression.is_jedi(r) and r.status == "active" and r.get("title","") != "Padawan":
 			var counsel := OptionButton.new(); counsel.add_item("Counsel: none")
 			var mentors: Array = campaign.state.roster.filter(func(m): return m.id != r.id and m.status == "active" and Progression.is_jedi(m) and int(m.rank) >= 4 and m.get("title","") in ["Knight","Master"])
@@ -450,6 +452,11 @@ func _open_galaxy() -> void:
 
 func _pick(id: String, key: String) -> void:
 	if Progression.choose(campaign.soldier(id), key): get_node("/root/CampaignFlow").save(); _show_page()
+func _open_promotion(id: String) -> void:
+	var screen := PromotionScreen.new()
+	add_child(screen)
+	screen.setup(campaign, id)
+	screen.changed.connect(func(): notice_label.text = "Training updated.")
 func _assign(id: String, job: String) -> void:
 	if campaign.assign(id, job): get_node("/root/CampaignFlow").save(); _refresh_shell()
 func _start_research(id: String) -> void:

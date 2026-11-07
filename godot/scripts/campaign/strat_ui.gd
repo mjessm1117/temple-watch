@@ -94,7 +94,7 @@ static func roster(view) -> void:
 	var c = view.campaign
 	var box: VBoxContainer = view._card("RECRUIT POOL", "Three candidates each month; a Padawan in odd months. Roster capacity %d." % Roster.capacity(c.state))
 	for candidate in c.state.cands:
-		button(view, box, "Recruit %s · %s · %s" % [candidate.n, candidate.cls, "Council-sponsored" if candidate.jedi else "30 Cr + 1 recruit"], Roster.hire.bind(c, str(candidate.id)))
+		button(view, box, "Recruit %s · %s · %s" % [candidate.n, candidate.cls, "Padawan · Council-sponsored" if candidate.jedi else "30 Cr + 1 recruit"], Roster.hire.bind(c, str(candidate.id)))
 	box = view._card("SQUAD DOCTRINE", "Deploy 5 now, 6 after upgrade I, 7 after upgrade II. Current capacity %d. Upgrade I needs a rank 3 veteran; upgrade II needs rank 4 and Barracks II." % c.squad_capacity())
 	button(view, box, "Increase squad capacity · %d Cr" % (100 + 75 * int(c.state.strategy.squad_upgrades)), Roster.upgrade_squad.bind(c), int(c.state.strategy.squad_upgrades) < 2)
 	if not c.state.strategy.training.is_empty(): view._card("TRAINING CENTER", "%s · %s · %.1f days remaining" % [c.state.strategy.training.id, c.state.strategy.training.mode, c.state.strategy.training.left])
