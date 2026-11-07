@@ -11,7 +11,7 @@ static func assign(c, master_id: String, padawan_id: String, taught_ability: Str
 	if str(pupil.get("mentor_id", "")) != "": return false
 	var pupils := 0
 	for other in c.state.roster:
-		if str(other.get("mentor_id", "")) == master_id: pupils += 1
+		if str(other.get("mentor_id", "")) == master_id and str(other.get("status", "")) == "active" and int(other.get("rank", 0)) <= 2: pupils += 1
 	if pupils >= 2: return false
 	if not Classes.class_data(str(master.cls)).get("abilities", {}).has(taught_ability): return false
 	pupil.mentor_id = master_id

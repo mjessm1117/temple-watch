@@ -74,7 +74,10 @@ func _refresh() -> void:
 			content.add_child(UI.label("CHOOSE A MASTER MENTOR", 14, UI.GOLD))
 			for master in campaign.state.roster:
 				if master == r or str(master.get("status", "")) != "active" or Classes.side(str(master.get("cls", ""))) != "jedi" or int(master.get("rank", 0)) < 5: continue
-				if master.get("trained_padawans", []).size() >= 2: continue
+				var pupils := 0
+				for other in campaign.state.roster:
+					if str(other.get("mentor_id", "")) == str(master.id) and str(other.get("status", "")) == "active" and int(other.get("rank", 0)) <= 2: pupils += 1
+				if pupils >= 2: continue
 				var signature := str(Classes.class_data(str(master.cls)).get("signature", ""))
 				if signature != "": _add_button("Train with %s · %s" % [master.n, signature], _mentor.bind(str(master.id), signature))
 	for legacy in r.get("legacies", []):
