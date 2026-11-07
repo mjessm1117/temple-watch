@@ -17,10 +17,7 @@
     "hunker",
     "suppress",
     "rapidFire",
-    "rally",
-    "trooper_thermal_detonator",
-    "trooper_breach_charge",
-    "trooper_armor_piercer"
+    "rally"
   ],
   "passives": [],
   "bonus_kit": [],
