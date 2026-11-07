@@ -12,12 +12,23 @@
   "implemented": true,
   "unit_kind": "medic",
   "kit": [
-    "medic_bacta_spray",
+    "shoot",
+    "overwatch",
     "heal",
-    "reviveStim"
+    "smoke",
+    "hack",
+    "reviveStim",
+    "protocol",
+    "shieldDrone",
+    "hackDroid",
+    "scan",
+    "medic_bacta_spray",
+    "medic_toxin_dart"
   ],
   "passives": [],
-  "bonus_kit": [],
+  "bonus_kit": [
+    "medBeacon"
+  ],
   "bonus_passives": [],
   "tree": {
     "trunk": {
