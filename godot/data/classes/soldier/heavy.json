@@ -165,7 +165,7 @@
         ],
         "apply": [
           {
-            "tag": "ATTUNED",
+            "tag": "SHIELDED",
             "target": "all_allies",
             "amount": 1
           }
@@ -203,7 +203,7 @@
         ],
         "apply": [
           {
-            "tag": "STAGGERED",
+            "tag": "PINNED",
             "target": "area_enemies"
           }
         ]
