@@ -59,7 +59,7 @@ func setup(game, root: Control, on_phone: bool) -> void:
 	targets = HBoxContainer.new(); targets.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	targets.add_theme_constant_override("separation", 8 if phone else 3); row.add_child(targets)
 	row.add_child(_button("›", 44, func() -> void: g._cycle_target(1)))
-	confirm = _button("FIRE", 96 if phone else 190, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
+	confirm = _button("CONFIRM", 140 if phone else 190, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
 	details = _button("ODDS", 64, _details); row.add_child(details)
 	cine_toggle = _button("Cinematics: On", 116 if phone else 142, _toggle_cine); cine_toggle.name = "Cine15Toggle"; row.add_child(cine_toggle)
 	cine_toggle.visible = not phone
@@ -69,7 +69,7 @@ func setup(game, root: Control, on_phone: bool) -> void:
 
 func _button(value: String, width: float, action: Callable) -> Button:
 	var b := Button.new(); b.text = value; b.focus_mode = Control.FOCUS_NONE
-	b.custom_minimum_size = Vector2(width, 56 if phone and value in ["FIRE", "CANCEL"] else 44 if phone else 50)
+	b.custom_minimum_size = Vector2(width, 56 if phone and value in ["CONFIRM", "CANCEL"] else 44 if phone else 50)
 	b.add_theme_font_size_override("font_size", 14 if phone else 13)
 	b.pressed.connect(action)
 	return b
@@ -101,7 +101,7 @@ func refresh() -> void:
 		var label := str(enemy.name)
 		if g.action in ["shoot", "strike"]:
 			var info: Dictionary = Shot.calculate(g.mission, actor, enemy, g.action == "strike")
-			label += (" · %d/%d" % [int(enemy.hp), int(enemy.max_hp)]) if phone else ("\n%d%% HIT" % int(info.hit))
+			label += ("\n%d%% HIT" % int(info.hit))
 		var chip := _button(label, 104 if not phone else 130, func() -> void: g.target_id = id; g._frame_target(); g._show_shot())
 		chip.add_theme_color_override("font_color", Color("f6d28a") if id == g.target_id else Color("e3edf0"))
 		targets.add_child(chip)
@@ -114,7 +114,7 @@ func refresh() -> void:
 	if g.action in ["shoot", "strike"]:
 		var info: Dictionary = Shot.calculate(g.mission, actor, target, g.action == "strike")
 		var damage: Dictionary = Shot.damage_preview(actor, target)
-		confirm.text = "%s · %d%% HIT\n%d–%d DMG" % ["FIRE" if g.action == "shoot" else "STRIKE", int(info.hit), int(damage.normal[0]), int(damage.normal[1])]
+		confirm.text = "CONFIRM %s\n%d%% HIT %d–%d DMG" % ["FIRE" if g.action == "shoot" else "STRIKE", int(info.hit), int(damage.normal[0]), int(damage.normal[1])] if phone else "%s · %d%% HIT\n%d–%d DMG" % ["FIRE" if g.action == "shoot" else "STRIKE", int(info.hit), int(damage.normal[0]), int(damage.normal[1])]
 	else:
 		confirm.text = "CONFIRM\n%s" % str(g.mission.abilities.get(g.action, {}).get("name", g.action)).to_upper()
 

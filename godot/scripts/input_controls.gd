@@ -40,7 +40,10 @@ static func valid_targets(m: RefCounted, unit: Dictionary, mode: String) -> Arra
 		var info: Dictionary = Shot.calculate(m, unit, target, mode == "strike")
 		if not bool(info.los) or (mode != "push" and not bool(info.range_ok)): continue
 		targets.append(target)
-	targets.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.id) < int(b.id))
+	targets.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		var da: float = Shot.distance(Shot.pos(unit), Shot.pos(a))
+		var db: float = Shot.distance(Shot.pos(unit), Shot.pos(b))
+		return int(a.id) < int(b.id) if is_equal_approx(da, db) else da < db)
 	return targets
 
 static func next_squad(m: RefCounted, current_id: int, direction: int = 1, only_ready: bool = false) -> int:
@@ -113,6 +116,18 @@ func handle_event(event: InputEvent) -> void:
 			if not nearby_player.is_empty(): g._select(int(nearby_player.id)); return
 			for u in g.mission.living("player"):
 				if nearby_attack_target.is_empty() and Shot.pos(u) == p: g._select(int(u.id)); return
+			if g.action == "move" and g.selected_id >= 0:
+				var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
+				var enemies: Array[Dictionary] = valid_targets(g.mission, actor, "shoot") if "shoot" in actor.get("kit", []) else []
+				var tapped_enemy: Dictionary = near_unit(g, event.position, enemies)
+				if tapped_enemy.is_empty():
+					for enemy in enemies:
+						if Shot.pos(enemy) == p: tapped_enemy = enemy; break
+				if not tapped_enemy.is_empty():
+					g._choose_action("shoot")
+					g.target_id = int(tapped_enemy.id)
+					g._frame_target(); g._refresh_highlights(); g._show_shot(); g._refresh()
+					return
 			if g.action == "move":
 				var preview: Dictionary = move_preview(g.mission, g.mission.unit_by_id(g.selected_id), p)
 				if preview.is_empty(): return
@@ -127,8 +142,8 @@ func handle_event(event: InputEvent) -> void:
 				var nearby_target := nearby_attack_target
 				for target in targets:
 					if (not nearby_target.is_empty() and int(target.id) == int(nearby_target.id)) or (nearby_target.is_empty() and nearby_player.is_empty() and Shot.pos(target) == p):
-						if g.target_id == int(target.id): g._attack(g.target_id, g.action)
-						else: g.target_id = int(target.id); g._frame_target(); g._refresh_highlights(); g._show_shot()
+						if g.target_id == int(target.id) and g.hud_controls.phone == null: g._attack(g.target_id, g.action)
+						else: g.target_id = int(target.id); g._frame_target(); g._refresh_highlights(); g._show_shot(); g._refresh()
 						return
 	elif event is InputEventMouseMotion:
 		if g.drag_button == MOUSE_BUTTON_MIDDLE:

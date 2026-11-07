@@ -157,7 +157,10 @@ func exercise(size: Vector2i) -> void:
 		check(actor_bounds.position.y >= header_bottom + 8.0 and actor_bounds.end.y <= hud_top - 8.0 and actor_bounds.position.x >= 8.0 and actor_bounds.end.x <= screen_width - 8.0, "selected unit fits between phone header and bottom HUD: %s header=%.1f hud=%.1f" % [actor_bounds,header_bottom,hud_top])
 	check(viewport.encloses(aim.panel.get_global_rect()), "aim card fits at %s" % size)
 	check(viewport.encloses(aim.confirm.get_global_rect()) and aim.confirm.size.y >= 44.0, "FIRE is reachable at %s" % size)
-	check(aim.confirm.text.contains("HIT") and aim.confirm.text.contains("DMG"), "hit and damage remain readable at %s" % size)
+	if size.x < 1000:
+		check(aim.targets.get_child(0).text.contains("HIT") and game.shot_label.text.contains("DMG"), "phone target chip shows hit and ODDS retains damage at %s" % size)
+	else:
+		check(aim.confirm.text.contains("HIT") and aim.confirm.text.contains("DMG"), "hit and damage remain readable at %s" % size)
 	check(aim.summary.text.contains(str(target.name)) and viewport.encloses(aim.summary.get_global_rect()), "target card fits at %s" % size)
 	if size.x < 1000:
 		var phone = game.hud_controls.phone
