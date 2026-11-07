@@ -8,7 +8,7 @@
 - Campaign units track up to three paths, with second path at Knight or Sergeant and third at Master or Captain. Jedi/soldier blends are rejected. Cross-trained abilities are explicit picks. Secondary abilities are capped at rank 4; a primary Knight's secondary paths reach rank 5.
 - Masters may mentor two Padawans. A mentored Padawan earns 50% more XP and carries one taught ability. On mentor death, pupils receive a half-power signature legacy; a Temple memorial and news entry are saved. A Grand Master dying without trained Padawans adds 2 Order Darkness.
 - Barracks Jedi recruits join at Padawan rank 1 with strike, guard/deflect, and two Focus; soldiers join as Recruit rank 1 with their current full kit and gear. Old version 1 and 2 campaign saves migrate new fields.
-- A full-screen promotion view shows rank, tier, power, blend slots, primary picks, and cross-training. It uses the existing touch scroll container. At 844×390 and 667×375, visible tap targets meet 44 px.
+- A full-screen promotion view shows rank, tier, power, blend slots, primary picks, cross-training, mentor selection, and inherited legacies. It uses the existing touch scroll container. At 844×390 and 667×375, visible tap targets meet 44 px.
 
 ## Lane data contract
 

@@ -3,6 +3,7 @@ extends Control
 const UI = preload("res://scripts/campaign/ui.gd")
 const Classes = preload("res://scripts/class_registry.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
+const Mentor = preload("res://scripts/campaign/mentor17.gd")
 var campaign: RefCounted
 var unit_id := ""
 var scroll: ScrollContainer
@@ -65,6 +66,19 @@ func _refresh() -> void:
 	elif rank.has("saber_forms"): content.add_child(UI.label("Second Focus pip  ·  saber forms", 14))
 	content.add_child(UI.label("BLEND SLOTS  %d / %d" % [r.get("classes", []).size(), Classes.blend_slots(side_name, int(r.rank))], 15, UI.ACCENT))
 	content.add_child(UI.label("Paths: %s" % ", ".join(r.get("classes", [])), 14))
+	if side_name == "jedi" and int(r.rank) <= 2:
+		if str(r.get("mentor_id", "")) != "":
+			var master: Dictionary = campaign.soldier(str(r.mentor_id))
+			content.add_child(UI.label("Mentor: %s  ·  taught %s" % [master.get("n", ""), r.get("taught_ability", "")], 14, UI.GOLD))
+		else:
+			content.add_child(UI.label("CHOOSE A MASTER MENTOR", 14, UI.GOLD))
+			for master in campaign.state.roster:
+				if master == r or str(master.get("status", "")) != "active" or Classes.side(str(master.get("cls", ""))) != "jedi" or int(master.get("rank", 0)) < 5: continue
+				if master.get("trained_padawans", []).size() >= 2: continue
+				var signature := str(Classes.class_data(str(master.cls)).get("signature", ""))
+				if signature != "": _add_button("Train with %s · %s" % [master.n, signature], _mentor.bind(str(master.id), signature))
+	for legacy in r.get("legacies", []):
+		content.add_child(UI.label("Legacy: %s · %s at 50%% power" % [legacy.get("mentor", ""), legacy.get("ability", "")], 14, UI.GOLD))
 	if r.get("classes", []).size() < Classes.blend_slots(side_name, int(r.rank)):
 		content.add_child(UI.label("CHOOSE ANOTHER PATH", 14, UI.GOLD))
 		for id in Classes.IDS[side_name]:
@@ -95,6 +109,9 @@ func _blend(id: String) -> void:
 
 func _cross_pick(id: String) -> void:
 	if Progression.choose_cross(campaign.soldier(unit_id), id): _save()
+
+func _mentor(id: String, skill: String) -> void:
+	if Mentor.assign(campaign, id, unit_id, skill): _save()
 
 func _close() -> void:
 	closed.emit()
