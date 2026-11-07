@@ -1,6 +1,7 @@
 extends RefCounted
 const Data = preload("res://scripts/campaign/data.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
+const Classes = preload("res://scripts/class_registry.gd")
 const Base = preload("res://scripts/campaign/strat_base.gd")
 
 static func ensure(s: Dictionary) -> void:
@@ -45,7 +46,7 @@ static func hire(c, id: String) -> bool:
 		var next_id := int(c.state.nid)
 		while not c.soldier("u%d" % next_id).is_empty(): next_id += 1
 		c.state.nid = next_id + 1
-		var r := {"id":"u%d" % next_id, "n":candidate.n, "cls":candidate.cls, "title":"Padawan" if jedi else "Recruit", "rank":1, "xp":0, "dark":0, "picks":[], "pick":1, "wound":0, "status":"active", "kills":0, "missions":0, "stress":0, "scars":[], "assign":"", "bonus":{}, "fatigue":0, "extra_picks":[], "ability_slots":0,
+		var r := {"id":"u%d" % next_id, "n":candidate.n, "cls":candidate.cls, "title":"Padawan" if jedi else "Recruit", "tier":"Padawan" if jedi else "Recruit", "rank":1, "xp":0, "dark":0, "picks":[], "pick":1, "classes":[Classes.class_id(str(candidate.cls))], "cross_picks":[], "trained_padawans":[], "legacies":[], "wound":0, "status":"active", "kills":0, "missions":0, "stress":0, "scars":[], "assign":"", "bonus":{}, "fatigue":0, "extra_picks":[], "ability_slots":0,
 			"col":"#72e0a4" if jedi else "#d9a05b", "gear":{"w":0 if jedi else 1,"armor":"robes" if jedi else "light","mods":[],"amods":[],"smods":[],"saber":1 if jedi else 0,"trait":"","util":"none","form":"shiiCho","mk":{"w":1,"a":1,"s":1}}}
 		c.state.roster.append(r); c.state.cands.erase(candidate); c.ensure_teams(); c.Identity.ensure(c)
 		c.state.news.append("%s joined the Order." % r.n)
@@ -110,7 +111,7 @@ static func tick(c) -> void:
 		r.stress = maxi(0, int(r.stress) - 1)
 		if r.assign == "rest" and int(r.wound) == 0 and int(r.fatigue) == 0: r.assign = ""
 		if r.assign == "train" and Base.operational(s, "training"):
-			r.xp = int(r.xp) + 1 + Base.staff_count(s, "training"); Progression.promote(r)
+			r.xp = int(r.xp) + 1 + Base.staff_count(s, "training"); Progression.promote(r, s.roster)
 	var training: Dictionary = s.strategy.training
 	if not training.is_empty() and Base.operational(s, "training"):
 		training.left = float(training.left) - 1.0 - 0.5 * Base.staff_count(s, "training")
@@ -140,12 +141,12 @@ static func after_mission(c, result: Dictionary) -> void:
 		deployed.append(r.id)
 		if r.status == "active":
 			r.fatigue = mini(100, int(r.fatigue) + 38 + (15 if bool(entry.get("downed", false)) else 0))
-			r.xp = int(r.xp) + int(effects.get("xp", 0)); Progression.promote(r)
+			r.xp = int(r.xp) + int(effects.get("xp", 0)); Progression.promote(r, s.roster)
 	for r in s.roster:
 		if r.status != "active": continue
 		r.wound = maxi(0, int(r.wound) - int(effects.get("heal", 0)))
 		r.stress = maxi(0, int(r.stress) - int(effects.get("stress", 0)))
-		if not deployed.has(r.id): r.xp = int(r.xp) + int(effects.get("bench", 0)); Progression.promote(r)
+		if not deployed.has(r.id): r.xp = int(r.xp) + int(effects.get("bench", 0)); Progression.promote(r, s.roster)
 	if bool(result.get("win", false)):
 		c.gain("credits", int(effects.get("winCr", 0)) + (20 if "reclamation" in s.strategy.edict else 0))
 	if s.research.cur != "": s.research.prog = float(s.research.prog) + int(effects.get("research", 0)); c._tick_research(0)

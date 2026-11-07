@@ -2,6 +2,8 @@ extends RefCounted
 ## Persistent strategy layer. Pass battle results to apply_mission_result(), then save().
 const Data = preload("res://scripts/campaign/data.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
+const Classes = preload("res://scripts/class_registry.gd")
+const Mentor17 = preload("res://scripts/campaign/mentor17.gd")
 const Modules = preload("res://scripts/campaign/modules.gd")
 const Legacy = preload("res://scripts/campaign/legacy.gd")
 const Story = preload("res://scripts/story/story_engine.gd")
@@ -51,13 +53,14 @@ func new_campaign(difficulty: String = "normal") -> void:
 		"staff": {}, "teams": [], "field": {"list": [], "log": []}, "unrest": {},
 		"team_assignments": {},
 		"bonds": {}, "quests": {}, "legacy": {"retired": [], "generals": {}}, "flags": {},
-		"legends": [], "news": [], "pending_mission": {}, "chosen": -1}
+		"legends": [], "mentor_memorials": [], "news": [], "pending_mission": {}, "chosen": -1}
 	var id := 1
 	for item in core.START_ROSTER:
 		var r: Dictionary = item.duplicate(true)
 		r.id = "u%d" % id; id += 1
 		r.rank = int(r.get("rank", 2)); r.xp = int(r.get("xp", 30))
 		r.dark = 0; r.picks = r.get("picks", []); r.pick = 0
+		r.classes = [Classes.class_id(str(r.cls))]; r.cross_picks = []; r.trained_padawans = []; r.legacies = []
 		r.wound = 0; r.status = "active"; r.kills = 0; r.missions = 0
 		r.stress = 0; r.scars = []; r.assign = ""; r.bonus = {}
 		var jedi := Progression.is_jedi(r)
@@ -83,14 +86,14 @@ func save(path: String = SAVE_PATH) -> bool:
 func load_save(path: String = SAVE_PATH) -> bool:
 	if not FileAccess.file_exists(path): return false
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
-	if not parsed is Dictionary or int(parsed.get("v", 0)) != 2 or not parsed.get("C") is Dictionary: return false
+	if not parsed is Dictionary or int(parsed.get("v", 0)) not in [1, 2] or not parsed.get("C") is Dictionary: return false
 	state = parsed.C
 	_migrate()
 	return true
 
 func _migrate() -> void:
-	for key in ["staff", "teams", "unrest", "bonds", "quests", "flags", "legends", "news"]:
-		if not state.has(key): state[key] = [] if key in ["teams", "legends", "news"] else {}
+	for key in ["staff", "teams", "unrest", "bonds", "quests", "flags", "legends", "mentor_memorials", "news"]:
+		if not state.has(key): state[key] = [] if key in ["teams", "legends", "mentor_memorials", "news"] else {}
 	if not state.has("field"): state.field = {"list": [], "log": []}
 	if not state.has("research"): state.research = {"done": [], "cur": "", "prog": 0.0}
 	Modules.ensure(self)
@@ -103,6 +106,10 @@ func _migrate() -> void:
 			if not r.has(key): r[key] = defaults[key]
 		for key in ["picks", "scars"]:
 			if not r.has(key): r[key] = []
+		if not r.has("classes"): r.classes = [Classes.class_id(str(r.get("cls", "")))]
+		for key in ["cross_picks", "trained_padawans", "legacies"]:
+			if not r.has(key): r[key] = []
+		if not r.has("tier"): r.tier = str(Classes.rank_data("jedi" if Progression.is_jedi(r) else "soldier", int(r.rank)).get("tier", r.get("title", "")))
 		if not r.has("gear"): r.gear = {"w": 0 if Progression.is_jedi(r) else 1, "armor": "robes" if Progression.is_jedi(r) else "light", "mods": [], "saber": 1 if Progression.is_jedi(r) else 0, "util": "none", "form": "shiiCho", "mk": {"w": 1, "a": 1, "s": 1}}
 		for key in ["mods", "amods", "smods"]:
 			if not r.gear.has(key): r.gear[key] = []
@@ -289,6 +296,7 @@ func apply_mission_result(result: Dictionary) -> Dictionary:
 		if fate == "dead":
 			r.status = "dead"; r.assign = ""
 			state.legends.append({"n": r.n, "cls": r.cls, "how": "Fell in battle", "where": mission.get("n", id)})
+			Mentor17.on_death(self, r, str(mission.get("n", id)))
 		elif fate == "captured" or (fate == "down" and not win):
 			r.status = "captured"; r.capT = int(Data.get_table("core", "CAPTIVE")); r.assign = ""
 		else:
@@ -298,6 +306,7 @@ func apply_mission_result(result: Dictionary) -> Dictionary:
 			var mult := (1.2 if int(state.wings.training) >= 2 else 1.1 if int(state.wings.training) >= 1 else 1.0)
 			if state.staff.has("training"): mult *= 1.1
 			if researched("holocron"): mult *= 1.1
+			mult *= Mentor17.xp_multiplier(self, r)
 			xp = roundi(xp * mult)
 			var wound := 0
 			if bool(unit_result.get("downed", false)): wound = int(wound_data.graveL2 if int(state.wings.medical) >= 2 else wound_data.grave)
@@ -307,7 +316,7 @@ func apply_mission_result(result: Dictionary) -> Dictionary:
 		if unit_result.has("dark"): r.dark = int(unit_result.dark)
 		if kills > 0: Legacy.add_deed(self, str(r.id), "kills", kills)
 		r.kills = int(r.kills) + kills; r.missions = int(r.missions) + 1; r.xp = int(r.xp) + xp
-		if str(r.status) == "active" and Progression.promote(r): summary.promotions.append(r.id)
+		if str(r.status) == "active" and Progression.promote(r, state.roster): summary.promotions.append(r.id)
 		summary.rows.append({"id": r.id, "xp": xp, "status": r.status, "wound": r.wound, "rank": r.rank})
 	for i in range(0 if result.get("bonds_recorded", false) else deployed.size()):
 		for j in range(i + 1, deployed.size()):
@@ -505,7 +514,7 @@ func _resolve_team(option: Dictionary, team_id: String, player_squad: Array) -> 
 			gain(str(key), amount)
 		for r in members:
 			r.xp = int(r.xp) + int(auto.xp); r.missions = int(r.missions) + 1
-			Progression.promote(r)
+			Progression.promote(r, state.roster)
 			if randi_range(0, 99) < int(auto.winWound): r.wound = maxi(int(r.wound), ceili(float(Data.get_table("core", "WOUND").light) / heal_multiplier()))
 		for i in members.size():
 			for j in range(i + 1, members.size()): Legacy.bond_points(self, members[i].id, members[j].id, 1)

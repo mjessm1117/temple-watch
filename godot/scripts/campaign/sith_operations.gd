@@ -108,7 +108,7 @@ static func resolve_teams(layer) -> void:
 			stopped(layer, op)
 			for r in team:
 				r.xp = int(r.get("xp", 0)) + int(layer.data.rules.team_xp)
-				preload("res://scripts/campaign/progression.gd").promote(r)
+				preload("res://scripts/campaign/progression.gd").promote(r, layer.state.roster)
 		else:
 			for r in team: r.stress = mini(100, int(r.get("stress", 0)) + int(layer.data.rules.team_fail_stress))
 		layer.emit_event("team_result", {"op_id": op.id, "n": layer.data.operations[op.key].n, "won": won, "chance": chance})
