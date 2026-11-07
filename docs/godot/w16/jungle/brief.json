@@ -1,0 +1,10 @@
+{
+  "credit_cap": 40,
+  "preview_cap": 1,
+  "refine_cap": 1,
+  "reference": "Jess rejected the pale procedural sandbag stack and v6 staged sandbag wall. Make an original jungle-moon ruin, not another bag wall.",
+  "texture": "Dark weathered charcoal grey-green stone, deep brown rough tree bark, sparse very dark moss only inside stone cracks. Matte, muted, high-contrast material separation. No yellow or lime green, leaves, vines, ferns, bushes, sandbags, crates, base plate or ground plane.",
+  "variants": {
+    "A": "Single waist-high cover barricade for a stylized low-poly tactics game: one broad toppled ancient carved stone block like a low wall, with a thick fallen tree trunk lying horizontally across its upper edge. The trunk is cylindrical with deep brown rough bark and a broken end. The dark grey-green stone has shallow original geometric carvings, chipped corners and dark cracks; sparse dark moss only in crevices. Compact connected two-part mass, broad solid front face, substantial depth, clearly large enough to hide behind from a distant elevated camera. Fits one square tile. Original jungle-moon ruin. No yellow, lime green, leaves, vines, ferns, bushes, sandbags, crates, base plate, pedestal, terrain or ground plane."
+  }
+}

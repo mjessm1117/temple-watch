@@ -1,0 +1,8 @@
+node_modules/
+*.log
+*.glb
+preview.png
+refined.png
+prop-local.mjs
+components.py
+_to_delete/

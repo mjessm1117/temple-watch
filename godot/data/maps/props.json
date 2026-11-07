@@ -33,7 +33,8 @@
       "half_cover": "res://assets/maps/meshy6/cover_half_caves_v6.glb"
     },
     "jungle": {
-      "full_cover": "res://assets/maps/meshy5/cover_full_jungle_v3.glb"
+      "full_cover": "res://assets/maps/meshy5/cover_full_jungle_v3.glb",
+      "half_cover": "res://assets/maps/meshy7/cover_half_jungle_v7.glb"
     },
     "plains": {
       "full_cover": "res://assets/maps/meshy3/cover_full_plains_v1.glb",
