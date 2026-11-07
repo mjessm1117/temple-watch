@@ -21,9 +21,7 @@
     "protocol",
     "shieldDrone",
     "hackDroid",
-    "scan",
-    "medic_bacta_spray",
-    "medic_toxin_dart"
+    "scan"
   ],
   "passives": [],
   "bonus_kit": [
