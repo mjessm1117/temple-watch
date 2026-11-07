@@ -10,7 +10,7 @@
     "Juggernaut"
   ],
   "implemented": true,
-  "unit_kind": "heavy",
+  "unit_kind": "heavy_soldier",
   "kit": [
     "heavy_rocket",
     "heavy_breaching_shell",
