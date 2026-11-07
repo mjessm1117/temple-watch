@@ -529,6 +529,7 @@ func _resolve_team(option: Dictionary, team_id: String, player_squad: Array) -> 
 		if fate < int(auto.death):
 			members[-1].status = "dead"
 			state.legends.append({"n":members[-1].n,"cls":members[-1].cls,"how":"Fell on a strike team mission","where":option.get("n", option.mission)})
+			Mentor17.on_death(self, members[-1], str(option.get("n", option.mission)))
 		elif fate < int(auto.death) + int(auto.capture):
 			members[-1].status = "captured"; members[-1].capT = int(Data.get_table("core", "CAPTIVE"))
 	state.news.append("%s %s %s (auto, %d%%)." % [team.n, "won" if win else "lost", option.get("n", option.mission), odds])
