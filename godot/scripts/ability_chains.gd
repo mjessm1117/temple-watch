@@ -71,6 +71,7 @@ static func _effect_one(m: RefCounted, actor: Dictionary, recipient: Dictionary,
 		"focus": recipient.focus_left = mini(int(recipient.get("focus", 0)), int(recipient.get("focus_left", 0)) + int(effect.get("amount", 0)))
 		"action": recipient.ap = int(recipient.get("ap", 0)) + int(effect.get("amount", 0))
 		"status": recipient[str(effect.get("status", ""))] = true
+		_: preload("res://scripts/effects_jedi.gd").apply(m, actor, recipient, effect)
 
 static func damage_amount(m: RefCounted, target: Dictionary, amount: int, source: Dictionary) -> int:
 	if has_tag(target, "LIFTED"): amount = ceili(float(amount) * 1.5)
