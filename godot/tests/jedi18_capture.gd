@@ -36,24 +36,40 @@ func capture() -> void:
 		await shot("promotion-" + path.to_lower() + "-844x390")
 		screen.queue_free()
 		await process_frame
+	root.size = Vector2i(667, 375)
+	root.content_scale_size = root.size
+	DisplayServer.window_set_size(root.size)
+	var narrow := Promotion.new()
+	root.add_child(narrow)
+	narrow.setup(flow.campaign, "u1")
+	await shot("promotion-guardian-667x375")
+	narrow.queue_free()
+	await process_frame
+	root.size = Vector2i(844, 390)
+	root.content_scale_size = root.size
+	DisplayServer.window_set_size(root.size)
 	var battle = load("res://scenes/rescue.tscn").instantiate()
 	root.add_child(battle)
 	await process_frame
 	await create_timer(1.6).timeout
 	battle.phase_banner.visible = false
 	var actor: Dictionary = battle.mission.unit_by_id(battle.selected_id)
-	actor.name = "Guardian"
-	actor.class_name = "Guardian"
-	actor.kit = ["guardian_deflect"]
+	actor.name = "Consular"
+	actor.class_name = "Consular"
+	actor.kit = ["consular_grand_living_force"]
+	actor.hp = 2
+	for ally in battle.mission.living("player"):
+		if ally != actor: ally.hp = maxi(1, int(ally.max_hp) - 5)
 	actor.focus = 4
 	actor.focus_left = 4
 	actor.ap = 2
 	battle._refresh()
-	battle.action = "guardian_deflect"
+	await shot("battle-consular-grand-button", 0.08)
+	battle.action = "consular_grand_living_force"
 	battle._use_ability()
 	battle.phase_banner.visible = false
 	battle.highlights.visible = false
-	await shot("battle-guardian-deflect", 0.08)
-	print("JEDI18 CAPTURE ability uses ", battle.mission.ability_uses.get("guardian_deflect", 0))
+	await shot("battle-consular-living-force", 0.4)
+	print("JEDI18 CAPTURE ability uses ", battle.mission.ability_uses.get("consular_grand_living_force", 0))
 	battle.queue_free()
 	quit()

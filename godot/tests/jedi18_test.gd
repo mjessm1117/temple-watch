@@ -2,6 +2,7 @@ extends SceneTree
 const Classes = preload("res://scripts/class_registry.gd")
 const Chains = preload("res://scripts/ability_chains.gd")
 const Mission = preload("res://scripts/mission.gd")
+const Promotion = preload("res://scripts/campaign/promotion_screen.gd")
 const PATHS := ["guardian", "knight", "duelist", "sage", "consular", "sentinel", "wayseeker"]
 const TAGS := ["ATTUNED", "BURNING", "EXPOSED", "INSPIRED", "IONIZED", "LIFTED", "MARKED", "PINNED", "READY", "SHIELDED", "STAGGERED", "TAUNTED"]
 const SHARED_LEGACY := ["shoot", "overwatch", "mark", "deadeye", "hack", "scan", "shieldDrone", "rapidFire", "rally", "hunker", "strike", "push", "meditate", "choke", "subdue", "disarm", "guard", "pull", "breach"]
@@ -17,15 +18,30 @@ func check(ok: bool, label: String) -> void:
 		push_error("JEDI18: " + label)
 
 func _signature(def: Dictionary) -> String:
-	var result := def.duplicate(true)
-	for key in ["name", "rank", "capstone"]: result.erase(key)
+	var result := {}
+	for key in ["effect", "target", "damage", "heal", "shield", "aim", "enemy_aim", "defense", "range", "cooldown", "status", "chance", "shots", "pierce", "pull", "melee", "cover_damage", "next_strike_aim", "distance", "collision_damage"]:
+		if def.has(key): result[key] = def[key]
+	var riders := []
+	for effect in def.get("effects", []):
+		var rider := {"type": effect.get("type", ""), "target": effect.get("target", "target")}
+		for key in ["amount", "status", "jumps", "range"]:
+			if effect.has(key): rider[key] = effect[key]
+		riders.append(rider)
+	result["effects"] = riders
 	return JSON.stringify(result)
+
+func _template(def: Dictionary) -> String:
+	var riders := []
+	for effect in def.get("effects", []): riders.append(str(effect.get("type", "")) + ":" + str(effect.get("target", "target")))
+	return str(def.get("effect", "")) + ":" + str(def.get("target", "")) + "|" + ",".join(riders) + "|" + str([def.get("shots", 1), def.get("pierce", false), def.get("pull", false), def.get("melee", false)])
 
 func run() -> void:
 	check(Classes.validate().is_empty(), "all 15 class schemas: " + str(Classes.validate()))
 	var legacy: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/jedi18_legacy.json"))
 	var all_ids: Dictionary = {}
 	var all_signatures: Dictionary = {}
+	var all_templates: Dictionary = {}
+	var grand_templates: Dictionary = {}
 	var total_new := 0
 	for side in Classes.IDS:
 		for id in Classes.IDS[side]:
@@ -59,7 +75,13 @@ func run() -> void:
 				if int(def.rank) <= 7: check(picks.has(ability_id), ability_id + " appears in promotion tree")
 				if int(def.rank) == 8:
 					gm = ability_id
-					check(bool(def.get("capstone", false)) and int(def.get("cooldown", 0)) >= 90, ability_id + " limited Grand Master signature")
+					check(bool(def.get("capstone", false)) and bool(def.get("once_per_mission", false)) and int(def.get("cooldown", 0)) >= 1000000000 and "Once per mission" in str(def.name), ability_id + " once-per-mission Grand Master signature")
+					var short_name := str(def.name).trim_suffix(" Once per mission")
+					var fits := ThemeDB.fallback_font.get_string_size(short_name + " Once", HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x <= 92.0 and ThemeDB.fallback_font.get_string_size("per mission", HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x <= 92.0
+					check(fits and short_name != str(def.name), ability_id + " once-per-mission text fits two battle-button lines")
+					var template := _template(def)
+					check(not grand_templates.has(template), ability_id + " distinct Grand Master effect template")
+					grand_templates[template] = ability_id
 				for entry in def.chain.get("apply", []):
 					check(str(entry.tag) in TAGS, ability_id + " applies shared tag")
 					applied[str(entry.tag)] = true
@@ -67,14 +89,65 @@ func run() -> void:
 					check(str(entry.tag) in TAGS, ability_id + " consumes shared tag")
 					consumed[str(entry.tag)] = true
 				var signature := _signature(def)
-				check(not all_signatures.has(signature), ability_id + " unique effect and number pattern")
+				check(not all_signatures.has(signature), ability_id + " unique mechanics excluding chain tags and description")
 				all_signatures[signature] = ability_id
+				var shape := _template(def)
+				check(not all_templates.has(shape), ability_id + " distinct effect mix beyond number tuning")
+				all_templates[shape] = ability_id
 			check(applied.size() >= 3 and consumed.size() >= 3, id + " applies and consumes at least three shared tags")
 			check(gm != "" and row.tree.specs.values().all(func(spec): return spec.get("8", []) == [gm]), id + " both branches award one Grand Master signature")
 	check(total_new == 98, "seven paths have 13 choices and one Grand Master ability each")
+	check(all_signatures.size() == 98 and all_templates.size() == 98 and grand_templates.size() == 7, "98 unique mechanical signatures and effect mixes; seven Grand Master templates")
+	var promotion := Promotion.new()
+	check(promotion._ability_name("sage_shatterpoint").begins_with("Shatterpoint") and promotion._ability_name("guardian_living_rampart").begins_with("Living Rampart") and not "sage_shatterpoint" in promotion._ability_name("sage_shatterpoint"), "promotion choices show display names instead of raw IDs")
+	check(promotion._ability_name("guardian_grand_aegis").begins_with("Aegis") and "Once per mission" in promotion._ability_name("guardian_grand_aegis"), "promotion shows full Grand Master name and once-per-mission label")
+	promotion.free()
 	check(Classes.power("jedi", 1) < Classes.power("soldier", 1), "Padawan below fresh soldier")
 	check(Classes.power("jedi", 5) > Classes.power("soldier", 7) and Classes.power("jedi", 8) == 420, "Master and Grand Master power curve")
 	check(Classes.rank_data("jedi", 1).get("starting_kit", []) == ["strike", "guard"], "Padawan starts with two basics")
+	var grand = Mission.new(20)
+	var leader: Dictionary = grand.living("player")[0]
+	var foe: Dictionary = grand.living("enemy")[0]
+	Chains.resolve(grand, leader, {}, Vector2i.ZERO, Classes.class_data("guardian").abilities.guardian_grand_aegis)
+	check(int(leader.shield) >= 14 and Chains.has_tag(foe, "TAUNTED"), "Aegis shields the squad and taunts enemies")
+	var before_ap := int(leader.ap)
+	Chains.resolve(grand, leader, {}, Vector2i.ZERO, Classes.class_data("knight").abilities.knight_grand_convergence)
+	check(int(leader.ap) == before_ap + 1 and Chains.has_tag(leader, "INSPIRED"), "Convergence grants squad actions and inspiration")
+	foe.hp = 20
+	Chains.resolve(grand, leader, {}, Vector2i(int(foe.x), int(foe.y)), Classes.class_data("sage").abilities.sage_grand_maelstrom)
+	check(int(foe.hp) <= 12 and Chains.has_tag(foe, "LIFTED") and bool(foe.get("rooted", false)), "Maelstrom damages and lifts foes in its area")
+	leader.hp = 1
+	leader.disarmed = true
+	Chains.resolve(grand, leader, {}, Vector2i.ZERO, Classes.class_data("consular").abilities.consular_grand_living_force)
+	check(int(leader.hp) > 1 and not bool(leader.get("disarmed", false)) and Chains.has_tag(leader, "INSPIRED"), "Living Force heals, cleanses, and inspires")
+	foe.spotted = false
+	Chains.resolve(grand, leader, {}, Vector2i.ZERO, Classes.class_data("sentinel").abilities.sentinel_grand_eclipse)
+	check(bool(foe.spotted) and Chains.has_tag(foe, "MARKED") and int(leader.buff_aim) >= 15, "Eclipse reveals and marks enemies while raising squad aim")
+	foe.hp = 30
+	Chains.resolve(grand, leader, {}, Vector2i(int(foe.x), int(foe.y)), Classes.class_data("wayseeker").abilities.wayseeker_grand_living_mountain)
+	check(bool(foe.get("rooted", false)) and Chains.has_tag(foe, "PINNED") and int(leader.shield) >= 26, "Living Mountain pins enemies and shelters the squad")
+	var chain_mission = Mission.new(22)
+	var striker: Dictionary = chain_mission.living("player")[0]
+	var victims: Array = chain_mission.living("enemy")
+	if victims.size() >= 2:
+		var first: Dictionary = victims[0]
+		var second: Dictionary = victims[1]
+		first.hp = 1
+		second.hp = 15
+		second.x = int(first.x) + 1
+		second.y = int(first.y)
+		Chains.resolve(chain_mission, striker, first, Vector2i.ZERO, Classes.class_data("duelist").abilities.duelist_grand_thousand_cuts)
+		check(int(first.hp) <= 0 and int(second.hp) < 15, "Thousand Cuts jumps to a nearby enemy after a kill")
+	else: check(false, "Grand Master chain has two enemy targets")
+	var lock_mission = Mission.new(23)
+	var caster: Dictionary = lock_mission.living("player")[0]
+	caster.kit.append("guardian_grand_aegis")
+	caster.focus = 4
+	caster.focus_left = 4
+	var first_cast := lock_mission.use_ability(int(caster.id), "guardian_grand_aegis")
+	caster.focus_left = 4
+	caster.ap = 2
+	check(first_cast and lock_mission.ability_reason(int(caster.id), "guardian_grand_aegis").begins_with("Cooldown") and not lock_mission.use_ability(int(caster.id), "guardian_grand_aegis"), "Grand Master signature fires once and stays locked for the mission")
 	var m = Mission.new(18)
 	var actor: Dictionary = m.living("player")[0]
 	var enemy: Dictionary = m.living("enemy")[0]

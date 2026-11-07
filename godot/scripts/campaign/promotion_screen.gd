@@ -52,6 +52,21 @@ func _add_button(label_text: String, callback: Callable) -> void:
 	button.custom_minimum_size.y = 44
 	content.add_child(button)
 
+func _ability_name(id: String, with_detail: bool = true) -> String:
+	for side in Classes.IDS:
+		for path in Classes.IDS[side]:
+			var definition: Dictionary = Classes.class_data(path).get("abilities", {}).get(id, {})
+			if not definition.is_empty():
+				var label_text := str(definition.get("promotion_name", definition.get("name", id)))
+				if not with_detail: return label_text
+				var detail := str(definition.get("description", "")).replace("_", " ")
+				var full := label_text + " · " + detail
+				var width := get_viewport_rect().size.x if is_inside_tree() else 844.0
+				if detail != "" and UI.font("display").get_string_size(full, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x < width - 48:
+					return full
+				return label_text
+	return id
+
 func _refresh() -> void:
 	var offset := scroll.scroll_vertical
 	UI.clear(content)
@@ -69,7 +84,7 @@ func _refresh() -> void:
 	if side_name == "jedi" and int(r.rank) <= 2:
 		if str(r.get("mentor_id", "")) != "":
 			var master: Dictionary = campaign.soldier(str(r.mentor_id))
-			content.add_child(UI.label("Mentor: %s  ·  taught %s" % [master.get("n", ""), r.get("taught_ability", "")], 14, UI.GOLD))
+			content.add_child(UI.label("Mentor: %s  ·  taught %s" % [master.get("n", ""), _ability_name(str(r.get("taught_ability", "")), false)], 14, UI.GOLD))
 		else:
 			content.add_child(UI.label("CHOOSE A MASTER MENTOR", 14, UI.GOLD))
 			for master in campaign.state.roster:
@@ -79,9 +94,9 @@ func _refresh() -> void:
 					if str(other.get("mentor_id", "")) == str(master.id) and str(other.get("status", "")) == "active" and int(other.get("rank", 0)) <= 2: pupils += 1
 				if pupils >= 2: continue
 				var signature := str(Classes.class_data(str(master.cls)).get("signature", ""))
-				if signature != "": _add_button("Train with %s · %s" % [master.n, signature], _mentor.bind(str(master.id), signature))
+				if signature != "": _add_button("Train with %s · %s" % [master.n, _ability_name(signature, false)], _mentor.bind(str(master.id), signature))
 	for legacy in r.get("legacies", []):
-		content.add_child(UI.label("Legacy: %s · %s at 50%% power" % [legacy.get("mentor", ""), legacy.get("ability", "")], 14, UI.GOLD))
+		content.add_child(UI.label("Legacy: %s · %s at 50%% power" % [legacy.get("mentor", ""), _ability_name(str(legacy.get("ability", "")), false)], 14, UI.GOLD))
 	if r.get("classes", []).size() < Classes.blend_slots(side_name, int(r.rank)):
 		content.add_child(UI.label("CHOOSE ANOTHER PATH", 14, UI.GOLD))
 		for id in Classes.IDS[side_name]:
@@ -89,11 +104,11 @@ func _refresh() -> void:
 	if int(r.get("pick", 0)) > 0:
 		content.add_child(UI.label("RANK %d ABILITY PICK" % int(r.pick), 14, UI.GOLD))
 		for id in Progression.tree_options(r, int(r.pick)):
-			_add_button(str(id), _pick.bind(str(id)))
+			_add_button(_ability_name(str(id)), _pick.bind(str(id)))
 	var options := Progression.cross_options(r)
 	if not options.is_empty():
 		content.add_child(UI.label("CROSS-TRAINED ABILITIES", 14, UI.GOLD))
-		for id in options: _add_button(str(id), _cross_pick.bind(str(id)))
+		for id in options: _add_button(_ability_name(str(id)), _cross_pick.bind(str(id)))
 	if options.is_empty() and int(r.get("pick", 0)) == 0:
 		content.add_child(UI.label("Next ability choices unlock with rank and training.", 14, UI.MUTED))
 	scroll.set_deferred("scroll_vertical", offset)
