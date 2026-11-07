@@ -43,6 +43,13 @@ static func create(campaign, seed_value: int) -> RefCounted:
 		u.focus = int(stats.get("maxF", 0)); u.focus_left = u.focus
 		u.guard_deflect = int(stats.get("guardDef", 0))
 		Deployment.apply_identity(campaign, u, r)
+		if Progression.is_jedi(r) and int(r.rank) == 1:
+			var start: Dictionary = Classes.rank_data("jedi", 1)
+			u.kit = start.get("starting_kit", ["strike", "guard"]).duplicate()
+			u.passives = []
+			u.focus = mini(int(u.focus), int(start.get("starting_focus", 2)))
+			u.focus_left = int(u.focus)
+			u.medpacs = 0
 		players.append(u)
 	if int(pending.get("fewer",0)) > 0:
 		for enemy in m.living("enemy").filter(func(u): return u.kind == "trooper").slice(0,int(pending.fewer)): m.units.erase(enemy)

@@ -38,7 +38,7 @@ func setup_combat(campaign_state: Dictionary = {}) -> void:
 			u.concealed = squad_concealed
 			if not "interact" in u.kit: u.kit.append("interact")
 			if u.has("ammo") and not "reload" in u.kit: u.kit.append("reload")
-			if str(u.class_name) in ["Guardian", "Consular"]:
+			if str(u.class_name) in ["Guardian", "Consular"] and (not u.has("rid") or int(u.get("rank", 2)) > 1):
 				for skill in ["pull", "breach"]:
 					if skill not in u.kit: u.kit.append(skill)
 			if modern:

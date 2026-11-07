@@ -6,7 +6,9 @@
       "title": "Padawan",
       "tier": "Padawan",
       "power": 50,
-      "xp": 0
+      "xp": 0,
+      "starting_kit": ["strike", "guard"],
+      "starting_focus": 2
     },
     {
       "level": 2,

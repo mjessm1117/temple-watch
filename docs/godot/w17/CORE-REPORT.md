@@ -7,14 +7,14 @@
 - `godot/scripts/ability_chains.gd` handles enemy and ally tags, consume-before-apply ordering, optional effect lists, three-pip squad Momentum, and one free action claim per turn. Tag rules cover aim, crit, cover, defense, movement, reactions, shield, Force cost, damage, burning, and taunt targeting. Existing abilities have no chain metadata, so old battles retain their numbers and behavior.
 - Campaign units track up to three paths, with second path at Knight or Sergeant and third at Master or Captain. Jedi/soldier blends are rejected. Cross-trained abilities are explicit picks. Secondary abilities are capped at rank 4; a primary Knight's secondary paths reach rank 5.
 - Masters may mentor two Padawans. A mentored Padawan earns 50% more XP and carries one taught ability. On mentor death, pupils receive a half-power signature legacy; a Temple memorial and news entry are saved. A Grand Master dying without trained Padawans adds 2 Order Darkness.
-- Barracks Jedi recruits join at Padawan rank 1; soldiers join as Recruit rank 1 with their current full kit and gear. Old version 1 and 2 campaign saves migrate new fields.
+- Barracks Jedi recruits join at Padawan rank 1 with strike, guard/deflect, and two Focus; soldiers join as Recruit rank 1 with their current full kit and gear. Old version 1 and 2 campaign saves migrate new fields.
 - A full-screen promotion view shows rank, tier, power, blend slots, primary picks, and cross-training. It uses the existing touch scroll container. At 844×390 and 667×375, visible tap targets meet 44 px.
 
 ## Lane data contract
 
 Jedi files: `godot/data/classes/jedi/{guardian,knight,duelist,sage,consular,sentinel,wayseeker}.json`.
 
-Soldier files: `godot/data/classes/soldier/{trooper,heavy,sniper,scout,medic,tech,droid,officer}.json`. Campaign `Soldier` maps to `trooper`. Rank and tier data live in `godot/data/classes/ranks.json`.
+Soldier files: `godot/data/classes/soldier/{trooper,heavy,sniper,scout,medic,tech,droid,officer}.json`. Campaign `Soldier` maps to `trooper`. Rank and tier data, including Padawan `starting_kit` and `starting_focus`, live in `godot/data/classes/ranks.json`.
 
 Each class file is one JSON object with `schema: 1`, string `id`, `name`, `side` (`jedi` or `soldier`), `role`, `signature` ability ID, array `branches`, boolean `implemented`, string `unit_kind`, arrays `kit`, `passives`, `bonus_kit`, `bonus_passives`, object `tree`, and object `abilities`. `tree` has the existing `trunk` and `specs` shape: rank strings map to arrays of ability IDs; each spec has `sig` and later rank arrays. Stub classes have empty kit, passives, tree, and abilities. Later Jedi and soldier lanes edit only their own class files.
 

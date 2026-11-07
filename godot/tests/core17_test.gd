@@ -8,6 +8,7 @@ const Chains = preload("res://scripts/ability_chains.gd")
 const Mission = preload("res://scripts/mission.gd")
 const Shot = preload("res://scripts/shot.gd")
 const Promotion = preload("res://scripts/campaign/promotion_screen.gd")
+const BattleBridge = preload("res://scripts/campaign/battle_bridge.gd")
 var checks := 0
 var failures := 0
 
@@ -95,6 +96,14 @@ func run() -> void:
 	check(Roster.hire(game, "new-jedi"), "barracks hires Jedi")
 	var hired: Dictionary = game.state.roster.back()
 	check(hired.title == "Padawan" and hired.rank == 1 and hired.classes == ["guardian"], "Jedi joins as Padawan")
+	var pending: Dictionary = game.select_mission(0)
+	var battle: RefCounted = BattleBridge.create(game, 7) if not pending.is_empty() else null
+	var recruit_battle: Dictionary = {}
+	if battle != null:
+		for member in battle.living("player"):
+			if str(member.get("rid", "")) == str(hired.id): recruit_battle = member
+	var class_kit: Array = recruit_battle.get("kit", []).filter(func(id): return id not in ["interact", "rewardSafe", "rewardRisky"])
+	check(class_kit == ["strike", "guard"] and int(recruit_battle.get("focus", 0)) <= 2, "new Padawan deploys with small starting kit")
 	hired.xp = 80
 	check(Progression.promote(hired, game.state.roster) and hired.title == "Knight" and hired.rank == 3, "Padawan promotes to Knight")
 	check(Classes.cross_train(hired, "Consular"), "promoted Knight cross-trains")
