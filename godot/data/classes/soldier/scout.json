@@ -231,7 +231,18 @@
       "chain": {
         "consume": [
           {
-            "tag": "MARKED",
+            "tag": "STAGGERED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          },
+          {
+            "tag": "EXPOSED",
             "target": "target",
             "bonus": [
               {
@@ -290,7 +301,7 @@
         ],
         "apply": [
           {
-            "tag": "PINNED",
+            "tag": "MARKED",
             "target": "area_enemies"
           }
         ]
