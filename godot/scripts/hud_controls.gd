@@ -16,6 +16,7 @@ var left_panel: PanelContainer
 var right_panel: PanelContainer
 var desktop_bottom: PanelContainer
 var aim_ui
+var combo_overlay: Control
 
 static func ap_pips(unit: Dictionary) -> String:
 	var maximum: int = int(unit.get("max_ap", Rules12.ACTIONS_PER_TURN))
@@ -239,6 +240,9 @@ func _build_ui() -> void:
 	else:
 		bar = preload("res://scripts/battle13_bar.gd").new()
 		bar.setup(g, root, row, g.action_buttons)
+	combo_overlay = preload("res://scripts/hud18_tags.gd").new()
+	root.add_child(combo_overlay)
+	combo_overlay.setup(g)
 
 
 func _refresh() -> void:
@@ -293,6 +297,7 @@ func _refresh() -> void:
 		var cd: Dictionary = u.get("cooldowns", {})
 		var turns := maxi(0, int(cd.get(mode, 0)) - g.mission.turn)
 		button.call("configure", mode, str(def.get("name", mode.capitalize())), key, ap, turns, reason, g.action == mode)
+		button.call("set_chain", def, g.mission.unit_by_id(g.target_id))
 		button.set_meta("battle13_available", button.visible and not button.disabled)
 		if charges != "": button.tooltip_text += detail
 	g.result_panel.visible = g.mission.result != ""

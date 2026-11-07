@@ -7,6 +7,8 @@ var cost := ""
 var cooldown := 0
 var active := false
 var compact := false
+var chain_marks: Array[Dictionary] = []
+var combo_ready := false
 
 func _ready() -> void:
 	button_down.connect(queue_redraw)
@@ -41,12 +43,23 @@ func configure(id: String, name: String, key: String, ap_cost: String, turns: in
 	text = ""
 	queue_redraw()
 
+func set_chain(def: Dictionary, target: Dictionary) -> void:
+	chain_marks.clear(); combo_ready = false
+	var chain: Dictionary = def.get("chain", {})
+	for kind in ["consume", "apply"]:
+		for entry in chain.get(kind, []):
+			var tag := str(entry.get("tag", "")) if entry is Dictionary else str(entry)
+			if tag == "": continue
+			chain_marks.append({"tag": tag, "consume": kind == "consume"})
+			if kind == "consume" and target.get("combo_tags", {}).has(tag): combo_ready = true
+	queue_redraw()
+
 func _draw() -> void:
 	var gold := Color("f5d68b") if active else Color("b69b65") if not disabled else Color("67737d")
 	var blue := Color("7ecde7") if not disabled else Color("67737d")
 	var touch_down := compact and button_pressed
 	draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), Color("32566b") if touch_down else Color("111d29"), true)
-	draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), Color("f5d68b") if touch_down else gold, false, 3.0 if touch_down else 2.0 if active else 1.0)
+	draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), Color("9ef6b3") if combo_ready else Color("f5d68b") if touch_down else gold, false, 3.0 if combo_ready or touch_down else 2.0 if active else 1.0)
 	var c := Vector2(size.x * 0.5, minf(25.0, size.y * 0.35)) if compact else Vector2(29, size.y * 0.55)
 	if compact:
 		var font := ThemeDB.fallback_font
@@ -93,3 +106,11 @@ func _draw() -> void:
 	if cooldown > 0:
 		draw_rect(Rect2(Vector2.ZERO, size), Color(0.02,0.04,0.07,0.68), true)
 		draw_string(ThemeDB.fallback_font, Vector2(size.x - 30, 20), str(cooldown), HORIZONTAL_ALIGNMENT_LEFT, -1, 17, Color("f0d287"))
+	for i in range(mini(chain_marks.size(), 3)):
+		var mark: Dictionary = chain_marks[i]
+		var at := Vector2(size.x - 10.0 - i * 15.0, 11.0)
+		var color := Color(preload("res://scripts/hud18_icon.gd").COLORS.get(str(mark.tag), "dcebf0"))
+		draw_circle(at, 7.0, Color("10212d"))
+		draw_arc(at, 7.0, 0, TAU, 12, color, 1.5)
+		var glyph: String = preload("res://scripts/hud18_icon.gd").GLYPHS.get(str(mark.tag), "•")
+		draw_string(ThemeDB.fallback_font, at + Vector2(-4, 4), glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, color)

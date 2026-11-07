@@ -19,6 +19,11 @@ var end_pulse: Tween
 var detail_scroll
 var last_unit_id := -1
 var last_unit_ap := -1
+var momentum_pips: Label
+var momentum_strike: Button
+var momentum_row: HBoxContainer
+var momentum_plate: ColorRect
+var last_chain_momentum := -1
 
 func setup(game, night_hud, root: Control, top: Control, left: Control, right: Control, bottom: Control, abilities: HFlowContainer) -> void:
 	g = game; night = night_hud
@@ -70,6 +75,32 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	tray.offset_top = -80
 	var tray_style: StyleBoxFlat = night.panel_style(); tray_style.set_content_margin_all(2)
 	tray.add_theme_stylebox_override("panel", tray_style); overlay.add_child(tray)
+	momentum_plate = ColorRect.new(); momentum_plate.name = "MomentumPlate"
+	momentum_plate.color = Color("0b1924d9"); momentum_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	momentum_plate.anchor_left = 0.5; momentum_plate.anchor_right = 0.5
+	momentum_plate.anchor_top = 1.0; momentum_plate.anchor_bottom = 1.0
+	momentum_plate.offset_left = -174; momentum_plate.offset_right = 174
+	momentum_plate.offset_top = -132; momentum_plate.offset_bottom = -82
+	overlay.add_child(momentum_plate)
+	momentum_row = HBoxContainer.new(); momentum_row.name = "ChainMomentum"
+	momentum_row.anchor_left = 0.5; momentum_row.anchor_right = 0.5
+	momentum_row.anchor_top = 1.0; momentum_row.anchor_bottom = 1.0
+	momentum_row.offset_left = -170; momentum_row.offset_right = 170
+	momentum_row.offset_top = -130; momentum_row.offset_bottom = -84
+	momentum_row.add_theme_constant_override("separation", 6); overlay.add_child(momentum_row)
+	momentum_pips = night.label("MOMENTUM  ○ ○ ○", 13, Color("e9ca83"))
+	momentum_pips.name = "ChainPips"; momentum_pips.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	momentum_pips.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	momentum_pips.mouse_filter = Control.MOUSE_FILTER_IGNORE; momentum_row.add_child(momentum_pips)
+	momentum_strike = _button("MOMENTUM\nSTRIKE", _claim_strike)
+	momentum_strike.name = "MomentumStrike"; momentum_strike.custom_minimum_size = Vector2(142, 44)
+	momentum_strike.add_theme_font_size_override("font_size", 12); momentum_row.add_child(momentum_strike)
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		var strike_style := StyleBoxFlat.new()
+		strike_style.bg_color = Color("204c50") if state != "disabled" else Color("28333c")
+		strike_style.border_color = Color("a8f3bb") if state != "disabled" else Color("66747a")
+		strike_style.set_border_width_all(2); strike_style.set_corner_radius_all(5)
+		momentum_strike.add_theme_stylebox_override(state, strike_style)
 	var tray_box := VBoxContainer.new(); tray_box.add_theme_constant_override("separation", 0); tray.add_child(tray_box)
 	action_name = night.label("Tap or hold an ability for its name", 12, Color("e9ca83"))
 	action_name.custom_minimum_size.y = 17; tray_box.add_child(action_name)
@@ -134,8 +165,26 @@ func _end_turn() -> void:
 func _close() -> void:
 	open_card = ""; refresh()
 
+func _claim_strike() -> void:
+	var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
+	if preload("res://scripts/ability_chains.gd").claim_momentum_strike(g.mission, actor):
+		g._refresh()
+
 func refresh(from_game: bool = false) -> void:
 	if overlay == null: return
+	var pips: int = clampi(int(g.mission.chain_momentum), 0, 3)
+	var used_this_turn: bool = int(g.mission.chain_strike_used_turn) == int(g.mission.turn)
+	momentum_row.visible = pips > 0 or used_this_turn
+	momentum_plate.visible = momentum_row.visible
+	momentum_pips.text = "MOMENTUM  " + ("● ".repeat(pips) + "○ ".repeat(3 - pips)).strip_edges()
+	momentum_strike.visible = pips == 3 or used_this_turn
+	momentum_strike.disabled = pips < 3 or used_this_turn or g.mission.phase != "player"
+	if pips != last_chain_momentum:
+		last_chain_momentum = pips
+		momentum_pips.pivot_offset = momentum_pips.size * 0.5
+		var pulse: Tween = g.create_tween()
+		pulse.tween_property(momentum_pips, "scale", Vector2(1.10, 1.10), 0.12)
+		pulse.tween_property(momentum_pips, "scale", Vector2.ONE, 0.20)
 	var all_spent: bool = g.mission.phase == "player" and g.mission.result == "" and not g.mission.living("player").is_empty()
 	for member in g.mission.living("player"):
 		if int(member.ap) > 0: all_spent = false; break
@@ -152,6 +201,7 @@ func refresh(from_game: bool = false) -> void:
 	elif g.path_label.text != "": action_name.text = g.path_label.text.get_slice("  •  COVER",0)
 	elif g.action == "move": action_name.text = "Blue: 1 action  ·  Amber: DASH ends turn"
 	else: action_name.text = "Choose an action · tap the map to preview"
+	if not momentum_row.visible: action_name.text += "  ·  MOMENTUM ○ ○ ○"
 	_update_actions(from_game)
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
 	unit_card.text = "%s\nHP %s  AP %s  ▾" % [str(unit.get("name", "UNIT")), str(int(unit.get("hp", 0))), g.hud_controls.ap_pips(unit)]
@@ -168,7 +218,7 @@ func refresh(from_game: bool = false) -> void:
 		for button in ability_buttons:
 			if button.visible or not bool(button.get_meta("battle12_available", false)) or button.ability_id == "": continue
 			var mode: String = button.ability_id
-			var item := _button("%s  ·  %s AP%s" % [button.display_name, button.cost, "  ·  %d TURN CD" % button.cooldown if button.cooldown > 0 else ""], func() -> void: g._choose_action(mode); _close())
+			var item := _button("%s %s  ·  %s AP%s" % [button.display_name, preload("res://scripts/hud18_icon.gd").marks(g.mission.abilities.get(mode, {})), button.cost, "  ·  %d TURN CD" % button.cooldown if button.cooldown > 0 else ""], func() -> void: g._choose_action(mode); _close())
 			item.disabled = button.disabled; popup_body.add_child(item)
 	elif open_card == "unit":
 		popup_body.add_child(night.label("SQUAD  ·  tap a name to select", 14, Color("efd49b")))
@@ -202,8 +252,6 @@ func refresh(from_game: bool = false) -> void:
 func _update_actions(from_game: bool) -> void:
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var available: int = int(unit.get("ap", 0))
-	if from_game and ability_scroll != null and not ability_scroll.touch_dragging and (last_unit_id != g.selected_id or last_unit_ap != available):
-		ability_scroll.set_deferred("scroll_horizontal", 0)
 	last_unit_id = g.selected_id; last_unit_ap = available
 	if from_game:
 		for button in ability_buttons: button.set_meta("battle12_available", button.visible and not button.disabled)

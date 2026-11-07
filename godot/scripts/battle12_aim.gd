@@ -117,6 +117,16 @@ func refresh() -> void:
 		confirm.text = "CONFIRM %s\n%d%% HIT %d–%d DMG" % ["FIRE" if g.action == "shoot" else "STRIKE", int(info.hit), int(damage.normal[0]), int(damage.normal[1])] if phone else "%s · %d%% HIT\n%d–%d DMG" % ["FIRE" if g.action == "shoot" else "STRIKE", int(info.hit), int(damage.normal[0]), int(damage.normal[1])]
 	else:
 		confirm.text = "CONFIRM\n%s" % str(g.mission.abilities.get(g.action, {}).get("name", g.action)).to_upper()
+	var chain: Dictionary = g.mission.abilities.get(g.action, {}).get("chain", {})
+	var marks: Array[String] = []
+	var ready := false
+	for kind in ["consume", "apply"]:
+		for entry in chain.get(kind, []):
+			var tag := str(entry.get("tag", "")) if entry is Dictionary else str(entry)
+			marks.append(("−" if kind == "consume" else "+") + str(preload("res://scripts/hud18_icon.gd").GLYPHS.get(tag, "•")))
+			if kind == "consume" and target.get("combo_tags", {}).has(tag): ready = true
+	if not marks.is_empty(): confirm.text += "  " + " ".join(marks)
+	confirm.modulate = Color("b2ffc1") if ready else Color.WHITE
 
 func _confirm() -> void:
 	if g.target_id < 0: return
