@@ -26,6 +26,14 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if g == null or g.camera == null or g.cinematic or preview_active: return
+	if g.playing_enemy_events and not skip_requested:
+		for enemy in g.mission.living("enemy"):
+			var view = g.views.get(int(enemy.id))
+			if view == null or view.motion == null or not view.motion.is_running(): continue
+			if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
+			g.pivot = g.pivot.lerp(Vector3(view.position.x, 0.0, view.position.z), minf(1.0, _delta * 7.0))
+			g._update_camera()
+			break
 	if g.zoom < 26.0:
 		if overhead:
 			overhead = false

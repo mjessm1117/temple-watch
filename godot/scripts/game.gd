@@ -98,7 +98,7 @@ func _ready() -> void:
 		var gate := Vector3(float(mission.spec.objective.points[0][0]),0,float(mission.spec.objective.points[0][1]))
 		pivot = BattleCamera.clamp_pivot(mission,gate + Vector3(0,0,-2.5))
 		zoom = maxf(zoom,25.0)
-	pivot = BattleCamera.phone_focus(pivot,yaw)
+	pivot = BattleCamera.phone_focus(pivot,yaw,1.55)
 	_update_camera()
 	_refresh()
 	var demo := ""
@@ -223,7 +223,7 @@ func _select(id: int) -> void:
 	sound.play("click")
 	var u: Dictionary = mission.unit_by_id(id)
 	if mission.identity != null: mission.identity.voice(mission,u,"select")
-	if not u.is_empty(): _glide_to(BattleCamera.phone_focus(Vector3(int(u.x), 0, int(u.y)),yaw), 0.38, BattleCamera.selected_zoom(mission))
+	if not u.is_empty(): _glide_to(BattleCamera.phone_focus(Vector3(int(u.x), 0, int(u.y)),yaw,1.55), 0.35, BattleCamera.selected_zoom(mission))
 	_refresh()
 
 func _after_action() -> void:
@@ -272,7 +272,7 @@ func _cancel_order() -> void:
 func _recenter() -> void:
 	var unit: Dictionary = mission.unit_by_id(selected_id)
 	if unit.is_empty(): return
-	_glide_to(BattleCamera.phone_focus(Vector3(unit.x, 0, unit.y),yaw), 0.38, BattleCamera.selected_zoom(mission))
+	_glide_to(BattleCamera.phone_focus(Vector3(unit.x, 0, unit.y),yaw,1.55), 0.35, BattleCamera.selected_zoom(mission))
 
 func _glide_to(point: Vector3, seconds: float, target_zoom: float = -1.0) -> void:
 	if Prefs.get_value("motion"):
@@ -303,7 +303,7 @@ func _process(_delta: float) -> void:
 	if Input.is_key_pressed(KEY_S): direction.y -= 1
 	var mouse := get_viewport().get_mouse_position()
 	var size := get_viewport().get_visible_rect().size
-	if get_viewport().gui_get_hovered_control() == null and mouse.x >= 0 and mouse.y >= 0 and mouse.x <= size.x and mouse.y <= size.y:
+	if hud_controls.phone == null and get_viewport().gui_get_hovered_control() == null and mouse.x >= 0 and mouse.y >= 0 and mouse.x <= size.x and mouse.y <= size.y:
 		if mouse.x < 14: direction.x -= 1
 		elif mouse.x > size.x - 14: direction.x += 1
 		if mouse.y < 14: direction.y += 1
@@ -345,6 +345,7 @@ func _move_selected(dest: Vector2i) -> void:
 	if DisplayServer.get_name() == "headless" and not animate_headless:
 		if mission.move(selected_id, dest):
 			if views.has(selected_id): views[selected_id].travel(points)
+			_glide_to(BattleCamera.phone_focus(Vector3(dest.x, 0, dest.y), yaw, 1.55), 0.35, BattleCamera.selected_zoom(mission))
 			mission.action_events.clear(); _after_action(); _refresh()
 		return
 	player_attack_pending = true
@@ -382,6 +383,7 @@ func _move_selected(dest: Vector2i) -> void:
 	player_attack_pending = false
 	mission.presentation_active = false
 	phase_banner.visible = false
+	if int(u.get("hp", 0)) > 0: _glide_to(BattleCamera.phone_focus(Vector3(u.x, 0, u.y), yaw, 1.55), 0.35, BattleCamera.selected_zoom(mission))
 	_after_action()
 	_refresh()
 

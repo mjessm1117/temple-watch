@@ -11,8 +11,14 @@ var popup_body: VBoxContainer
 var open_card := ""
 var more_button: Button
 var ability_tray: PanelContainer
+var ability_scroll
 var ability_buttons: Array[Button] = []
 var end_confirm := false
+var end_button: Button
+var end_pulse: Tween
+var detail_scroll
+var last_unit_id := -1
+var last_unit_ap := -1
 
 func setup(game, night_hud, root: Control, top: Control, left: Control, right: Control, bottom: Control, abilities: HFlowContainer) -> void:
 	g = game; night = night_hud
@@ -38,7 +44,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	g.objective_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	g.objective_label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	g.objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-	var end_button := _button("END TURN", _end_turn); end_button.name = "PhoneEndTurn"
+	end_button = _button("END TURN", _end_turn); end_button.name = "PhoneEndTurn"
 	end_button.custom_minimum_size = Vector2(110, 56); heading.add_child(end_button)
 	var controls := HBoxContainer.new(); controls.add_theme_constant_override("separation", 8); rows.add_child(controls)
 	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
@@ -68,6 +74,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	action_name = night.label("Tap or hold an ability for its name", 12, Color("e9ca83"))
 	action_name.custom_minimum_size.y = 17; tray_box.add_child(action_name)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.name = "Abilities"
+	ability_scroll = scroll
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 56; tray_box.add_child(scroll)
 	scroll.get_h_scroll_bar().modulate.a = 0.0
@@ -86,7 +93,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	var popup_half := minf(250.0, (root.size.x - 16.0) * 0.5)
 	popup.offset_left = -popup_half; popup.offset_right = popup_half; popup.offset_top = 96; popup.offset_bottom = -80
 	popup.add_theme_stylebox_override("panel", night.panel_style()); overlay.add_child(popup)
-	var detail_scroll := preload("res://scripts/touch_scroll.gd").new(); detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	detail_scroll = preload("res://scripts/touch_scroll.gd").new(); detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	popup.add_child(detail_scroll)
 	popup_body = VBoxContainer.new(); popup_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	popup_body.add_theme_constant_override("separation", 8)
@@ -129,9 +136,19 @@ func _close() -> void:
 
 func refresh(from_game: bool = false) -> void:
 	if overlay == null: return
-	if g.warning_label.text.contains("TAB / SHIFT+TAB"): action_name.text = "Tap a target · FIRE to confirm · CANCEL to back"
+	var all_spent: bool = g.mission.phase == "player" and g.mission.result == "" and not g.mission.living("player").is_empty()
+	for member in g.mission.living("player"):
+		if int(member.ap) > 0: all_spent = false; break
+	if all_spent and (end_pulse == null or not end_pulse.is_running()):
+		end_pulse = g.create_tween().set_loops()
+		end_pulse.tween_property(end_button, "modulate", Color("ffe19a"), 0.55).set_trans(Tween.TRANS_SINE)
+		end_pulse.tween_property(end_button, "modulate", Color.WHITE, 0.55).set_trans(Tween.TRANS_SINE)
+	elif not all_spent and end_pulse != null:
+		end_pulse.kill(); end_pulse = null; end_button.modulate = Color.WHITE
+	if g.warning_label.text.contains("TAB / SHIFT+TAB"): action_name.text = "Tap a target · CONFIRM FIRE · CANCEL"
 	elif g.warning_label.text != "": action_name.text = g.warning_label.text
 	elif end_confirm: action_name.text = "End the squad turn? Tap END TURN again."
+	elif all_spent: action_name.text = "Squad spent · END TURN"
 	elif g.path_label.text != "": action_name.text = g.path_label.text.get_slice("  •  COVER",0)
 	elif g.action == "move": action_name.text = "Blue: 1 action  ·  Amber: DASH ends turn"
 	else: action_name.text = "Choose an action · tap the map to preview"
@@ -143,6 +160,8 @@ func refresh(from_game: bool = false) -> void:
 	popup.visible = open_card != ""
 	if open_card == "": return
 	if open_card == "settings": return
+	if detail_scroll.touch_dragging: return
+	var saved_scroll: int = detail_scroll.scroll_vertical
 	for child in popup_body.get_children(): child.queue_free()
 	if open_card == "more":
 		popup_body.add_child(night.label("MORE ACTIONS", 16, Color("efd49b")))
@@ -178,8 +197,14 @@ func refresh(from_game: bool = false) -> void:
 		popup_body.add_child(_button("RESTART MISSION", func() -> void: g.get_tree().reload_current_scene()))
 		popup_body.add_child(_button("MAIN MENU", func() -> void: g.get_node("/root/CampaignFlow").go("menu")))
 	popup_body.add_child(_button("CLOSE", _close))
+	detail_scroll.set_deferred("scroll_vertical", saved_scroll)
 
 func _update_actions(from_game: bool) -> void:
+	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
+	var available: int = int(unit.get("ap", 0))
+	if from_game and ability_scroll != null and not ability_scroll.touch_dragging and (last_unit_id != g.selected_id or last_unit_ap != available):
+		ability_scroll.set_deferred("scroll_horizontal", 0)
+	last_unit_id = g.selected_id; last_unit_ap = available
 	if from_game:
 		for button in ability_buttons: button.set_meta("battle12_available", button.visible and not button.disabled)
 	var primary: Array[String] = []
