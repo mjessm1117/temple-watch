@@ -339,7 +339,7 @@
       "chain": {
         "consume": [
           {
-            "tag": "IONIZED",
+            "tag": "MARKED",
             "target": "target",
             "bonus": [
               {
