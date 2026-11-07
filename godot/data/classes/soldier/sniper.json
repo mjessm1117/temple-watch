@@ -99,7 +99,8 @@
             "target": "target"
           }
         ]
-      }
+      },
+      "chance": 85
     },
     "sniper_spotter_round": {
       "name": "Spotter Round",
