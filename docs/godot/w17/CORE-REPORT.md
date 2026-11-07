@@ -26,6 +26,8 @@ HUD lane reads `unit.combo_tags` (tag to source unit ID), `mission.chain_momentu
 
 `godot/tests/core17_test.gd` checks class schema, legacy ability values and kits, power curve, blend restrictions, chains, Momentum, Master action, hiring, promotion, old saves, mentor effects, phone tap sizes, and touch scrolling. Capture source: `godot/tests/core17_capture.gd`.
 
+Final gate: headless import exited 0; `./godot/test.sh` exited 0 with no `SCRIPT ERROR`, every suite reported zero failures, `core17_test` passed 272 checks, and the Normal rescue bot won 9/20. Logs are in `/home/jess/projects/tw-logs/w17/core/` (`final-import.log` and `full-test-final.log`).
+
 - [Promotion 844×390](core/promotion-844x390.png)
 - [Promotion 667×375](core/promotion-667x375.png)
 - [Padawan hire at the barracks](core/barracks-padawan-hire.png)
