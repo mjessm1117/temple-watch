@@ -78,22 +78,22 @@
       "chain": {
         "consume": [
           {
-            "tag": "ATTUNED",
+            "tag": "SHIELDED",
             "target": "target",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 1
+                "amount": 6
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "INSPIRED",
+            "tag": "ATTUNED",
             "target": "target",
-            "amount": 1
+            "amount": 6
           }
         ]
       }
@@ -112,20 +112,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "IONIZED",
+            "tag": "PINNED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 1
+                "amount": 3
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "STAGGERED",
+            "tag": "MARKED",
             "target": "target"
           }
         ]
@@ -144,22 +144,22 @@
       "chain": {
         "consume": [
           {
-            "tag": "INSPIRED",
+            "tag": "ATTUNED",
             "target": "all_allies",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 1
+                "amount": 6
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "READY",
+            "tag": "SHIELDED",
             "target": "all_allies",
-            "amount": 1
+            "amount": 6
           }
         ]
       }
@@ -179,20 +179,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "EXPOSED",
+            "tag": "PINNED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 1
+                "amount": 3
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "EXPOSED",
+            "tag": "STAGGERED",
             "target": "target"
           }
         ]
@@ -217,16 +217,16 @@
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 2
+                "amount": 6
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "INSPIRED",
+            "tag": "ATTUNED",
             "target": "target",
-            "amount": 2
+            "amount": 6
           }
         ]
       }
@@ -250,16 +250,16 @@
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 2
+                "amount": 7
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "SHIELDED",
+            "tag": "INSPIRED",
             "target": "all_allies",
-            "amount": 2
+            "amount": 7
           }
         ]
       }
@@ -278,20 +278,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "STAGGERED",
+            "tag": "EXPOSED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 2
+                "amount": 3
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "MARKED",
+            "tag": "PINNED",
             "target": "target"
           }
         ]
@@ -312,20 +312,20 @@
       "chain": {
         "consume": [
           {
-            "tag": "IONIZED",
+            "tag": "EXPOSED",
             "target": "target",
             "bonus": [
               {
                 "type": "damage",
                 "target": "target",
-                "amount": 2
+                "amount": 3
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "STAGGERED",
+            "tag": "BURNING",
             "target": "target"
           }
         ]
@@ -344,22 +344,22 @@
       "chain": {
         "consume": [
           {
-            "tag": "ATTUNED",
+            "tag": "READY",
             "target": "all_allies",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 3
+                "amount": 7
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "INSPIRED",
+            "tag": "ATTUNED",
             "target": "all_allies",
-            "amount": 3
+            "amount": 7
           }
         ]
       }
@@ -377,22 +377,22 @@
       "chain": {
         "consume": [
           {
-            "tag": "READY",
+            "tag": "INSPIRED",
             "target": "target",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 3
+                "amount": 7
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "SHIELDED",
+            "tag": "INSPIRED",
             "target": "target",
-            "amount": 3
+            "amount": 7
           }
         ]
       }
@@ -412,7 +412,7 @@
       "chain": {
         "consume": [
           {
-            "tag": "LIFTED",
+            "tag": "EXPOSED",
             "target": "target",
             "bonus": [
               {
@@ -425,7 +425,7 @@
         ],
         "apply": [
           {
-            "tag": "PINNED",
+            "tag": "IONIZED",
             "target": "target"
           }
         ]
@@ -446,22 +446,22 @@
       "chain": {
         "consume": [
           {
-            "tag": "SHIELDED",
+            "tag": "INSPIRED",
             "target": "all_allies",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 3
+                "amount": 7
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "ATTUNED",
+            "tag": "READY",
             "target": "all_allies",
-            "amount": 3
+            "amount": 7
           }
         ]
       }
@@ -480,22 +480,22 @@
       "chain": {
         "consume": [
           {
-            "tag": "ATTUNED",
+            "tag": "INSPIRED",
             "target": "target",
             "bonus": [
               {
                 "type": "shield",
                 "target": "target",
-                "amount": 4
+                "amount": 7
               }
             ]
           }
         ],
         "apply": [
           {
-            "tag": "INSPIRED",
+            "tag": "ATTUNED",
             "target": "target",
-            "amount": 4
+            "amount": 7
           }
         ]
       }
