@@ -18,6 +18,9 @@ var equipment: Node3D
 var jedi := false
 
 static func model_path(r: Dictionary) -> String:
+	var cls := str(r.get("cls", ""))
+	if cls in ["Sniper", "Heavy", "Tech", "Droid", "Officer"]:
+		return "res://assets/units/w17/%s.glb" % cls.to_lower()
 	var kind: String = "jedi" if Progression.is_jedi(r) else {"Medic":"medic", "Heavy":"heavy", "Scout":"scout", "Sniper":"scout"}.get(str(r.cls), "trooper")
 	return "res://assets/loadout/models/%s.glb" % kind
 
@@ -56,7 +59,7 @@ func setup(r: Dictionary, portrait: bool = false) -> void:
 		equipment.top_level = true
 	else: equipment.position = Vector3(-0.55, 1.0, 0.2)
 	if Progression.is_jedi(r): _saber(r)
-	else: _blaster(r)
+	elif str(r.cls) not in ["Sniper", "Heavy", "Tech", "Droid", "Officer"]: _blaster(r)
 	if r.cls == "Medic": _medkit(model)
 	if not portrait:
 		ring = MeshInstance3D.new(); var torus := TorusMesh.new()

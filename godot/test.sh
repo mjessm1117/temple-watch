@@ -66,3 +66,5 @@ run_suite cam16_test --rendering-method forward_plus --resolution 844x390 -- --g
 run_suite armory16_test
 run_suite scroll16_test --resolution 844x390
 run_suite tap16_test --resolution 844x390
+
+run_suite w17_wire_test

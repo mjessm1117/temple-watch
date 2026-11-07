@@ -405,5 +405,103 @@
     "description": "Escort near a soldier to the blue exit.",
     "visual_tint": "#e8dcbb",
     "visual_scale": 0.8
+  },
+  "sniper": {
+    "name": "Republic Sniper",
+    "class_name": "Sniper",
+    "side": "player",
+    "hp": 7,
+    "aim": 82,
+    "mob": 5,
+    "damage": [
+      4,
+      7
+    ],
+    "range": 12,
+    "focus": 0,
+    "armor": 1,
+    "crit": 15,
+    "model": "trooper",
+    "kit": [
+      "shoot",
+      "overwatch",
+      "mark",
+      "deadeye"
+    ],
+    "medpacs": 2,
+    "clip": 4
+  },
+  "tech": {
+    "name": "Republic Tech",
+    "class_name": "Tech",
+    "side": "player",
+    "hp": 7,
+    "aim": 68,
+    "mob": 5,
+    "damage": [
+      3,
+      5
+    ],
+    "range": 7,
+    "focus": 0,
+    "armor": 1,
+    "model": "trooper",
+    "kit": [
+      "shoot",
+      "overwatch",
+      "hack",
+      "scan",
+      "shieldDrone"
+    ],
+    "medpacs": 2,
+    "clip": 4
+  },
+  "droid": {
+    "name": "Republic Droid",
+    "class_name": "Droid",
+    "side": "player",
+    "hp": 9,
+    "aim": 72,
+    "mob": 5,
+    "damage": [
+      3,
+      6
+    ],
+    "range": 8,
+    "focus": 0,
+    "armor": 2,
+    "model": "trooper",
+    "kit": [
+      "shoot",
+      "overwatch",
+      "shieldDrone",
+      "rapidFire"
+    ],
+    "medpacs": 2,
+    "clip": 4
+  },
+  "officer": {
+    "name": "Republic Officer",
+    "class_name": "Officer",
+    "side": "player",
+    "hp": 8,
+    "aim": 72,
+    "mob": 5,
+    "damage": [
+      3,
+      5
+    ],
+    "range": 8,
+    "focus": 0,
+    "armor": 1,
+    "model": "trooper",
+    "kit": [
+      "shoot",
+      "overwatch",
+      "rally",
+      "mark"
+    ],
+    "medpacs": 2,
+    "clip": 4
   }
 }

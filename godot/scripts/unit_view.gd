@@ -1,9 +1,12 @@
 extends Node3D
 
 const Audio = preload("res://scripts/audio.gd")
+const W17_ROOT := "res://assets/units/w17/"
+const W17_KINDS := ["sniper", "heavy", "tech", "droid", "officer"]
 var unit_id: int
 var model: Node3D
 var animation: AnimationPlayer
+var lod_animation: AnimationPlayer
 var base_clip := "idle"
 var motion: Tween
 var turn_motion: Tween
@@ -22,9 +25,19 @@ func setup(u: Dictionary, scene: PackedScene, at: Vector3) -> void:
 	unit_id = int(u.id)
 	enemy_side = str(u.side) == "enemy"
 	position = at
-	model = scene.instantiate()
+	var kind := w17_kind(u)
+	var selected := battle_model_scene(u, scene)
+	model = selected.instantiate()
 	model.scale = Vector3.ONE * 1.2
 	add_child(model)
+	if kind in W17_KINDS:
+		var low_scene := load(W17_ROOT + kind + "_lod1.glb") as PackedScene
+		if low_scene != null:
+			var low := low_scene.instantiate() as Node3D
+			model.add_child(low)
+			_set_lod_range(model, 0.0, 26.0, low)
+			_set_lod_range(low, 26.0, 0.0)
+			lod_animation = _find_animation(low)
 	ring = MeshInstance3D.new()
 	var disc := CylinderMesh.new(); disc.top_radius = 0.48; disc.bottom_radius = 0.48; disc.height = 0.035
 	ring.mesh = disc; ring.position.y = 0.025; add_child(ring)
@@ -40,6 +53,28 @@ func setup(u: Dictionary, scene: PackedScene, at: Vector3) -> void:
 	synth.free()
 	foot.stream = _step_stream
 	add_child(foot)
+
+static func battle_model_path(u: Dictionary) -> String:
+	var kind := w17_kind(u)
+	return W17_ROOT + kind + ".glb" if kind in W17_KINDS else "res://assets/models/units/%s.glb" % str(u.get("model", "trooper"))
+
+static func battle_model_scene(u: Dictionary, fallback: PackedScene) -> PackedScene:
+	var kind := w17_kind(u)
+	if kind not in W17_KINDS: return fallback
+	return load(battle_model_path(u)) as PackedScene
+
+static func w17_kind(u: Dictionary) -> String:
+	var cls := str(u.get("class_name", "")).to_lower()
+	return cls if cls in W17_KINDS else str(u.get("kind", "")).to_lower()
+
+func _set_lod_range(node: Node, begin: float, end: float, skip: Node = null) -> void:
+	if node == skip: return
+	if node is GeometryInstance3D:
+		node.visibility_range_begin = begin
+		node.visibility_range_end = end
+		node.visibility_range_begin_margin = 0.0
+		node.visibility_range_end_margin = 0.0
+	for child in node.get_children(): _set_lod_range(child, begin, end, skip)
 
 func _find_animation(node: Node) -> AnimationPlayer:
 	if node is AnimationPlayer: return node
@@ -86,9 +121,12 @@ func _attach_saber(u: Dictionary) -> void:
 func play(clip: String) -> void:
 	if animation == null: return
 	animation.speed_scale = float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if enemy_side else 1.0)
+	if lod_animation != null: lod_animation.speed_scale = animation.speed_scale
 	var name := clip if animation.has_animation(clip) else base_clip if animation.has_animation(base_clip) else "idle"
 	if animation.has_animation(name) and animation.current_animation != name:
 		animation.play(name, 0.14 if clip == "run" else 0.1)
+	if lod_animation != null and lod_animation.has_animation(name) and lod_animation.current_animation != name:
+		lod_animation.play(name, 0.14 if clip == "run" else 0.1)
 
 func set_selected(value: bool, enemy: bool) -> void:
 	if ring == null: return

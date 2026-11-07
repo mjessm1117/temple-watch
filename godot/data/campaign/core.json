@@ -177,6 +177,63 @@
       "init": 14,
       "will": 55,
       "desc": "Pistol fighter. Cheap 1-AP shots, Fan the Hammer, hit-and-run."
+    },
+    "Sniper": {
+      "hp": 7,
+      "armor": 1,
+      "aim": 82,
+      "mob": 5,
+      "dmg": [
+        4,
+        7
+      ],
+      "range": 12,
+      "crit": 15,
+      "init": 13,
+      "will": 55,
+      "desc": "Long-range soldier. Marks targets and fires precise shots."
+    },
+    "Tech": {
+      "hp": 7,
+      "armor": 1,
+      "aim": 68,
+      "mob": 5,
+      "dmg": [
+        3,
+        5
+      ],
+      "range": 7,
+      "init": 11,
+      "will": 60,
+      "desc": "Engineer and slicer. Hacks devices and deploys shield support."
+    },
+    "Droid": {
+      "hp": 9,
+      "armor": 2,
+      "aim": 72,
+      "mob": 5,
+      "dmg": [
+        3,
+        6
+      ],
+      "range": 8,
+      "init": 9,
+      "will": 65,
+      "desc": "Armored droid soldier with support modules."
+    },
+    "Officer": {
+      "hp": 8,
+      "armor": 1,
+      "aim": 72,
+      "mob": 5,
+      "dmg": [
+        3,
+        5
+      ],
+      "range": 8,
+      "init": 12,
+      "will": 65,
+      "desc": "Command soldier. Rallies and marks targets for the squad."
     }
   },
   "BASE_KIT": {
@@ -190,6 +247,23 @@
     ],
     "Shieldbearer": [
       "hunker"
+    ],
+    "Sniper": [
+      "mark",
+      "deadeye"
+    ],
+    "Tech": [
+      "hack",
+      "scan",
+      "shieldDrone"
+    ],
+    "Droid": [
+      "shieldDrone",
+      "rapidFire"
+    ],
+    "Officer": [
+      "rally",
+      "mark"
     ]
   },
   "RANKS": [
