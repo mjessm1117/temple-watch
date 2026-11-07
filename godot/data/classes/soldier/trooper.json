@@ -119,7 +119,8 @@
       "reaction": true,
       "ammo_cost": 1,
       "cost": 1,
-      "ends_turn": true
+      "ends_turn": true,
+      "rank": 2
     },
     "rapidFire": {
       "name": "Rapid Fire",
@@ -133,7 +134,8 @@
       "cooldown": 1,
       "ammo_cost": 2,
       "cost": 1,
-      "ends_turn": true
+      "ends_turn": true,
+      "rank": 2
     },
     "trooper_breach_charge": {
       "name": "Breach Charge",
@@ -189,7 +191,8 @@
       "effect": "aura",
       "clear_status": true,
       "cost": 1,
-      "ends_turn": false
+      "ends_turn": false,
+      "rank": 4
     },
     "trooper_armor_piercer": {
       "name": "Armor Piercer",
