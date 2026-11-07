@@ -38,6 +38,8 @@ var reinforcement_marker: Vector2i = Vector2i(-1, -1)
 var terrain_revision := 0
 var action_events: Array[Dictionary] = []
 var ability_uses: Dictionary = {}
+var chain_momentum := 0
+var chain_strike_used_turn := -1
 var clues := 0
 var saved_by: Dictionary = {}
 func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") -> void:
@@ -54,7 +56,12 @@ func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") ->
 			else: spec[key] = tuning[key]
 		if int(spec.objective.get("hold_turns",0)) > 0: spec.objective.hp = maxi(int(spec.objective.hp),int(spec.objective.get("hold_hp",0)))
 	catalog = _json("res://data/units.json")
-	abilities = _json("res://data/abilities.json")
+	abilities = preload("res://scripts/class_registry.gd").ability_catalog()
+	for class_row in preload("res://scripts/class_registry.gd").classes().values():
+		var kind := str(class_row.get("unit_kind", ""))
+		if kind != "" and catalog.has(kind) and str(catalog[kind].get("side", "")) == "player":
+			catalog[kind].kit = class_row.get("kit", []).duplicate()
+			catalog[kind].passives = class_row.get("passives", []).duplicate()
 	if modern: Pressure.setup(self)
 	for row in spec.rows: board.append(str(row))
 	for y in range(board.size()):

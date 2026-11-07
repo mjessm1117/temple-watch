@@ -99,6 +99,12 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 		var pair_key: String = attacker.bondmates[int(ally.id)]
 		bond_bonus = maxi(bond_bonus, 10 if int(m.bond_pairs[pair_key].get("lvl",0)) >= 8 else 5)
 	if bond_bonus > 0: lines.append(["Bond proximity", bond_bonus])
+	if str(attacker.get("side", "")) == "player":
+		var aura := 0
+		for ally in m.units:
+			if str(ally.get("side", "")) == "player" and int(ally.get("hp", 0)) > 0 and distance(pos(ally), a) <= 3.0:
+				aura = maxi(aura, int(ally.get("master_aura", 0)))
+		if aura > 0: lines.append(["Master aura", aura * 5])
 	var cv := 0
 	if melee: lines.append(["Close quarters", 10])
 	else:
@@ -113,7 +119,7 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 	var defense := int(target.get("defense", 0))
 	if bool(target.get("hunkered", false)): defense += 30
 	defense += int(target.get("buff_defense", 0))
-	if bool(target.get("guard", false)): defense += 25
+	if bool(target.get("guard", false)): defense += roundi(25 * float(target.get("guard_power", 1.0)))
 	if str(target.get("side", "")) == "player":
 		for ally in m.units:
 			if str(ally.get("side", "")) == "player" and int(ally.get("hp", 0)) > 0 and int(ally.get("id", -1)) != int(target.get("id", -2)) and "defLine" in ally.get("passives", []) and distance(pos(ally), t) <= 1.5:

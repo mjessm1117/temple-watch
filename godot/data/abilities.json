@@ -952,5 +952,14 @@
     "cost": 1,
     "ap": 1,
     "ends_turn": true
+  },
+  "masterAction": {
+    "name": "Master's Resolve",
+    "target": "self",
+    "effect": "master_action",
+    "range": 0,
+    "cost": 0,
+    "ap": 0,
+    "ends_turn": false
   }
 }

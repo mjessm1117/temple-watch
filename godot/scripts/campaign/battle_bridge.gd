@@ -2,6 +2,7 @@ extends RefCounted
 const Mission = preload("res://scripts/mission.gd")
 const Deployment = preload("res://scripts/campaign/strat_deployment.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
+const Classes = preload("res://scripts/class_registry.gd")
 const Settings = preload("res://scripts/settings.gd")
 const Story = preload("res://scripts/story/story_engine.gd")
 
@@ -28,6 +29,10 @@ static func create(campaign, seed_value: int) -> RefCounted:
 		m._spawn(kind, tiles[i].x, tiles[i].y, -1)
 		var u: Dictionary = m.units.pop_back()
 		u.rid = r.id; u.name = r.n; u.class_name = r.cls; u.rank = r.rank
+		if Progression.is_jedi(r):
+			var tier: Dictionary = Classes.rank_data("jedi", int(r.rank))
+			u.master_aura = int(tier.get("aura", 0))
+			u.master_action_available = bool(tier.get("third_action_once", false)) or int(r.rank) > 5
 		u.dark = r.get("dark", 0)
 		var stats: Dictionary = preload("res://scripts/campaign/gear.gd").battle_stats(campaign, str(r.id))
 		for key in ["hp", "aim", "mob", "range", "will", "crit", "deflect", "dodge", "armor"]:

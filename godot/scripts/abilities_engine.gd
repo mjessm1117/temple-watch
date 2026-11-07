@@ -5,6 +5,7 @@ const Combat = preload("res://scripts/combat_abilities.gd")
 const Bonds = preload("res://scripts/combat_bonds.gd")
 const Shot = preload("res://scripts/shot.gd")
 const Rules12 = preload("res://scripts/rules12_actions.gd")
+const Chains = preload("res://scripts/ability_chains.gd")
 
 static func cost(def: Dictionary, u: Dictionary) -> int:
 	return Rules12.cost(def, u)
@@ -29,6 +30,7 @@ static func reason(m: RefCounted, u: Dictionary, id: String) -> String:
 	if id == "free" and bool(m.prisoner.freed): return "Already free"
 	if id == "free" and max(abs(int(u.x) - int(m.prisoner.x)), abs(int(u.y) - int(m.prisoner.y))) > 1: return "Move adjacent"
 	if id == "meditate" and int(u.get("focus_left", 0)) >= int(u.get("focus", 0)): return "Focus full"
+	if id == "masterAction" and bool(u.get("master_action_used", false)): return "Already used"
 	if id == "rally":
 		var need := false
 		for ally in m.living("player"):
@@ -108,7 +110,13 @@ static func tiles(m: RefCounted, u: Dictionary, id: String) -> Array[Vector2i]:
 static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, tile: Vector2i = Vector2i(-1, -1)) -> bool:
 	var u: Dictionary = m.unit_by_id(actor_id)
 	if reason(m, u, id) != "": return false
-	var def: Dictionary = m.abilities[id]
+	var def: Dictionary = m.abilities[id].duplicate(true)
+	if u.get("legacy_power", {}).has(id):
+		var factor := float(u.legacy_power[id])
+		for key in ["heal", "revive", "shield", "defense", "aim", "enemy_aim", "amount", "damage_mod", "next_strike_aim", "cover_damage", "collision_damage"]:
+			if def.has(key): def[key] = roundi(float(def[key]) * factor)
+		if def.get("damage") is Array:
+			def.damage = [maxi(1, roundi(float(def.damage[0]) * factor)), maxi(1, roundi(float(def.damage[1]) * factor))]
 	if id in ["rewardSafe","rewardRisky"]: return bool(m.hack(u,tile,"safe" if id == "rewardSafe" else "risky").get("ok",false))
 	var target_kind := str(def.get("target", ""))
 	var t: Dictionary = {}
@@ -150,6 +158,7 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 				if Shot.distance(Shot.pos(u), Shot.pos(enemy)) <= range_of(def, u): enemy.debuff_aim = int(def.get("enemy_aim", 0)); enemy.debuff_until = m.turn + 1
 		"focus": u.focus_left = mini(int(u.focus), int(u.focus_left) + int(def.get("amount", 0)) + (1 if "wildBond" in u.get("passives", []) else 0))
 		"ap": u.ap = mini(Rules12.ACTIONS_PER_TURN, int(u.ap) + int(def.get("amount", 0)))
+		"master_action": u.ap = int(u.ap) + 1; u.master_action_used = true
 		"leap": u.x = tile.x; u.y = tile.y; u.leap_aim = int(def.get("next_strike_aim", 0)); m._wake_groups(); m._enemy_reaction_fire(u)
 		"area_attack":
 			for enemy in m.living("enemy"):
@@ -169,11 +178,12 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 			if m.rng.randi_range(1, 100) <= capture_chance:
 				u.captures = int(u.get("captures", 0)) + 1
 				t.hp = 0; t.status = "captured"; m.message("%s captures %s." % [u.name, t.name])
-		"guard": u.guard = true; u.guard_until = m.turn + 1
+		"guard": u.guard = true; u.guard_until = m.turn + 1; u.guard_power = float(u.get("legacy_power", {}).get(id, 1.0))
 		"overwatch": u.overwatch = true
 		"hunker": u.hunkered = true
 		"displace": _displace(m, u, t, def)
 		_: pass
+	if def.has("chain") or def.has("effects"): Chains.resolve(m, u, t, tile, def)
 	if m.has_method("setup_combat") and (effect in ["attack", "area_attack", "status", "displace", "blast", "wave", "breach", "collapse", "backup", "bond_strike"]):
 		var ghost_triggered := not ghost_used and bool(u.get("ghost_used", false))
 		u.concealed = was_concealed

@@ -1,22 +1,26 @@
 extends RefCounted
 const Data = preload("res://scripts/campaign/data.gd")
+const Classes = preload("res://scripts/class_registry.gd")
 const TITLES = ["", "Recruit", "Private", "Corporal", "Sergeant", "Lieutenant", "Captain", "Commander", "Veteran Commander", "Elite Commander", "Legend"]
 
 static func is_jedi(r: Dictionary) -> bool:
-	return bool(Data.get_table("core", "CLASS").get(str(r.get("cls", "")), {}).get("jedi", false))
+	return Classes.side(str(r.get("cls", ""))) == "jedi" or bool(Data.get_table("core", "CLASS").get(str(r.get("cls", "")), {}).get("jedi", false))
 
-static func promote(r: Dictionary) -> bool:
+static func promote(r: Dictionary, roster: Array = []) -> bool:
 	var before := int(r.get("rank", 1))
-	var ranks: Array = Data.get_table("core", "RANKS")
+	var side_name := "jedi" if is_jedi(r) else "soldier"
+	var ranks := Classes.ranks(side_name)
 	while int(r.get("rank", 1)) < ranks.size() and int(r.get("xp", 0)) >= int(ranks[int(r.rank)].xp):
+		if side_name == "jedi" and int(r.rank) == 7 and roster.any(func(other): return other != r and str(other.get("status", "")) == "active" and is_jedi(other) and int(other.get("rank", 1)) >= 8): break
 		r.rank = int(r.rank) + 1
-	if int(r.rank) > before and not is_jedi(r):
-		r.title = TITLES[min(int(r.rank), TITLES.size() - 1)]
+	if int(r.rank) > before:
+		r.title = str(Classes.rank_data(side_name, int(r.rank)).get("title", r.get("title", "")))
+		r.tier = str(Classes.rank_data(side_name, int(r.rank)).get("tier", r.title))
 	r.pick = pending_rank(r)
 	return int(r.rank) > before
 
 static func tree_options(r: Dictionary, rank: int) -> Array:
-	var tree: Dictionary = Data.get_table("research", "TREES").get(str(r.get("cls", "")), {})
+	var tree: Dictionary = Classes.class_data(str(r.get("cls", ""))).get("tree", Data.get_table("research", "TREES").get(str(r.get("cls", "")), {}))
 	if tree.is_empty(): return []
 	if rank <= 2: return tree.get("trunk", {}).get(str(rank), [])
 	if rank == 3:
@@ -34,7 +38,7 @@ static func choose(r: Dictionary, pick: String) -> bool:
 	if rank == 0 or not tree_options(r, rank).has(pick): return false
 	r.picks.append(pick)
 	if rank == 3:
-		var specs: Dictionary = Data.get_table("research", "TREES").get(str(r.cls), {}).get("specs", {})
+		var specs: Dictionary = Classes.class_data(str(r.cls)).get("tree", Data.get_table("research", "TREES").get(str(r.cls), {})).get("specs", {})
 		for key in specs:
 			if str(specs[key].sig) == pick: r.spec = key
 	r.pick = pending_rank(r)
@@ -49,6 +53,10 @@ static func battle_stats(r: Dictionary) -> Dictionary:
 		var special: Dictionary = gain.get("jedi" if is_jedi(r) else "troop", {})
 		for key in special:
 			if base.has(key): base[key] = int(base[key]) + int(special[key])
+	if is_jedi(r) and int(r.get("rank", 1)) >= 5:
+		base.hp = int(base.get("hp", 0)) + 2
+		base.aim = int(base.get("aim", 0)) + 10
+		base.maxF = int(base.get("maxF", 0)) + 2
 	var applied := []
 	for pick in r.get("picks", []) + r.get("extra_picks", []):
 		if pick in applied: continue
@@ -66,8 +74,27 @@ static func _add_mod(stats: Dictionary, mod: Dictionary) -> void:
 
 static func battle_abilities(r: Dictionary) -> Array:
 	## Merge this into the tactical kit at spawn; passive picks are handled by battle_stats.
-	var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/abilities.json"))
+	var catalog: Dictionary = Classes.ability_catalog()
 	var out := []
 	for pick in r.get("picks", []) + r.get("extra_picks", []):
 		if catalog.has(pick) and pick not in out: out.append(pick)
+	for pick in r.get("cross_picks", []):
+		if catalog.has(pick) and pick not in out: out.append(pick)
+	if str(r.get("taught_ability", "")) != "" and catalog.has(str(r.taught_ability)): out.append(str(r.taught_ability))
+	for legacy in r.get("legacies", []):
+		if catalog.has(str(legacy.get("ability", ""))) and str(legacy.ability) not in out: out.append(str(legacy.ability))
 	return out
+
+static func cross_options(r: Dictionary) -> Array:
+	var out := []
+	for path_name in r.get("classes", []):
+		if Classes.class_id(str(path_name)) == Classes.class_id(str(r.get("cls", ""))): continue
+		var row := Classes.class_data(str(path_name))
+		for id in row.get("kit", []) + row.get("bonus_kit", []):
+			if id not in r.get("cross_picks", []) and row.get("abilities", {}).has(id) and id not in out: out.append(id)
+	return out
+
+static func choose_cross(r: Dictionary, id: String) -> bool:
+	if id not in cross_options(r): return false
+	r.cross_picks.append(id)
+	return true
