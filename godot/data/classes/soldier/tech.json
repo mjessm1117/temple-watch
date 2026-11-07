@@ -165,7 +165,7 @@
         ],
         "apply": [
           {
-            "tag": "ATTUNED",
+            "tag": "SHIELDED",
             "target": "target",
             "amount": 5
           }
@@ -234,7 +234,7 @@
         ],
         "apply": [
           {
-            "tag": "MARKED",
+            "tag": "PINNED",
             "target": "target"
           }
         ]
@@ -254,7 +254,7 @@
       "chain": {
         "consume": [
           {
-            "tag": "LIFTED",
+            "tag": "IONIZED",
             "target": "target",
             "bonus": [
               {
