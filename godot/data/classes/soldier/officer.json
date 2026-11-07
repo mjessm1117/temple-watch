@@ -157,7 +157,7 @@
         ],
         "apply": [
           {
-            "tag": "SHIELDED",
+            "tag": "INSPIRED",
             "target": "all_allies",
             "amount": 6
           }
@@ -179,7 +179,7 @@
       "chain": {
         "consume": [
           {
-            "tag": "PINNED",
+            "tag": "MARKED",
             "target": "target",
             "bonus": [
               {
@@ -257,7 +257,7 @@
         ],
         "apply": [
           {
-            "tag": "INSPIRED",
+            "tag": "READY",
             "target": "all_allies",
             "amount": 7
           }
