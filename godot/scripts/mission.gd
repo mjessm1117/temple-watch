@@ -1,6 +1,5 @@
 extends RefCounted
 class_name RescueMission
-
 const Maps = preload("res://scripts/map_catalog.gd")
 const Objectives = preload("res://scripts/mission_objectives.gd")
 const Pressure = preload("res://scripts/mission_pressure.gd")
@@ -57,11 +56,7 @@ func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") ->
 		if int(spec.objective.get("hold_turns",0)) > 0: spec.objective.hp = maxi(int(spec.objective.hp),int(spec.objective.get("hold_hp",0)))
 	catalog = _json("res://data/units.json")
 	abilities = preload("res://scripts/class_registry.gd").ability_catalog()
-	for class_row in preload("res://scripts/class_registry.gd").classes().values():
-		var kind := str(class_row.get("unit_kind", ""))
-		if kind != "" and catalog.has(kind) and str(catalog[kind].get("side", "")) == "player":
-			catalog[kind].kit = class_row.get("kit", []).duplicate()
-			catalog[kind].passives = class_row.get("passives", []).duplicate()
+	preload("res://scripts/class_registry.gd").apply_to_units(catalog)
 	if modern: Pressure.setup(self)
 	for row in spec.rows: board.append(str(row))
 	for y in range(board.size()):
@@ -82,13 +77,11 @@ func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") ->
 		Objectives.setup(self)
 		return
 	message("Rescue Aide Mira Tal, then escort her to the blue evac tiles before turn %d." % int(spec.turn_limit))
-
 static func _json(path: String) -> Dictionary:
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null: return {}
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
 	return parsed if parsed is Dictionary else {}
-
 func _spawn(kind: String, x: int, y: int, group: int) -> void:
 	var u: Dictionary = catalog[kind].duplicate(true)
 	u["id"] = next_id
@@ -124,7 +117,6 @@ func _spawn(kind: String, x: int, y: int, group: int) -> void:
 	u["shield_drone"] = 1 if kind == "medic" else 0
 	if modern and str(u.side) == "player": u.concealed = bool(spec.get("concealed",false))
 	units.append(u)
-
 func _spawn_near(kind: String, anchor: Vector2i, group: int, max_radius: int = 4) -> void:
 	for radius in range(1, max_radius+1):
 		for y in range(anchor.y - radius, anchor.y + radius + 1):
@@ -133,7 +125,6 @@ func _spawn_near(kind: String, anchor: Vector2i, group: int, max_radius: int = 4
 				if passable(q) and not occupied(q):
 					_spawn(kind, x, y, group)
 					return
-
 func in_bounds(p: Vector2i) -> bool:
 	return p.x >= 0 and p.y >= 0 and p.x < int(spec.width) and p.y < int(spec.height)
 

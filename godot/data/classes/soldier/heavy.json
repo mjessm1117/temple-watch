@@ -9,7 +9,7 @@
     "Demolition",
     "Juggernaut"
   ],
-  "implemented": false,
+  "implemented": true,
   "unit_kind": "",
   "kit": [],
   "passives": [],

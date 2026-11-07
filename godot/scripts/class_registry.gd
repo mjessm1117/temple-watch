@@ -70,6 +70,13 @@ static func ability_catalog() -> Dictionary:
 		for id in row.get("abilities", {}): out[id] = row.abilities[id].duplicate(true)
 	return out
 
+static func apply_to_units(catalog: Dictionary) -> void:
+	for row in classes().values():
+		var kind := str(row.get("unit_kind", ""))
+		if kind != "" and catalog.has(kind) and str(catalog[kind].get("side", "")) == "player":
+			catalog[kind].kit = row.get("kit", []).duplicate()
+			catalog[kind].passives = row.get("passives", []).duplicate()
+
 static func validate() -> Array[String]:
 	var errors: Array[String] = []
 	var seen: Dictionary = {}
