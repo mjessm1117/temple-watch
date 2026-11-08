@@ -28,6 +28,16 @@ static func display_texture(name: String) -> Texture2D:
 	crop.region = Rect2(78, 38, 100, 126)
 	return crop
 
+static func promotion_texture(name: String) -> Texture2D:
+	var source := texture(name)
+	if source == null: return null
+	if source.resource_path.begins_with("res://assets/portraits/jedi/"): return source
+	# Story renders have a colored calibration border; keep it outside the promotion crop.
+	var crop := AtlasTexture.new()
+	crop.atlas = source
+	crop.region = Rect2(5, 18, source.get_width() - 10, source.get_height() - 50)
+	return crop
+
 static func picture(name: String, dimensions: Vector2) -> TextureRect:
 	var node := TextureRect.new()
 	node.texture = display_texture(name)
