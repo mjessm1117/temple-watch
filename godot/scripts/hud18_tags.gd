@@ -86,10 +86,12 @@ func _sync_icons(id: int, unit: Dictionary, held: Dictionary) -> void:
 			old.append(icon)
 		icons[id] = old
 	if old.is_empty(): return
-	var point := _screen(unit, 3.0)
+	var point := _screen(unit, 1.85)
 	var on_screen := point.x >= 0.0 and point.x <= size.x and point.y >= 0.0 and point.y <= size.y
 	var x := clampf(point.x - old.size() * 22.0, 0.0, maxf(0.0, size.x - old.size() * 44.0))
-	var y := clampf(point.y - 22.0, 138.0, maxf(138.0, size.y - 140.0))
+	var bottom_limit := size.y - (96.0 if g.hud_controls.phone != null else 8.0) - 44.0
+	var y := minf(point.y - 52.0, bottom_limit)
+	on_screen = on_screen and y >= (48.0 if g.hud_controls.phone != null else 4.0)
 	for index in old.size():
 		old[index].visible = on_screen
 		old[index].position = Vector2(x + index * 44.0, y)
@@ -126,9 +128,9 @@ func _draw() -> void:
 		if unit.is_empty(): continue
 		var progress: float = clampf((now - float(callout.start)) / 1.2, 0.0, 1.0)
 		var at := _screen(unit, 3.65) - Vector2(0, progress * 20.0)
-		if g.hud_controls.phone != null:
-			at.y = 132.0 - progress * 12.0
-			at.x -= 30.0
+		var badges: Array = icons.get(int(callout.id), [])
+		if not badges.is_empty() and badges[0].visible:
+			at = Vector2(badges[0].position.x + badges.size() * 22.0, badges[0].position.y - 5.0 - progress * 20.0)
 		var text_value: String = callout.text
 		var width := ThemeDB.fallback_font.get_string_size(text_value, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
 		at.x = clampf(at.x, width * 0.5 + 8.0, size.x - width * 0.5 - 8.0)

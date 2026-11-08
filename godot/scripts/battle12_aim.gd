@@ -5,6 +5,10 @@ const Shot = preload("res://scripts/shot.gd")
 var g
 var panel: PanelContainer
 var targets: HBoxContainer
+var target_row: PanelContainer
+var odds: Label
+var cancel: Button
+var aim_momentum: Label
 var confirm: Button
 var details: Button
 var summary: Label
@@ -35,8 +39,10 @@ func setup(game, root: Control, on_phone: bool) -> void:
 	panel.offset_left = -minf(350.0, root.size.x * 0.47)
 	panel.offset_right = minf(350.0, root.size.x * 0.47)
 	if phone:
+		panel.anchor_left = 1.0; panel.anchor_right = 1.0
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
-		panel.offset_top = -68; panel.offset_bottom = -4
+		panel.offset_left = -minf(350.0, root.size.x - 262.0); panel.offset_right = -6
+		panel.offset_top = -90; panel.offset_bottom = -4
 	else:
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
 		panel.offset_top = -114; panel.offset_bottom = -8
@@ -54,18 +60,46 @@ func setup(game, root: Control, on_phone: bool) -> void:
 	summary.add_theme_font_size_override("font_size", 14); summary.add_theme_color_override("font_color", Color("f2d99a"))
 	summary.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; body.add_child(summary)
 	summary.visible = not phone
-	var row := HBoxContainer.new(); row.add_theme_constant_override("separation", 8 if phone else 3); body.add_child(row)
-	row.add_child(_button("‹", 44, func() -> void: g._cycle_target(-1)))
-	targets = HBoxContainer.new(); targets.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	targets.add_theme_constant_override("separation", 8 if phone else 3); row.add_child(targets)
-	row.add_child(_button("›", 44, func() -> void: g._cycle_target(1)))
-	confirm = _button("CONFIRM", 140 if phone else 190, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
-	details = _button("ODDS", 64, _details); row.add_child(details)
-	cine_toggle = _button("Cinematics: On", 116 if phone else 142, _toggle_cine); cine_toggle.name = "Cine15Toggle"; row.add_child(cine_toggle)
-	cine_toggle.visible = not phone
-	cine_toggle.add_theme_font_size_override("font_size", 14 if phone else 13)
-	row.add_child(_button("CANCEL", 76, g._cancel_order))
+	var row := HBoxContainer.new(); row.add_theme_constant_override("separation", 4); body.add_child(row)
+	if phone:
+		odds = Label.new(); odds.name = "AimOdds"; odds.custom_minimum_size = Vector2(90 if root.size.x < 600 else 100, 78)
+		odds.add_theme_font_size_override("font_size", 16 if root.size.x < 600 else 21); odds.add_theme_color_override("font_color", Color("f2d99a"))
+		row.add_child(odds)
+		confirm = _button("CONFIRM", 112 if root.size.x < 600 else 135, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
+		if root.size.x < 600: confirm.add_theme_font_size_override("font_size", 12)
+		cancel = _button("CANCEL", 70 if root.size.x < 600 else 76, g._cancel_order); cancel.name = "AimCancel"; row.add_child(cancel)
+		target_row = PanelContainer.new(); target_row.name = "AimTargetRow"
+		target_row.anchor_left = 1.0; target_row.anchor_right = 1.0
+		target_row.offset_left = -minf(340.0, root.size.x * 0.48); target_row.offset_right = -6
+		target_row.offset_top = 48; target_row.offset_bottom = 102
+		target_row.add_theme_stylebox_override("panel", style.duplicate()); root.add_child(target_row)
+		var target_box := HBoxContainer.new(); target_box.add_theme_constant_override("separation", 3); target_row.add_child(target_box)
+		target_box.add_child(_button("‹", 44, func() -> void: g._cycle_target(-1)))
+		targets = HBoxContainer.new(); targets.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		targets.add_theme_constant_override("separation", 2); target_box.add_child(targets)
+		target_box.add_child(_button("›", 44, func() -> void: g._cycle_target(1)))
+		details = _button("ODDS", 44, _details); target_box.add_child(details)
+		details.visible = root.size.x >= 600
+		aim_momentum = Label.new(); aim_momentum.name = "AimMomentum"
+		aim_momentum.custom_minimum_size = Vector2(33, 44)
+		aim_momentum.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		aim_momentum.add_theme_font_size_override("font_size", 11)
+		aim_momentum.add_theme_color_override("font_color", Color("e9ca83"))
+		target_box.add_child(aim_momentum)
+		cine_toggle = _button("Cinematics: On", 116, _toggle_cine); cine_toggle.visible = false
+		target_box.add_child(cine_toggle)
+	else:
+		row.add_child(_button("‹", 44, func() -> void: g._cycle_target(-1)))
+		targets = HBoxContainer.new(); targets.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		targets.add_theme_constant_override("separation", 3); row.add_child(targets)
+		row.add_child(_button("›", 44, func() -> void: g._cycle_target(1)))
+		confirm = _button("CONFIRM", 190, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
+		details = _button("ODDS", 64, _details); row.add_child(details)
+		cine_toggle = _button("Cinematics: On", 142, _toggle_cine); cine_toggle.name = "Cine15Toggle"; row.add_child(cine_toggle)
+		cine_toggle.add_theme_font_size_override("font_size", 13)
+		cancel = _button("CANCEL", 76, g._cancel_order); cancel.name = "AimCancel"; row.add_child(cancel)
 	panel.hide()
+	if target_row != null: target_row.hide()
 
 func _button(value: String, width: float, action: Callable) -> Button:
 	var b := Button.new(); b.text = value; b.focus_mode = Control.FOCUS_NONE
@@ -79,11 +113,16 @@ func refresh() -> void:
 	var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var active: bool = g.action != "move" and g.action != "free" and g.action != "overwatch" and g.action != "hunker" and g.target_id >= 0 and not actor.is_empty() and g.mission.phase == "player" and g.mission.result == ""
 	panel.visible = active
+	if target_row != null: target_row.visible = active
+	if aim_momentum != null:
+		var pip_count: int = clampi(int(g.mission.chain_momentum), 0, 3)
+		aim_momentum.text = "●".repeat(pip_count) + "○".repeat(3 - pip_count)
 	sight.visible = active
 	cine_toggle.text = "Cinematics: On" if g.action_camera else "Cinematics: Off"
 	if phone and g.hud_controls.phone != null:
 		g.hud_controls.phone.ability_tray.visible = not active
-		g.hud_controls.phone.ability_tray.offset_top = 0.0 if active else -80.0
+		g.hud_controls.phone.camera_rail.visible = not active
+
 	elif g.hud_controls.desktop_bottom != null:
 		g.hud_controls.desktop_bottom.visible = not active
 	if not active:
@@ -95,14 +134,15 @@ func refresh() -> void:
 	var selected_index := 0
 	for index in range(options.size()):
 		if int(options[index].id) == g.target_id: selected_index = index
-	for offset in range(mini(options.size(), 1 if phone else 2)):
+	for offset in range(mini(options.size(), 2 if phone else 2)):
 		var enemy: Dictionary = options[(selected_index + offset) % options.size()]
 		var id: int = int(enemy.id)
-		var label := str(enemy.name)
+		var label := "◉" if phone else str(enemy.name)
 		if g.action in ["shoot", "strike"]:
 			var info: Dictionary = Shot.calculate(g.mission, actor, enemy, g.action == "strike")
 			label += ("\n%d%% HIT" % int(info.hit))
-		var chip := _button(label, 104 if not phone else 130, func() -> void: g.target_id = id; g._frame_target(); g._show_shot())
+		var chip := _button(label, 104 if not phone else 52 if g.get_viewport().get_visible_rect().size.x < 600 else 62, func() -> void: g.target_id = id; g._frame_target(); g._show_shot())
+		chip.tooltip_text = str(enemy.name)
 		chip.add_theme_color_override("font_color", Color("f6d28a") if id == g.target_id else Color("e3edf0"))
 		targets.add_child(chip)
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
@@ -115,6 +155,7 @@ func refresh() -> void:
 		var info: Dictionary = Shot.calculate(g.mission, actor, target, g.action == "strike")
 		var damage: Dictionary = Shot.damage_preview(actor, target)
 		confirm.text = "CONFIRM %s\n%d%% HIT %d–%d DMG" % ["FIRE" if g.action == "shoot" else "STRIKE", int(info.hit), int(damage.normal[0]), int(damage.normal[1])] if phone else "%s · %d%% HIT\n%d–%d DMG" % ["FIRE" if g.action == "shoot" else "STRIKE", int(info.hit), int(damage.normal[0]), int(damage.normal[1])]
+		if phone: odds.text = "%d%% HIT\n%d%% CRIT\n%d–%d DMG" % [int(info.hit), int(info.crit), int(damage.normal[0]), int(damage.normal[1])]
 	else:
 		confirm.text = "CONFIRM\n%s" % str(g.mission.abilities.get(g.action, {}).get("name", g.action)).to_upper()
 	var chain: Dictionary = g.mission.abilities.get(g.action, {}).get("chain", {})

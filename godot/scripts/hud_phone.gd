@@ -22,8 +22,13 @@ var last_unit_ap := -1
 var momentum_pips: Label
 var momentum_strike: Button
 var momentum_row: HBoxContainer
-var momentum_plate: ColorRect
+var momentum_plate: Control
 var last_chain_momentum := -1
+var unit_plate: PanelContainer
+var camera_rail: VBoxContainer
+var unit_portrait: TextureRect
+var plate_touch_start := Vector2.ZERO
+var plate_swiping := false
 
 func setup(game, night_hud, root: Control, top: Control, left: Control, right: Control, bottom: Control, abilities: HFlowContainer) -> void:
 	g = game; night = night_hud
@@ -34,101 +39,119 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	var physical := DisplayServer.window_get_size()
 	var safe := DisplayServer.get_display_safe_area()
 	if physical.x > 0 and physical.y > 0 and safe.size.x > 0 and safe.size.y > 0:
-		var scale := Vector2(root.size.x/float(physical.x),root.size.y/float(physical.y))
-		overlay.offset_left = clampf(float(safe.position.x)*scale.x,0.0,root.size.x*0.2)
-		overlay.offset_top = clampf(float(safe.position.y)*scale.y,0.0,root.size.y*0.2)
-		overlay.offset_right = -clampf(float(physical.x-safe.end.x)*scale.x,0.0,root.size.x*0.2)
-		overlay.offset_bottom = -clampf(float(physical.y-safe.end.y)*scale.y,0.0,root.size.y*0.2)
-	var strip := PanelContainer.new(); strip.anchor_right = 1.0; strip.offset_bottom = 108
-	var strip_style: StyleBoxFlat = night.panel_style(); strip_style.set_content_margin_all(2)
-	strip_style.content_margin_top = 0; strip_style.content_margin_bottom = 0
+		var scale := Vector2(root.size.x / float(physical.x), root.size.y / float(physical.y))
+		overlay.offset_left = clampf(float(safe.position.x) * scale.x, 0.0, root.size.x * 0.2)
+		overlay.offset_top = clampf(float(safe.position.y) * scale.y, 0.0, root.size.y * 0.2)
+		overlay.offset_right = -clampf(float(physical.x - safe.end.x) * scale.x, 0.0, root.size.x * 0.2)
+		overlay.offset_bottom = -clampf(float(physical.y - safe.end.y) * scale.y, 0.0, root.size.y * 0.2)
+	var layout: Dictionary = preload("res://scripts/hud_phone_layout.gd").boxes(root.size)
+	var physical_height := float(physical.y) if physical.y > 0 else float(g.get_tree().root.size.y)
+	var visual_height := 44.0 * root.size.y / maxf(1.0, physical_height)
+	var top_back := ColorRect.new(); top_back.name = "PhoneTopBackground"
+	top_back.color = Color("101b26ee"); top_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	preload("res://scripts/hud_phone_layout.gd").place(top_back, Rect2(0, 0, root.size.x, visual_height))
+	overlay.add_child(top_back)
+	var strip := PanelContainer.new(); strip.name = "PhoneTopStrip"
+	preload("res://scripts/hud_phone_layout.gd").place(strip, layout.header)
+	var strip_style: StyleBoxFlat = night.panel_style(); strip_style.set_content_margin_all(0)
+	strip_style.bg_color = Color.TRANSPARENT; strip_style.border_color = Color.TRANSPARENT
 	strip.add_theme_stylebox_override("panel", strip_style); overlay.add_child(strip)
-	var rows := VBoxContainer.new(); rows.add_theme_constant_override("separation", 8); strip.add_child(rows)
-	var heading := HBoxContainer.new(); heading.add_theme_constant_override("separation", 8); rows.add_child(heading)
+	var heading := HBoxContainer.new(); heading.add_theme_constant_override("separation", 3); strip.add_child(heading)
 	g.objective_label.reparent(heading); g.objective_label.add_theme_font_size_override("font_size", 12)
 	g.objective_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	g.objective_label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	g.objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	end_button = _button("END TURN", _end_turn); end_button.name = "PhoneEndTurn"
-	end_button.custom_minimum_size = Vector2(110, 56); heading.add_child(end_button)
-	var controls := HBoxContainer.new(); controls.add_theme_constant_override("separation", 8); rows.add_child(controls)
+	end_button.custom_minimum_size = Vector2(96, 44); heading.add_child(end_button)
+	var menu := _button("☰", _show_menu); menu.name = "PhoneMenu"
+	menu.custom_minimum_size = Vector2(44, 44); heading.add_child(menu)
+	for button in [end_button, menu]:
+		for state in ["normal", "hover", "pressed", "disabled"]:
+			button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	unit_plate = PanelContainer.new(); unit_plate.name = "UnitPlate"
+	preload("res://scripts/hud_phone_layout.gd").place(unit_plate, layout.plate)
+	var plate_style: StyleBoxFlat = night.panel_style(); plate_style.set_content_margin_all(2)
+	unit_plate.add_theme_stylebox_override("panel", plate_style); overlay.add_child(unit_plate)
+	var plate_row := HBoxContainer.new(); plate_row.add_theme_constant_override("separation", 0); unit_plate.add_child(plate_row)
+	unit_portrait = left.find_children("*", "TextureRect", true, false)[0] as TextureRect
+	unit_portrait.name = "UnitPortrait"; unit_portrait.reparent(plate_row)
+	unit_portrait.custom_minimum_size = Vector2(42, 80)
+	unit_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	unit_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	unit_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
-	unit_card.custom_minimum_size = Vector2(105 if physical.x < 500 else 155, 44)
+	unit_card.custom_minimum_size = Vector2(78, 80)
 	unit_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	unit_card.add_theme_font_size_override("font_size", 14); controls.add_child(unit_card)
-	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
-		var card_style: StyleBox = unit_card.get_theme_stylebox(state).duplicate()
-		card_style.content_margin_top = 0; card_style.content_margin_bottom = 0
-		unit_card.add_theme_stylebox_override(state, card_style)
-	controls.add_child(_button("◀", func() -> void: _cycle_unit(-1)))
-	controls.add_child(_button("▶", func() -> void: _cycle_unit(1)))
-	if physical.x >= 500: controls.add_child(_button("CENTER", g._recenter))
-	controls.add_child(_button("☰", _show_menu))
+	unit_card.add_theme_font_size_override("font_size", 11); plate_row.add_child(unit_card)
+	unit_plate.gui_input.connect(_plate_input)
+	for direction in [-1, 1]:
+		var arrow := _button("‹" if direction < 0 else "›", _cycle_unit.bind(direction))
+		arrow.name = "UnitPrevious" if direction < 0 else "UnitNext"
+		arrow.custom_minimum_size = Vector2(44, 80); plate_row.add_child(arrow)
+	camera_rail = VBoxContainer.new(); camera_rail.name = "CameraRail"
+	camera_rail.add_theme_constant_override("separation", 0)
+	preload("res://scripts/hud_phone_layout.gd").place(camera_rail, layout.camera); overlay.add_child(camera_rail)
+	for entry in [["↶", -1], ["⌖", 0], ["↷", 1]]:
+		var button := _button(str(entry[0]), func() -> void:
+			if int(entry[1]) == 0: g._recenter()
+			else: g._rotate_camera(float(entry[1]) * PI / 2.0))
+		button.name = "CameraCenter" if int(entry[1]) == 0 else "CameraRotateLeft" if int(entry[1]) < 0 else "CameraRotateRight"
+		button.custom_minimum_size = Vector2(44, 44); camera_rail.add_child(button)
+		for state in ["normal", "hover", "pressed", "disabled"]:
+			button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	target_card = _button("TARGET", _toggle.bind("target")); target_card.name = "TargetCard"
 	target_card.visible = false; overlay.add_child(target_card)
-	var tray := PanelContainer.new(); tray.name = "AbilityTray"
-	ability_tray = tray
-	tray.anchor_left = 0.5; tray.anchor_right = 0.5
-	tray.anchor_top = 1.0; tray.anchor_bottom = 1.0
-	tray.offset_left = -minf(340.0, root.size.x * 0.47)
-	tray.offset_right = minf(340.0, root.size.x * 0.47)
-	tray.offset_top = -80
+	var tray := PanelContainer.new(); tray.name = "AbilityTray"; ability_tray = tray
+	preload("res://scripts/hud_phone_layout.gd").place(tray, layout.tray)
 	var tray_style: StyleBoxFlat = night.panel_style(); tray_style.set_content_margin_all(2)
 	tray.add_theme_stylebox_override("panel", tray_style); overlay.add_child(tray)
-	momentum_plate = ColorRect.new(); momentum_plate.name = "MomentumPlate"
-	momentum_plate.color = Color("0b1924d9"); momentum_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	momentum_plate.anchor_left = 0.5; momentum_plate.anchor_right = 0.5
-	momentum_plate.anchor_top = 1.0; momentum_plate.anchor_bottom = 1.0
-	momentum_plate.offset_left = -174; momentum_plate.offset_right = 174
-	momentum_plate.offset_top = -132; momentum_plate.offset_bottom = -82
-	overlay.add_child(momentum_plate)
-	momentum_row = HBoxContainer.new(); momentum_row.name = "ChainMomentum"
-	momentum_row.anchor_left = 0.5; momentum_row.anchor_right = 0.5
-	momentum_row.anchor_top = 1.0; momentum_row.anchor_bottom = 1.0
-	momentum_row.offset_left = -170; momentum_row.offset_right = 170
-	momentum_row.offset_top = -130; momentum_row.offset_bottom = -84
-	momentum_row.add_theme_constant_override("separation", 6); overlay.add_child(momentum_row)
-	momentum_pips = night.label("MOMENTUM  ○ ○ ○", 13, Color("e9ca83"))
-	momentum_pips.name = "ChainPips"; momentum_pips.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	momentum_pips.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	momentum_pips.mouse_filter = Control.MOUSE_FILTER_IGNORE; momentum_row.add_child(momentum_pips)
-	momentum_strike = _button("MOMENTUM\nSTRIKE", _claim_strike)
-	momentum_strike.name = "MomentumStrike"; momentum_strike.custom_minimum_size = Vector2(142, 44)
-	momentum_strike.add_theme_font_size_override("font_size", 12); momentum_row.add_child(momentum_strike)
-	for state in ["normal", "hover", "pressed", "disabled"]:
-		var strike_style := StyleBoxFlat.new()
-		strike_style.bg_color = Color("204c50") if state != "disabled" else Color("28333c")
-		strike_style.border_color = Color("a8f3bb") if state != "disabled" else Color("66747a")
-		strike_style.set_border_width_all(2); strike_style.set_corner_radius_all(5)
-		momentum_strike.add_theme_stylebox_override(state, strike_style)
 	var tray_box := VBoxContainer.new(); tray_box.add_theme_constant_override("separation", 0); tray.add_child(tray_box)
-	action_name = night.label("Tap or hold an ability for its name", 12, Color("e9ca83"))
-	action_name.custom_minimum_size.y = 17; tray_box.add_child(action_name)
+	var readout := HBoxContainer.new(); readout.add_theme_constant_override("separation", 4); tray_box.add_child(readout)
+	momentum_plate = Control.new(); momentum_plate.name = "MomentumPlate"
+	momentum_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	momentum_plate.custom_minimum_size = Vector2(99, 21); readout.add_child(momentum_plate)
+	momentum_pips = night.label("○ ○ ○", 13, Color("e9ca83")); momentum_pips.name = "ChainPips"
+	momentum_pips.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	momentum_pips.position = Vector2(4, 1); momentum_plate.add_child(momentum_pips)
+	action_name = night.label("Choose an action", 12, Color("e9ca83"))
+	action_name.name = "AbilityReadout"; action_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	action_name.custom_minimum_size.y = 21; readout.add_child(action_name)
+	momentum_row = HBoxContainer.new(); momentum_row.name = "ChainMomentum"
+	momentum_row.visible = false; tray_box.add_child(momentum_row)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.name = "Abilities"
-	ability_scroll = scroll
-	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 56; tray_box.add_child(scroll)
+	ability_scroll = scroll; scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 62; tray_box.add_child(scroll)
 	scroll.get_h_scroll_bar().modulate.a = 0.0
-	var track := HBoxContainer.new(); track.add_theme_constant_override("separation", 8); scroll.add_child(track)
+	var track := HBoxContainer.new(); track.add_theme_constant_override("separation", 4); scroll.add_child(track)
 	for node in abilities.get_children():
 		var button: Button = node
-		button.reparent(track); button.custom_minimum_size = Vector2(83, 56)
+		button.reparent(track); button.custom_minimum_size = Vector2(62, 60)
 		ability_buttons.append(button)
-		button.set_meta("graphics_custom_minimum_size", Vector2(83, 56))
-		button.set("compact", true); button.button_down.connect(_show_ability.bind(button))
+		button.set_meta("graphics_custom_minimum_size", Vector2(62, 60))
+		button.set("compact", true); button.set("phone_icon", true)
+		button.button_down.connect(_show_ability.bind(button))
 		button.pressed.connect(_show_ability.bind(button))
 		button.gui_input.connect(_ability_input.bind(button))
-	more_button = _button("MORE ▴", _toggle.bind("more")); more_button.custom_minimum_size = Vector2(84, 55); track.add_child(more_button)
+	momentum_strike = _button("✦\nSTRIKE", _claim_strike)
+	momentum_strike.name = "MomentumStrike"; momentum_strike.custom_minimum_size = Vector2(62, 60)
+	momentum_strike.add_theme_font_size_override("font_size", 11); track.add_child(momentum_strike)
+	more_button = _button("MORE", _toggle.bind("more")); more_button.custom_minimum_size = Vector2(62, 60); track.add_child(more_button)
+	for button in [momentum_strike, more_button]:
+		for state in ["normal", "hover", "pressed", "disabled"]:
+			var round_style := StyleBoxFlat.new()
+			round_style.bg_color = Color("12303a") if state != "disabled" else Color("28333c")
+			round_style.border_color = Color("a8f3bb") if button == momentum_strike and state != "disabled" else Color("be9d5b")
+			round_style.set_border_width_all(1); round_style.set_corner_radius_all(18)
+			button.add_theme_stylebox_override(state, round_style)
 	popup = PanelContainer.new(); popup.name = "PhoneDetails"; popup.visible = false
 	popup.anchor_left = 0.5; popup.anchor_right = 0.5; popup.anchor_bottom = 1.0
 	var popup_half := minf(250.0, (root.size.x - 16.0) * 0.5)
-	popup.offset_left = -popup_half; popup.offset_right = popup_half; popup.offset_top = 96; popup.offset_bottom = -80
+	popup.offset_left = -popup_half; popup.offset_right = popup_half; popup.offset_top = 48; popup.offset_bottom = -96
 	popup.add_theme_stylebox_override("panel", night.panel_style()); overlay.add_child(popup)
 	detail_scroll = preload("res://scripts/touch_scroll.gd").new(); detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	popup.add_child(detail_scroll)
 	popup_body = VBoxContainer.new(); popup_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	popup_body.add_theme_constant_override("separation", 8)
-	detail_scroll.add_child(popup_body)
+	popup_body.add_theme_constant_override("separation", 8); detail_scroll.add_child(popup_body)
 
 func _button(title: String, action: Callable) -> Button:
 	var button := Button.new(); button.text = title; button.focus_mode = Control.FOCUS_NONE
@@ -141,6 +164,21 @@ func _show_ability(button: Button) -> void:
 
 func _ability_input(event: InputEvent, button: Button) -> void:
 	if event is InputEventScreenTouch and event.pressed: _show_ability(button)
+	if event is InputEventScreenDrag:
+		if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
+		var right: Vector3 = g.camera.global_basis.x
+		var forward: Vector3 = -g.camera.global_basis.z; forward.y = 0.0; forward = forward.normalized()
+		g.pivot += (-right * event.relative.x + forward * event.relative.y) * g.zoom * 0.0015
+		g._update_camera()
+
+func _plate_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			plate_touch_start = event.position; plate_swiping = true
+		elif plate_swiping:
+			plate_swiping = false
+			if absf(event.position.x - plate_touch_start.x) >= 65.0:
+				_cycle_unit(-1 if event.position.x > plate_touch_start.x else 1)
 
 func _toggle(card: String) -> void:
 	open_card = "" if open_card == card else card
@@ -174,9 +212,9 @@ func refresh(from_game: bool = false) -> void:
 	if overlay == null: return
 	var pips: int = clampi(int(g.mission.chain_momentum), 0, 3)
 	var used_this_turn: bool = int(g.mission.chain_strike_used_turn) == int(g.mission.turn)
-	momentum_row.visible = pips > 0 or used_this_turn
-	momentum_plate.visible = momentum_row.visible
-	momentum_pips.text = "MOMENTUM  " + ("● ".repeat(pips) + "○ ".repeat(3 - pips)).strip_edges()
+	momentum_row.visible = false
+	momentum_plate.visible = true
+	momentum_pips.text = "MOM " + ("● ".repeat(pips) + "○ ".repeat(3 - pips)).strip_edges()
 	momentum_strike.visible = pips == 3 or used_this_turn
 	momentum_strike.disabled = pips < 3 or used_this_turn or g.mission.phase != "player"
 	if pips != last_chain_momentum:
@@ -201,10 +239,21 @@ func refresh(from_game: bool = false) -> void:
 	elif g.path_label.text != "": action_name.text = g.path_label.text.get_slice("  •  COVER",0)
 	elif g.action == "move": action_name.text = "Blue: 1 action  ·  Amber: DASH ends turn"
 	else: action_name.text = "Choose an action · tap the map to preview"
-	if not momentum_row.visible: action_name.text += "  ·  MOMENTUM ○ ○ ○"
+
 	_update_actions(from_game)
+	if g.warning_label.text == "" and not end_confirm and g.path_label.text == "":
+		var selected_ability: Dictionary = g.mission.abilities.get(g.action, {})
+		if not selected_ability.is_empty():
+			var effect := "1 AP; dash 2 AP" if g.action == "move" else "weapon damage" if g.action == "shoot" else str(selected_ability.get("effect", "action")).replace("_", " ")
+			action_name.text = "%s  ·  %s" % [str(selected_ability.get("name", g.action)).to_upper(), effect]
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
-	unit_card.text = "%s\nHP %s  AP %s  ▾" % [str(unit.get("name", "UNIT")), str(int(unit.get("hp", 0))), g.hud_controls.ap_pips(unit)]
+	var tag_glyphs: Array[String] = []
+	for tag in preload("res://scripts/hud18_tags.gd").shown(unit.get("combo_tags", {})):
+		tag_glyphs.append(str(preload("res://scripts/hud18_icon.gd").GLYPHS.get(tag, tag)))
+	var hp: int = int(unit.get("hp", 0))
+	var hp_pips := "▮".repeat(mini(hp, 7)) + "▯".repeat(mini(maxi(0, int(unit.get("max_hp", 0)) - hp), 7))
+	var ap: int = clampi(int(unit.get("ap", 0)), 0, 2)
+	unit_card.text = "%s\nHP %d %s\nAP %s %s\n%s" % [str(unit.get("name", "UNIT")), hp, hp_pips, g.hud_controls.ap_pips(unit), "●".repeat(ap) + "○".repeat(2 - ap), " ".join(tag_glyphs)]
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	target_card.text = "%s  %s  ▾" % [str(target.get("name", "TARGET")), g.hit_big_label.text]
 	popup.visible = open_card != ""
@@ -252,17 +301,18 @@ func refresh(from_game: bool = false) -> void:
 func _update_actions(from_game: bool) -> void:
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var available: int = int(unit.get("ap", 0))
+	var primary_limit := mini(3, maxi(1, int(floor((ability_tray.size.x - 8.0) / 66.0)) - (2 if momentum_strike.visible else 1)))
 	last_unit_id = g.selected_id; last_unit_ap = available
 	if from_game:
 		for button in ability_buttons: button.set_meta("battle12_available", button.visible and not button.disabled)
 	var primary: Array[String] = []
 	for mode in ["move", "shoot", "strike", "push", "overwatch", "reload", "hunker", "medpac"]:
-		if primary.size() >= 5: break
+		if primary.size() >= primary_limit: break
 		for button in ability_buttons:
 			if button.ability_id == mode and bool(button.get_meta("battle12_available", false)):
 				primary.append(mode); break
 	for button in ability_buttons:
-		if primary.size() >= 5: break
+		if primary.size() >= primary_limit: break
 		if bool(button.get_meta("battle12_available", false)) and button.ability_id not in primary:
 			primary.append(button.ability_id)
 	for button in ability_buttons:

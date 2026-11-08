@@ -78,7 +78,7 @@ func exercise(dimensions: Vector2i) -> void:
 	for pips in range(4):
 		game.mission.chain_momentum = pips; phone.refresh()
 		check(phone.momentum_pips.text.count("●") == pips, "pips %d" % pips)
-		check((phone.action_name.text.contains("MOMENTUM ○ ○ ○") and not phone.momentum_row.visible) if pips == 0 else phone.momentum_row.visible, "meter visible at %d" % pips)
+		check(phone.momentum_plate.visible and phone.ability_tray.get_global_rect().encloses(phone.momentum_plate.get_global_rect()), "meter in action tray at %d" % pips)
 	check(phone.momentum_strike.visible and not phone.momentum_strike.disabled, "full strike enabled")
 	var before_ap := int(first.ap)
 	game.selected_id = int(first.id)

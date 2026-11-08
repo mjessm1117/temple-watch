@@ -312,6 +312,7 @@ func _refresh() -> void:
 	if phone != null: phone.refresh(true)
 	if bar != null: bar.refresh()
 	if aim_ui != null: aim_ui.refresh()
+	if phone != null: night.chips.visible = false
 	if phone == null:
 		var aiming: bool = aim_ui != null and aim_ui.panel.visible
 		left_panel.visible = not aiming
