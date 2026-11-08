@@ -69,6 +69,7 @@ run_suite tap16_test --resolution 844x390
 
 run_suite w17_wire_test
 run_suite core17_test
+run_suite temple19_test
 run_suite jedi18_test
 run_suite soldier18_test
 run_suite balance18_audit

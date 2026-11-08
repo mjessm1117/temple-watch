@@ -54,7 +54,7 @@ static func settle_front(c, receipt: Dictionary) -> bool:
 			var value := int(mission.reward[key])
 			if key == "credits": value = roundi(value * float(c.Data.get_table("core","MISSION_CR")) * float(c.Data.get_table("missions","DIFF")[c.state.diff].income))
 			c.gain(str(key),value)
-		for id in receipt.squad: Progression.promote(c.soldier(str(id)), c.state.roster)
+		for id in receipt.squad: Progression.promote(c.soldier(str(id)), c.state.roster, c)
 	c.gain("favor",int(receipt.get("favor",0)))
 	if receipt.has("mission"): c.change_unrest(c.region_for_mission(str(receipt.mission)),int(c.Data.get_table("galaxy","UNREST").win if receipt.win else c.Data.get_table("galaxy","UNREST").lose))
 	ignored(c,receipt.ignored)

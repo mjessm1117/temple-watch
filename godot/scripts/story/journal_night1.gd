@@ -1,5 +1,9 @@
 extends RefCounted
 
+static func rank_entries(s: Dictionary, record: Dictionary) -> void:
+	record.ranks = s.get("rank_story_journal", []).duplicate()
+	for line in record.ranks: record.arcs.append("Rank & legacy · " + str(line))
+
 static func entries(s: Dictionary, callbacks: Array, arcs: Array) -> Dictionary:
 	preload("res://scripts/story/arc_night1.gd").check_losses(s, arcs)
 	var choices: Array = []
@@ -22,7 +26,9 @@ static func entries(s: Dictionary, callbacks: Array, arcs: Array) -> Dictionary:
 			var wait := maxi(0, 6 - done)
 			hint = "Return to the Temple for their decision now." if wait == 0 or int(s.get("era", 1)) >= 2 else "After %d more mission%s or at era 2: return to the Temple." % [wait, "" if wait == 1 else "s"]
 		active.append("%s — %s: %s" % [row.name, row.title, hint])
-	return {"era":int(s.get("era", 1)),"choices":choices,"arcs":active,"fallen":s.get("memorials", []).duplicate()}
+	var record := {"era":int(s.get("era", 1)),"choices":choices,"arcs":active,"fallen":s.get("memorials", []).duplicate()}
+	rank_entries(s, record)
+	return record
 
 static func interlude(s: Dictionary, from_era: int, callbacks: Array) -> Dictionary:
 	var lines: Array = []

@@ -123,7 +123,7 @@ static func resolve(c, op: Dictionary, rolls: Array = []) -> void:
 		if r.assign == "field:" + str(op.id): r.assign = ""
 		r.fatigue = mini(100, int(r.fatigue) + 38)
 		r.field_returns = int(r.get("field_returns", 0)) + 1
-		if won: r.xp = int(r.xp) + 15; Progression.promote(r, c.state.roster)
+		if won: r.xp = int(r.xp) + 15; Progression.promote(r, c.state.roster, c)
 		else: r.stress = mini(100, int(r.stress) + 15)
 		members.append(r)
 	if captured and not members.is_empty():

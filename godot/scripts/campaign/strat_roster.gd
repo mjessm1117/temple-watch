@@ -111,7 +111,8 @@ static func tick(c) -> void:
 		r.stress = maxi(0, int(r.stress) - 1)
 		if r.assign == "rest" and int(r.wound) == 0 and int(r.fatigue) == 0: r.assign = ""
 		if r.assign == "train" and Base.operational(s, "training"):
-			r.xp = int(r.xp) + 1 + Base.staff_count(s, "training"); Progression.promote(r, s.roster)
+			r.xp = int(r.xp) + 1 + Base.staff_count(s, "training"); Progression.promote(r, s.roster, c)
+	preload("res://scripts/campaign/mentor17.gd").tick(c)
 	var training: Dictionary = s.strategy.training
 	if not training.is_empty() and Base.operational(s, "training"):
 		training.left = float(training.left) - 1.0 - 0.5 * Base.staff_count(s, "training")
@@ -141,12 +142,12 @@ static func after_mission(c, result: Dictionary) -> void:
 		deployed.append(r.id)
 		if r.status == "active":
 			r.fatigue = mini(100, int(r.fatigue) + 38 + (15 if bool(entry.get("downed", false)) else 0))
-			r.xp = int(r.xp) + int(effects.get("xp", 0)); Progression.promote(r, s.roster)
+			r.xp = int(r.xp) + int(effects.get("xp", 0)); Progression.promote(r, s.roster, c)
 	for r in s.roster:
 		if r.status != "active": continue
 		r.wound = maxi(0, int(r.wound) - int(effects.get("heal", 0)))
 		r.stress = maxi(0, int(r.stress) - int(effects.get("stress", 0)))
-		if not deployed.has(r.id): r.xp = int(r.xp) + int(effects.get("bench", 0)); Progression.promote(r, s.roster)
+		if not deployed.has(r.id): r.xp = int(r.xp) + int(effects.get("bench", 0)); Progression.promote(r, s.roster, c)
 	if bool(result.get("win", false)):
 		c.gain("credits", int(effects.get("winCr", 0)) + (20 if "reclamation" in s.strategy.edict else 0))
 	if s.research.cur != "": s.research.prog = float(s.research.prog) + int(effects.get("research", 0)); c._tick_research(0)

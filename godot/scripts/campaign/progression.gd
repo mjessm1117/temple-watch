@@ -6,16 +6,17 @@ const TITLES = ["", "Recruit", "Private", "Corporal", "Sergeant", "Lieutenant", 
 static func is_jedi(r: Dictionary) -> bool:
 	return Classes.side(str(r.get("cls", ""))) == "jedi" or bool(Data.get_table("core", "CLASS").get(str(r.get("cls", "")), {}).get("jedi", false))
 
-static func promote(r: Dictionary, roster: Array = []) -> bool:
+static func promote(r: Dictionary, roster: Array = [], campaign = null) -> bool:
 	var before := int(r.get("rank", 1))
 	var side_name := "jedi" if is_jedi(r) else "soldier"
 	var ranks := Classes.ranks(side_name)
 	while int(r.get("rank", 1)) < ranks.size() and int(r.get("xp", 0)) >= int(ranks[int(r.rank)].xp):
 		if side_name == "jedi" and int(r.rank) == 7 and roster.any(func(other): return other != r and str(other.get("status", "")) == "active" and is_jedi(other) and int(other.get("rank", 1)) >= 8): break
+		var previous := int(r.rank)
 		r.rank = int(r.rank) + 1
-	if int(r.rank) > before:
 		r.title = str(Classes.rank_data(side_name, int(r.rank)).get("title", r.get("title", "")))
 		r.tier = str(Classes.rank_data(side_name, int(r.rank)).get("tier", r.title))
+		if campaign != null: campaign.rank_advanced(r, previous, int(r.rank))
 	r.pick = pending_rank(r)
 	return int(r.rank) > before
 
