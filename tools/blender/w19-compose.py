@@ -37,8 +37,16 @@ for y in (965,1418):
         bbox=d.textbbox((0,0),name,font=small);w=bbox[2]-bbox[0]
         d.text((x-w/2,y),name,font=small,fill=white)
 d.text((26,1470),'Medic W17 baseline uses the shared Trooper; Scout keeps its existing model.',font=small,fill=muted)
-d.text((26,1503),'Enclosed Blender helmets and rounded gear.  Idle poses.  Assets staged only.',font=small,fill=muted)
+d.text((26,1503),'Original-scale Trooper helmets and curved class gear.  Idle poses.  Assets staged only.',font=small,fill=muted)
 sheet=sheet.crop((0,0,2100,1545))
 sheet.save(root/'2026-11-07-soldier-art-before-after.jpg',quality=92,subsampling=0)
 print(root/'2026-11-07-soldier-art-before-after.jpg')
 print(root/'2026-11-07-soldier-lineup.jpg')
+
+poses=Image.new('RGB',(1800,1260),bg);pd=ImageDraw.Draw(poses)
+for row,clip in enumerate(('idle','run','shoot')):
+    y=row*420
+    pd.text((20,y+3),clip.upper(),font=title,fill=white)
+    poses.paste(Image.open(src/f'w19-pose-{clip}.jpg').convert('RGB'),(0,y+30))
+poses.save(src/'w19-pose-review.jpg',quality=92,subsampling=0)
+print(src/'w19-pose-review.jpg')

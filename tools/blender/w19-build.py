@@ -1,4 +1,4 @@
-"""Build staged W19 soldier GLBs from W17 rigs, Meshy preview heads, and bone-bound kitbash gear."""
+"""Build staged W19 soldier GLBs with W17 helmets and bone-bound class gear."""
 import bpy
 import bmesh
 import math
@@ -25,7 +25,7 @@ def bind(o,arm,bone):
 def box(name,xyz,dim,m,arm,bone,bevel=.012):
     bpy.ops.mesh.primitive_cube_add(size=1,location=xyz);o=bpy.context.object;o.name=name;o.dimensions=dim
     bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
-    if bevel:
+    if bevel and not LOD:
         mod=o.modifiers.new('rounded edges','BEVEL');mod.width=min(bevel,min(dim)*.28);mod.segments=1 if LOD else (3 if bevel>.006 else 2);bpy.ops.object.modifier_apply(modifier=mod.name)
     o.data.materials.append(m);return bind(o,arm,bone)
 
@@ -38,7 +38,7 @@ def cyl(name,xyz,r,depth,m,arm,bone,vertices=8,axis='Z'):
     return bind(o,arm,bone)
 
 def ellipsoid(name,xyz,dim,m,arm,bone,lod):
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=8 if lod else 20,ring_count=4 if lod else 12,location=xyz)
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=6 if lod else 20,ring_count=3 if lod else 12,location=xyz)
     o=bpy.context.object;o.name=name;o.scale=tuple(d/2 for d in dim)
     bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
     o.data.materials.append(m);return bind(o,arm,bone)
@@ -51,40 +51,61 @@ def cape(name,arm,bone,m,wide=.30,long=.48,y=.17):
     bpy.context.view_layer.objects.active=o;bpy.ops.object.modifier_apply(modifier=solid.name)
     return bind(o,arm,bone)
 
+def sniper_cloak(arm,m):
+    # Curved cross sections wrap the back; the narrow hem follows the torso.
+    rows=[(1.34,.22,.115),(1.23,.27,.155),(1.08,.28,.215),(.88,.24,.275),(.69,.21,.29)]
+    verts=[]
+    for z,half,y in rows:
+        for u in (-1,-.5,0,.5,1):
+            verts.append((u*half,y+.095*(1-u*u)-.065*abs(u),z+.018*(1-u*u)))
+    faces=[]
+    for row in range(len(rows)-1):
+        for col in range(4):
+            a=row*5+col;faces.append((a,a+1,a+6,a+5))
+    mesh=bpy.data.meshes.new('curved sniper cloak');mesh.from_pydata(verts,[],faces);mesh.update()
+    o=bpy.data.objects.new('W19 dark olive shoulder cloak',mesh)
+    bpy.context.collection.objects.link(o);mesh.materials.append(m)
+    solid=o.modifiers.new('cloth thickness','SOLIDIFY');solid.thickness=.014
+    bpy.context.view_layer.objects.active=o;bpy.ops.object.modifier_apply(modifier=solid.name)
+    return bind(o,arm,'spine_03')
+
 def remove_old_head(body):
     bm=bmesh.new();bm.from_mesh(body.data)
     kill=[f for f in bm.faces if (body.matrix_world @ f.calc_center_median()).z>1.425]
     bmesh.ops.delete(bm,geom=kill,context='FACES');bm.to_mesh(body.data);bm.free();body.data.update()
 
 def import_head(kind,arm,lod,M):
-    # An enclosed Trooper-derived helmet replaces the exposed W17 face geometry.
-    shell=M['accent'] if kind=='droid' else M['tan']
-    ellipsoid('W19 enclosed helmet',(0,-.012,1.565),(.43,.40,.37),shell,arm,'Head',lod)
-    ellipsoid('W19 navy faceplate',(0,-.174,1.553),(.33,.105,.205),M['navy'],arm,'Head',lod)
-    ellipsoid('W19 dark visor',(0,-.225,1.602),(.29,.048,.075),M['dark'],arm,'Head',lod)
-    box('W19 jaw guard',(0,-.205,1.478),(.24,.067,.055),M['navy'],arm,'Head')
+    # W17's white helmet and visor remain on every human class.
+    existing=set(bpy.data.objects)
     if kind=='sniper':
-        ellipsoid('W19 olive hood crown',(0,.016,1.665),(.45,.42,.21),M['accent'],arm,'Head',lod)
-        cyl('W19 attached scope',(.145,-.207,1.614),.038,.13,M['navy'],arm,'Head',8,axis='Y')
-        cyl('W19 scope lens',(.145,-.275,1.614),.026,.012,M['dark'],arm,'Head',8,axis='Y')
+        ellipsoid('W19 low olive hood crown',(0,.025,1.625),(.36,.27,.045),M['olive'],arm,'Head',lod)
+        for s in (-1,1):
+            ellipsoid('W19 hood side drape',(s*.162,.050,1.524),(.025,.19,.15),M['olive'],arm,'Head',lod)
+        ellipsoid('W19 hood back drape',(0,.135,1.510),(.31,.025,.17),M['olive'],arm,'Head',lod)
+        cyl('W19 attached scope',(.154,-.155,1.565),.026,.085,M['navy'],arm,'Head',8,axis='Y')
+        cyl('W19 scope lens',(.154,-.205,1.565),.019,.012,M['dark'],arm,'Head',8,axis='Y')
     elif kind=='heavy':
-        for s in (-1,1):ellipsoid('W19 orange cheek',(s*.177,-.098,1.535),(.09,.16,.15),M['accent'],arm,'Head',lod)
+        for s in (-1,1):ellipsoid('W19 orange cheek',(s*.16,-.092,1.503),(.045,.11,.13),M['accent'],arm,'Head',lod)
     elif kind=='tech':
-        for s in (-1,1):cyl('W19 teal goggle',(s*.09,-.252,1.605),.058,.026,M['accent'],arm,'Head',8,axis='Y')
-        cyl('W19 tech antenna',(.178,.006,1.771),.010,.17,M['navy'],arm,'Head',6)
-        cyl('W19 antenna tip',(.178,.006,1.857),.019,.027,M['accent'],arm,'Head',6)
+        for s in (-1,1):cyl('W19 teal goggle',(s*.078,-.177,1.593),.041,.021,M['accent'],arm,'Head',8,axis='Y')
+        cyl('W19 tech antenna',(.163,.057,1.691),.007,.105,M['navy'],arm,'Head',6)
+        cyl('W19 antenna tip',(.163,.057,1.747),.012,.018,M['accent'],arm,'Head',6)
     elif kind=='officer':
-        ellipsoid('W19 officer cap crown',(0,-.005,1.744),(.42,.38,.15),M['navy'],arm,'Head',lod)
-        box('W19 crimson cap band',(0,-.153,1.704),(.37,.045,.046),M['accent'],arm,'Head')
-        ellipsoid('W19 peaked cap brim',(0,-.178,1.688),(.44,.23,.035),M['navy'],arm,'Head',lod)
+        ellipsoid('W19 officer cap crown',(0,.015,1.656),(.39,.31,.09),M['navy'],arm,'Head',lod)
+        box('W19 crimson cap band',(0,-.134,1.629),(.35,.032,.029),M['accent'],arm,'Head')
+        ellipsoid('W19 peaked cap brim',(0,-.159,1.619),(.39,.13,.025),M['navy'],arm,'Head',lod)
     elif kind=='medic':
-        ellipsoid('W19 medical forehead badge',(0,-.157,1.704),(.17,.045,.09),M['white'],arm,'Head',lod)
-        box('W19 medical cross vertical',(0,-.184,1.704),(.028,.014,.065),M['accent'],arm,'Head')
-        box('W19 medical cross horizontal',(0,-.186,1.704),(.076,.014,.026),M['accent'],arm,'Head')
+        ellipsoid('W19 medical forehead panel',(0,-.148,1.612),(.15,.036,.065),M['white'],arm,'Head',lod)
+        box('W19 medical cross vertical',(0,-.17,1.612),(.019,.012,.047),M['accent'],arm,'Head')
+        box('W19 medical cross horizontal',(0,-.171,1.612),(.053,.012,.018),M['accent'],arm,'Head')
     elif kind=='droid':
-        ellipsoid('W19 elongated droid dome',(0,.025,1.675),(.48,.41,.22),M['accent'],arm,'Head',lod)
-        for s in (-1,1):cyl('W19 droid photoreceptor',(s*.09,-.257,1.596),.037,.025,M['glow'],arm,'Head',10,axis='Y')
-        box('W19 droid jaw grille',(0,-.247,1.48),(.20,.025,.065),M['navy'],arm,'Head')
+        ellipsoid('W19 yellow elongated droid head',(0,-.015,1.562),(.355,.29,.29),M['accent'],arm,'Head',lod)
+        ellipsoid('W19 droid faceplate',(0,-.155,1.56),(.29,.035,.16),M['navy'],arm,'Head',lod)
+        for s in (-1,1):cyl('W19 droid photoreceptor',(s*.075,-.18,1.594),.026,.015,M['glow'],arm,'Head',10,axis='Y')
+        box('W19 droid jaw grille',(0,-.163,1.48),(.17,.022,.035),M['navy'],arm,'Head')
+    if kind not in ('droid','medic'):
+        for part in set(bpy.data.objects)-existing:
+            world=part.matrix_world.copy();world.translation.z-=.07;part.matrix_world=world
 
 def gear(kind,arm,lod,M):
     a=M['accent'];n=M['navy'];t=M['tan'];w=M['white']
@@ -93,9 +114,7 @@ def gear(kind,arm,lod,M):
             ellipsoid('W19 curved orange pauldron',(s*.255,.005,1.318),(.23,.24,.105),a,arm,bone,lod)
             ellipsoid('W19 pauldron navy inset',(s*.255,-.105,1.312),(.15,.035,.042),n,arm,bone,lod)
     elif kind=='sniper':
-        cape('W19 dark olive shoulder cloak',arm,'spine_03',M['olive'],.68,.68,.13)
-        if not lod:
-            for x in (-.22,-.07,.08,.22):ellipsoid('W19 cloak fold',(x,.30,.94),(.055,.06,.24),M['olive'],arm,'spine_03',lod)
+        sniper_cloak(arm,M['olive'])
     elif kind=='tech':
         for s in (-1,1):
             box('W19 tool harness strap',(s*.18,-.12,1.15),(.065,.065,.34),n,arm,'spine_03')
@@ -106,9 +125,9 @@ def gear(kind,arm,lod,M):
         box('rank plate',(0,-.18,1.23),(.19,.035,.09),a,arm,'spine_03')
         for x in (-.04,0,.04):box('rank bar',(x,-.204,1.23),(.020,.012,.05),w,arm,'spine_03')
     elif kind=='medic':
-        ellipsoid('W19 medical satchel',(.30,.11,.99),(.23,.20,.28),w,arm,'pelvis',lod)
-        box('satchel red cross vertical',(.43,.11,1.00),(.014,.04,.12),a,arm,'pelvis')
-        box('satchel red cross horizontal',(.44,.11,1.00),(.014,.12,.04),a,arm,'pelvis')
+        box('W19 medical satchel',(.235,.015,.97),(.15,.22,.22),w,arm,'pelvis',.035)
+        box('satchel red cross vertical',(.235,-.103,.97),(.018,.012,.095),a,arm,'pelvis')
+        box('satchel red cross horizontal',(.235,-.104,.97),(.075,.012,.026),a,arm,'pelvis')
         box('medical strap',(.17,-.11,1.18),(.055,.055,.38),n,arm,'spine_03')
     elif kind=='droid':
         ellipsoid('W19 droid chest armour',(0,-.165,1.19),(.32,.085,.25),n,arm,'spine_03',lod)
@@ -127,7 +146,7 @@ def build(kind,lod):
     body=next(o for o in bpy.data.objects if o.type=='MESH' and o.name.startswith('output_unwrapped'))
     for o in list(bpy.data.objects):
         if o.type=='MESH' and o!=body:bpy.data.objects.remove(o,do_unlink=True)
-    remove_old_head(body)
+    if kind=='droid':remove_old_head(body)
     M={'tan':mat('painted tan',(.49,.39,.27)),'navy':mat('deep navy',(.045,.105,.19)),'dark':mat('visor black',(.012,.022,.035)),'white':mat('medical off white',(.82,.80,.71)),'accent':mat(kind+' accent',ACC[kind]),'olive':mat('dark olive',(.18,.24,.12)),'glow':mat('photoreceptor yellow',(.92,.78,.25))}
     import_head(kind,arm,lod,M);gear(kind,arm,lod,M)
     # The source materials and animation clips remain in the exported scene.

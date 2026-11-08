@@ -4,9 +4,10 @@ import {createRequire} from 'node:module';
 const R=createRequire('/home/jess/projects/tw-logs/w19/art/deps/package.json');
 const {NodeIO,PropertyType}=R('@gltf-transform/core');
 const {ALL_EXTENSIONS}=R('@gltf-transform/extensions');
-const {copyToDocument,createDefaultPropertyResolver,prune,dedup,unpartition}=R('@gltf-transform/functions');
-const {MeshoptDecoder}=R('meshoptimizer');
+const {copyToDocument,createDefaultPropertyResolver,prune,dedup,unpartition,simplify}=R('@gltf-transform/functions');
+const {MeshoptDecoder,MeshoptSimplifier}=R('meshoptimizer');
 await MeshoptDecoder.ready;
+await MeshoptSimplifier.ready;
 const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.decoder':MeshoptDecoder});
 const root='godot/assets/units',log='/home/jess/projects/tw-logs/w19/art';
 const soldierClips=new Set(['idle','gunIdle','run','shoot','hit','death','aim','walk']);
@@ -19,11 +20,13 @@ for(const kind of process.argv.slice(2))for(const suffix of ['', '_lod1']){
  const prim=original.getMesh().listPrimitives()[0];
  const pos=prim.getAttribute('POSITION'),indices=prim.getIndices();
  const input=indices.getArray(),kept=[],v=[];
- for(let i=0;i<input.length;i+=3){
-   const y=[0,1,2].map(k=>{pos.getElement(input[i+k],v);return v[1]});
-   if(y.reduce((a,b)=>a+b,0)/3<=1.425)kept.push(input[i],input[i+1],input[i+2]);
+ if(kind==='droid'){
+   for(let i=0;i<input.length;i+=3){
+     const y=[0,1,2].map(k=>{pos.getElement(input[i+k],v);return v[1]});
+     if(y.reduce((a,b)=>a+b,0)/3<=1.425)kept.push(input[i],input[i+1],input[i+2]);
+   }
+   indices.setArray(new input.constructor(kept));
  }
- indices.setArray(new input.constructor(kept));
  const joints=new Map(old.getRoot().listSkins()[0].listJoints().map(n=>[n.getName(),n]));
  const resolver=createDefaultPropertyResolver(old,fresh);
  let added=0;
@@ -35,6 +38,7 @@ for(const kind of process.argv.slice(2))for(const suffix of ['', '_lod1']){
    const n=old.createNode(src.getName()).setMesh(mesh).setTranslation(src.getTranslation()).setRotation(src.getRotation()).setScale(src.getScale());
    joints.get(parent.getName()).addChild(n);added++;
  }
+ if(suffix)await old.transform(simplify({simplifier:MeshoptSimplifier,ratio:.55,error:1}));
  await old.transform(prune(),dedup({propertyTypes:[PropertyType.ACCESSOR]}),unpartition());
  const dest=`${root}/w19/${kind}${suffix}.glb`;
  fs.copyFileSync(dest,`${log}/${kind}${suffix}-blender.glb`);
