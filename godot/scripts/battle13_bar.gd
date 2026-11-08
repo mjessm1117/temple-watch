@@ -7,6 +7,7 @@ var copies: Dictionary = {}
 var more: Button
 var popup: PanelContainer
 var list: VBoxContainer
+var popup_scroll
 
 func setup(game, root: Control, action_row: HFlowContainer, action_buttons: Dictionary) -> void:
 	g = game; buttons = action_buttons
@@ -40,6 +41,7 @@ func setup(game, root: Control, action_row: HFlowContainer, action_buttons: Dict
 	style.set_content_margin_all(8); popup.add_theme_stylebox_override("panel", style)
 	root.add_child(popup)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	popup_scroll = scroll
 	popup.add_child(scroll)
 	list = VBoxContainer.new(); list.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(list)
 
@@ -60,6 +62,7 @@ func refresh() -> void:
 		copy.visible = mode in primary
 		if copy.visible:
 			copy.call("configure", mode, source.display_name, "", source.cost, source.cooldown, "", g.action == mode)
+			copy.call("set_chain", g.mission.abilities.get(mode, {}), g.mission.unit_by_id(g.target_id))
 			copy.tooltip_text = source.tooltip_text
 	for i in range(primary.size()): row.move_child(copies[primary[i]], i)
 	var overflow: Array[String] = []
@@ -67,10 +70,13 @@ func refresh() -> void:
 		if mode not in primary: overflow.append(mode)
 	more.visible = not overflow.is_empty()
 	if overflow.is_empty(): popup.visible = false
+	if popup_scroll.touch_dragging: return
+	var saved_scroll: int = popup_scroll.scroll_vertical
 	for child in list.get_children(): child.queue_free()
 	for mode in overflow:
 		var source: Button = buttons[mode]
-		var item := Button.new(); item.text = "%s  ·  %s AP" % [source.display_name, source.cost]
+		var item := Button.new(); item.text = "%s %s  ·  %s AP" % [source.display_name, preload("res://scripts/hud18_icon.gd").marks(g.mission.abilities.get(mode, {})), source.cost]
 		item.custom_minimum_size.y = 42; item.focus_mode = Control.FOCUS_NONE
 		item.pressed.connect(func() -> void: popup.hide(); g._choose_action(mode))
 		list.add_child(item)
+	popup_scroll.set_deferred("scroll_vertical", saved_scroll)

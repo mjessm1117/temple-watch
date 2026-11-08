@@ -72,3 +72,5 @@ run_suite core17_test
 run_suite jedi18_test
 run_suite soldier18_test
 run_suite phone17_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
+run_suite hud18_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
+run_suite phoneui18_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low

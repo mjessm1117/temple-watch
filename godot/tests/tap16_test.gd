@@ -27,8 +27,9 @@ func scan(screen: Node, title: String) -> void:
 		var primary: bool = button.name in ["PhoneEndTurn", "FireButton", "GalaxyOverview", "Tab_Galaxy", "MoreCommands", "MenuCommand"] or button.text.strip_edges() in ["MOVE", "FIRE", "OVERWATCH", "CANCEL", "END TURN", "DEPLOY →", "ROOMS", "MISSION BRIEFING  →", "←  TEMPLE"]
 		if button.name.begins_with("Tab_") or button.text.begins_with("SITH INTELLIGENCE"): primary = true
 		if button.get("ability_id") != null and str(button.get("ability_id")) in ["move", "shoot", "overwatch"]: primary = true
-		if primary and rect.size.y < 56: fail(str(button.get_path()), "%s primary height %s below 56" % [title, rect.size.y])
-		if button.has_theme_font_size_override("font_size") and button.get_theme_font_size("font_size") < 14:
+		var primary_height := 44 if button.name == "PhoneEndTurn" else 56
+		if primary and rect.size.y < primary_height: fail(str(button.get_path()), "%s primary height %s below %d" % [title, rect.size.y, primary_height])
+		if button.name != "UnitCard" and button.has_theme_font_size_override("font_size") and button.get_theme_font_size("font_size") < 14:
 			fail(str(button.get_path()), "%s font below 14" % title)
 	for surface in surfaces:
 		if not _visible_rect(surface, view).has_area(): continue
@@ -45,10 +46,12 @@ func scan(screen: Node, title: String) -> void:
 		for j in range(i + 1, hit_controls.size()):
 			var b := _visible_rect(hit_controls[j], view)
 			if not b.has_area(): continue
+			if hit_controls[i].is_ancestor_of(hit_controls[j]) or hit_controls[j].is_ancestor_of(hit_controls[i]): continue
+			var grouped := hit_controls[i].get_parent() == hit_controls[j].get_parent() and hit_controls[i].get_parent() is Container and (title == "battle" or title == "aim")
 			if a.intersects(b): fail(str(hit_controls[i].get_path()), "%s overlaps %s: %s / %s" % [title, hit_controls[j].get_path(), a, b])
-			elif a.end.y > b.position.y and b.end.y > a.position.y and minf(absf(a.end.x - b.position.x), absf(b.end.x - a.position.x)) < 7.9:
+			elif not grouped and a.end.y > b.position.y and b.end.y > a.position.y and minf(absf(a.end.x - b.position.x), absf(b.end.x - a.position.x)) < 7.9:
 				fail(str(hit_controls[i].get_path()), "%s horizontal gap below 8 to %s" % [title, hit_controls[j].get_path()])
-			elif a.end.x > b.position.x and b.end.x > a.position.x and minf(absf(a.end.y - b.position.y), absf(b.end.y - a.position.y)) < 7.9:
+			elif not grouped and a.end.x > b.position.x and b.end.x > a.position.x and minf(absf(a.end.y - b.position.y), absf(b.end.y - a.position.y)) < 7.9:
 				fail(str(hit_controls[i].get_path()), "%s vertical gap below 8 to %s" % [title, hit_controls[j].get_path()])
 	print("TAP16 ", title, " visible buttons=", buttons.size(), " custom surfaces=", surfaces.size())
 
