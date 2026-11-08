@@ -351,7 +351,7 @@
         {
           "type": "heal",
           "target": "all_allies",
-          "amount": 4
+          "amount": 0
         },
         {
           "type": "shield",

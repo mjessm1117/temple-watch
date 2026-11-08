@@ -11,6 +11,12 @@ var phone_icon := false
 var chain_marks: Array[Dictionary] = []
 var combo_ready := false
 
+static func phone_badge_rect(button_size: Vector2) -> Rect2:
+	return Rect2(button_size.x - 30, 0, 30, 14)
+
+static func phone_label_rect(button_size: Vector2) -> Rect2:
+	return Rect2(1, button_size.y - 12, button_size.x - 2, 12)
+
 func _ready() -> void:
 	button_down.connect(queue_redraw)
 	button_up.connect(queue_redraw)
@@ -56,17 +62,21 @@ func set_chain(def: Dictionary, target: Dictionary) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	if phone_icon and bool(get_meta("shared_phone_art", false)): return
 	var gold := Color("f5d68b") if active else Color("b69b65") if not disabled else Color("67737d")
 	var blue := Color("7ecde7") if not disabled else Color("67737d")
 	var touch_down := compact and button_pressed
 	if phone_icon:
-		draw_arc(Vector2(size.x * 0.5, 24), 21, 0, TAU, 32, Color("9ef6b3") if combo_ready else gold, 2.5)
+		draw_arc(Vector2(size.x * 0.5, 18), 15, 0, TAU, 32, Color("9ef6b3") if combo_ready else gold, 2.5)
 		var caption := display_name.to_upper()
-		if caption.length() > 9: caption = caption.substr(0, 8) + "…"
-		draw_string(ThemeDB.fallback_font, Vector2(2, 58), caption, HORIZONTAL_ALIGNMENT_CENTER, size.x - 4, 10, Color("edf3f4") if not disabled else Color("87919b"))
+		if caption.length() > 7: caption = caption.substr(0, 6) + "…"
+		draw_string(ThemeDB.fallback_font, Vector2(1, 39), caption, HORIZONTAL_ALIGNMENT_CENTER, size.x - 2, 10, Color("edf3f4") if not disabled else Color("87919b"))
 		var badge := "%s AP" % cost
 		if cooldown > 0: badge = "%d CD" % cooldown
-		draw_string(ThemeDB.fallback_font, Vector2(2, 46), badge, HORIZONTAL_ALIGNMENT_CENTER, 28, 9, gold)
+		var badge_rect := phone_badge_rect(size)
+		draw_rect(badge_rect, Color("10212d"), true)
+		draw_rect(badge_rect, gold, false, 1.0)
+		draw_string(ThemeDB.fallback_font, Vector2(size.x - 30, 11), badge, HORIZONTAL_ALIGNMENT_CENTER, 30, 11, Color("f9e5b8"))
 	else:
 		draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), Color("32566b") if touch_down else Color("111d29"), true)
 		draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), Color("9ef6b3") if combo_ready else Color("f5d68b") if touch_down else gold, false, 3.0 if combo_ready or touch_down else 2.0 if active else 1.0)
@@ -99,7 +109,7 @@ func _draw() -> void:
 		draw_string(ThemeDB.fallback_font, Vector2(44, 51), "%s AP" % cost, HORIZONTAL_ALIGNMENT_LEFT, size.x - 47, 12, gold)
 	if phone_icon:
 		var glyphs := {"move":"➜", "shoot":"◎", "overwatch":"⌖", "hunker":"⬟", "strike":"⚔", "push":"⇥", "reload":"↻"}
-		draw_string(ThemeDB.fallback_font, Vector2(2, 33), str(glyphs.get(ability_id, "✦")), HORIZONTAL_ALIGNMENT_CENTER, size.x - 4, 25, blue)
+		draw_string(ThemeDB.fallback_font, Vector2(2, 28), str(glyphs.get(ability_id, "✦")), HORIZONTAL_ALIGNMENT_CENTER, size.x - 4, 18, blue)
 	else:
 		match ability_id:
 			"move":

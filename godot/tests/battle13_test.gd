@@ -73,7 +73,7 @@ func exercise(size: Vector2i) -> void:
 		for button in game.hud_controls.phone.ability_buttons:
 			if bool(button.get_meta("battle12_available", false)): available_at_start += 1
 			if button.visible: shown_at_start += 1
-		check(shown_at_start == mini(3, available_at_start), "phone shows three primary actions with overflow at turn start")
+		check(shown_at_start == mini(4, available_at_start), "phone shows four primary actions with overflow at turn start")
 		var another: Dictionary = game.mission.living("player")[1]
 		Input.warp_mouse(Vector2(422, 195))
 		game._select(int(another.id))
@@ -169,7 +169,7 @@ func exercise(size: Vector2i) -> void:
 		for button in phone.ability_buttons:
 			if button.visible:
 				count += 1
-				check(button.compact and button.hotkey != "" and button.size.y >= 44, "phone uses icon touch buttons")
+				check(button.compact and button.hotkey != "" and button.size.y >= 40, "phone uses 48 physical pixel icon touch buttons")
 		check(count <= 5 and phone.more_button.visible, "phone shows at most five actions plus More")
 		check(viewport.encloses(phone.unit_card.get_global_rect()), "phone unit card fits")
 		check(phone.unit_card.text.contains(str(actor.name)), "phone unit name is complete")

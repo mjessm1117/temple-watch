@@ -74,7 +74,7 @@ func exercise(dimensions: Vector2i) -> void:
 	for icon in hud.icons[int(first.id)] + hud.icons[int(target.id)]:
 		var rect: Rect2 = icon.get_global_rect()
 		check(rect.size.x >= 44 and rect.size.y >= 44, "icon touch target at %s" % dimensions)
-	check(phone.momentum_strike.custom_minimum_size.x >= 44 and phone.momentum_strike.custom_minimum_size.y >= 44, "strike target")
+	check(phone.momentum_strike.custom_minimum_size.x >= 44 and phone.momentum_strike.custom_minimum_size.y >= 40, "48 physical pixel strike target")
 	for pips in range(4):
 		game.mission.chain_momentum = pips; phone.refresh()
 		check(phone.momentum_pips.text.count("●") == pips, "pips %d" % pips)

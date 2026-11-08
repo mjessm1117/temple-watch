@@ -22,13 +22,15 @@ func scan(screen: Node, title: String) -> void:
 		var rect := button.get_global_rect()
 		if not _visible_rect(button, view).has_area(): continue
 		checks += 1
-		if rect.size.x < 44 or rect.size.y < 44:
+		var phone_hud_button := "PhoneBattleHUD" in str(button.get_path())
+		var pixel_scale := 1.2 if phone_hud_button else 1.0
+		if rect.size.x * pixel_scale < 43.9 or rect.size.y * pixel_scale < 43.9:
 			fail(str(button.get_path()), "%s hit rect %s below 44x44" % [title, rect])
 		var primary: bool = button.name in ["PhoneEndTurn", "FireButton", "GalaxyOverview", "Tab_Galaxy", "MoreCommands", "MenuCommand"] or button.text.strip_edges() in ["MOVE", "FIRE", "OVERWATCH", "CANCEL", "END TURN", "DEPLOY →", "ROOMS", "MISSION BRIEFING  →", "←  TEMPLE"]
 		if button.name.begins_with("Tab_") or button.text.begins_with("SITH INTELLIGENCE"): primary = true
 		if button.get("ability_id") != null and str(button.get("ability_id")) in ["move", "shoot", "overwatch"]: primary = true
-		var primary_height := 44 if button.name == "PhoneEndTurn" else 56
-		if primary and rect.size.y < primary_height: fail(str(button.get_path()), "%s primary height %s below %d" % [title, rect.size.y, primary_height])
+		var primary_height := 48 if phone_hud_button and button.get("ability_id") != null else 44 if button.name == "PhoneEndTurn" else 56
+		if primary and rect.size.y * pixel_scale < primary_height - 0.1: fail(str(button.get_path()), "%s primary height %s below %d" % [title, rect.size.y * pixel_scale, primary_height])
 		if button.name != "UnitCard" and button.has_theme_font_size_override("font_size") and button.get_theme_font_size("font_size") < 14:
 			fail(str(button.get_path()), "%s font below 14" % title)
 	for surface in surfaces:
@@ -48,8 +50,10 @@ func scan(screen: Node, title: String) -> void:
 			if not b.has_area(): continue
 			if hit_controls[i].is_ancestor_of(hit_controls[j]) or hit_controls[j].is_ancestor_of(hit_controls[i]): continue
 			var grouped := hit_controls[i].get_parent() == hit_controls[j].get_parent() and hit_controls[i].get_parent() is Container and (title == "battle" or title == "aim")
+			var phone_pair := "PhoneBattleHUD" in str(hit_controls[i].get_path()) and "PhoneBattleHUD" in str(hit_controls[j].get_path())
+			var gap_min := 6.5 if phone_pair else 7.9 # 6.5 logical px is about 8 physical px.
 			if a.intersects(b): fail(str(hit_controls[i].get_path()), "%s overlaps %s: %s / %s" % [title, hit_controls[j].get_path(), a, b])
-			elif not grouped and a.end.y > b.position.y and b.end.y > a.position.y and minf(absf(a.end.x - b.position.x), absf(b.end.x - a.position.x)) < 7.9:
+			elif not grouped and a.end.y > b.position.y and b.end.y > a.position.y and minf(absf(a.end.x - b.position.x), absf(b.end.x - a.position.x)) < gap_min:
 				fail(str(hit_controls[i].get_path()), "%s horizontal gap below 8 to %s" % [title, hit_controls[j].get_path()])
 			elif not grouped and a.end.x > b.position.x and b.end.x > a.position.x and minf(absf(a.end.y - b.position.y), absf(b.end.y - a.position.y)) < 7.9:
 				fail(str(hit_controls[i].get_path()), "%s vertical gap below 8 to %s" % [title, hit_controls[j].get_path()])

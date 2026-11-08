@@ -8,6 +8,7 @@ var checks := 0
 var failures := 0
 var capture := false
 var before := false
+var physical_size := Vector2i.ZERO
 
 func _initialize() -> void:
 	run.call_deferred()
@@ -60,6 +61,7 @@ func controls(node: Node, result: Array[BaseButton]) -> void:
 
 func geometry(game: Node, label: String) -> void:
 	await process_frame
+	var pixel_scale: float = float(physical_size.x) / float(game.hud_controls.phone.overlay.size.x)
 	var buttons: Array[BaseButton] = []
 	controls(game.hud_controls.phone.overlay, buttons)
 	controls(game.hud_controls.aim_ui.panel, buttons)
@@ -70,7 +72,7 @@ func geometry(game: Node, label: String) -> void:
 		if not a.has_area(): continue
 		count += 1
 		minimum = Vector2(minf(minimum.x, a.size.x), minf(minimum.y, a.size.y))
-		check(a.size.x >= 44.0 and a.size.y >= 44.0, "%s %s visible hit area %s" % [label, buttons[i].name, a])
+		check(a.size.x * pixel_scale >= 43.9 and a.size.y * pixel_scale >= 43.9, "%s %s visible hit area %s" % [label, buttons[i].name, a])
 		if not in_scroll(buttons[i]):
 			check(a.position.distance_to(buttons[i].get_global_rect().position) < 0.1 and a.size.distance_to(buttons[i].get_global_rect().size) < 0.1, "%s %s not clipped %s / %s" % [label, buttons[i].name, a, buttons[i].get_global_rect()])
 		for j in range(i + 1, buttons.size()):
@@ -86,6 +88,7 @@ func shot(name: String) -> void:
 	check(root.get_texture().get_image().save_png(path) == OK, "save " + path)
 
 func setup(size: Vector2i) -> Node:
+	physical_size = size
 	DisplayServer.window_set_size(size)
 	root.size = size; root.content_scale_size = size
 	await process_frame
@@ -143,7 +146,7 @@ func exercise(size: Vector2i) -> void:
 		await create_timer(0.38).timeout
 		check(not game.player_attack_pending, tag + " movement presentation completes")
 		check(int(unit.ap) == 1, tag + " move spends one AP")
-		check(phone.unit_card.text.contains("AP 1/2"), "%s AP pips update text=%s" % [tag, phone.unit_card.text])
+		check(phone.unit_card.text.contains("●○"), "%s AP pips update text=%s" % [tag, phone.unit_card.text])
 		check(Vector2(game.pivot.x, game.pivot.z).distance_to(Vector2(unit.x, unit.y)) < 2.0, "%s camera stays with moved unit pivot=%s unit=%s" % [tag, game.pivot, Vector2(unit.x, unit.y)])
 		await shot("move-" + tag)
 	else: check(false, tag + " one-step move exists")

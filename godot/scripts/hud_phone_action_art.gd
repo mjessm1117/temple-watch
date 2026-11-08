@@ -1,0 +1,67 @@
+extends Control
+## Draw all phone action icons in one canvas item so their shapes and text batch.
+const Marks = preload("res://scripts/hud18_icon.gd")
+var buttons: Array[Button] = []
+
+func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip_contents = true
+
+func _draw() -> void:
+	var visible_buttons: Array[Button] = []
+	var offsets: Array[Vector2] = []
+	for button in buttons:
+		if not button.visible or not button.is_visible_in_tree(): continue
+		visible_buttons.append(button)
+		offsets.append(button.get_global_rect().position - get_global_rect().position)
+	var font := ThemeDB.fallback_font
+	# Draw each primitive and font size together across the whole row.
+	for index in visible_buttons.size():
+		var button = visible_buttons[index]
+		var at := offsets[index]
+		var gold := Color("f5d68b") if button.active else Color("b69b65") if not button.disabled else Color("67737d")
+		draw_arc(at + Vector2(button.size.x * 0.5, 18), 15, 0, TAU, 32, Color("9ef6b3") if button.combo_ready else gold, 2.5)
+	for index in visible_buttons.size():
+		var button = visible_buttons[index]
+		var at := offsets[index]
+		var gold := Color("f5d68b") if button.active else Color("b69b65") if not button.disabled else Color("67737d")
+		var pill := StyleBoxFlat.new()
+		pill.bg_color = Color("10212d"); pill.border_color = gold
+		pill.set_border_width_all(1); pill.set_corner_radius_all(7)
+		draw_style_box(pill, Rect2(at + Vector2(button.size.x - 30, 0), Vector2(30, 14)))
+	for index in visible_buttons.size():
+		var button = visible_buttons[index]
+		var at := offsets[index]
+		for i in range(mini(button.chain_marks.size(), 3)):
+			var mark: Dictionary = button.chain_marks[i]
+			var center := at + Vector2(button.size.x - 10.0 - i * 15.0, 11.0)
+			var color := Color(Marks.COLORS.get(str(mark.tag), "dcebf0"))
+			draw_circle(center, 7.0, Color("10212d"))
+			draw_arc(center, 7.0, 0, TAU, 12, color, 1.5)
+	for index in visible_buttons.size():
+		var button = visible_buttons[index]
+		var at := offsets[index]
+		var badge := "%s AP" % button.cost
+		if button.cooldown > 0: badge = "%d CD" % button.cooldown
+		draw_string(font, at + Vector2(button.size.x - 30, 11), badge, HORIZONTAL_ALIGNMENT_CENTER, 30, 11, Color("f9e5b8"))
+	for index in visible_buttons.size():
+		var button = visible_buttons[index]
+		var at := offsets[index]
+		var blue := Color("7ecde7") if not button.disabled else Color("67737d")
+		var glyphs := {"move":"➜", "shoot":"◎", "overwatch":"⌖", "hunker":"⬟", "strike":"⚔", "push":"⇥", "reload":"↻"}
+		draw_string(font, at + Vector2(2, 28), str(glyphs.get(button.ability_id, "✦")), HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 4, 18, blue)
+	for index in visible_buttons.size():
+		var button = visible_buttons[index]
+		var at := offsets[index]
+		var caption: String = button.display_name.to_upper()
+		if caption.length() > 7: caption = caption.substr(0, 6) + "…"
+		draw_string(font, at + Vector2(1, 39), caption, HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, 10, Color("edf3f4") if not button.disabled else Color("87919b"))
+	for index in visible_buttons.size():
+		var button = visible_buttons[index]
+		var at := offsets[index]
+		for i in range(mini(button.chain_marks.size(), 3)):
+			var mark: Dictionary = button.chain_marks[i]
+			var center := at + Vector2(button.size.x - 10.0 - i * 15.0, 11.0)
+			var color := Color(Marks.COLORS.get(str(mark.tag), "dcebf0"))
+			var glyph: String = Marks.GLYPHS.get(str(mark.tag), "•")
+			draw_string(font, center + Vector2(-4, 4), glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, color)

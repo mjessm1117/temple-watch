@@ -7,6 +7,7 @@ const Shot = preload("res://scripts/shot.gd")
 var checks := 0
 var failures := 0
 var capture := false
+var physical_scale := 1.0
 const OUT = "res://../docs/godot/w18/phoneui/"
 
 func _initialize() -> void:
@@ -62,7 +63,7 @@ func geometry(nodes: Array[Node], label: String) -> void:
 	for i in buttons.size():
 		var a := clipped_rect(buttons[i])
 		if not a.has_area(): continue
-		check(a.size.x >= 44 and a.size.y >= 44, "%s %s hit %s" % [label, buttons[i].name, a])
+		check(a.size.x * physical_scale >= 43.9 and a.size.y * physical_scale >= 43.9, "%s %s hit %s" % [label, buttons[i].name, a])
 		for j in range(i + 1, buttons.size()):
 			var b := clipped_rect(buttons[j])
 			if b.has_area(): check(not a.intersects(b), "%s %s overlaps %s: %s %s" % [label, buttons[i].name, buttons[j].name, a, b])
@@ -77,6 +78,7 @@ func battle(value: Vector2i) -> void:
 	game.demo_mode = true
 	var phone = game.hud_controls.phone
 	check(phone != null, "%s phone HUD exists" % value)
+	physical_scale = float(value.x) / phone.overlay.size.x
 	var layout := Layout.boxes(value)
 	var header: Control = phone.overlay.find_child("PhoneTopStrip", true, false)
 	var header_background: Control = phone.overlay.find_child("PhoneTopBackground", true, false)
@@ -88,6 +90,13 @@ func battle(value: Vector2i) -> void:
 	check(phone.unit_plate.get_global_rect().get_center().x < value.x * 0.5 and phone.unit_plate.get_global_rect().get_center().y > value.y * 0.5, "%s plate bottom left" % value)
 	check(phone.unit_plate.get_global_rect().size.x >= 44.0 and phone.unit_plate.get_global_rect().size.y >= 44.0, "%s swipe plate hit area" % value)
 	check(not phone.unit_plate.get_global_rect().intersects(phone.ability_tray.get_global_rect()), "%s plate and tray separated" % value)
+	var band_top: float = minf(phone.unit_plate.get_global_rect().position.y, phone.ability_tray.get_global_rect().position.y)
+	print("PHONEUI18 BAND ", value, " plate=", phone.unit_plate.get_global_rect(), " tray=", phone.ability_tray.get_global_rect(), " overlay=", phone.overlay.get_global_rect())
+	check((phone.overlay.size.y - band_top) / phone.overlay.size.y <= 0.22, "%s bottom band at most 22 percent" % value)
+	var plate_limit := Vector2(230, 70) if value.x < 750 else Vector2(260, 76)
+	var scale := physical_scale
+	check(phone.unit_plate.size.x * scale <= plate_limit.x + 0.1 and phone.unit_plate.size.y * scale <= plate_limit.y + 0.1, "%s plate within size limit" % value)
+	check(phone.unit_portrait.size.x * scale >= 48 and phone.unit_portrait.size.y * scale >= 48 and phone.unit_portrait.texture != null, "%s actual portrait at least 48 square" % value)
 	check(not header.get_global_rect().intersects(phone.unit_plate.get_global_rect()) and not header.get_global_rect().intersects(phone.ability_tray.get_global_rect()), "%s header separated from bottom HUD" % value)
 	var squad: Array[Dictionary] = game.mission.living("player")
 	var enemies: Array[Dictionary] = game.mission.living("enemy")
@@ -101,6 +110,13 @@ func battle(value: Vector2i) -> void:
 	Chains.apply_tag(enemy, "EXPOSED", int(actor.id))
 	game.mission.chain_momentum = 3; game._refresh()
 	for i in 3: await process_frame
+	var shown := 0
+	for button in phone.ability_buttons:
+		if button.visible:
+			shown += 1
+			check(not button.phone_badge_rect(button.size).intersects(button.phone_label_rect(button.size)), "%s %s badge clear of label" % [value, button.ability_id])
+	check(shown >= (3 if value.x < 750 else 4), "%s visible ability count" % value)
+	check(phone.momentum_strike.visible and phone.more_button.visible, "%s strike and more visible" % value)
 	check(phone.ability_tray.get_global_rect().encloses(phone.momentum_strike.get_global_rect()), "%s strike inside tray" % value)
 	check(phone.ability_tray.get_global_rect().encloses(phone.momentum_plate.get_global_rect()), "%s pips inside tray" % value)
 	geometry([phone.overlay, game.hud_controls.combo_overlay], str(value) + " battle")
@@ -134,7 +150,9 @@ func battle(value: Vector2i) -> void:
 	check(aim.panel.visible and aim.target_row.visible and aim.targets.get_child_count() > 0, "%s target row" % value)
 	check(not aim.target_row.get_global_rect().intersects(aim.panel.get_global_rect()), "%s aim target and confirm areas separated" % value)
 	check(aim.confirm.visible and aim.cancel.visible and aim.confirm.get_global_rect().size.y >= 44, "%s confirm and cancel" % value)
-	check(aim.odds.text.contains("HIT") and aim.odds.text.contains("CRIT") and aim.odds.text.contains("DMG"), "%s hit crit damage" % value)
+	check(aim.odds.text.contains("HIT") and aim.odds_detail.text.contains("CRIT") and aim.odds_detail.text.contains("DMG"), "%s hit crit damage" % value)
+	check(aim.panel.get_global_rect().encloses(aim.odds.get_global_rect()) and aim.panel.get_global_rect().encloses(aim.odds_detail.get_global_rect()), "%s aim readout fully inside panel" % value)
+	check(aim.confirm.text.count("\n") <= 1 and not aim.confirm.text.contains("% HIT") and not aim.confirm.text.contains("% CRIT"), "%s confirm has no duplicate numeric readout" % value)
 	check(aim.aim_momentum.text == "●●●", "%s full momentum remains visible in aim" % value)
 	check(not game.hud_controls.night.chips.visible, "%s no ghost hit text" % value)
 	if aim.targets.get_child_count() >= 2:

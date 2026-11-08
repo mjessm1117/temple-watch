@@ -12,6 +12,7 @@ var open_card := ""
 var more_button: Button
 var ability_tray: PanelContainer
 var ability_scroll
+var action_art: Control
 var ability_buttons: Array[Button] = []
 var end_confirm := false
 var end_button: Button
@@ -26,7 +27,9 @@ var momentum_plate: Control
 var last_chain_momentum := -1
 var unit_plate: PanelContainer
 var camera_rail: VBoxContainer
+var camera_art: Control
 var unit_portrait: TextureRect
+var portrait_path := ""
 var plate_touch_start := Vector2.ZERO
 var plate_swiping := false
 
@@ -70,24 +73,27 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 			button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	unit_plate = PanelContainer.new(); unit_plate.name = "UnitPlate"
 	preload("res://scripts/hud_phone_layout.gd").place(unit_plate, layout.plate)
-	var plate_style: StyleBoxFlat = night.panel_style(); plate_style.set_content_margin_all(2)
+	var plate_style: StyleBoxFlat = night.panel_style(); plate_style.set_content_margin_all(0)
 	unit_plate.add_theme_stylebox_override("panel", plate_style); overlay.add_child(unit_plate)
 	var plate_row := HBoxContainer.new(); plate_row.add_theme_constant_override("separation", 0); unit_plate.add_child(plate_row)
 	unit_portrait = left.find_children("*", "TextureRect", true, false)[0] as TextureRect
 	unit_portrait.name = "UnitPortrait"; unit_portrait.reparent(plate_row)
-	unit_portrait.custom_minimum_size = Vector2(42, 80)
+	unit_portrait.texture = load("res://assets/story/portraits14/satele.png")
+	unit_portrait.custom_minimum_size = Vector2(40, 40)
 	unit_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	unit_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	unit_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
-	unit_card.custom_minimum_size = Vector2(78, 80)
+	unit_card.custom_minimum_size = Vector2(72, 40)
 	unit_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	unit_card.add_theme_font_size_override("font_size", 11); plate_row.add_child(unit_card)
 	unit_plate.gui_input.connect(_plate_input)
 	for direction in [-1, 1]:
 		var arrow := _button("‹" if direction < 0 else "›", _cycle_unit.bind(direction))
 		arrow.name = "UnitPrevious" if direction < 0 else "UnitNext"
-		arrow.custom_minimum_size = Vector2(44, 80); plate_row.add_child(arrow)
+		arrow.custom_minimum_size = Vector2(37, 40); plate_row.add_child(arrow)
+		for state in ["normal", "hover", "pressed", "disabled"]:
+			arrow.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	camera_rail = VBoxContainer.new(); camera_rail.name = "CameraRail"
 	camera_rail.add_theme_constant_override("separation", 0)
 	preload("res://scripts/hud_phone_layout.gd").place(camera_rail, layout.camera); overlay.add_child(camera_rail)
@@ -96,46 +102,52 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 			if int(entry[1]) == 0: g._recenter()
 			else: g._rotate_camera(float(entry[1]) * PI / 2.0))
 		button.name = "CameraCenter" if int(entry[1]) == 0 else "CameraRotateLeft" if int(entry[1]) < 0 else "CameraRotateRight"
+		button.text = ""
 		button.custom_minimum_size = Vector2(44, 44); camera_rail.add_child(button)
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	camera_art = preload("res://scripts/hud_phone_camera_art.gd").new()
+	camera_art.name = "CameraArt"
+	preload("res://scripts/hud_phone_layout.gd").place(camera_art, layout.camera)
+	overlay.add_child(camera_art)
 	target_card = _button("TARGET", _toggle.bind("target")); target_card.name = "TargetCard"
 	target_card.visible = false; overlay.add_child(target_card)
 	var tray := PanelContainer.new(); tray.name = "AbilityTray"; ability_tray = tray
 	preload("res://scripts/hud_phone_layout.gd").place(tray, layout.tray)
-	var tray_style: StyleBoxFlat = night.panel_style(); tray_style.set_content_margin_all(2)
+	var tray_style: StyleBoxFlat = night.panel_style(); tray_style.set_content_margin_all(0)
 	tray.add_theme_stylebox_override("panel", tray_style); overlay.add_child(tray)
 	var tray_box := VBoxContainer.new(); tray_box.add_theme_constant_override("separation", 0); tray.add_child(tray_box)
 	var readout := HBoxContainer.new(); readout.add_theme_constant_override("separation", 4); tray_box.add_child(readout)
 	momentum_plate = Control.new(); momentum_plate.name = "MomentumPlate"
 	momentum_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	momentum_plate.custom_minimum_size = Vector2(99, 21); readout.add_child(momentum_plate)
-	momentum_pips = night.label("○ ○ ○", 13, Color("e9ca83")); momentum_pips.name = "ChainPips"
+	momentum_plate.custom_minimum_size = Vector2(70, 13); readout.add_child(momentum_plate)
+	momentum_pips = night.label("○ ○ ○", 11, Color("e9ca83")); momentum_pips.name = "ChainPips"
 	momentum_pips.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	momentum_pips.position = Vector2(4, 1); momentum_plate.add_child(momentum_pips)
-	action_name = night.label("Choose an action", 12, Color("e9ca83"))
+	momentum_pips.position = Vector2(2, 0); momentum_plate.add_child(momentum_pips)
+	action_name = night.label("Choose an action", 11, Color("e9ca83"))
 	action_name.name = "AbilityReadout"; action_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	action_name.custom_minimum_size.y = 21; readout.add_child(action_name)
+	action_name.custom_minimum_size.y = 13; readout.add_child(action_name)
 	momentum_row = HBoxContainer.new(); momentum_row.name = "ChainMomentum"
 	momentum_row.visible = false; tray_box.add_child(momentum_row)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.name = "Abilities"
 	ability_scroll = scroll; scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 62; tray_box.add_child(scroll)
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 40; tray_box.add_child(scroll)
 	scroll.get_h_scroll_bar().modulate.a = 0.0
 	var track := HBoxContainer.new(); track.add_theme_constant_override("separation", 4); scroll.add_child(track)
 	for node in abilities.get_children():
 		var button: Button = node
-		button.reparent(track); button.custom_minimum_size = Vector2(62, 60)
+		button.reparent(track); button.custom_minimum_size = Vector2(44, 40)
 		ability_buttons.append(button)
-		button.set_meta("graphics_custom_minimum_size", Vector2(62, 60))
+		button.set_meta("graphics_custom_minimum_size", Vector2(44, 40))
+		button.set_meta("shared_phone_art", true)
 		button.set("compact", true); button.set("phone_icon", true)
 		button.button_down.connect(_show_ability.bind(button))
 		button.pressed.connect(_show_ability.bind(button))
 		button.gui_input.connect(_ability_input.bind(button))
 	momentum_strike = _button("✦\nSTRIKE", _claim_strike)
-	momentum_strike.name = "MomentumStrike"; momentum_strike.custom_minimum_size = Vector2(62, 60)
+	momentum_strike.name = "MomentumStrike"; momentum_strike.custom_minimum_size = Vector2(44, 40)
 	momentum_strike.add_theme_font_size_override("font_size", 11); track.add_child(momentum_strike)
-	more_button = _button("MORE", _toggle.bind("more")); more_button.custom_minimum_size = Vector2(62, 60); track.add_child(more_button)
+	more_button = _button("MORE", _toggle.bind("more")); more_button.custom_minimum_size = Vector2(44, 40); track.add_child(more_button)
 	for button in [momentum_strike, more_button]:
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			var round_style := StyleBoxFlat.new()
@@ -143,6 +155,10 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 			round_style.border_color = Color("a8f3bb") if button == momentum_strike and state != "disabled" else Color("be9d5b")
 			round_style.set_border_width_all(1); round_style.set_corner_radius_all(18)
 			button.add_theme_stylebox_override(state, round_style)
+	action_art = preload("res://scripts/hud_phone_action_art.gd").new()
+	action_art.name = "PhoneActionArt"; action_art.buttons = ability_buttons
+	preload("res://scripts/hud_phone_layout.gd").place(action_art, layout.tray)
+	overlay.add_child(action_art)
 	popup = PanelContainer.new(); popup.name = "PhoneDetails"; popup.visible = false
 	popup.anchor_left = 0.5; popup.anchor_right = 0.5; popup.anchor_bottom = 1.0
 	var popup_half := minf(250.0, (root.size.x - 16.0) * 0.5)
@@ -215,7 +231,7 @@ func refresh(from_game: bool = false) -> void:
 	momentum_row.visible = false
 	momentum_plate.visible = true
 	momentum_pips.text = "MOM " + ("● ".repeat(pips) + "○ ".repeat(3 - pips)).strip_edges()
-	momentum_strike.visible = pips == 3 or used_this_turn
+	momentum_strike.visible = true
 	momentum_strike.disabled = pips < 3 or used_this_turn or g.mission.phase != "player"
 	if pips != last_chain_momentum:
 		last_chain_momentum = pips
@@ -241,19 +257,25 @@ func refresh(from_game: bool = false) -> void:
 	else: action_name.text = "Choose an action · tap the map to preview"
 
 	_update_actions(from_game)
+	action_art.queue_redraw()
 	if g.warning_label.text == "" and not end_confirm and g.path_label.text == "":
 		var selected_ability: Dictionary = g.mission.abilities.get(g.action, {})
 		if not selected_ability.is_empty():
 			var effect := "1 AP; dash 2 AP" if g.action == "move" else "weapon damage" if g.action == "shoot" else str(selected_ability.get("effect", "action")).replace("_", " ")
 			action_name.text = "%s  ·  %s" % [str(selected_ability.get("name", g.action)).to_upper(), effect]
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
+	var portrait_name := str(unit.get("name", "")).to_lower().replace(" ", "_")
+	var candidate := "res://assets/story/portraits14/%s.png" % portrait_name
+	var wanted := candidate if ResourceLoader.exists(candidate) else "res://assets/story/portraits14/jace.png" if str(unit.get("class_name", "")).to_lower().contains("soldier") else "res://assets/portraits/jedi/satele.png"
+	if wanted != portrait_path:
+		portrait_path = wanted; unit_portrait.texture = load(wanted)
 	var tag_glyphs: Array[String] = []
 	for tag in preload("res://scripts/hud18_tags.gd").shown(unit.get("combo_tags", {})):
 		tag_glyphs.append(str(preload("res://scripts/hud18_icon.gd").GLYPHS.get(tag, tag)))
 	var hp: int = int(unit.get("hp", 0))
 	var hp_pips := "▮".repeat(mini(hp, 7)) + "▯".repeat(mini(maxi(0, int(unit.get("max_hp", 0)) - hp), 7))
 	var ap: int = clampi(int(unit.get("ap", 0)), 0, 2)
-	unit_card.text = "%s\nHP %d %s\nAP %s %s\n%s" % [str(unit.get("name", "UNIT")), hp, hp_pips, g.hud_controls.ap_pips(unit), "●".repeat(ap) + "○".repeat(2 - ap), " ".join(tag_glyphs)]
+	unit_card.text = "%s\n%d %s\n%s %s %s" % [str(unit.get("name", "UNIT")), hp, hp_pips, g.hud_controls.ap_pips(unit), "●".repeat(ap) + "○".repeat(2 - ap), " ".join(tag_glyphs)]
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	target_card.text = "%s  %s  ▾" % [str(target.get("name", "TARGET")), g.hit_big_label.text]
 	popup.visible = open_card != ""
@@ -301,7 +323,7 @@ func refresh(from_game: bool = false) -> void:
 func _update_actions(from_game: bool) -> void:
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var available: int = int(unit.get("ap", 0))
-	var primary_limit := mini(3, maxi(1, int(floor((ability_tray.size.x - 8.0) / 66.0)) - (2 if momentum_strike.visible else 1)))
+	var primary_limit := mini(4, maxi(3, int(floor((ability_tray.size.x - 8.0) / 48.0)) - 2))
 	last_unit_id = g.selected_id; last_unit_ap = available
 	if from_game:
 		for button in ability_buttons: button.set_meta("battle12_available", button.visible and not button.disabled)

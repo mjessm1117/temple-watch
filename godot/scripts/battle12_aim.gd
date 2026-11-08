@@ -7,6 +7,7 @@ var panel: PanelContainer
 var targets: HBoxContainer
 var target_row: PanelContainer
 var odds: Label
+var odds_detail: Label
 var cancel: Button
 var aim_momentum: Label
 var confirm: Button
@@ -42,7 +43,7 @@ func setup(game, root: Control, on_phone: bool) -> void:
 		panel.anchor_left = 1.0; panel.anchor_right = 1.0
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
 		panel.offset_left = -minf(350.0, root.size.x - 262.0); panel.offset_right = -6
-		panel.offset_top = -90; panel.offset_bottom = -4
+		panel.offset_top = -78; panel.offset_bottom = -4
 	else:
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
 		panel.offset_top = -114; panel.offset_bottom = -8
@@ -62,10 +63,12 @@ func setup(game, root: Control, on_phone: bool) -> void:
 	summary.visible = not phone
 	var row := HBoxContainer.new(); row.add_theme_constant_override("separation", 4); body.add_child(row)
 	if phone:
-		odds = Label.new(); odds.name = "AimOdds"; odds.custom_minimum_size = Vector2(90 if root.size.x < 600 else 100, 78)
-		odds.add_theme_font_size_override("font_size", 16 if root.size.x < 600 else 21); odds.add_theme_color_override("font_color", Color("f2d99a"))
-		row.add_child(odds)
-		confirm = _button("CONFIRM", 112 if root.size.x < 600 else 135, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
+		var odds_box := VBoxContainer.new(); odds_box.custom_minimum_size.x = 144; row.add_child(odds_box)
+		odds = Label.new(); odds.name = "AimOdds"; odds.add_theme_font_size_override("font_size", 21)
+		odds.add_theme_color_override("font_color", Color("f2d99a")); odds_box.add_child(odds)
+		odds_detail = Label.new(); odds_detail.name = "AimOddsDetail"; odds_detail.add_theme_font_size_override("font_size", 12)
+		odds_detail.add_theme_color_override("font_color", Color("e7edf0")); odds_box.add_child(odds_detail)
+		confirm = _button("CONFIRM", 105, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
 		if root.size.x < 600: confirm.add_theme_font_size_override("font_size", 12)
 		cancel = _button("CANCEL", 70 if root.size.x < 600 else 76, g._cancel_order); cancel.name = "AimCancel"; row.add_child(cancel)
 		target_row = PanelContainer.new(); target_row.name = "AimTargetRow"
@@ -122,6 +125,7 @@ func refresh() -> void:
 	if phone and g.hud_controls.phone != null:
 		g.hud_controls.phone.ability_tray.visible = not active
 		g.hud_controls.phone.camera_rail.visible = not active
+		g.hud_controls.phone.camera_art.visible = not active
 
 	elif g.hud_controls.desktop_bottom != null:
 		g.hud_controls.desktop_bottom.visible = not active
@@ -154,8 +158,10 @@ func refresh() -> void:
 	if g.action in ["shoot", "strike"]:
 		var info: Dictionary = Shot.calculate(g.mission, actor, target, g.action == "strike")
 		var damage: Dictionary = Shot.damage_preview(actor, target)
-		confirm.text = "CONFIRM %s\n%d%% HIT %d–%d DMG" % ["FIRE" if g.action == "shoot" else "STRIKE", int(info.hit), int(damage.normal[0]), int(damage.normal[1])] if phone else "%s · %d%% HIT\n%d–%d DMG" % ["FIRE" if g.action == "shoot" else "STRIKE", int(info.hit), int(damage.normal[0]), int(damage.normal[1])]
-		if phone: odds.text = "%d%% HIT\n%d%% CRIT\n%d–%d DMG" % [int(info.hit), int(info.crit), int(damage.normal[0]), int(damage.normal[1])]
+		confirm.text = "CONFIRM %s\nHIT · DMG" % ("FIRE" if g.action == "shoot" else "STRIKE") if phone else "%s · %d%% HIT\n%d–%d DMG" % ["FIRE" if g.action == "shoot" else "STRIKE", int(info.hit), int(damage.normal[0]), int(damage.normal[1])]
+		if phone:
+			odds.text = "%d%% HIT" % int(info.hit)
+			odds_detail.text = "%d%% CRIT · %d–%d DMG" % [int(info.crit), int(damage.normal[0]), int(damage.normal[1])]
 	else:
 		confirm.text = "CONFIRM\n%s" % str(g.mission.abilities.get(g.action, {}).get("name", g.action)).to_upper()
 	var chain: Dictionary = g.mission.abilities.get(g.action, {}).get("chain", {})
@@ -166,7 +172,7 @@ func refresh() -> void:
 			var tag := str(entry.get("tag", "")) if entry is Dictionary else str(entry)
 			marks.append(("−" if kind == "consume" else "+") + str(preload("res://scripts/hud18_icon.gd").GLYPHS.get(tag, "•")))
 			if kind == "consume" and target.get("combo_tags", {}).has(tag): ready = true
-	if not marks.is_empty(): confirm.text += "  " + " ".join(marks)
+	if not marks.is_empty() and not phone: confirm.text += "  " + " ".join(marks)
 	confirm.modulate = Color("b2ffc1") if ready else Color.WHITE
 
 func _confirm() -> void:
