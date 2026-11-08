@@ -79,12 +79,12 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	unit_portrait = left.find_children("*", "TextureRect", true, false)[0] as TextureRect
 	unit_portrait.name = "UnitPortrait"; unit_portrait.reparent(plate_row)
 	unit_portrait.texture = load("res://assets/story/portraits14/satele.png")
-	unit_portrait.custom_minimum_size = Vector2(40, 40)
+	unit_portrait.custom_minimum_size = Vector2(52, 52)
 	unit_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	unit_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	unit_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
-	unit_card.custom_minimum_size = Vector2(72, 40)
+	unit_card.custom_minimum_size = Vector2(54, 40)
 	unit_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	unit_card.add_theme_font_size_override("font_size", 11); plate_row.add_child(unit_card)
 	unit_plate.gui_input.connect(_plate_input)
@@ -120,7 +120,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	var readout := HBoxContainer.new(); readout.add_theme_constant_override("separation", 4); tray_box.add_child(readout)
 	momentum_plate = Control.new(); momentum_plate.name = "MomentumPlate"
 	momentum_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	momentum_plate.custom_minimum_size = Vector2(70, 13); readout.add_child(momentum_plate)
+	momentum_plate.custom_minimum_size = Vector2(82, 13); readout.add_child(momentum_plate)
 	momentum_pips = night.label("○ ○ ○", 11, Color("e9ca83")); momentum_pips.name = "ChainPips"
 	momentum_pips.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	momentum_pips.position = Vector2(2, 0); momentum_plate.add_child(momentum_pips)
@@ -230,7 +230,7 @@ func refresh(from_game: bool = false) -> void:
 	var used_this_turn: bool = int(g.mission.chain_strike_used_turn) == int(g.mission.turn)
 	momentum_row.visible = false
 	momentum_plate.visible = true
-	momentum_pips.text = "MOM " + ("● ".repeat(pips) + "○ ".repeat(3 - pips)).strip_edges()
+	momentum_pips.text = "MOM " + "●".repeat(pips) + "○".repeat(3 - pips)
 	momentum_strike.visible = true
 	momentum_strike.disabled = pips < 3 or used_this_turn or g.mission.phase != "player"
 	if pips != last_chain_momentum:

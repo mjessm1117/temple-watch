@@ -69,5 +69,6 @@ func run() -> void:
 	var draws := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
 	var triangles := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)
 	print("CINE15 CAPTURE %s result=%s draws=%d triangles=%d" % [label, error_string(result), draws, triangles])
-	var ceiling := 103 if view == "aim" else 126 if view == "impact" else 91 if theme == "snow" else 87 if theme == "city" else 85
+	# W19's readable phone action captions add two canvas draw batches.
+	var ceiling := 103 if view == "aim" else 126 if view == "impact" else 91 if theme == "snow" else 87 if theme in ["city", "temple"] else 85
 	quit(0 if result == OK and ("--ceiling" not in args or not phone or draws <= ceiling) else 1)

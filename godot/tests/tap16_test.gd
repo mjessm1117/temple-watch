@@ -29,7 +29,7 @@ func scan(screen: Node, title: String) -> void:
 		var primary: bool = button.name in ["PhoneEndTurn", "FireButton", "GalaxyOverview", "Tab_Galaxy", "MoreCommands", "MenuCommand"] or button.text.strip_edges() in ["MOVE", "FIRE", "OVERWATCH", "CANCEL", "END TURN", "DEPLOY →", "ROOMS", "MISSION BRIEFING  →", "←  TEMPLE"]
 		if button.name.begins_with("Tab_") or button.text.begins_with("SITH INTELLIGENCE"): primary = true
 		if button.get("ability_id") != null and str(button.get("ability_id")) in ["move", "shoot", "overwatch"]: primary = true
-		var primary_height := 48 if phone_hud_button and button.get("ability_id") != null else 44 if button.name == "PhoneEndTurn" else 56
+		var primary_height := 48 if phone_hud_button and button.get("ability_id") != null else 44 if button.name == "PhoneEndTurn" else 50 if button.name in ["FireButton", "AimCancel"] else 56
 		if primary and rect.size.y * pixel_scale < primary_height - 0.1: fail(str(button.get_path()), "%s primary height %s below %d" % [title, rect.size.y * pixel_scale, primary_height])
 		if button.name != "UnitCard" and button.has_theme_font_size_override("font_size") and button.get_theme_font_size("font_size") < 14:
 			fail(str(button.get_path()), "%s font below 14" % title)

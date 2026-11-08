@@ -43,10 +43,10 @@ func setup(game, root: Control, on_phone: bool) -> void:
 		panel.anchor_left = 1.0; panel.anchor_right = 1.0
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
 		panel.offset_left = -minf(350.0, root.size.x - 262.0); panel.offset_right = -6
-		panel.offset_top = -78; panel.offset_bottom = -4
+		panel.offset_top = -62; panel.offset_bottom = -4
 	else:
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
-		panel.offset_top = -114; panel.offset_bottom = -8
+		panel.offset_top = -94; panel.offset_bottom = -8
 	var style := StyleBoxFlat.new(); style.bg_color = Color("101b26ee")
 	style.border_color = Color("d2aa65"); style.set_border_width_all(1)
 	style.set_content_margin_all(4); panel.add_theme_stylebox_override("panel", style)
@@ -106,7 +106,7 @@ func setup(game, root: Control, on_phone: bool) -> void:
 
 func _button(value: String, width: float, action: Callable) -> Button:
 	var b := Button.new(); b.text = value; b.focus_mode = Control.FOCUS_NONE
-	b.custom_minimum_size = Vector2(width, 56 if phone and value in ["CONFIRM", "CANCEL"] else 44 if phone else 50)
+	b.custom_minimum_size = Vector2(width, 50 if phone and value in ["CONFIRM", "CANCEL"] else 44 if phone else 50)
 	b.add_theme_font_size_override("font_size", 14 if phone else 13)
 	b.pressed.connect(action)
 	return b
