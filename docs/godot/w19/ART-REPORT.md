@@ -1,6 +1,6 @@
-# W19 soldier armour pass: true-scale helmets
+# W19 soldier armour pass 5: fitted Meshy gear
 
-Seven class pairs are staged in `godot/assets/units/w19/`; class wiring is unchanged. The [before/after sheet](/home/jess/projects/tw-logs/w19/2026-11-07-soldier-art-before-after.jpg) compares W17 and W19 at 844×390 battle distance and armory close-up. The [lineup](/home/jess/projects/tw-logs/w19/2026-11-07-soldier-lineup.jpg) shows seven idle poses. The [pose sheet](/home/jess/projects/tw-logs/w19/art/w19-pose-review.jpg) shows idle, run, and shoot. The preceding sheets are preserved with `-v2.jpg` suffixes. These are Blender renders of staged assets, not live game captures.
+Seven class pairs are staged in `godot/assets/units/w19/`; class wiring is unchanged. The [pass 3/5 sheet](/home/jess/projects/tw-logs/w19/2026-11-07-soldier-art-pass5.jpg) compares flat grey and colour silhouettes at 844×390 battle distance plus armory close-ups. The [lineup](/home/jess/projects/tw-logs/w19/2026-11-07-soldier-lineup.jpg) shows seven idle poses. The [pose sheet](/home/jess/projects/tw-logs/w19/art/w19-pose-review.jpg) shows idle, run, and shoot. The preceding sheets and source captures are preserved with `-v3` suffixes. These are Blender renders of staged assets, not live game captures.
 
 ## Head choices and gear
 
@@ -8,30 +8,30 @@ The five human classes retain their original W17 white Trooper helmet mesh, text
 
 | Class | Helmet choice and class read | Gear and attachment |
 | --- | --- | --- |
-| Sniper | Low dark-olive hood draped over helmet back and sides; scope beside the original visor | Curved dark-olive shoulder/back cloak on `spine_03`, 0.56 maximum width, shaped in five cross sections |
+| Sniper | Meshy hood trimmed from the preview jacket, widened and seated over the helmet on `Head`; visor and scope remain visible | Meshy rear shoulder/upper-back cloak trimmed from the same preview, bound to `spine_03`; sleeves and torso front removed |
 | Heavy | Small orange cheek plates on original helmet | Curved orange pauldrons on both clavicles, below helmet line |
 | Tech | Teal brow goggles and slim antenna | Rounded teal tool pods and harness on `spine_03` |
 | Officer | Navy peaked cap seated on helmet, with crimson band; no crest or cross | Crimson cape and rank plate on `spine_03` |
-| Medic | Off-white forehead panel with red cross on original helmet | Bevelled, rounded-box off-white pouch and red cross flush to `pelvis`; strap on `spine_03` |
+| Medic | Off-white forehead panel with red cross on original helmet | Meshy hip kit scaled and seated on `pelvis`, matte off-white with a bold red cross; existing strap remains on `spine_03` |
 | Droid | Yellow elongated head at helmet scale with navy faceplate and twin photoreceptors | Rounded yellow chest and shoulder plates on `spine_03` and clavicles |
 | Scout | Existing model and helmet | Existing model; no new parts |
 
-The Sniper cloak follows the shoulders and back in idle, run, and shoot. The Medic pouch stays seated at the hip in those poses. LOD0 gear remains bevelled; LOD1 uses simpler geometry to meet the phone budget.
+The paid previews were inspected in Blender before fitting: Sniper 2,525 triangles, bounds (-0.692,-0.405,-0.948) to (0.689,0.406,0.947), with two connected parts after position welding; Medic 2,368 triangles, bounds (-0.950,-0.665,-0.647) to (0.947,0.666,0.653), with one connected part. The Sniper source was a full sleeved jacket; source-space face cuts retain 637 hood and 556 rear cloak triangles at LOD0, with no sleeves or front torso. The Medic source was a pack with small tabs; all 2,368 source triangles remain at LOD0. LOD1 decimates the fitted pieces to 254/222 Sniper triangles and 947 Medic triangles. Both pieces use flat, matte paint. The hood and cloak follow `Head` and `spine_03`; the hip kit follows `pelvis` in idle, run, and shoot. The other five classes are byte-identical to pass 3.
 
 ## Credits and budgets
 
-The first W19 pass spent **120 Meshy credits** on six previews, 20 each. This pass spent **0** and made no Meshy calls. [credits.log](/home/jess/projects/tw-logs/w19/art/credits.log) is unchanged (SHA-256 `fe2945bbe515a159b25c7f9dcd78cb15cf2fff698f01ee386320b77ff82fac11`). The seven-class GLB pack is **9,198,044 bytes** (9.20 MB), below 12 MB. Every LOD0 is below 15,000 triangles and every LOD1 below 2,500. Each rebuilt GLB retains eight clips: `idle`, `gunIdle`, `run`, `shoot`, `hit`, `death`, `aim`, and `walk`.
+Pass 5 spent **0 Meshy credits** and made no Meshy API calls. [credits.log](/home/jess/projects/tw-logs/w19/art/credits.log) is unchanged (SHA-256 `b45ff3a805bbe2c8af4c6022f2794b46add6154cf15f6779b079ece5d88ad6bb`). The seven-class GLB pack is **10,817,228 bytes** (10.82 MB), below 12 MB. Every LOD0 is below 15,000 triangles and every LOD1 below 2,500. Each rebuilt GLB retains eight clips: `idle`, `gunIdle`, `run`, `shoot`, `hit`, `death`, `aim`, and `walk`.
 
 | Class | LOD0 tris | LOD0 bytes | LOD1 tris | LOD1 bytes |
 | --- | ---: | ---: | ---: | ---: |
-| Sniper | 7,773 | 946,224 | 2,178 | 425,712 |
+| Sniper | 7,110 | 1,302,804 | 2,247 | 797,872 |
 | Heavy | 8,409 | 932,896 | 1,834 | 403,740 |
 | Tech | 7,737 | 924,804 | 2,490 | 431,448 |
 | Officer | 7,061 | 909,056 | 1,590 | 394,532 |
-| Medic | 6,789 | 906,116 | 1,558 | 392,628 |
+| Medic | 8,969 | 1,395,056 | 2,066 | 794,132 |
 | Droid | 7,982 | 972,376 | 2,079 | 398,772 |
 | Scout | 4,925 | 763,228 | 1,969 | 396,512 |
 
 ## Validation
 
-Godot 4.7.2 [headless import](/home/jess/projects/tw-logs/w19/art/art3-final-import.log) exited 0 with no script errors. `./godot/test.sh` exited 0; its [full log](/home/jess/projects/tw-logs/w19/art/art3-full-test.log) has 71 zero-failure suite results, zero `SCRIPT ERROR`, zero `ERROR:`, and Normal rescue **9/20**. `git diff --check` exited 0.
+Godot 4.7.2 [headless import](/home/jess/projects/tw-logs/w19/art/art5-import.log) exited 0 with no script errors. `./godot/test.sh` exited 0; its [full log](/home/jess/projects/tw-logs/w19/art/art5-full-test.log) has 71 zero-failure suite results, zero `SCRIPT ERROR`, zero `ERROR:`, zero parse errors, and Normal rescue **9/20**. Two tracked screenshots outside the file lease rewritten by the test runner were restored. `git diff --check` exited 0.

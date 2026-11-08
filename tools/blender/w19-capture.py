@@ -1,5 +1,6 @@
 """Render the W17/W19 comparison and phone-distance lineup without changing game wiring."""
 import bpy
+import sys
 from pathlib import Path
 from mathutils import Vector
 
@@ -58,7 +59,8 @@ def render(version,distance):
         for i,arm in enumerate(ARMS):arm.location.x-=(i-3)*.9
     bpy.data.objects.remove(cam,do_unlink=True)
 
-for version in ('w17','w19'):
+versions=tuple(sys.argv[sys.argv.index('--')+1:]) if '--' in sys.argv else ('w17','w19')
+for version in versions:
     clear();ARMS.clear();import_lineup(version);lights()
     for distance in ('battle','armory'):render(version,distance)
     print('W19 CAPTURE',version)

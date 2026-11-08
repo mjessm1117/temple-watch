@@ -51,23 +51,41 @@ def cape(name,arm,bone,m,wide=.30,long=.48,y=.17):
     bpy.context.view_layer.objects.active=o;bpy.ops.object.modifier_apply(modifier=solid.name)
     return bind(o,arm,bone)
 
-def sniper_cloak(arm,m):
-    # Curved cross sections wrap the back; the narrow hem follows the torso.
-    rows=[(1.34,.22,.115),(1.23,.27,.155),(1.08,.28,.215),(.88,.24,.275),(.69,.21,.29)]
-    verts=[]
-    for z,half,y in rows:
-        for u in (-1,-.5,0,.5,1):
-            verts.append((u*half,y+.095*(1-u*u)-.065*abs(u),z+.018*(1-u*u)))
-    faces=[]
-    for row in range(len(rows)-1):
-        for col in range(4):
-            a=row*5+col;faces.append((a,a+1,a+6,a+5))
-    mesh=bpy.data.meshes.new('curved sniper cloak');mesh.from_pydata(verts,[],faces);mesh.update()
-    o=bpy.data.objects.new('W19 dark olive shoulder cloak',mesh)
-    bpy.context.collection.objects.link(o);mesh.materials.append(m)
-    solid=o.modifiers.new('cloth thickness','SOLIDIFY');solid.thickness=.014
-    bpy.context.view_layer.objects.active=o;bpy.ops.object.modifier_apply(modifier=solid.name)
-    return bind(o,arm,'spine_03')
+def meshy_piece(kind, part, arm, bone, material, lod):
+    """Trim the paid preview in source space, then seat it in soldier space."""
+    before=set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=str(PREV/f'pass4-{kind}-preview.glb'))
+    imported=[o for o in bpy.data.objects if o not in before]
+    src=next(o for o in imported if o.type=='MESH')
+    mesh=src.data.copy()
+    world=src.matrix_world.copy()
+    for v in mesh.vertices:v.co=world @ v.co
+    for obj in imported:bpy.data.objects.remove(obj,do_unlink=True)
+    if kind=='sniper':
+        bm=bmesh.new();bm.from_mesh(mesh)
+        if part=='hood':
+            cut=[f for f in bm.faces if f.calc_center_median().z<.36 or abs(f.calc_center_median().x)>.46]
+        else:
+            cut=[f for f in bm.faces if not (-.27<f.calc_center_median().z<.39 and f.calc_center_median().y>.025 and abs(f.calc_center_median().x)<.53)]
+        bmesh.ops.delete(bm,geom=cut,context='FACES')
+        bmesh.ops.delete(bm,geom=[v for v in bm.verts if not v.link_faces],context='VERTS')
+        bm.to_mesh(mesh);bm.free();mesh.update()
+    if kind=='sniper' and part=='hood':
+        scale=(.50,.50,.46);offset=(0,-.025,1.26)
+    elif kind=='sniper':
+        scale=(.42,.42,.42);offset=(0,.04,1.30)
+    else:
+        scale=(.17,.17,.17);offset=(.10,-.025,.87)
+    for v in mesh.vertices:v.co=Vector(tuple(v.co[i]*scale[i]+offset[i] for i in range(3)))
+    mesh.materials.clear();mesh.materials.append(material)
+    obj=bpy.data.objects.new('W19 Meshy '+kind+' '+part,mesh)
+    bpy.context.collection.objects.link(obj)
+    if lod and len(mesh.polygons)>200:
+        mod=obj.modifiers.new('phone geometry','DECIMATE');mod.ratio=.40
+        bpy.context.view_layer.objects.active=obj;bpy.ops.object.modifier_apply(modifier=mod.name)
+    bind(obj,arm,bone)
+    print('MESHY_FIT',kind,part,'tris',sum(len(p.vertices)-2 for p in obj.data.polygons))
+    return obj
 
 def remove_old_head(body):
     bm=bmesh.new();bm.from_mesh(body.data)
@@ -78,10 +96,7 @@ def import_head(kind,arm,lod,M):
     # W17's white helmet and visor remain on every human class.
     existing=set(bpy.data.objects)
     if kind=='sniper':
-        ellipsoid('W19 low olive hood crown',(0,.025,1.625),(.36,.27,.045),M['olive'],arm,'Head',lod)
-        for s in (-1,1):
-            ellipsoid('W19 hood side drape',(s*.162,.050,1.524),(.025,.19,.15),M['olive'],arm,'Head',lod)
-        ellipsoid('W19 hood back drape',(0,.135,1.510),(.31,.025,.17),M['olive'],arm,'Head',lod)
+        meshy_piece('sniper','hood',arm,'Head',M['olive'],lod)
         cyl('W19 attached scope',(.154,-.155,1.565),.026,.085,M['navy'],arm,'Head',8,axis='Y')
         cyl('W19 scope lens',(.154,-.205,1.565),.019,.012,M['dark'],arm,'Head',8,axis='Y')
     elif kind=='heavy':
@@ -114,7 +129,7 @@ def gear(kind,arm,lod,M):
             ellipsoid('W19 curved orange pauldron',(s*.255,.005,1.318),(.23,.24,.105),a,arm,bone,lod)
             ellipsoid('W19 pauldron navy inset',(s*.255,-.105,1.312),(.15,.035,.042),n,arm,bone,lod)
     elif kind=='sniper':
-        sniper_cloak(arm,M['olive'])
+        meshy_piece('sniper','cloak',arm,'spine_03',M['olive'],lod)
     elif kind=='tech':
         for s in (-1,1):
             box('W19 tool harness strap',(s*.18,-.12,1.15),(.065,.065,.34),n,arm,'spine_03')
@@ -125,9 +140,9 @@ def gear(kind,arm,lod,M):
         box('rank plate',(0,-.18,1.23),(.19,.035,.09),a,arm,'spine_03')
         for x in (-.04,0,.04):box('rank bar',(x,-.204,1.23),(.020,.012,.05),w,arm,'spine_03')
     elif kind=='medic':
-        box('W19 medical satchel',(.235,.015,.97),(.15,.22,.22),w,arm,'pelvis',.035)
-        box('satchel red cross vertical',(.235,-.103,.97),(.018,.012,.095),a,arm,'pelvis')
-        box('satchel red cross horizontal',(.235,-.104,.97),(.075,.012,.026),a,arm,'pelvis')
+        meshy_piece('medic','hip kit',arm,'pelvis',w,lod)
+        box('satchel red cross vertical',(.10,-.151,.87),(.025,.012,.13),a,arm,'pelvis')
+        box('satchel red cross horizontal',(.10,-.152,.87),(.105,.012,.03),a,arm,'pelvis')
         box('medical strap',(.17,-.11,1.18),(.055,.055,.38),n,arm,'spine_03')
     elif kind=='droid':
         ellipsoid('W19 droid chest armour',(0,-.165,1.19),(.32,.085,.25),n,arm,'spine_03',lod)
