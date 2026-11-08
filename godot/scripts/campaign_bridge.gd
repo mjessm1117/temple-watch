@@ -80,7 +80,8 @@ func temple_story() -> void:
 	if not active: return
 	var s: Dictionary = campaign.state
 	screen = s.get("pending", {})
-	if screen.get("kind", "") not in ["talk", "event", "vote", "villain11", "scene11"]: screen = story.next_villain_beat(s)
+	if screen.get("kind", "") not in ["talk", "event", "vote", "villain11", "scene11", "grief"]: screen = preload("res://scripts/story/rank19_beats.gd").next(s)
+	if screen.is_empty(): screen = story.next_villain_beat(s)
 	if screen.is_empty() and show_sith_events(): return
 	if screen.is_empty(): screen = story.next_story_event(s)
 	if screen.is_empty() and int(s.get("vote_month", 0)) < int(s.month):

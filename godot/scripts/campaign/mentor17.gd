@@ -9,16 +9,49 @@ static func assign(c, master_id: String, padawan_id: String, taught_ability: Str
 	if Classes.side(str(master.get("cls", ""))) != "jedi" or Classes.side(str(pupil.get("cls", ""))) != "jedi": return false
 	if int(master.get("rank", 0)) < 5 or int(pupil.get("rank", 0)) > 2: return false
 	if str(pupil.get("mentor_id", "")) != "": return false
+	var slots := room_slots(c)
+	if slots == 0: return false
 	var pupils := 0
+	var occupied := 0
 	for other in c.state.roster:
-		if str(other.get("mentor_id", "")) == master_id and str(other.get("status", "")) == "active" and int(other.get("rank", 0)) <= 2: pupils += 1
-	if pupils >= 2: return false
+		if str(other.get("mentor_id", "")) != "" and str(other.get("status", "")) == "active" and int(other.get("rank", 0)) <= 2:
+			occupied += 1
+			if str(other.mentor_id) == master_id: pupils += 1
+	if pupils >= 2 or occupied >= slots: return false
 	if not Classes.class_data(str(master.cls)).get("abilities", {}).has(taught_ability): return false
 	pupil.mentor_id = master_id
 	pupil.taught_ability = taught_ability
 	if not master.has("trained_padawans"): master.trained_padawans = []
+	var first: bool = master.trained_padawans.is_empty()
 	if padawan_id not in master.trained_padawans: master.trained_padawans.append(padawan_id)
+	if first: preload("res://scripts/story/rank19_beats.gd").on_first_pupil(c.state, master, pupil)
 	return true
+
+static func room_slots(c) -> int:
+	return 0 if not preload("res://scripts/campaign/strat_base.gd").operational(c.state, "training") else 2 if int(c.state.wings.training) >= 2 else 1
+
+static func room_assign(c, master_id: String, padawan_id: String) -> bool:
+	if room_slots(c) <= 0: return false
+	var master: Dictionary = c.soldier(master_id)
+	var signature := str(Classes.class_data(str(master.get("cls", ""))).get("signature", ""))
+	return assign(c, master_id, padawan_id, signature)
+
+static func unassign(c, padawan_id: String) -> bool:
+	var pupil: Dictionary = c.soldier(padawan_id)
+	if pupil.is_empty() or str(pupil.get("mentor_id", "")) == "": return false
+	pupil.erase("mentor_id")
+	pupil.erase("taught_ability")
+	return true
+
+static func tick(c) -> void:
+	if room_slots(c) <= 0: return
+	for pupil in c.state.roster:
+		if str(pupil.get("mentor_id", "")) == "" or str(pupil.get("status", "")) != "active" or int(pupil.get("rank", 0)) > 2: continue
+		if c.state.pending_mission.get("squad", []).has(pupil.id) or c.state.strategy.team_deployed.has(pupil.id): continue
+		var master: Dictionary = c.soldier(str(pupil.mentor_id))
+		if master.is_empty() or str(master.get("status", "")) != "active": continue
+		pupil.xp = int(pupil.xp) + 3
+		preload("res://scripts/campaign/progression.gd").promote(pupil, c.state.roster, c)
 
 static func xp_multiplier(c, pupil: Dictionary) -> float:
 	var mentor: Dictionary = c.soldier(str(pupil.get("mentor_id", "")))
@@ -27,6 +60,7 @@ static func xp_multiplier(c, pupil: Dictionary) -> float:
 static func on_death(c, master: Dictionary, where: String) -> void:
 	if Classes.side(str(master.get("cls", ""))) != "jedi": return
 	var taught: Array = master.get("trained_padawans", [])
+	preload("res://scripts/story/rank19_beats.gd").on_death(c.state, master, where)
 	for id in taught:
 		var pupil: Dictionary = c.soldier(str(id))
 		if pupil.is_empty(): continue

@@ -83,6 +83,14 @@ func _build_shell() -> void:
 	HomeResources.add_row(resources, campaign)
 	resources.add_child(HomeResources.power_label(campaign))
 	resources.add_child(UI.label("Order Darkness  %d/100" % int(campaign.state.orderDark), 13, Color("b5a2d3")))
+	if Phone.window_size().x < 700:
+		resources.get_node("Resource_credits").text = "Cr %d" % int(campaign.state.res.credits)
+		resources.get_node("Resource_intel").text = "Intel %d" % int(campaign.state.res.intel)
+		resources.get_node("Resource_kyber").text = "Kyber %d" % int(campaign.state.res.kyber)
+		resources.get_node("Resource_favor").hide()
+		resources.get_node("Resource_recruits").hide()
+		resources.get_node("PowerStatus").text = "Power %d/%d" % [Base.power(campaign.state).used, Base.power(campaign.state).capacity]
+		resources.get_child(resources.get_child_count() - 1).text = "Dark %d" % int(campaign.state.orderDark)
 	if not compact:
 		var era_label := UI.label("JEDI TEMPLE  /  %s" % {1:"OLD REPUBLIC", 2:"NEW SITH WARS", 3:"HIGH REPUBLIC"}.get(int(campaign.state.era), "REPUBLIC"), 13, UI.MUTED)
 		era_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; era_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; resources.add_child(era_label)
@@ -153,8 +161,8 @@ func _build_shell() -> void:
 	mini_galaxy.position = Vector2(8, 100) if compact else Vector2(25, 340)
 	station_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.97)); add_child(station_panel)
 	station_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	station_panel.anchor_left = 0.0 if compact else 0.35; station_panel.offset_left = 8 if compact else 0
-	station_panel.offset_top = 98 if compact else 113; station_panel.offset_right = -8 if compact else -20
+	station_panel.anchor_left = 0.0 if compact else 0.35; station_panel.offset_left = 0
+	station_panel.offset_top = 98 if compact else 113; station_panel.offset_right = 0 if compact else -20
 	station_panel.offset_bottom = -57 if compact else -100
 	station_panel.visible = panel_open
 	var column := UI.column(8); station_panel.add_child(column)
@@ -217,7 +225,7 @@ func _slide_station() -> void:
 	panel_tween = create_tween().set_parallel(true)
 	panel_tween.tween_property(station_panel, "modulate:a", 1.0, 0.22)
 	panel_tween.tween_property(station_panel, "offset_left", 0.0, 0.28).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	panel_tween.tween_property(station_panel, "offset_right", -20.0, 0.28).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	panel_tween.tween_property(station_panel, "offset_right", 0.0 if Phone.narrow(Phone.window_size()) else -20.0, 0.28).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 func _refresh_shell() -> void:
 	if panel_tween != null: panel_tween.kill()
@@ -235,7 +243,13 @@ func _change_page(name: String, room_id: String = "") -> void:
 func _show_page() -> void:
 	UI.clear(page_content)
 	HomeTabs.update(nav_buttons, HomeBadges.collect(campaign), page, panel_open)
-	status_label.text = "MONTH %d  ·  DAY %d  ·  WEEK %d" % [int(campaign.state.month), int(campaign.state.day), campaign.week()]
+	status_label.text = "M%d · D%d" % [int(campaign.state.month), int(campaign.state.day)] if Phone.window_size().x < 700 else "MONTH %d  ·  DAY %d  ·  WEEK %d" % [int(campaign.state.month), int(campaign.state.day), campaign.week()]
+	if selected_room == "training" and page == "Roster":
+		var training_room := preload("res://scripts/campaign/training_room19.gd").new()
+		page_content.add_child(training_room)
+		training_room.setup(campaign)
+		training_room.changed.connect(func(): get_node("/root/CampaignFlow").save())
+		return
 	page_content.add_child(UI.label(page.to_upper(), 30, UI.ACCENT))
 	if selected_room != "" and temple_view.rooms.has(selected_room):
 		var room: Dictionary = temple_view.rooms[selected_room]

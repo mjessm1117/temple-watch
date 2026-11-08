@@ -24,6 +24,11 @@ const Crisis11 = preload("res://scripts/campaign/crisis11_engine.gd")
 signal month_advanced(month: int, snapshot: Dictionary)
 signal mission_resolved(result: Dictionary, summary: Dictionary)
 signal darkness_changed(segments: int, value: int)
+signal rank_up(unit: Dictionary, previous: int, current: int)
+
+func rank_advanced(unit: Dictionary, previous: int, current: int) -> void:
+	rank_up.emit(unit, previous, current)
+	preload("res://scripts/story/rank19_beats.gd").on_rank(state, unit, previous, current)
 
 func ensure_strategy() -> void:
 	Base.ensure(state); Roster.ensure(state); Identity.ensure(self); Ops.ensure(self)
@@ -316,7 +321,7 @@ func apply_mission_result(result: Dictionary) -> Dictionary:
 		if unit_result.has("dark"): r.dark = int(unit_result.dark)
 		if kills > 0: Legacy.add_deed(self, str(r.id), "kills", kills)
 		r.kills = int(r.kills) + kills; r.missions = int(r.missions) + 1; r.xp = int(r.xp) + xp
-		if str(r.status) == "active" and Progression.promote(r, state.roster): summary.promotions.append(r.id)
+		if str(r.status) == "active" and Progression.promote(r, state.roster, self): summary.promotions.append(r.id)
 		summary.rows.append({"id": r.id, "xp": xp, "status": r.status, "wound": r.wound, "rank": r.rank})
 	for i in range(0 if result.get("bonds_recorded", false) else deployed.size()):
 		for j in range(i + 1, deployed.size()):
@@ -514,7 +519,7 @@ func _resolve_team(option: Dictionary, team_id: String, player_squad: Array) -> 
 			gain(str(key), amount)
 		for r in members:
 			r.xp = int(r.xp) + int(auto.xp); r.missions = int(r.missions) + 1
-			Progression.promote(r, state.roster)
+			Progression.promote(r, state.roster, self)
 			if randi_range(0, 99) < int(auto.winWound): r.wound = maxi(int(r.wound), ceili(float(Data.get_table("core", "WOUND").light) / heal_multiplier()))
 		for i in members.size():
 			for j in range(i + 1, members.size()): Legacy.bond_points(self, members[i].id, members[j].id, 1)

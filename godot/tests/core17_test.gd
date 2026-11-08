@@ -140,6 +140,7 @@ func run() -> void:
 	var pupil: Dictionary = game.soldier(str(hired.id))
 	pupil.rank = 1
 	pupil.erase("mentor_id")
+	game.state.wings.training = 1
 	check(Mentor.assign(game, "u1", str(hired.id), "guard"), "Master teaches Padawan")
 	check(Mentor.xp_multiplier(game, pupil) == 1.5, "mentored Padawan gains 50 percent XP")
 	Mentor.on_death(game, master, "Test mission")

@@ -32,7 +32,7 @@ const ROOMS = [
 	["armory", "Armory", "Arsenal", "armory", -5.2, 4.6, "racks"],
 	["comms", "Comms Hub", "Galaxy", "comms", 0.0, 4.6, "holo"],
 	["gardens", "Meditation Gardens", "Roster", "gardens", 5.2, 4.6, "garden"],
-	["training", "Training Salle", "Roster", "training", -7.8, 1.7, "training"],
+	["training", "Training Room", "Roster", "training", -7.8, 1.7, "training"],
 	["barracks", "Barracks", "Roster", "barracks", -2.6, 1.7, "beds"],
 	["medical", "Medical Halls", "Roster", "medical", 2.6, 1.7, "medical"],
 	["forge", "Kyber Forge", "Arsenal", "forge", 7.8, 1.7, "forge"],
