@@ -104,20 +104,49 @@ func preview(actor: Dictionary, target: Dictionary) -> void:
 	if preview_tween != null and preview_tween.is_running(): preview_tween.kill()
 	var origin := Vector3(float(actor.x), Shot.elevation(g.mission, Shot.pos(actor)) * 0.7, float(actor.y))
 	var destination := Vector3(float(target.x), Shot.elevation(g.mission, Shot.pos(target)) * 0.7, float(target.y))
-	var direction := destination - origin
-	direction.y = 0.0
-	if direction.length_squared() < 0.01: direction = Vector3.FORWARD
-	direction = direction.normalized()
-	var side := Vector3(-direction.z, 0.0, direction.x)
-	var shoulder := origin - direction * 0.7 + side * 4.5 + Vector3.UP * (2.2 if phone else 2.55)
-	shoulder = preload("res://scripts/battle11_camera.gd").aim_position(g.mission, shoulder)
-	var look := origin.lerp(destination, 0.8) + Vector3.UP * (1.4 if phone else 1.25)
+	var shoulder := aim_shoulder(g.mission, origin, destination)
+	var view_direction := destination - shoulder
+	view_direction.y = 0.0
+	var screen_right := view_direction.normalized().cross(Vector3.UP)
+	var look := destination + screen_right * (0.75 if phone else 0.0) + Vector3.UP * 1.25
 	g.cinematic = true
 	preview_tween = g.create_tween().set_parallel(true)
 	preview_tween.tween_property(g.camera, "position", shoulder, AIM_BLEND).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	preview_tween.tween_property(g.camera, "fov", 74.0 if phone else 52.0, AIM_BLEND)
+	preview_tween.tween_property(g.camera, "fov", 58.0 if phone else 52.0, AIM_BLEND)
 	var initial_look: Vector3 = g.camera.position - g.camera.global_basis.z * 8.0
 	preview_tween.tween_method(func(value: Vector3) -> void: g.camera.look_at(value, Vector3.UP), initial_look, look, AIM_BLEND)
+
+static func aim_shoulder(m: RefCounted, origin: Vector3, destination: Vector3) -> Vector3:
+	var forward := destination - origin
+	forward.y = 0.0
+	if forward.length_squared() < 0.01: forward = Vector3.FORWARD
+	forward = forward.normalized()
+	var side := Vector3(-forward.z, 0.0, forward.x)
+	var target := destination + Vector3.UP * 1.25
+	for retreat in [1.15, 1.8, 2.5]:
+		for height in [1.55, 2.15, 2.9]:
+			for sign_side in [1.0, -1.0]:
+				var eye: Vector3 = origin - forward * retreat + side * 0.85 * sign_side + Vector3.UP * height
+				eye = preload("res://scripts/battle11_camera.gd").aim_position(m, eye)
+				if aim_ray_clear(m, eye, target): return eye
+	for height in [3.4, 4.5, 6.0, 9.0, 12.0, 20.0]:
+		var eye: Vector3 = preload("res://scripts/battle11_camera.gd").aim_position(m, origin - forward * 2.5 + Vector3.UP * height)
+		if aim_ray_clear(m, eye, target): return eye
+	return preload("res://scripts/battle11_camera.gd").aim_position(m, origin - forward * 2.5 + Vector3.UP * 30.0)
+
+static func aim_ray_clear(m: RefCounted, eye: Vector3, target: Vector3) -> bool:
+	# Map art has no physics colliders. Sample the same tile heights used to draw cover.
+	var distance := eye.distance_to(target)
+	var steps := maxi(1, ceili(distance * 5.0))
+	for step in range(1, steps):
+		var t := float(step) / float(steps)
+		var point := eye.lerp(target, t)
+		var tile := Vector2i(roundi(point.x), roundi(point.z))
+		var kind: String = m.tile(tile)
+		var floor_height: float = float(Shot.elevation(m, tile)) * 0.7
+		var top := floor_height + (1.9 if kind == "#" else 0.8 if kind in ["c", "h", "k"] else 0.0)
+		if point.y < top and kind in ["#", "c", "h", "k"]: return false
+	return true
 
 func skip_preview_transition() -> void:
 	if not preview_active or preview_tween == null or not preview_tween.is_running(): return

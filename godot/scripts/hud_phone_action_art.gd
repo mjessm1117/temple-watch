@@ -53,9 +53,11 @@ func _draw() -> void:
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
 		var at := offsets[index]
-		var caption: String = button.display_name.to_upper()
-		if caption.length() > 7: caption = caption.substr(0, 6) + "…"
-		draw_string(font, at + Vector2(1, 39), caption, HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, 10, Color("edf3f4") if not button.disabled else Color("87919b"))
+		var caption: String = caption_for(button.display_name)
+		var size := 10
+		while size > 7 and font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > button.size.x - 4:
+			size -= 1
+		draw_string(font, at + Vector2(1, 39), caption, HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, size, Color("edf3f4") if not button.disabled else Color("87919b"))
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
 		var at := offsets[index]
@@ -65,3 +67,9 @@ func _draw() -> void:
 			var color := Color(Marks.COLORS.get(str(mark.tag), "dcebf0"))
 			var glyph: String = Marks.GLYPHS.get(str(mark.tag), "•")
 			draw_string(font, center + Vector2(-4, 4), glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, color)
+
+static func caption_for(display_name: String) -> String:
+	var caption := display_name.to_upper()
+	if caption.begins_with("SABER "): return "SABER"
+	if caption == "FORCE LEAP": return "LEAP"
+	return caption

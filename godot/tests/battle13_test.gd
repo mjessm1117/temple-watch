@@ -111,50 +111,22 @@ func exercise(size: Vector2i) -> void:
 	game.cam.skip_preview_transition()
 	check(game.cam.preview_tween == null or not game.cam.preview_tween.is_running(), "aim transition skips immediately")
 	var target: Dictionary = game.mission.unit_by_id(game.target_id)
-	var shooter_bounds := aim_body_bounds(game, actor)
 	var target_bounds := aim_body_bounds(game, target)
-	check(not shooter_bounds.intersects(target_bounds), "shooter and target screen bounds do not overlap at %s: %s / %s" % [size, shooter_bounds, target_bounds])
+	var target_point: Vector3 = game.views[int(target.id)].global_position + Vector3.UP * 1.25
+	var target_screen: Vector2 = game.camera.unproject_position(target_point)
+	var viewport := Rect2(Vector2.ZERO, Vector2(size))
+	check(viewport.has_point(target_screen) and not game.camera.is_position_behind(target_point), "aim target stays on screen at %s" % size)
+	check(not aim.panel.get_global_rect().has_point(target_screen), "target clears aim card at %s" % size)
 	if size.x < 1000:
-		var phone = game.hud_controls.phone
-		var header_bottom: float = phone.overlay.get_child(0).get_global_rect().end.y
-		var hud_top: float = minf(aim.panel.get_global_rect().position.y, phone.overlay.find_child("AbilityTray", true, false).get_global_rect().position.y)
-		for bounds in [shooter_bounds, target_bounds]:
-			check(bounds.size.y >= 55.0, "phone aim unit height is at least 55 px: %s" % bounds)
-		for unit in [actor, target]:
-			var bounds := unit_bounds(game, unit)
-			check(bounds.position.y >= header_bottom + 8.0 and not bounds.intersects(aim.panel.get_global_rect()) and bounds.position.x >= 8.0 and bounds.end.x <= size.x - 8.0, "phone aim unit clears header and right action panel: %s header=%.1f hud=%.1f" % [bounds,header_bottom,hud_top])
-		game.hud_controls.night.update_chips()
-		await process_frame
-		var chips: Control = game.hud_controls.night.chips
-		var hit_chip: Control = null
-		for chip in chips.get_children():
-			if "HIT" in chip.text: hit_chip = chip; break
-		check(hit_chip != null, "phone hit-chance badge is visible")
-		if hit_chip != null:
-			var chip_bounds := hit_chip.get_global_rect()
-			check(not chip_bounds.intersects(shooter_bounds) and not chip_bounds.intersects(target_bounds), "phone hit-chance badge clears both units: %s" % chip_bounds)
+		check(target_bounds.size.y >= 55.0, "phone aim target is at least 55 px tall: %s" % target_bounds)
+		check(game.cam.preview_shoulder != null and game.cam.preview_shoulder.visible, "phone foreground shoulder is visible")
+		check(aim.odds.text.contains("HIT") and aim.odds_detail.text.contains("DMG"), "phone aim card shows odds and damage")
 	var origin := Vector3(float(actor.x), Shot.elevation(game.mission, Shot.pos(actor)) * 0.7, float(actor.y))
 	var destination := Vector3(float(target.x), Shot.elevation(game.mission, Shot.pos(target)) * 0.7, float(target.y))
 	var shot_direction := destination - origin; shot_direction.y = 0.0
 	check((game.camera.position - origin).dot(shot_direction) < 0.0, "camera is behind shooter at %s" % size)
-	check(absf((game.camera.position - origin).cross(shot_direction.normalized()).y) > 4.0, "camera is offset over shoulder at %s" % size)
-	var viewport := Rect2(Vector2.ZERO, Vector2(size))
-	if size.x < 1000:
-		var actor_at: Vector3 = game.views[int(actor.id)].global_position
-		var actor_bounds := Rect2()
-		var first := true
-		for x in [-0.55, 0.55]:
-			for y in [0.0, 2.3]:
-				for z in [-0.55, 0.55]:
-					var point: Vector2 = game.camera.unproject_position(actor_at + Vector3(x, y, z))
-					if first:
-						actor_bounds = Rect2(point, Vector2.ZERO); first = false
-					else: actor_bounds = actor_bounds.expand(point)
-		var phone = game.hud_controls.phone
-		var hud_top: float = minf(aim.panel.get_global_rect().position.y, phone.overlay.find_child("AbilityTray", true, false).get_global_rect().position.y)
-		var header_bottom: float = phone.overlay.get_child(0).get_global_rect().end.y
-		var screen_width: float = game.camera.get_viewport().get_visible_rect().size.x
-		check(actor_bounds.position.y >= header_bottom + 8.0 and not actor_bounds.intersects(aim.panel.get_global_rect()) and actor_bounds.position.x >= 8.0 and actor_bounds.end.x <= screen_width - 8.0, "selected unit clears phone header and right HUD: %s header=%.1f hud=%.1f" % [actor_bounds,header_bottom,hud_top])
+	check(absf((game.camera.position - origin).cross(shot_direction.normalized()).y) > 0.45, "camera is offset over shoulder at %s" % size)
+	check(Camera.aim_ray_clear(game.mission, game.camera.position, target_point), "cover clears camera ray at %s" % size)
 	check(viewport.encloses(aim.panel.get_global_rect()), "aim card fits at %s" % size)
 	check(viewport.encloses(aim.confirm.get_global_rect()) and aim.confirm.size.y >= 44.0, "FIRE is reachable at %s" % size)
 	if size.x < 1000:
