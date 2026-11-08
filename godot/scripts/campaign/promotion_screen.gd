@@ -41,7 +41,7 @@ func setup(c: RefCounted, id: String) -> void:
     margin.add_child(frame)
     var portrait_panel := UI.panel(Color("11242c"))
     portrait_panel.name = "RankupPortrait"
-    portrait_panel.custom_minimum_size.x = 152 if get_viewport_rect().size.x <= 700 else 185 if get_viewport_rect().size.x <= 900 else 300
+    portrait_panel.custom_minimum_size.x = 152 if get_tree().root.size.x <= 700 else 185 if get_tree().root.size.x <= 900 else 300
     portrait_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
     frame.add_child(portrait_panel)
     var portrait_column := VBoxContainer.new()
@@ -50,14 +50,13 @@ func setup(c: RefCounted, id: String) -> void:
     var r: Dictionary = campaign.soldier(unit_id)
     var eyebrow := UI.label("FIELD RECORD  /  PROMOTION", 10, UI.ACCENT)
     portrait_column.add_child(eyebrow)
-    var image := Portraits.picture(str(r.get("n", "")), Vector2(120, 90))
+    var portrait_height: float = minf(270.0, get_viewport_rect().size.y - 130.0)
+    var portrait_width: float = minf(246.0, portrait_panel.custom_minimum_size.x - 28.0)
+    var image := Portraits.picture(str(r.get("n", "")), Vector2(portrait_width, portrait_height))
     image.name = "UnitPortrait"
-    if Classes.side(str(r.cls)) == "soldier" and image.texture != null:
-        var crop := AtlasTexture.new()
-        crop.atlas = image.texture
-        crop.region = Rect2(0, 6, image.texture.get_width(), image.texture.get_height() - 48)
-        image.texture = crop
-    image.size_flags_vertical = Control.SIZE_EXPAND_FILL
+    image.texture = Portraits.promotion_texture(str(r.get("n", "")))
+    image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+    image.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
     portrait_column.add_child(image)
     var name_label := UI.label(str(r.get("n", "")), 17, UI.GOLD)
     portrait_column.add_child(name_label)
@@ -212,7 +211,7 @@ func _ability_card(id: String, active: bool, earned: bool = false) -> Control:
     var definition := _ability_data(id)
     var card: Control = Button.new() if active else PanelContainer.new()
     card.name = "Card_" + id
-    card.custom_minimum_size.y = 76 if active else 46
+    card.custom_minimum_size.y = 94 if active else 46
     card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     var fill := Color("1d333b") if earned else Color("182b34") if active else Color("142127")
     var border := UI.GOLD if earned else UI.ACCENT if active else UI.BORDER
@@ -242,17 +241,18 @@ func _ability_card(id: String, active: bool, earned: bool = false) -> Control:
     var effect := UI.label(_effect_text(definition), 12, UI.TEXT if active or earned else UI.MUTED)
     effect.name = "Effect_" + id
     effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    effect.autowrap_mode = TextServer.AUTOWRAP_OFF
-    effect.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-    effect.custom_minimum_size.y = 18
+    effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if active else TextServer.AUTOWRAP_OFF
+    effect.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING if active else TextServer.OVERRUN_TRIM_ELLIPSIS
+    effect.custom_minimum_size.y = 38 if active else 18
     stack.add_child(effect)
     var chain_text := _chain_text(definition)
-    var chains := UI.label(chain_text if chain_text != "" else "NO CHAIN TAG", 11, UI.ACCENT if active or earned else UI.MUTED)
-    chains.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    chains.autowrap_mode = TextServer.AUTOWRAP_OFF
-    chains.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-    chains.custom_minimum_size.y = 16
-    stack.add_child(chains)
+    if chain_text != "":
+        var chains := UI.label(chain_text, 11, UI.ACCENT if active or earned else UI.MUTED)
+        chains.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        chains.autowrap_mode = TextServer.AUTOWRAP_OFF
+        chains.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+        chains.custom_minimum_size.y = 16
+        stack.add_child(chains)
     if active: cards[id] = card
     return card
 
@@ -297,7 +297,13 @@ func _refresh() -> void:
         var picks: Array = r.get("picks", [])
         if level == pending:
             var options := Progression.tree_options(r, level)
-            for option in options: row.add_child(_ability_card(str(option), true))
+            var grid := GridContainer.new()
+            grid.name = "ChoiceGrid"
+            grid.columns = 2 if get_tree().root.size.x >= 800 else 1
+            grid.add_theme_constant_override("h_separation", 4)
+            grid.add_theme_constant_override("v_separation", 4)
+            row.add_child(grid)
+            for option in options: grid.add_child(_ability_card(str(option), true))
         elif level <= picks.size():
             row.add_child(_ability_card(str(picks[level - 1]), false, true))
         elif level > rank:

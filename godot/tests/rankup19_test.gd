@@ -54,6 +54,17 @@ func within(node: Control, bounds: Vector2) -> bool:
     var rect := node.get_global_rect()
     return rect.position.x >= -1 and rect.position.y >= -1 and rect.end.x <= bounds.x + 1 and rect.end.y <= bounds.y + 1
 
+func portrait_fits(screen: Control) -> bool:
+    var portrait: TextureRect = screen.find_child("UnitPortrait", true, false)
+    if portrait.texture == null: return false
+    return portrait.texture.get_size().x >= portrait.size.x and portrait.texture.get_size().y >= portrait.size.y
+
+func card_text_fits(card: Control) -> bool:
+    var area := card.get_global_rect()
+    for label in card.find_children("*", "Label", true, false):
+        if label.get_global_rect().end.y > area.end.y - 3: return false
+    return true
+
 func run() -> void:
     ProjectSettings.set_setting("input_devices/pointing/emulate_touch_from_mouse", true)
     var c = Campaign.new()
@@ -70,11 +81,20 @@ func run() -> void:
         check(within(screen, value), "%s full screen bounds" % value)
         check(within(screen.confirm, value), "%s confirm bounds" % value)
         check(within(screen.new_badge, value), "%s badge bounds" % value)
+        check(portrait_fits(screen), "%s portrait source covers displayed rect" % value)
         if value.x == 667:
             touch(Vector2(20, 20), true)
             touch(Vector2(20, 20), false)
             check(screen.new_badge.modulate.a == 1.0, "tap skips promotion flourish")
         var card: Button = screen.cards["guardian_soresu_circle"]
+        var grid: GridContainer = screen.rank_rows[3].find_child("ChoiceGrid", true, false)
+        check(grid.columns == (1 if value.x == 667 else 2), "%s choice columns" % value)
+        for choice in screen.cards.values():
+            check(card_text_fits(choice), "%s choice text fits card" % value)
+            if value.x == 844:
+                var bounds: Rect2 = screen.scroll.get_global_rect()
+                var rect: Rect2 = choice.get_global_rect()
+                check(rect.position.y >= bounds.position.y - 1 and rect.end.y <= bounds.end.y + 1, "844 current rank card fully visible")
         check(card.get_global_rect().position.x >= 0 and card.get_global_rect().end.x <= value.x + 1, "%s choice card horizontal bounds" % value)
         var effect: Label = card.find_child("Effect_guardian_soresu_circle", true, false)
         check(effect.get_global_rect().end.y <= screen.scroll.get_global_rect().end.y + 1, "%s effect line visible" % value)
@@ -138,9 +158,22 @@ func run() -> void:
     soldier.picks = ["trooper_thermal_detonator"]
     soldier.pick = Progression.pending_rank(soldier)
     screen = await screen_for(c, "u3")
+    check(portrait_fits(screen), "soldier portrait source covers displayed rect")
+    var soldier_image: TextureRect = screen.find_child("UnitPortrait", true, false)
+    check(soldier_image.texture is AtlasTexture and soldier_image.texture.region.position.y >= 18, "soldier crop removes magenta top strip")
+    var soldier_text := ""
+    for label in screen.find_children("*", "Label", true, false): soldier_text += label.text
+    check(not soldier_text.contains("NO CHAIN TAG"), "empty chain tag has no developer copy")
     await shot("soldier-844")
     screen.queue_free()
     await process_frame
+    for value in [Vector2i(667, 375), Vector2i(1366, 768)]:
+        await resize_to(value)
+        screen = await screen_for(c, "u3")
+        check(portrait_fits(screen), "%s soldier portrait source covers displayed rect" % value)
+        screen.queue_free()
+        await process_frame
+    await resize_to(Vector2i(844, 390))
     jedi.rank = 8
     jedi.spec = "a"
     jedi.picks = ["guardian_deflect", "guardian_brace", "guardian_soresu_circle", "guardian_interpose", "guardian_living_rampart", "guardian_bastion_wave", "guardian_citadel_oath"]
