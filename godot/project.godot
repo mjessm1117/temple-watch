@@ -11,7 +11,7 @@ Graphics="*res://scripts/graphics_settings.gd"
 CampaignFlow="*res://scripts/campaign_bridge.gd"
 
 [editor_plugins]
-enabled=PackedStringArray("res://addons/godot_ai/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_ai/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
 
 [display]
 window/size/viewport_width=1366
