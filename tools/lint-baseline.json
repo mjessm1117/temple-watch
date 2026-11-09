@@ -1,5 +1,7 @@
 {
   "biome_errors": 31,
   "biome_warnings": 26,
-  "ts_errors": 0
+  "ts_errors": 0,
+  "gdlint_errors": 4917,
+  "gdformat_unformatted": 433
 }
