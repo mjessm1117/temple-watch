@@ -1,0 +1,9 @@
+DONE step1 — addon copied and wired; battle-engine.png at tw-logs/tooling/ (518339 bytes; xvfb-run needed because --headless uses dummy renderer)
+DONE step2 — 10 Playwright baselines captured and comparison passes at 2% max diff
+DONE step3 — Biome/checkJs and gdtoolkit baseline gates committed; gdtoolkit 4.5.0 preinstalled
+DONE step4 — gdUnit4 v6.2.3, 4 test methods pass; lint baseline refreshed for addon
+DONE step5 — critique loop working; test-only mask flipped XCOM feel FAIL to PASS; before/after at tw-logs/tooling/
+BLOCKED visual-fix — original critique found small tap targets, dim labels, and banner obstruction; UI files are outside tooling lane boundary
+BLOCKED uv-mcp — addon wired, MCP server needs uv (House installing)
+DONE lint-baseline — {"biome_errors":31,"biome_warnings":26,"ts_errors":0,"gdlint_errors":6049,"gdformat_unformatted":645}
+ALL DONE — npm test exit 0, test.sh exit 0, gdunit4 exit 0, lint PASS
