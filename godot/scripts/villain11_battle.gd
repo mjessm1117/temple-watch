@@ -5,6 +5,9 @@ static func setup(m: RefCounted, pending: Dictionary) -> void:
 	if not bool(pending.get("villain_present", false)): return
 	m.objective_state.villain_name = str(pending.get("villain_name", "Sith Lord"))
 	m.objective_state.villain_end_bark = str(pending.get("villain_end_bark", ""))
+	m.objective_state.villain_intro_line = str(pending.get("villain_intro_line", pending.get("villain_start_bark", "%s enters the battle." % m.objective_state.villain_name))).replace("\n", " ").strip_edges()
+	m.objective_state.villain_retreat_line = str(pending.get("villain_retreat_line", pending.get("villain_end_bark", "%s withdraws." % m.objective_state.villain_name))).replace("\n", " ").strip_edges()
+	m.objective_state.villain_status = "arriving"
 	var duel := str(m.spec.get("family", "")) == "sith_lord_duel"
 	var villain: Dictionary = {}
 	if duel:
@@ -33,10 +36,14 @@ static func setup(m: RefCounted, pending: Dictionary) -> void:
 	m.objective_state.villain_outcome = "present"
 	m.message(str(pending.get("villain_start_bark", "")))
 
+static func mark_present(m: RefCounted) -> void:
+	if str(m.objective_state.get("villain_status", "")) == "arriving": m.objective_state.villain_status = "present"
+
 static func on_damage(m: RefCounted, target: Dictionary) -> bool:
 	if not bool(target.get("villain11", false)) or m.objective_state.get("villain_outcome", "absent") != "present": return false
 	if str(m.spec.get("family", "")) != "sith_lord_duel" and int(target.hp) * 10 <= int(target.max_hp) * 3:
 		m.objective_state.villain_outcome = "retreated"
+		m.objective_state.villain_status = "retreating"
 		target.status = "retreated"
 		target.hp = maxi(1, int(target.hp))
 		m.units.erase(target)
@@ -44,6 +51,7 @@ static func on_damage(m: RefCounted, target: Dictionary) -> bool:
 		return true
 	if int(target.hp) <= 0:
 		m.objective_state.villain_outcome = "defeated"
+		m.objective_state.villain_status = "retreating"
 		if not str(m.objective_state.villain_end_bark).is_empty(): m.message(m.objective_state.villain_end_bark)
 	return false
 
@@ -57,6 +65,7 @@ static func outcome_text(name: String, outcome: String) -> String:
 static func finish(m: RefCounted) -> void:
 	if m.objective_state.get("villain_outcome", "absent") != "present": return
 	m.objective_state.villain_outcome = "retreated"
+	m.objective_state.villain_status = "retreating"
 	for enemy in m.living("enemy"):
 		if bool(enemy.get("villain11", false)):
 			enemy.status = "retreated"
