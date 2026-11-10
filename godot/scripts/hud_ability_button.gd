@@ -109,7 +109,8 @@ func _draw() -> void:
 		draw_string(ThemeDB.fallback_font, Vector2(44, 51), "%s AP" % cost, HORIZONTAL_ALIGNMENT_LEFT, size.x - 47, 12, gold)
 	if phone_icon:
 		var glyphs := {"move":"➜", "shoot":"◎", "overwatch":"⌖", "hunker":"⬟", "strike":"⚔", "push":"⇥", "reload":"↻"}
-		draw_string(ThemeDB.fallback_font, Vector2(2, 28), str(glyphs.get(ability_id, "✦")), HORIZONTAL_ALIGNMENT_CENTER, size.x - 4, 18, blue)
+		if not preload("res://scripts/phone_layout.gd").touch_device():
+			draw_string(ThemeDB.fallback_font, Vector2(2, 28), str(glyphs.get(ability_id, "✦")), HORIZONTAL_ALIGNMENT_CENTER, size.x - 4, 18, blue)
 	else:
 		match ability_id:
 			"move":

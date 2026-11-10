@@ -12,7 +12,7 @@ func setup(rooms: Dictionary, state: Dictionary) -> void:
 	offset_left = 8; offset_right = -8; offset_top = 84; offset_bottom = -110
 	var column := UI.column(4); add_child(column)
 	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	galaxy_button = UI.button("GALAXY MAP  ·  %d missions and threats  →" % state.options.size(), func(): galaxy_selected.emit())
+	galaxy_button = UI.button(("GALAXY MAP  ·  %d missions and threats  >" if preload("res://scripts/phone_layout.gd").touch_device() else "GALAXY MAP  ·  %d missions and threats  →") % state.options.size(), func(): galaxy_selected.emit())
 	galaxy_button.name = "GalaxyOverview"; galaxy_button.custom_minimum_size.y = 56
 	galaxy_button.add_theme_font_size_override("font_size", 15)
 	column.add_child(galaxy_button)

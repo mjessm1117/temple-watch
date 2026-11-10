@@ -105,7 +105,7 @@ static func region_panel(view) -> void:
 	var count := 0
 	for offer in view.map_view.offers:
 		if Data.get_table("galaxy","PLANETS")[offer.planet].reg == key:
-			count += 1; box.add_child(UI.button("↗ " + str(offer.name),view._select.bind(int(offer.index))))
+			count += 1; box.add_child(UI.button(("> " if preload("res://scripts/phone_layout.gd").touch_device() else "↗ ") + str(offer.name),view._select.bind(int(offer.index))))
 	if count == 0: box.add_child(UI.label("Nothing needs the Order here right now.",14,UI.MUTED))
 	for op in c.sith.operations():
 		if op.status not in ["open","team"]: continue

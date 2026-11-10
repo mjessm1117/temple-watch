@@ -11,11 +11,12 @@
       overflow: hidden; overscroll-behavior: none; }
     body { position: fixed; inset: 0; height: 100dvh; color: #f6e8c4;
       font-family: Georgia, "Times New Roman", serif; touch-action: none; }
-    #canvas { display: block; position: fixed; top: env(safe-area-inset-top, 0px);
-      left: env(safe-area-inset-left, 0px);
-      width: calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-      height: calc(var(--visible-height, 100dvh) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    #canvas { display: block; position: fixed; top: 0; left: 0;
+      width: 100vw; height: var(--visible-height, 100dvh);
       outline: none; touch-action: none; }
+    #safe-area-probe { position: fixed; visibility: hidden; pointer-events: none;
+      padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+        env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
     #loading { position: fixed; inset: 0; display: grid; place-items: center; z-index: 4;
       background: radial-gradient(ellipse at 50% 35%, #304647 0%, #17282d 47%, #0b161b 100%); }
     #loading[hidden] { display: none; }
@@ -33,6 +34,7 @@
 </head>
 <body>
   <canvas id="canvas">Your browser does not support canvas.</canvas>
+  <div id="safe-area-probe" aria-hidden="true"></div>
   <div id="loading" role="status" aria-live="polite">
     <div class="panel">
       <span class="mark" aria-hidden="true"></span>
@@ -46,13 +48,15 @@
   <script src="$GODOT_URL"></script>
   <script>
     const GODOT_CONFIG = $GODOT_CONFIG;
-    // The page, not Godot, sizes the canvas: Godot's full-window policy uses
-    // innerWidth/innerHeight and would ignore the iPhone safe-area insets.
+    // Render behind the notch; the game positions controls inside the measured safe area.
     GODOT_CONFIG.canvasResizePolicy = 0;
     const canvas = document.getElementById('canvas');
     function fitVisibleViewport() {
       const height = window.visualViewport ? window.visualViewport.height : window.innerHeight;
       document.documentElement.style.setProperty('--visible-height', `${height}px`);
+      const safe = getComputedStyle(document.getElementById('safe-area-probe'));
+      window.templeSafeArea = Object.fromEntries(['top', 'right', 'bottom', 'left']
+        .map(side => [side, parseFloat(safe.getPropertyValue(`padding-${side}`)) || 0]));
       window.scrollTo(0, 0);
       const rect = canvas.getBoundingClientRect();
       const ratio = window.devicePixelRatio || 1;

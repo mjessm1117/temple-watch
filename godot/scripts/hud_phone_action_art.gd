@@ -49,7 +49,8 @@ func _draw() -> void:
 		var at := offsets[index]
 		var blue := Color("7ecde7") if not button.disabled else Color("67737d")
 		var glyphs := {"move":"➜", "shoot":"◎", "overwatch":"⌖", "hunker":"⬟", "strike":"⚔", "push":"⇥", "reload":"↻"}
-		draw_string(font, at + Vector2(2, 28), str(glyphs.get(button.ability_id, "✦")), HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 4, 18, blue)
+		if not preload("res://scripts/phone_layout.gd").touch_device():
+			draw_string(font, at + Vector2(2, 28), str(glyphs.get(button.ability_id, "✦")), HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 4, 18, blue)
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
 		var at := offsets[index]
@@ -57,7 +58,7 @@ func _draw() -> void:
 		var size := 10
 		while size > 7 and font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > button.size.x - 4:
 			size -= 1
-		draw_string(font, at + Vector2(1, 39), caption, HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, size, Color("edf3f4") if not button.disabled else Color("87919b"))
+		draw_string(font, at + Vector2(1, 29 if preload("res://scripts/phone_layout.gd").touch_device() else 39), caption, HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, size, Color("edf3f4") if not button.disabled else Color("87919b"))
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
 		var at := offsets[index]
@@ -65,7 +66,7 @@ func _draw() -> void:
 			var mark: Dictionary = button.chain_marks[i]
 			var center := at + Vector2(button.size.x - 10.0 - i * 15.0, 11.0)
 			var color := Color(Marks.COLORS.get(str(mark.tag), "dcebf0"))
-			var glyph: String = Marks.GLYPHS.get(str(mark.tag), "•")
+			var glyph: String = str(mark.tag).substr(0, 1) if preload("res://scripts/phone_layout.gd").touch_device() else Marks.GLYPHS.get(str(mark.tag), "•")
 			draw_string(font, center + Vector2(-4, 4), glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, color)
 
 static func caption_for(display_name: String) -> String:

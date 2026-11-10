@@ -18,7 +18,7 @@ func setup(campaign, compact: bool) -> void:
 	button.flat = true; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	add_child(button); button.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	button.pressed.connect(func(): opened.emit())
-	var title := UI.label("GALAXY  ↗", 11, UI.ACCENT)
+	var title := UI.label("GALAXY  >" if preload("res://scripts/phone_layout.gd").touch_device() else "GALAXY  ↗", 11, UI.ACCENT)
 	add_child(title); title.position = Vector2(8, 2); title.size.x = 145; title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var threats := 0
 	for planet in map.planets:

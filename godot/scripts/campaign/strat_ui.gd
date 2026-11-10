@@ -67,7 +67,7 @@ static func build(view) -> void:
 		for pair in Data.get_table("temple", "ADJ"):
 			if wing not in [pair.a, pair.b]: continue
 			var live := Base.operational(c.state, pair.a) and Base.operational(c.state, pair.b) and Base.adjacent(Base.slot_of(c.state, pair.a), Base.slot_of(c.state, pair.b))
-			box.add_child(UI.label("%s %s · %s ↔ %s" % ["LINKED" if live else "Link", pair.n, pair.a, pair.b], 13, UI.ACCENT if live else UI.MUTED))
+			box.add_child(UI.label(("%s %s · %s - %s" if preload("res://scripts/phone_layout.gd").touch_device() else "%s %s · %s ↔ %s") % ["LINKED" if live else "Link", pair.n, pair.a, pair.b], 13, UI.ACCENT if live else UI.MUTED))
 		for line in c.state.facility.log.get(wing, []).slice(0, 2): box.add_child(UI.label(str(line), 12, UI.MUTED))
 	box = view._card("TEMPLE STAFF", "Archivists speed research; artisans speed building and projects; healers improve recovery. One staff slot per room level, up to two.")
 	for worker in c.state.facility.workers: box.add_child(UI.label("%s · %s · %s" % [worker.n, worker.role, worker.wing if worker.wing != "" else "available"], 14))

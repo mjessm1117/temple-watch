@@ -1,4 +1,5 @@
 extends Control
+const Phone = preload("res://scripts/phone_layout.gd")
 signal completed
 ## All story modes retain the campaign-owned engine and completion contract.
 const StoryEngine = preload("res://scripts/story/story_engine.gd")
@@ -84,9 +85,12 @@ func _build() -> void:
 	var outer := MarginContainer.new()
 	outer_frame = outer
 	outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var phone := get_viewport_rect().size.x < 900
-	for side in ["left","right"]: outer.add_theme_constant_override("margin_"+side,10 if phone else 36)
-	for side in ["top","bottom"]: outer.add_theme_constant_override("margin_"+side,8 if phone else 24)
+	var phone := Phone.narrow(Phone.window_size())
+	var safe := Phone.safe_margins(get_viewport_rect().size) if phone else Vector4.ZERO
+	outer.add_theme_constant_override("margin_left", int(safe.x) + (10 if phone else 36))
+	outer.add_theme_constant_override("margin_right", int(safe.z) + (10 if phone else 36))
+	outer.add_theme_constant_override("margin_top", int(safe.y) + (8 if phone else 24))
+	outer.add_theme_constant_override("margin_bottom", int(safe.w) + (8 if phone else 24))
 	add_child(outer)
 	body = UI.column(16)
 	outer.add_child(body)
@@ -98,7 +102,7 @@ func _header(title: String, detail: String) -> void:
 	var head := HBoxContainer.new()
 	body.add_child(head)
 	head.add_child(UI.icon("holocron",32))
-	var mark := UI.label(title,18 if get_viewport_rect().size.x < 900 else 24,UI.ACCENT)
+	var mark := UI.label(title,18 if Phone.narrow(Phone.window_size()) else 24,UI.ACCENT)
 	mark.size_flags_horizontal = SIZE_EXPAND_FILL
 	head.add_child(mark)
 	var date := UI.label(detail,14,UI.GOLD)
@@ -109,7 +113,7 @@ func _header(title: String, detail: String) -> void:
 func _build_story() -> void:
 	var kind: String = scene_data.get("kind","briefing")
 	var is_talk := kind in ["talk","beat","grief","scene11"]
-	var phone := get_viewport_rect().size.x < 900
+	var phone := Phone.narrow(Phone.window_size())
 	_header("TEMPLE WATCH", "%s  /  %s BBY" % ["OLD REPUBLIC" if int(campaign_state.era)==1 else "RUUSAN" if int(campaign_state.era)==2 else "HIGH REPUBLIC",str(campaign_state.story.bby)])
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation",20)

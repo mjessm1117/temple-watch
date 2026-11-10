@@ -61,13 +61,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _build_shell() -> void:
 	var compact := Phone.narrow(Phone.window_size())
+	var safe := Phone.safe_margins(get_viewport_rect().size)
 	temple_view = TempleView.new(); add_child(temple_view); temple_view.setup(campaign.state)
 	temple_view.room_selected.connect(_open_room)
 	temple_view.room_hovered.connect(func(message: String): notice_label.text = message)
 	var head := UI.panel(Color(0.035, 0.075, 0.09, 0.94)); add_child(head)
 	head.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	head.offset_left = 8 if compact else 20; head.offset_right = -8 if compact else -20
-	head.offset_top = 3 if compact else 14; head.offset_bottom = 95 if compact else 106
+	head.offset_left = safe.x + (8 if compact else 20); head.offset_right = -safe.z - (8 if compact else 20)
+	head.offset_top = safe.y + (3 if compact else 14); head.offset_bottom = safe.y + (95 if compact else 106)
 	if compact:
 		var head_style: StyleBoxFlat = head.get_theme_stylebox("panel").duplicate()
 		head_style.set_content_margin_all(6); head.add_theme_stylebox_override("panel", head_style)
@@ -83,7 +84,7 @@ func _build_shell() -> void:
 	HomeResources.add_row(resources, campaign)
 	resources.add_child(HomeResources.power_label(campaign))
 	resources.add_child(UI.label("Order Darkness  %d/100" % int(campaign.state.orderDark), 13, Color("b5a2d3")))
-	if Phone.window_size().x < 700:
+	if compact and Phone.logical_size(Phone.window_size()).x < 700:
 		resources.get_node("Resource_credits").text = "Cr %d" % int(campaign.state.res.credits)
 		resources.get_node("Resource_intel").text = "Intel %d" % int(campaign.state.res.intel)
 		resources.get_node("Resource_kyber").text = "Kyber %d" % int(campaign.state.res.kyber)
@@ -103,8 +104,8 @@ func _build_shell() -> void:
 	foot_bg.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); foot_bg.offset_top = -64 if compact else -97
 	foot_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var footer := UI.column(7); add_child(footer); footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	footer.offset_left = 8 if compact else 20; footer.offset_right = -8 if compact else -20
-	footer.offset_top = -60 if compact else -88; footer.offset_bottom = -4 if compact else -14
+	footer.offset_left = safe.x + (8 if compact else 20); footer.offset_right = -safe.z - (8 if compact else 20)
+	footer.offset_top = -safe.w - (60 if compact else 88); footer.offset_bottom = -safe.w - (4 if compact else 14)
 	notice_label = UI.label("Select a room to manage the Order.  •  Gold: module ready  •  Dark: awaiting construction", 14, UI.MUTED)
 	if compact: notice_label.hide()
 	notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; footer.add_child(notice_label)
@@ -127,7 +128,7 @@ func _build_shell() -> void:
 	menu_button.name = "MenuCommand"
 	menu_button.custom_minimum_size.y = 56 if compact else 44; menu_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if compact:
-		var more := UI.button("⋯  More", _toggle_more); more.name = "MoreCommands"
+		var more := UI.button("More" if Phone.touch_device() else "⋯  More", _toggle_more); more.name = "MoreCommands"
 		more.custom_minimum_size.y = 56; more.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		nav.add_child(more)
 		more_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.98)); add_child(more_panel)
@@ -153,22 +154,22 @@ func _build_shell() -> void:
 	readout.add_child(UI.label("%d active · %d wounded\n%d / 8 wings online\n%d missions waiting" % [active, wounded, built, campaign.state.options.size()], 13, UI.MUTED))
 	readout.add_child(HomeResources.power_label(campaign))
 	readout.add_child(UI.label("%d staff · squad %d\nSith Darkness %d / 12" % [campaign.state.facility.workers.size(), campaign.squad_capacity(), campaign.darkness_segments()], 13, UI.ACCENT))
-	readout.add_child(UI.label("1–7 stations\nG galaxy · Esc close", 12, Color("627d87")))
+	if not Phone.touch_device(): readout.add_child(UI.label("1–7 stations\nG galaxy · Esc close", 12, Color("627d87")))
 	if compact: readout.hide()
 	mini_galaxy = GalaxyCard.new(); add_child(mini_galaxy)
 	mini_galaxy.setup(campaign, compact)
 	mini_galaxy.opened.connect(_open_galaxy)
-	mini_galaxy.position = Vector2(8, 100) if compact else Vector2(25, 340)
+	mini_galaxy.position = Vector2(safe.x + (8 if compact else 25), safe.y + (100 if compact else 340))
 	station_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.97)); add_child(station_panel)
 	station_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	station_panel.anchor_left = 0.0 if compact else 0.35; station_panel.offset_left = 0
-	station_panel.offset_top = 98 if compact else 113; station_panel.offset_right = 0 if compact else -20
-	station_panel.offset_bottom = -57 if compact else -100
+	station_panel.offset_top = safe.y + (98 if compact else 113); station_panel.offset_right = -safe.z if compact else -20
+	station_panel.offset_bottom = -safe.w - (57 if compact else 100)
 	station_panel.visible = panel_open
 	var column := UI.column(8); station_panel.add_child(column)
 	var top := HBoxContainer.new(); column.add_child(top)
 	var heading := UI.label("TEMPLE STATION", 13, UI.MUTED); heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top.add_child(heading)
-	top.add_child(UI.button("← Temple view", _close_station))
+	top.add_child(UI.button("Temple view" if Phone.touch_device() else "← Temple view", _close_station))
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
 	page_content = UI.column(13); page_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(page_content)
@@ -177,9 +178,10 @@ func _build_shell() -> void:
 		phone_grid = null
 
 func _build_room_picker() -> void:
+	var safe := Phone.safe_margins(get_viewport_rect().size)
 	room_picker = UI.panel(Color(0.045, 0.09, 0.115, 0.98)); room_picker.visible = false
 	room_picker.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	room_picker.offset_left = 8; room_picker.offset_right = -8; room_picker.offset_top = 98; room_picker.offset_bottom = -57
+	room_picker.offset_left = safe.x + 8; room_picker.offset_right = -safe.z - 8; room_picker.offset_top = safe.y + 98; room_picker.offset_bottom = -safe.w - 57
 	add_child(room_picker)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	room_picker.add_child(scroll)
@@ -243,7 +245,7 @@ func _change_page(name: String, room_id: String = "") -> void:
 func _show_page() -> void:
 	UI.clear(page_content)
 	HomeTabs.update(nav_buttons, HomeBadges.collect(campaign), page, panel_open)
-	status_label.text = "M%d · D%d" % [int(campaign.state.month), int(campaign.state.day)] if Phone.window_size().x < 700 else "MONTH %d  ·  DAY %d  ·  WEEK %d" % [int(campaign.state.month), int(campaign.state.day), campaign.week()]
+	status_label.text = "M%d · D%d" % [int(campaign.state.month), int(campaign.state.day)] if Phone.narrow(Phone.window_size()) and Phone.logical_size(Phone.window_size()).x < 700 else "MONTH %d  ·  DAY %d  ·  WEEK %d" % [int(campaign.state.month), int(campaign.state.day), campaign.week()]
 	if selected_room == "training" and page == "Roster":
 		var training_room := preload("res://scripts/campaign/training_room19.gd").new()
 		page_content.add_child(training_room)
@@ -304,13 +306,13 @@ func _command() -> void:
 	command.add_child(UI.label("Edicts: %s" % ", ".join(campaign.state.strategy.edict), 14, UI.MUTED))
 	var next := "A story mission awaits." if int(campaign.state.step) in [0, 2] else "%d crises await your decision." % campaign.state.options.size()
 	var box := _card("NEXT DEPLOYMENT", next)
-	box.add_child(UI.button("OPEN GALAXY  →", _open_galaxy))
+	box.add_child(UI.button("OPEN GALAXY  >" if Phone.touch_device() else "OPEN GALAXY  →", _open_galaxy))
 	box.add_child(UI.button("Rest 7 days", _rest))
 	var flow = get_node("/root/CampaignFlow")
 	if not campaign.state.pending_mission.is_empty(): box.add_child(UI.button("Resume deployment", func(): flow.go("squad")))
 	var era := int(campaign.state.era)
 	if era < 3 and (campaign.state.flags.get("boss_or_won" if era == 1 else "boss_ru_won", false) or campaign.state.flags.get("temple_scarred" if era == 1 else "e2_bomb_fired", false)):
-		box.add_child(UI.button("Begin the next era →", flow.advance_era))
+		box.add_child(UI.button("Begin the next era >" if Phone.touch_device() else "Begin the next era →", flow.advance_era))
 	if campaign.state.options.is_empty(): _card("CHAPTER COMPLETE", "The Order’s record endures. Tend your roster, explore the Codex, or begin a new campaign from the main menu.")
 	if str(campaign.state.build) != "": _card("CONSTRUCTION", "%s · %.1f work days remaining." % [Data.get_table("core", "WINGS")[str(campaign.state.build)].n, campaign.state.facility.build_left])
 	if str(campaign.state.research.cur) != "":
@@ -410,7 +412,7 @@ func _arsenal() -> void:
 		if Gear.slots(r, kind) == 0: continue
 		var slot_name := "SABER" if kind == "s" else "WEAPON" if kind == "w" else "ARMOR"
 		var equipped: Array = gear["smods" if kind == "s" else "mods" if kind == "w" else "amods"]
-		box = _card("%s MODULES" % slot_name, "%d / %d slots  ·  click to fit" % [equipped.size(), Gear.slots(r, kind)])
+		box = _card("%s MODULES" % slot_name, ("%d / %d slots  ·  tap to fit" if Phone.touch_device() else "%d / %d slots  ·  click to fit") % [equipped.size(), Gear.slots(r, kind)])
 		var module_row := HFlowContainer.new(); box.add_child(module_row)
 		var pool: Dictionary = Data.get_table("gear", "SMODS" if kind == "s" else "W_MODS" if kind == "w" else "AMODS")
 		for key in pool:
@@ -451,7 +453,7 @@ func _legacy() -> void:
 		var identity := "%s%s  ·  %s  ·  %d kills  ·  %d missions" % [r.n, " “%s”" % r.nick if str(r.get("nick", "")) != "" else "", r.cls, int(r.kills), int(r.missions)]
 		var box := _card(identity, "Rank %d  ·  %s" % [int(r.rank), str(r.status)])
 		StrategyUI.identity(self, box, r)
-		var nick := LineEdit.new(); nick.placeholder_text = "Enter a nickname and press Enter"; nick.max_length = int(Data.get_table("legacy", "NICK_MAX")); nick.text_submitted.connect(_set_nick.bind(str(r.id))); box.add_child(nick)
+		var nick := LineEdit.new(); nick.placeholder_text = "Nickname" if Phone.touch_device() else "Enter a nickname and press Enter"; nick.max_length = int(Data.get_table("legacy", "NICK_MAX")); nick.text_submitted.connect(_set_nick.bind(str(r.id))); box.add_child(nick)
 		if str(r.status) == "active" and int(r.rank) >= 4: box.add_child(UI.button("Retire to the Order", _retire.bind(str(r.id))))
 	var bonds := _card("BONDS", "Comrades gain bond points when they survive missions together.")
 	for pair in campaign.state.bonds:

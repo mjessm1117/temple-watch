@@ -90,7 +90,7 @@ func _show(g: Node, event: String, players: Array) -> void:
 	fade.tween_callback(func(): card.visible = false)
 
 func _build(g: Node) -> void:
-	var phone := g.get_viewport().get_visible_rect().size.x < 900
+	var phone := preload("res://scripts/phone_layout.gd").narrow(preload("res://scripts/phone_layout.gd").window_size())
 	layer = CanvasLayer.new()
 	layer.layer = 15
 	g.add_child(layer)

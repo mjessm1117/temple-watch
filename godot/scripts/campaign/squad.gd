@@ -86,12 +86,12 @@ func _build_header() -> void:
 
 func _build_footer() -> void:
 	footer = HBoxContainer.new(); footer.add_theme_constant_override("separation", 16); add_child(footer)
-	var back := S.button("← Temple", func(): flow.go("temple")); footer.add_child(back); wire_button(back)
+	var back := S.button("Temple" if Phone.touch_device() else "← Temple", func(): flow.go("temple")); footer.add_child(back); wire_button(back)
 	var text := S.column(2); text.size_flags_horizontal = SIZE_EXPAND_FILL; footer.add_child(text)
 	counter = S.label("", 17, S.CYAN); text.add_child(counter)
-	notice = S.label("Click a soldier to inspect  ·  Esc returns to the lineup", 12, S.MUTED); text.add_child(notice)
+	notice = S.label("Tap a soldier to inspect" if Phone.touch_device() else "Click a soldier to inspect  ·  Esc returns to the lineup", 12, S.MUTED); text.add_child(notice)
 	if Phone.narrow(Phone.window_size()): notice.hide()
-	deploy = S.button("DEPLOY →", _deploy); deploy.custom_minimum_size = Vector2(210, 48)
+	deploy = S.button("DEPLOY >" if Phone.touch_device() else "DEPLOY →", _deploy); deploy.custom_minimum_size = Vector2(210, 48)
 	if Phone.narrow(Phone.window_size()): deploy.custom_minimum_size = Vector2(100, 56)
 	deploy.add_theme_font_size_override("font_size", 19)
 	deploy.add_theme_stylebox_override("normal", S.box(Color("254651"), S.CYAN, 12)); footer.add_child(deploy); wire_button(deploy)
@@ -99,21 +99,24 @@ func _build_footer() -> void:
 func _layout() -> void:
 	if not is_instance_valid(header): return
 	var compact := Phone.narrow(Phone.window_size())
+	var safe := Phone.safe_margins(size)
 	if compact != compact_layout:
 		compact_layout = compact; _draw_cards()
 	card_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	if compact:
 		card_row.add_theme_constant_override("separation",8)
 		header.visible = focus_index < 0; footer.visible = focus_index < 0
-		header.position = Vector2(6, 5); header.size = Vector2(size.x - 12, 56)
+		header.position = Vector2(safe.x + 6, safe.y + 5); header.size = Vector2(size.x - safe.x - safe.z - 12, 56)
 		_footer_rect(6, -78, -6)
+		footer.offset_left += safe.x; footer.offset_right -= safe.z
+		footer.offset_top -= safe.w; footer.offset_bottom -= safe.w
 		if focus_index >= 0:
 			stage_container.position = Vector2(0, 4); stage_container.size = Vector2(168, size.y - 88)
-			card_scroll.position = Vector2(6, size.y - 84); card_scroll.size = Vector2(size.x - 12, 80)
-			drawer.position = Vector2(174, 4); drawer.size = Vector2(size.x - 180, size.y - 88)
+			card_scroll.position = Vector2(safe.x + 6, size.y - safe.w - 84); card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, 80)
+			drawer.position = Vector2(174, safe.y + 4); drawer.size = Vector2(size.x - safe.z - 180, size.y - safe.y - safe.w - 88)
 		else:
 			stage_container.position = Vector2(0, 64); stage_container.size = Vector2(size.x, 78)
-			card_scroll.position = Vector2(6, 146); card_scroll.size = Vector2(size.x - 12, maxf(65, size.y - 200))
+			card_scroll.position = Vector2(safe.x + 6, safe.y + 146); card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, maxf(65, size.y - safe.y - safe.w - 200))
 		stage_container.custom_minimum_size.y = stage_container.size.y
 		card_scroll.visible = true; stage_container.visible = true
 		card_row.reset_size()
@@ -193,7 +196,7 @@ func _build_drawer() -> void:
 		var title := S.label(str(r.n), 22); title.size_flags_horizontal = SIZE_EXPAND_FILL; top.add_child(title)
 		top.add_child(S.label("%d Cr · %d Ky" % [flow.session().state.res.credits, flow.session().state.res.kyber], 11, S.GOLD))
 		var close := S.button("×", close_inspector); close.custom_minimum_size = Vector2(44, 44)
-		close.tooltip_text = "Return to lineup (Esc)"; top.add_child(close); wire_button(close)
+		close.tooltip_text = "Return to lineup" if Phone.touch_device() else "Return to lineup (Esc)"; top.add_child(close); wire_button(close)
 	var stats := Gear.battle_stats(flow.session(), str(r.id))
 	var tabs := HBoxContainer.new(); tabs.add_theme_constant_override("separation", 8 if compact else 4); drawer_content.add_child(tabs)
 	for tab in ["roster", "arsenal", "skills"]:

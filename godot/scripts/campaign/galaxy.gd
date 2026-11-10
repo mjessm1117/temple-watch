@@ -47,19 +47,20 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _build() -> void:
 	var compact := Phone.narrow(Phone.window_size())
+	var safe := Phone.safe_margins(get_viewport_rect().size)
 	var bg := ColorRect.new(); bg.color = Color("0a1113"); bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); add_child(bg)
 	var outer := UI.column(6); outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	outer.offset_left = 8 if compact else 22; outer.offset_top = 5 if compact else 16
-	outer.offset_right = -8 if compact else -22; outer.offset_bottom = -5 if compact else -12; add_child(outer)
+	outer.offset_left = safe.x + (8 if compact else 22); outer.offset_top = safe.y + (5 if compact else 16)
+	outer.offset_right = -safe.z - (8 if compact else 22); outer.offset_bottom = -safe.w - (5 if compact else 12); add_child(outer)
 	var head := HBoxContainer.new(); head.add_theme_constant_override("separation", 8 if compact else 4); outer.add_child(head)
 	var title := UI.column(0); title.size_flags_horizontal = Control.SIZE_EXPAND_FILL; head.add_child(title)
 	if not compact: title.add_child(UI.label("J E D I   T E M P L E   /   W A R   R O O M",12,Color("79d3e2")))
 	title.add_child(UI.label("Galaxy command",20 if compact else 30,Color("dbe7e4")))
-	back_button = UI.button("←  GALAXY", _overview); back_button.visible = false; head.add_child(back_button)
+	back_button = UI.button("GALAXY" if Phone.touch_device() else "←  GALAXY", _overview); back_button.visible = false; head.add_child(back_button)
 	var intelligence := UI.button("SITH INTELLIGENCE",func(): get_node("/root/CampaignFlow").open_intelligence())
 	if compact: intelligence.custom_minimum_size.y = 56
 	head.add_child(intelligence)
-	var temple_button := UI.button("←  TEMPLE",_temple)
+	var temple_button := UI.button("TEMPLE" if Phone.touch_device() else "←  TEMPLE",_temple)
 	if compact: temple_button.custom_minimum_size.y = 56
 	head.add_child(temple_button)
 	status = UI.label("",14,Color("8aa2a5")); outer.add_child(status)
@@ -110,10 +111,10 @@ func _build() -> void:
 	scroll = preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
 	detail = UI.column(10); detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(detail)
-	launch_button = UI.button("MISSION BRIEFING  →",_launch)
+	launch_button = UI.button("MISSION BRIEFING  >" if Phone.touch_device() else "MISSION BRIEFING  →",_launch)
 	if compact: launch_button.custom_minimum_size.y = 56
 	column.add_child(launch_button)
-	message = UI.label("Select a world or a signal.  ↑ ↓ offers  ·  Enter briefing  ·  Esc back  ·  T Temple",12,Color("8aa2a5")); outer.add_child(message)
+	message = UI.label("Tap a world or signal to inspect it." if Phone.touch_device() else "Select a world or a signal.  ↑ ↓ offers  ·  Enter briefing  ·  Esc back  ·  T Temple",12,Color("8aa2a5")); outer.add_child(message)
 	if compact: message.hide()
 	_refresh_chips()
 

@@ -165,7 +165,7 @@ func _choose_action(mode: String) -> void:
 		if mission.ability_reason(selected_id, mode) != "": warning_label.text = mission.ability_reason(selected_id, mode)
 		elif str(mission.abilities[mode].target) == "self": _use_ability(-1)
 		elif str(mission.abilities[mode].target).begins_with("ally") or str(mission.abilities[mode].target).begins_with("enemy"): _cycle_target(1)
-		else: warning_label.text = "Choose a tile, then click or press Enter to confirm."
+		else: warning_label.text = "Choose a tile, then tap again to confirm." if preload("res://scripts/phone_layout.gd").touch_device() else "Choose a tile, then click or press Enter to confirm."
 		_refresh(); return
 	if mode == "overwatch":
 		if mission.overwatch(selected_id): _after_action()
@@ -424,7 +424,7 @@ func _request_end_turn() -> void:
 		if int(u.ap) > 0: ready += 1
 	if ready > 0 and not end_turn_armed:
 		end_turn_armed = true
-		warning_label.text = "%d squad member%s still ha%s actions. End turn? Press Enter or END TURN again." % [ready, "s" if ready != 1 else "", "ve" if ready != 1 else "s"]
+		warning_label.text = ("%d squad member%s still ha%s actions. Tap END TURN again." if preload("res://scripts/phone_layout.gd").touch_device() else "%d squad member%s still ha%s actions. End turn? Press Enter or END TURN again.") % [ready, "s" if ready != 1 else "", "ve" if ready != 1 else "s"]
 		return
 	end_turn_armed = false
 	warning_label.text = ""

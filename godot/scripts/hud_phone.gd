@@ -40,19 +40,18 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE; root.add_child(overlay)
 	var physical := DisplayServer.window_get_size()
-	var safe := DisplayServer.get_display_safe_area()
-	if physical.x > 0 and physical.y > 0 and safe.size.x > 0 and safe.size.y > 0:
-		var scale := Vector2(root.size.x / float(physical.x), root.size.y / float(physical.y))
-		overlay.offset_left = clampf(float(safe.position.x) * scale.x, 0.0, root.size.x * 0.2)
-		overlay.offset_top = clampf(float(safe.position.y) * scale.y, 0.0, root.size.y * 0.2)
-		overlay.offset_right = -clampf(float(physical.x - safe.end.x) * scale.x, 0.0, root.size.x * 0.2)
-		overlay.offset_bottom = -clampf(float(physical.y - safe.end.y) * scale.y, 0.0, root.size.y * 0.2)
-	var layout: Dictionary = preload("res://scripts/hud_phone_layout.gd").boxes(root.size)
+	var safe := preload("res://scripts/phone_layout.gd").safe_margins(root.size)
+	overlay.offset_left = clampf(safe.x, 0.0, root.size.x * 0.2)
+	overlay.offset_top = clampf(safe.y, 0.0, root.size.y * 0.2)
+	overlay.offset_right = -clampf(safe.z, 0.0, root.size.x * 0.2)
+	overlay.offset_bottom = -clampf(safe.w, 0.0, root.size.y * 0.2)
+	var safe_size := root.size - Vector2(safe.x + safe.z, safe.y + safe.w)
+	var layout: Dictionary = preload("res://scripts/hud_phone_layout.gd").boxes(safe_size)
 	var physical_height := float(physical.y) if physical.y > 0 else float(g.get_tree().root.size.y)
 	var visual_height := 44.0 * root.size.y / maxf(1.0, physical_height)
 	var top_back := ColorRect.new(); top_back.name = "PhoneTopBackground"
 	top_back.color = Color("101b26ee"); top_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	preload("res://scripts/hud_phone_layout.gd").place(top_back, Rect2(0, 0, root.size.x, visual_height))
+	preload("res://scripts/hud_phone_layout.gd").place(top_back, Rect2(0, 0, safe_size.x, visual_height))
 	overlay.add_child(top_back)
 	var strip := PanelContainer.new(); strip.name = "PhoneTopStrip"
 	preload("res://scripts/hud_phone_layout.gd").place(strip, layout.header)
@@ -66,7 +65,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	g.objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	end_button = _button("END TURN", _end_turn); end_button.name = "PhoneEndTurn"
 	end_button.custom_minimum_size = Vector2(96, 44); heading.add_child(end_button)
-	var menu := _button("☰", _show_menu); menu.name = "PhoneMenu"
+	var menu := _button("MENU" if preload("res://scripts/phone_layout.gd").touch_device() else "☰", _show_menu); menu.name = "PhoneMenu"
 	menu.custom_minimum_size = Vector2(44, 44); heading.add_child(menu)
 	for button in [end_button, menu]:
 		for state in ["normal", "hover", "pressed", "disabled"]:
@@ -121,7 +120,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	momentum_plate = Control.new(); momentum_plate.name = "MomentumPlate"
 	momentum_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	momentum_plate.custom_minimum_size = Vector2(82, 13); readout.add_child(momentum_plate)
-	momentum_pips = night.label("○ ○ ○", 11, Color("e9ca83")); momentum_pips.name = "ChainPips"
+	momentum_pips = night.label("MOM 0/3" if preload("res://scripts/phone_layout.gd").touch_device() else "○ ○ ○", 11, Color("e9ca83")); momentum_pips.name = "ChainPips"
 	momentum_pips.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	momentum_pips.position = Vector2(2, 0); momentum_plate.add_child(momentum_pips)
 	action_name = night.label("Choose an action", 11, Color("e9ca83"))
@@ -144,7 +143,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 		button.button_down.connect(_show_ability.bind(button))
 		button.pressed.connect(_show_ability.bind(button))
 		button.gui_input.connect(_ability_input.bind(button))
-	momentum_strike = _button("✦\nSTRIKE", _claim_strike)
+	momentum_strike = _button("STRIKE" if preload("res://scripts/phone_layout.gd").touch_device() else "✦\nSTRIKE", _claim_strike)
 	momentum_strike.name = "MomentumStrike"; momentum_strike.custom_minimum_size = Vector2(44, 40)
 	momentum_strike.add_theme_font_size_override("font_size", 11); track.add_child(momentum_strike)
 	more_button = _button("MORE", _toggle.bind("more")); more_button.custom_minimum_size = Vector2(44, 40); track.add_child(more_button)
@@ -161,7 +160,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	overlay.add_child(action_art)
 	popup = PanelContainer.new(); popup.name = "PhoneDetails"; popup.visible = false
 	popup.anchor_left = 0.5; popup.anchor_right = 0.5; popup.anchor_bottom = 1.0
-	var popup_half := minf(250.0, (root.size.x - 16.0) * 0.5)
+	var popup_half := minf(250.0, (safe_size.x - 16.0) * 0.5)
 	popup.offset_left = -popup_half; popup.offset_right = popup_half; popup.offset_top = 48; popup.offset_bottom = -96
 	popup.add_theme_stylebox_override("panel", night.panel_style()); overlay.add_child(popup)
 	detail_scroll = preload("res://scripts/touch_scroll.gd").new(); detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -230,7 +229,7 @@ func refresh(from_game: bool = false) -> void:
 	var used_this_turn: bool = int(g.mission.chain_strike_used_turn) == int(g.mission.turn)
 	momentum_row.visible = false
 	momentum_plate.visible = true
-	momentum_pips.text = "MOM " + "●".repeat(pips) + "○".repeat(3 - pips)
+	momentum_pips.text = "MOM %d/3" % pips if preload("res://scripts/phone_layout.gd").touch_device() else "MOM " + "●".repeat(pips) + "○".repeat(3 - pips)
 	momentum_strike.visible = true
 	momentum_strike.disabled = pips < 3 or used_this_turn or g.mission.phase != "player"
 	if pips != last_chain_momentum:
@@ -273,11 +272,14 @@ func refresh(from_game: bool = false) -> void:
 	for tag in preload("res://scripts/hud18_tags.gd").shown(unit.get("combo_tags", {})):
 		tag_glyphs.append(str(preload("res://scripts/hud18_icon.gd").GLYPHS.get(tag, tag)))
 	var hp: int = int(unit.get("hp", 0))
-	var hp_pips := "▮".repeat(mini(hp, 7)) + "▯".repeat(mini(maxi(0, int(unit.get("max_hp", 0)) - hp), 7))
 	var ap: int = clampi(int(unit.get("ap", 0)), 0, 2)
-	unit_card.text = "%s\n%d %s\n%s %s %s" % [str(unit.get("name", "UNIT")), hp, hp_pips, g.hud_controls.ap_pips(unit), "●".repeat(ap) + "○".repeat(2 - ap), " ".join(tag_glyphs)]
+	if preload("res://scripts/phone_layout.gd").touch_device():
+		unit_card.text = "%s\nHP %d/%d\nAP %s" % [str(unit.get("name", "UNIT")), hp, int(unit.get("max_hp", 0)), g.hud_controls.ap_pips(unit)]
+	else:
+		var hp_pips := "▮".repeat(mini(hp, 7)) + "▯".repeat(mini(maxi(0, int(unit.get("max_hp", 0)) - hp), 7))
+		unit_card.text = "%s\n%d %s\n%s %s %s" % [str(unit.get("name", "UNIT")), hp, hp_pips, g.hud_controls.ap_pips(unit), "●".repeat(ap) + "○".repeat(2 - ap), " ".join(tag_glyphs)]
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
-	target_card.text = "%s  %s  ▾" % [str(target.get("name", "TARGET")), g.hit_big_label.text]
+	target_card.text = "%s  %s  %s" % [str(target.get("name", "TARGET")), g.hit_big_label.text, "v" if preload("res://scripts/phone_layout.gd").touch_device() else "▾"]
 	popup.visible = open_card != ""
 	if open_card == "": return
 	if open_card == "settings": return

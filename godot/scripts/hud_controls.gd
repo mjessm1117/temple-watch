@@ -256,7 +256,7 @@ func _refresh() -> void:
 	var objective: Dictionary = g.mission.objective_status()
 	var clock_note := " · %d turns left" % int(objective.turns_left) if int(objective.turns_left) >= 0 else " · clock starts on reveal" if objective.get("clock_trigger", "") == "concealment" else ""
 	if phone != null:
-		var brief: String = str(objective.label).replace("Rescue Mira and escort to evac", "Rescue Mira → evac")
+		var brief: String = str(objective.label).replace("Rescue Mira and escort to evac", "Rescue Mira to evac" if Phone.touch_device() else "Rescue Mira → evac")
 		g.objective_label.text = "T%d · %s · %d left" % [g.mission.turn, brief, int(objective.turns_left)] if int(objective.turns_left) >= 0 else "T%d · %s" % [g.mission.turn, brief]
 	else:
 		g.objective_label.text = "TURN %d · %s%s · %s" % [g.mission.turn,objective.label,clock_note,str(objective.phase).to_upper()]
@@ -342,7 +342,7 @@ func _show_shot() -> void:
 		if g.action in ["rewardSafe","rewardRisky"] and g.preview_tile.x >= 0:
 			var options: Dictionary = preload("res://scripts/mission_hack.gd").options(g.mission,actor,g.preview_tile)
 			if not options.is_empty(): lines.append("Safe %d%% · reveal / Intel or stun\nRisky %d%% · stun / control; failure alerts enemies" % [options.safe,options.risky])
-		lines.append("Click again or Enter to confirm.")
+		lines.append("Tap again to confirm." if preload("res://scripts/phone_layout.gd").touch_device() else "Click again or Enter to confirm.")
 		g.shot_label.text = "\n".join(lines)
 		return
 	var target: Dictionary = {}
@@ -350,7 +350,7 @@ func _show_shot() -> void:
 		if (int(u.id) == g.target_id or (g.target_id < 0 and Shot.pos(u) == g.hovered)) and (bool(u.awake) or bool(u.get("spotted", false))): target = u; break
 	if actor.is_empty() or target.is_empty():
 		g.hit_big_label.text = "--%"
-		g.shot_label.text = "Choose Shoot, Strike or Push.\nTab cycles valid targets.\nEnter confirms; Esc cancels."
+		g.shot_label.text = "Choose Shoot, Strike or Push.\nTap a target, then confirm or cancel." if preload("res://scripts/phone_layout.gd").touch_device() else "Choose Shoot, Strike or Push.\nTab cycles valid targets.\nEnter confirms; Esc cancels."
 		return
 	if g.action == "push":
 		var legal := false

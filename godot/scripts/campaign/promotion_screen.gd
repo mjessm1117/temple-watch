@@ -7,6 +7,7 @@ const Mentor = preload("res://scripts/campaign/mentor17.gd")
 const Soldier = preload("res://scripts/effects_soldier.gd")
 const Portraits = preload("res://scripts/story14_portraits.gd")
 const Badge = preload("res://scripts/campaign/rankup_badge.gd")
+const Phone = preload("res://scripts/phone_layout.gd")
 var campaign: RefCounted
 var unit_id := ""
 var scroll: ScrollContainer
@@ -31,17 +32,19 @@ func setup(c: RefCounted, id: String) -> void:
     add_child(shade)
     var margin := MarginContainer.new()
     margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    margin.add_theme_constant_override("margin_left", 8)
-    margin.add_theme_constant_override("margin_right", 8)
-    margin.add_theme_constant_override("margin_top", 6)
-    margin.add_theme_constant_override("margin_bottom", 6)
+    var safe := Phone.safe_margins(get_viewport_rect().size) if Phone.narrow(Phone.window_size()) else Vector4.ZERO
+    margin.add_theme_constant_override("margin_left", 8 + int(safe.x))
+    margin.add_theme_constant_override("margin_right", 8 + int(safe.z))
+    margin.add_theme_constant_override("margin_top", 6 + int(safe.y))
+    margin.add_theme_constant_override("margin_bottom", 6 + int(safe.w))
     add_child(margin)
     var frame := HBoxContainer.new()
     frame.add_theme_constant_override("separation", 8)
     margin.add_child(frame)
     var portrait_panel := UI.panel(Color("11242c"))
     portrait_panel.name = "RankupPortrait"
-    portrait_panel.custom_minimum_size.x = 152 if get_tree().root.size.x <= 700 else 185 if get_tree().root.size.x <= 900 else 300
+    var logical_width := Phone.logical_size(Phone.window_size()).x
+    portrait_panel.custom_minimum_size.x = 152 if Phone.narrow(Phone.window_size()) and logical_width <= 700 else 185 if Phone.narrow(Phone.window_size()) else 300
     portrait_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
     frame.add_child(portrait_panel)
     var portrait_column := VBoxContainer.new()
@@ -299,7 +302,7 @@ func _refresh() -> void:
             var options := Progression.tree_options(r, level)
             var grid := GridContainer.new()
             grid.name = "ChoiceGrid"
-            grid.columns = 2 if get_tree().root.size.x >= 800 else 1
+            grid.columns = 1 if Phone.narrow(Phone.window_size()) and Phone.logical_size(Phone.window_size()).x < 800 else 2
             grid.add_theme_constant_override("h_separation", 4)
             grid.add_theme_constant_override("v_separation", 4)
             row.add_child(grid)
