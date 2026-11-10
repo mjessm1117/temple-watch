@@ -93,11 +93,11 @@ func run() -> void:
 	roster.state.roster[1].fatigue = 40
 	roster = fixture(roster.state, "roster injured")
 	await display(roster)
-	check(badge("Roster").visible and int(Badges.collect(roster).Roster.count) == 2, "wounded and tired soldier count")
+	check(badge("Roster").visible and int(Badges.collect(roster).Roster.count) == 3 and str(Badges.collect(roster).Roster.action) == "Recruit", "wounded and tired soldiers plus recruit opportunity")
 	for soldier in roster.state.roster: soldier.wound = 0; soldier.fatigue = 0
 	roster = fixture(roster.state, "roster recovered")
 	await display(roster)
-	check(not badge("Roster").visible, "recovery clears roster badge")
+	check(badge("Roster").visible and int(Badges.collect(roster).Roster.count) == 1 and str(Badges.collect(roster).Roster.action) == "Recruit", "recovery leaves the recruit opportunity")
 	var votes: Dictionary = preload("res://scripts/campaign/data.gd").get_table("temple", "VOTES")
 	var vote_id: String = votes.keys()[(int(roster.state.month) - 1) % votes.size()]
 	roster.state.strategy.votes["%d:%s" % [roster.state.month, vote_id]] = 0

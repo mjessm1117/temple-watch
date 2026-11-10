@@ -3,11 +3,14 @@ extends RefCounted
 static var test_scale := 0.0
 static var test_touch := -1
 static var test_mobile := -1
+static var test_window_size := Vector2i.ZERO
 
 static func window_size() -> Vector2i:
+	if test_window_size != Vector2i.ZERO: return test_window_size
+	var tree := Engine.get_main_loop() as SceneTree
+	if DisplayServer.get_name() == "headless" and tree != null: return tree.root.size
 	var physical := DisplayServer.window_get_size()
 	if physical.x > 0 and physical.y > 0: return physical
-	var tree := Engine.get_main_loop() as SceneTree
 	return tree.root.size if tree != null else Vector2i.ZERO
 
 static func device_scale() -> float:

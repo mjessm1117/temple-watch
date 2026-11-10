@@ -84,3 +84,4 @@ run_suite camera20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite story20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite strategy20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite art20_test --rendering-method gl_compatibility --resolution 844x390
+run_suite temple21_test --rendering-method gl_compatibility --resolution 844x390; run_suite temple21_test --rendering-method gl_compatibility --resolution 390x844 -- --portrait; run_suite temple21_test --rendering-method gl_compatibility --resolution 1366x768 -- --desktop

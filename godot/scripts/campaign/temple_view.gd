@@ -24,9 +24,18 @@ var hovered := ""
 var sound: AudioStreamPlayer
 var phone_names: Control
 var state: Dictionary
+var badges: Dictionary = {}
+var priority_key := ""
+var focused_room := ""
+var camera_tween: Tween
+var camera_home := Vector3(0, 17.3, 42)
+var camera_home_size := 21.0
 
-func setup(save_state: Dictionary) -> void:
+func setup(save_state: Dictionary, room_badges: Dictionary = {}) -> void:
 	state = save_state
+	badges = room_badges
+	for key in ["Galaxy", "Research", "Roster", "Build", "Command"]:
+		if badges.has(key): priority_key = key; break
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var container := SubViewportContainer.new()
@@ -48,8 +57,9 @@ func setup(save_state: Dictionary) -> void:
 	var rim := DirectionalLight3D.new(); rim.rotation_degrees = Vector3(-15, 155, 0)
 	rim.light_color = Color("d6b68a"); rim.light_energy = 0.6; world.add_child(rim)
 	camera = Camera3D.new(); camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = 21.0 if Phone.narrow(Phone.window_size()) else 31.5; world.add_child(camera); camera.current = true
-	camera.position = Vector3(0, 17.3, 42); camera.look_at(Vector3(0, 5.8, 0))
+	camera.size = 21.0 if Phone.narrow(Phone.window_size()) else 31.5; camera_home_size = camera.size
+	world.add_child(camera); camera.current = true
+	camera.position = camera_home; camera.look_at(Vector3(0, 5.8, 0))
 	art = Geometry.new(); galaxy = art.galaxy(world, false)
 	temple = Node3D.new(); temple.name = "TempleCutaway"; world.add_child(temple)
 	art.architecture(temple)
@@ -141,6 +151,25 @@ func _make_button(info: Dictionary) -> void:
 		alert.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 		alert.offset_left = -20; alert.offset_right = -2
 		alert.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(alert)
+	var key := badge_key(str(info.id))
+	if badges.has(key):
+		if key == priority_key:
+			for style_name in ["normal", "hover", "pressed", "focus"]:
+				var focus_style: StyleBoxFlat = b.get_theme_stylebox(style_name).duplicate()
+				focus_style.border_color = Color("ffe2a0"); focus_style.set_border_width_all(3)
+				focus_style.bg_color = Color(0.28, 0.20, 0.06, 0.32)
+				b.add_theme_stylebox_override(style_name, focus_style)
+		var badge := Label.new(); badge.name = "ActionBadge"
+		badge.text = "%d  %s" % [int(badges[key].count), str(badges[key].action)]
+		badge.add_theme_font_size_override("font_size", 16 if key == priority_key else 14)
+		badge.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		badge.add_theme_color_override("font_color", Color("102126") if key == priority_key else Color("ffe4a4"))
+		var badge_style := StyleBoxFlat.new(); badge_style.bg_color = Color("ffe2a0") if key == priority_key else Color("183039"); badge_style.border_color = Color("ffe2a0") if key == priority_key else Color("e3bd72")
+		badge_style.set_border_width_all(1); badge_style.set_content_margin_all(3)
+		badge.add_theme_stylebox_override("normal", badge_style)
+		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(badge)
 	name_label.visible = not Phone.narrow(Phone.window_size())
 	line.visible = not Phone.narrow(Phone.window_size())
 	b.mouse_entered.connect(_hover.bind(str(info.id)))
@@ -151,6 +180,30 @@ func _make_button(info: Dictionary) -> void:
 
 func activate_room(id: String) -> void:
 	if rooms.has(id): room_selected.emit(id, str(rooms[id].tab))
+
+static func badge_key(id: String) -> String:
+	return {"war":"Galaxy", "archives":"Research", "works":"Build", "barracks":"Roster", "council":"Command"}.get(id, "")
+
+func focus_room(id: String) -> void:
+	if not rooms.has(id): return
+	focused_room = id
+	if camera_tween != null: camera_tween.kill()
+	var at: Vector3 = rooms[id].position
+	var target := Vector3(at.x + 4.5, camera_home.y + (at.y - 5.8) * 0.45, camera_home.z)
+	if Prefs.get_value("motion"):
+		camera.position = target; camera.size = 14.0; return
+	camera_tween = create_tween().set_parallel(true)
+	camera_tween.tween_property(camera, "position", target, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	camera_tween.tween_property(camera, "size", 14.0, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+
+func restore_camera() -> void:
+	focused_room = ""
+	if camera_tween != null: camera_tween.kill()
+	if Prefs.get_value("motion"):
+		camera.position = camera_home; camera.size = camera_home_size; return
+	camera_tween = create_tween().set_parallel(true)
+	camera_tween.tween_property(camera, "position", camera_home, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	camera_tween.tween_property(camera, "size", camera_home_size, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 func _hover(id: String) -> void:
 	hovered = id
@@ -175,8 +228,8 @@ func _process(delta: float) -> void:
 	time += delta * float(Prefs.get_value("speed"))
 	galaxy.rotation.y = time * 0.012
 	art.animate(time)
-	camera.position = Vector3(sin(time * 0.12) * 0.3, 17.3 + sin(time * 0.16) * 0.12, 42)
-	camera.look_at(Vector3(0, 5.8, 0))
+	if focused_room == "" and (camera_tween == null or not camera_tween.is_running()):
+		camera.position = camera_home + Vector3(sin(time * 0.12) * 0.3, sin(time * 0.16) * 0.12, 0)
 	_project_rooms()
 
 func _project_rooms() -> void:
@@ -191,7 +244,25 @@ func _project_rooms() -> void:
 		var ratio := size / Vector2(viewport.size)
 		var projected_size := (b - a) * ratio
 		var target_size := projected_size.max(Vector2(44, 44)) if Phone.narrow(Phone.window_size()) else projected_size
+		if Phone.narrow(Phone.window_size()) and badges.has(badge_key(str(id))): target_size.x = maxf(target_size.x, 74.0)
 		buttons[id].position = a * ratio - (target_size - projected_size) * 0.5
 		buttons[id].size = target_size
 		Plates.layout(buttons[id], info, Phone.narrow(Phone.window_size()))
-	if phone_names != null: phone_names.layout()
+		var portrait := size.x < size.y
+		var secondary: bool = not info.built and info.kind in ["spire", "vault", "annex"]
+		buttons[id].visible = not portrait and (not Phone.narrow(Phone.window_size()) or not secondary or id == focused_room)
+		var key := badge_key(str(id))
+		var focal: bool = id == focused_room or id == hovered or badges.has(key) or id == "war" and badges.is_empty()
+		var name_label: Label = buttons[id].get_node("RoomName")
+		name_label.visible = buttons[id].visible and (not Phone.narrow(Phone.window_size()) or focal)
+		if Phone.narrow(Phone.window_size()) and focal:
+			name_label.add_theme_font_size_override("font_size", 14)
+			if buttons[id].has_node("ActionBadge"):
+				name_label.offset_top = -17; name_label.offset_bottom = 0
+		buttons[id].get_node("RoomDetail").visible = buttons[id].visible and not Phone.narrow(Phone.window_size())
+		if buttons[id].has_node("ActionBadge"):
+			var badge: Label = buttons[id].get_node("ActionBadge")
+			badge.visible = buttons[id].visible
+			badge.size = Vector2(buttons[id].size.x, 34)
+			badge.position = Vector2(0, maxf(0, buttons[id].size.y - 34))
+			if buttons[id].has_node("RoomAlert"): buttons[id].get_node("RoomAlert").hide()
