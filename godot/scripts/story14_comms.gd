@@ -118,7 +118,9 @@ func _show(g: Node, event: String, players: Array) -> void:
 			var id := str(story_id) if story_id != null else str(ally.get("rid", ally.get("id", "")))
 			if str(ally.get("name", "")) == name: actor_id = id
 			if event == "ally_down" and (str(ally.get("status", "")) == "down" or int(ally.get("hp", 1)) <= 0): target_id = id
-		var context := {"villain_name":str(g.mission.objective_state.get("villain_name", ""))}
+		var context := {}
+		if event == "villain" and g is Node3D and g.get("mission") != null:
+			context.villain_name = str(g.mission.objective_state.get("villain_name", ""))
 		var bark: Dictionary = Beats.pick_bark(kind, actor_id, target_id, context)
 		if not bark.is_empty():
 			name = str(bark.get("speaker", name)); portrait_key = str(bark.get("portrait_key", name)); sentence = str(bark.get("text", sentence))
