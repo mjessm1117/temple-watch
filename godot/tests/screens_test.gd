@@ -76,15 +76,20 @@ func run() -> void:
 	flow.new_campaign("normal")
 	await process_frame
 	await process_frame
+	check(current_scene.scene_file_path.ends_with("opening.tscn"),"new campaign starts with opening cinematic")
+	current_scene._finish()
+	for frame in 4: await process_frame
+	check(current_scene.scene_file_path.ends_with("briefing.tscn"),"opening leads to first mission briefing")
 	for i in 20:
 		if is_instance_valid(flow.intelligence):
 			flow.intelligence.close_requested.emit()
 			for frame in 4: await process_frame
 			continue
-		if current_scene.scene_file_path.ends_with("temple.tscn"): break
+		if current_scene.scene_file_path.ends_with("squad.tscn"): break
 		if current_scene.scene_data.choices.is_empty(): current_scene._finish()
 		else: current_scene._choose(current_scene.scene_data.choices[0].id)
 		for frame in 4: await process_frame
+	check(current_scene.scene_file_path.ends_with("squad.tscn"),"first mission briefing reaches loadout")
 	flow.open_codex()
 	await process_frame
 	await process_frame
@@ -94,7 +99,7 @@ func run() -> void:
 	current_scene._finish()
 	await process_frame
 	await process_frame
-	check(current_scene.scene_file_path.ends_with("temple.tscn"),"codex returns to Temple")
+	check(current_scene.scene_file_path.ends_with("dialogue.tscn") and flow.screen_return == "temple" and flow.campaign.state.flow_stage == "temple","codex returns through Temple story")
 	DirAccess.remove_absolute(flow.save_path)
 	if current_scene != null:
 		current_scene.queue_free()
