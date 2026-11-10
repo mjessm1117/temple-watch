@@ -97,7 +97,7 @@ func run() -> void:
 		print("TEMPLE WINDOW PERFORMANCE: %.1f fps at %s; process %.2f ms; draw calls %d; nodes %d" % [180000000.0 / float(Time.get_ticks_usec() - start), root.size, Performance.get_monitor(Performance.TIME_PROCESS) * 1000, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), Performance.get_monitor(Performance.OBJECT_NODE_COUNT)])
 	for id in temple.temple_view.rooms:
 		var room: Dictionary = temple.temple_view.rooms[id]
-		if room.tab in ["Galaxy", "Codex"]: continue
+		if room.tab in ["Galaxy", "Codex", "Arsenal"]: continue
 		temple.temple_view.buttons[id].pressed.emit(); await frames(1)
 		check(temple.page == room.tab and temple.panel_open, "room button opens " + str(id))
 		temple._close_station()
@@ -114,7 +114,12 @@ func run() -> void:
 	check("Medical Halls" in temple.notice_label.text and "2 missions" in temple.notice_label.text, "hover names room and saved status")
 	await shot("hover")
 	for station in ["Command", "Roster", "Research", "Build", "Arsenal", "Teams", "Legacy"]:
-		temple._change_page(station); check(temple.page == station, "station preserved " + station)
+		temple._change_page(station)
+		if station == "Arsenal":
+			check(current_scene.scene_file_path.ends_with("squad.tscn"), "station preserved " + station)
+			current_scene.queue_free(); current_scene = null; await frames()
+			await open_temple()
+		else: check(temple.page == station, "station preserved " + station)
 	temple.temple_view.buttons.u1.pressed.emit(); await frames()
 	check(current_scene.scene_file_path.ends_with("codex.tscn"), "holocron cell opens existing Codex")
 	current_scene.queue_free(); current_scene = null; await frames()
