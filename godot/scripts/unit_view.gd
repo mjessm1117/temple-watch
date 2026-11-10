@@ -14,12 +14,20 @@ var pose_motion: Tween
 var alive := true
 var ring: MeshInstance3D
 var foot: AudioStreamPlayer
+var hum: AudioStreamPlayer
+var saber_blade: MeshInstance3D
+var saber_active := false
 var _step_stream: AudioStreamWAV
 var _action_serial := 0
 var _cover_level := 0
 var downed := false
 var enemy_side := false
 var aim_ready := false
+var footfalls := 0
+static var _corpses: Array[Node3D] = []
+const CORPSE_CAP := 6
+const CORPSE_LIFETIME := 9.0
+const FALL_SECONDS := 0.78
 
 func setup(u: Dictionary, scene: PackedScene, at: Vector3) -> void:
 	unit_id = int(u.id)
@@ -50,9 +58,28 @@ func setup(u: Dictionary, scene: PackedScene, at: Vector3) -> void:
 	foot.volume_db = -22.0
 	var synth := Audio.new()
 	_step_stream = synth._synthesize("step")
+	var hum_stream := synth._synthesize("hum") if saber_blade != null else null
 	synth.free()
 	foot.stream = _step_stream
 	add_child(foot)
+	if saber_blade != null:
+		hum = AudioStreamPlayer.new()
+		hum.stream = hum_stream
+		add_child(hum)
+		set_saber_active(true)
+
+func _process(_delta: float) -> void:
+	if hum == null: return
+	var game := get_parent().get_parent() if get_parent() != null else null
+	var sound: Node = game.get("sound") if game != null else null
+	hum.volume_linear = 0.0 if sound == null or bool(sound.get("muted")) else float(sound.get("volume")) * 0.055
+
+func set_saber_active(value: bool) -> void:
+	saber_active = value and alive and not downed and saber_blade != null
+	if saber_blade != null: saber_blade.visible = saber_active
+	if hum != null:
+		if saber_active and not hum.playing: hum.play()
+		elif not saber_active: hum.stop()
 
 static func battle_model_path(u: Dictionary) -> String:
 	var kind := w17_kind(u)
@@ -118,6 +145,7 @@ func _attach_saber(u: Dictionary) -> void:
 	glow.albedo_color = color; glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	glow.emission_enabled = true; glow.emission = color; glow.emission_energy_multiplier = 2.6
 	blade.material_override = glow; grip.add_child(blade)
+	saber_blade = blade
 
 func play(clip: String) -> void:
 	if animation == null: return
@@ -154,6 +182,7 @@ func set_cover(level: int) -> void:
 func set_downed(value: bool) -> void:
 	if value == downed or not alive or model == null: return
 	downed = value
+	if saber_blade != null: set_saber_active(not value)
 	if pose_motion != null and pose_motion.is_running(): pose_motion.kill()
 	pose_motion = _paced_tween().set_parallel(true)
 	pose_motion.tween_property(model, "rotation:z", 1.35 if value else 0.0, 0.35)
@@ -176,8 +205,10 @@ func act(clip: String) -> void:
 	if clip == "hit":
 		play("hit")
 		pose_motion = _paced_tween()
-		pose_motion.tween_property(model, "rotation:z", 0.16, 0.07)
-		pose_motion.tween_property(model, "rotation:z", 0.0, 0.22).set_trans(Tween.TRANS_BACK)
+		pose_motion.tween_property(model, "rotation:z", 0.32, 0.09)
+		pose_motion.parallel().tween_property(model, "position:x", -0.16, 0.09)
+		pose_motion.tween_property(model, "rotation:z", 0.0, 0.30).set_trans(Tween.TRANS_BACK)
+		pose_motion.parallel().tween_property(model, "position:x", 0.0, 0.30)
 	else:
 		var delay := 0.12 if turn_motion != null and turn_motion.is_running() else 0.0
 		get_tree().create_timer(delay/(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if enemy_side else 1.0))).timeout.connect(func() -> void:
@@ -221,25 +252,65 @@ func travel(route: Array) -> void:
 		if flat.length_squared() < 0.001: continue
 		motion.tween_callback(func() -> void: face(point))
 		motion.tween_property(self, "position", point, maxf(0.08, flat.length() / 4.0)).set_trans(Tween.TRANS_SINE)
-		motion.parallel().tween_callback(func() -> void:
-			if foot != null and not foot.playing: foot.play()).set_delay(0.07)
+		motion.parallel().tween_callback(_footstep).set_delay(0.07)
 		previous = point
 	motion.tween_callback(func() -> void: if alive: play(base_clip))
 
 func fall() -> void:
 	if not alive: return
 	alive = false
+	set_saber_active(false)
+	if ring != null: ring.hide()
+	var selection_ring := get_node_or_null("GfxSelectionRing")
+	if selection_ring != null: selection_ring.hide()
+	if status_label != null: status_label.hide()
+	if watch_eye != null: watch_eye.hide()
+	_corpses.append(self)
+	while _corpses.size() > CORPSE_CAP:
+		var oldest: Node3D = _corpses.pop_front()
+		if is_instance_valid(oldest): oldest.queue_free()
 	_action_serial += 1
 	if motion != null and motion.is_running(): motion.kill()
 	if turn_motion != null and turn_motion.is_running(): turn_motion.kill()
 	if pose_motion != null and pose_motion.is_running(): pose_motion.kill()
 	play("death")
 	var tween := _paced_tween().set_parallel(true)
-	tween.tween_property(model, "rotation:z", 1.35, 0.48).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tween.tween_property(model, "position:y", -0.48, 0.48).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tween.chain().tween_interval(0.45)
-	tween.chain().tween_property(self, "scale", Vector3.ZERO, 0.22)
+	tween.tween_property(model, "rotation:z", 1.5, FALL_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tween.tween_property(model, "position:y", -0.28, FALL_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tween.chain().tween_interval(CORPSE_LIFETIME)
 	tween.chain().tween_callback(queue_free)
+	var game := get_parent().get_parent() if get_parent() != null else null
+	if game != null and game.get("sound") != null and game.sound.has_method("cue"): game.sound.cue("kill")
+	if game != null and game.get("fx") is Node3D and get_parent() == game.get("figures"):
+		reparent(game.fx, true)
+
+func _dust() -> void:
+	footfalls += 1
+	var puff := MeshInstance3D.new()
+	var mesh := CylinderMesh.new()
+	mesh.top_radius = 0.22; mesh.bottom_radius = 0.3; mesh.height = 0.025
+	puff.mesh = mesh
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = Color(0.65, 0.61, 0.53, 0.55)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	puff.material_override = mat
+	puff.position = Vector3(0, 0.04, 0)
+	add_child(puff)
+	var tween := _paced_tween().set_parallel(true)
+	tween.tween_property(puff, "scale", Vector3(2.0, 1.0, 2.0), 0.28)
+	tween.tween_property(puff, "transparency", 1.0, 0.28)
+	tween.chain().tween_callback(puff.queue_free)
+
+func _footstep() -> void:
+	if foot != null:
+		var game := get_parent().get_parent() if get_parent() != null else null
+		var sound: Node = game.get("sound") if game != null else null
+		if sound != null:
+			foot.volume_linear = 0.0 if bool(sound.get("muted")) else float(sound.get("volume")) * 0.11
+		foot.stop()
+		foot.play()
+	_dust()
 
 var status_label: Label3D
 var watch_eye: Sprite3D

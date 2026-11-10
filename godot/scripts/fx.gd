@@ -7,13 +7,17 @@ var _scorches: Array[Node3D] = []
 var float_anchors: Array[Dictionary] = []
 var _hit_stop_serial := 0
 var _time_scale_before := 1.0
+const BLAST_CORE_SECONDS := 0.19
+const BLAST_SHELL_SECONDS := 0.48
+const CAMERA_IMPULSE_MAX := 0.16
+const HIT_STOP_LIMIT := 0.3
 
 func hit_stop(seconds := 0.055) -> void:
 	if _hit_stop_serial == 0: _time_scale_before = Engine.time_scale
 	_hit_stop_serial += 1
 	var serial := _hit_stop_serial
 	Engine.time_scale = 0.12
-	get_tree().create_timer(minf(seconds, 0.08), true, false, true).timeout.connect(func() -> void:
+	get_tree().create_timer(minf(seconds, HIT_STOP_LIMIT), true, false, true).timeout.connect(func() -> void:
 		if serial == _hit_stop_serial:
 			Engine.time_scale = _time_scale_before
 			_hit_stop_serial = 0)
@@ -22,6 +26,10 @@ func _exit_tree() -> void:
 	if _hit_stop_serial != 0: Engine.time_scale = _time_scale_before
 
 func _cue(kind: String) -> void:
+	var game := get_parent()
+	if game != null and game.get("sound") != null and game.sound.has_method("cue"):
+		game.sound.cue(kind)
+		return
 	var synth := Audio.new()
 	var stream := synth._synthesize(kind)
 	synth.free()
@@ -70,6 +78,63 @@ func _flash(at: Vector3, color: Color, energy: float, duration: float) -> void:
 	var tween := _paced_tween()
 	tween.tween_property(light, "light_energy", 0.0, duration)
 	tween.tween_callback(light.queue_free)
+
+func contact(at: Vector3, clash := false) -> void:
+	# The two emissive meshes remain legible without dynamic lighting or glow.
+	var color := Color("a5f2ff") if clash else Color("ffe2ab")
+	var core := _sphere(at, 0.22 if clash else 0.16, color)
+	core.name = "HitCore"
+	var rim := MeshInstance3D.new()
+	rim.name = "HitRim"
+	var mesh := TorusMesh.new()
+	mesh.inner_radius = 0.33; mesh.outer_radius = 0.43
+	rim.mesh = mesh
+	rim.material_override = _material(color)
+	rim.position = at
+	rim.rotation.x = PI * 0.5
+	add_child(rim)
+	var tween := _paced_tween().set_parallel(true)
+	tween.tween_property(core, "scale", Vector3.ZERO, 0.22)
+	tween.tween_property(rim, "scale", Vector3.ONE * 2.0, 0.22)
+	tween.tween_property(rim, "transparency", 1.0, 0.22)
+	tween.chain().tween_callback(func() -> void: core.queue_free(); rim.queue_free())
+
+func camera_impulse(power: float = 0.12, duration: float = 0.18) -> void:
+	if view_camera == null or bool(preload("res://scripts/campaign/strat_preferences.gd").get_value("motion")): return
+	var amplitude := clampf(power, 0.0, CAMERA_IMPULSE_MAX)
+	var seconds := clampf(duration, 0.0, 0.24)
+	var original := view_camera.position
+	var tween := create_tween()
+	tween.tween_property(view_camera, "position", original + Vector3(amplitude, amplitude * 0.45, 0), seconds * 0.25)
+	tween.tween_property(view_camera, "position", original - Vector3(amplitude * 0.5, amplitude * 0.2, 0), seconds * 0.25)
+	tween.tween_property(view_camera, "position", original, seconds * 0.5)
+
+func blast(at: Vector3, ion := false) -> void:
+	var color := Color("b7a0ff") if ion else Color("ffb050")
+	var visual_scale := blast_screen_scale(get_viewport().get_visible_rect().size)
+	var core := _sphere(at, 0.38, Color("fff2cc") if not ion else Color("e1d6ff"))
+	core.name = "BlastCore"
+	core.transparency = 0.28
+	var shell := _sphere(at, 0.46, color)
+	shell.name = "BlastShell"
+	shell.transparency = 0.45
+	var first := _paced_tween().set_parallel(true)
+	first.tween_property(core, "scale", Vector3.ONE * 2.5 * visual_scale, BLAST_CORE_SECONDS)
+	first.tween_property(core, "transparency", 1.0, BLAST_CORE_SECONDS)
+	first.chain().tween_callback(core.queue_free)
+	var second := _paced_tween().set_parallel(true)
+	second.tween_property(shell, "scale", Vector3(4.5, 2.5, 4.5) * visual_scale, BLAST_SHELL_SECONDS)
+	second.tween_property(shell, "transparency", 1.0, BLAST_SHELL_SECONDS)
+	second.chain().tween_callback(shell.queue_free)
+	ring(at - Vector3.UP * 0.8, color, 2.1 * visual_scale)
+	burst(at, color, 12)
+	camera_impulse()
+	var game := get_parent()
+	if game != null and game.get("sound") != null and game.sound.has_method("cue"): game.sound.cue("blast")
+	else: _cue("blast")
+
+static func blast_screen_scale(size: Vector2) -> float:
+	return 0.55 if size.x < size.y else 1.0
 
 func burst(at: Vector3, color: Color, count := 8) -> void:
 	count = mini(count,4 if _tier() == "low" else 8 if _tier() == "medium" else count)
@@ -135,6 +200,7 @@ func bolt(from: Vector3, to: Vector3, enemy: bool, miss: bool) -> void:
 	tween.tween_property(glow, "position", end, duration)
 	tween.chain().tween_callback(func() -> void:
 		_flash(end, Color("ffd7a4"), 0.9, 0.1)
+		if not miss: contact(end)
 		burst(end, Color("e8c896") if miss else color, 10)
 		_scorch(end)
 		core.queue_free(); glow.queue_free())
@@ -169,8 +235,9 @@ func saber(from: Vector3, to: Vector3) -> void:
 	ribbon_fade.tween_property(ribbon,"transparency",1.0,0.24)
 	ribbon_fade.tween_callback(ribbon.queue_free)
 	burst(to, Color("f1fbff"), 12)
+	contact(to, true)
 	get_tree().create_timer(0.14/float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed"))).timeout.connect(func() -> void:
-		if is_instance_valid(self): _cue("clash"))
+		if is_instance_valid(self): _cue("saber_clash"))
 
 func _saber_ribbon(from: Vector3, to: Vector3) -> MeshInstance3D:
 	var steps := 4 if _tier() == "low" else 10
@@ -256,8 +323,7 @@ func ability(id: String, from: Vector3, to: Vector3) -> void:
 		var dome := _sphere(to, 0.85, Color("7fd99a")); dome.transparency = 0.65
 		var tween := _paced_tween(); tween.tween_property(dome, "transparency", 1.0, 0.85); tween.tween_callback(dome.queue_free)
 	elif id in ["grenade", "ionNade", "barrage", "moStrike", "tremor", "collapse"]:
-		burst(to, Color("b294f5") if id == "ionNade" else Color("ffb050"), 32)
-		ring(to - Vector3.UP * 0.8, Color("ffb050"), 1.8)
+		blast(to, id == "ionNade")
 		if id != "ionNade": cover_chunks(to); _scorch(to)
 	elif id in ["breach", "saberThrow", "flurry", "mightyBlow", "precisionStrike", "sweep"]: saber(from, to)
 	elif id in ["battleMed", "meditate", "bondAid", "bondStrike", "handoff", "moRally", "moSurge"]:
