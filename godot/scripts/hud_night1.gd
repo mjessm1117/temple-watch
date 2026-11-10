@@ -8,6 +8,7 @@ var vitals_label: Label
 var vitals_pips: Control
 var status_row: HBoxContainer
 var target_details: Label
+var odds_badge: Label
 var details_button: Button
 var detail_open := false
 var chips: Control
@@ -37,12 +38,14 @@ func setup(left_box: VBoxContainer, right_box: VBoxContainer) -> void:
 	vitals_pips = preload("res://scripts/hud_pips.gd").new(); body.add_child(vitals_pips)
 	status_row = HBoxContainer.new(); body.add_child(status_row)
 	details_button = Button.new(); details_button.text = "ODDS BREAKDOWN ▸"; details_button.focus_mode = Control.FOCUS_NONE
+	details_button.custom_minimum_size.y = 44; details_button.add_theme_font_size_override("font_size", 14)
 	details_button.pressed.connect(func() -> void: detail_open = not detail_open; refresh_target())
 	right_box.add_child(details_button)
-	target_details = label("", 12, Color("b8d3dd")); target_details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(target_details)
+	target_details = label("", 14, Color("dbe7e4")); target_details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(target_details)
 	right_box.move_child(details_button, 3)
 	right_box.move_child(target_details, 4)
 	log_heading = right_box.get_child(5)
+	odds_badge = label("", 16, Color("ef6a5d")); odds_badge.name = "OddsBadge"; right_box.add_child(odds_badge); right_box.move_child(odds_badge, 2)
 	chips = Control.new(); chips.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); chips.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(chips)
 	phase_plate = PanelContainer.new(); phase_plate.visible = false; phase_plate.anchor_left = 0.5; phase_plate.anchor_right = 0.5
 	phase_plate.offset_left = -170; phase_plate.offset_right = 170; phase_plate.offset_top = 116; phase_plate.offset_bottom = 170
@@ -61,12 +64,23 @@ func _layout_phase_plate() -> void:
 	phase_plate.offset_left = -half_width
 	phase_plate.offset_right = half_width
 
+func show_reveal(title: String) -> void:
+	if title == "": return
+	phase_text.text = title.to_upper()
+	phase_plate.visible = true
+	phase_plate.modulate.a = 1.0
+	var tween := create_tween()
+	tween.tween_interval(1.6)
+	tween.tween_property(phase_plate, "modulate:a", 0.0, 0.25)
+	tween.tween_callback(func() -> void: phase_plate.visible = false)
+
 func panel_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new(); style.bg_color = Color("101b26ee"); style.border_color = Color("be9d5b")
 	style.set_border_width_all(1); style.set_content_margin_all(8); return style
 
 func label(value: String, font_size: int, color: Color = Color("e9eff0")) -> Label:
 	var l := Label.new(); l.text = value; l.add_theme_font_size_override("font_size", font_size)
+	l.add_theme_font_override("font", preload("res://scripts/campaign/ui.gd").font("display" if font_size >= 24 else "body"))
 	l.add_theme_color_override("font_color", color); return l
 
 func refresh() -> void:
@@ -101,18 +115,22 @@ func refresh_target() -> void:
 	var aiming: bool = g.action in ["shoot", "strike"] and not actor.is_empty() and not target.is_empty()
 	details_button.visible = aiming
 	target_details.visible = aiming
+	odds_badge.visible = aiming
 	g.shot_label.visible = not aiming
 	if log_heading != null: log_heading.visible = not aiming
 	g.log_label.visible = not aiming
 	if aiming:
 		var data: Dictionary = Targeting.shot_breakdown(g.mission, actor, target, g.action == "strike", int(actor.get("leap_aim",0)) if g.action == "strike" else 0)
+		var decision: Dictionary = Targeting.decision_summary(data, str(target.name), g.action == "strike")
+		odds_badge.text = "◆ " + str(decision.badge)
+		odds_badge.add_theme_color_override("font_color", Color("ef6a5d") if str(decision.badge) == "FLANKED" else Color("e0bd78"))
 		var rows: Array[String] = []
 		for item in data.aim_lines: rows.append("%s  %+d" % [item[0], int(item[1])])
 		rows.append("TOTAL  %d%%  ·  CRIT %d%%" % [int(data.hit), int(data.crit)])
 		var damage: Dictionary = Shot.damage_preview(actor, target)
 		var summary := "%s  HP %d/%d\nCRIT %d%%  ·  GRAZE %d%%\nDMG %d–%d  ·  ARMOR %d\nCRIT %d–%d  ·  GRAZE %d–%d\nSHRED %d on hit\n%s" % [str(target.name), int(target.hp), int(target.max_hp), int(data.crit), int(data.graze), int(damage.normal[0]), int(damage.normal[1]), int(damage.armor), int(damage.critical[0]), int(damage.critical[1]), int(damage.graze[0]), int(damage.graze[1]), int(damage.shred), "FLANKED" if bool(data.flanked) else "LOS CLEAR" if bool(data.los) else "LOS BLOCKED — red trace"]
 		if actor.has("ammo"): summary += "\nAMMO %d/%d · %d AP" % [int(actor.ammo), int(actor.clip), int(g.mission.abilities[g.action].ap)]
-		target_details.text = summary + ("\n" + "\n".join(rows) if detail_open else "")
+		target_details.text = "%s\n%s\n%s" % [str(decision.target), "  ·  ".join(decision.modifiers), summary] + ("\n" + "\n".join(rows) if detail_open else "")
 		details_button.text = "ODDS BREAKDOWN %s" % ("▾" if detail_open else "▸")
 	update_chips()
 

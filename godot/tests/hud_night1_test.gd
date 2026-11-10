@@ -113,7 +113,7 @@ func run() -> void:
 	var dash: Dictionary = InputControls.move_preview(m, actor, Vector2i(2 + int(actor.mob) + 1,2))
 	check(int(walk.ap) == 1 and HudControls.move_color(int(walk.ap)) == Color("60b9ff"), "one AP movement is blue")
 	check(int(dash.ap) == 2 and HudControls.move_color(int(dash.ap)) == Color("ffd16a"), "dash movement is yellow")
-	check(HudControls.move_fill(1).a >= 0.5 and HudControls.move_fill(2).a >= 0.5, "move tile fill alpha is visible")
+	check(HudControls.move_fill(1).a >= 0.18 and HudControls.move_fill(2).a >= 0.18 and HudControls.move_fill(1).a <= 0.30, "move tile fill is legible without obscuring units")
 	var shields_node := Node3D.new(); game.add_child(shields_node)
 	game.hud_controls._shield(shields_node, Vector2i(3, 2), Vector2i.UP, true)
 	game.hud_controls._shield(shields_node, Vector2i(3, 2), Vector2i.RIGHT, false)
