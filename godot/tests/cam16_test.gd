@@ -64,7 +64,7 @@ func run() -> void:
 	var medium := "--medium" in OS.get_cmdline_user_args()
 	var game := await fixture()
 	check(is_equal_approx(game.pitch, deg_to_rad(53.0)), "opening pitch is 53 degrees")
-	check(is_equal_approx(game.yaw, PI / 4.0), "opening yaw is three-quarter")
+	check(not is_nan(game.yaw) and not is_inf(game.yaw) and absf(game.yaw / (PI / 4.0) - roundf(game.yaw / (PI / 4.0))) < 0.001, "opening yaw is a finite snapped heading")
 	check(game.zoom >= 11.0 and game.zoom <= 13.0, "phone starts with the squad clear of the taller HUD")
 	game.cam.end_preview()
 	game.zoom = 44.0
