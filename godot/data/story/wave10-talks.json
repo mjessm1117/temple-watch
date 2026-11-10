@@ -235,7 +235,7 @@
         "id": "w10_pair_1",
         "min_level": 1,
         "title": "A shared watch",
-        "text": "Two Jedi keep the final watch together.",
+        "text": "{a} and {b} keep the final watch together.",
         "choices": [
           {
             "label": "Share what still weighs on you",
@@ -256,7 +256,7 @@
         "id": "w10_pair_2",
         "min_level": 1,
         "title": "The same step",
-        "text": "Their practice blades stop in the same instant.",
+        "text": "{a} and {b} stop their practice blades in the same instant.",
         "choices": [
           {
             "label": "Share what still weighs on you",
@@ -277,7 +277,7 @@
         "id": "w10_pair_3",
         "min_level": 1,
         "title": "A steady hand",
-        "text": "One Jedi notices the other hiding a tremor.",
+        "text": "{a} notices a tremor in {b}’s hand and waits for an answer.",
         "choices": [
           {
             "label": "Share what still weighs on you",
@@ -298,7 +298,7 @@
         "id": "w10_pair_4",
         "min_level": 1,
         "title": "After the rescue",
-        "text": "They speak of the lives carried home.",
+        "text": "{a} and {b} speak of the lives they carried home.",
         "choices": [
           {
             "label": "Share what still weighs on you",
@@ -319,7 +319,7 @@
         "id": "w10_pair_5",
         "min_level": 2,
         "title": "The long corridor",
-        "text": "A quiet walk becomes an honest conversation.",
+        "text": "{a} and {b} take a quiet walk that becomes an honest conversation.",
         "choices": [
           {
             "label": "Share what still weighs on you",
@@ -340,7 +340,7 @@
         "id": "w10_pair_6",
         "min_level": 2,
         "title": "A promise kept",
-        "text": "One remembers a promise made under fire.",
+        "text": "{a} reminds {b} of a promise made under fire.",
         "choices": [
           {
             "label": "Share what still weighs on you",
@@ -361,7 +361,7 @@
         "id": "w10_pair_7",
         "min_level": 2,
         "title": "The better question",
-        "text": "They disagree, then find the question beneath it.",
+        "text": "{a} and {b} disagree, then find the question beneath it.",
         "choices": [
           {
             "label": "Share what still weighs on you",
@@ -382,7 +382,7 @@
         "id": "w10_pair_8",
         "min_level": 2,
         "title": "The old scar",
-        "text": "A scar brings back a mission neither has forgotten.",
+        "text": "{a} and {b} compare scars from a mission neither has forgotten.",
         "choices": [
           {
             "label": "Share what still weighs on you",
@@ -403,7 +403,7 @@
         "id": "w10_pair_9",
         "min_level": 3,
         "title": "At the archive door",
-        "text": "They choose which memory to leave for the next generation.",
+        "text": "{a} and {b} choose which memory to leave for the next generation.",
         "choices": [
           {
             "label": "Share what still weighs on you",
@@ -424,7 +424,7 @@
         "id": "w10_pair_10",
         "min_level": 3,
         "title": "The night before",
-        "text": "Before deployment, they decide to trust each other again.",
+        "text": "{a} and {b} decide to trust each other again before deployment.",
         "choices": [
           {
             "label": "Share what still weighs on you",

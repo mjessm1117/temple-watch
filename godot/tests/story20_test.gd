@@ -69,7 +69,7 @@ func run() -> void:
 	var pages: Array = parsed.pages
 	var total := 0
 	for page in pages: total += words(str(page.text))
-	check(pages.size() >= 6 and pages.size() <= 9 and total >= 800 and total <= 1100, "eight paced panels and 800-1100 words")
+	check(pages.size() >= 16 and pages.size() <= 24 and total >= 800 and total <= 1100 and pages.all(func(page): return words(str(page.text)) <= 60), "short opening panels preserve 800-1100 words")
 	check(not flow.show_sith_events(), "Sith intelligence held until first mission ends")
 	flow.open_intelligence()
 	check(not is_instance_valid(flow.intelligence), "direct Sith panel route held until first mission ends")

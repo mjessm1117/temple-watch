@@ -19,7 +19,7 @@ static func mid_scene(s: Dictionary, mission_id: String, turn: int, family: Stri
 	for i in row.choices.size():
 		var c: Dictionary = row.choices[i]
 		choices.append({"id":"beat:%d" % i,"label":c.label,"text":c.get("text", ""),"fx":c.fx,"battle":c.battle})
-	return {"kind":"beat","id":row.id,"mission_id":mission_id,"title":row.title,"eyebrow":"Comms · Turn %d" % turn,"text":row.text,"choices":choices}
+	return {"kind":"beat","id":row.id,"mission_id":mission_id,"who":row.get("who",""),"name":row.get("speaker","Field command"),"title":row.title,"eyebrow":"Comms · Turn %d" % turn,"text":row.text,"choices":choices}
 
 static func pair_talk(s: Dictionary, rows: Array) -> Dictionary:
 	if rows.is_empty() or s.bonds.is_empty(): return {}
@@ -37,7 +37,7 @@ static func pair_talk(s: Dictionary, rows: Array) -> Dictionary:
 			for i in row.choices.size():
 				var c: Dictionary = row.choices[i]
 				choices.append({"id":"talk:%d" % i,"label":c.label,"fx":c.fx})
-			var scene := {"kind":"talk","id":row.id,"pair":str(pair),"who":"","name":str(a.n) + " & " + str(b.n),"title":row.title,"eyebrow":"Temple conversation · Bond %d" % mini(level,3),"text":row.text,"choices":choices}
+			var scene := {"kind":"talk","id":row.id,"pair":str(pair),"who":"","name":str(a.n) + " & " + str(b.n),"title":row.title,"eyebrow":"Temple conversation · Bond %d" % mini(level,3),"text":str(row.text).replace("{a}",str(a.n)).replace("{b}",str(b.n)),"choices":choices}
 			s.pending = scene
 			return scene
 	return {}

@@ -3300,7 +3300,7 @@
             9
           ]
         ],
-        "brief": "Sith troopers are raiding a kyber shrine. Pilgrims swear something else came with them: a beast that hunts Jedi. Hold for 6 turns.",
+        "brief": "Sith troopers are raiding a kyber shrine. Pilgrims swear something else came with them: a beast that hunts Jedi. Hold for 6 turns.\nThe attackers left the gate, but their scouts marked a pilgrim shrine on Dantooine before they withdrew. A frightened keeper reports troops gathering at its boundary and a beast drawn to Jedi voices.\nGnost-Dural finds the shrine on an old route used by Republic couriers; the same route crosses the peace delegation’s next stop. Tor asks the squad to keep the pilgrims safe and watch what the raiders try to carry away. Hold until the evacuation is complete; soldiers can shield Jedi from the beast.",
         "goal": "Hold the shrine for 6 turns. The Terentatek can only hurt Jedi, and it devours a downed Jedi left unstabilized for a turn. Troops are your shield.",
         "win": "The pilgrims come out of hiding. The shrine stands.",
         "lose": "The shrine is looted. The pilgrims scatter.",
@@ -3458,7 +3458,7 @@
             10
           ]
         ],
-        "brief": "Sith raiders hold a prisoner in a locked cell. A Medic can Hack the door from 4 tiles; a Jedi can try the console. Then walk the prisoner to an evac zone (E).",
+        "brief": "Sith raiders hold a prisoner in a locked cell. A Medic can Hack the door from 4 tiles; a Jedi can try the console. Then walk the prisoner to an evac zone (E).\nThe gate is repaired enough to close, but its intercepted signals point to a prisoner transfer on Ord Mantell. Tor recognizes the transport code from the damaged vehicles left in the avenue. The prisoner may have seen who issued the order to withdraw; the convoy is already preparing to leave.\nThe Council asks your squad to bring that witness home before the trail reaches the peace delegation. A medic can open the cell remotely, but the rescue is complete only when the prisoner reaches the evacuation zone.",
         "goal": "Open the cell (Hack or console), then get the prisoner to an evac zone. Threat rises after turn 5; at Threat 6 they fly the prisoner out.",
         "win": "The prisoner is out. The shuttle lifts off under fire.",
         "lose": "The prisoner is lost.",
@@ -3847,7 +3847,7 @@
             ]
           }
         ],
-        "brief": "An Imperial post is reading Republic fleet traffic. Copy its data terminals (Jedi or Medic, adjacent), then get anyone to an evac zone. Blast walls crack under explosions.",
+        "brief": "An Imperial post is reading Republic fleet traffic. Copy its data terminals (Jedi or Medic, adjacent), then get anyone to an evac zone. Blast walls crack under explosions.\nThe gate attackers withdrew with their orders, yet one damaged transmitter kept a fragment of their route. Ilsa traces it to an Imperial listening post on Balmorra, where Republic traffic has been collected for months. The post may show whether the gate assault was a diversion from the peace talks.\nGnost-Dural wants copies of the records, not a ruined terminal; fire alone will erase the proof. Scan two terminals and carry the data to extraction before the staff wipes them. The envoy investigation begins with whatever your squad brings back.",
         "goal": "Scan 2 of 3 terminals, then reach an evac zone. Threat rises after turn 6: terminals get wiped. Shoot alarm beacons before they call help.",
         "win": "The fleet codes are ours. Navy Intelligence owes the Order a favor.",
         "lose": "The post burns its data. The trail goes cold.",
