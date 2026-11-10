@@ -58,8 +58,10 @@ func run() -> void:
 		check(view.is_inside_tree(),scene+" screen loads")
 		if scene == "temple":
 			check(view.temple_view.rooms.size() == 22,"temple rooms remain present")
+			current_scene = view
 			view._change_page("Settings"); await frames()
 			check(view.find_child("GraphicsTier",true,false) != null,"Graphics appears in existing Presentation settings")
+			flow.open_settings(); current_scene = null
 		if scene == "galaxy": check(view.map_view.planets.size() == 14,"galaxy planets remain present")
 		if scene == "menu":
 			current_scene = view
