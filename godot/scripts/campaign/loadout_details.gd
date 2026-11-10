@@ -76,11 +76,11 @@ static func card(c, r: Dictionary, action: Callable, portrait: Texture2D = null)
 	var update_name := func() -> void:
 		name.text = visible_name(str(r.n), name.size.x) if phone else str(r.n)
 	select.resized.connect(update_name)
-	update_name.call_deferred()
+	name.text = str(r.n)
 	if portrait != null:
 		var face := Sprite2D.new(); face.texture = portrait; face.position = Vector2(21, 21)
 		face.scale = Vector2(0.26, 0.26); select.add_child(face)
-	content.add_child(S.label("R%d · HP %d" % [int(r.rank), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))] if phone else "%s · R%d · HP %d" % [r.cls, int(r.rank), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 9 if phone else 10, S.GOLD))
+	content.add_child(S.label("T%d · HP %d" % [Progression.skill_rank(r), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))] if phone else "%s · R%d / T%d · HP %d" % [r.cls, int(r.rank), Progression.skill_rank(r), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 9 if phone else 10, S.GOLD))
 	if not fit(r): compact.modulate = Color("899194")
 	return compact
 

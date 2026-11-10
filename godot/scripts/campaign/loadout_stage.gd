@@ -56,13 +56,16 @@ func show_squad(roster: Array) -> void:
 func _layout_actors() -> void:
 	if camera == null: return
 	var viewport_size := get_viewport().get_visible_rect().size
-	var span := 2.0 * home.z * tan(deg_to_rad(camera.fov * 0.5)) * viewport_size.x / maxf(1, viewport_size.y)
+	var span := 2.0 * home.z * tan(deg_to_rad(camera.fov * 0.5))
+	if focused < 0: span = minf(8.0, span * viewport_size.x / maxf(1.0, viewport_size.y))
 	for i in actors.size():
 		actors[i].visible = focused < 0 or i == focused
 		actors[i].position.x = 0.0 if focused >= 0 else (float(i) - (actors.size() - 1) * 0.5) * span / maxf(1, actors.size())
 
 func focus_slot(index: int) -> void:
 	focused = index
+	camera.keep_aspect = Camera3D.KEEP_HEIGHT if focused < 0 else Camera3D.KEEP_WIDTH
+	camera.fov = 30.0
 	_layout_actors()
 	for i in actors.size(): actors[i].highlighted = i == focused
 

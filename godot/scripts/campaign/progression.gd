@@ -2,9 +2,13 @@ extends RefCounted
 const Data = preload("res://scripts/campaign/data.gd")
 const Classes = preload("res://scripts/class_registry.gd")
 const TITLES = ["", "Recruit", "Private", "Corporal", "Sergeant", "Lieutenant", "Captain", "Commander", "Veteran Commander", "Elite Commander", "Legend"]
+const OPENING_ALTS = {"guardian":"saberThrow", "knight":"strike", "duelist":"guard", "sage":"guard", "consular":"forceHeal", "sentinel":"pull", "wayseeker":"beastCalm", "trooper":"hunker", "heavy":"hunker", "sniper":"hunker", "scout":"deadeye", "medic":"shieldDrone", "tech":"mark", "droid":"hunker", "officer":"mark"}
 
 static func is_jedi(r: Dictionary) -> bool:
 	return Classes.side(str(r.get("cls", ""))) == "jedi" or bool(Data.get_table("core", "CLASS").get(str(r.get("cls", "")), {}).get("jedi", false))
+
+static func skill_rank(r: Dictionary) -> int:
+	return maxi(int(r.get("rank", 1)), int(r.get("skill_rank", 0)))
 
 static func promote(r: Dictionary, roster: Array = [], campaign = null) -> bool:
 	var before := int(r.get("rank", 1))
@@ -23,7 +27,12 @@ static func promote(r: Dictionary, roster: Array = [], campaign = null) -> bool:
 static func tree_options(r: Dictionary, rank: int) -> Array:
 	var tree: Dictionary = Classes.class_data(str(r.get("cls", ""))).get("tree", Data.get_table("research", "TREES").get(str(r.get("cls", "")), {}))
 	if tree.is_empty(): return []
-	if rank <= 2: return tree.get("trunk", {}).get(str(rank), [])
+	if rank == 1:
+		var opening: Array = tree.get("trunk", {}).get("1", []).duplicate()
+		var alternate: String = OPENING_ALTS.get(Classes.class_id(str(r.get("cls", ""))), "")
+		if alternate != "" and alternate not in opening: opening.append(alternate)
+		return opening
+	if rank == 2: return tree.get("trunk", {}).get("2", [])
 	if rank == 3:
 		var out := []
 		for spec in tree.get("specs", {}).values(): out.append(spec.sig)
@@ -32,7 +41,7 @@ static func tree_options(r: Dictionary, rank: int) -> Array:
 
 static func pending_rank(r: Dictionary) -> int:
 	var rank: int = r.get("picks", []).size() + 1
-	return rank if rank <= int(r.get("rank", 1)) and not tree_options(r, rank).is_empty() else 0
+	return rank if rank <= skill_rank(r) and not tree_options(r, rank).is_empty() else 0
 
 static func choose(r: Dictionary, pick: String) -> bool:
 	var rank := pending_rank(r)
@@ -42,6 +51,23 @@ static func choose(r: Dictionary, pick: String) -> bool:
 		var specs: Dictionary = Classes.class_data(str(r.cls)).get("tree", Data.get_table("research", "TREES").get(str(r.cls), {})).get("specs", {})
 		for key in specs:
 			if str(specs[key].sig) == pick: r.spec = key
+	r.pick = pending_rank(r)
+	return true
+
+static func set_choice(r: Dictionary, rank: int, pick: String, allow_respec: bool = false) -> bool:
+	if rank <= 3 and bool(r.get("skill_picks_locked", false)): return false
+	if rank < 1 or rank > skill_rank(r) or pick not in tree_options(r, rank): return false
+	var index := rank - 1
+	var picks: Array = r.get("picks", [])
+	if index > picks.size(): return false
+	if index < picks.size():
+		if not allow_respec: return false
+		picks[index] = pick
+	else: picks.append(pick)
+	if rank == 3:
+		var specs: Dictionary = Classes.class_data(str(r.cls)).get("tree", {}).get("specs", {})
+		for key in specs:
+			if str(specs[key].sig) == pick: r.spec = key; break
 	r.pick = pending_rank(r)
 	return true
 

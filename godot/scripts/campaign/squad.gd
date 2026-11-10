@@ -23,9 +23,12 @@ var stage_container: SubViewportContainer
 var card_row: HBoxContainer
 var card_scroll: ScrollContainer
 var footer: HBoxContainer
+var footer_bg: ColorRect
+var swap_button: Button
+var skill_confirm: Button
 var header: PanelContainer
-var drawer: PanelContainer
-var drawer_content: VBoxContainer
+var drawer: ColorRect
+var drawer_content: Control
 var resources: Label
 var notice: Label
 var focus_index := -1
@@ -50,10 +53,13 @@ func _ready() -> void:
 		if selected.size() < capacity and not selected.has(id): selected.append(id)
 	var bg := ColorRect.new(); bg.color = S.BG; bg.set_anchors_and_offsets_preset(PRESET_FULL_RECT); add_child(bg)
 	_build_stage(); _build_header(); _build_footer()
+	swap_button = S.button("SWAP", _tab.bind("roster")); add_child(swap_button); wire_button(swap_button)
+	skill_confirm = S.button("CONFIRM", _confirm_skill); skill_confirm.name = "SkillConfirm"; add_child(skill_confirm); wire_button(skill_confirm)
 	card_row = HBoxContainer.new(); card_row.add_theme_constant_override("separation", 6)
 	card_scroll = preload("res://scripts/touch_scroll.gd").new(); card_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	add_child(card_scroll); card_scroll.add_child(card_row)
-	drawer = S.panel(); add_child(drawer); drawer.hide()
+	card_scroll.resized.connect(_sync_roster_visibility)
+	drawer = ColorRect.new(); drawer.color = S.PANEL; drawer.clip_contents = true; add_child(drawer); drawer.hide()
 	for r in c.state.roster: _portrait(r)
 	_make_audio()
 	resized.connect(_layout)
@@ -85,7 +91,8 @@ func _build_header() -> void:
 	if not compact: info.add_child(S.label(hint, 12, S.MUTED))
 
 func _build_footer() -> void:
-	footer = HBoxContainer.new(); footer.add_theme_constant_override("separation", 16); add_child(footer)
+	footer_bg = ColorRect.new(); footer_bg.color = S.BG; footer_bg.mouse_filter = MOUSE_FILTER_IGNORE; footer_bg.z_index = 10; add_child(footer_bg)
+	footer = HBoxContainer.new(); footer.z_index = 11; footer.add_theme_constant_override("separation", 16); add_child(footer)
 	var back := S.button("Temple" if Phone.touch_device() else "← Temple", func(): flow.go("temple")); footer.add_child(back); wire_button(back)
 	var text := S.column(2); text.size_flags_horizontal = SIZE_EXPAND_FILL; footer.add_child(text)
 	counter = S.label("", 17, S.CYAN); text.add_child(counter)
@@ -99,38 +106,95 @@ func _build_footer() -> void:
 func _layout() -> void:
 	if not is_instance_valid(header): return
 	var compact := Phone.narrow(Phone.window_size())
-	var safe := Phone.safe_margins(size)
+	var raw_safe := Phone.safe_margins(size)
+	var safe := Vector4(maxf(0.0, raw_safe.x), maxf(0.0, raw_safe.y), maxf(0.0, raw_safe.z), maxf(0.0, raw_safe.w))
 	if compact != compact_layout:
 		compact_layout = compact; _draw_cards()
 	card_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	if compact:
-		card_row.add_theme_constant_override("separation",8)
-		header.visible = focus_index < 0; footer.visible = focus_index < 0
-		header.position = Vector2(safe.x + 6, safe.y + 5); header.size = Vector2(size.x - safe.x - safe.z - 12, 56)
-		_footer_rect(6, -78, -6)
-		footer.offset_left += safe.x; footer.offset_right -= safe.z
-		footer.offset_top -= safe.w; footer.offset_bottom -= safe.w
+		card_row.add_theme_constant_override("separation", 8)
+		header.visible = focus_index < 0
+		counter.visible = focus_index < 0
+		footer.visible = true
+		swap_button.visible = focus_index >= 0
+		swap_button.position = Vector2(safe.x + 9, safe.y + 10); swap_button.size = Vector2(92, 44)
+		skill_confirm.visible = focus_index >= 0 and armory_skills
+		skill_confirm.position = Vector2(safe.x + 9, safe.y + 60); skill_confirm.size = Vector2(110, 44)
+		footer_bg.position = Vector2(0, size.y - safe.w - 70); footer_bg.size = Vector2(size.x, 70)
+		header.position = Vector2(safe.x + 6, safe.y + 5)
+		header.size = Vector2(size.x - safe.x - safe.z - 12, 56)
+		_footer_rect(6 + safe.x, -66 - safe.w, -6 - safe.w)
 		if focus_index >= 0:
-			stage_container.position = Vector2(0, 4); stage_container.size = Vector2(168, size.y - 88)
-			card_scroll.position = Vector2(safe.x + 6, size.y - safe.w - 84); card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, 80)
-			drawer.position = Vector2(174, safe.y + 4); drawer.size = Vector2(size.x - safe.z - 180, size.y - safe.y - safe.w - 88)
+			stage_container.position = Vector2(0, safe.y + 4)
+			stage_container.custom_minimum_size.y = 0
+			stage_container.size = Vector2(168, size.y - safe.y - safe.w - 115)
+			card_scroll.visible = true
+			card_scroll.process_mode = Node.PROCESS_MODE_INHERIT
+			card_scroll.position = Vector2(safe.x + 6, size.y - safe.w - 111)
+			card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, 80)
+			drawer.position = Vector2(174, safe.y + 4)
+			drawer.size = Vector2(size.x - safe.z - 180, size.y - safe.y - safe.w - 78)
 		else:
-			stage_container.position = Vector2(0, 64); stage_container.size = Vector2(size.x, 78)
-			card_scroll.position = Vector2(safe.x + 6, safe.y + 146); card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, maxf(65, size.y - safe.y - safe.w - 200))
+			stage_container.position = Vector2(0, 64)
+			stage_container.custom_minimum_size.y = 0
+			stage_container.size = Vector2(size.x, maxf(110, size.y - safe.y - safe.w - 214))
+			card_scroll.visible = true
+			card_scroll.process_mode = Node.PROCESS_MODE_INHERIT
+			card_scroll.position = Vector2(safe.x + 6, size.y - safe.w - 150)
+			card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, 72)
 		stage_container.custom_minimum_size.y = stage_container.size.y
-		card_scroll.visible = true; stage_container.visible = true
 		card_row.reset_size()
+		_sync_roster_visibility()
+		_layout_drawer_children()
 		return
-	card_row.add_theme_constant_override("separation",6)
+	card_row.add_theme_constant_override("separation", 6)
+	header.visible = true
+	counter.visible = true
+	card_scroll.modulate.a = 1.0
+	card_scroll.process_mode = Node.PROCESS_MODE_INHERIT
 	header.position = Vector2(24, 16); header.size = Vector2(size.x - 48, 100)
 	_footer_rect(24, -80, -8)
-	var width := size.x - (536 if focus_index >= 0 else 0)
-	stage_container.position = Vector2(0, 120); stage_container.size = Vector2(width, maxf(160, size.y - 270))
-	stage_container.custom_minimum_size.y = maxf(160, size.y - 270)
-	card_scroll.position = Vector2(24, size.y - 180); card_scroll.size = Vector2(width - 48, 94)
-	drawer.position = Vector2(size.x - 524, 128); drawer.size = Vector2(500, size.y - 204)
-	card_row.reset_size()
-	card_row.size.x = width - 48
+	footer.visible = true
+	swap_button.visible = focus_index >= 0
+	swap_button.position = Vector2(24, 132); swap_button.size = Vector2(92, 44)
+	skill_confirm.visible = focus_index >= 0 and armory_skills
+	skill_confirm.position = Vector2(24, 182); skill_confirm.size = Vector2(110, 44)
+	footer_bg.position = Vector2(0, size.y - 84); footer_bg.size = Vector2(size.x, 84)
+	var stage_width := 480.0 if focus_index >= 0 else size.x
+	stage_container.position = Vector2(0, 120)
+	stage_container.custom_minimum_size.y = 0
+	stage_container.size = Vector2(stage_width, maxf(160, size.y - 310))
+	stage_container.custom_minimum_size.y = maxf(160, size.y - 310)
+	card_scroll.visible = true
+	card_scroll.position = Vector2(24, size.y - 180)
+	card_scroll.size = Vector2(size.x - 48, 94)
+	drawer.position = Vector2(492, 128)
+	drawer.size = Vector2(size.x - 516, size.y - 312)
+	card_row.reset_size(); card_row.size.x = size.x - 48
+	_layout_drawer_children()
+
+func _sync_roster_visibility() -> void:
+	if not is_instance_valid(card_scroll): return
+	var phone_focus := focus_index >= 0 and Phone.narrow(Phone.window_size())
+	var compact_strip := card_scroll.size.x <= 350.0
+	card_scroll.visible = true
+	card_scroll.modulate.a = 0.0 if phone_focus and not compact_strip else 1.0
+	for card in cards.values():
+		var button: Button = card.get_child(0).get_child(0)
+		button.disabled = phone_focus and not compact_strip
+
+func _layout_drawer_children() -> void:
+	if not is_instance_valid(drawer_content) or drawer_content.get_parent() != drawer: return
+	drawer_content.position = Vector2(12, 12)
+	drawer_content.size = drawer.size - Vector2(24, 24)
+	var top := 0.0
+	for child in drawer_content.get_children():
+		child.position = Vector2(0, top)
+		if child is ScrollContainer:
+			child.size = Vector2(drawer_content.size.x, maxf(44, drawer_content.size.y - top))
+		else:
+			child.size = Vector2(drawer_content.size.x, 44)
+			top += 52.0 if Phone.narrow(Phone.window_size()) else 46.0
 
 func _footer_rect(margin: float, top: float, bottom: float) -> void:
 	footer.anchor_left = 0.0; footer.anchor_right = 1.0
@@ -180,7 +244,7 @@ func _draw_cards() -> void:
 func inspect(index: int) -> void:
 	if index < 0 or index >= selected.size(): return
 	focus_index = index; drawer_tab = "arsenal"; armory_skills = false; armory_slot = ""
-	drawer.show(); stage.focus_slot(index); _draw_cards(); _build_drawer(); _layout()
+	drawer.show(); stage.focus_slot(index); _draw_cards(); _layout(); _build_drawer(); _layout()
 	drawer.modulate.a = 0.0; create_tween().tween_property(drawer, "modulate:a", 1.0, 0.22)
 
 func close_inspector() -> void:
@@ -188,7 +252,7 @@ func close_inspector() -> void:
 
 func _build_drawer() -> void:
 	S.clear(drawer); choices.clear()
-	drawer_content = S.column(9); drawer.add_child(drawer_content)
+	drawer_content = Control.new(); drawer.add_child(drawer_content)
 	var r: Dictionary = flow.session().soldier(str(selected[focus_index]))
 	var compact := Phone.narrow(Phone.window_size())
 	if not compact:
@@ -199,8 +263,8 @@ func _build_drawer() -> void:
 		close.tooltip_text = "Return to lineup" if Phone.touch_device() else "Return to lineup (Esc)"; top.add_child(close); wire_button(close)
 	var stats := Gear.battle_stats(flow.session(), str(r.id))
 	var tabs := HBoxContainer.new(); tabs.add_theme_constant_override("separation", 8 if compact else 4); drawer_content.add_child(tabs)
-	for tab in ["roster", "arsenal", "skills"]:
-		var label := "SWAP" if tab == "roster" and compact else "SWAP SOLDIER" if tab == "roster" else "SKILLS" if tab == "skills" else "GEAR" if compact else "ARMORY"
+	for tab in ["arsenal", "skills"]:
+		var label := "ROSTER" if tab == "roster" else "SKILLS" if tab == "skills" else "GEAR"
 		var b := S.button(label, _tab_armory_skills if tab == "skills" else _tab.bind(tab)); b.size_flags_horizontal = SIZE_EXPAND_FILL
 		b.custom_minimum_size.y = 44
 		b.modulate = S.CYAN if (tab == "skills" and armory_skills) or (drawer_tab == tab and not armory_skills) else Color.WHITE
@@ -209,7 +273,7 @@ func _build_drawer() -> void:
 		var close := S.button("×", close_inspector); close.custom_minimum_size = Vector2(44, 44)
 		tabs.add_child(close); wire_button(close)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; drawer_content.add_child(scroll)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO; drawer_content.add_child(scroll)
 	if drawer_tab == "arsenal":
 		arsenal = Arsenal.new(); arsenal.size_flags_horizontal = SIZE_EXPAND_FILL; scroll.add_child(arsenal); arsenal.setup(self, str(r.id))
 		if armory_skills: arsenal._show_skills()
@@ -218,12 +282,17 @@ func _build_drawer() -> void:
 		list.add_child(S.label("ROSTER  /  %d SOLDIERS" % flow.session().state.roster.size(), 12, S.CYAN))
 		for soldier in flow.session().state.roster: _roster_row(list, soldier)
 
+func _confirm_skill() -> void:
+	if not is_instance_valid(arsenal): return
+	var tree = arsenal.picker.get_node_or_null("SkillTree")
+	if tree != null: tree._confirm()
+
 func _tab(tab: String) -> void:
-	drawer_tab = tab; armory_skills = false; _build_drawer()
+	drawer_tab = tab; armory_skills = false; _layout(); _build_drawer(); _layout()
 	drawer_content.modulate.a = 0.3; create_tween().tween_property(drawer_content, "modulate:a", 1.0, 0.16)
 
 func _tab_armory_skills() -> void:
-	drawer_tab = "arsenal"; armory_skills = true; _build_drawer()
+	drawer_tab = "arsenal"; armory_skills = true; _layout(); _build_drawer(); _layout()
 
 func _roster_row(parent: VBoxContainer, r: Dictionary) -> void:
 	var id := str(r.id); var fit := Details.fit(r)
@@ -327,4 +396,11 @@ func _input(event: InputEvent) -> void:
 		inspect(clampi(int(event.position.x / (size.x / maxf(1, selected.size()))), 0, selected.size() - 1)); get_viewport().set_input_as_handled()
 
 func _deploy() -> void:
-	if not flow.launch_squad(selected): notice.text = "Deployment unavailable; review squad readiness and mission requirements."
+	var c = flow.session()
+	var was_locked := bool(c.state.get("skill_picks_locked", false))
+	c.state.skill_picks_locked = true
+	for soldier in c.state.roster: soldier.skill_picks_locked = true
+	if not flow.launch_squad(selected):
+		c.state.skill_picks_locked = was_locked
+		for soldier in c.state.roster: soldier.skill_picks_locked = was_locked
+		notice.text = "Deployment unavailable; review squad readiness and mission requirements."

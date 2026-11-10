@@ -231,9 +231,10 @@
       "range": 12,
       "ends_turn": true,
       "damage": "weapon",
-      "damage_mod": 2,
+      "damage_mod": 1,
+      "shots": 2,
       "ammo_cost": 1,
-      "aim_mod": 12,
+      "aim_mod": -10,
       "chain": {
         "consume": [
           {
@@ -264,7 +265,7 @@
           "amount": 1
         }
       ],
-      "description": "Pierce a line of targets and brace behind the rifle."
+      "description": "Fire two cover-splitting shots and brace behind the rifle."
     },
     "sniper_eagle_perch": {
       "name": "Eagle Perch",

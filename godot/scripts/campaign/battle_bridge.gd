@@ -20,6 +20,8 @@ static func create(campaign, seed_value: int) -> RefCounted:
 	m.units = m.units.filter(func(u): return u.side != "player")
 	var tiles := Deployment.spawn_tiles(m, pending.squad.size())
 	if tiles.size() != pending.squad.size(): return null
+	campaign.state.skill_picks_locked = true
+	for soldier in campaign.state.roster: soldier.skill_picks_locked = true
 	var players: Array[Dictionary] = []
 	for i in pending.squad.size():
 		var r: Dictionary = campaign.soldier(str(pending.squad[i]))
@@ -42,7 +44,15 @@ static func create(campaign, seed_value: int) -> RefCounted:
 		u.damage = stats.get("dmg", u.damage).duplicate()
 		u.focus = int(stats.get("maxF", 0)); u.focus_left = u.focus
 		u.guard_deflect = int(stats.get("guardDef", 0))
+		# Once a rank is chosen, only that side of its pair remains in the kit.
+		for chosen_rank in range(1, mini(3, r.get("picks", []).size()) + 1):
+			for choice in Progression.tree_options(r, chosen_rank):
+				u.kit.erase(choice)
+				u.passives.erase(choice)
 		Deployment.apply_identity(campaign, u, r)
+		for pick in r.get("picks", []):
+			if bool(Classes.ability_catalog().get(str(pick), {}).get("passive", false)) and pick not in u.passives: u.passives.append(pick)
+		u.selected_skills = r.get("picks", []).duplicate()
 		if Progression.is_jedi(r) and int(r.rank) == 1:
 			var start: Dictionary = Classes.rank_data("jedi", 1)
 			u.kit = start.get("starting_kit", ["strike", "guard"]).duplicate()
