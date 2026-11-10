@@ -114,6 +114,23 @@
         "title": "The unanswered warning",
         "text": "The vision of Ruusan returns as the frontier burns. Bane’s lesson was patience; the Order must decide what to learn from Kaan’s failure."
       }
-    ]
+    ],
+    "W11_BATTLE_LINES": {
+      "Lord Kaan": {
+        "intro": "Lord Kaan: You stand where my army will pass.",
+        "taunt": "Lord Kaan: Courage is easier before you count the lost.",
+        "retreat": "Lord Kaan: Keep this ground. I will choose the next."
+      },
+      "Darth Bane": {
+        "intro": "Darth Bane: Your line is strong. I came to find its seam.",
+        "taunt": "Darth Bane: Every defense teaches me where to strike.",
+        "retreat": "Darth Bane: I have learned enough for today."
+      },
+      "Darth Malgus": {
+        "intro": "Darth Malgus: The gate was a question. This is my answer.",
+        "taunt": "Darth Malgus: You protect the Temple. Who protects everyone beyond it?",
+        "retreat": "Darth Malgus: The next door will not hold so long."
+      }
+    }
   }
 }

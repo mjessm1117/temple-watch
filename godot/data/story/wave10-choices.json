@@ -29,7 +29,8 @@
               "aim": 2
             }
           }
-        ]
+        ],
+        "speaker": "Tor Saalen"
       },
       {
         "id": "w10_mid_2",
@@ -59,7 +60,8 @@
               "aim": 2
             }
           }
-        ]
+        ],
+        "speaker": "Sgt. Rhal Dax"
       },
       {
         "id": "w10_mid_3",
@@ -89,7 +91,8 @@
               "aim": 2
             }
           }
-        ]
+        ],
+        "speaker": "Ilsa Myr"
       },
       {
         "id": "w10_mid_4",
@@ -119,7 +122,8 @@
               "aim": 2
             }
           }
-        ]
+        ],
+        "speaker": "Ilsa Myr"
       },
       {
         "id": "w10_mid_5",
@@ -149,7 +153,8 @@
               "aim": 2
             }
           }
-        ]
+        ],
+        "speaker": "Sgt. Rhal Dax"
       },
       {
         "id": "w10_mid_6",
@@ -179,7 +184,8 @@
               "aim": 2
             }
           }
-        ]
+        ],
+        "speaker": "Kira Venn"
       },
       {
         "id": "w10_mid_7",
@@ -209,7 +215,8 @@
               "aim": 2
             }
           }
-        ]
+        ],
+        "speaker": "Tor Saalen"
       },
       {
         "id": "w10_mid_8",
@@ -239,7 +246,8 @@
               "aim": 2
             }
           }
-        ]
+        ],
+        "speaker": "Ilsa Myr"
       }
     ],
     "W10_DEBRIEF": {

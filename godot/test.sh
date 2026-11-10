@@ -55,6 +55,7 @@ run_suite map14_test --rendering-method gl_compatibility --resolution 1366x768 -
 run_suite home14_test --rendering-method gl_compatibility --resolution 844x390 -- --phone
 run_suite home14_test --rendering-method gl_compatibility --resolution 1366x768
 run_suite story14_test --rendering-method gl_compatibility -- --graphics=low
+run_suite storycontent22_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
 run_suite galaxy15_test --rendering-method gl_compatibility --resolution 844x390 -- --phone --graphics=low
 run_suite galaxy15_test --rendering-method forward_plus --resolution 1366x768 -- --graphics=high
 run_suite cine15_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low

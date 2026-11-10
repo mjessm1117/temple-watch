@@ -1771,17 +1771,17 @@
     "AFTER": {
       "relay:win": {
         "who": "bren",
-        "t": "Three prisoners",
-        "text": "Three Sith troopers surrendered at the relay. The Navy wants them now. Doc Bren wants to treat their burns first. Grak wants to know what they know.",
+        "t": "Signals in the wreckage",
+        "text": "The attackers withdrew, leaving damaged transports and a trail of burned transmitters. Doc Bren found a wounded driver pinned beneath one chassis. Grak has the signal core, but its cooling unit will fail while the driver waits.",
         "ch": [
           {
-            "l": "The Navy takes them",
+            "l": "Send the core to the Navy now",
             "fx": {
               "favor": 3
             }
           },
           {
-            "l": "Treat them first",
+            "l": "Treat the driver before moving the wreck",
             "fx": {
               "orderDark": -4,
               "trust": {
@@ -1790,7 +1790,7 @@
             }
           },
           {
-            "l": "Question them ourselves",
+            "l": "Question the driver while the core is copied",
             "fx": {
               "intel": 2,
               "orderDark": 4,

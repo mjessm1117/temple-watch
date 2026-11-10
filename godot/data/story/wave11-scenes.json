@@ -19,12 +19,12 @@
         ],
         "choices": [
           {
-            "label": "Make room for both voices",
+            "label": "Let Kira and Tor share the watch",
             "bond": 6,
             "dark": -1
           },
           {
-            "label": "Demand a faster answer",
+            "label": "Ask Kira and Tor to shorten the watch",
             "bond": 2,
             "dark": 2
           }
@@ -48,12 +48,12 @@
         ],
         "choices": [
           {
-            "label": "Make room for both voices",
+            "label": "Put Rhal and Ilsa’s names on the map",
             "bond": 6,
             "dark": -1
           },
           {
-            "label": "Demand a faster answer",
+            "label": "Let Rhal and Ilsa mark routes only",
             "bond": 2,
             "dark": 2
           }
@@ -78,12 +78,12 @@
         ],
         "choices": [
           {
-            "label": "Make room for both voices",
+            "label": "Keep Kira, Rhal, and Bren together",
             "bond": 6,
             "dark": -1
           },
           {
-            "label": "Demand a faster answer",
+            "label": "Send Kira, Rhal, and Bren separately",
             "bond": 2,
             "dark": 2
           }
@@ -107,12 +107,12 @@
         ],
         "choices": [
           {
-            "label": "Make room for both voices",
+            "label": "Let Tor and Bren treat every prisoner",
             "bond": 6,
             "dark": -1
           },
           {
-            "label": "Demand a faster answer",
+            "label": "Limit Tor and Bren to urgent cases",
             "bond": 2,
             "dark": 2
           }
@@ -136,12 +136,12 @@
         ],
         "choices": [
           {
-            "label": "Make room for both voices",
+            "label": "Give Ressa and Kell relief before dawn",
             "bond": 6,
             "dark": -1
           },
           {
-            "label": "Demand a faster answer",
+            "label": "Keep Ressa and Kell at the beacon",
             "bond": 2,
             "dark": 2
           }
@@ -165,12 +165,12 @@
         ],
         "choices": [
           {
-            "label": "Make room for both voices",
+            "label": "Record Bo and Mira’s eighth survivor",
             "bond": 6,
             "dark": -1
           },
           {
-            "label": "Demand a faster answer",
+            "label": "File Bo and Mira’s first count",
             "bond": 2,
             "dark": 2
           }
@@ -195,12 +195,12 @@
         ],
         "choices": [
           {
-            "label": "Make room for both voices",
+            "label": "Help Ressa, Bo, and Ilo write the families",
             "bond": 6,
             "dark": -1
           },
           {
-            "label": "Demand a faster answer",
+            "label": "Ask Ressa, Bo, and Ilo to wait",
             "bond": 2,
             "dark": 2
           }
@@ -224,12 +224,12 @@
         ],
         "choices": [
           {
-            "label": "Make room for both voices",
+            "label": "Honor Kell and Rusk’s safe passage",
             "bond": 6,
             "dark": -1
           },
           {
-            "label": "Demand a faster answer",
+            "label": "Have Kell and Rusk take the shortcut",
             "bond": 2,
             "dark": 2
           }
@@ -253,12 +253,12 @@
         ],
         "choices": [
           {
-            "label": "Make room for both voices",
+            "label": "Send Sava and Tem to the lamp",
             "bond": 6,
             "dark": -1
           },
           {
-            "label": "Demand a faster answer",
+            "label": "Ask Sava and Tem to hold position",
             "bond": 2,
             "dark": 2
           }
@@ -282,8 +282,13 @@
         ],
         "choices": [
           {
-            "label": "Listen together",
+            "label": "Trust Dace and Kiri’s uncertain route",
             "bond": 5
+          },
+          {
+            "label": "Keep Dace and Kiri on mapped ground",
+            "bond": 2,
+            "dark": 1
           }
         ]
       },
@@ -306,8 +311,13 @@
         ],
         "choices": [
           {
-            "label": "Listen together",
+            "label": "Clear beds with Sava, Halden, and Bruk",
             "bond": 5
+          },
+          {
+            "label": "Move Sava, Halden, and Bruk ahead",
+            "bond": 2,
+            "dark": 1
           }
         ]
       },
@@ -329,8 +339,13 @@
         ],
         "choices": [
           {
-            "label": "Listen together",
+            "label": "Let Tem and Kiri name their fear",
             "bond": 5
+          },
+          {
+            "label": "Ask Tem and Kiri for a quieter report",
+            "bond": 2,
+            "dark": 1
           }
         ]
       },
@@ -338,7 +353,10 @@
         "id": "s14_kira_tor",
         "era": 1,
         "done": 1,
-        "members": [0, 1],
+        "members": [
+          0,
+          1
+        ],
         "bond": 1,
         "title": "The watch after",
         "lines": [
@@ -347,13 +365,26 @@
           "Kira Venn: I knew you would bring it in.",
           "Tor Saalen: Then take the next watch with me."
         ],
-        "choices": [{"label":"Share the watch","bond":5}]
+        "choices": [
+          {
+            "label": "Take Kira and Tor’s next watch together",
+            "bond": 5
+          },
+          {
+            "label": "Give Kira and Tor separate watches",
+            "bond": 2,
+            "dark": 1
+          }
+        ]
       },
       {
         "id": "s14_rhal_ilsa",
         "era": 1,
         "done": 1,
-        "members": [2, 3],
+        "members": [
+          2,
+          3
+        ],
         "bond": 1,
         "title": "Names on the route",
         "lines": [
@@ -362,7 +393,17 @@
           "Sgt. Rhal Dax: Keep them on the map.",
           "Ilsa Myr: I already have."
         ],
-        "choices": [{"label":"Keep the names","bond":5}]
+        "choices": [
+          {
+            "label": "Keep Rhal and Ilsa’s missing names",
+            "bond": 5
+          },
+          {
+            "label": "Close Rhal and Ilsa’s route report",
+            "bond": 2,
+            "dark": 1
+          }
+        ]
       }
     ]
   }
