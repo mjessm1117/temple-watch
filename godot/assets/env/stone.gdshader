@@ -28,7 +28,7 @@ void fragment() {
 	float grain = hash31(floor(world_pos * grain_scale));
 	float veins = sin(world_pos.x * 13.1 + world_pos.z * 7.4 + world_pos.y * 2.1) * 0.5 + 0.5;
 	float chips = smoothstep(0.08, 0.01, min(min(tile_uv.x, 1.0-tile_uv.x), min(tile_uv.y, 1.0-tile_uv.y)));
-	float age = 0.80 + grain * 0.25 + veins * 0.16 + chips * wear;
+	float age = 0.89 + grain * 0.12 + veins * 0.08 + chips * wear * 0.35;
 	if (detail_quality > 0.5) {
 		float cracks = smoothstep(0.83, 0.95, hash31(floor(world_pos * 17.0)));
 		age *= 1.0 - cracks * 0.12;

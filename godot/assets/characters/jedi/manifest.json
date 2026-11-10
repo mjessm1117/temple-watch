@@ -10,9 +10,9 @@
         "preview": "kira/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 621636,
+      "glb_bytes": 712224,
       "lod_tris": 1400,
-      "lod_glb_bytes": 168300,
+      "lod_glb_bytes": 177020,
       "height_m": 1.8,
       "rig": "UE shared battle clips",
       "animation_clips": [
@@ -56,9 +56,9 @@
         "preview": "tor/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 611360,
+      "glb_bytes": 712212,
       "lod_tris": 1400,
-      "lod_glb_bytes": 164180,
+      "lod_glb_bytes": 173142,
       "height_m": 1.8,
       "rig": "UE shared battle clips",
       "animation_clips": [
@@ -102,9 +102,9 @@
         "preview": "satele/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 614876,
+      "glb_bytes": 698110,
       "lod_tris": 1400,
-      "lod_glb_bytes": 170544,
+      "lod_glb_bytes": 178800,
       "height_m": 1.8,
       "rig": "UE shared battle clips",
       "animation_clips": [
@@ -148,9 +148,9 @@
         "preview": "ressa/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 624928,
+      "glb_bytes": 714844,
       "lod_tris": 1400,
-      "lod_glb_bytes": 172044,
+      "lod_glb_bytes": 180624,
       "height_m": 1.8,
       "rig": "UE shared battle clips",
       "animation_clips": [
@@ -198,9 +198,9 @@
         "preview": "kell/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 606208,
+      "glb_bytes": 707810,
       "lod_tris": 1400,
-      "lod_glb_bytes": 159836,
+      "lod_glb_bytes": 168626,
       "height_m": 1.8,
       "rig": "UE shared battle clips",
       "animation_clips": [
@@ -248,9 +248,9 @@
         "preview": "sava/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 583880,
+      "glb_bytes": 682152,
       "lod_tris": 1400,
-      "lod_glb_bytes": 151880,
+      "lod_glb_bytes": 160736,
       "height_m": 1.8,
       "rig": "UE shared battle clips",
       "animation_clips": [
@@ -300,9 +300,9 @@
         "preview": "tem/preview.png"
       },
       "tris": 3000,
-      "glb_bytes": 598420,
+      "glb_bytes": 677754,
       "lod_tris": 1400,
-      "lod_glb_bytes": 162148,
+      "lod_glb_bytes": 169534,
       "height_m": 1.8,
       "rig": "UE shared battle clips",
       "animation_clips": [

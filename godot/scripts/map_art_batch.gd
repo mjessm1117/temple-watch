@@ -9,10 +9,10 @@ var current: Dictionary = {}
 var record_first := true
 
 func _init() -> void:
-	var cube := BoxMesh.new(); cube.size = Vector3.ONE; shapes.box = cube
+	var cube := BoxMesh.new(); cube.size = Vector3.ONE; shapes.box = cube; shapes.bevel = _bevel_mesh()
 	var cylinder := CylinderMesh.new(); cylinder.height = 1; cylinder.top_radius = 0.5; cylinder.bottom_radius = 0.5; cylinder.radial_segments = 12; shapes.cylinder = cylinder
 	var cone := CylinderMesh.new(); cone.height = 1; cone.top_radius = 0; cone.bottom_radius = 0.5; cone.radial_segments = 9; shapes.cone = cone
-	var rock := SphereMesh.new(); rock.radius = 0.5; rock.height = 1; rock.radial_segments = 9; rock.rings = 4; shapes.rock = rock
+	var rock := SphereMesh.new(); rock.radius = 0.5; rock.height = 1; rock.radial_segments = 12; rock.rings = 6; shapes.rock = rock
 	var surface := SurfaceTool.new(); surface.begin(Mesh.PRIMITIVE_TRIANGLES); surface.set_smooth_group(-1)
 	var v := [Vector3(-0.5,0,-0.5),Vector3(0.5,0,-0.5),Vector3(-0.5,1,-0.5),Vector3(0.5,1,-0.5),Vector3(-0.5,0,0.5),Vector3(0.5,0,0.5)]
 	for index in [2,3,5,2,5,4,0,2,4,1,5,3,0,1,3,0,3,2,0,4,5,0,5,1]: surface.add_vertex(v[index])
@@ -20,19 +20,58 @@ func _init() -> void:
 	var stone_surface := SurfaceTool.new(); stone_surface.begin(Mesh.PRIMITIVE_TRIANGLES); stone_surface.set_smooth_group(-1)
 	var rings: Array[Vector3] = []
 	for level in 3:
-		for j in 8:
-			var a := TAU*float(j)/8.0
+		for j in 12:
+			var a := TAU*float(j)/12.0
 			var radius := (0.38 if level == 0 else 0.5 if level == 1 else 0.31)*(0.85+0.15*float(j%3)/2)
 			var h := -0.5 if level == 0 else -0.08 if level == 1 else 0.22+0.28*float(j%3)/2
 			rings.append(Vector3(cos(a)*radius,h,sin(a)*radius))
 	for level in 2:
-		for j in 8:
-			var k := (j+1)%8
-			for index in [level*8+j,level*8+k,(level+1)*8+k,level*8+j,(level+1)*8+k,(level+1)*8+j]: stone_surface.add_vertex(rings[index])
-	for j in 8:
-		for vertex in [Vector3(0,0.43,0),rings[16+j],rings[16+(j+1)%8]]: stone_surface.add_vertex(vertex)
-		for vertex in [Vector3(0,-0.5,0),rings[(j+1)%8],rings[j]]: stone_surface.add_vertex(vertex)
+		for j in 12:
+			var k := (j+1)%12
+			for index in [level*12+j,level*12+k,(level+1)*12+k,level*12+j,(level+1)*12+k,(level+1)*12+j]: stone_surface.add_vertex(rings[index])
+	for j in 12:
+		for vertex in [Vector3(0,0.43,0),rings[24+j],rings[24+(j+1)%12]]: stone_surface.add_vertex(vertex)
+		for vertex in [Vector3(0,-0.5,0),rings[(j+1)%12],rings[j]]: stone_surface.add_vertex(vertex)
 	stone_surface.generate_normals(); shapes.boulder = stone_surface.commit()
+
+func _bevel_mesh() -> ArrayMesh:
+	var surface := SurfaceTool.new(); surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var inner := 0.43; var outer := 0.5
+	for axis in 3:
+		var a := (axis+1)%3; var b := (axis+2)%3
+		for sign_value in [-1.0,1.0]:
+			var corners: Array[Vector3] = []
+			for pair in [[-1.0,-1.0],[1.0,-1.0],[1.0,1.0],[-1.0,1.0]]:
+				var v := Vector3.ZERO; v[axis] = sign_value*outer; v[a] = pair[0]*inner; v[b] = pair[1]*inner; corners.append(v)
+			_add_quad(surface,corners[0],corners[1],corners[2],corners[3])
+	for free_axis in 3:
+		var a := (free_axis+1)%3; var b := (free_axis+2)%3
+		for sa in [-1.0,1.0]:
+			for sb in [-1.0,1.0]:
+				var points: Array[Vector3] = []
+				for end in [-1.0,1.0]:
+					for side in [0,1]:
+						var v := Vector3.ZERO; v[free_axis] = end*inner
+						v[a] = sa*(outer if side == 0 else inner)
+						v[b] = sb*(inner if side == 0 else outer)
+						points.append(v)
+				_add_quad(surface,points[0],points[2],points[3],points[1])
+	for sx in [-1.0,1.0]:
+		for sy in [-1.0,1.0]:
+			for sz in [-1.0,1.0]:
+				var x := Vector3(sx*outer,sy*inner,sz*inner)
+				var y := Vector3(sx*inner,sy*outer,sz*inner)
+				var z := Vector3(sx*inner,sy*inner,sz*outer)
+				_add_triangle(surface,x,y,z)
+	surface.generate_normals(); return surface.commit()
+
+func _add_quad(surface: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3) -> void:
+	_add_triangle(surface,a,b,c); _add_triangle(surface,a,c,d)
+
+func _add_triangle(surface: SurfaceTool, a: Vector3, b: Vector3, c: Vector3) -> void:
+	if (b-a).cross(c-a).dot((a+b+c)/3.0) < 0.0:
+		var swap := b; b = c; c = swap
+	for v in [a,b,c]: surface.add_vertex(v)
 
 func put(shape: String, mat: Material, at: Vector3, size: Vector3, angle := 0.0) -> AABB:
 	var transform := Transform3D(Basis(Vector3.UP,angle)*Basis.from_scale(size),at)
