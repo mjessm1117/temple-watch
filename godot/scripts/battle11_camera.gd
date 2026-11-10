@@ -5,6 +5,32 @@ static func _phone_view() -> bool:
 	var tree := Engine.get_main_loop() as SceneTree
 	return tree != null and preload("res://scripts/phone_layout.gd").narrow(tree.root.size)
 
+static func battle_heading(m: RefCounted) -> float:
+	var allies: Array = m.living("player")
+	if allies.is_empty(): return 0.0
+	var squad := Vector2.ZERO
+	for unit in allies: squad += Vector2(float(unit.x), float(unit.y))
+	squad /= float(allies.size())
+	var target := Vector2.ZERO
+	var count := 0
+	var points: Array = []
+	var objective: Dictionary = m.spec.get("objective", {})
+	for point in objective.get("points", []): points.append(Vector2i(int(point[0]), int(point[1])))
+	if points.is_empty() and bool(m.prisoner.get("active", false)):
+		points.append(Vector2i(int(m.prisoner.x), int(m.prisoner.y)))
+	for point in points:
+		target += Vector2(point); count += 1
+	var threats: Array = m.living("enemy")
+	if not threats.is_empty():
+		var enemy_center := Vector2.ZERO
+		for enemy in threats: enemy_center += Vector2(float(enemy.x), float(enemy.y))
+		target += enemy_center / float(threats.size()); count += 1
+	if count == 0: return 0.0
+	var toward: Vector2 = target / float(count) - squad
+	if toward.length_squared() < 0.01: return 0.0
+	var behind := -toward
+	return snappedf(atan2(behind.x, behind.y), PI / 4.0)
+
 static func start_zoom(m: RefCounted) -> float:
 	if _phone_view():
 		return clampf(maxf(float(m.spec.width), float(m.spec.height)) * 1.1, 26.0, 32.0)

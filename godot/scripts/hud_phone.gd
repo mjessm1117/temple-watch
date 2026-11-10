@@ -3,6 +3,7 @@ extends RefCounted
 var g
 var night
 var overlay: Control
+var root_control: Control
 var unit_card: Button
 var target_card: Button
 var action_name: Label
@@ -35,20 +36,22 @@ var plate_swiping := false
 
 func setup(game, night_hud, root: Control, top: Control, left: Control, right: Control, bottom: Control, abilities: HFlowContainer) -> void:
 	g = game; night = night_hud
+	root_control = root
 	top.hide(); left.hide(); right.hide(); bottom.hide()
 	overlay = Control.new(); overlay.name = "PhoneBattleHUD"
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE; root.add_child(overlay)
 	var physical := DisplayServer.window_get_size()
 	var safe := preload("res://scripts/phone_layout.gd").safe_margins(root.size)
+	safe = Vector4(maxf(0.0, safe.x), maxf(0.0, safe.y), maxf(0.0, safe.z), maxf(0.0, safe.w))
 	overlay.offset_left = clampf(safe.x, 0.0, root.size.x * 0.2)
 	overlay.offset_top = clampf(safe.y, 0.0, root.size.y * 0.2)
 	overlay.offset_right = -clampf(safe.z, 0.0, root.size.x * 0.2)
 	overlay.offset_bottom = -clampf(safe.w, 0.0, root.size.y * 0.2)
 	var safe_size := root.size - Vector2(safe.x + safe.z, safe.y + safe.w)
 	var layout: Dictionary = preload("res://scripts/hud_phone_layout.gd").boxes(safe_size)
-	var physical_height := float(physical.y) if physical.y > 0 else float(g.get_tree().root.size.y)
-	var visual_height := 44.0 * root.size.y / maxf(1.0, physical_height)
+	var logical_height := float(preload("res://scripts/phone_layout.gd").logical_size(physical).y) if physical.y > 0 else float(g.get_tree().root.size.y)
+	var visual_height := 44.0 * root.size.y / maxf(1.0, logical_height)
 	var top_back := ColorRect.new(); top_back.name = "PhoneTopBackground"
 	top_back.color = Color("101b26ee"); top_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	preload("res://scripts/hud_phone_layout.gd").place(top_back, Rect2(0, 0, safe_size.x, visual_height))
@@ -83,14 +86,17 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	unit_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	unit_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
-	unit_card.custom_minimum_size = Vector2(54, 40)
+	unit_card.custom_minimum_size = Vector2(48, 44)
 	unit_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	unit_card.add_theme_font_size_override("font_size", 11); plate_row.add_child(unit_card)
+	unit_card.clip_text = true
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		unit_card.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	unit_plate.gui_input.connect(_plate_input)
 	for direction in [-1, 1]:
 		var arrow := _button("‹" if direction < 0 else "›", _cycle_unit.bind(direction))
 		arrow.name = "UnitPrevious" if direction < 0 else "UnitNext"
-		arrow.custom_minimum_size = Vector2(37, 40); plate_row.add_child(arrow)
+		arrow.custom_minimum_size = Vector2(44, 44); plate_row.add_child(arrow)
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			arrow.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	camera_rail = VBoxContainer.new(); camera_rail.name = "CameraRail"
@@ -102,7 +108,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 			else: g._rotate_camera(float(entry[1]) * PI / 2.0))
 		button.name = "CameraCenter" if int(entry[1]) == 0 else "CameraRotateLeft" if int(entry[1]) < 0 else "CameraRotateRight"
 		button.text = ""
-		button.custom_minimum_size = Vector2(44, 44); camera_rail.add_child(button)
+		button.custom_minimum_size = Vector2(48, 48); camera_rail.add_child(button)
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	camera_art = preload("res://scripts/hud_phone_camera_art.gd").new()
@@ -130,23 +136,23 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	momentum_row.visible = false; tray_box.add_child(momentum_row)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.name = "Abilities"
 	ability_scroll = scroll; scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 40; tray_box.add_child(scroll)
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 44; tray_box.add_child(scroll)
 	scroll.get_h_scroll_bar().modulate.a = 0.0
 	var track := HBoxContainer.new(); track.add_theme_constant_override("separation", 4); scroll.add_child(track)
 	for node in abilities.get_children():
 		var button: Button = node
-		button.reparent(track); button.custom_minimum_size = Vector2(44, 40)
+		button.reparent(track); button.custom_minimum_size = Vector2(48, 44)
 		ability_buttons.append(button)
-		button.set_meta("graphics_custom_minimum_size", Vector2(44, 40))
+		button.set_meta("graphics_custom_minimum_size", Vector2(48, 44))
 		button.set_meta("shared_phone_art", true)
 		button.set("compact", true); button.set("phone_icon", true)
 		button.button_down.connect(_show_ability.bind(button))
 		button.pressed.connect(_show_ability.bind(button))
 		button.gui_input.connect(_ability_input.bind(button))
 	momentum_strike = _button("STRIKE" if preload("res://scripts/phone_layout.gd").touch_device() else "✦\nSTRIKE", _claim_strike)
-	momentum_strike.name = "MomentumStrike"; momentum_strike.custom_minimum_size = Vector2(44, 40)
+	momentum_strike.name = "MomentumStrike"; momentum_strike.custom_minimum_size = Vector2(48, 44)
 	momentum_strike.add_theme_font_size_override("font_size", 11); track.add_child(momentum_strike)
-	more_button = _button("MORE", _toggle.bind("more")); more_button.custom_minimum_size = Vector2(44, 40); track.add_child(more_button)
+	more_button = _button("MORE", _toggle.bind("more")); more_button.custom_minimum_size = Vector2(48, 44); track.add_child(more_button)
 	for button in [momentum_strike, more_button]:
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			var round_style := StyleBoxFlat.new()
@@ -167,6 +173,28 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	popup.add_child(detail_scroll)
 	popup_body = VBoxContainer.new(); popup_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	popup_body.add_theme_constant_override("separation", 8); detail_scroll.add_child(popup_body)
+	root_control.resized.connect(_relayout)
+	_relayout.call_deferred()
+
+func _relayout() -> void:
+	if not is_instance_valid(overlay) or root_control.size.x <= 0.0: return
+	var safe := preload("res://scripts/phone_layout.gd").safe_margins(root_control.size)
+	safe = Vector4(maxf(0.0, safe.x), maxf(0.0, safe.y), maxf(0.0, safe.z), maxf(0.0, safe.w))
+	overlay.offset_left = clampf(safe.x, 0.0, root_control.size.x * 0.2)
+	overlay.offset_top = clampf(safe.y, 0.0, root_control.size.y * 0.2)
+	overlay.offset_right = -clampf(safe.z, 0.0, root_control.size.x * 0.2)
+	overlay.offset_bottom = -clampf(safe.w, 0.0, root_control.size.y * 0.2)
+	var area := root_control.size - Vector2(safe.x + safe.z, safe.y + safe.w)
+	var boxes: Dictionary = preload("res://scripts/hud_phone_layout.gd").boxes(area)
+	var layout = preload("res://scripts/hud_phone_layout.gd")
+	var logical_height := maxf(1.0, preload("res://scripts/phone_layout.gd").logical_size(preload("res://scripts/phone_layout.gd").window_size()).y)
+	layout.place(overlay.find_child("PhoneTopBackground", false, false), Rect2(0, 0, area.x, 44.0 * root_control.size.y / logical_height))
+	layout.place(overlay.find_child("PhoneTopStrip", false, false), boxes.header)
+	layout.place(unit_plate, boxes.plate)
+	layout.place(ability_tray, boxes.tray)
+	layout.place(action_art, boxes.tray)
+	layout.place(camera_rail, boxes.camera)
+	layout.place(camera_art, boxes.camera)
 
 func _button(title: String, action: Callable) -> Button:
 	var button := Button.new(); button.text = title; button.focus_mode = Control.FOCUS_NONE

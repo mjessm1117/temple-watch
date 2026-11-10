@@ -7,8 +7,8 @@ func _ready() -> void:
 func _draw() -> void:
 	var chip := StyleBoxFlat.new()
 	chip.bg_color = Color("101b26f5"); chip.set_corner_radius_all(9)
-	draw_style_box(chip, Rect2(0, 0, 44, 132))
+	draw_style_box(chip, Rect2(0, 0, 48, 144))
 	var font := ThemeDB.fallback_font
 	for index in 3:
-		var glyph: String = (["<", "O", ">"][index] if preload("res://scripts/phone_layout.gd").touch_device() else ["↶", "⌖", "↷"][index])
-		draw_string(font, Vector2(0, index * 44 + 30), glyph, HORIZONTAL_ALIGNMENT_CENTER, 44, 16, Color("f2d99a"))
+		var glyph: String = ["↶", "⌖", "↷"][index]
+		draw_string(font, Vector2(0, index * 48 + 32), glyph, HORIZONTAL_ALIGNMENT_CENTER, 48, 16, Color("f2d99a"))

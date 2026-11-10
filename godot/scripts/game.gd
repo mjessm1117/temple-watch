@@ -85,6 +85,7 @@ func _ready() -> void:
 	input_controls = InputControls.new()
 	input_controls.g = self
 	_setup_scene()
+	yaw = BattleCamera.battle_heading(mission)
 	if preload("res://scripts/phone_layout.gd").narrow(get_tree().root.size):
 		camera.fov = 47.0
 	_load_models()
@@ -289,7 +290,14 @@ func _glide_to(point: Vector3, seconds: float, target_zoom: float = -1.0) -> voi
 	set_process(true)
 
 func _process(_delta: float) -> void:
-	if mission != null: scene_view.arrange_labels()
+	if mission != null:
+		scene_view.arrange_labels()
+		if preload("res://scripts/phone_layout.gd").narrow(get_tree().root.size):
+			for id in views:
+				var label: Label3D = views[id].status_label
+				if label != null:
+					label.font_size = 12
+					label.visible = label.visible and (int(id) == selected_id or int(id) == target_id)
 	if player_attack_pending and not playing_enemy_events and not cinematic and selected_id >= 0 and views.has(selected_id):
 		var moving_view: Node3D = views[selected_id]
 		if moving_view.motion != null and moving_view.motion.is_running():
@@ -438,9 +446,18 @@ func _end_turn() -> void:
 		mission.end_turn()
 		mission.action_events.clear()
 		_refresh()
+		_face_battle_front()
 		return
 	await preload("res://scripts/combat_turns.gd").play(self)
+	_face_battle_front()
 	_recenter()
+
+func _face_battle_front() -> void:
+	var wanted: float = BattleCamera.battle_heading(mission)
+	var turn: float = wrapf(wanted - yaw, -PI, PI)
+	if absf(turn) >= PI / 4.0 - 0.001:
+		yaw += turn
+		_update_camera()
 
 
 func _demo(kind: String) -> void:

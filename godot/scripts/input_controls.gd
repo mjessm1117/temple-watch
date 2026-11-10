@@ -90,6 +90,7 @@ func handle_event(event: InputEvent) -> void:
 			if g.cinematic: g._skip_cinematic()
 			var p: Vector2i = g._screen_tile(event.position)
 			var nearby_player := near_unit(g, event.position, g.mission.living("player"))
+			if not nearby_player.is_empty() and p.x >= 0 and Shot.pos(nearby_player) != p: nearby_player = {}
 			var nearby_attack_target: Dictionary = {}
 			if g.action in ["shoot", "strike", "push"]:
 				nearby_attack_target = near_unit(g, event.position, valid_targets(g.mission, g.mission.unit_by_id(g.selected_id), g.action))
@@ -118,7 +119,8 @@ func handle_event(event: InputEvent) -> void:
 				if nearby_attack_target.is_empty() and Shot.pos(u) == p: g._select(int(u.id)); return
 			if g.action == "move" and g.selected_id >= 0:
 				var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
-				var enemies: Array[Dictionary] = valid_targets(g.mission, actor, "shoot") if "shoot" in actor.get("kit", []) else []
+				var enemies: Array[Dictionary] = []
+				if "shoot" in actor.get("kit", []): enemies = valid_targets(g.mission, actor, "shoot")
 				var tapped_enemy: Dictionary = near_unit(g, event.position, enemies)
 				if tapped_enemy.is_empty():
 					for enemy in enemies:
