@@ -90,6 +90,11 @@ func _build_terrain() -> void:
 		var mood := preload("res://scripts/env_art.gd").new()
 		mood.apply_environment(world,sun,str(g.mission.spec.get("theme","temple")))
 		mood.free()
+	# Compatibility has no screen-space softening; keep the key gentle and fill the figures.
+	if str(g.get_node("/root/Graphics").effective) == "low":
+		world.environment.ambient_light_energy *= 1.16
+		sun.light_energy *= 0.88
+		sun.light_angular_distance = 2.2
 
 func _sync_terrain() -> void:
 	if g.mission.terrain_revision == g.terrain_seen_revision: return

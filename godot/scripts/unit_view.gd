@@ -72,8 +72,9 @@ func _set_lod_range(node: Node, begin: float, end: float, skip: Node = null) -> 
 	if node is GeometryInstance3D:
 		node.visibility_range_begin = begin
 		node.visibility_range_end = end
-		node.visibility_range_begin_margin = 0.0
-		node.visibility_range_end_margin = 0.0
+		node.visibility_range_begin_margin = 1.5 if begin > 0.0 else 0.0
+		node.visibility_range_end_margin = 1.5 if end > 0.0 else 0.0
+		node.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
 	for child in node.get_children(): _set_lod_range(child, begin, end, skip)
 
 func _find_animation(node: Node) -> AnimationPlayer:
@@ -109,13 +110,13 @@ func _attach_saber(u: Dictionary) -> void:
 	var steel := StandardMaterial3D.new(); steel.albedo_color = Color("a8b7bc")
 	hilt.material_override = steel
 	var blade := MeshInstance3D.new()
-	var blade_mesh := CylinderMesh.new()
-	blade_mesh.top_radius = 0.014; blade_mesh.bottom_radius = 0.022; blade_mesh.height = 1.02
+	var blade_mesh := CapsuleMesh.new()
+	blade_mesh.radius = 0.038; blade_mesh.height = 1.06; blade_mesh.radial_segments = 8; blade_mesh.rings = 4
 	blade.mesh = blade_mesh; blade.position.y = 0.62
 	var color := Color(str(u.get("col", "#79d3e2")))
 	var glow := StandardMaterial3D.new()
 	glow.albedo_color = color; glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	glow.emission_enabled = true; glow.emission = color; glow.emission_energy_multiplier = 2.0
+	glow.emission_enabled = true; glow.emission = color; glow.emission_energy_multiplier = 2.6
 	blade.material_override = glow; grip.add_child(blade)
 
 func play(clip: String) -> void:

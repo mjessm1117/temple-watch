@@ -31,12 +31,12 @@ void fragment() {
 	float rough=0.9, metal=0.015;
 	if(biome==0) {
 		vec2 slab=abs(fract((p+0.5)/vec2(2.0,1.0))-0.5);
-		float joint=smoothstep(0.484,0.498,max(slab.x,slab.y));
+		float joint=smoothstep(0.44,0.50,max(slab.x,slab.y));
 		float vein=sin(p.x*7.0+p.y*3.0+noise(p)*8.0)*0.025;
 		float crack=1.0-smoothstep(0.012,0.032,abs(fract(p.x*0.39+p.y*0.22+tile*4.0)-0.5));
-		col*=1.0-joint*0.23+vein-crack*step(0.78,tile)*0.12;
+		col*=1.0-joint*0.10+vein-crack*step(0.78,tile)*0.12;
 		// Contact tint is baked into the material and costs no screen pass on Low.
-		col*=1.0-joint*0.075;
+		col*=1.0-joint*0.035;
 		if(detail_quality>0.5) {
 			float chips=noise(p*11.0+vec2(3.7,8.1));
 			col*=0.94+chips*0.10;
@@ -47,7 +47,7 @@ void fragment() {
 		float seam=smoothstep(0.485,0.499,max(plate.x,plate.y));
 		float tread=step(0.85,sin((p.x+p.y)*55.0))*step(0.6,sin((p.x-p.y)*32.0));
 		float scorch=smoothstep(0.70,0.86,noise(p*0.55+vec2(map_seed*0.01)));
-		col*=1.0-seam*0.5+tread*0.09-scorch*0.19;
+		col*=1.0-seam*0.22+tread*0.09-scorch*0.19;
 		rough=0.50+grain*0.15; metal=0.65;
 		float puddle=smoothstep(0.77,0.89,wear)*step(0.65,tile);
 		col=mix(col,col*vec3(0.64,0.82,0.91),puddle*0.58);
@@ -68,10 +68,10 @@ void fragment() {
 	}
 	// Tactical grid is local to the hovered destination; never a permanent checkerboard.
 	vec2 edge=abs(fract(p+0.5)-0.5);
-	float line=smoothstep(0.48,0.495,max(edge.x,edge.y));
+	float line=smoothstep(0.43,0.50,max(edge.x,edge.y));
 	float grid=line*(1.0-smoothstep(1.0,4.5,distance(p,hover_tile)))*grid_strength*step(0.7,world_normal.y);
-	ALBEDO=mix(col,vec3(0.28,0.62,0.68),grid*0.4);
-	EMISSION=vec3(0.15,0.45,0.53)*grid*0.15;
+	ALBEDO=mix(col,vec3(0.28,0.62,0.68),grid*0.22);
+	EMISSION=vec3(0.15,0.45,0.53)*grid*0.08;
 	ROUGHNESS=rough; METALLIC=metal;
 	float micro=detail_quality>0.5?noise(p*25.0):grain;
 	NORMAL_MAP=vec3(0.5+(grain-0.5)*0.08,0.5+(micro-0.5)*0.08,1.0);
