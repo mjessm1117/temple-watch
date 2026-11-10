@@ -28,6 +28,7 @@ for suite in run campaign_test campaign11_test gear_research_test story_port_tes
   run_suite "$suite"
 done
 run_suite battle12_test
+run_suite threat22_test
 run_suite mobile_web1_test
 run_suite rules12_test
 run_suite temple12_test --resolution 844x390 -- --phone

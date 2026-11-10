@@ -3,6 +3,71 @@ const Shot = preload("res://scripts/shot.gd")
 const Maps = preload("res://scripts/map_catalog.gd")
 const AI = preload("res://scripts/ai.gd")
 
+static func _type_name(m: RefCounted, kind: String) -> String:
+	return str(m.catalog.get(kind, {}).get("name", kind.capitalize()))
+
+static func _types(m: RefCounted, kinds: Array) -> Array:
+	var counts := {}
+	for kind in kinds:
+		var name := _type_name(m, str(kind))
+		counts[name] = int(counts.get(name, 0)) + 1
+	var out: Array = []
+	for name in counts: out.append("%s ×%d" % [name, counts[name]])
+	return out
+
+static func threat_summary(m: RefCounted) -> Dictionary:
+	var exposed: Array = []
+	var risk := 0
+	var known: Array = []
+	for enemy in m.living("enemy"):
+		if not bool(enemy.get("spotted", false)) and not bool(enemy.get("detected", false)): continue
+		known.append(enemy)
+	for player in m.living("player"):
+		for enemy in known:
+			var info: Dictionary = Shot.calculate(m, enemy, player, AI.is_melee(enemy))
+			if bool(info.los) and bool(info.range_ok):
+				exposed.append(int(player.id))
+				break
+	if bool(m.modern) and str(m.spec.get("family", "")) == "defend" and str(m.objective_state.get("phase", "")) == "primary":
+		var target := Maps.point(m.spec.objective.points[0])
+		for enemy in known:
+			if not bool(enemy.get("awake", false)) or bool(enemy.get("stunned", false)) or bool(enemy.get("skip_turn", false)): continue
+			var at := Shot.pos(enemy)
+			if Shot.distance(at, target) > 5.0 or not Shot.los(m, at, target):
+				var reachable: Dictionary = m.paths(enemy, int(enemy.mob))
+				for tile in reachable.costs:
+					if Shot.distance(tile, target) < Shot.distance(at, target): at = tile
+			if Shot.distance(at, target) <= 5.0 and Shot.los(m, at, target): risk += 2
+		risk = mini(risk, int(m.objective_state.get("relay_hp", risk)))
+	var pending: Array = []
+	if bool(m.modern):
+		for wave in m.pressure_state.get("pending", []):
+			pending.append({"label":str(wave.get("reason", wave.get("name", "Reinforcements"))), "count":wave.kinds.size(), "turns":maxi(0, int(wave.turn) - m.turn), "entry_pos":Maps.point(wave.at), "types":_types(m, wave.kinds)})
+	elif bool(m.reinforcement_announced) and not bool(m.reinforcement_dropped) and int(m.difficulty.get("reinforcement_size", 2)) > 0 and m.spec.has("reinforcement"):
+		var wave: Dictionary = m.spec.reinforcement
+		var kinds: Array = []
+		for i in int(m.difficulty.get("reinforcement_size", 2)):
+			kinds.append(str(wave.units[i % wave.units.size()][0]))
+		pending.append({"label":"Sith reinforcements", "count":kinds.size(), "turns":maxi(0, int(wave.drop_turn) - m.turn), "entry_pos":Vector2i(int(wave.units[0][1]), int(wave.units[0][2])), "types":_types(m, kinds)})
+	var villain := {}
+	if m.objective_state.has("villain_name") and str(m.objective_state.get("villain_outcome", "absent")) != "absent":
+		var status := str(m.objective_state.get("villain_status", "present"))
+		var line := str(m.objective_state.get("villain_intro_line", "")) if status != "retreating" else str(m.objective_state.get("villain_retreat_line", ""))
+		villain = {"name":str(m.objective_state.villain_name), "status":status, "line":line}
+	return {"exposed_units":exposed, "objective_risk":risk, "pending_groups":pending, "villain":villain}
+
+static func reveal_info(m: RefCounted, group: Array) -> Dictionary:
+	var kinds: Array = []
+	var number := -1
+	for enemy in group:
+		if not enemy is Dictionary or str(enemy.get("side", "enemy")) != "enemy" or int(enemy.get("hp", 0)) <= 0: continue
+		kinds.append(str(enemy.get("kind", "trooper")))
+		if number < 0: number = int(enemy.get("group", -1))
+	var types := _types(m, kinds)
+	var count := kinds.size()
+	var title := "GROUP %d REVEALED" % (number + 1) if number >= 0 else "HOSTILES REVEALED"
+	return {"title":title, "count":count, "types":types, "threat_line":"%d hostiles: %s" % [count, ", ".join(types)]}
+
 static func setup(m: RefCounted) -> void:
 	m.pressure_state = {"pending":[],"last_entry":-1,"waves":0,"brood_turn":0,"chain_turn":0,"chain_count":0,"calm_turn":0,"serial":0}
 	# Introduce one new threat at a time across the late war and later era.
@@ -43,7 +108,7 @@ static func queue(m: RefCounted, kinds: Array, delay: int = 1, reason: String = 
 	m.pressure_state.serial += 1
 	m.pressure_state.pending.append({"serial":m.pressure_state.serial,"spawned":0,"at":[entry[0],entry[1]],"name":entry[2],"kinds":kinds.duplicate(),"turn":m.turn+maxi(1,delay),"announced":m.turn,"reason":reason})
 	m.reinforcement_announced = true; m.reinforcement_marker = Maps.point(entry)
-	m.message("INBOUND: %s — %s in %d turn(s)." % [reason,entry[2],maxi(1,delay)])
+	m.message("INBOUND: %s — %s at (%d,%d), %d hostiles: %s in %d turn(s)." % [reason,entry[2],int(entry[0]),int(entry[1]),kinds.size(),", ".join(_types(m,kinds)),maxi(1,delay)])
 
 static func player_start(m: RefCounted) -> void:
 	var later: Array = []
