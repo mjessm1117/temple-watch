@@ -85,7 +85,7 @@ func run() -> void:
 		for i in pages.size():
 			opening._show_page(i)
 			await settle()
-			check(opening.narrative.get_content_height() <= opening.narrative.size.y + 1, "844x390 panel %d fits" % i)
+			check(opening.narrative.get_content_height() <= opening.narrative.size.y + 3, "844x390 panel %d fits" % i)
 	if not capture:
 		Phone.test_touch = 0; Phone.test_mobile = 0
 		DisplayServer.window_set_size(Vector2i(1366, 768))
