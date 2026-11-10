@@ -93,3 +93,4 @@ run_suite temple21_test --rendering-method gl_compatibility --resolution 844x390
 run_suite galaxy21_test --rendering-method gl_compatibility -- --graphics=low
 run_suite menus21_test --rendering-method gl_compatibility --resolution 844x390
 run_suite impact22_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
+run_suite storydelivery22_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low

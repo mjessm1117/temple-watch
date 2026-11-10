@@ -6,6 +6,7 @@ const Battle = preload("res://scripts/campaign/battle_bridge.gd")
 const Settings = preload("res://scripts/settings.gd")
 const Villain11Battle = preload("res://scripts/villain11_battle.gd")
 const SaveSlots = preload("res://scripts/campaign/save_slots.gd")
+const Beats22 = preload("res://scripts/story/story14_beats.gd")
 var campaign: RefCounted
 var story: RefCounted
 var active := false
@@ -18,6 +19,10 @@ var intelligence: Control
 var launch_origin := "galaxy"
 var settings_panel: Control
 var fade_duration := 0.24
+var last_bark_at := -4000
+var actor_bark_turn: Dictionary = {}
+var turn_prompt: PanelContainer
+var queued_radio: Dictionary = {}
 
 func session() -> RefCounted:
 	if campaign == null:
@@ -217,7 +222,16 @@ func create_battle(seed_value: int) -> RefCounted:
 
 func battle_refresh(game: Node) -> void:
 	if not active or campaign == null or campaign.state.get("flow_stage", "") != "battle" or transitioning: return
+	if battle_game != game:
+		actor_bark_turn.clear()
+		last_bark_at = -4000
+		queued_radio.clear()
 	battle_game = game
+	if game.has_signal("battle_event") and not game.battle_event.is_connected(_battle_event):
+		game.battle_event.connect(_battle_event)
+		if game.has_meta("story_comms"):
+			var comms = game.get_meta("story_comms")
+			if comms != null: comms.event_mode = true
 	for u in game.mission.units:
 		if u.side == "enemy" and u.spotted: story.unlock_codex(campaign.state, "enemy", str(u.kind))
 	for ability in game.mission.ability_uses: story.unlock_codex(campaign.state, "ability", str(ability))
@@ -227,16 +241,84 @@ func battle_refresh(game: Node) -> void:
 
 func battle_beat(game: Node) -> void:
 	if not active or transitioning or game.mission.result != "": return
+	if is_instance_valid(turn_prompt): return
 	battle_game = game
 	var names: Array = game.mission.living("player").map(func(u): return u.name)
 	screen = story.next_squad_beat(campaign.state, str(campaign.state.pending_mission.mission_id), game.mission.turn, names)
 	if screen.is_empty(): return
-	screen_return = "battle"
-	var panel = load("res://scenes/dialogue.tscn").instantiate()
-	panel.set_campaign_state(campaign.state); panel.show_scene(screen)
-	panel.completed.connect(func(): panel.queue_free(); story_finished())
-	game.hud.add_child(panel)
-	game.set_process_unhandled_input(false)
+	var speaker := str(screen.get("name", "Field Comms"))
+	var genuine_choice := false
+	for choice in screen.get("choices", []):
+		if not choice.get("battle", {}).is_empty(): genuine_choice = true
+	if not genuine_choice:
+		_show_radio(speaker,speaker,str(screen.get("text","")),1,game.mission.turn)
+		campaign.state.beat_mission = str(campaign.state.pending_mission.mission_id)
+		campaign.state.erase("pending")
+		save()
+		return
+	if is_instance_valid(turn_prompt): turn_prompt.queue_free()
+	turn_prompt = preload("res://scripts/storydelivery22_prompt.gd").new()
+	turn_prompt.present(game,screen,_choose_battle_beat)
+	_record_story(speaker,game.mission.turn,str(screen.get("text","")))
+	save()
+
+func _choose_battle_beat(id: String) -> void:
+	var choice: Dictionary = story.apply_choice(campaign.state,id)
+	if not choice.get("ok",false): return
+	Battle.effects(battle_game.mission,campaign,campaign.state.get("battle_choice",{}))
+	campaign.state.erase("battle_choice")
+	if is_instance_valid(turn_prompt): turn_prompt.close()
+	turn_prompt = null
+	if not queued_radio.is_empty() and battle_game.has_meta("story_comms"):
+		var comms = battle_game.get_meta("story_comms")
+		if comms != null and comms.has_method("show_radio"):
+			comms.show_radio(str(queued_radio.speaker),str(queued_radio.portrait_key),str(queued_radio.text),int(queued_radio.priority))
+	queued_radio.clear()
+	battle_game._refresh()
+	save()
+
+func _battle_event(kind: String, actor_id: String, target_id: String, context: Dictionary) -> void:
+	if battle_game == null or campaign == null or transitioning: return
+	var turn := int(context.get("turn",battle_game.mission.turn))
+	var comms = battle_game.get_meta("story_comms") if battle_game.has_meta("story_comms") else null
+	if kind == "villain_reveal":
+		var name := str(context.get("name", ""))
+		for unit in battle_game.mission.units:
+			if str(unit.get("id","")) == actor_id or str(unit.get("rid","")) == actor_id: name = str(unit.get("name",name)); break
+		if name.is_empty(): name = "Unknown Sith"
+		_show_radio(name,name,str(context.get("line","The Sith steps into view.")),3,turn)
+		if battle_game.get("sound") != null and battle_game.sound.has_method("cue"): battle_game.sound.cue("villain")
+		if battle_game.has_method("cue_story"): battle_game.cue_story("villain",context.get("world_pos",Vector3.ZERO))
+		return
+	var now := Time.get_ticks_msec()
+	if now - last_bark_at < 4000 or actor_bark_turn.get(actor_id,-1) == turn: return
+	var bark: Dictionary = {}
+	var beats = Beats22.new()
+	if beats.has_method("pick_bark"): bark = beats.call("pick_bark",kind,actor_id,target_id,context)
+	if bark.is_empty() and comms != null: bark = comms.fallback(kind,actor_id,target_id)
+	if bark.is_empty(): return
+	_show_radio(str(bark.get("speaker","Field Comms")),str(bark.get("portrait_key",bark.get("speaker",""))),str(bark.get("text","")),int(bark.get("priority",1)),turn)
+	last_bark_at = now
+	actor_bark_turn[actor_id] = turn
+	if comms != null: comms.bark_number += 1
+
+func _show_radio(speaker: String, portrait_key: String, line: String, priority: int, turn: int) -> void:
+	if battle_game == null or not battle_game.has_meta("story_comms"): return
+	var comms = battle_game.get_meta("story_comms")
+	if comms == null or not comms.has_method("show_radio"): return
+	if is_instance_valid(turn_prompt) and preload("res://scripts/phone_layout.gd").window_size().x < 700:
+		queued_radio = {"speaker":speaker,"portrait_key":portrait_key,"text":line,"priority":priority}
+		_record_story(speaker,turn,line)
+		return
+	comms.show_radio(speaker,portrait_key,line,priority)
+	_record_story(speaker,turn,line)
+
+func _record_story(speaker: String, turn: int, line: String) -> void:
+	if campaign == null or line.strip_edges().is_empty(): return
+	var transcript: Array = campaign.state.get("story_transcript",[])
+	transcript.append({"speaker":speaker,"turn":turn,"text":line.strip_edges()})
+	while transcript.size() > 40: transcript.pop_front()
+	campaign.state.story_transcript = transcript
 	save()
 
 func debrief(mission: RefCounted) -> void:
@@ -246,8 +328,9 @@ func debrief(mission: RefCounted) -> void:
 	var result: Dictionary = Battle.result(campaign, mission)
 	result.villain_outcome = mission.objective_state.get("villain_outcome", "absent")
 	campaign.state.battle_result = result
-	screen = story.start_debrief({"mission_id":result.mission_id, "won":result.win,
-		"squad":result.units.filter(func(u): return u.status != "dead").map(func(u): return u.id), "saved_by":mission.saved_by, "clues":mission.clues})
+	if is_instance_valid(battle_game) and battle_game.get("sound") != null and battle_game.sound.has_method("cue"):
+		battle_game.sound.cue("victory" if bool(result.win) else "defeat")
+	screen = story.start_debrief(debrief_input(result,mission))
 	if campaign.state.pending_mission.get("villain_present",false):
 		screen.text += "\n\n" + Villain11Battle.outcome_text(str(mission.objective_state.villain_name), str(mission.objective_state.villain_outcome))
 		var encounters: Array = campaign.state.get("villain11_encounters", [])
@@ -262,6 +345,11 @@ func debrief(mission: RefCounted) -> void:
 	screen_return = "result"
 	save()
 	go("dialogue")
+
+static func debrief_input(result: Dictionary, mission: RefCounted) -> Dictionary:
+	return {"mission_id":result.mission_id,"won":result.win,"units":result.units,"mission_result":result,
+		"squad":result.units.filter(func(u): return u.status != "dead").map(func(u): return u.id),
+		"saved_by":mission.saved_by,"clues":mission.clues}
 
 func finish_result() -> void:
 	if campaign.state.get("flow_stage", "") != "debrief": return
