@@ -14,6 +14,7 @@ const HomeTabs = preload("res://scripts/campaign/home_tabs.gd")
 const HomeResources = preload("res://scripts/campaign/home_resources.gd")
 const GalaxyCard = preload("res://scripts/campaign/home12_galaxy_card.gd")
 const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
+const Squad = preload("res://scripts/campaign/squad.gd")
 var build_slot := "b0"
 var field_team: Array = []
 var edict_draft: Array = []
@@ -39,6 +40,8 @@ var more_panel: PanelContainer
 func _ready() -> void:
 	campaign = get_node("/root/CampaignFlow").session()
 	get_node("/root/CampaignFlow").active = true
+	var remembered_id := str(campaign.state.get("armory_selected_id", ""))
+	if remembered_id != "": selected_id = remembered_id
 	if campaign.soldier(selected_id).is_empty() and not campaign.state.roster.is_empty(): selected_id = str(campaign.state.roster[0].id)
 	edict_draft = campaign.state.strategy.edict.duplicate()
 	_build_shell()
@@ -264,6 +267,8 @@ func _refresh_shell() -> void:
 func _change_page(name: String, room_id: String = "") -> void:
 	selected_room = room_id
 	if name == "Galaxy": _open_galaxy(); return
+	if name == "Arsenal": Squad.open_from_temple(get_tree(), selected_id); return
+	if name == "Settings": get_node("/root/CampaignFlow").open_settings(); return
 	if name == "Codex": get_node("/root/CampaignFlow").open_codex(); return
 	if room_id != "": temple_view.focus_room(room_id)
 	page = name; panel_open = true; _show_page(); _slide_station()

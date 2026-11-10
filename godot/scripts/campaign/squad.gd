@@ -115,7 +115,9 @@ func _build_header() -> void:
 func _build_footer() -> void:
 	footer_bg = ColorRect.new(); footer_bg.color = S.BG; footer_bg.mouse_filter = MOUSE_FILTER_IGNORE; footer_bg.z_index = 10; add_child(footer_bg)
 	footer = HBoxContainer.new(); footer.z_index = 11; footer.add_theme_constant_override("separation", 16); add_child(footer)
-	var back := S.button("DONE" if from_temple else "Temple" if Phone.touch_device() else "← Temple", func(): flow.go("temple")); footer.add_child(back); wire_button(back)
+	var back := S.button("DONE" if from_temple else "Temple" if Phone.touch_device() else "← Temple", func():
+		if from_temple: flow.go("temple")
+		else: flow.back_from_squad()); footer.add_child(back); wire_button(back)
 	var text := S.column(2); text.size_flags_horizontal = SIZE_EXPAND_FILL; footer.add_child(text)
 	counter = UI.label("", 17, S.CYAN); text.add_child(counter)
 	notice = UI.label("Tap a soldier to inspect" if Phone.touch_device() else "Click a soldier to inspect  ·  Esc returns to the lineup", 12, S.MUTED); text.add_child(notice)

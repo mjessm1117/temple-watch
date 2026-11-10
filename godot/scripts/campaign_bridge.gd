@@ -55,7 +55,7 @@ func open_settings() -> void:
 	panel.add_theme_stylebox_override("panel", preload("res://scripts/campaign/ui.gd").style())
 	var content := VBoxContainer.new()
 	panel.add_child(content)
-	content.add_child(preload("res://scripts/graphics_options.gd").new())
+	content.add_child(preload("res://scripts/graphics_options.gd").build_settings_panel())
 	content.add_child(preload("res://scripts/campaign/ui.gd").button("BACK", open_settings))
 	scene.add_child(panel)
 	settings_panel = panel

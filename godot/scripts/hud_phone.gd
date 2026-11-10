@@ -402,7 +402,7 @@ func _show_settings() -> void:
 	open_card = "settings"
 	for child in popup_body.get_children(): child.queue_free()
 	popup_body.add_child(_button("BACK", _show_menu))
-	popup_body.add_child(preload("res://scripts/graphics_options.gd").new())
+	popup_body.add_child(preload("res://scripts/graphics_options.gd").build_settings_panel())
 	var tips := CheckButton.new(); tips.text = "Tips"; tips.button_pressed = bool(g.Prefs.get_value("tips"))
 	tips.custom_minimum_size.y = 44; tips.add_theme_font_size_override("font_size", 14)
 	tips.toggled.connect(func(value: bool) -> void: g.Prefs.set_value("tips", value)); popup_body.add_child(tips)
