@@ -1,7 +1,9 @@
 extends Node
 ## One camera owner; completion (or an explicit skip) gates attack resolution.
 const Shot = preload("res://scripts/shot.gd")
-const BLEND := 0.42
+const BLEND := 0.20
+const REPEAT_BLEND := 0.12
+const PLAYER_SHOT_BLEND := 0.42
 const AIM_BLEND := 0.28
 const TACTICAL_V_OFFSET := -0.5
 var g
@@ -20,13 +22,14 @@ var preview_shoulder: Node3D
 var preview_source_model: Node3D
 var close_pitch := deg_to_rad(53.0)
 var overhead := false
+var last_frame_at := -10.0
 
 func _ready() -> void:
 	touch.g = g
 
 func _process(_delta: float) -> void:
 	if g == null or g.camera == null or g.cinematic or preview_active: return
-	if g.playing_enemy_events and not skip_requested:
+	if g.playing_enemy_events and not skip_requested and g.quiet_motions.is_empty():
 		for enemy in g.mission.living("enemy"):
 			var view = g.views.get(int(enemy.id))
 			if view == null or view.motion == null or not view.motion.is_running(): continue
@@ -104,7 +107,7 @@ func preview(actor: Dictionary, target: Dictionary) -> void:
 	if preview_tween != null and preview_tween.is_running(): preview_tween.kill()
 	var origin := Vector3(float(actor.x), Shot.elevation(g.mission, Shot.pos(actor)) * 0.7, float(actor.y))
 	var destination := Vector3(float(target.x), Shot.elevation(g.mission, Shot.pos(target)) * 0.7, float(target.y))
-	var shoulder := aim_shoulder(g.mission, origin, destination)
+	var shoulder := aim_shoulder(g.mission, origin, destination, phone, g.get_viewport().get_visible_rect().size)
 	var view_direction := destination - shoulder
 	view_direction.y = 0.0
 	var screen_right := view_direction.normalized().cross(Vector3.UP)
@@ -116,19 +119,45 @@ func preview(actor: Dictionary, target: Dictionary) -> void:
 	var initial_look: Vector3 = g.camera.position - g.camera.global_basis.z * 8.0
 	preview_tween.tween_method(func(value: Vector3) -> void: g.camera.look_at(value, Vector3.UP), initial_look, look, AIM_BLEND)
 
-static func aim_shoulder(m: RefCounted, origin: Vector3, destination: Vector3) -> Vector3:
+static func aim_screen_point(eye: Vector3, look: Vector3, target: Vector3, viewport: Vector2, fov: float = 58.0) -> Vector2:
+	var forward := (look - eye).normalized()
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	var delta := target - eye
+	var depth := maxf(0.01, delta.dot(forward))
+	var scale := tan(deg_to_rad(fov) * 0.5)
+	var aspect := viewport.x / maxf(1.0, viewport.y)
+	return Vector2(0.5 + delta.dot(right) / (2.0 * depth * scale * aspect), 0.5 - delta.dot(up) / (2.0 * depth * scale))
+
+static func aim_shoulder(m: RefCounted, origin: Vector3, destination: Vector3, phone: bool = false, viewport: Vector2 = Vector2(844, 390)) -> Vector3:
 	var forward := destination - origin
 	forward.y = 0.0
 	if forward.length_squared() < 0.01: forward = Vector3.FORWARD
 	forward = forward.normalized()
 	var side := Vector3(-forward.z, 0.0, forward.x)
 	var target := destination + Vector3.UP * 1.25
-	for retreat in [1.15, 1.8, 2.5]:
+	var best := Vector3.ZERO
+	var best_score := -INF
+	for retreat in [1.15, 1.8, 2.5, 3.5, 5.0]:
 		for height in [1.55, 2.15, 2.9]:
-			for sign_side in [1.0, -1.0]:
-				var eye: Vector3 = origin - forward * retreat + side * 0.85 * sign_side + Vector3.UP * height
-				eye = preload("res://scripts/battle11_camera.gd").aim_position(m, eye)
-				if aim_ray_clear(m, eye, target): return eye
+			for lateral in [0.85, 1.6, 2.4]:
+				for sign_side in [1.0, -1.0]:
+					var eye: Vector3 = origin - forward * retreat + side * lateral * sign_side + Vector3.UP * height
+					eye = preload("res://scripts/battle11_camera.gd").aim_position(m, eye)
+					if not aim_ray_clear(m, eye, target): continue
+					var direction := destination - eye; direction.y = 0.0
+					var screen_right := direction.normalized().cross(Vector3.UP)
+					var look := destination + screen_right * (0.75 if phone else 0.0) + Vector3.UP * 1.25
+					var screen := aim_screen_point(eye, look, target, viewport, 58.0 if phone else 52.0)
+					var source_screen := aim_screen_point(eye, look, origin + Vector3.UP * 1.18, viewport, 58.0 if phone else 52.0)
+					var separation := Vector2((screen.x - source_screen.x) * viewport.x, (screen.y - source_screen.y) * viewport.y).length()
+					var score := -absf(screen.x - 0.53) * 8.0 - absf(screen.y - 0.43) * 8.0
+					if phone and (screen.x < 0.38 or screen.x > 0.70 or screen.y < 0.20 or screen.y > 0.63): score -= 20.0
+					if separation < 40.0: score -= 10.0
+					score += minf(separation, 100.0) * 0.06
+					score += minf(eye.distance_to(target), 12.0) * 0.01
+					if score > best_score: best_score = score; best = eye
+	if best_score > -INF: return best
 	for height in [3.4, 4.5, 6.0, 9.0, 12.0, 20.0]:
 		var eye: Vector3 = preload("res://scripts/battle11_camera.gd").aim_position(m, origin - forward * 2.5 + Vector3.UP * height)
 		if aim_ray_clear(m, eye, target): return eye
@@ -184,10 +213,10 @@ func impact_beat(point: Vector3) -> void:
 	if beat_tween != null and beat_tween.is_running(): beat_tween.kill()
 	var original_fov: float = g.camera.fov
 	beat_tween = g.create_tween()
-	beat_tween.tween_property(g.camera, "fov", maxf(42.0, original_fov - 5.0), 0.11)
-	beat_tween.tween_interval(0.12)
-	beat_tween.tween_property(g.camera, "fov", original_fov, 0.14)
-	await wait(0.38)
+	beat_tween.tween_property(g.camera, "fov", maxf(42.0, original_fov - 5.0), 0.06)
+	beat_tween.tween_interval(0.06)
+	beat_tween.tween_property(g.camera, "fov", original_fov, 0.06)
+	await wait(0.18)
 	if beat_tween != null and beat_tween.is_running(): beat_tween.kill()
 	g.camera.fov = original_fov
 
@@ -211,15 +240,20 @@ func frame(from: Vector3, to: Vector3, style: String = "shoot") -> void:
 	var side := Vector3(-direction.z, 0, direction.x)
 	var shoulder := from - direction * 3.0 + side * 1.25 + Vector3.UP * 2.3
 	var look := from.lerp(to, 0.65) + Vector3.UP
+	if style == "objective":
+		shoulder = from.lerp(to, 0.5) + side * maxf(4.0, from.distance_to(to) * 0.8) + Vector3.UP * 3.8
+		look = from.lerp(to, 0.5) + Vector3.UP
 	if style in ["push", "pull", "force", "reveal"]:
 		shoulder = from.lerp(to, 0.4) + side * maxf(4.0, from.distance_to(to) * 0.8) + Vector3.UP * 3.4
 		look = from.lerp(to, 0.5) + Vector3.UP
 	shoulder = preload("res://scripts/battle11_camera.gd").safe_position(g.mission, shoulder)
 	var initial_look: Vector3 = g.camera.position - g.camera.global_basis.z * 8.0
 	g.action_tween = g.create_tween().set_parallel(true).set_speed_scale(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if g.playing_enemy_events else 1.0))
-	g.action_tween.tween_property(g.camera, "position", shoulder, BLEND).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	g.action_tween.tween_method(func(value: Vector3): g.camera.look_at(value, Vector3.UP), initial_look, look, BLEND)
-	await wait(BLEND)
+	var duration := REPEAT_BLEND if g.playing_enemy_events and Time.get_ticks_msec() / 1000.0 - last_frame_at < 1.0 else PLAYER_SHOT_BLEND if not g.playing_enemy_events and style in ["shoot", "strike"] else BLEND
+	last_frame_at = Time.get_ticks_msec() / 1000.0
+	g.action_tween.tween_property(g.camera, "position", shoulder, duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	g.action_tween.tween_method(func(value: Vector3): g.camera.look_at(value, Vector3.UP), initial_look, look, duration)
+	await wait(duration)
 	if not skip_requested:
 		g.camera.position = shoulder; g.camera.look_at(look, Vector3.UP)
 	trace.append("camera_ready")

@@ -1,4 +1,5 @@
 extends Node3D
+signal battle_event(kind: String, actor_id: String, target_id: String, context: Dictionary)
 
 const Mission = preload("res://scripts/combat_mission.gd")
 const Shot = preload("res://scripts/shot.gd")
@@ -12,6 +13,7 @@ const AttackPresentation = preload("res://scripts/attack_presentation.gd")
 const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 const Ability = preload("res://scripts/abilities_engine.gd")
 const BattleCamera = preload("res://scripts/battle11_camera.gd")
+const FeelEvents = preload("res://scripts/feelcam22_events.gd")
 var animate_headless := false
 var cam = preload("res://scripts/cam_combat.gd").new()
 var scene_view = preload("res://scripts/combat_scene.gd").new()
@@ -69,6 +71,11 @@ var player_attack_pending := false
 var terrain_seen_revision := 0
 var terrain_seen_board: Array[String] = []
 var reinforcement_view: Node3D
+var quiet_motions: Array[Node3D] = []
+var quiet_targets: Dictionary = {}
+var last_reveal_group := -999
+var villain_seen := false
+var villain_retreat_seen := false
 
 func _ready() -> void:
 	scene_view.g = self
@@ -102,6 +109,8 @@ func _ready() -> void:
 	pivot = BattleCamera.phone_focus(pivot,yaw,1.55)
 	_update_camera()
 	_refresh()
+	if sound.has_method("set_music_state"): sound.set_music_state("calm")
+	battle_event.emit("player_turn_start", "", "", {"world_pos":pivot, "turn":mission.turn})
 	var demo := ""
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--demo="): demo = arg.trim_prefix("--demo=")
@@ -195,6 +204,7 @@ func _use_ability(id: int = -1, tile: Vector2i = Vector2i(-1, -1)) -> void:
 	var before: Dictionary = {}
 	for u in mission.units: before[int(u.id)] = int(u.hp)
 	if mission.use_ability(selected_id, ability_id, id, tile):
+		if str(def.effect) in ["blast", "wave", "collapse"] and sound.has_method("cue"): sound.cue("blast")
 		if views.has(selected_id): views[selected_id].act("reload" if ability_id == "reload" else "cast")
 		fx.ability(ability_id, from + Vector3.UP, to + Vector3.UP)
 		await cam.wait(0.3)
@@ -203,6 +213,16 @@ func _use_ability(id: int = -1, tile: Vector2i = Vector2i(-1, -1)) -> void:
 			if change != 0:
 				var at := Vector3(u.x, Shot.elevation(mission, Shot.pos(u)) * 0.7 + 1.7, u.y)
 				fx.float_text(at, "%+d HP" % change, Color("6aeda5") if change > 0 else Color("ffad8d"))
+				if change < 0:
+					var queued_hit := false
+					for queued in mission.action_events:
+						if str(queued.get("kind", "")) in ["attack", "push"] and int(queued.get("target", -1)) == int(u.id): queued_hit = true; break
+					if not queued_hit:
+						var hit_event := {"actor":selected_id, "target":int(u.id), "damage":-change}
+						FeelEvents.emit(self, "hit", hit_event, at)
+						FeelEvents.cue(self, "hit")
+						if str(u.side) == "player": FeelEvents.emit(self, "hurt", hit_event, at)
+						if int(u.hp) <= 0: FeelEvents.emit(self, "kill", hit_event, at); FeelEvents.cue(self, "kill")
 		await EnemyPresentation.drain(self)
 	cam.finish()
 	player_attack_pending = false
@@ -412,12 +432,22 @@ func _attack(id: int, mode: String) -> void:
 	await cam.frame(Vector3(actor.x, Shot.elevation(mission, Shot.pos(actor)) * 0.7, actor.y), Vector3(target.x, Shot.elevation(mission, Shot.pos(target)) * 0.7, target.y), mode)
 	mission.action_events.clear()
 	cam.trace.append("resolve_%d" % selected_id)
+	var flank_info: Dictionary = Shot.calculate(mission, actor, target, mode == "strike") if mode != "push" else {}
 	var success: bool = mission.push(selected_id, id) if mode == "push" else mission.shot(selected_id, id, mode)
+	var killed_shot := false
 	if success and not mission.action_events.is_empty():
 		var event: Dictionary = mission.action_events.pop_front(); event.framed = true
+		event.flanked = bool(flank_info.get("flanked", false))
+		killed_shot = bool(event.get("killed", false))
 		await AttackPresentation.play(self, event)
 	await EnemyPresentation.drain(self)
 	cam.finish()
+	if killed_shot:
+		var ready_id: int = InputControls.next_squad(mission, selected_id, 1, true)
+		if ready_id >= 0:
+			var ready: Dictionary = mission.unit_by_id(ready_id)
+			pivot = BattleCamera.phone_focus(Vector3(ready.x, 0, ready.y), yaw, 1.55)
+			_update_camera()
 	player_attack_pending = false
 	mission.presentation_active = false
 	phase_banner.visible = false
@@ -443,7 +473,13 @@ func _end_turn() -> void:
 	# --- wave10 story ---
 	if mission.get("bond_pairs") != null: preload("res://scripts/combat_bonds.gd").nearby_cohesion(mission)
 	if DisplayServer.get_name() == "headless" and not animate_headless:
+		battle_event.emit("enemy_turn_start", "", "", {"world_pos":pivot, "turn":mission.turn})
+		if sound.has_method("set_music_state"): sound.set_music_state("enemy")
 		mission.end_turn()
+		battle_event.emit("enemy_turn_end", "", "", {"world_pos":pivot, "turn":mission.turn})
+		if mission.result == "":
+			if sound.has_method("set_music_state"): sound.set_music_state("contact")
+			battle_event.emit("player_turn_start", "", "", {"world_pos":pivot, "turn":mission.turn})
 		mission.action_events.clear()
 		_refresh()
 		_face_battle_front()
@@ -451,6 +487,16 @@ func _end_turn() -> void:
 	await preload("res://scripts/combat_turns.gd").play(self)
 	_face_battle_front()
 	_recenter()
+
+func cue_story(kind: String, world_pos: Vector3) -> void:
+	if kind not in ["focus", "villain", "reveal"] or player_attack_pending: return
+	if playing_enemy_events:
+		if not cinematic: await cam.frame(world_pos, world_pos, "reveal")
+		await cam.wait(0.12)
+		return
+	cam.skip_requested = false
+	_glide_to(BattleCamera.phone_focus(world_pos, yaw, 1.55), 0.24)
+	await cam.wait(0.36)
 
 func _face_battle_front() -> void:
 	var wanted: float = BattleCamera.battle_heading(mission)

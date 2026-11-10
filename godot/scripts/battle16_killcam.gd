@@ -29,11 +29,11 @@ static func play(game: Node3D, event: Dictionary) -> void:
 		actor.animation.play("swing", 0.06)
 		actor.animation.seek(0.0, true)
 	var tween := game.create_tween().set_parallel(true)
-	tween.tween_property(game.camera, "position", eye, 0.12).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(game.camera, "fov", 54.0, 0.12)
+	tween.tween_property(game.camera, "position", eye, 0.06).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(game.camera, "fov", 54.0, 0.06)
 	var from_look: Vector3 = game.camera.position - game.camera.global_basis.z * 8.0
-	tween.tween_method(func(point: Vector3) -> void: game.camera.look_at(point, Vector3.UP), from_look, look, 0.12)
-	await game.cam.wait(0.12)
+	tween.tween_method(func(point: Vector3) -> void: game.camera.look_at(point, Vector3.UP), from_look, look, 0.06)
+	await game.cam.wait(0.06)
 	if tween.is_running(): tween.kill()
 	if game.cam.skip_requested:
 		actor.model.rotation = prior_pose
@@ -42,12 +42,12 @@ static func play(game: Node3D, event: Dictionary) -> void:
 	game.camera.fov = 54.0
 	game.camera.look_at(look, Vector3.UP)
 	game.cam.trace.append("jedi_killcam_close")
-	await game.cam.wait(0.20)
+	await game.cam.wait(0.09)
 	if not game.cam.skip_requested:
 		victim.act("hit")
 		game.fx.burst(victim.global_position + Vector3.UP * 1.1, Color("b9f5ff"), 8)
 		game.cam.trace.append("jedi_killcam_hit")
-	await game.cam.wait(0.32)
+	await game.cam.wait(0.09)
 	actor.model.rotation = prior_pose
 	if game.cam.skip_requested: game.cam.trace.append("jedi_killcam_skipped"); return
 	game.camera.transform = prior
