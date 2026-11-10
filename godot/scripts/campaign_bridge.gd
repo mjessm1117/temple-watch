@@ -293,8 +293,14 @@ func _battle_event(kind: String, actor_id: String, target_id: String, context: D
 	var now := Time.get_ticks_msec()
 	if now - last_bark_at < 4000 or actor_bark_turn.get(actor_id,-1) == turn: return
 	var bark: Dictionary = {}
+	var bark_actor := actor_id
+	var bark_target := target_id
+	for unit in battle_game.mission.units:
+		if str(unit.get("id", "")) == actor_id or str(unit.get("rid", "")) == actor_id: bark_actor = str(unit.get("name", actor_id))
+		if str(unit.get("id", "")) == target_id or str(unit.get("rid", "")) == target_id: bark_target = str(unit.get("name", target_id))
+	if kind == "flank" and bark_target != target_id: bark_actor = bark_target
 	var beats = Beats22.new()
-	if beats.has_method("pick_bark"): bark = beats.call("pick_bark",kind,actor_id,target_id,context)
+	if beats.has_method("pick_bark"): bark = beats.call("pick_bark",kind,bark_actor,bark_target,context)
 	if bark.is_empty() and comms != null: bark = comms.fallback(kind,actor_id,target_id)
 	if bark.is_empty(): return
 	_show_radio(str(bark.get("speaker","Field Comms")),str(bark.get("portrait_key",bark.get("speaker",""))),str(bark.get("text","")),int(bark.get("priority",1)),turn)

@@ -222,8 +222,8 @@ func run() -> void:
 	check(Threat.phone_chip(forecast) == "OBJ\n−4" and Threat.phone_chip({"exposed_units":[1],"objective_risk":0}) == "1\nEXPOSED", "portrait chip prioritizes objective and exposed threats")
 	var shot_script: Script = load("res://scripts/shot.gd")
 	check(shot_script.has_method("calculate"), "guarded Script.has_method detects static cross-lane APIs")
-	check(Threat.summary(m).is_empty() and not phone.threat_chip.visible, "threat chip hides while D API is unavailable")
-	check(Threat.reveal(m, []).is_empty(), "reveal hook stays guarded before D merges")
+	check(not Threat.summary(m).is_empty() and phone.threat_chip.visible, "merged threat API populates phone chip")
+	check(int(Threat.reveal(m, [enemy]).count) == 1, "merged reveal API reports visible group")
 	game.hud_controls.night.show_reveal("Patrol: 3 troopers")
 	check(game.hud_controls.night.phase_plate.visible and game.hud_controls.night.phase_text.text == "PATROL: 3 TROOPERS", "reveal title hook displays D's title")
 	game.queue_free(); await process_frame
@@ -233,7 +233,7 @@ func run() -> void:
 	var desktop_game = load("res://scenes/rescue.tscn").instantiate(); root.add_child(desktop_game)
 	for i in 8: await process_frame
 	check(desktop_game.hud_controls.phone == null and desktop_game.hud_controls.bar != null, "desktop layout remains available")
-	check(not desktop_game.hud_controls.desktop_threat_chip.visible, "desktop End Turn chip hides before D API merges")
+	check(desktop_game.hud_controls.desktop_threat_chip.visible and not desktop_game.hud_controls.desktop_threat_chip.text.is_empty(), "merged desktop End Turn chip shows threat summary")
 	desktop_game.queue_free(); await process_frame
 	print("DECISION22 TEST RESULTS: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
