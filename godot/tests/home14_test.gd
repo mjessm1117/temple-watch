@@ -40,7 +40,7 @@ func run() -> void:
 		var cap_height: float = glyph_font.get_glyph_size(0, Vector2i(names.FONT_SIZE, names.FONT_SIZE), glyph_font.get_glyph_index(names.FONT_SIZE, 65, 0)).y
 		# 16 px face produces 14 px uppercase ink in the 844x390 capture.
 		check(names.FONT_SIZE >= 16 and cap_height >= 11, "Phone room type keeps 11 px minimum")
-		check(names.labels.size() == built, "Every built room has a phone name")
+		check(names.labels.size() < built and temple.temple_view.buttons.war.get_node("RoomName").visible, "Phone limits simultaneous names while keeping the mission room labeled")
 		for i in names.labels.size():
 			var row: Dictionary = names.labels[i]
 			check(cap_height >= 11.0, "Phone caps at least 11 px: " + str(row.id))
