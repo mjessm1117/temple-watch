@@ -92,7 +92,10 @@ static func projects(view) -> void:
 
 static func roster(view) -> void:
 	var c = view.campaign
-	var box: VBoxContainer = view._card("RECRUIT POOL", "Three candidates each month; a Padawan in odd months. Roster capacity %d." % Roster.capacity(c.state))
+	var active := 0
+	for soldier in c.state.roster:
+		if str(soldier.get("status", "active")) == "active": active += 1
+	var box: VBoxContainer = view._card("RECRUITS  %d AVAILABLE  ·  CAPACITY  %d / %d" % [c.state.cands.size(), active, Roster.capacity(c.state)], "Choose a candidate. Three arrive each month; a Padawan in odd months.")
 	for candidate in c.state.cands:
 		button(view, box, "Recruit %s · %s · %s" % [candidate.n, candidate.cls, "Padawan · Council-sponsored" if candidate.jedi else "30 Cr + 1 recruit"], Roster.hire.bind(c, str(candidate.id)))
 	box = view._card("SQUAD DOCTRINE", "Deploy 5 now, 6 after upgrade I, 7 after upgrade II. Current capacity %d. Upgrade I needs a rank 3 veteran; upgrade II needs rank 4 and Barracks II." % c.squad_capacity())
@@ -174,8 +177,8 @@ static func field(view) -> void:
 
 static func settings(view) -> void:
 	var box: VBoxContainer = view._card("PRESENTATION SETTINGS", "Saved on this device.")
-	box.add_child(preload("res://scripts/graphics_options.gd").new())
-	for row in [["speed","Animation speed",[0.5,1.0,2.0,4.0]], ["cine","Cinematics",[true,false]], ["motion","Reduced motion",[true,false]], ["numbers","Show numbers",[true,false]], ["cb","Colorblind palette",[true,false]], ["tips","Tips",[true,false]]]:
+	box.add_child(preload("res://scripts/graphics_options.gd").build_settings_panel())
+	for row in [["speed","Animation speed",[0.5,1.0,2.0,4.0]], ["numbers","Show numbers",[true,false]], ["cb","Colorblind palette",[true,false]], ["tips","Tips",[true,false]]]:
 		box.add_child(UI.label(row[1], 16, UI.GOLD))
 		var buttons := HFlowContainer.new(); box.add_child(buttons)
 		for value in row[2]:

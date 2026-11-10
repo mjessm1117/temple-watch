@@ -33,10 +33,10 @@ func setup(c: RefCounted, id: String) -> void:
     var margin := MarginContainer.new()
     margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     var safe := Phone.safe_margins(get_viewport_rect().size) if Phone.narrow(Phone.window_size()) else Vector4.ZERO
-    margin.add_theme_constant_override("margin_left", 8 + int(safe.x))
-    margin.add_theme_constant_override("margin_right", 8 + int(safe.z))
-    margin.add_theme_constant_override("margin_top", 6 + int(safe.y))
-    margin.add_theme_constant_override("margin_bottom", 6 + int(safe.w))
+    margin.add_theme_constant_override("margin_left", 12 + int(safe.x))
+    margin.add_theme_constant_override("margin_right", 12 + int(safe.z))
+    margin.add_theme_constant_override("margin_top", 12 + int(safe.y))
+    margin.add_theme_constant_override("margin_bottom", 12 + int(safe.w))
     add_child(margin)
     var frame := HBoxContainer.new()
     frame.add_theme_constant_override("separation", 8)
@@ -47,6 +47,7 @@ func setup(c: RefCounted, id: String) -> void:
     portrait_panel.custom_minimum_size.x = 152 if Phone.narrow(Phone.window_size()) and logical_width <= 700 else 185 if Phone.narrow(Phone.window_size()) else 300
     portrait_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
     frame.add_child(portrait_panel)
+    if get_viewport_rect().size.x < 500: portrait_panel.hide()
     var portrait_column := VBoxContainer.new()
     portrait_column.add_theme_constant_override("separation", 2)
     portrait_panel.add_child(portrait_column)
@@ -210,15 +211,16 @@ func _effect_text(definition: Dictionary) -> String:
     if definition.has("reaction"): pieces.append("reaction fire")
     return "  ·  ".join(pieces)
 
-func _ability_card(id: String, active: bool, earned: bool = false) -> Control:
+func _ability_card(id: String, active: bool, earned: bool = false, show_metric: bool = true) -> Control:
     var definition := _ability_data(id)
     var card: Control = Button.new() if active else PanelContainer.new()
     card.name = "Card_" + id
-    card.custom_minimum_size.y = 94 if active else 46
+    card.custom_minimum_size.y = 112 if active else 50
     card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     var fill := Color("1d333b") if earned else Color("182b34") if active else Color("142127")
     var border := UI.GOLD if earned else UI.ACCENT if active else UI.BORDER
     if card is Button:
+        UI.style_button(card as Button)
         for state in ["normal", "hover", "pressed", "focus"]: card.add_theme_stylebox_override(state, UI.style(fill, border))
         (card as Button).pressed.connect(_select.bind(id))
     else:
@@ -241,6 +243,12 @@ func _ability_card(id: String, active: bool, earned: bool = false) -> Control:
     title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
     title.custom_minimum_size.y = 20
     stack.add_child(title)
+    if active and show_metric:
+        var metric := UI.label(_ability_number(definition), 14, UI.ACCENT)
+        metric.name = "Metric_" + id
+        metric.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        metric.autowrap_mode = TextServer.AUTOWRAP_OFF
+        stack.add_child(metric)
     var effect := UI.label(_effect_text(definition), 12, UI.TEXT if active or earned else UI.MUTED)
     effect.name = "Effect_" + id
     effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -258,6 +266,14 @@ func _ability_card(id: String, active: bool, earned: bool = false) -> Control:
         stack.add_child(chains)
     if active: cards[id] = card
     return card
+
+func _ability_number(definition: Dictionary) -> String:
+    for key in ["damage", "aim", "defense", "amount", "shots", "range", "heal"]:
+        if not definition.has(key): continue
+        var value: Variant = definition[key]
+        if value is Array: return "%s %s–%s" % [key.to_upper(), value[0], value[1]]
+        if value is int or value is float: return "%s %s" % [key.to_upper(), value]
+    return "R%d" % int(definition.get("rank", 1))
 
 func _select(id: String) -> void:
     var r: Dictionary = campaign.soldier(unit_id)
@@ -306,7 +322,7 @@ func _refresh() -> void:
             grid.add_theme_constant_override("h_separation", 4)
             grid.add_theme_constant_override("v_separation", 4)
             row.add_child(grid)
-            for option in options: grid.add_child(_ability_card(str(option), true))
+            for option in options: grid.add_child(_ability_card(str(option), true, false, grid.columns == 2))
         elif level <= picks.size():
             row.add_child(_ability_card(str(picks[level - 1]), false, true))
         elif level > rank:
