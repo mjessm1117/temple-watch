@@ -3,42 +3,122 @@
     {
       "title": "The same fire",
       "speaker": "Jedi Council",
-      "text": "At dawn, every member of the Council wakes from the same vision. The Temple burns above Coruscant. Clone soldiers climb its steps through smoke. A hooded figure waits in a red-lit office beyond the flames, patient as if the end has already been decided. No one can say whether the vision shows tomorrow or a century from now. Grand Master Zym orders the record sealed, but a sealed record cannot keep a gate shut. Beneath the Council chamber, ordinary life continues: apprentices hurry to lessons, healers change shifts, and the guard counts visitors at the outer gate. You have been given command of the Temple's field squads. Your first order arrives before the morning bells finish ringing."
+      "text": "At dawn, every member of the Council wakes from the same vision. The Temple burns above Coruscant. Clone soldiers climb its steps through smoke. A hooded figure waits in a red-lit office beyond the flames, patient as if the end has already been decided."
+    },
+    {
+      "title": "A sealed warning",
+      "speaker": "Jedi Council",
+      "text": "No one can say whether the vision shows tomorrow or a century from now. Grand Master Zym orders the record sealed, but a sealed record cannot keep a gate shut."
+    },
+    {
+      "title": "Morning bells",
+      "speaker": "Jedi Council",
+      "text": "Beneath the Council chamber, ordinary life continues: apprentices hurry to lessons, healers change shifts, and the guard counts visitors at the outer gate. You have been given command of the Temple's field squads. Your first order arrives before the morning bells finish ringing."
     },
     {
       "title": "A quiet approach",
       "speaker": "Tor Saalen",
-      "text": "Tor Saalen meets you in the command hall with a map still warm from the projector. Imperial troops are moving through the streets below the Temple. They have stripped the markings from their transports, but the formation is military, and their scouts have already tested three service entrances. Tor has placed guards at each one. That leaves the outer gate thin. He speaks calmly, as he does when the news is worst: the attackers may only be probing, or they may know exactly where the guard will bend. A Council debate can wait. The people crossing the plaza cannot. Tor asks for a squad that can hold ground while he seals the inner passages and moves the younglings away from the windows."
+      "text": "Tor Saalen meets you in the command hall with a map still warm from the projector. Imperial troops are moving through the streets below the Temple. They have stripped the markings from their transports, but the formation is military, and their scouts have already tested three service entrances."
     },
     {
-      "title": "Kira's question",
+      "title": "The thin gate",
+      "speaker": "Tor Saalen",
+      "text": "Tor has placed guards at each one. That leaves the outer gate thin. He speaks calmly, as he does when the news is worst: the attackers may only be probing, or they may know exactly where the guard will bend."
+    },
+    {
+      "title": "The people crossing",
+      "speaker": "Tor Saalen",
+      "text": "A Council debate can wait. The people crossing the plaza cannot. Tor asks for a squad that can hold ground while he seals the inner passages and moves the younglings away from the windows."
+    },
+    {
+      "title": "Kira’s question",
       "speaker": "Kira Venn",
-      "text": "Kira Venn is already at the gate when your call reaches her. She watches families turn back from the steps and hears the first distant shots from the avenue. A Temple guard offers to clear the plaza by force. Kira refuses. Panic would send people into the attackers' path, so she walks among them, gives simple directions, and keeps her saber unlit. Over the comm she asks whether this is the fire from the Council's vision. No one knows. You tell her what you can: there are civilians behind her, a guard detail on the inner doors, and a squad coming to stand beside her. She answers that she will hold until they arrive. The line stays open."
+      "text": "Kira Venn is already at the gate when your call reaches her. She watches families turn back from the steps and hears the first distant shots from the avenue. A Temple guard offers to clear the plaza by force."
+    },
+    {
+      "title": "Among the families",
+      "speaker": "Kira Venn",
+      "text": "Kira refuses. Panic would send people into the attackers' path, so she walks among them, gives simple directions, and keeps her saber unlit. Over the comm she asks whether this is the fire from the Council's vision. No one knows."
+    },
+    {
+      "title": "A line stays open",
+      "speaker": "Kira Venn",
+      "text": "You tell her what you can: there are civilians behind her, a guard detail on the inner doors, and a squad coming to stand beside her. She answers that she will hold until they arrive. The line stays open."
     },
     {
       "title": "What the Temple protects",
       "speaker": "Jedi Council",
-      "text": "The Temple is more than a fortress. Its archives hold the lives of worlds that no longer have libraries. Its infirmary takes in people who cannot pay. Its training halls are full of children who trust the adults around them to make the right choice under pressure. Losing the gate would put all of them within reach before anyone could evacuate the upper levels. The Council can send reinforcements, but not in time to make the first stand for you. Zym authorizes the guard to close the inner doors and gives your squad the outer approach. You are to buy time, not chase a retreating enemy into the city. Every turn the gate remains yours is another turn for the Temple to breathe."
+      "text": "The Temple is more than a fortress. Its archives hold the lives of worlds that no longer have libraries. Its infirmary takes in people who cannot pay. Its training halls are full of children who trust the adults around them to make the right choice under pressure."
+    },
+    {
+      "title": "The first stand",
+      "speaker": "Jedi Council",
+      "text": "Losing the gate would put all of them within reach before anyone could evacuate the upper levels. The Council can send reinforcements, but not in time to make the first stand for you."
+    },
+    {
+      "title": "A turn to breathe",
+      "speaker": "Jedi Council",
+      "text": "Zym authorizes the guard to close the inner doors and gives your squad the outer approach. You are to buy time, not chase a retreating enemy into the city. Every turn the gate remains yours is another turn for the Temple to breathe."
     },
     {
       "title": "A name in the noise",
       "speaker": "Tor Saalen",
-      "text": "A second report arrives under the first. Someone has been listening to Republic peace talks. The dates of a coming treaty have leaked, and Imperial agents are moving as if they know where the Order will be looking when the delegates meet. Master Gnost-Dural wants the archives copied. Others call that fear. Tor files the report without asking you to settle the argument now. The attack at the gate is real; the larger pattern is still a shape behind frosted glass. He asks you to remember both. If the squad survives today, it can follow the envoy's trail, search the old records, and learn why the Empire is pressing toward the Temple. First, it must survive today."
+      "text": "A second report arrives under the first. Someone has been listening to Republic peace talks. The dates of a coming treaty have leaked, and Imperial agents are moving as if they know where the Order will be looking when the delegates meet."
+    },
+    {
+      "title": "Frosted glass",
+      "speaker": "Tor Saalen",
+      "text": "Master Gnost-Dural wants the archives copied. Others call that fear. Tor files the report without asking you to settle the argument now. The attack at the gate is real; the larger pattern is still a shape behind frosted glass."
+    },
+    {
+      "title": "The envoy’s trail",
+      "speaker": "Tor Saalen",
+      "text": "He asks you to remember both. If the squad survives today, it can follow the envoy's trail, search the old records, and learn why the Empire is pressing toward the Temple. First, it must survive today."
     },
     {
       "title": "The first line",
       "speaker": "Kira Venn",
-      "text": "Kira marks the plaza on your tactical display. Stone planters offer cover, but the center lane is open. The attackers will have a clear run if your squad spreads too far. She has seen a medic helping stragglers across the approach and a few troopers taking positions with the gate guard. None of them knows what the Council saw in its vision. They know only the sound of boots below the steps. Kira's voice steadies as she walks the line. She tells each guard where to fall back if the outer barricade breaks. She leaves room for your arriving squad beside her. There is no speech, no promise that everyone comes home. There is a place to stand and work to do."
+      "text": "Kira marks the plaza on your tactical display. Stone planters offer cover, but the center lane is open. The attackers will have a clear run if your squad spreads too far."
+    },
+    {
+      "title": "Below the steps",
+      "speaker": "Kira Venn",
+      "text": "She has seen a medic helping stragglers across the approach and a few troopers taking positions with the gate guard. None of them knows what the Council saw in its vision. They know only the sound of boots below the steps. Kira's voice steadies as she walks the line."
+    },
+    {
+      "title": "Room to retreat",
+      "speaker": "Kira Venn",
+      "text": "She tells each guard where to fall back if the outer barricade breaks. She leaves room for your arriving squad beside her. There is no speech, no promise that everyone comes home. There is a place to stand and work to do."
     },
     {
       "title": "Six turns",
       "speaker": "Tor Saalen",
-      "text": "Tor finishes the lock sequence on the inner doors. The mechanism needs time to seat; forcing it early would leave the whole entrance vulnerable. He can give you a precise number now: hold the outer gate for six turns. After that, the guard can seal the breach and withdraw behind a line the attackers cannot cross quickly. You do not have to win the war on the plaza. You have to keep the approach from collapsing while the Temple protects its people. Tor sends the squad roster to your console. Choose who carries the first order, check their gear, and make certain someone can keep the wounded moving. The battlefield will wait for the squad you select, but the threat below the steps will not."
+      "text": "Tor finishes the lock sequence on the inner doors. The mechanism needs time to seat; forcing it early would leave the whole entrance vulnerable. He can give you a precise number now: hold the outer gate for six turns."
+    },
+    {
+      "title": "The inner line",
+      "speaker": "Tor Saalen",
+      "text": "After that, the guard can seal the breach and withdraw behind a line the attackers cannot cross quickly. You do not have to win the war on the plaza. You have to keep the approach from collapsing while the Temple protects its people."
+    },
+    {
+      "title": "The first order",
+      "speaker": "Tor Saalen",
+      "text": "Tor sends the squad roster to your console. Choose who carries the first order, check their gear, and make certain someone can keep the wounded moving. The battlefield will wait for the squad you select, but the threat below the steps will not."
     },
     {
       "title": "Before the doors open",
       "speaker": "Kira Venn",
-      "text": "Kira looks once toward the high windows of the Temple. From here they reflect the pale Coruscant sky; there is no fire in them. She knows a vision can be a warning without being a verdict. The Council may argue over what it means for years. In the next few minutes, her world is smaller: the gate, the people behind it, and the squad on its way. She asks you to send them now. You close the vision file and open the mission briefing. Tor's map shows the approach, the clock, and the positions where your people can hold. The first choice is yours, and it is concrete. Put a squad at the Temple's outer gate. Give the guard six turns. Bring as many of them home as you can."
+      "text": "Kira looks once toward the high windows of the Temple. From here they reflect the pale Coruscant sky; there is no fire in them. She knows a vision can be a warning without being a verdict. The Council may argue over what it means for years."
+    },
+    {
+      "title": "A smaller world",
+      "speaker": "Kira Venn",
+      "text": "In the next few minutes, her world is smaller: the gate, the people behind it, and the squad on its way. She asks you to send them now. You close the vision file and open the mission briefing."
+    },
+    {
+      "title": "Bring them home",
+      "speaker": "Kira Venn",
+      "text": "Tor's map shows the approach, the clock, and the positions where your people can hold. The first choice is yours, and it is concrete. Put a squad at the Temple's outer gate. Give the guard six turns. Bring as many of them home as you can."
     }
   ]
 }

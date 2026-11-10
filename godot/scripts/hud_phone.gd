@@ -33,6 +33,15 @@ var unit_portrait: TextureRect
 var portrait_path := ""
 var plate_touch_start := Vector2.ZERO
 var plate_swiping := false
+var threat_chip: Label
+var odds_plate: PanelContainer
+var odds_title: Label
+var odds_hit: Label
+var odds_modifiers: Label
+var odds_badge: Label
+var last_threat: Dictionary = {}
+const Targeting22 = preload("res://scripts/combat_targeting.gd")
+const Threat22 = preload("res://scripts/decision22_threat.gd")
 
 func setup(game, night_hud, root: Control, top: Control, left: Control, right: Control, bottom: Control, abilities: HFlowContainer) -> void:
 	g = game; night = night_hud
@@ -59,15 +68,21 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	var strip := PanelContainer.new(); strip.name = "PhoneTopStrip"
 	preload("res://scripts/hud_phone_layout.gd").place(strip, layout.header)
 	var strip_style: StyleBoxFlat = night.panel_style(); strip_style.set_content_margin_all(0)
+	strip_style.content_margin_left = 12; strip_style.content_margin_right = 12
 	strip_style.bg_color = Color.TRANSPARENT; strip_style.border_color = Color.TRANSPARENT
 	strip.add_theme_stylebox_override("panel", strip_style); overlay.add_child(strip)
 	var heading := HBoxContainer.new(); heading.add_theme_constant_override("separation", 3); strip.add_child(heading)
-	g.objective_label.reparent(heading); g.objective_label.add_theme_font_size_override("font_size", 12)
+	g.objective_label.reparent(heading); g.objective_label.add_theme_font_size_override("font_size", 14)
 	g.objective_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	g.objective_label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	g.objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	threat_chip = night.label("", 14, Color("f2d99a")); threat_chip.name = "EndThreatChip"
+	threat_chip.custom_minimum_size.x = 104; threat_chip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	threat_chip.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var threat_style: StyleBoxFlat = night.panel_style(); threat_style.set_content_margin_all(0)
+	threat_chip.add_theme_stylebox_override("normal", threat_style); heading.add_child(threat_chip)
 	end_button = _button("END TURN", _end_turn); end_button.name = "PhoneEndTurn"
-	end_button.custom_minimum_size = Vector2(96, 44); heading.add_child(end_button)
+	end_button.custom_minimum_size = Vector2(88, 44); heading.add_child(end_button)
 	var menu := _button("MENU" if preload("res://scripts/phone_layout.gd").touch_device() else "☰", _show_menu); menu.name = "PhoneMenu"
 	menu.custom_minimum_size = Vector2(44, 44); heading.add_child(menu)
 	for button in [end_button, menu]:
@@ -88,7 +103,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	unit_card = _button("UNIT", _toggle.bind("unit")); unit_card.name = "UnitCard"
 	unit_card.custom_minimum_size = Vector2(48, 44)
 	unit_card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	unit_card.add_theme_font_size_override("font_size", 11); plate_row.add_child(unit_card)
+	unit_card.add_theme_font_size_override("font_size", 14); plate_row.add_child(unit_card)
 	unit_card.clip_text = true
 	for state in ["normal", "hover", "pressed", "disabled"]:
 		unit_card.add_theme_stylebox_override(state, StyleBoxEmpty.new())
@@ -101,7 +116,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 			arrow.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	camera_rail = VBoxContainer.new(); camera_rail.name = "CameraRail"
 	camera_rail.add_theme_constant_override("separation", 0)
-	preload("res://scripts/hud_phone_layout.gd").place(camera_rail, layout.camera); overlay.add_child(camera_rail)
+	preload("res://scripts/hud_phone_layout.gd").place(camera_rail, Rect2(layout.camera.position - Vector2(4, 0), layout.camera.size)); overlay.add_child(camera_rail)
 	for entry in [["↶", -1], ["⌖", 0], ["↷", 1]]:
 		var button := _button(str(entry[0]), func() -> void:
 			if int(entry[1]) == 0: g._recenter()
@@ -113,25 +128,27 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 			button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	camera_art = preload("res://scripts/hud_phone_camera_art.gd").new()
 	camera_art.name = "CameraArt"
-	preload("res://scripts/hud_phone_layout.gd").place(camera_art, layout.camera)
+	preload("res://scripts/hud_phone_layout.gd").place(camera_art, Rect2(layout.camera.position - Vector2(4, 0), layout.camera.size))
 	overlay.add_child(camera_art)
 	target_card = _button("TARGET", _toggle.bind("target")); target_card.name = "TargetCard"
 	target_card.visible = false; overlay.add_child(target_card)
 	var tray := PanelContainer.new(); tray.name = "AbilityTray"; ability_tray = tray
-	preload("res://scripts/hud_phone_layout.gd").place(tray, layout.tray)
+	preload("res://scripts/hud_phone_layout.gd").place(tray, Rect2(layout.tray.position, layout.tray.size - Vector2(8, 0)))
 	var tray_style: StyleBoxFlat = night.panel_style(); tray_style.set_content_margin_all(0)
 	tray.add_theme_stylebox_override("panel", tray_style); overlay.add_child(tray)
 	var tray_box := VBoxContainer.new(); tray_box.add_theme_constant_override("separation", 0); tray.add_child(tray_box)
 	var readout := HBoxContainer.new(); readout.add_theme_constant_override("separation", 4); tray_box.add_child(readout)
 	momentum_plate = Control.new(); momentum_plate.name = "MomentumPlate"
 	momentum_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	momentum_plate.custom_minimum_size = Vector2(82, 13); readout.add_child(momentum_plate)
-	momentum_pips = night.label("MOM 0/3" if preload("res://scripts/phone_layout.gd").touch_device() else "○ ○ ○", 11, Color("e9ca83")); momentum_pips.name = "ChainPips"
+	momentum_plate.custom_minimum_size = Vector2(82, 17); readout.add_child(momentum_plate)
+	momentum_pips = night.label("MOM 0/3" if preload("res://scripts/phone_layout.gd").touch_device() else "○ ○ ○", 14, Color("e9ca83")); momentum_pips.name = "ChainPips"
 	momentum_pips.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	momentum_pips.position = Vector2(2, 0); momentum_plate.add_child(momentum_pips)
-	action_name = night.label("Choose an action", 11, Color("e9ca83"))
+	action_name = night.label("Choose an action", 14, Color("e9ca83"))
 	action_name.name = "AbilityReadout"; action_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	action_name.custom_minimum_size.y = 13; readout.add_child(action_name)
+	action_name.autowrap_mode = TextServer.AUTOWRAP_OFF
+	action_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	action_name.custom_minimum_size.y = 17; readout.add_child(action_name)
 	momentum_row = HBoxContainer.new(); momentum_row.name = "ChainMomentum"
 	momentum_row.visible = false; tray_box.add_child(momentum_row)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.name = "Abilities"
@@ -162,7 +179,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 			button.add_theme_stylebox_override(state, round_style)
 	action_art = preload("res://scripts/hud_phone_action_art.gd").new()
 	action_art.name = "PhoneActionArt"; action_art.buttons = ability_buttons
-	preload("res://scripts/hud_phone_layout.gd").place(action_art, layout.tray)
+	preload("res://scripts/hud_phone_layout.gd").place(action_art, Rect2(layout.tray.position, layout.tray.size - Vector2(8, 0)))
 	overlay.add_child(action_art)
 	popup = PanelContainer.new(); popup.name = "PhoneDetails"; popup.visible = false
 	popup.anchor_left = 0.5; popup.anchor_right = 0.5; popup.anchor_bottom = 1.0
@@ -173,6 +190,15 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	popup.add_child(detail_scroll)
 	popup_body = VBoxContainer.new(); popup_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	popup_body.add_theme_constant_override("separation", 8); detail_scroll.add_child(popup_body)
+	odds_plate = PanelContainer.new(); odds_plate.name = "DecisionOdds"; odds_plate.visible = false
+	odds_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var odds_style: StyleBoxFlat = night.panel_style(); odds_style.set_content_margin_all(3)
+	odds_plate.add_theme_stylebox_override("panel", odds_style); overlay.add_child(odds_plate)
+	var odds_box := VBoxContainer.new(); odds_box.add_theme_constant_override("separation", 0); odds_plate.add_child(odds_box)
+	odds_title = night.label("", 14, Color("dbe7e4")); odds_title.name = "DecisionTarget"; odds_box.add_child(odds_title)
+	odds_hit = night.label("", 24, Color("f2d99a")); odds_hit.name = "DecisionHit"; odds_box.add_child(odds_hit)
+	odds_badge = night.label("", 14, Color("ef6a5d")); odds_badge.name = "DecisionBadge"; odds_box.add_child(odds_badge)
+	odds_modifiers = night.label("", 14, Color("dbe7e4")); odds_modifiers.name = "DecisionModifiers"; odds_modifiers.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; odds_box.add_child(odds_modifiers)
 	root_control.resized.connect(_relayout)
 	_relayout.call_deferred()
 
@@ -190,11 +216,38 @@ func _relayout() -> void:
 	var logical_height := maxf(1.0, preload("res://scripts/phone_layout.gd").logical_size(preload("res://scripts/phone_layout.gd").window_size()).y)
 	layout.place(overlay.find_child("PhoneTopBackground", false, false), Rect2(0, 0, area.x, 44.0 * root_control.size.y / logical_height))
 	layout.place(overlay.find_child("PhoneTopStrip", false, false), boxes.header)
-	layout.place(unit_plate, boxes.plate)
-	layout.place(ability_tray, boxes.tray)
-	layout.place(action_art, boxes.tray)
-	layout.place(camera_rail, boxes.camera)
-	layout.place(camera_art, boxes.camera)
+	layout.place(unit_plate, Rect2(Vector2(11, boxes.plate.position.y), boxes.plate.size - Vector2(9, 0)))
+	layout.place(ability_tray, Rect2(boxes.tray.position, boxes.tray.size - Vector2(8, 0)))
+	layout.place(action_art, Rect2(boxes.tray.position, boxes.tray.size - Vector2(8, 0)))
+	layout.place(camera_rail, Rect2(boxes.camera.position - Vector2(4, 0), boxes.camera.size))
+	layout.place(camera_art, Rect2(boxes.camera.position - Vector2(4, 0), boxes.camera.size))
+	var portrait := area.y > area.x
+	threat_chip.custom_minimum_size.x = 72 if portrait else 104
+	threat_chip.text = Threat22.phone_chip(last_threat) if portrait else Threat22.chip(last_threat)
+	layout.place(odds_plate, Rect2(12, 124 if portrait else 50, minf(235.0 if portrait else 340.0, area.x - 82.0), 112 if portrait else 96))
+	if g.hud_controls != null and g.hud_controls.aim_ui != null:
+		var aim = g.hud_controls.aim_ui
+		if portrait:
+			aim.odds.get_parent().custom_minimum_size.x = 96
+			aim.odds_detail.visible = false
+			aim.panel.anchor_left = 0.0; aim.panel.anchor_right = 1.0
+			aim.panel.offset_left = 12; aim.panel.offset_right = -12
+			aim.panel.offset_top = -110; aim.panel.offset_bottom = -12
+			aim.target_row.anchor_left = 0.0; aim.target_row.anchor_right = 1.0
+			aim.target_row.offset_left = 12; aim.target_row.offset_right = -12
+			aim.target_row.offset_top = 58; aim.target_row.offset_bottom = 114
+		else:
+			aim.odds.get_parent().custom_minimum_size.x = 144
+			aim.odds_detail.visible = true
+			aim.panel.anchor_left = 1.0; aim.panel.anchor_right = 1.0
+			aim.panel.anchor_top = 1.0; aim.panel.anchor_bottom = 1.0
+			aim.panel.offset_left = -minf(356.0, area.x - 262.0)
+			aim.panel.offset_right = -12
+			aim.panel.offset_top = -62; aim.panel.offset_bottom = -4
+			aim.target_row.anchor_left = 1.0; aim.target_row.anchor_right = 1.0
+			aim.target_row.offset_left = -minf(340.0, area.x * 0.48)
+			aim.target_row.offset_right = -12
+			aim.target_row.offset_top = 48; aim.target_row.offset_bottom = 102
 
 func _button(title: String, action: Callable) -> Button:
 	var button := Button.new(); button.text = title; button.focus_mode = Control.FOCUS_NONE
@@ -202,6 +255,42 @@ func _button(title: String, action: Callable) -> Button:
 	button.add_theme_font_size_override("font_size", 14)
 	button.custom_minimum_size = Vector2(44, 56 if title in ["END TURN", "MOVE", "FIRE", "OVERWATCH", "CANCEL"] else 44); button.pressed.connect(action)
 	return button
+
+func _refresh_odds() -> void:
+	if odds_plate == null: return
+	var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
+	var target: Dictionary = g.mission.unit_by_id(g.target_id)
+	var active: bool = g.action in ["shoot", "strike"] and g.mission.phase == "player" and g.mission.result == "" and not actor.is_empty() and not target.is_empty() and (bool(target.get("spotted", false)) or bool(target.get("detected", false)) or bool(target.get("awake", false)))
+	var move_preview: Dictionary = g.hud_controls.move_decision
+	var moving: bool = not active and overlay.size.y > overlay.size.x and g.action == "move" and not move_preview.is_empty()
+	odds_plate.visible = (active or moving) and open_card == ""
+	unit_plate.visible = not active
+	if moving:
+		odds_title.text = "DESTINATION %d, %d" % [g.hud_controls.move_destination.x, g.hud_controls.move_destination.y]
+		odds_hit.text = "1 ACTION" if int(move_preview.ap) == 1 else "DASH · 2 AP"
+		odds_hit.add_theme_color_override("font_color", Color("60b9ff") if int(move_preview.ap) == 1 else Color("ffd16a"))
+		var flank: Array = move_preview.flanks
+		var seen: Array = move_preview.seen_by
+		odds_badge.text = "◆ FLANKED BY %d" % flank.size() if not flank.is_empty() else "◆ SEEN BY %d" % seen.size() if not seen.is_empty() else "◆ NO KNOWN LOS"
+		odds_badge.add_theme_color_override("font_color", Color("ef6a5d") if not flank.is_empty() else Color("e0bd78"))
+		odds_modifiers.text = compact_names(flank if not flank.is_empty() else seen) if not flank.is_empty() or not seen.is_empty() else "No visible enemy can shoot here"
+		return
+	if not active: return
+	var data: Dictionary = Targeting22.shot_breakdown(g.mission, actor, target, g.action == "strike", int(actor.get("leap_aim", 0)) if g.action == "strike" else 0)
+	var decision: Dictionary = Targeting22.decision_summary(data, str(target.name), g.action == "strike")
+	odds_title.text = str(decision.target).to_upper()
+	odds_hit.text = "%d%% HIT" % int(decision.hit)
+	odds_hit.add_theme_color_override("font_color", Color("f2d99a"))
+	odds_badge.text = "◆ " + str(decision.badge)
+	odds_badge.add_theme_color_override("font_color", Color("ef6a5d") if str(decision.badge) == "FLANKED" else Color("e0bd78"))
+	odds_modifiers.text = "\n".join(decision.modifiers) if overlay.size.y > overlay.size.x else "  ·  ".join(decision.modifiers)
+
+static func compact_names(names: Array) -> String:
+	var counts: Dictionary = {}
+	for name in names: counts[str(name)] = int(counts.get(str(name), 0)) + 1
+	var labels: Array[String] = []
+	for name in counts: labels.append(str(name) + (" ×%d" % int(counts[name]) if int(counts[name]) > 1 else ""))
+	return ", ".join(labels)
 
 func _show_ability(button: Button) -> void:
 	action_name.text = button.tooltip_text
@@ -254,6 +343,13 @@ func _claim_strike() -> void:
 
 func refresh(from_game: bool = false) -> void:
 	if overlay == null: return
+	if from_game:
+		var forecast: Dictionary = Threat22.summary(g.mission)
+		last_threat = forecast
+		threat_chip.text = Threat22.phone_chip(forecast) if overlay.size.y > overlay.size.x else Threat22.chip(forecast)
+		threat_chip.tooltip_text = str(forecast)
+		threat_chip.visible = not forecast.is_empty()
+	_refresh_odds()
 	var pips: int = clampi(int(g.mission.chain_momentum), 0, 3)
 	var used_this_turn: bool = int(g.mission.chain_strike_used_turn) == int(g.mission.turn)
 	momentum_row.visible = false
@@ -307,6 +403,8 @@ func refresh(from_game: bool = false) -> void:
 	else:
 		var hp_pips := "▮".repeat(mini(hp, 7)) + "▯".repeat(mini(maxi(0, int(unit.get("max_hp", 0)) - hp), 7))
 		unit_card.text = "%s\n%d %s\n%s %s %s" % [str(unit.get("name", "UNIT")), hp, hp_pips, g.hud_controls.ap_pips(unit), "●".repeat(ap) + "○".repeat(2 - ap), " ".join(tag_glyphs)]
+	if preload("res://scripts/phone_layout.gd").window_size().x < 750:
+		unit_card.text = "%s\nHP%d AP%s" % [str(unit.get("name", "UNIT")), hp, "●".repeat(ap) + "○".repeat(2 - ap)]
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	target_card.text = "%s  %s  %s" % [str(target.get("name", "TARGET")), g.hit_big_label.text, "v" if preload("res://scripts/phone_layout.gd").touch_device() else "▾"]
 	popup.visible = open_card != ""
@@ -356,6 +454,7 @@ func _update_actions(from_game: bool) -> void:
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var available: int = int(unit.get("ap", 0))
 	var primary_limit := mini(4, maxi(3, int(floor((ability_tray.size.x - 8.0) / 48.0)) - 2))
+	if overlay.size.y > overlay.size.x and ability_tray.size.y < 192.0: primary_limit = 2
 	last_unit_id = g.selected_id; last_unit_ap = available
 	if from_game:
 		for button in ability_buttons: button.set_meta("battle12_available", button.visible and not button.disabled)

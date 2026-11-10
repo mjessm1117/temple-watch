@@ -108,6 +108,7 @@ func start_briefing(mission_id: String) -> Dictionary:
 	state.pending = scene
 	state.mission_id = mission_id
 	state.beat_mission = ""
+	state.beat_decision = ""
 	unlock_codex(state,"mission",mission_id)
 	_unlock_lore_for_mission(state,mission_id)
 	return scene
@@ -136,7 +137,7 @@ func start_debrief(result: Dictionary) -> Dictionary:
 	if squad.size() > 1: record_mission_bonds(state,squad,won,result.get("saved_by",{}))
 	var text: String = m.get("win" if won else "lose","")
 	var addition: String = story20.get("missions", {}).get(id, {}).get("win" if won else "lose", "")
-	if not addition.is_empty(): text += "\n\n" + addition
+	if not addition.is_empty(): text = addition
 	var variants: Dictionary = table("DEBRIEF_IF")
 	for row in variants.get(id, []):
 		if state.flags.get(row[0],false) and row[1 if won else 2] != null:
@@ -159,7 +160,7 @@ func start_debrief(result: Dictionary) -> Dictionary:
 	var scene := {"kind":"debrief","id":id,"title":aftermath.get("t",m.get("n",id)),"eyebrow":"Mission complete" if won else "Mission lost","text":text + ("\n\n" + _saga_text(state,str(aftermath.get("text","")),aftermath.get("who","")) if not aftermath.is_empty() else ""),"choices":choices,"who":aftermath.get("who","")}
 	Callbacks.apply(state,scene,table("N1_CALLBACKS"))
 	Villain11.debrief(state,scene)
-	scene.text += "\n\n" + Beats14.debrief(state,result)
+	scene.text = Beats14.debrief(state,result,m) + "\n\n" + str(scene.text)
 	state.pending = scene
 	return scene
 
@@ -384,7 +385,9 @@ func apply_choice(s: Dictionary, choice_id: String) -> Dictionary:
 		Villain11.chosen(s,scene,c)
 		Scenes11.chosen(s,scene,c,self)
 		if scene.kind == "briefing": s.approach = c.get("battle",c.get("fx",{}))
-		if scene.kind == "beat": s.battle_choice = c.get("battle",{})
+		if scene.kind == "beat":
+			s.battle_choice = c.get("battle",{})
+			s.beat_decision = str(c.get("label", ""))
 		if scene.kind == "talk":
 			s.saga.seen.append(scene.id)
 			if scene.get("forced",false): s.saga.forced_count = int(s.saga.get("forced_count",0))+1

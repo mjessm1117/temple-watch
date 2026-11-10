@@ -44,6 +44,9 @@ func setup(game, root: Control, on_phone: bool) -> void:
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
 		panel.offset_left = -minf(350.0, root.size.x - 262.0); panel.offset_right = -6
 		panel.offset_top = -62; panel.offset_bottom = -4
+		if root.size.x < root.size.y:
+			panel.anchor_left = 0.0; panel.anchor_right = 1.0
+			panel.offset_left = 12; panel.offset_right = -12
 	else:
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
 		panel.offset_top = -94; panel.offset_bottom = -8
@@ -63,7 +66,7 @@ func setup(game, root: Control, on_phone: bool) -> void:
 	summary.visible = not phone
 	var row := HBoxContainer.new(); row.add_theme_constant_override("separation", 4); body.add_child(row)
 	if phone:
-		var odds_box := VBoxContainer.new(); odds_box.custom_minimum_size.x = 144; row.add_child(odds_box)
+		var odds_box := VBoxContainer.new(); odds_box.custom_minimum_size.x = 96 if root.size.x < root.size.y else 144; row.add_child(odds_box)
 		odds = Label.new(); odds.name = "AimOdds"; odds.add_theme_font_size_override("font_size", 21)
 		odds.add_theme_color_override("font_color", Color("f2d99a")); odds_box.add_child(odds)
 		odds_detail = Label.new(); odds_detail.name = "AimOddsDetail"; odds_detail.add_theme_font_size_override("font_size", 12)

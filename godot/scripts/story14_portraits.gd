@@ -12,7 +12,7 @@ const NAMES := {
 }
 
 static func texture(name: String) -> Texture2D:
-	var key: String = NAMES.get(name,"council")
+	var key: String = NAMES.get(name,name if name in NAMES.values() else "council")
 	if key in ["kira", "tor", "satele", "ressa", "kell", "sava", "tem"]:
 		var jedi_path := "res://assets/portraits/jedi/%s.png" % key
 		if ResourceLoader.exists(jedi_path): return load(jedi_path)

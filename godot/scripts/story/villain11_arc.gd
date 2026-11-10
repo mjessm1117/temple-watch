@@ -38,17 +38,20 @@ static func briefing(s: Dictionary, scene: Dictionary) -> void:
 	var id := str(scene.get("id",""))
 	var rival := "Lord Kaan" if id in ["r_seventh","r_bomb"] else "Darth Bane"
 	if id not in ["r_caves","r_seventh","r_bomb"]: return
-	var start := "%s: You have come far enough to hear us." % rival
-	var end := "%s: The field remembers who walked away." % rival
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/story/wave11-villain.json"))
+	var lines: Dictionary = parsed.get("records", {}).get("W11_BATTLE_LINES", {}).get(rival, {}) if parsed is Dictionary else {}
+	var start := str(lines.get("intro", ""))
+	var end := str(lines.get("retreat", ""))
 	scene.villain_present = true
 	scene.villain_name = rival
 	scene.villain_start_bark = start
+	scene.villain_taunt_bark = str(lines.get("taunt", ""))
 	scene.villain_end_bark = end
 
 static func attach_battle(s: Dictionary, pending: Dictionary) -> void:
 	var briefing: Dictionary = s.get("last_villain_briefing",{})
 	if briefing.get("id","") != pending.get("mission_id",""): return
-	for key in ["villain_present","villain_name","villain_start_bark","villain_end_bark"]:
+	for key in ["villain_present","villain_name","villain_start_bark","villain_taunt_bark","villain_end_bark"]:
 		pending[key] = briefing.get(key)
 
 static func debrief(s: Dictionary, scene: Dictionary) -> void:

@@ -17,6 +17,22 @@ static func shot_breakdown(m: RefCounted, actor: Dictionary, target: Dictionary,
 	data.aim_lines = aim_lines
 	return data
 
+static func decision_summary(data: Dictionary, target_name: String, melee: bool = false) -> Dictionary:
+	var modifiers: Array[String] = []
+	if not melee:
+		modifiers.append("COVER −%d" % int(data.get("cover", 0)) if int(data.get("cover", 0)) > 0 else "NO COVER +0")
+	for item in data.get("lines", []):
+		if str(item[0]) == "High ground" and int(item[1]) != 0:
+			modifiers.append("HEIGHT %+d" % int(item[1]))
+			break
+	if modifiers.size() < 2:
+		for item in data.get("lines", []):
+			var label := str(item[0])
+			if label in ["Base aim", "Full cover", "Half cover", "No cover", "High ground", "Flanking critical chance", "Hunker blocks flank critical"] or int(item[1]) == 0: continue
+			modifiers.append("%s %+d" % [label.to_upper(), int(item[1])])
+			if modifiers.size() == 2: break
+	return {"target": target_name, "hit": int(data.get("hit", 0)), "badge": "FLANKED" if bool(data.get("flanked", false)) else "NO COVER" if not melee and int(data.get("cover", 0)) == 0 else "IN COVER", "modifiers": modifiers.slice(0, 2)}
+
 func clear_trace() -> void:
 	if trace_root == null:
 		trace_root = Node3D.new(); g.add_child(trace_root)

@@ -5,14 +5,26 @@
       "ally_down": ["One of ours is down. I have the near gate.", "Get to our wounded. Watch the passage behind them.", "We are bringing them home. Keep the route open."],
       "objective_done": ["The objective is ours. I have the near gate.", "The work is done here. Watch the passage behind them.", "Now find the way out. Keep the route open."],
       "villain": ["The commander is here. I have the near gate.", "That is the one we came for. Watch the passage behind them.", "Keep your eyes on the leader. Keep the route open."],
-      "last_enemy": ["One hostile left. I have the near gate.", "Their line is broken. Watch the passage behind them.", "Find the last one. Keep the route open."]
+      "last_enemy": ["One hostile left. I have the near gate.", "Their line is broken. Watch the passage behind them.", "Find the last one. Keep the route open."],
+      "kill": ["Tor, that lane is clear. Keep the evac route open."],
+      "hurt": ["Tor, I am hit. Keep the others moving."],
+      "flank": ["I see the gap. Tor, cover our retreat."],
+      "crit": ["That struck deeper than I meant. Stay sharp."],
+      "miss": ["The Force offered a warning, not a guarantee."],
+      "reveal": ["Tor, that signal matches the gate. Someone planned this."]
     },
     "Tor Saalen": {
       "contact": ["Enemy contact. I can feel them ahead.", "They see us. Stay where I can reach you.", "Their line is awake. We move together."],
       "ally_down": ["One of ours is down. I can feel them ahead.", "Get to our wounded. Stay where I can reach you.", "We are bringing them home. We move together."],
       "objective_done": ["The objective is ours. I can feel them ahead.", "The work is done here. Stay where I can reach you.", "Now find the way out. We move together."],
       "villain": ["The commander is here. I can feel them ahead.", "That is the one we came for. Stay where I can reach you.", "Keep your eyes on the leader. We move together."],
-      "last_enemy": ["One hostile left. I can feel them ahead.", "Their line is broken. Stay where I can reach you.", "Find the last one. We move together."]
+      "last_enemy": ["One hostile left. I can feel them ahead.", "Their line is broken. Stay where I can reach you.", "Find the last one. We move together."],
+      "kill": ["Kira, the threat has stopped. Check the wounded."],
+      "hurt": ["Kira, stay on the objective. I can still stand."],
+      "flank": ["Kira, their blind side is open. Take care with it."],
+      "crit": ["That should end the fight quickly. I hope it does."],
+      "miss": ["Too hurried. Kira, I will try again."],
+      "reveal": ["Kira, I sense fear ahead. Ours or theirs, I cannot tell."]
     },
     "Sgt. Rhal Dax": {
       "contact": ["Enemy contact. Mark the angles.", "They see us. Hold your line.", "Their line is awake. Check the second exit."],
@@ -47,7 +59,13 @@
       "ally_down": ["One of ours is down. I feel the field turn.", "Get to our wounded. Keep your focus here.", "We are bringing them home. There is still a path."],
       "objective_done": ["The objective is ours. I feel the field turn.", "The work is done here. Keep your focus here.", "Now find the way out. There is still a path."],
       "villain": ["The commander is here. I feel the field turn.", "That is the one we came for. Keep your focus here.", "Keep your eyes on the leader. There is still a path."],
-      "last_enemy": ["One hostile left. I feel the field turn.", "Their line is broken. Keep your focus here.", "Find the last one. There is still a path."]
+      "last_enemy": ["One hostile left. I feel the field turn.", "Their line is broken. Keep your focus here.", "Find the last one. There is still a path."],
+      "kill": ["The path is open. Do not linger over the fallen."],
+      "hurt": ["Pain is information. I remain here."],
+      "flank": ["Their guard turns. We have one clean moment."],
+      "crit": ["A decisive strike. Now offer them a way back."],
+      "miss": ["I misread the moment. Correcting course."],
+      "reveal": ["The shadow has a name. Listen before you answer it."]
     },
     "Jace Malcom": {
       "contact": ["Enemy contact. Cover that approach.", "They see us. I have the rear.", "Their line is awake. Move on my mark."],
@@ -68,14 +86,26 @@
       "ally_down": ["One of ours is down. Hold the ground.", "Get to our wounded. No one goes alone.", "We are bringing them home. I have the front."],
       "objective_done": ["The objective is ours. Hold the ground.", "The work is done here. No one goes alone.", "Now find the way out. I have the front."],
       "villain": ["The commander is here. Hold the ground.", "That is the one we came for. No one goes alone.", "Keep your eyes on the leader. I have the front."],
-      "last_enemy": ["One hostile left. Hold the ground.", "Their line is broken. No one goes alone.", "Find the last one. I have the front."]
+      "last_enemy": ["One hostile left. Hold the ground.", "Their line is broken. No one goes alone.", "Find the last one. I have the front."],
+      "kill": ["Kell, the passage is ours. Count everyone through."],
+      "hurt": ["Kell, a small wound. Mark the attacker."],
+      "flank": ["Their left folds. Kell, take the honest angle."],
+      "crit": ["Kell, I struck hard. Tell me if I went too far."],
+      "miss": ["I reached too soon. That is mine to correct."],
+      "reveal": ["Kell, that voice has been waiting for us."]
     },
     "Kell Darrow": {
       "contact": ["Enemy contact. I sense movement.", "They see us. Keep your focus.", "Their line is awake. The path is still open."],
       "ally_down": ["One of ours is down. I sense movement.", "Get to our wounded. Keep your focus.", "We are bringing them home. The path is still open."],
       "objective_done": ["The objective is ours. I sense movement.", "The work is done here. Keep your focus.", "Now find the way out. The path is still open."],
       "villain": ["The commander is here. I sense movement.", "That is the one we came for. Keep your focus.", "Keep your eyes on the leader. The path is still open."],
-      "last_enemy": ["One hostile left. I sense movement.", "Their line is broken. Keep your focus.", "Find the last one. The path is still open."]
+      "last_enemy": ["One hostile left. I sense movement.", "Their line is broken. Keep your focus.", "Find the last one. The path is still open."],
+      "kill": ["Ressa, one less at the door. I hold position."],
+      "hurt": ["Ressa, armor held. Mostly."],
+      "flank": ["Ressa, their rear is exposed. Moving now."],
+      "crit": ["That should buy time. Use it."],
+      "miss": ["Missed. Recording the angle."],
+      "reveal": ["Ressa, contact ahead. Same mark as the last raid."]
     },
     "Sgt. Bo Hallan": {
       "contact": ["Enemy contact. Mark that cover.", "They see us. I have the left.", "Their line is awake. Move when I call."],
@@ -110,14 +140,26 @@
       "ally_down": ["One of ours is down. Keep the field clear.", "Get to our wounded. I am with you.", "We are bringing them home. We can still reach them."],
       "objective_done": ["The objective is ours. Keep the field clear.", "The work is done here. I am with you.", "Now find the way out. We can still reach them."],
       "villain": ["The commander is here. Keep the field clear.", "That is the one we came for. I am with you.", "Keep your eyes on the leader. We can still reach them."],
-      "last_enemy": ["One hostile left. Keep the field clear.", "Their line is broken. I am with you.", "Find the last one. We can still reach them."]
+      "last_enemy": ["One hostile left. Keep the field clear.", "Their line is broken. I am with you.", "Find the last one. We can still reach them."],
+      "kill": ["Tem, the road is clear. Bring the others through."],
+      "hurt": ["Tem, I am wounded. Keep teaching by example."],
+      "flank": ["Tem, guide the younger ones around their line."],
+      "crit": ["A hard lesson. I hope it is the last."],
+      "miss": ["Tem, I have taught patience better than I practiced it."],
+      "reveal": ["Tem, listen. Even this enemy has a choice."]
     },
     "Tem Ruhl": {
       "contact": ["Enemy contact. There is a way through.", "They see us. Hold to what you know.", "Their line is awake. I am here."],
       "ally_down": ["One of ours is down. There is a way through.", "Get to our wounded. Hold to what you know.", "We are bringing them home. I am here."],
       "objective_done": ["The objective is ours. There is a way through.", "The work is done here. Hold to what you know.", "Now find the way out. I am here."],
       "villain": ["The commander is here. There is a way through.", "That is the one we came for. Hold to what you know.", "Keep your eyes on the leader. I am here."],
-      "last_enemy": ["One hostile left. There is a way through.", "Their line is broken. Hold to what you know.", "Find the last one. I am here."]
+      "last_enemy": ["One hostile left. There is a way through.", "Their line is broken. Hold to what you know.", "Find the last one. I am here."],
+      "kill": ["Sava, I heard them fall. I will remember."],
+      "hurt": ["Sava, I am hurt. Still hearing the path."],
+      "flank": ["Sava, the quiet side is open. I can reach it."],
+      "crit": ["That echo was louder than I expected."],
+      "miss": ["I followed the wrong echo. Again, carefully."],
+      "reveal": ["Sava, there are more voices than the scan shows."]
     },
     "Sgt. Dace Morrow": {
       "contact": ["Enemy contact. Cover the crossing.", "They see us. I have the rear.", "Their line is awake. Eyes on the flank."],
@@ -146,6 +188,24 @@
       "objective_done": ["The objective is ours. I have the breach.", "The work is done here. Stay close.", "Now find the way out. I will hold it."],
       "villain": ["The commander is here. I have the breach.", "That is the one we came for. Stay close.", "Keep your eyes on the leader. I will hold it."],
       "last_enemy": ["One hostile left. I have the breach.", "Their line is broken. Stay close.", "Find the last one. I will hold it."]
+    }
+  },
+  "advisors": {
+    "Jace Malcom": {
+      "kill": ["Target down. Hold the line."],
+      "hurt": ["Medic to the wounded. Keep cover."],
+      "flank": ["Their side is open. Take the ground."],
+      "crit": ["Solid hit. Stay disciplined."],
+      "miss": ["Reset your sight and breathe."],
+      "reveal": ["Contact confirmed. Mark the approach."]
+    },
+    "Ilsa Myr": {
+      "kill": ["One signal ended. Others remain."],
+      "hurt": ["I have your position. Help is moving."],
+      "flank": ["Their pattern has a seam. Use it."],
+      "crit": ["That changed their plan. Watch the response."],
+      "miss": ["A miss still tells us where they moved."],
+      "reveal": ["The new contact matches our intercept."]
     }
   }
 }

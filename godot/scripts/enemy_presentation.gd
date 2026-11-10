@@ -1,5 +1,7 @@
 extends RefCounted
 const Shot = preload("res://scripts/shot.gd")
+const Events = preload("res://scripts/feelcam22_events.gd")
+const Pressure = preload("res://scripts/mission_pressure.gd")
 
 static func _point(m: RefCounted, tile: Vector2i, height: float = 0.0) -> Vector3:
 	return Vector3(tile.x, Shot.elevation(m, tile) * 0.7 + height, tile.y)
@@ -8,8 +10,10 @@ static func drain(game: Node3D) -> void:
 	decorate(game)
 	while not game.mission.action_events.is_empty():
 		var event: Dictionary = game.mission.action_events.pop_front()
+		if str(event.kind) != "move": await flush_quiet(game)
 		await show_event(game, event)
 	decorate(game)
+	if not game.presentation_routes.is_empty(): await flush_quiet(game)
 	for id in game.presentation_routes:
 		var u: Dictionary = game.mission.unit_by_id(int(id))
 		var view: Node3D = game.views.get(int(id))
@@ -21,8 +25,21 @@ static func drain(game: Node3D) -> void:
 		view.position = _point(game.mission, Shot.pos(u))
 	game.presentation_routes.clear()
 
+static func flush_quiet(game: Node3D) -> void:
+	for view in game.quiet_motions:
+		if not is_instance_valid(view): continue
+		while view.motion != null and view.motion.is_running() and not game.cam.skip_requested:
+			await game.get_tree().process_frame
+		if view.motion != null and view.motion.is_running(): view.motion.kill()
+		if game.quiet_targets.has(view.unit_id): view.position = game.quiet_targets[view.unit_id]
+	game.quiet_motions.clear()
+	game.quiet_targets.clear()
+
 static func play(game: Node3D, events: Array[Dictionary], _sequence: int) -> void:
-	for event in events: await show_event(game, event)
+	for event in events:
+		if str(event.kind) != "move": await flush_quiet(game)
+		await show_event(game, event)
+	await flush_quiet(game)
 
 static func show_event(game: Node3D, event: Dictionary) -> void:
 	var actor: Node3D = game.views.get(int(event.actor))
@@ -39,32 +56,59 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 				victim.position = _point(game.mission, event.to)
 		await game.cam.frame(_point(game.mission, event.from), _point(game.mission, event.to), str(event.mode))
 		game.cam.trace.append("resolve_%d" % int(event.actor))
+		var intent_info: Dictionary = event.get("info", {})
 		event = game.mission.resolve_intent(event)
 		if event.is_empty(): return
+		event.flanked = bool(intent_info.get("flanked", false))
 		game.mission.action_events.erase(event)
 		kind = str(event.kind)
 	elif kind in ["attack", "push"] and not bool(event.get("framed", false)):
 		await game.cam.frame(_point(game.mission, event.from), _point(game.mission, event.to), str(event.get("mode", "push")))
 	match kind:
 		"objective_attack", "vip_attack":
+			game._refresh()
 			var to := _point(game.mission,event.to,1.0)
-			if actor != null: game.fx.bolt(actor.position+Vector3.UP,to,true,false)
-			game.fx.float_text(to,"-%d" % int(event.damage),Color("ffad8d"))
-			await game.cam.wait(0.3)
+			var from := actor.position + Vector3.UP if actor != null else _point(game.mission, event.get("from", event.to), 1.0)
+			await game.cam.frame(from, to, "objective")
+			game.fx.bolt(from, to, true, false)
+			var hp := Events.objective_hp(game, kind)
+			game.fx.float_text(to + Vector3.UP * 0.7, "GATE %d HP  -%d" % [hp, int(event.damage)] if kind == "objective_attack" else "VIP %d HP  -%d" % [hp, int(event.damage)], Color("ffad8d"))
+			var source: Dictionary = game.mission.unit_by_id(int(event.actor))
+			game.phase_banner.text = "%s HIT  •  %d HP  •  %s" % ["GATE" if kind == "objective_attack" else "VIP", hp, str(source.get("name", "ENEMY"))]
+			game.phase_banner.visible = true
+			Events.emit(game, "objective_hit", event, to, {"source_pos":from})
+			Events.cue(game, "objective_hit")
+			await game.cam.wait(0.25)
 		"reinforcement":
 			game._refresh_figures()
 			game.fx.float_text(_point(game.mission,event.at,1.8),"REINFORCEMENTS",Color("ffad8d"))
+			Events.emit(game, "reinforce", event, _point(game.mission,event.at))
 			await game.cam.wait(0.3)
 		"activation":
-			game.cam.finish()
 			game._refresh_figures()
 			actor = game.views.get(int(event.actor))
 			if actor != null: actor.position = _point(game.mission, event.at)
-			game.phase_banner.text = "PATROL ALERTED"
-			await game.cam.frame(_point(game.mission, event.at), _point(game.mission, event.at), "reveal")
-			await game.cam.wait(0.15)
+			var unit: Dictionary = game.mission.unit_by_id(int(event.actor))
+			var group_id := int(unit.get("group", -1))
+			if group_id != game.last_reveal_group:
+				game.last_reveal_group = group_id
+				var members: Array = []
+				var center := Vector3.ZERO
+				for enemy in game.mission.living("enemy"):
+					if int(enemy.get("group", -2)) != group_id: continue
+					members.append(enemy)
+					center += _point(game.mission, Shot.pos(enemy))
+				if not members.is_empty(): center /= float(members.size())
+				var pressure_script: Script = Pressure
+				var info: Dictionary = pressure_script.call("reveal_info", game.mission, members) if pressure_script.has_method("reveal_info") else {}
+				game.phase_banner.text = str(info.get("title", "PATROL ALERTED"))
+				game.phase_banner.visible = true
+				await game.cam.frame(center, center, "reveal")
+				Events.emit(game, "reveal", event, center, {"group":group_id, "count":members.size(), "title":game.phase_banner.text})
+				Events.cue(game, "alert")
+				Events.music(game, "contact")
+				await game.cam.wait(0.12)
 		"move":
-			game.cam.finish()
 			if actor == null:
 				game._refresh_figures(); actor = game.views.get(int(event.actor))
 			if actor != null:
@@ -81,11 +125,10 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 					if p == stop: past = true
 				if not remainder.is_empty(): game.presentation_routes[int(event.actor)] = remainder
 				if not game.cam.skip_requested:
-					game._glide_to(_point(game.mission, event.to), 0.35)
 					actor.travel(points)
-					while actor.motion != null and actor.motion.is_running() and not game.cam.skip_requested: await game.get_tree().process_frame
-				if actor.motion != null and actor.motion.is_running(): actor.motion.kill()
-				actor.position = _point(game.mission, stop)
+					if not game.quiet_motions.has(actor): game.quiet_motions.append(actor)
+					game.quiet_targets[int(event.actor)] = _point(game.mission, stop)
+				else: actor.position = _point(game.mission, stop)
 		"attack", "push":
 			await impact(game, event)
 		"overwatch", "reload":
@@ -94,7 +137,7 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 				game.fx.float_text(actor.position + Vector3.UP * 1.7, kind.to_upper(), Color("f2ba47"))
 				if kind == "reload": actor.act("reload")
 			await game.cam.wait(0.2)
-	game.cam.finish()
+	if kind != "move": game.cam.finish()
 	decorate(game)
 
 static func decorate(game: Node3D) -> void:
@@ -126,6 +169,19 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 	await game.cam.wait(0.28 if mode == "push" else 0.16 if mode == "strike" else clampf(from.distance_to(to) / 38.0, 0.11, 0.31))
 	var damage := int(event.damage)
 	var outcome := str(event.get("outcome", ""))
+	if damage > 0:
+		Events.emit(game, "hit", event, to)
+		Events.cue(game, "hit")
+		Events.music(game, "contact")
+		if bool(event.get("flanked", false)): Events.emit(game, "flank", event, to)
+		if outcome == "crits": Events.emit(game, "crit", event, to); Events.cue(game, "crit")
+		var target_data: Dictionary = game.mission.unit_by_id(int(event.target))
+		if str(target_data.get("side", "")) == "player": Events.emit(game, "hurt", event, to)
+		if bool(event.killed): Events.emit(game, "kill", event, to); Events.cue(game, "kill")
+		if not game.villain_retreat_seen and str(game.mission.objective_state.get("villain_outcome", "")) == "retreated":
+			game.villain_retreat_seen = true
+			Events.emit(game, "villain_retreat", event, to)
+	elif mode != "push": Events.emit(game, "miss", event, to)
 	var word := "DEFLECT" if "deflected" in outcome else "MISS" if damage == 0 and mode != "push" else "CRIT %d" % damage if outcome == "crits" else "GRAZE %d" % damage if outcome == "grazes" else "-%d" % damage if damage > 0 else "PUSH"
 	game.fx.float_text(to + Vector3.UP * 0.6, word, Color("ffca70") if outcome == "crits" else Color("a8eaff") if outcome == "grazes" else Color.WHITE, outcome == "crits")
 	if int(event.get("armor_lost", 0)) > 0: game.fx.float_text(to + Vector3.UP * 0.15, "SHRED -%d" % int(event.armor_lost), Color("f0c68b"))
@@ -138,10 +194,10 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 			else: victim.fall(); game.views.erase(int(event.target))
 	if damage > 0: game.sound.play("hit")
 	if not game.cam.skip_requested and (outcome == "crits" or bool(event.killed)): game.fx.hit_stop()
-	if not game.cam.skip_requested and (outcome == "crits" or bool(event.killed)):
+	if not game.cam.skip_requested and (outcome == "crits" or bool(event.killed)) and not bool(event.get("killcam_played", false)):
 		await game.cam.impact_beat(to)
 	if victim != null and not bool(event.killed): victim.set_status(game.mission.unit_by_id(int(event.target)))
 	if actor != null: actor.set_status(game.mission.unit_by_id(int(event.actor)))
 	game.cam.trace.append("impact_%d" % int(event.actor))
 	game._sync_terrain()
-	await game.cam.wait(0.18)
+	await game.cam.wait(0.06 if bool(event.killed) else 0.10)

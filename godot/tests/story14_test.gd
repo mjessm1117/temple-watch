@@ -76,7 +76,7 @@ func run() -> void:
 		var comms := Comms.new(stub)
 		comms._show(stub,"contact",[{"name":"Kira Venn","hp":1}])
 		await process_frame
-		check(comms.card != null and comms.card.visible and comms.card.mouse_filter == Control.MOUSE_FILTER_IGNORE,"nonblocking combat bark exists %s" % size)
+		check(comms.card != null and comms.card.visible and comms.card.mouse_filter == Control.MOUSE_FILTER_STOP,"tappable combat bark exists %s" % size)
 		check(comms.card.position.x >= 0 and comms.card.position.y >= 0 and comms.card.position.x + comms.card.size.x <= size.x and comms.card.position.y + comms.card.size.y <= size.y,"combat bark fits %s" % size)
 		stub.queue_free()
 		scene.queue_free()

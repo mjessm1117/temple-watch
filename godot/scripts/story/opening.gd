@@ -4,6 +4,7 @@ const UI = preload("res://scripts/campaign/ui.gd")
 const World = preload("res://scripts/ui_world.gd")
 const Portraits = preload("res://scripts/story14_portraits.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
+const Paging = preload("res://scripts/storydelivery22_paging.gd")
 var pages: Array = []
 var page_index := 0
 var typed := 0.0
@@ -24,6 +25,13 @@ var layout_size := Vector2.ZERO
 func _ready() -> void:
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/story/opening.json"))
 	if parsed is Dictionary: pages = parsed.get("pages", [])
+	var split_pages: Array = []
+	for source in pages:
+		for passage in Paging.pages(str(source.get("text", ""))):
+			var part: Dictionary = source.duplicate()
+			part.text = passage
+			split_pages.append(part)
+	pages = split_pages
 	_build()
 	_show_page(0)
 
@@ -80,6 +88,9 @@ func _build() -> void:
 	var skip := UI.button("SKIP STORY", _finish)
 	skip.custom_minimum_size = Vector2(118, 44)
 	actions.add_child(skip)
+	var fast := UI.button("FAST ››", _fast_forward)
+	fast.custom_minimum_size = Vector2(88, 44)
+	actions.add_child(fast)
 	next_button = UI.button("CONTINUE  ›", _advance)
 	next_button.custom_minimum_size = Vector2(142, 44)
 	actions.add_child(next_button)
@@ -99,6 +110,7 @@ func _layout() -> void:
 	var bottom := int(safe.w) + (8 if compact else 24)
 	var available := size.x - left - right
 	var small := compact and size.x < 750
+	brand.text = "TEMPLE WATCH" if small else "TEMPLE WATCH  /  THE SEALED VISION"
 	var portrait_width := (70 if small else 112) if compact else 260
 	var gap := 10 if compact else 22
 	var action_height := 44 if compact else 48
@@ -120,6 +132,15 @@ func _layout() -> void:
 	narrative.add_theme_font_size_override("normal_font_size", 14 if small else 15 if compact else 21)
 	actions.position = Vector2(left, row_bottom + 8)
 	actions.size = Vector2(available, action_height)
+	if small:
+		actions.get_child(1).custom_minimum_size.x = 100
+		actions.get_child(1).add_theme_font_size_override("font_size",14)
+		actions.get_child(2).custom_minimum_size.x = 60
+		actions.get_child(2).text = "FAST"
+		actions.get_child(2).add_theme_font_size_override("font_size",14)
+		next_button.custom_minimum_size.x = 100
+		next_button.add_theme_font_size_override("font_size",14)
+		next_button.text = "NEXT ›"
 	hint.visible = not small
 
 func _show_page(index: int) -> void:
@@ -136,6 +157,7 @@ func _show_page(index: int) -> void:
 	portrait.texture = Portraits.display_texture(str(page.get("speaker", "Jedi Council")))
 	typed = 0.0
 	next_button.text = "TO BRIEFING  ›" if index + 1 == pages.size() else "CONTINUE  ›"
+	if size.x < 750: next_button.text = "FINISH ›" if index + 1 == pages.size() else "NEXT ›"
 
 func _process(delta: float) -> void:
 	if layout_size != size: _layout()
@@ -149,6 +171,11 @@ func _advance() -> void:
 		narrative.visible_characters = -1
 		return
 	_show_page(page_index + 1)
+
+func _fast_forward() -> void:
+	narrative.visible_characters = -1
+	_show_page(page_index + 1)
+	narrative.visible_characters = -1
 
 func _on_narrative_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:

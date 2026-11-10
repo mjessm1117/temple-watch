@@ -5,6 +5,7 @@ const InputControls = preload("res://scripts/input_controls.gd")
 const Ability = preload("res://scripts/abilities_engine.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
 const Rules12 = preload("res://scripts/rules12_actions.gd")
+const Threat22 = preload("res://scripts/decision22_threat.gd")
 var g
 var techniques: HFlowContainer
 var techniques_open := false
@@ -15,8 +16,11 @@ var bar
 var left_panel: PanelContainer
 var right_panel: PanelContainer
 var desktop_bottom: PanelContainer
+var desktop_threat_chip: Label
 var aim_ui
 var combo_overlay: Control
+var move_decision: Dictionary = {}
+var move_destination := Vector2i(-1, -1)
 
 static func ap_pips(unit: Dictionary) -> String:
 	var maximum: int = int(unit.get("max_ap", Rules12.ACTIONS_PER_TURN))
@@ -28,8 +32,30 @@ static func move_color(ap_cost: int) -> Color:
 
 static func move_fill(ap_cost: int) -> Color:
 	var color := Color("0875df") if ap_cost == 1 else Color("e6a000")
-	color.a = 0.52
+	color.a = 0.24
 	return color
+
+func _range_edge(parent: Node3D, p: Vector2i, ap_cost: int, blue: Dictionary, all: Dictionary) -> void:
+	var at := Vector3(p.x, Shot.elevation(g.mission, p) * 0.7 + 0.13, p.y)
+	for entry in [[Vector2i.LEFT, Vector3(-0.43, 0, 0)], [Vector2i.RIGHT, Vector3(0.43, 0, 0)], [Vector2i.UP, Vector3(0, 0, -0.43)], [Vector2i.DOWN, Vector3(0, 0, 0.43)]]:
+		var next: Vector2i = p + entry[0]
+		if all.costs.has(next) and (blue.costs.has(next) == (ap_cost == 1)): continue
+		var size := Vector3(0.10, 0.05, 0.86) if entry[0].x != 0 else Vector3(0.86, 0.05, 0.10)
+		g._box(parent, at + entry[1], size, move_color(ap_cost))
+
+func _route_end(parent: Node3D, p: Vector2i, color: Color, previous: Vector2i) -> void:
+	var at := Vector3(p.x, Shot.elevation(g.mission, p) * 0.7 + 0.23, p.y)
+	for offset in [Vector3(-0.32, 0, -0.32), Vector3(0.32, 0, -0.32), Vector3(-0.32, 0, 0.32), Vector3(0.32, 0, 0.32)]:
+		g._box(parent, at + offset, Vector3(0.16, 0.05, 0.16), color)
+	var marker: MeshInstance3D = g._box(parent, at, Vector3(0.34, 0.06, 0.34), color)
+	marker.rotation.y = PI / 4.0
+	var direction := Vector3(p.x - previous.x, 0, p.y - previous.y).normalized()
+	if direction.length_squared() < 0.1: return
+	var tip := at + direction * 0.39
+	var side := Vector3(-direction.z, 0, direction.x)
+	for wing in [tip - direction * 0.30 + side * 0.19, tip - direction * 0.30 - side * 0.19]:
+		var arrow: MeshInstance3D = g._box(parent, (tip + wing) * 0.5, Vector3(0.11, 0.05, tip.distance_to(wing)), color)
+		arrow.look_at(wing, Vector3.UP)
 
 func _border(parent: Node3D, p: Vector2i, color: Color, height: float = 0.12) -> void:
 	var at := Vector3(p.x, Shot.elevation(g.mission, p) * 0.7 + height, p.y)
@@ -39,6 +65,7 @@ func _border(parent: Node3D, p: Vector2i, color: Color, height: float = 0.12) ->
 
 func _refresh_highlights(force: bool = false) -> void:
 	g._clear(g.hover_highlights)
+	move_decision = {}; move_destination = Vector2i(-1, -1)
 	targeting.g = g
 	if force: targeting.detection()
 	if force: g._clear(g.range_highlights)
@@ -61,7 +88,7 @@ func _refresh_highlights(force: bool = false) -> void:
 			var fill_material: StandardMaterial3D = g._mat(color, true)
 			fill_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 			tile.material_override = fill_material
-			_border(g.range_highlights, p, move_color(ap_cost))
+			_range_edge(g.range_highlights, p, ap_cost, blue, yellow)
 	elif force and g.action not in ["move", "free", "overwatch", "hunker"] and g.mission.abilities.has(g.action):
 		var target_kind := str(g.mission.abilities[g.action].target)
 		if target_kind.begins_with("tile"):
@@ -76,19 +103,21 @@ func _refresh_highlights(force: bool = false) -> void:
 		if g.action == "move":
 			var preview: Dictionary = InputControls.move_preview(g.mission, u, shown)
 			if not preview.is_empty():
+				move_decision = preview; move_destination = shown
 				var cursor := shown
+				var route_color := move_color(int(preview.ap))
+				_route_end(g.hover_highlights, shown, route_color, preview.prev.get(shown, Shot.pos(u)))
 				while preview.prev.has(cursor):
-					var here := Vector3(cursor.x, Shot.elevation(g.mission, cursor) * 0.7 + 0.18, cursor.y)
-					var dot: MeshInstance3D = g._box(g.hover_highlights, here, Vector3(0.21, 0.06, 0.21), Color("70dfff"))
-					dot.material_override = g._mat(Color("70dfff"))
+					var here := Vector3(cursor.x, Shot.elevation(g.mission, cursor) * 0.7 + 0.20, cursor.y)
 					var next: Vector2i = preview.prev[cursor]
-					var next_at := Vector3(next.x, Shot.elevation(g.mission, next) * 0.7 + 0.18, next.y)
-					var line: MeshInstance3D = g._box(g.hover_highlights, (here + next_at) * 0.5, Vector3(0.08, 0.04, here.distance_to(next_at)), Color("70dfff"))
+					var next_at := Vector3(next.x, Shot.elevation(g.mission, next) * 0.7 + 0.20, next.y)
+					var line: MeshInstance3D = g._box(g.hover_highlights, (here + next_at) * 0.5, Vector3(0.15, 0.06, here.distance_to(next_at) * 0.88), route_color)
 					line.look_at(next_at, Vector3.UP)
 					cursor = next
 				var cost_label := "1 action · 1 action remains" if int(preview.ap) == 1 and int(u.ap) == 2 else "1 action" if int(preview.ap) == 1 else "DASH: ends turn"
-				g.path_label.text = "%s  ·  %d tiles%s" % [cost_label, int(preview.tiles), "  ·  FLANKED BY %s" % ", ".join(preview.flanks) if not preview.flanks.is_empty() else ""]
-				g.path_label.add_theme_color_override("font_color", Color("ff746b") if not preview.flanks.is_empty() else Color("91d6fa"))
+				var risk := "  ·  FLANKED: %s" % ", ".join(preview.flanks) if not preview.flanks.is_empty() else "  ·  SEEN: %s" % ", ".join(preview.seen_by) if not preview.seen_by.is_empty() else "  ·  NO KNOWN LOS"
+				g.path_label.text = "%s  ·  %d tiles%s" % [cost_label, int(preview.tiles), risk]
+				g.path_label.add_theme_color_override("font_color", Color("ff746b") if not preview.flanks.is_empty() else Color("ffd16a") if not preview.seen_by.is_empty() else Color("91d6fa"))
 			else: g.path_label.text = ""
 		else: g.path_label.text = ""
 		var shields := "  •  COVER "
@@ -102,8 +131,10 @@ func _refresh_highlights(force: bool = false) -> void:
 		phone.action_name.text = path_text if path_text != "" else "Blue: 1 action  ·  Amber: DASH ends turn"
 
 func _shield(parent: Node3D, tile: Vector2i, direction: Vector2i, full: bool) -> void:
-	var center := Vector3(tile.x + direction.x * 0.36, Shot.elevation(g.mission, tile) * 0.7 + 1.45, tile.y + direction.y * 0.36)
+	var phone_scale := 1.65 if phone != null else 1.0
+	var center := Vector3(tile.x + direction.x * 0.36, Shot.elevation(g.mission, tile) * 0.7 + 1.65, tile.y + direction.y * 0.36)
 	var points := [Vector2(-0.19, -0.16), Vector2(0.19, -0.16), Vector2(0.15, 0.09), Vector2(0, 0.21), Vector2(-0.15, 0.09)]
+	for i in range(points.size()): points[i] *= phone_scale
 	var mesh := ImmediateMesh.new()
 	var material := StandardMaterial3D.new(); material.albedo_color = Color("ffe6a2") if full else Color("9fe3ff")
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; material.cull_mode = BaseMaterial3D.CULL_DISABLED
@@ -222,6 +253,10 @@ func _build_ui() -> void:
 	var mute_button := _button("SOUND", func() -> void: g.sound.muted = not g.sound.muted)
 	command_row.add_child(mute_button)
 	g.audio_slider = HSlider.new(); g.audio_slider.custom_minimum_size = Vector2(75, 0); g.audio_slider.max_value = 100; g.audio_slider.value = 55; g.audio_slider.value_changed.connect(func(value: float) -> void: g.sound.volume = value / 100.0); command_row.add_child(g.audio_slider)
+	desktop_threat_chip = _label("", 14); desktop_threat_chip.name = "DesktopThreatChip"
+	desktop_threat_chip.add_theme_font_override("font", preload("res://scripts/campaign/ui.gd").font("body"))
+	desktop_threat_chip.custom_minimum_size.x = 104; desktop_threat_chip.visible = false
+	command_row.add_child(desktop_threat_chip)
 	command_row.add_child(_button("END TURN", g._request_end_turn))
 	command_row.add_child(_button("RESTART", func() -> void: g.get_tree().reload_current_scene()))
 	g.phase_banner = _label("ENEMY ACTIVITY", 30); g.phase_banner.visible = false; g.phase_banner.anchor_left = 0.5; g.phase_banner.anchor_right = 0.5; g.phase_banner.anchor_top = 0.18; g.phase_banner.offset_left = -370; g.phase_banner.offset_right = 370; g.phase_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; g.phase_banner.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; root.add_child(g.phase_banner)
@@ -232,6 +267,7 @@ func _build_ui() -> void:
 	result_box.add_child(_button("Restart mission", func() -> void: g.get_tree().reload_current_scene()))
 	result_box.add_child(_button("Main menu", func() -> void: g.get_node("/root/CampaignFlow").go("menu")))
 	night = preload("res://scripts/hud_night1.gd").new(); night.g = g; root.add_child(night); night.setup(left_box, right_box)
+	if g.has_signal("battle_event") and not g.is_connected("battle_event", _on_battle_event): g.connect("battle_event", _on_battle_event)
 	aim_ui = preload("res://scripts/battle12_aim.gd").new()
 	aim_ui.setup(g, root, Phone.narrow(Phone.window_size()))
 	if Phone.narrow(Phone.window_size()):
@@ -244,9 +280,24 @@ func _build_ui() -> void:
 	root.add_child(combo_overlay)
 	combo_overlay.setup(g)
 
+func _on_battle_event(kind: String, _actor_id: String, _target_id: String, context: Dictionary) -> void:
+	if kind not in ["reveal", "villain_reveal"] or night == null: return
+	var group: Array = []
+	var token: Variant = context.get("group", [])
+	if token is Array: group = token
+	elif token is int or token is String and str(token).is_valid_int():
+		for enemy in g.mission.living("enemy"):
+			if int(enemy.get("group", -999)) == int(token): group.append(enemy)
+	var info: Dictionary = Threat22.reveal(g.mission, group)
+	if not info.is_empty(): night.show_reveal(str(info.get("title", "")))
+
 
 func _refresh() -> void:
 	var u: Dictionary = g.mission.unit_by_id(g.selected_id)
+	if phone == null and desktop_threat_chip != null:
+		var forecast: Dictionary = Threat22.summary(g.mission)
+		desktop_threat_chip.text = Threat22.chip(forecast)
+		desktop_threat_chip.visible = not forecast.is_empty()
 	g.warning_label.visible = phone == null and g.warning_label.text != "" and not g.warning_label.text.begins_with("TAB / SHIFT+TAB")
 	if u.is_empty() or int(u.get("hp", 0)) <= 0:
 		var survivors: Array[Dictionary] = g.mission.living("player")
@@ -257,6 +308,7 @@ func _refresh() -> void:
 	var clock_note := " · %d turns left" % int(objective.turns_left) if int(objective.turns_left) >= 0 else " · clock starts on reveal" if objective.get("clock_trigger", "") == "concealment" else ""
 	if phone != null:
 		var brief: String = str(objective.label).replace("Rescue Mira and escort to evac", "Rescue Mira to evac" if Phone.touch_device() else "Rescue Mira → evac")
+		if Phone.window_size().x < 600: brief = "RESCUE" if brief.begins_with("Rescue Mira") else brief.get_slice(" · ", 0)
 		g.objective_label.text = "T%d · %s · %d left" % [g.mission.turn, brief, int(objective.turns_left)] if int(objective.turns_left) >= 0 else "T%d · %s" % [g.mission.turn, brief]
 	else:
 		g.objective_label.text = "TURN %d · %s%s · %s" % [g.mission.turn,objective.label,clock_note,str(objective.phase).to_upper()]

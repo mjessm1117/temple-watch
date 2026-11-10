@@ -28,6 +28,7 @@ for suite in run campaign_test campaign11_test gear_research_test story_port_tes
   run_suite "$suite"
 done
 run_suite battle12_test
+run_suite threat22_test
 run_suite mobile_web1_test
 run_suite rules12_test
 run_suite temple12_test --resolution 844x390 -- --phone
@@ -54,6 +55,7 @@ run_suite map14_test --rendering-method gl_compatibility --resolution 1366x768 -
 run_suite home14_test --rendering-method gl_compatibility --resolution 844x390 -- --phone
 run_suite home14_test --rendering-method gl_compatibility --resolution 1366x768
 run_suite story14_test --rendering-method gl_compatibility -- --graphics=low
+run_suite storycontent22_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
 run_suite galaxy15_test --rendering-method gl_compatibility --resolution 844x390 -- --phone --graphics=low
 run_suite galaxy15_test --rendering-method forward_plus --resolution 1366x768 -- --graphics=high
 run_suite cine15_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
@@ -75,6 +77,7 @@ run_suite soldier18_test
 run_suite balance18_audit
 run_suite phone17_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
 run_suite hud18_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
+run_suite decision22_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low; run_suite decision22_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low --portrait
 run_suite phoneui18_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
 run_suite rankup19_test --rendering-method gl_compatibility --resolution 844x390
 run_suite battle19_test --rendering-method gl_compatibility --resolution 667x375 -- --graphics=low
@@ -82,9 +85,12 @@ run_suite phone_detect20_test --rendering-method gl_compatibility --resolution 8
 run_suite loadout20_test --rendering-method gl_compatibility --resolution 956x440
 run_suite armory21_test --rendering-method gl_compatibility --resolution 844x390
 run_suite camera20_test --rendering-method gl_compatibility --resolution 844x390
+run_suite feelcam22_test --rendering-method gl_compatibility --resolution 844x390
 run_suite story20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite strategy20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite art20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite temple21_test --rendering-method gl_compatibility --resolution 844x390; run_suite temple21_test --rendering-method gl_compatibility --resolution 390x844 -- --portrait; run_suite temple21_test --rendering-method gl_compatibility --resolution 1366x768 -- --desktop
 run_suite galaxy21_test --rendering-method gl_compatibility -- --graphics=low
 run_suite menus21_test --rendering-method gl_compatibility --resolution 844x390
+run_suite impact22_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
+run_suite storydelivery22_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
