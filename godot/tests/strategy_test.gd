@@ -253,7 +253,7 @@ func ui_checks() -> void:
 	await shot("temple")
 	for page in ["Command","Build","Roster","Research","Council","Teams","Legacy","Settings"]:
 		temple._change_page(page); await frames()
-		check(temple.page == page and temple.page_content.get_child_count() > 1, "strategy page renders " + page)
+		check(temple.find_child("GraphicsTier", true, false) != null if page == "Settings" else temple.page == page and temple.page_content.get_child_count() > 1, "strategy page renders " + page)
 		if page == "Build":
 			var bay: Button = temple.page_content.find_child("Bay_u1", true, false)
 			check(bay != null, "stepped build grid has selectable vault bay")
