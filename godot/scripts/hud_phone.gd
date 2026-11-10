@@ -198,6 +198,7 @@ func _relayout() -> void:
 
 func _button(title: String, action: Callable) -> Button:
 	var button := Button.new(); button.text = title; button.focus_mode = Control.FOCUS_NONE
+	preload("res://scripts/campaign/ui.gd").style_button(button)
 	button.add_theme_font_size_override("font_size", 14)
 	button.custom_minimum_size = Vector2(44, 56 if title in ["END TURN", "MOVE", "FIRE", "OVERWATCH", "CANCEL"] else 44); button.pressed.connect(action)
 	return button
@@ -340,7 +341,8 @@ func refresh(from_game: bool = false) -> void:
 		popup_body.add_child(night.label("COMBAT LOG\n" + g.log_label.text, 12))
 	else:
 		popup_body.add_child(_button("RESUME", _close))
-		popup_body.add_child(_button("GRAPHICS", _show_settings))
+		popup_body.add_child(_button("Settings", func() -> void: g.get_node("/root/CampaignFlow").open_settings()))
+		popup_body.add_child(_button("SAVE / LOAD", func() -> void: g.get_node("/root/CampaignFlow").open_saves("rescue")))
 		popup_body.add_child(_button("ACTION CAM: %s" % ("ON" if g.action_camera else "OFF"), func() -> void: g.action_camera = not g.action_camera; refresh()))
 		popup_body.add_child(_button("SOUND: %s" % ("OFF" if g.sound.muted else "ON"), func() -> void: g.sound.muted = not g.sound.muted; refresh()))
 		popup_body.add_child(_button("NUMBERS: %s" % ("ON" if bool(g.Prefs.get_value("numbers")) else "OFF"), func() -> void:

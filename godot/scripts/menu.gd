@@ -4,6 +4,7 @@ const Settings = preload("res://scripts/settings.gd")
 const World = preload("res://scripts/ui_world.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
 const Theme13 = preload("res://scripts/armory13_theme.gd")
+const SaveSlots = preload("res://scripts/campaign/save_slots.gd")
 var picked := "normal"
 var buttons: Dictionary = {}
 
@@ -42,7 +43,8 @@ func _ready() -> void:
 	var column := UI.column(12)
 	column.size_flags_horizontal = SIZE_EXPAND_FILL
 	scroll.add_child(column)
-	column.add_child(preload("res://scripts/graphics_options.gd").new())
+	var flow = get_node("/root/CampaignFlow")
+	column.add_child(UI.button("Settings", flow.open_settings))
 	column.add_child(UI.label("THE SEALED RECORD",26,UI.ACCENT))
 	column.add_child(UI.label("NEW CAMPAIGN  /  CHOOSE YOUR DIFFICULTY",13,UI.MUTED))
 	var descriptions := {
@@ -62,10 +64,11 @@ func _ready() -> void:
 		button.add_theme_font_size_override("font_size",14)
 		column.add_child(button)
 		buttons[id] = button
-	var flow = get_node("/root/CampaignFlow")
 	column.add_child(UI.button("New Campaign",func(): flow.new_campaign(picked)))
 	var saved = preload("res://scripts/campaign/state.gd").new()
 	column.add_child(UI.button("Continue Campaign",flow.continue_campaign,saved.load_save(flow.save_path)))
+	column.add_child(UI.label(SaveSlots.description(0),14,UI.MUTED))
+	column.add_child(UI.button("Save / Load",func(): flow.open_saves("menu")))
 	column.add_child(UI.button("Direct Rescue Mission",_start))
 	column.add_child(UI.label("THE ARCHIVE REMEMBERS EVERY CHOICE",12,UI.MUTED))
 	UI.slide(outer)
@@ -77,16 +80,16 @@ func _build_phone() -> void:
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); add_child(shade)
 	var outer := MarginContainer.new(); outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var safe := Phone.safe_margins(get_viewport_rect().size)
-	outer.add_theme_constant_override("margin_left", 10 + int(safe.x))
-	outer.add_theme_constant_override("margin_top", 10 + int(safe.y))
-	outer.add_theme_constant_override("margin_right", 10 + int(safe.z))
-	outer.add_theme_constant_override("margin_bottom", 10 + int(safe.w))
+	outer.add_theme_constant_override("margin_left", 12 + int(safe.x))
+	outer.add_theme_constant_override("margin_top", 12 + int(safe.y))
+	outer.add_theme_constant_override("margin_right", 12 + int(safe.z))
+	outer.add_theme_constant_override("margin_bottom", 12 + int(safe.w))
 	add_child(outer)
 	var body := UI.column(5); outer.add_child(body)
 	var head := HBoxContainer.new(); body.add_child(head)
 	var title := UI.label("TEMPLE WATCH", 32, UI.TEXT); title.size_flags_horizontal = SIZE_EXPAND_FILL
 	head.add_child(title)
-	var settings := UI.button("GRAPHICS", func() -> void: _phone_settings(body))
+	var settings := UI.button("Settings", get_node("/root/CampaignFlow").open_settings)
 	head.add_child(settings)
 	body.add_child(UI.label("COMMAND THE ORDER. BEND WHAT IS COMING.", 14, UI.ACCENT))
 	if Phone.window_size().x < Phone.window_size().y:
@@ -102,15 +105,11 @@ func _build_phone() -> void:
 	var saved = preload("res://scripts/campaign/state.gd").new()
 	var continuing := UI.button("CONTINUE", flow.continue_campaign, saved.load_save(flow.save_path))
 	continuing.name = "ContinueButton"; actions.add_child(continuing)
+	var details := UI.label(SaveSlots.description(0), 14, UI.MUTED)
+	details.name = "ContinueMetadata"; body.add_child(details)
+	actions.add_child(UI.button("SAVE / LOAD", func(): flow.open_saves("menu")))
 	actions.add_child(UI.button("DIRECT RESCUE", _start))
 	body.add_child(UI.label("Your first order: hold the Temple gate.", 15, UI.GOLD))
-
-func _phone_settings(body: VBoxContainer) -> void:
-	if body.has_node("PhoneGraphics"):
-		body.get_node("PhoneGraphics").queue_free(); return
-	var settings := preload("res://scripts/graphics_options.gd").new()
-	settings.name = "PhoneGraphics"; body.add_child(settings)
-	Theme13.apply_tree(settings)
 
 func _pick(id: String) -> void:
 	picked = id
