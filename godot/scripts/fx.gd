@@ -7,6 +7,7 @@ var _scorches: Array[Node3D] = []
 var float_anchors: Array[Dictionary] = []
 var _hit_stop_serial := 0
 var _time_scale_before := 1.0
+var _billboards: MultiMeshInstance3D
 const BLAST_CORE_SECONDS := 0.19
 const BLAST_SHELL_SECONDS := 0.48
 const CAMERA_IMPULSE_MAX := 0.16
@@ -43,6 +44,18 @@ func _cue(kind: String) -> void:
 func setup(cam: Camera3D, ui: Control) -> void:
 	view_camera = cam
 	overlay = ui
+
+func _ensure_billboards() -> void:
+	if is_instance_valid(_billboards):
+		if _billboards.capacity != (12 if _tier() == "low" else 32): _billboards.configure(_tier() == "low")
+		return
+	_billboards = preload("res://scripts/w23_lightfx_billboards.gd").new()
+	add_child(_billboards)
+	_billboards.configure(_tier() == "low")
+
+func _layer(at: Vector3, size: float, color: Color, life: float, drift := Vector3.ZERO) -> void:
+	_ensure_billboards()
+	_billboards.spawn(at, size, color, life, drift)
 
 func _tier() -> String:
 	var graphics := get_node_or_null("/root/Graphics")
@@ -82,6 +95,9 @@ func _flash(at: Vector3, color: Color, energy: float, duration: float) -> void:
 func contact(at: Vector3, clash := false) -> void:
 	# The two emissive meshes remain legible without dynamic lighting or glow.
 	var color := Color("a5f2ff") if clash else Color("ffe2ab")
+	_layer(at, 0.72 if clash else 0.5, Color(color, 0.75), 0.10)
+	_layer(at + Vector3.UP * 0.1, 0.34, Color.WHITE, 0.16)
+	_layer(at, 0.40, Color("8e8c88", 0.28), 0.36, Vector3(0.1, 0.5, 0))
 	var core := _sphere(at, 0.22 if clash else 0.16, color)
 	core.name = "HitCore"
 	var rim := MeshInstance3D.new()
@@ -111,15 +127,23 @@ func camera_impulse(power: float = 0.12, duration: float = 0.18) -> void:
 
 func blast(at: Vector3, ion := false) -> void:
 	var color := Color("b7a0ff") if ion else Color("ffb050")
+	_layer(at, 1.2, Color("fff4d6", 0.95) if not ion else Color("e9dfff", 0.95), 0.32)
+	_layer(at, 0.76, Color(color, 0.9), 0.40)
+	for i in (2 if _tier() == "low" else 4):
+		var offset := Vector3(float(i) * 0.28 - 0.2, 0.1, float(i % 2) * 0.3)
+		_layer(at + offset, 0.28, Color(color, 0.65), 0.45, offset + Vector3.UP * 0.8)
+	_layer(at + Vector3(0.75, 0.25, 0.45), 1.55, Color("3d4650", 0.72), 0.9, Vector3(0.22, 0.5, 0.1))
+	_layer(at + Vector3(-0.65, 0.15, -0.1), 1.25, Color("58606b", 0.58), 0.78, Vector3(-0.15, 0.45, 0))
 	var visual_scale := blast_screen_scale(get_viewport().get_visible_rect().size)
-	var core := _sphere(at, 0.38, Color("fff2cc") if not ion else Color("e1d6ff"))
+	var core := _sphere(at, 0.18 if _tier() == "low" else 0.30, Color("fff2cc") if not ion else Color("e1d6ff"))
 	core.name = "BlastCore"
-	core.transparency = 0.28
-	var shell := _sphere(at, 0.46, color)
+	core.transparency = 0.48
+	var shell := _sphere(at, 0.38, color)
 	shell.name = "BlastShell"
-	shell.transparency = 0.45
+	shell.transparency = 0.65
+	if _tier() == "low": shell.visible = false # The pooled flash/smoke draws the Low shell.
 	var first := _paced_tween().set_parallel(true)
-	first.tween_property(core, "scale", Vector3.ONE * 2.5 * visual_scale, BLAST_CORE_SECONDS)
+	first.tween_property(core, "scale", Vector3.ONE * 2.0 * visual_scale, BLAST_CORE_SECONDS)
 	first.tween_property(core, "transparency", 1.0, BLAST_CORE_SECONDS)
 	first.chain().tween_callback(core.queue_free)
 	var second := _paced_tween().set_parallel(true)
@@ -140,8 +164,11 @@ func burst(at: Vector3, color: Color, count := 8) -> void:
 	count = mini(count,4 if _tier() == "low" else 8 if _tier() == "medium" else count)
 	var rng := RandomNumberGenerator.new(); rng.randomize()
 	for i in range(count):
-		var spark := _sphere(at, 0.025 if i % 3 else 0.04, color)
 		var vector := Vector3(rng.randf_range(-1, 1), rng.randf_range(0.15, 1.1), rng.randf_range(-1, 1))
+		if _tier() == "low":
+			_layer(at, 0.12 if i % 3 else 0.18, Color(color, 0.85), 0.26, vector * 2.7)
+			continue
+		var spark := _sphere(at, 0.025 if i % 3 else 0.04, color)
 		var tween := _paced_tween().set_parallel(true)
 		tween.tween_property(spark, "position", at + vector * 0.65, 0.24)
 		tween.tween_property(spark, "scale", Vector3.ZERO, 0.24)
@@ -155,6 +182,7 @@ func _scorch(at: Vector3) -> void:
 	decal.material_override = _material(Color("25201e"), false)
 	decal.position = Vector3(at.x, maxf(0.018, at.y - 1.08), at.z)
 	decal.set_meta("born_turn",_battle_turn())
+	decal.set_meta("born_ms",Time.get_ticks_msec())
 	add_child(decal)
 	_scorches.append(decal)
 	if _scorches.size() > (12 if _tier() == "low" else 24):
@@ -170,6 +198,7 @@ func bolt(from: Vector3, to: Vector3, enemy: bool, miss: bool) -> void:
 	var end := to + direction * 1.4 if miss else to
 	if miss: _cue("whiz")
 	_flash(from, color, 2.0, 0.09)
+	_layer(from, 0.42, Color(color, 0.85), 0.10)
 	burst(from, color, 4)
 	var core := _sphere(from, 0.075, Color.WHITE)
 	core.scale = Vector3(0.8, 0.8, 4.5)
@@ -201,11 +230,13 @@ func bolt(from: Vector3, to: Vector3, enemy: bool, miss: bool) -> void:
 	tween.chain().tween_callback(func() -> void:
 		_flash(end, Color("ffd7a4"), 0.9, 0.1)
 		if not miss: contact(end)
+		_layer(end, 0.25, Color("a5a6a8", 0.38), 0.42, Vector3.UP * 0.35)
 		burst(end, Color("e8c896") if miss else color, 10)
 		_scorch(end)
 		core.queue_free(); glow.queue_free())
 
 func shockwave(from: Vector3, to: Vector3) -> void:
+	_layer(from, 0.8, Color("b9f3ff", 0.55), 0.16)
 	var wave := _sphere(from, 0.22, Color("8beafa"))
 	wave.scale = Vector3(1.0, 0.25, 1.0)
 	_flash(from, Color("8beafa"), 1.1, 0.16)
@@ -213,6 +244,8 @@ func shockwave(from: Vector3, to: Vector3) -> void:
 	tween.tween_property(wave, "position", to, 0.28)
 	tween.tween_property(wave, "scale", Vector3(6, 0.12, 6), 0.36)
 	tween.chain().tween_callback(func() -> void:
+		_layer(to, 0.85, Color("8ceaff", 0.62), 0.20)
+		_layer(to, 0.55, Color("777f91", 0.25), 0.48, Vector3.UP * 0.3)
 		burst(to, Color("9cefff"), 12)
 		ring(to - Vector3.UP * 0.8, Color("a1eeff"), 1.6)
 		if _tier() == "high": ring(to - Vector3.UP * 0.78, Color("c7f6ff"), 2.4)
@@ -222,6 +255,8 @@ func shockwave(from: Vector3, to: Vector3) -> void:
 func saber(from: Vector3, to: Vector3) -> void:
 	_cue("ignite")
 	var mid := (from + to) * 0.5 + Vector3.UP * 0.45
+	_layer(mid, 0.7, Color("86eaff", 0.62), 0.17)
+	_layer(to, 0.42, Color.WHITE, 0.13)
 	var ribbon := _saber_ribbon(from,to)
 	var trail := _sphere(mid, 0.13, Color("80eaff"))
 	trail.scale = Vector3(0.8, 0.8, 4.5)
@@ -333,14 +368,16 @@ func ability(id: String, from: Vector3, to: Vector3) -> void:
 
 func _process(delta: float) -> void:
 	var current_turn := _battle_turn()
+	var current_ms := Time.get_ticks_msec()
 	for i in range(_scorches.size()-1,-1,-1):
 		var mark := _scorches[i]
 		if not is_instance_valid(mark): _scorches.remove_at(i); continue
 		var age := current_turn-int(mark.get_meta("born_turn",current_turn))
-		if age >= 3:
+		var seconds := float(current_ms-int(mark.get_meta("born_ms",current_ms))) / 1000.0
+		if age >= 2 or seconds >= 5.0:
 			mark.queue_free(); _scorches.remove_at(i)
 		else:
-			mark.transparency = clampf(float(age)/3.0,0.0,0.9)
+			mark.transparency = clampf(maxf(float(age)/2.0, seconds/5.0),0.0,0.9)
 	for i in range(float_anchors.size()-1,-1,-1):
 		var entry: Dictionary = float_anchors[i]
 		if not is_instance_valid(entry.label): float_anchors.remove_at(i); continue
