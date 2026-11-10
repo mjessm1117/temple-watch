@@ -110,9 +110,15 @@ func run() -> void:
 			galaxy.tab_scroll.scroll_horizontal = 0
 	await capture("%s-galaxy-%s" % [phase, size_name])
 	if phase == "after":
+		galaxy._select(0)
+		await settle()
+		check(galaxy.detail_open and not galaxy.map_view.focused.is_empty(), "Galaxy selection opens details")
 		galaxy._back()
 		await settle()
-		check(current_scene != galaxy and current_scene.scene_file_path == "res://scenes/temple.tscn", "Back returns to Temple")
+		check(current_scene == galaxy and not galaxy.detail_open and galaxy.map_view.focused.is_empty(), "Galaxy Back closes details first")
+		galaxy._back()
+		await settle()
+		check(current_scene != galaxy and current_scene.scene_file_path == "res://scenes/dialogue.tscn" and flow.screen_return == "temple", "Back returns through Temple story")
 	if FileAccess.file_exists(flow.save_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(flow.save_path))
 	print("HOME13 TEST RESULTS: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)

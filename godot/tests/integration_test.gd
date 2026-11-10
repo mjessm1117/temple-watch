@@ -23,6 +23,8 @@ func run() -> void:
 	check(c.sith != null and c.sith.s.day == 0 and c.sith.s.segments == 2,"new campaign binds Sith state")
 	c.advance_days(30)
 	check(c.state.month == 2 and c.sith.s.day == 30 and c.sith.s.reports.size() == 1,"day tick fires exactly one monthly report")
+	check(not flow.show_sith_events() and not is_instance_valid(flow.intelligence),"first mission guard holds Sith report")
+	c.state.story.done = 1
 	check(flow.show_sith_events(),"Temple event route opens the Council Report")
 	check(is_instance_valid(flow.intelligence) and flow.intelligence.page == "report" and is_same(flow.intelligence.layer.state,c.state),"Council Report uses live campaign")
 	flow.intelligence.queue_free(); await frames()
