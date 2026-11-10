@@ -9,6 +9,9 @@ const Phone = preload("res://scripts/phone_layout.gd")
 const JediModels = preload("res://scripts/characters/jedi_models.gd")
 const StoryPortraits = preload("res://scripts/story14_portraits.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
+const UI = preload("res://scripts/campaign/ui.gd")
+var from_temple := false
+var temple_soldier_id := ""
 var capacity := 5
 var flow: Node
 var selected: Array = []
@@ -41,6 +44,16 @@ var compact_layout := false
 var armory_skills := false
 var armory_slot := ""
 
+static func open_from_temple(tree: SceneTree, soldier_id := "") -> Control:
+	var screen: Control = load("res://scenes/squad.tscn").instantiate()
+	screen.from_temple = true
+	screen.temple_soldier_id = soldier_id
+	var previous := tree.current_scene
+	tree.root.add_child(screen)
+	tree.current_scene = screen
+	if previous != null and previous != screen: previous.queue_free()
+	return screen
+
 func _ready() -> void:
 	flow = get_node("/root/CampaignFlow")
 	var c = flow.session()
@@ -51,6 +64,14 @@ func _ready() -> void:
 	if not preload("res://scripts/campaign/strat_deployment.gd").validate(c,selected,option): selected = c.default_squad(option)
 	for id in c.default_squad(option):
 		if selected.size() < capacity and not selected.has(id): selected.append(id)
+	if from_temple and temple_soldier_id == "": temple_soldier_id = str(c.state.get("armory_selected_id", ""))
+	if from_temple and temple_soldier_id != "" and not c.soldier(temple_soldier_id).is_empty():
+		if not selected.has(temple_soldier_id):
+			if selected.is_empty(): selected.append(temple_soldier_id)
+			else: selected[0] = temple_soldier_id
+		focus_index = selected.find(temple_soldier_id)
+		c.state.armory_selected_id = temple_soldier_id
+		flow.save()
 	var bg := ColorRect.new(); bg.color = S.BG; bg.set_anchors_and_offsets_preset(PRESET_FULL_RECT); add_child(bg)
 	_build_stage(); _build_header(); _build_footer()
 	swap_button = S.button("SWAP", _tab.bind("roster")); add_child(swap_button); wire_button(swap_button)
@@ -64,6 +85,7 @@ func _ready() -> void:
 	_make_audio()
 	resized.connect(_layout)
 	_refresh(); _layout()
+	if from_temple and focus_index >= 0: inspect(focus_index)
 
 func _build_stage() -> void:
 	stage_container = SubViewportContainer.new(); stage_container.stretch = true
@@ -76,32 +98,33 @@ func _build_header() -> void:
 	var compact := Phone.narrow(Phone.window_size())
 	header = S.panel(); add_child(header); var row := HBoxContainer.new(); header.add_child(row)
 	var title := S.column(3); title.size_flags_horizontal = SIZE_EXPAND_FILL; row.add_child(title)
-	if not compact: title.add_child(S.label("JEDI TEMPLE  /  HANGAR 07  /  DEPLOYMENT", 12, S.CYAN))
-	title.add_child(S.label("SQUAD LOADOUT", 20 if compact else 32))
-	if not compact: title.add_child(S.label("Choose up to %d. Equip for the mission. Bring everyone home." % capacity, 13, S.MUTED))
+	if not compact: title.add_child(UI.label("JEDI TEMPLE  /  HANGAR 07  /  %s" % ("ARMORY" if from_temple else "DEPLOYMENT"), 14, S.CYAN))
+	title.add_child(UI.label("TEMPLE ARMORY" if from_temple else "SQUAD LOADOUT", 20 if compact else 32))
+	if not compact: title.add_child(UI.label("Choose up to %d. Equip for the mission. Bring everyone home." % capacity, 13, S.MUTED))
 	var info := S.column(5); row.add_child(info)
-	resources = S.label("", 14, S.GOLD); resources.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; info.add_child(resources)
+	resources = UI.label("", 14, S.GOLD); resources.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; info.add_child(resources)
 	var option: Dictionary = flow.session().state.get("launch_option", {})
 	var mission := str(option.get("n", option.get("mission", "Detention Line"))).to_upper().replace("_", " ")
-	info.add_child(S.label("OPERATION  /  " + mission, 12 if compact else 16, S.CYAN))
+	if not from_temple: info.add_child(UI.label("OPERATION  /  " + mission, 14 if compact else 16, S.CYAN))
 	var mission_id := str(option.get("mission", "rescue"))
 	var hint := "Select a soldier to inspect gear or swap with the roster."
 	if preload("res://scripts/campaign/battle_bridge.gd").map_path(mission_id).ends_with("rescue.json") and mission_id != "rescue":
 		hint = "Battlefield: Detention Line · free Mira and reach evacuation."
-	if not compact: info.add_child(S.label(hint, 12, S.MUTED))
+	if not compact: info.add_child(UI.label(hint, 12, S.MUTED))
 
 func _build_footer() -> void:
 	footer_bg = ColorRect.new(); footer_bg.color = S.BG; footer_bg.mouse_filter = MOUSE_FILTER_IGNORE; footer_bg.z_index = 10; add_child(footer_bg)
 	footer = HBoxContainer.new(); footer.z_index = 11; footer.add_theme_constant_override("separation", 16); add_child(footer)
-	var back := S.button("Temple" if Phone.touch_device() else "← Temple", func(): flow.go("temple")); footer.add_child(back); wire_button(back)
+	var back := S.button("DONE" if from_temple else "Temple" if Phone.touch_device() else "← Temple", func(): flow.go("temple")); footer.add_child(back); wire_button(back)
 	var text := S.column(2); text.size_flags_horizontal = SIZE_EXPAND_FILL; footer.add_child(text)
-	counter = S.label("", 17, S.CYAN); text.add_child(counter)
-	notice = S.label("Tap a soldier to inspect" if Phone.touch_device() else "Click a soldier to inspect  ·  Esc returns to the lineup", 12, S.MUTED); text.add_child(notice)
+	counter = UI.label("", 17, S.CYAN); text.add_child(counter)
+	notice = UI.label("Tap a soldier to inspect" if Phone.touch_device() else "Click a soldier to inspect  ·  Esc returns to the lineup", 12, S.MUTED); text.add_child(notice)
 	if Phone.narrow(Phone.window_size()): notice.hide()
 	deploy = S.button("DEPLOY >" if Phone.touch_device() else "DEPLOY →", _deploy); deploy.custom_minimum_size = Vector2(210, 48)
 	if Phone.narrow(Phone.window_size()): deploy.custom_minimum_size = Vector2(100, 56)
 	deploy.add_theme_font_size_override("font_size", 19)
 	deploy.add_theme_stylebox_override("normal", S.box(Color("254651"), S.CYAN, 12)); footer.add_child(deploy); wire_button(deploy)
+	if from_temple: deploy.hide()
 
 func _layout() -> void:
 	if not is_instance_valid(header): return
@@ -110,7 +133,7 @@ func _layout() -> void:
 	var safe := Vector4(maxf(0.0, raw_safe.x), maxf(0.0, raw_safe.y), maxf(0.0, raw_safe.z), maxf(0.0, raw_safe.w))
 	if compact != compact_layout:
 		compact_layout = compact; _draw_cards()
-	card_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	card_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	if compact:
 		card_row.add_theme_constant_override("separation", 8)
 		header.visible = focus_index < 0
@@ -123,25 +146,35 @@ func _layout() -> void:
 		footer_bg.position = Vector2(0, size.y - safe.w - 70); footer_bg.size = Vector2(size.x, 70)
 		header.position = Vector2(safe.x + 6, safe.y + 5)
 		header.size = Vector2(size.x - safe.x - safe.z - 12, 56)
-		_footer_rect(6 + safe.x, -66 - safe.w, -6 - safe.w)
+		_footer_rect(12 + safe.x, -66 - safe.w, -12 - safe.w)
 		if focus_index >= 0:
-			stage_container.position = Vector2(0, safe.y + 4)
 			stage_container.custom_minimum_size.y = 0
-			stage_container.size = Vector2(168, size.y - safe.y - safe.w - 115)
-			card_scroll.visible = true
-			card_scroll.process_mode = Node.PROCESS_MODE_INHERIT
-			card_scroll.position = Vector2(safe.x + 6, size.y - safe.w - 111)
-			card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, 80)
-			drawer.position = Vector2(174, safe.y + 4)
-			drawer.size = Vector2(size.x - safe.z - 180, size.y - safe.y - safe.w - 78)
+			if size.x < 500:
+				stage_container.position = Vector2(0, safe.y)
+				stage_container.size = Vector2(size.x, 220)
+				stage.camera.keep_aspect = Camera3D.KEEP_HEIGHT
+				stage.camera.fov = 34.0
+				card_scroll.visible = false
+				card_scroll.process_mode = Node.PROCESS_MODE_DISABLED
+				drawer.position = Vector2(safe.x + 12, safe.y + 228)
+				drawer.size = Vector2(size.x - safe.x - safe.z - 24, size.y - safe.y - safe.w - 310)
+			else:
+				stage_container.position = Vector2(0, safe.y + 4)
+				stage_container.size = Vector2(168, size.y - safe.y - safe.w - 120)
+				card_scroll.visible = true
+				card_scroll.process_mode = Node.PROCESS_MODE_INHERIT
+				card_scroll.position = Vector2(safe.x + 6, size.y - safe.w - 117)
+				card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, 86)
+				drawer.position = Vector2(174, safe.y + 4)
+				drawer.size = Vector2(size.x - safe.z - 180, size.y - safe.y - safe.w - 78)
 		else:
 			stage_container.position = Vector2(0, 64)
 			stage_container.custom_minimum_size.y = 0
-			stage_container.size = Vector2(size.x, maxf(110, size.y - safe.y - safe.w - 214))
+			stage_container.size = Vector2(size.x, maxf(110, size.y - safe.y - safe.w - 228))
 			card_scroll.visible = true
 			card_scroll.process_mode = Node.PROCESS_MODE_INHERIT
-			card_scroll.position = Vector2(safe.x + 6, size.y - safe.w - 150)
-			card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, 72)
+			card_scroll.position = Vector2(safe.x + 6, size.y - safe.w - 164)
+			card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, 86)
 		stage_container.custom_minimum_size.y = stage_container.size.y
 		card_row.reset_size()
 		_sync_roster_visibility()
@@ -153,7 +186,7 @@ func _layout() -> void:
 	card_scroll.modulate.a = 1.0
 	card_scroll.process_mode = Node.PROCESS_MODE_INHERIT
 	header.position = Vector2(24, 16); header.size = Vector2(size.x - 48, 100)
-	_footer_rect(24, -80, -8)
+	_footer_rect(24, -80, -12)
 	footer.visible = true
 	swap_button.visible = focus_index >= 0
 	swap_button.position = Vector2(24, 132); swap_button.size = Vector2(92, 44)
@@ -176,6 +209,9 @@ func _layout() -> void:
 func _sync_roster_visibility() -> void:
 	if not is_instance_valid(card_scroll): return
 	var phone_focus := focus_index >= 0 and Phone.narrow(Phone.window_size())
+	if phone_focus and size.x < 500:
+		card_scroll.visible = false
+		return
 	var compact_strip := card_scroll.size.x <= 350.0
 	card_scroll.visible = true
 	card_scroll.modulate.a = 0.0 if phone_focus and not compact_strip else 1.0
@@ -220,12 +256,14 @@ func _refresh() -> void:
 	_draw_cards()
 	var roster: Array = selected.map(func(id): return c.soldier(str(id)))
 	stage.show_squad(roster); stage.focus_slot(focus_index)
-	counter.text = "%d / %d READY FOR DEPLOYMENT" % [selected.size(), capacity]
+	UI.ensure_phone_type(stage)
+	counter.text = "%d / %d IN SQUAD" % [selected.size(), capacity] if from_temple else "%d / %d READY FOR DEPLOYMENT" % [selected.size(), capacity]
 	deploy.disabled = not preload("res://scripts/campaign/strat_deployment.gd").validate(c, selected, c.state.get("launch_option",{}))
 	resources.text = "%d Cr   /   %d Intel   /   %d Kyber" % [c.state.res.credits, c.state.res.intel, c.state.res.kyber]
 	if focus_index >= selected.size(): focus_index = -1
 	if focus_index >= 0: _build_drawer()
 	_layout()
+	UI.ensure_phone_type(self)
 
 
 func _draw_cards() -> void:
@@ -244,6 +282,9 @@ func _draw_cards() -> void:
 func inspect(index: int) -> void:
 	if index < 0 or index >= selected.size(): return
 	focus_index = index; drawer_tab = "arsenal"; armory_skills = false; armory_slot = ""
+	if from_temple:
+		flow.session().state.armory_selected_id = str(selected[index])
+		flow.save()
 	drawer.show(); stage.focus_slot(index); _draw_cards(); _layout(); _build_drawer(); _layout()
 	drawer.modulate.a = 0.0; create_tween().tween_property(drawer, "modulate:a", 1.0, 0.22)
 
@@ -257,8 +298,8 @@ func _build_drawer() -> void:
 	var compact := Phone.narrow(Phone.window_size())
 	if not compact:
 		var top := HBoxContainer.new(); drawer_content.add_child(top)
-		var title := S.label(str(r.n), 22); title.size_flags_horizontal = SIZE_EXPAND_FILL; top.add_child(title)
-		top.add_child(S.label("%d Cr · %d Ky" % [flow.session().state.res.credits, flow.session().state.res.kyber], 11, S.GOLD))
+		var title := UI.label(str(r.n), 22); title.size_flags_horizontal = SIZE_EXPAND_FILL; top.add_child(title)
+		top.add_child(UI.label("%d Cr · %d Ky" % [flow.session().state.res.credits, flow.session().state.res.kyber], 11, S.GOLD))
 		var close := S.button("×", close_inspector); close.custom_minimum_size = Vector2(44, 44)
 		close.tooltip_text = "Return to lineup" if Phone.touch_device() else "Return to lineup (Esc)"; top.add_child(close); wire_button(close)
 	var stats := Gear.battle_stats(flow.session(), str(r.id))
@@ -279,8 +320,9 @@ func _build_drawer() -> void:
 		if armory_skills: arsenal._show_skills()
 	else:
 		var list := S.column(8); list.size_flags_horizontal = SIZE_EXPAND_FILL; scroll.add_child(list)
-		list.add_child(S.label("ROSTER  /  %d SOLDIERS" % flow.session().state.roster.size(), 12, S.CYAN))
+		list.add_child(UI.label("ROSTER  /  %d SOLDIERS" % flow.session().state.roster.size(), 12, S.CYAN))
 		for soldier in flow.session().state.roster: _roster_row(list, soldier)
+	UI.ensure_phone_type(drawer)
 
 func _confirm_skill() -> void:
 	if not is_instance_valid(arsenal): return
@@ -311,8 +353,8 @@ func _roster_row(parent: VBoxContainer, r: Dictionary) -> void:
 		b.text = Details.visible_name(str(r.n), maxf(12.0, b.size.x - 50.0 - ThemeDB.fallback_font.get_string_size(suffix, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x)) + suffix
 	b.resized.connect(update_name)
 	update_name.call_deferred()
-	col.add_child(S.label("%s · R%d · %s" % [r.cls, int(r.rank), Details.nickname(r)], 11, S.MUTED))
-	var status := S.label(Details.status(flow.session(), r), 11, S.GREEN if fit else S.RED)
+	col.add_child(UI.label("%s · R%d · %s" % [r.cls, int(r.rank), Details.nickname(r)], 11, S.MUTED))
+	var status := UI.label(Details.status(flow.session(), r), 11, S.GREEN if fit else S.RED)
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; col.add_child(status)
 
 func _portrait_texture(r: Dictionary) -> Texture2D:
@@ -333,7 +375,12 @@ func _toggle(id: String) -> void:
 	focus_index = -1; drawer.hide(); _persist_selection(); _refresh()
 
 func _persist_selection() -> void:
-	var c = flow.session(); c.state.loadout_squad = selected.duplicate()
+	var c = flow.session()
+	if from_temple:
+		if focus_index >= 0: c.state.armory_selected_id = str(selected[focus_index])
+		flow.save()
+		return
+	c.state.loadout_squad = selected.duplicate()
 	if not c.state.pending_mission.is_empty(): c.state.pending_mission.squad = selected.duplicate()
 	flow.save()
 
@@ -363,8 +410,9 @@ func change_gear(action: String, kind: String = "", key: String = "") -> bool:
 	return changed
 
 func wire_button(button: Button) -> void:
+	UI.style_button(button)
 	button.mouse_entered.connect(func(): if audio and not button.disabled: audio.play())
-	button.pressed.connect(func(): if audio: audio.play())
+	button.pressed.connect(func(): if is_instance_valid(audio) and audio.is_inside_tree(): audio.play())
 
 func _make_audio() -> void:
 	audio = AudioStreamPlayer.new(); audio.volume_db = -28; add_child(audio)
@@ -380,7 +428,7 @@ func _make_audio() -> void:
 func _process(_delta: float) -> void:
 	if is_instance_valid(footer):
 		var desired := -78.0 if Phone.narrow(Phone.window_size()) else -80.0
-		if absf(footer.offset_top - desired) > 1.0: _footer_rect(6 if desired == -78.0 else 24, desired, -6 if desired == -78.0 else -8)
+		if absf(footer.offset_top - desired) > 1.0: _footer_rect(12 if desired == -78.0 else 24, desired, -12)
 	if not is_instance_valid(stage_container) or focus_index >= 0: return
 	var mouse := get_local_mouse_position()
 	var index := -1

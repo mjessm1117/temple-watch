@@ -3,6 +3,7 @@ const Gear = preload("res://scripts/campaign/gear.gd")
 const Data = preload("res://scripts/campaign/data.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
 const S = preload("res://scripts/campaign/loadout_style.gd")
+const UI = preload("res://scripts/campaign/ui.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
 
 static func fit(r: Dictionary) -> bool:
@@ -63,11 +64,13 @@ static func card(c, r: Dictionary, action: Callable, portrait: Texture2D = null)
 	var compact := S.panel(); compact.name = "Card_" + str(r.id)
 	compact.add_theme_stylebox_override("panel", S.box(S.PANEL, S.EDGE, 4))
 	var phone := Phone.narrow(Phone.window_size())
-	compact.custom_minimum_size = Vector2(90 if phone else 166, 62); compact.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	compact.custom_minimum_size = Vector2(90 if phone else 166, 78 if phone else 62); compact.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var content := S.column(2); compact.add_child(content)
 	var select := S.button("", action); select.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	select.custom_minimum_size.y = 44; content.add_child(select)
-	var name := S.label("", 14 if phone else 11); name.name = "SoldierName"
+	var name := UI.label("", 14 if phone else 11); name.name = "SoldierName"
+	name.autowrap_mode = TextServer.AUTOWRAP_OFF
+	name.clip_text = true
 	name.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	name.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	name.offset_left = 43 if portrait != null else 4
@@ -80,7 +83,10 @@ static func card(c, r: Dictionary, action: Callable, portrait: Texture2D = null)
 	if portrait != null:
 		var face := Sprite2D.new(); face.texture = portrait; face.position = Vector2(21, 21)
 		face.scale = Vector2(0.26, 0.26); select.add_child(face)
-	content.add_child(S.label("T%d · HP %d" % [Progression.skill_rank(r), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))] if phone else "%s · R%d / T%d · HP %d" % [r.cls, int(r.rank), Progression.skill_rank(r), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 9 if phone else 10, S.GOLD))
+	var summary := UI.label("T%d · HP %d" % [Progression.skill_rank(r), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))] if phone else "%s · R%d / T%d · HP %d" % [r.cls, int(r.rank), Progression.skill_rank(r), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 9 if phone else 10, S.GOLD)
+	summary.autowrap_mode = TextServer.AUTOWRAP_OFF
+	summary.clip_text = true
+	content.add_child(summary)
 	if not fit(r): compact.modulate = Color("899194")
 	return compact
 

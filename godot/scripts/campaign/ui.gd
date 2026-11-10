@@ -11,13 +11,16 @@ const GOLD = Color("e0bd78")
 const DANGER = Color("ef6a5d")
 const Motion = preload("res://scripts/ui_motion.gd")
 const Icons = preload("res://scripts/ui_icon.gd")
+const Phone = preload("res://scripts/phone_layout.gd")
+const Feedback = preload("res://scripts/campaign/style21_feedback.gd")
+const StylePrefs = preload("res://scripts/campaign/style21_preferences.gd")
+const TYPE = {"small": 14, "body": 16, "title": 20, "hero": 32}
+const DISABLED_TEXT = Color("9bb2b5")
 static var fonts: Dictionary = {}
 
 static func font(kind: String = "body") -> Font:
 	if not fonts.has(kind):
-		var f := SystemFont.new()
-		f.font_names = PackedStringArray(["Chakra Petch", "DejaVu Sans"] if kind == "display" else ["IBM Plex Mono", "DejaVu Sans Mono"] if kind == "mono" else ["IBM Plex Sans", "DejaVu Sans"])
-		f.font_weight = 600 if kind == "display" else 400
+		var f := load("res://assets/fonts/NotoSansMono-Regular.ttf" if kind == "mono" else "res://assets/fonts/NotoSans-Bold.ttf" if kind == "display" else "res://assets/fonts/NotoSans-Regular.ttf") as Font
 		fonts[kind] = f
 	return fonts[kind]
 
@@ -40,7 +43,9 @@ static func label(message: String, size: int = 17, color: Color = TEXT) -> Label
 	var l := Label.new()
 	l.text = message
 	l.add_theme_font_override("font", font("display" if size >= 24 else "body"))
-	l.add_theme_font_size_override("font_size", size)
+	var tree := Engine.get_main_loop() as SceneTree
+	var phone := Phone.narrow(Vector2i(tree.root.size)) if tree != null else Phone.narrow(Phone.window_size())
+	l.add_theme_font_size_override("font_size", maxi(14, roundi(size * float(StylePrefs.get_value("text_scale")))) if phone else roundi(size * float(StylePrefs.get_value("text_scale"))))
 	l.add_theme_color_override("font_color", color)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return l
@@ -49,7 +54,7 @@ static func button(message: String, action: Callable, enabled: bool = true) -> B
 	var b := Button.new()
 	b.text = message
 	b.disabled = not enabled
-	b.custom_minimum_size.y = 44 if preload("res://scripts/phone_layout.gd").narrow(preload("res://scripts/phone_layout.gd").window_size()) else 40
+	b.custom_minimum_size.y = 44 if Phone.narrow(Phone.window_size()) else 40
 	style_button(b)
 	b.pressed.connect(action)
 	return b
@@ -65,7 +70,7 @@ static func clear(node: Node) -> void:
 		child.queue_free()
 
 static func style_button(b: Button) -> void:
-	var phone := preload("res://scripts/phone_layout.gd").narrow(preload("res://scripts/phone_layout.gd").window_size())
+	var phone := Phone.narrow(Phone.window_size())
 	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
 		var s := style(Color("315c68") if phone and state == "pressed" else PANEL_ALT if state in ["hover", "pressed"] else PANEL, GOLD if phone and state == "pressed" else ACCENT if state in ["hover", "pressed", "focus"] else BORDER)
 		s.set_content_margin_all(10)
@@ -78,11 +83,30 @@ static func style_button(b: Button) -> void:
 	b.add_theme_color_override("font_color", TEXT)
 	b.add_theme_color_override("font_hover_color", ACCENT)
 	b.add_theme_color_override("font_pressed_color", GOLD if phone else ACCENT)
-	b.add_theme_color_override("font_disabled_color", Color("52676a"))
+	b.add_theme_color_override("font_disabled_color", DISABLED_TEXT)
+	b.add_theme_color_override("font_focus_color", TEXT)
 	if not b.has_node("UIFeedback"):
 		var motion := Motion.new()
 		motion.name = "UIFeedback"
 		b.add_child(motion)
+	if not b.has_node("Style21Feedback"):
+		var feedback := Feedback.new()
+		feedback.name = "Style21Feedback"
+		b.add_child(feedback)
+
+static func header(message: String) -> PanelContainer:
+	var p := panel(PANEL_ALT)
+	p.add_child(label(message, TYPE.title, GOLD))
+	return p
+
+static func ensure_phone_type(node: Node) -> void:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null or not Phone.narrow(Vector2i(tree.root.size)) and not Phone.mobile_device(): return
+	if node is Label:
+		var item := node as Label
+		item.add_theme_font_override("font", font("body"))
+		item.add_theme_font_size_override("font_size", maxi(14, item.get_theme_font_size("font_size")))
+	for child in node.get_children(): ensure_phone_type(child)
 
 static func icon(kind: String, side: float = 28.0, color: Color = ACCENT) -> Control:
 	var node := Icons.new()
