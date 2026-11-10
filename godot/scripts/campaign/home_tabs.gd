@@ -14,12 +14,12 @@ static func decorate(button: Button, name: String) -> void:
 	button.add_child(glyph)
 	var badge := Label.new(); badge.name = "Badge"; badge.visible = false
 	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	badge.add_theme_font_size_override("font_size", 10)
+	badge.add_theme_font_size_override("font_size", 14)
 	badge.add_theme_color_override("font_color", Color("091116"))
 	var chip := StyleBoxFlat.new(); chip.bg_color = UI.GOLD; chip.set_corner_radius_all(8)
 	badge.add_theme_stylebox_override("normal", chip)
 	badge.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	badge.offset_left = -23; badge.offset_right = -5; badge.offset_top = 2; badge.offset_bottom = 18
+	badge.offset_left = -26; badge.offset_right = -4; badge.offset_top = 1; badge.offset_bottom = 23
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	button.add_child(badge)
 

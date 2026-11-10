@@ -1,5 +1,6 @@
 extends VBoxContainer
 const S = preload("res://scripts/campaign/loadout_style.gd")
+const UI = preload("res://scripts/campaign/ui.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
 const Classes = preload("res://scripts/class_registry.gd")
 var host: Control
@@ -19,8 +20,8 @@ func build() -> void:
 	S.clear(self); cards.clear(); columns.clear()
 	var r: Dictionary = host.flow.session().soldier(soldier_id)
 	var locked := bool(host.flow.session().state.get("skill_picks_locked", false))
-	add_child(S.label("%s  /  SKILL TREE  ·  %s" % [str(r.cls).to_upper(), "LOCKED" if locked else "FREE UNTIL DEPLOY"], 15, S.GOLD))
-	comparison = S.label("Tap a node to compare · tap again to equip.", 11, S.CYAN)
+	add_child(UI.label("%s  /  SKILL TREE  ·  %s" % [str(r.cls).to_upper(), "LOCKED" if locked else "FREE UNTIL DEPLOY"], 15, S.GOLD))
+	comparison = UI.label("Tap a node to compare · tap again to equip.", 11, S.CYAN)
 	comparison.clip_text = true; add_child(comparison)
 	var ranks := HBoxContainer.new(); ranks.name = "RankColumns"
 	ranks.add_theme_constant_override("separation", 7); add_child(ranks)
@@ -29,7 +30,7 @@ func build() -> void:
 	for rank in range(1, 4):
 		var column := S.column(3); column.name = "Rank%d" % rank
 		column.custom_minimum_size.x = col_width; ranks.add_child(column); columns[rank] = column
-		var rank_label := S.label("R%d  /  %s" % [rank, "SPECIALIZATION" if rank == 3 else "FOUNDATION" if rank == 1 else "TACTICS"], 10, S.CYAN)
+		var rank_label := UI.label("R%d  /  %s" % [rank, "SPECIALIZATION" if rank == 3 else "FOUNDATION" if rank == 1 else "TACTICS"], 10, S.CYAN)
 		column.add_child(rank_label)
 		var pair := HBoxContainer.new(); pair.name = "Pair%d" % rank
 		pair.add_theme_constant_override("separation", 4); column.add_child(pair)
@@ -40,10 +41,10 @@ func build() -> void:
 			pair.add_child(card); cards[str(key)] = card
 	var later := S.column(3); later.name = "LaterRanks"; later.custom_minimum_size.x = col_width
 	ranks.add_child(later)
-	later.add_child(S.label("R4+  /  FUTURE RANKS", 10, S.MUTED))
+	later.add_child(UI.label("R4+  /  FUTURE RANKS", 10, S.MUTED))
 	var future := S.panel(); future.custom_minimum_size.y = 138
 	future.add_theme_stylebox_override("panel", S.box(Color("142025"), Color("344047"), 5)); later.add_child(future)
-	var future_label := S.label("◇  LOCKED\nEarn ranks in battle to reveal the next branches.", 11, S.MUTED)
+	var future_label := UI.label("◇  LOCKED\nEarn ranks in battle to reveal the next branches.", 11, S.MUTED)
 	future_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; future.add_child(future_label)
 	confirm = host.skill_confirm
 	confirm.disabled = true
@@ -55,6 +56,7 @@ func _card(r: Dictionary, rank: int, key: String, other: String, width: float, l
 	var available: bool = rank <= Progression.skill_rank(r) and rank <= r.get("picks", []).size() + 1 and not locked
 	var card := S.button("", _preview.bind(rank, key), available)
 	card.name = "Skill_" + key; card.custom_minimum_size = Vector2(width, 136)
+	UI.style_button(card)
 	card.add_theme_stylebox_override("normal", S.box(Color("22434b") if picked else Color("172b32"), S.GOLD if picked else S.EDGE, 4))
 	card.add_theme_stylebox_override("disabled", S.box(Color("142025"), Color("344047"), 4))
 	card.tooltip_text = str(ability.get("description", ""))
@@ -66,18 +68,18 @@ func _card(r: Dictionary, rank: int, key: String, other: String, width: float, l
 	icon.texture = S.icon(_icon(ability)); icon.custom_minimum_size = Vector2(18, 18)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	top.add_child(icon)
-	var state := S.label("✓" if picked else "○", 12, S.GOLD if picked else S.MUTED)
+	var state := UI.label("✓" if picked else "○", 12, S.GOLD if picked else S.MUTED)
 	state.size_flags_horizontal = SIZE_EXPAND_FILL; state.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; top.add_child(state)
-	var name_label := S.label(str(ability.get("name", key)).to_upper(), 10, S.TEXT)
+	var name_label := UI.label(str(ability.get("name", key)).to_upper(), 10, S.TEXT)
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	name_label.custom_minimum_size.y = 20; info.add_child(name_label)
-	var number := S.label(_main_number(ability), 19, S.GOLD if picked else S.CYAN)
+	var number := UI.label(_main_number(ability), 19, S.GOLD if picked else S.CYAN)
 	number.name = "Number"; info.add_child(number)
-	var effect := S.label(_effect_line(ability), 8, S.TEXT)
+	var effect := UI.label(_effect_line(ability), 8, S.TEXT)
 	effect.clip_text = true; info.add_child(effect)
-	var compare := S.label("VS " + _main_number(other_ability) + " " + _short_metric(other_ability) if other != "" else "FOUNDATION", 8, S.MUTED)
+	var compare := UI.label("VS " + _main_number(other_ability) + " " + _short_metric(other_ability) if other != "" else "FOUNDATION", 8, S.MUTED)
 	compare.name = "Compare"; compare.clip_text = true; info.add_child(compare)
-	var chain := S.label(_chain_line(ability, r, rank), 8, S.GREEN)
+	var chain := UI.label(_chain_line(ability, r, rank), 8, S.GREEN)
 	chain.name = "Chain"; chain.clip_text = true; info.add_child(chain)
 	return card
 

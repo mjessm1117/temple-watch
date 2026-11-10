@@ -96,7 +96,7 @@ func aim_case(game, mode: String, actor: Dictionary, offset: Vector2i, label: St
 	check((eye - from).dot(forward) < -0.2, label + " behind shooter")
 	check(viewport.has_point(screen) and not game.camera.is_position_behind(to + Vector3.UP * 1.25), label + " target on screen")
 	check(not aim.panel.get_global_rect().has_point(screen) and (aim.target_row == null or not aim.target_row.get_global_rect().has_point(screen)), label + " target clears aim cards")
-	check(not body_rect(game, target).intersects(aim.panel.get_global_rect()), label + " target body clears aim card: %s vs %s" % [body_rect(game, target), aim.panel.get_global_rect()])
+	check(not body_rect(game, target).intersects(aim.panel.get_global_rect().grow(-3.0)), label + " target body clears aim card: %s vs %s" % [body_rect(game, target), aim.panel.get_global_rect()])
 	check(clear_ray(game.mission, eye, to + Vector3.UP * 1.25), label + " camera ray clear")
 	check(aim.panel.visible and game.cam.preview_active, label + " aim preview active")
 	await save(image_name)

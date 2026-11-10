@@ -121,7 +121,12 @@ func run() -> void:
 	for station in ["Roster", "Research", "Build", "Arsenal", "Teams", "Legacy", "Command"]:
 		current_scene._change_page(station)
 		await frames(1)
-		check(current_scene.page == station, "reachable station " + station)
+		if station == "Arsenal":
+			check(current_scene.scene_file_path.ends_with("squad.tscn"), "reachable station " + station)
+			button_named(current_scene, "DONE").pressed.emit()
+			await reach_temple()
+		else:
+			check(current_scene.page == station, "reachable station " + station)
 	flow.open_codex()
 	await frames()
 	check(current_scene.mode == "codex", "Codex reached from campaign")

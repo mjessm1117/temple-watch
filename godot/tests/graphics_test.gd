@@ -58,13 +58,19 @@ func run() -> void:
 		check(view.is_inside_tree(),scene+" screen loads")
 		if scene == "temple":
 			check(view.temple_view.rooms.size() == 22,"temple rooms remain present")
+			current_scene = view
 			view._change_page("Settings"); await frames()
 			check(view.find_child("GraphicsTier",true,false) != null,"Graphics appears in existing Presentation settings")
+			flow.open_settings(); current_scene = null
 		if scene == "galaxy": check(view.map_view.planets.size() == 14,"galaxy planets remain present")
 		if scene == "menu":
+			current_scene = view
+			root.get_node("CampaignFlow").open_settings(); await frames()
 			var options = view.find_child("GraphicsTier",true,false)
-			check(options != null and options.item_count == 3,"player can select all three tiers")
+			check(options != null and options.item_count == 3,"Settings opens all three graphics tiers")
 			if rendered and tier == "high" and "--capture" in OS.get_cmdline_user_args(): await save_shot("settings")
+			root.get_node("CampaignFlow").open_settings()
+			current_scene = null
 		view.queue_free(); await frames()
 	if FileAccess.file_exists(flow.save_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(flow.save_path))
 	print("Graphics %s (%s): %d checks, %d failures" % [tier,RenderingServer.get_current_rendering_method(),checks,failures])

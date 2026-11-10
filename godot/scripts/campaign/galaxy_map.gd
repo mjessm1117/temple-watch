@@ -77,7 +77,10 @@ func refresh_signals() -> void:
 	offers.clear()
 	for i in campaign.state.options.size():
 		var option: Dictionary = campaign.state.options[i]; var m: Dictionary = campaign.story.mission(str(option.mission))
-		offers.append({"index":i, "planet":Intel.planet_for(m), "name":str(option.get("n",m.get("n",option.mission))), "risk":Intel.risk(campaign,m,option)})
+		var urgency := "NO LIMIT" if option.get("story", false) else "LAST" if option.get("adv", false) and campaign.state.options.size() == 1 else "NEXT" if option.get("adv", false) else "OPEN"
+		var reward: Dictionary = m.get("reward", {})
+		var reward_key := str(reward.keys()[0]).capitalize() if not reward.is_empty() else "Intel"
+		offers.append({"index":i, "planet":Intel.planet_for(m), "name":str(option.get("n",m.get("n",option.mission))), "risk":Intel.risk(campaign,m,option), "type":str(m.get("type", option.get("kind", "Mission"))).replace("_", " ").to_upper(), "urgency":urgency, "reward":reward_key})
 	operations.clear()
 	for op in campaign.sith.operations():
 		if op.status in ["open","team"]:
@@ -156,6 +159,35 @@ func marker_position(index: int) -> Vector2:
 	var slot := same.find(index); var shift := (float(slot)-float(same.size()-1)*0.5)*42.0
 	return projected(planets[offer.planet].position)+Vector2(shift,-35.0-absf(shift)*0.18)
 
+func marker_label_layout() -> Array:
+	# Place urgent/selected cards first; each later card searches a free lane near its marker.
+	var result := []
+	var order := offers.duplicate()
+	order.sort_custom(func(a, b):
+		var pa := (4 if a.urgency == "LAST" else 3 if a.urgency == "NEXT" else 1) + (2 if a.index == selected else 0)
+		var pb := (4 if b.urgency == "LAST" else 3 if b.urgency == "NEXT" else 1) + (2 if b.index == selected else 0)
+		return pa > pb if pa != pb else a.index < b.index)
+	var width := minf(174.0, maxf(120.0, size.x - 36.0))
+	var height := 44.0
+	var area := Rect2(Vector2(12, 42), Vector2(size.x - 24, size.y - 78))
+	for offer in order:
+		var marker := marker_position(int(offer.index))
+		if not Rect2(Vector2.ZERO, size).has_point(marker): continue
+		var candidates := [marker + Vector2(20, -height * 0.5), marker + Vector2(-width - 20, -height * 0.5)]
+		for step in 14:
+			var y := area.position.y + float(step) * maxf(1.0, (area.size.y - height) / 13.0)
+			candidates.append(Vector2(12, y))
+			candidates.append(Vector2(size.x - 12 - width, y))
+		for point in candidates:
+			var rect := Rect2(Vector2(clampf(point.x, area.position.x, area.end.x - width), clampf(point.y, area.position.y, area.end.y - height)), Vector2(width, height))
+			var free := true
+			for placed in result:
+				if rect.grow(3).intersects(placed.rect): free = false; break
+			if free:
+				result.append({"index":offer.index, "rect":rect, "marker":marker, "offer":offer})
+				break
+	return result
+
 func _draw() -> void:
 	if camera == null: return
 	# SubViewport renders as a child; overlays are drawn by a topmost child below.
@@ -185,7 +217,7 @@ func _draw_labels(overlay: Control) -> void:
 		var p := projected(planets[title].position)
 		if not bounds.has_point(p): continue
 		var active: bool = title == hovered or title == focused
-		var label_size := 16 if active else 14 if Phone.narrow(Phone.window_size()) else 12
+		var label_size := 16 if active else 14
 		var color := Color("dbe7e4") if active else Color("91afb9")
 		var threat := preload("res://scripts/campaign/events11_engine.gd").threat(campaign.state, title)
 		var offset := Vector2(14,18)
@@ -197,7 +229,7 @@ func _draw_labels(overlay: Control) -> void:
 		overlay.draw_string_outline(font,p+offset,title,HORIZONTAL_ALIGNMENT_LEFT,-1,label_size,4,Color("061017"))
 		overlay.draw_string(font,p+offset,title,HORIZONTAL_ALIGNMENT_LEFT,-1,label_size,color)
 		if threat >= 2:
-			overlay.draw_string(font,p+offset+Vector2(0,15),"THREAT %d/5" % threat,HORIZONTAL_ALIGNMENT_LEFT,-1,12 if Phone.narrow(Phone.window_size()) else 10,Color("ef6a5d"))
+			overlay.draw_string(font,p+offset+Vector2(0,15),"THREAT %d/5" % threat,HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("ef6a5d"))
 	for offer in offers:
 		var p := marker_position(offer.index)
 		if not bounds.has_point(p): continue
@@ -206,39 +238,43 @@ func _draw_labels(overlay: Control) -> void:
 		overlay.draw_circle(p,15*pulse,Color(color,0.12))
 		overlay.draw_arc(p,11*pulse,0,TAU,40,Color(color,0.7),1.2,true)
 		overlay.draw_circle(p,6,color)
-		overlay.draw_string(font,p+Vector2(-4,4),str(int(offer.index)+1),HORIZONTAL_ALIGNMENT_LEFT,-1,11,Color("081317"))
-		if compact or offer.index != selected and hovered != offer.planet: continue
-		var text_width := font.get_string_size(offer.name,HORIZONTAL_ALIGNMENT_LEFT,-1,13).x
-		var label_pos := p+Vector2(18,4)
-		if label_pos.x+text_width > size.x-10: label_pos.x = p.x-18-text_width
-		overlay.draw_string_outline(font,label_pos,offer.name,HORIZONTAL_ALIGNMENT_LEFT,-1,13,4,Color("061017"))
-		overlay.draw_string(font,label_pos,offer.name,HORIZONTAL_ALIGNMENT_LEFT,-1,13,color)
+		overlay.draw_string(font,p+Vector2(-5,5),str(int(offer.index)+1),HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("081317"))
+	for label in marker_label_layout():
+		var rect: Rect2 = label.rect
+		var offer: Dictionary = label.offer
+		var standout: bool = int(label.index) == selected or offer.urgency in ["LAST", "NEXT"]
+		var ink: Color = offer.risk.color if standout else Color("9ec1c9")
+		overlay.draw_line(label.marker, rect.get_center(), Color(ink, 0.55), 1, true)
+		var plate := _plate(); plate.border_color = ink; plate.bg_color = Color("11252c") if standout else Color("0a171b")
+		overlay.draw_style_box(plate, rect)
+		overlay.draw_string(font, rect.position + Vector2(8, 17), "%s · %s" % [str(offer.type).substr(0, 9), offer.urgency], HORIZONTAL_ALIGNMENT_LEFT, int(rect.size.x - 16), 14, ink)
+		overlay.draw_string(font, rect.position + Vector2(8, 36), "◆ %s" % offer.reward, HORIZONTAL_ALIGNMENT_LEFT, int(rect.size.x - 16), 14, Color("dbe7e4"))
 	for op in operations:
 		var p := projected(planets[op.planet].position)+Vector2(-26,-25)
 		if not bounds.has_point(p): continue
 		var diamond := PackedVector2Array([p+Vector2(0,-8),p+Vector2(8,0),p+Vector2(0,8),p+Vector2(-8,0),p+Vector2(0,-8)])
 		overlay.draw_colored_polygon(diamond,Color("ef6a5d"))
 		if hovered != op.planet: continue
-		overlay.draw_string_outline(font,p+Vector2(12,-4),str(op.name),HORIZONTAL_ALIGNMENT_LEFT,-1,12,4,Color("061017"))
-		overlay.draw_string(font,p+Vector2(12,-4),str(op.name),HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("ef6a5d"))
+		overlay.draw_string_outline(font,p+Vector2(12,-4),str(op.name),HORIZONTAL_ALIGNMENT_LEFT,-1,14,4,Color("061017"))
+		overlay.draw_string(font,p+Vector2(12,-4),str(op.name),HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("ef6a5d"))
 	for ship in ships:
 		var p := projected(ship.position)
 		if bounds.has_point(p):
 			overlay.draw_arc(p,6,0,TAU,16,Color("a7c7cc"),1,true)
-			if not compact: overlay.draw_string(font,p+Vector2(10,-5),str(ship.get_meta("label")),HORIZONTAL_ALIGNMENT_LEFT,-1,11,Color("a7c7cc"))
+			if not compact: overlay.draw_string(font,p+Vector2(10,-5),str(ship.get_meta("label")),HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("a7c7cc"))
 	if not focused.is_empty():
 		var card_width := minf(188.0,size.x-36.0)
 		var card := Rect2(Vector2(16,38),Vector2(card_width,67))
 		overlay.draw_style_box(_plate(),card)
 		overlay.draw_string(font,card.position+Vector2(10,19),focused.to_upper(),HORIZONTAL_ALIGNMENT_LEFT,int(card_width-20),14,Color("dbe7e4"))
 		var biome := str(Art.BIOMES.get(focused,["Uncharted"])[0])
-		overlay.draw_string(font,card.position+Vector2(10,39),biome,HORIZONTAL_ALIGNMENT_LEFT,int(card_width-20),11,Color("79d3e2"))
+		overlay.draw_string(font,card.position+Vector2(10,39),biome,HORIZONTAL_ALIGNMENT_LEFT,int(card_width-20),14,Color("79d3e2"))
 		var risk: Dictionary = offers[selected].risk if selected < offers.size() and str(offers[selected].planet) == focused else {}
 		var threat := preload("res://scripts/campaign/events11_engine.gd").threat(campaign.state,focused)
 		var scan := "RISK %d / 4  ·  %s" % [int(risk.level), str(risk.name).to_upper()] if not risk.is_empty() else "REGION THREAT %d / 5" % threat
-		overlay.draw_string(font,card.position+Vector2(10,57),scan,HORIZONTAL_ALIGNMENT_LEFT,int(card_width-20),10,risk.color if not risk.is_empty() else Color("8aa2a5"))
-	overlay.draw_string(font,Vector2(18,25),"LIVE HOLOMAP  /  " + (focused.to_upper() if not focused.is_empty() else "REPUBLIC SPACE"),HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("79d3e2"))
-	overlay.draw_string(font,Vector2(18,size.y-15),"DRAG to pan · TAP a signal" if compact else "SCROLL zoom   ·   DRAG / WASD pan   ·   CLICK inspect",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("8aa2a5"))
+		overlay.draw_string(font,card.position+Vector2(10,57),scan,HORIZONTAL_ALIGNMENT_LEFT,int(card_width-20),14,risk.color if not risk.is_empty() else Color("8aa2a5"))
+	overlay.draw_string(font,Vector2(18,25),"LIVE HOLOMAP  /  " + (focused.to_upper() if not focused.is_empty() else "REPUBLIC SPACE"),HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("79d3e2"))
+	overlay.draw_string(font,Vector2(18,size.y-15),"DRAG to pan · TAP a signal" if compact else "SCROLL zoom   ·   DRAG / WASD pan   ·   CLICK inspect",HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("8aa2a5"))
 
 func _on_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:

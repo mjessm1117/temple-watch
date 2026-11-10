@@ -14,6 +14,7 @@ const HomeTabs = preload("res://scripts/campaign/home_tabs.gd")
 const HomeResources = preload("res://scripts/campaign/home_resources.gd")
 const GalaxyCard = preload("res://scripts/campaign/home12_galaxy_card.gd")
 const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
+const Squad = preload("res://scripts/campaign/squad.gd")
 var build_slot := "b0"
 var field_team: Array = []
 var edict_draft: Array = []
@@ -39,6 +40,8 @@ var more_panel: PanelContainer
 func _ready() -> void:
 	campaign = get_node("/root/CampaignFlow").session()
 	get_node("/root/CampaignFlow").active = true
+	var remembered_id := str(campaign.state.get("armory_selected_id", ""))
+	if remembered_id != "": selected_id = remembered_id
 	if campaign.soldier(selected_id).is_empty() and not campaign.state.roster.is_empty(): selected_id = str(campaign.state.roster[0].id)
 	edict_draft = campaign.state.strategy.edict.duplicate()
 	_build_shell()
@@ -61,13 +64,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _build_shell() -> void:
 	var compact := Phone.narrow(Phone.window_size())
+	var portrait := compact and get_viewport_rect().size.x < get_viewport_rect().size.y
 	var safe := Phone.safe_margins(get_viewport_rect().size)
-	temple_view = TempleView.new(); add_child(temple_view); temple_view.setup(campaign.state)
+	temple_view = TempleView.new(); add_child(temple_view); temple_view.setup(campaign.state, HomeBadges.collect(campaign))
 	temple_view.room_selected.connect(_open_room)
 	temple_view.room_hovered.connect(func(message: String): notice_label.text = message)
 	var head := UI.panel(Color(0.035, 0.075, 0.09, 0.94)); add_child(head)
 	head.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	head.offset_left = safe.x + (8 if compact else 20); head.offset_right = -safe.z - (8 if compact else 20)
+	head.offset_left = safe.x + (12 if compact else 20); head.offset_right = -safe.z - (12 if compact else 20)
 	head.offset_top = safe.y + (3 if compact else 14); head.offset_bottom = safe.y + (52 if compact else 106)
 	if compact:
 		var head_style: StyleBoxFlat = head.get_theme_stylebox("panel").duplicate()
@@ -102,15 +106,15 @@ func _build_shell() -> void:
 		for child in row.get_children():
 			if child is Label: child.autowrap_mode = TextServer.AUTOWRAP_OFF
 	var foot_bg := ColorRect.new(); add_child(foot_bg); foot_bg.color = Color(0.02, 0.05, 0.065, 0.84)
-	foot_bg.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); foot_bg.offset_top = -52 if compact else -97
+	foot_bg.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); foot_bg.offset_top = -116 if portrait else -64 if compact else -97
 	foot_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var footer := UI.column(7); add_child(footer); footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	footer.offset_left = safe.x + (8 if compact else 20); footer.offset_right = -safe.z - (8 if compact else 20)
-	footer.offset_top = -safe.w - (48 if compact else 88); footer.offset_bottom = -safe.w - (2 if compact else 14)
+	footer.offset_left = safe.x + (12 if compact else 20); footer.offset_right = -safe.z - (12 if compact else 20)
+	footer.offset_top = -safe.w - (112 if portrait else 60 if compact else 88); footer.offset_bottom = -safe.w - (12 if compact else 14)
 	notice_label = UI.label("Select a room to manage the Order.  •  Gold: module ready  •  Dark: awaiting construction", 14, UI.MUTED)
 	if compact: notice_label.hide()
 	notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; footer.add_child(notice_label)
-	var nav := GridContainer.new(); nav.columns = 6 if compact else 10
+	var nav := GridContainer.new(); nav.columns = 3 if portrait else 6 if compact else 10
 	nav.add_theme_constant_override("h_separation", 8 if compact else 7)
 	nav.add_theme_constant_override("v_separation", 4); footer.add_child(nav)
 	var names := ["Galaxy", "Arsenal", "Roster", "Research", "Build", "Command", "Legacy", "Teams", "Codex"]
@@ -123,7 +127,7 @@ func _build_shell() -> void:
 		button.text = "   " + str(titles[name])
 		if compact: button.add_theme_font_size_override("font_size", 14)
 		button.mouse_entered.connect(func(): temple_view.sound.play())
-		if not compact or name in ["Galaxy", "Arsenal", "Research", "Build", "Command"]: nav.add_child(button)
+		if not compact or name in ["Galaxy", "Roster", "Research", "Build", "Command"]: nav.add_child(button)
 		nav_buttons[name] = button
 	var menu_button := UI.button("Menu", func(): get_node("/root/CampaignFlow").go("menu"))
 	menu_button.name = "MenuCommand"
@@ -134,10 +138,10 @@ func _build_shell() -> void:
 		nav.add_child(more)
 		more_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.98)); add_child(more_panel)
 		more_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-		more_panel.offset_left = 8; more_panel.offset_right = -8
-		more_panel.offset_top = -100; more_panel.offset_bottom = -48
+		more_panel.offset_left = safe.x + 12; more_panel.offset_right = -safe.z - 12
+		more_panel.offset_top = -168 if portrait else -116; more_panel.offset_bottom = -116 if portrait else -64
 		var extras := HBoxContainer.new(); more_panel.add_child(extras)
-		for name in ["Roster", "Legacy", "Teams", "Codex"]:
+		for name in ["Arsenal", "Legacy", "Teams", "Codex"]:
 			var button: Button = nav_buttons[name]
 			button.custom_minimum_size.y = 48; button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			extras.add_child(button)
@@ -160,12 +164,13 @@ func _build_shell() -> void:
 	mini_galaxy = GalaxyCard.new(); add_child(mini_galaxy)
 	mini_galaxy.setup(campaign, compact)
 	mini_galaxy.opened.connect(_open_galaxy)
-	mini_galaxy.position = Vector2(safe.x + (8 if compact else 25), safe.y + (56 if compact else 340))
+	mini_galaxy.position = Vector2(safe.x + (12 if compact else 25), safe.y + (56 if compact else 340))
+	if portrait: mini_galaxy.hide()
 	station_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.97)); add_child(station_panel)
 	station_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	station_panel.anchor_left = 0.0 if compact else 0.35; station_panel.offset_left = 0
-	station_panel.offset_top = safe.y + (54 if compact else 113); station_panel.offset_right = -safe.z if compact else -20
-	station_panel.offset_bottom = -safe.w - (48 if compact else 100)
+	station_panel.anchor_left = 0.0 if portrait else 0.53 if compact else 0.55; station_panel.offset_left = safe.x + 12 if portrait else 0
+	station_panel.offset_top = safe.y + (58 if compact else 113); station_panel.offset_right = -safe.z - 12 if portrait else -safe.z - 12 if compact else -20
+	station_panel.offset_bottom = -safe.w - (118 if portrait else 66 if compact else 100)
 	station_panel.visible = panel_open
 	var column := UI.column(8); station_panel.add_child(column)
 	var top := HBoxContainer.new(); column.add_child(top)
@@ -176,21 +181,34 @@ func _build_shell() -> void:
 	page_content = UI.column(13); page_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(page_content)
 	if compact:
 		_build_room_picker()
+		if portrait: room_picker.show()
 		phone_grid = null
 
 func _build_room_picker() -> void:
 	var safe := Phone.safe_margins(get_viewport_rect().size)
 	room_picker = UI.panel(Color(0.045, 0.09, 0.115, 0.98)); room_picker.visible = false
 	room_picker.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	room_picker.offset_left = safe.x + 8; room_picker.offset_right = -safe.z - 8; room_picker.offset_top = safe.y + 54; room_picker.offset_bottom = -safe.w - 48
+	var portrait := get_viewport_rect().size.x < get_viewport_rect().size.y
+	room_picker.offset_left = safe.x + 12; room_picker.offset_right = -safe.z - 12; room_picker.offset_top = safe.y + 58; room_picker.offset_bottom = -safe.w - (118 if portrait else 66)
 	add_child(room_picker)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	room_picker.add_child(scroll)
 	var list := UI.column(8); list.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(list)
-	var close := UI.button("CLOSE ROOMS", _toggle_rooms); close.custom_minimum_size.y = 44; list.add_child(close)
+	var close := UI.button("SHOW TEMPLE" if portrait else "CLOSE ROOMS", _toggle_rooms); close.custom_minimum_size.y = 44; list.add_child(close)
+	var ordered := ["war"]
 	for id in temple_view.rooms:
+		if id != "war" and not (not temple_view.rooms[id].built and temple_view.rooms[id].kind in ["spire", "vault", "annex"]): ordered.append(id)
+	for id in temple_view.rooms:
+		if not temple_view.rooms[id].built and temple_view.rooms[id].kind in ["spire", "vault", "annex"]: ordered.append(id)
+	for id in ordered:
+		if not temple_view.rooms.has(id): continue
+		if not temple_view.rooms[id].built and temple_view.rooms[id].kind in ["spire", "vault", "annex"] and not list.has_node("SealedGroup"):
+			var separator := UI.label("SEALED / LATER ROOMS", 14, UI.GOLD); separator.name = "SealedGroup"; list.add_child(separator)
 		var info: Dictionary = temple_view.rooms[id]
-		var button := UI.button("%s  ·  %s" % [info.name, info.status], _select_phone_room.bind(str(id)))
+		var key: String = TempleView.badge_key(str(id))
+		var badge: Dictionary = HomeBadges.collect(campaign).get(key, {})
+		var action := "  ·  %d %s" % [int(badge.count), str(badge.action)] if not badge.is_empty() else ""
+		var button := UI.button("%s%s" % [info.name, action], _select_phone_room.bind(str(id)))
 		button.name = "DrawerRoom_" + str(id); button.custom_minimum_size.y = 44
 		list.add_child(button)
 
@@ -209,6 +227,8 @@ func _open_room(id: String, target: String) -> void:
 
 func _close_station() -> void:
 	panel_open = false
+	temple_view.restore_camera()
+	if room_picker != null and get_viewport_rect().size.x < get_viewport_rect().size.y: room_picker.show()
 	HomeTabs.update(nav_buttons, HomeBadges.collect(campaign), page, panel_open)
 	if panel_tween != null: panel_tween.kill()
 	if Prefs.get_value("motion"):
@@ -220,15 +240,21 @@ func _close_station() -> void:
 func _slide_station() -> void:
 	if not panel_open: return
 	if panel_tween != null: panel_tween.kill()
+	if selected_room != "" and not Prefs.get_value("motion"):
+		station_panel.hide()
+		await get_tree().create_timer(0.5).timeout
+		if not panel_open: return
 	station_panel.show()
+	var portrait := get_viewport_rect().size.x < get_viewport_rect().size.y
+	station_panel.offset_bottom = -Phone.safe_margins(get_viewport_rect().size).w - (118 if portrait else 66 if Phone.narrow(Phone.window_size()) else 100)
 	if Prefs.get_value("motion"):
 		station_panel.modulate.a = 1.0; return
 	station_panel.modulate.a = 0.0
 	station_panel.offset_left = 50; station_panel.offset_right = 30
 	panel_tween = create_tween().set_parallel(true)
 	panel_tween.tween_property(station_panel, "modulate:a", 1.0, 0.22)
-	panel_tween.tween_property(station_panel, "offset_left", 0.0, 0.28).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	panel_tween.tween_property(station_panel, "offset_right", 0.0 if Phone.narrow(Phone.window_size()) else -20.0, 0.28).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	panel_tween.tween_property(station_panel, "offset_left", 12.0 if get_viewport_rect().size.x < get_viewport_rect().size.y else 0.0, 0.28).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	panel_tween.tween_property(station_panel, "offset_right", -12.0 if Phone.narrow(Phone.window_size()) else -20.0, 0.28).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 func _refresh_shell() -> void:
 	if panel_tween != null: panel_tween.kill()
@@ -236,11 +262,15 @@ func _refresh_shell() -> void:
 	nav_buttons.clear()
 	_build_shell()
 	_show_page()
+	if panel_open and selected_room != "" and temple_view.rooms.has(selected_room): temple_view.focus_room(selected_room)
 
 func _change_page(name: String, room_id: String = "") -> void:
 	selected_room = room_id
 	if name == "Galaxy": _open_galaxy(); return
+	if name == "Arsenal": Squad.open_from_temple(get_tree(), selected_id); return
+	if name == "Settings": get_node("/root/CampaignFlow").open_settings(); return
 	if name == "Codex": get_node("/root/CampaignFlow").open_codex(); return
+	if room_id != "": temple_view.focus_room(room_id)
 	page = name; panel_open = true; _show_page(); _slide_station()
 
 func _show_page() -> void:
@@ -253,8 +283,8 @@ func _show_page() -> void:
 		training_room.setup(campaign)
 		training_room.changed.connect(func(): get_node("/root/CampaignFlow").save())
 		return
-	page_content.add_child(UI.label(page.to_upper(), 30, UI.ACCENT))
-	if selected_room != "" and temple_view.rooms.has(selected_room):
+	if page != "Research": page_content.add_child(UI.label(page.to_upper(), 30, UI.ACCENT))
+	if page != "Research" and selected_room != "" and temple_view.rooms.has(selected_room):
 		var room: Dictionary = temple_view.rooms[selected_room]
 		var context := _card(str(room.name), str(room.status))
 		if room.wing != "":
@@ -362,26 +392,7 @@ func _roster() -> void:
 func _research() -> void:
 	StrategyUI.projects(self)
 	if int(campaign.state.wings.archives) == 0:
-		_card("ARCHIVES REQUIRED", "Build Archives to start one research project at a time.")
-		return
-	var current := str(campaign.state.research.cur)
-	if current != "":
-		var p: Dictionary = Data.get_table("research", "RESEARCH")[current]
-		_card("CURRENT PROJECT", "%s   •   %.0f / %d days" % [p.n, float(campaign.state.research.prog), int(p.days)])
-	for branch in Data.get_table("research", "RES_TREE"):
-		var box := _card(str(branch.n).to_upper())
-		for id in branch.ids:
-			var p: Dictionary = Data.get_table("research", "RESEARCH")[str(id)]
-			var done := campaign.researched(str(id)); var requirements := []
-			for need in p.get("need", []):
-				if not campaign.researched(str(need)): requirements.append(str(need))
-			var cost: Dictionary = p.cost
-			var line := "%s  ·  %d days  ·  %d Cr  +  %d Intel" % [p.n, int(p.days), int(cost.get("credits", 0)), int(cost.get("intel", 0))]
-			if done: line += "  ·  COMPLETE"
-			elif not requirements.is_empty(): line += "  ·  needs %s" % ", ".join(requirements)
-			var row := HBoxContainer.new(); box.add_child(row)
-			var label := UI.label(line, 15); label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(label)
-			row.add_child(UI.button("Research", _start_research.bind(str(id)), not done and current == "" and requirements.is_empty() and int(p.get("era", 1)) <= int(campaign.state.era) and campaign.can_afford(cost)))
+		_card("ARCHIVES REQUIRED", "Build Archives to begin research.")
 
 func _arsenal() -> void:
 	var row := HFlowContainer.new(); page_content.add_child(row)

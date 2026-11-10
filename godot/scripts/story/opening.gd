@@ -54,7 +54,7 @@ func _build() -> void:
 	panel = Panel.new()
 	panel.add_theme_stylebox_override("panel", UI.style(Color(0.04, 0.075, 0.085, 0.97)))
 	add_child(panel)
-	speaker = UI.label("", 13, UI.GOLD)
+	speaker = UI.label("", 14, UI.GOLD)
 	speaker.autowrap_mode = TextServer.AUTOWRAP_OFF
 	panel.add_child(speaker)
 	heading = UI.label("", 23, UI.ACCENT)
@@ -73,7 +73,7 @@ func _build() -> void:
 	actions = HBoxContainer.new()
 	actions.add_theme_constant_override("separation", 10)
 	add_child(actions)
-	hint = UI.label("Tap text to reveal, then advance.", 13, UI.MUTED)
+	hint = UI.label("Tap text to reveal, then advance.", 14, UI.MUTED)
 	hint.size_flags_horizontal = SIZE_EXPAND_FILL
 	hint.autowrap_mode = TextServer.AUTOWRAP_OFF
 	actions.add_child(hint)
@@ -117,7 +117,7 @@ func _layout() -> void:
 	heading.add_theme_font_size_override("font_size", 20 if small else 23 if compact else 34)
 	narrative.position = Vector2(12, 50 if small else 59)
 	narrative.size = Vector2(panel.size.x - 24, panel.size.y - (56 if small else 66))
-	narrative.add_theme_font_size_override("normal_font_size", 13 if small else 15 if compact else 21)
+	narrative.add_theme_font_size_override("normal_font_size", 14 if small else 15 if compact else 21)
 	actions.position = Vector2(left, row_bottom + 8)
 	actions.size = Vector2(available, action_height)
 	hint.visible = not small
