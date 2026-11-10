@@ -44,7 +44,7 @@ static func safe_margins(view_size: Vector2) -> Vector4:
 	else:
 		var safe := DisplayServer.get_display_safe_area()
 		if safe.size.x > 0 and safe.size.y > 0:
-			margins = Vector4(safe.position.x, safe.position.y, physical.x - safe.end.x, physical.y - safe.end.y)
+			margins = Vector4(maxi(0, safe.position.x), maxi(0, safe.position.y), maxi(0, physical.x - safe.end.x), maxi(0, physical.y - safe.end.y))
 	return Vector4(margins.x * view_size.x / physical.x, margins.y * view_size.y / physical.y,
 		margins.z * view_size.x / physical.x, margins.w * view_size.y / physical.y)
 

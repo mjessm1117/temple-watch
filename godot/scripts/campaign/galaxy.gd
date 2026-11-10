@@ -29,12 +29,23 @@ var transition: Tween
 var back_button: Button
 var launch_button: Button
 var sound: AudioStreamPlayer
+var detail_panel: PanelContainer
+var detail_open := false
+var detail_left := 0.0
+var detail_right := 0.0
 
 func _ready() -> void:
 	campaign = get_node("/root/CampaignFlow").session()
 	_build(); _show_details()
+	if Phone.narrow(Phone.window_size()):
+		detail_panel.show(); detail_panel.modulate.a = 0.0
+		get_tree().process_frame.connect(_hide_initial_detail, CONNECT_ONE_SHOT)
 	sound = preload("res://scripts/campaign/galaxy_sound.gd").new(); add_child(sound)
 	_wire_buttons(self)
+
+func _hide_initial_detail() -> void:
+	if not detail_open: detail_panel.hide()
+	detail_panel.modulate.a = 1.0
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -56,12 +67,12 @@ func _build() -> void:
 	var title := UI.column(0); title.size_flags_horizontal = Control.SIZE_EXPAND_FILL; head.add_child(title)
 	if not compact: title.add_child(UI.label("J E D I   T E M P L E   /   W A R   R O O M",12,Color("79d3e2")))
 	title.add_child(UI.label("Galaxy command",20 if compact else 30,Color("dbe7e4")))
-	back_button = UI.button("GALAXY" if Phone.touch_device() else "←  GALAXY", _overview); back_button.visible = false; head.add_child(back_button)
-	var intelligence := UI.button("SITH INTELLIGENCE",func(): get_node("/root/CampaignFlow").open_intelligence())
-	if compact: intelligence.custom_minimum_size.y = 56
+	back_button = UI.button("GALAXY" if Phone.touch_device() else "←  GALAXY", _overview); back_button.name = "GalaxyOverview"; back_button.visible = false; head.add_child(back_button)
+	var intelligence := UI.button("SITH INTELLIGENCE",func(): get_node("/root/CampaignFlow").open_intelligence()); intelligence.name = "Intelligence"
+	if compact: intelligence.custom_minimum_size.y = 44
 	head.add_child(intelligence)
-	var temple_button := UI.button("TEMPLE" if Phone.touch_device() else "←  TEMPLE",_temple)
-	if compact: temple_button.custom_minimum_size.y = 56
+	var temple_button := UI.button("TEMPLE" if Phone.touch_device() else "←  TEMPLE",_temple); temple_button.name = "TempleReturn"
+	if compact: temple_button.custom_minimum_size.y = 44
 	head.add_child(temple_button)
 	status = UI.label("",14,Color("8aa2a5")); outer.add_child(status)
 	var body := HBoxContainer.new(); body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -72,8 +83,29 @@ func _build() -> void:
 	map_view = GalaxyMap.new(); map_view.campaign = campaign; map_view.clip_contents = true; map_panel.add_child(map_view)
 	if compact: map_view.custom_minimum_size = Vector2(260, 130)
 	map_view.field_selected.connect(_field); map_view.mission_selected.connect(_select); map_view.planet_selected.connect(_planet); map_view.region_selected.connect(_region)
-	var right := UI.panel(Color("15232a")); right.custom_minimum_size.x = 228 if compact else 330; body.add_child(right)
-	var column := UI.column(8 if compact else 7); column.custom_minimum_size.x = 212 if compact else 304; right.add_child(column)
+	var right := UI.panel(Color("15232a")); detail_panel = right
+	if compact:
+		var overlay := Control.new()
+		overlay.name = "SiteOverlay"
+		overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		overlay.clip_contents = true
+		add_child(overlay)
+		overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		overlay.add_child(right)
+		right.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
+		right.offset_left = -minf(370.0, get_viewport_rect().size.x * 0.65)
+		right.offset_right = -safe.z - 4
+		right.offset_top = safe.y + 50
+		right.offset_bottom = -safe.w - 4
+		detail_left = right.offset_left; detail_right = right.offset_right
+		right.visible = false
+	else:
+		right.custom_minimum_size.x = 330; body.add_child(right)
+	var column := UI.column(8 if compact else 7); column.custom_minimum_size.x = 0 if compact else 304; right.add_child(column)
+	if compact:
+		var close := UI.button("CLOSE", _overview)
+		close.name = "CloseSite"; close.custom_minimum_size.y = 44
+		column.add_child(close)
 	tabs = HBoxContainer.new()
 	if compact:
 		var tab_row := HBoxContainer.new(); tab_row.add_theme_constant_override("separation", 8); column.add_child(tab_row)
@@ -81,7 +113,7 @@ func _build() -> void:
 		previous.custom_minimum_size.x = 44
 		previous.tooltip_text = "Scroll tabs left"; tab_row.add_child(previous)
 		tab_scroll = preload("res://scripts/touch_scroll.gd").new(); tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-		tab_scroll.custom_minimum_size.y = 39; tab_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tab_scroll.custom_minimum_size.y = 44; tab_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		tab_row.add_child(tab_scroll); tab_scroll.add_child(tabs)
 		var next := UI.button("›", func(): tab_scroll.scroll_horizontal += 120)
 		next.custom_minimum_size.x = 44
@@ -112,10 +144,10 @@ func _build() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
 	detail = UI.column(10); detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(detail)
 	launch_button = UI.button("MISSION BRIEFING  >" if Phone.touch_device() else "MISSION BRIEFING  →",_launch)
-	if compact: launch_button.custom_minimum_size.y = 56
+	if compact: launch_button.custom_minimum_size.y = 44
 	column.add_child(launch_button)
 	message = UI.label("Tap a world or signal to inspect it." if Phone.touch_device() else "Select a world or a signal.  ↑ ↓ offers  ·  Enter briefing  ·  Esc back  ·  T Temple",12,Color("8aa2a5")); outer.add_child(message)
-	if compact: message.hide()
+	if compact: message.hide(); status.hide()
 	_refresh_chips()
 
 func _refresh_chips() -> void:
@@ -128,6 +160,7 @@ func _refresh_chips() -> void:
 		b.tooltip_text = Intel.deadline(o,campaign.state.options); chips.add_child(b)
 
 func _show_details() -> void:
+	if detail_panel != null and Phone.narrow(Phone.window_size()): detail_panel.visible = detail_open
 	if transition and transition.is_running(): transition.kill()
 	detail.position.x = 0; detail.modulate.a = 1
 	UI.clear(detail); scroll.scroll_vertical = 0
@@ -171,7 +204,7 @@ func _choose_crisis(id: String, index: int) -> void:
 		get_node("/root/CampaignFlow").save(); map_view.refresh_signals(); _show_details()
 	else: message.text = "Insufficient resources or the next crisis step is not ready."
 
-func _slide() -> void:
+func _slide(open_panel: bool = false) -> void:
 	if transition and transition.is_running(): transition.kill()
 	detail.modulate.a = 0.0
 	# Child of the scroll container slides in without disturbing the map layout.
@@ -179,6 +212,11 @@ func _slide() -> void:
 	transition = create_tween().set_parallel(true)
 	transition.tween_property(detail,"modulate:a",1.0,0.32)
 	transition.tween_property(detail,"position:x",home,0.38).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if open_panel and Phone.narrow(Phone.window_size()) and detail_panel != null:
+		detail_panel.offset_left = detail_left + detail_panel.size.x
+		detail_panel.offset_right = detail_right + detail_panel.size.x
+		transition.tween_property(detail_panel, "offset_left", detail_left, 0.32).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		transition.tween_property(detail_panel, "offset_right", detail_right, 0.32).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 func _tab(value: String) -> void:
 	page = value; _show_details(); _slide()
@@ -188,22 +226,24 @@ func _select(index: int) -> void:
 	selected = clampi(index,0,campaign.state.options.size()-1); page = "Briefing"
 	var m: Dictionary = campaign.story.mission(str(campaign.state.options[selected].mission))
 	planet = Intel.planet_for(m); region = str(Data.get_table("galaxy","PLANETS")[planet].reg)
-	map_view.focus_offer(selected); _show_details(); _slide()
+	map_view.focus_offer(selected); detail_open = true; _show_details(); _slide(true)
 
 func _planet(title: String) -> void:
 	planet = title; region = str(Data.get_table("galaxy","PLANETS")[title].reg)
 	for offer in map_view.offers:
 		if offer.planet == title: _select(int(offer.index)); return
-	map_view.focus_planet(title); page = "Regions"; _show_details(); _slide()
+	map_view.focus_planet(title); page = "Regions"; detail_open = true; _show_details(); _slide(true)
 
 func _region(key: String) -> void:
-	region = key; planet = ""; page = "Regions"; _show_details(); _slide()
+	region = key; planet = ""; page = "Regions"; detail_open = true; _show_details(); _slide(true)
 
 func _overview() -> void:
-	map_view.return_to_overview(); planet = ""; _show_details()
+	map_view.return_to_overview(); planet = ""; detail_open = false; _show_details()
+	if Phone.narrow(Phone.window_size()):
+		detail_panel.offset_left = detail_left; detail_panel.offset_right = detail_right
 
 func _back() -> void:
-	if not map_view.focused.is_empty(): _overview()
+	if detail_open or not map_view.focused.is_empty(): _overview()
 	else: _temple()
 
 func _temple() -> void:
@@ -239,7 +279,7 @@ func _wire_buttons(node: Node) -> void:
 	for child in node.get_children(): _wire_buttons(child)
 
 func _field(key: String) -> void:
-	field_key = key; page = "Field ops"; _show_details(); _slide()
+	field_key = key; page = "Field ops"; detail_open = true; _show_details(); _slide(true)
 
 func _front_auto() -> void:
 	var rng := RandomNumberGenerator.new(); rng.randomize()

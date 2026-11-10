@@ -32,7 +32,7 @@ static func build(view) -> void:
 			var label: String = occupant.capitalize() if occupant != "" else "Clear" if c.state.facility.clear.has(slot.id) else "Sealed"
 			if c.state.facility.dig.get("slot", "") == slot.id: label = "Digging"
 			var cell := UI.button("%s · %s" % [slot.sn, label], func(): view.build_slot = str(slot.id); view._show_page())
-			cell.name = "Bay_" + str(slot.id); cell.custom_minimum_size = Vector2(155, 42)
+			cell.name = "Bay_" + str(slot.id); cell.custom_minimum_size = Vector2(155, 44)
 			cell.modulate = UI.ACCENT if view.build_slot == slot.id else Color.WHITE
 			cells.add_child(cell)
 	for slot in Data.get_table("temple", "SLOTS"):
@@ -134,7 +134,7 @@ static func council(view) -> void:
 
 static func identity(view, box: VBoxContainer, r: Dictionary) -> void:
 	var c = view.campaign
-	var picker := OptionButton.new(); box.add_child(picker)
+	var picker := OptionButton.new(); picker.custom_minimum_size.y = 44; box.add_child(picker)
 	var voices: Dictionary = Data.get_table("legacy", "VOICES")
 	var pool := voices.keys().filter(func(key): return voices[key].who == ("jedi" if preload("res://scripts/campaign/progression.gd").is_jedi(r) else "troop"))
 	for key in pool: picker.add_item("Voice: " + str(voices[key].n))

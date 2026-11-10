@@ -48,7 +48,7 @@ func setup(save_state: Dictionary) -> void:
 	var rim := DirectionalLight3D.new(); rim.rotation_degrees = Vector3(-15, 155, 0)
 	rim.light_color = Color("d6b68a"); rim.light_energy = 0.6; world.add_child(rim)
 	camera = Camera3D.new(); camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = 31.5; world.add_child(camera); camera.current = true
+	camera.size = 21.0 if Phone.narrow(Phone.window_size()) else 31.5; world.add_child(camera); camera.current = true
 	camera.position = Vector3(0, 17.3, 42); camera.look_at(Vector3(0, 5.8, 0))
 	art = Geometry.new(); galaxy = art.galaxy(world, false)
 	temple = Node3D.new(); temple.name = "TempleCutaway"; world.add_child(temple)
@@ -66,6 +66,7 @@ func setup(save_state: Dictionary) -> void:
 		_make_button(info)
 	if Phone.narrow(Phone.window_size()):
 		phone_names = PhoneNames.new(); phone_names.buttons = buttons; phone_names.rooms = rooms; add_child(phone_names)
+		phone_names.hide()
 	art.batch_static(temple)
 	var jedi_actors: Array[Node3D] = Show16Rooms.populate(cell_nodes, rooms, state, RenderingServer.get_current_rendering_method() == "gl_compatibility")
 	if Phone.narrow(Phone.window_size()):
@@ -88,7 +89,7 @@ func setup(save_state: Dictionary) -> void:
 
 func _make_button(info: Dictionary) -> void:
 	var b := Button.new(); b.name = "Room_" + str(info.id); b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	if Phone.narrow(Phone.window_size()): b.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if Phone.narrow(Phone.window_size()): b.mouse_filter = Control.MOUSE_FILTER_STOP
 	b.tooltip_text = "%s\n%s%s\nOpen %s" % [info.name, info.detail, " · " + str(info.module) if info.module != "" else "", info.tab]
 	if not Prefs.get_value("tips"): b.tooltip_text = ""
 	for style_name in ["normal", "hover", "pressed", "focus"]:
@@ -97,7 +98,7 @@ func _make_button(info: Dictionary) -> void:
 		style.set_border_width_all(1); style.set_corner_radius_all(2); b.add_theme_stylebox_override(style_name, style)
 	add_child(b); buttons[info.id] = b
 	if not info.built: b.add_child(preload("res://scripts/campaign/home_room_outline.gd").new())
-	var name_label := Label.new(); name_label.text = str(info.name).to_upper()
+	var name_label := Label.new(); name_label.text = str(PhoneNames.SHORT.get(str(info.id), str(info.name).to_upper())) if Phone.narrow(Phone.window_size()) else str(info.name).to_upper()
 	name_label.add_theme_font_size_override("font_size", 12 if Phone.narrow(Phone.window_size()) else 10 if info.kind in ["spire", "council"] else 11)
 	name_label.add_theme_color_override("font_color", info.color if info.built else Color("e0c49a"))
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -153,7 +154,7 @@ func activate_room(id: String) -> void:
 
 func _hover(id: String) -> void:
 	hovered = id
-	buttons[id].get_node("RoomName").visible = not Phone.narrow(Phone.window_size())
+	buttons[id].get_node("RoomName").visible = true
 	buttons[id].get_node("RoomDetail").visible = not Phone.narrow(Phone.window_size())
 	var info: Dictionary = rooms[id]
 	room_hovered.emit("%s  /  %s%s  →  %s" % [info.name, info.detail, " · " + str(info.module) if info.built and info.module != "" else "", info.tab])
@@ -161,7 +162,7 @@ func _hover(id: String) -> void:
 
 func _unhover(id: String) -> void:
 	if hovered == id:
-		buttons[id].get_node("RoomName").visible = not Phone.narrow(Phone.window_size())
+		buttons[id].get_node("RoomName").visible = true
 		buttons[id].get_node("RoomDetail").visible = not Phone.narrow(Phone.window_size())
 		hovered = ""; room_hovered.emit("Select a room to manage the Order.  •  Gold: module ready  •  Dark: awaiting construction")
 
@@ -188,7 +189,9 @@ func _project_rooms() -> void:
 		var a := camera.unproject_position(at + Vector3(-width / 2, height, 1.8))
 		var b := camera.unproject_position(at + Vector3(width / 2, 0.0, 1.8))
 		var ratio := size / Vector2(viewport.size)
-		buttons[id].position = a * ratio
-		buttons[id].size = (b - a) * ratio
+		var projected_size := (b - a) * ratio
+		var target_size := projected_size.max(Vector2(44, 44)) if Phone.narrow(Phone.window_size()) else projected_size
+		buttons[id].position = a * ratio - (target_size - projected_size) * 0.5
+		buttons[id].size = target_size
 		Plates.layout(buttons[id], info, Phone.narrow(Phone.window_size()))
 	if phone_names != null: phone_names.layout()
