@@ -95,7 +95,7 @@ func run() -> void:
 	for station in ["Command", "Roster", "Research", "Build", "Arsenal", "Teams", "Legacy"]:
 		temple._change_page(station)
 		await process_frame
-		check(temple.page == station, "Temple station %s renders" % station)
+		check((current_scene != null and current_scene.scene_file_path.ends_with("squad.tscn")) if station == "Arsenal" else temple.page == station, "Temple station %s renders" % station)
 	temple.queue_free()
 	await process_frame
 	var galaxy_scene: PackedScene = load("res://scenes/galaxy.tscn")
