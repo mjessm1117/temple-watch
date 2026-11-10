@@ -26,7 +26,9 @@ static func play(game: Node3D, event: Dictionary) -> void:
 		await game.cam.wait(0.17)
 		game.cam.trace.append("cine15_push")
 	var jedi_close := camera_on and JediKillcam.eligible(game, event)
-	if jedi_close: await JediKillcam.play(game, event)
+	if jedi_close:
+		await JediKillcam.play(game, event)
+		event.killcam_played = true
 	await Presentation.show_event(game, event)
 	if camera_on and bool(event.get("killed", false)) and not game.cam.skip_requested:
 		if not jedi_close:
@@ -39,7 +41,7 @@ static func play(game: Node3D, event: Dictionary) -> void:
 			game.camera.look_at(at, Vector3.UP)
 			game.camera.fov = 46.0
 			game.cam.trace.append("cine15_fall_frame")
-			await game.cam.wait(0.22)
+			await game.cam.wait(0.06)
 			game.camera.position = previous_position
 			game.camera.fov = previous_fov
 		game.cam.finish()

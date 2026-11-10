@@ -82,6 +82,7 @@ run_suite phone_detect20_test --rendering-method gl_compatibility --resolution 8
 run_suite loadout20_test --rendering-method gl_compatibility --resolution 956x440
 run_suite armory21_test --rendering-method gl_compatibility --resolution 844x390
 run_suite camera20_test --rendering-method gl_compatibility --resolution 844x390
+run_suite feelcam22_test --rendering-method gl_compatibility --resolution 844x390
 run_suite story20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite strategy20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite art20_test --rendering-method gl_compatibility --resolution 844x390
