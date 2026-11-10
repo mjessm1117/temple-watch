@@ -21,13 +21,13 @@ static func default_tier(os_name: String = OS.get_name(), web := OS.has_feature(
 	return "low" if web or mobile or touchscreen or mobile_os(os_name) else "high"
 
 static func phone_ui_scale(size: Vector2i) -> float:
-	return 1.2 if mini(size.x, size.y) > 0 and mini(size.x, size.y) < 900 else 1.0
+	return 1.2 if Phone.narrow(size) else 1.0
 
 func update_window_layout() -> void:
 	if DisplayServer.window_get_size() == Vector2i.ZERO and get_tree().root.size.x < 486:
 		get_tree().root.size = Vector2i(1366, 768)
 	var physical := Phone.window_size()
-	var base := physical if Phone.narrow(physical) else Vector2i(1366, 768)
+	var base := Vector2i(Phone.logical_size(physical).round()) if Phone.narrow(physical) else Vector2i(1366, 768)
 	if get_tree().root.content_scale_size != base: get_tree().root.content_scale_size = base
 	var factor := phone_ui_scale(physical) if DisplayServer.window_get_size().x > 0 or Phone.narrow(physical) else 1.0
 	if get_tree().root.content_scale_factor != factor: get_tree().root.content_scale_factor = factor
@@ -104,9 +104,10 @@ func _added(node: Node) -> void:
 func _ensure_phone_report_close(reference: WeakRef) -> void:
 	var screen = reference.get_ref()
 	if not is_instance_valid(screen) or not Phone.narrow(Phone.window_size()) or screen.has_node("PhoneClose"): return
+	var safe := Phone.safe_margins(screen.get_viewport_rect().size)
 	var close := Button.new(); close.name = "PhoneClose"; close.text = "CLOSE"
 	close.anchor_left = 1.0; close.anchor_right = 1.0
-	close.offset_left = -110; close.offset_right = -8; close.offset_top = 8; close.offset_bottom = 48
+	close.offset_left = -safe.z - 110; close.offset_right = -safe.z - 8; close.offset_top = safe.y + 8; close.offset_bottom = safe.y + 48
 	close.pressed.connect(screen._close)
 	screen.add_child(close)
 
@@ -116,8 +117,11 @@ func _adapt_phone_report(reference: WeakRef) -> void:
 	var body: VBoxContainer = screen.body
 	if body.get_child_count() < 5 or body.has_node("PhoneTabScroll"): return
 	var margin: MarginContainer = body.get_parent()
-	for side in ["left", "right"]: margin.add_theme_constant_override("margin_" + side, 8)
-	for side in ["top", "bottom"]: margin.add_theme_constant_override("margin_" + side, 6)
+	var safe := Phone.safe_margins(screen.get_viewport_rect().size)
+	margin.add_theme_constant_override("margin_left", 8 + int(safe.x))
+	margin.add_theme_constant_override("margin_right", 8 + int(safe.z))
+	margin.add_theme_constant_override("margin_top", 6 + int(safe.y))
+	margin.add_theme_constant_override("margin_bottom", 6 + int(safe.w))
 	body.add_theme_constant_override("separation", 5)
 	var heading: HBoxContainer = body.get_child(0)
 	heading.get_child(1).hide()
@@ -153,8 +157,11 @@ func _adapt_phone_story(reference: WeakRef) -> void:
 	if not is_instance_valid(screen) or not Phone.narrow(Phone.window_size()) or screen.mode == "codex": return
 	if not is_instance_valid(screen.outer_frame) or not is_instance_valid(screen.body): return
 	var outer: MarginContainer = screen.outer_frame
-	for side in ["left", "right"]: outer.add_theme_constant_override("margin_" + side, 8)
-	for side in ["top", "bottom"]: outer.add_theme_constant_override("margin_" + side, 6)
+	var safe := Phone.safe_margins(screen.get_viewport_rect().size)
+	outer.add_theme_constant_override("margin_left", 8 + int(safe.x))
+	outer.add_theme_constant_override("margin_right", 8 + int(safe.z))
+	outer.add_theme_constant_override("margin_top", 6 + int(safe.y))
+	outer.add_theme_constant_override("margin_bottom", 6 + int(safe.w))
 	var body: VBoxContainer = screen.body
 	if body.get_child_count() < 4: return
 	body.add_theme_constant_override("separation", 4)
