@@ -6,6 +6,7 @@ const StoryEngine = preload("res://scripts/story/story_engine.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const World = preload("res://scripts/ui_world.gd")
 const Portraits14 = preload("res://scripts/story14_portraits.gd")
+const Paging = preload("res://scripts/storydelivery22_paging.gd")
 @export_enum("briefing", "dialogue", "codex") var mode := "briefing"
 var engine: RefCounted
 var campaign_state: Dictionary = {}
@@ -26,6 +27,7 @@ var completed_once := false
 var portrait_count := 0
 var dialogue_lines: PackedStringArray
 var dialogue_index := 0
+var page_counter: Label
 var speaker_plate: Label
 var speaker_portrait: TextureRect
 var big_speaker_portrait: TextureRect
@@ -105,7 +107,7 @@ func _header(title: String, detail: String) -> void:
 	var mark := UI.label(title,18 if Phone.narrow(Phone.window_size()) else 24,UI.ACCENT)
 	mark.size_flags_horizontal = SIZE_EXPAND_FILL
 	head.add_child(mark)
-	var date := UI.label(detail,14,UI.GOLD)
+	var date := UI.label(str(campaign_state.get("story",{}).get("bby","")) + " BBY" if Phone.window_size().x < 750 else detail,14,UI.GOLD)
 	date.autowrap_mode = TextServer.AUTOWRAP_OFF
 	head.add_child(date)
 	body.add_child(HSeparator.new())
@@ -151,7 +153,7 @@ func _build_story() -> void:
 	var frame := UI.panel(Color(0.04,0.075,0.085,0.96))
 	frame.size_flags_horizontal = SIZE_EXPAND_FILL
 	row.add_child(frame)
-	var content := UI.column(6 if phone else 12)
+	var content := UI.column(8 if phone else 12)
 	content.size_flags_horizontal = SIZE_EXPAND_FILL
 	var scroll := preload("res://scripts/touch_scroll.gd").new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -177,11 +179,18 @@ func _build_story() -> void:
 	skip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	skip.add_theme_font_size_override("font_size",14 if phone else 11)
 	speaking.add_child(skip)
+	var fast := UI.button("FAST ››",_fast_forward)
+	fast.custom_minimum_size = Vector2(72,44)
+	speaking.add_child(fast)
 	content.add_child(UI.label(str(scene_data.get("eyebrow","TEMPLE")).to_upper(),14,UI.GOLD))
 	content.add_child(UI.label(scene_data.get("title","The Temple"),23 if phone else 32,UI.ACCENT))
-	dialogue_lines = str(scene_data.get("text","")).split("\n",false)
+	dialogue_lines = PackedStringArray()
+	for source_line in str(scene_data.get("text","")).split("\n",false):
+		for passage in Paging.pages(source_line): dialogue_lines.append(passage)
 	if dialogue_lines.is_empty(): dialogue_lines = PackedStringArray([""])
 	dialogue_index = 0
+	page_counter = UI.label("PAGE 1 / %d" % dialogue_lines.size(),14,UI.GOLD)
+	content.add_child(page_counter)
 	narrative = UI.label(_dialogue_text(dialogue_lines[0]),16 if phone else 18)
 	content.add_child(narrative)
 	typed = 0
@@ -224,6 +233,7 @@ func _build_story() -> void:
 	body.add_child(foot)
 	var hint := UI.label("Every choice leaves a record in the Temple archive.",14 if phone else 13,UI.MUTED)
 	hint.size_flags_horizontal = SIZE_EXPAND_FILL
+	hint.visible = not (phone and Phone.window_size().x < 750)
 	foot.add_child(hint)
 	var vision := UI.label("THE VISION  %d / 10" % int(campaign_state.story.shadow),14,UI.GOLD)
 	vision.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -311,6 +321,7 @@ func _advance_dialogue() -> void:
 		choices_box.visible = true
 		return
 	dialogue_index += 1
+	page_counter.text = "PAGE %d / %d" % [dialogue_index + 1,dialogue_lines.size()]
 	var line := dialogue_lines[dialogue_index]
 	var cut := line.find(": ")
 	if cut > 0 and cut < 40:
@@ -323,12 +334,20 @@ func _advance_dialogue() -> void:
 
 func _skip_dialogue() -> void:
 	dialogue_index = dialogue_lines.size()-1
+	page_counter.text = "PAGE %d / %d" % [dialogue_lines.size(),dialogue_lines.size()]
 	var line := dialogue_lines[dialogue_index]
 	var cut := line.find(": ")
 	if cut > 0 and cut < 40: _set_speaker(line.substr(0,cut))
 	narrative.text = _dialogue_text(line)
 	_reveal()
 	choices_box.visible = true
+
+func _fast_forward() -> void:
+	if narrative.visible_characters != -1:
+		_reveal()
+	else:
+		_advance_dialogue()
+		_reveal()
 
 func _set_speaker(name: String) -> void:
 	speaker_plate.text = "SPEAKER  " + name.to_upper()
@@ -421,6 +440,9 @@ func _build_codex() -> void:
 func _build_journal(list: VBoxContainer) -> void:
 	var record: Dictionary = engine.journal(campaign_state)
 	list.add_child(UI.label("ERA %d  /  THE TEMPLE JOURNAL" % int(record.era),22,UI.GOLD))
+	list.add_child(UI.label("BATTLE TRANSMISSIONS  /  %d" % record.get("transcript",[]).size(),16,UI.ACCENT))
+	for row in record.get("transcript",[]):
+		list.add_child(UI.label("TURN %d · %s: %s" % [int(row.get("turn",0)),str(row.get("speaker","")),str(row.get("text",""))],16,UI.TEXT))
 	for section in [["CHOICES REMEMBERED",record.choices],["PERSONAL ARCS",record.arcs],["VILLAIN TRANSMISSIONS",record.get("villain",[])],["SQUAD SCENES",record.get("squad",[])],["FALLEN",record.fallen]]:
 		list.add_child(UI.label(str(section[0]),16,UI.ACCENT))
 		if section[1].is_empty(): list.add_child(UI.label("No entries yet.",14,UI.MUTED))

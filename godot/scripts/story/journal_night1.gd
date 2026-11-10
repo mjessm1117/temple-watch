@@ -27,6 +27,7 @@ static func entries(s: Dictionary, callbacks: Array, arcs: Array) -> Dictionary:
 			hint = "Return to the Temple for their decision now." if wait == 0 or int(s.get("era", 1)) >= 2 else "After %d more mission%s or at era 2: return to the Temple." % [wait, "" if wait == 1 else "s"]
 		active.append("%s — %s: %s" % [row.name, row.title, hint])
 	var record := {"era":int(s.get("era", 1)),"choices":choices,"arcs":active,"fallen":s.get("memorials", []).duplicate()}
+	record.transcript = s.get("story_transcript", []).duplicate(true)
 	rank_entries(s, record)
 	return record
 
