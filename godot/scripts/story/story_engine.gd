@@ -12,6 +12,7 @@ const Scenes11 = preload("res://scripts/story/scenes11_squad.gd")
 const Beats14 = preload("res://scripts/story/story14_beats.gd")
 var state: Dictionary
 var data: Dictionary = {}
+var story20: Dictionary = {}
 
 func _init(initial_state: Dictionary = {}) -> void:
 	state = initial_state
@@ -19,6 +20,8 @@ func _init(initial_state: Dictionary = {}) -> void:
 		var path := "res://data/story/%s.json" % source
 		var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
 		data[source] = parsed.get("records", {}) if parsed is Dictionary else {}
+	var expansion: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/story/story20-expansion.json"))
+	story20 = expansion if expansion is Dictionary else {}
 	ensure_state(state)
 
 func table(name: String) -> Variant:
@@ -87,7 +90,6 @@ func ensure_state(s: Dictionary) -> void:
 func start_briefing(mission_id: String) -> Dictionary:
 	var m := mission(mission_id)
 	if m.is_empty(): return {}
-	# --- wave10 story ---
 	var choices: Array = [{"id":"brief:0","label":"As briefed","text":table("AP_BRIEF").get("d",""),"fx":table("W10_BRIEF_DEFAULT").get("fx",{}),"cost":{}}]
 	var approaches: Dictionary = table("APPROACH")
 	var options: Array = approaches.get(mission_id, approaches.get("_", []))
@@ -112,6 +114,8 @@ func start_briefing(mission_id: String) -> Dictionary:
 
 func _brief_text(id: String, m: Dictionary) -> String:
 	var result: String = m.get("brief","")
+	var addition: String = story20.get("missions", {}).get(id, {}).get("brief", "")
+	if not addition.is_empty(): result += "\n\n" + addition
 	var variants: Dictionary = table("BRIEF_IF")
 	for row in variants.get(id, []):
 		if state.flags.get(row[0],false): return result + "\n\n" + str(row[1])
@@ -131,6 +135,8 @@ func start_debrief(result: Dictionary) -> Dictionary:
 	var squad: Array = result.get("squad",[])
 	if squad.size() > 1: record_mission_bonds(state,squad,won,result.get("saved_by",{}))
 	var text: String = m.get("win" if won else "lose","")
+	var addition: String = story20.get("missions", {}).get(id, {}).get("win" if won else "lose", "")
+	if not addition.is_empty(): text += "\n\n" + addition
 	var variants: Dictionary = table("DEBRIEF_IF")
 	for row in variants.get(id, []):
 		if state.flags.get(row[0],false) and row[1 if won else 2] != null:
@@ -146,11 +152,9 @@ func start_debrief(result: Dictionary) -> Dictionary:
 	var choices: Array = []
 	for i in aftermath.get("ch",[]).size():
 		var c: Dictionary = aftermath.ch[i]
-		# --- wave10 story ---
 		var fx: Dictionary = c.get("fx",{})
 		if fx.is_empty(): fx = table("W10_CHOICE_OVERRIDES").get(after_key,{}).get(str(i),{})
 		choices.append({"id":"after:%d" % i,"label":c.get("l",""),"text":_saga_text(state,str(c.get("say","")),aftermath.get("who","")),"fx":fx,"need":c.get("need",[])})
-	# --- wave10 story ---
 	if choices.is_empty(): choices = ChoiceScenes.debrief_choices(table("W10_DEBRIEF"),won)
 	var scene := {"kind":"debrief","id":id,"title":aftermath.get("t",m.get("n",id)),"eyebrow":"Mission complete" if won else "Mission lost","text":text + ("\n\n" + _saga_text(state,str(aftermath.get("text","")),aftermath.get("who","")) if not aftermath.is_empty() else ""),"choices":choices,"who":aftermath.get("who","")}
 	Callbacks.apply(state,scene,table("N1_CALLBACKS"))
@@ -224,7 +228,6 @@ func next_era_resolution(s: Dictionary) -> Dictionary:
 
 func next_temple_talk(s: Dictionary) -> Dictionary:
 	ensure_state(s)
-	# --- wave10 story ---
 	var pair_scene: Dictionary = ChoiceScenes.pair_talk(s,table("W10_PAIR_TALKS"))
 	if not pair_scene.is_empty(): return Callbacks.apply(s,pair_scene,table("N1_CALLBACKS"))
 	if int(s.era) != 1:
@@ -282,7 +285,7 @@ func next_story_event(s: Dictionary) -> Dictionary:
 		for i in event.choices.size():
 			var c: Dictionary = event.choices[i]
 			choices.append({"id":"event:%d" % i,"label":c.get("label",""),"fx":c.get("effects",{})})
-		var scene := {"kind":"event","id":event.id,"title":"A Council matter","eyebrow":"Temple · Month %d" % int(s.month),"text":event.text,"choices":choices}
+		var scene := {"kind":"event","id":event.id,"title":"A Council matter","eyebrow":"Temple · Month %d" % int(s.month),"text":story20.get("events", {}).get(str(event.id), event.text),"choices":choices}
 		s.pending = scene
 		return scene
 	return {}

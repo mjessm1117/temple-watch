@@ -29,9 +29,16 @@ func new_campaign(difficulty: String) -> void:
 	campaign = Campaign.new(difficulty)
 	story = Story.new(campaign.state)
 	active = true
-	campaign.state.flow_stage = "temple"
+	campaign.state.flow_stage = "opening"
 	save()
-	go("temple")
+	go("opening")
+
+func opening_finished() -> void:
+	if not active or campaign == null or campaign.state.get("flow_stage", "") != "opening": return
+	for i in campaign.state.options.size():
+		if campaign.state.options[i].get("story", false) and str(campaign.state.options[i].get("mission", "")) == "relay":
+			prepare_briefing(i)
+			return
 
 func continue_campaign() -> void:
 	campaign = Campaign.new()
@@ -39,7 +46,8 @@ func continue_campaign() -> void:
 	story = Story.new(campaign.state)
 	active = true
 	var stage: String = campaign.state.get("flow_stage", "temple")
-	if stage in ["briefing", "debrief", "interlude", "arc_transition"]:
+	if stage == "opening": go("opening")
+	elif stage in ["briefing", "debrief", "interlude", "arc_transition"]:
 		screen = campaign.state.get("pending", {})
 		screen_return = "squad" if stage == "briefing" else "result" if stage == "debrief" else "era_transition" if stage == "arc_transition" else "temple"
 		go("briefing" if stage == "briefing" else "dialogue")
@@ -64,9 +72,11 @@ func prepare_briefing(index: int) -> void:
 	if screen.is_empty():
 		screen = {"kind":"briefing", "title":str(option.mission).capitalize(), "text":"Complete the operation and reach evacuation.", "choices":[]}
 		campaign.state.pending = screen
+	if not campaign.state.launch_option.has("n"): campaign.state.launch_option.n = str(screen.get("title", option.mission))
 	var maps = preload("res://scripts/map_catalog.gd")
 	var map := maps.load_map(maps.select_layout(preload("res://scripts/campaign/battle_sith.gd").map_id(option),7,int(option.get("map_variant",0 if option.has("sith_offer_id") else -1))))
-	screen.goal = "%s · %s. Complete the objective, then reach evacuation." % [map.get("name",option.mission),str(map.get("family","rescue")).replace("_"," ")]
+	var mission_goal := str(story.mission(str(option.mission)).get("goal", ""))
+	screen.goal = mission_goal if option.get("story", false) and not mission_goal.is_empty() else "%s · %s. Complete the objective, then reach evacuation." % [map.get("name",option.mission),str(map.get("family","rescue")).replace("_"," ")]
 	if option.has("sith_offer_id"): screen.goal = str(option.n) + " · " + str(option.get("risk",screen.goal))
 	screen_return = "squad"
 	save()
@@ -213,6 +223,7 @@ func advance_era() -> void:
 		save(); go("dialogue")
 
 func open_intelligence(page: String = "operations") -> void:
+	if int(campaign.state.era) == 1 and int(campaign.state.story.get("done", 0)) == 0: return
 	if is_instance_valid(intelligence): intelligence.queue_free()
 	intelligence = load("res://scenes/sith_report.tscn").instantiate()
 	intelligence.bind_state(campaign.state)
@@ -231,6 +242,7 @@ func open_intelligence(page: String = "operations") -> void:
 
 func show_sith_events() -> bool:
 	if get_tree().current_scene == null: return false
+	if int(campaign.state.era) == 1 and int(campaign.state.story.get("done", 0)) == 0: return false
 	var events: Array = campaign.sith.pending_events()
 	var report := events.any(func(event): return event.kind == "council_report")
 	if events.is_empty() and not campaign.sith.project_status().defeated: return false

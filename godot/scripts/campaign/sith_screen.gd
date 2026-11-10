@@ -134,7 +134,9 @@ func _operations() -> void:
 	row.add_child(left)
 	left.add_child(UI.label("ENEMY OPERATIONS", 21, GOLD))
 	left.add_child(UI.label("Counter one by mission this month. Intel can stop additional threats.", 15, UI.MUTED))
-	for op in layer.operations():
+	var active_ops: Array = layer.operations()
+	if active_ops.is_empty(): left.add_child(UI.label("No Sith movements detected yet.", 16, UI.MUTED))
+	for op in active_ops:
 		var box := _card(left)
 		box.add_child(UI.label(str(op.status).to_upper() + "   /   " + date_label(int(op.deadline)), 12, RED))
 		box.add_child(UI.label(str(op.n), 23))
@@ -172,6 +174,9 @@ func _operations() -> void:
 
 func _rivals() -> void:
 	page_content.add_child(UI.label("They remember every encounter. Each victory reveals a countermeasure.", 15, UI.MUTED))
+	if layer.rivals().is_empty():
+		page_content.add_child(UI.label("No Sith movements detected yet.", 16, UI.MUTED))
+		return
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 16)
 	page_content.add_child(row)
@@ -226,6 +231,7 @@ func _report() -> void:
 	var ops := _card(row)
 	ops.get_parent().size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	ops.add_child(UI.label("WHAT THE ENEMY ACHIEVED", 18, RED))
+	if report.operations.is_empty(): ops.add_child(UI.label("No Sith movements detected yet.", 16, UI.MUTED))
 	for op in report.operations:
 		ops.add_child(UI.label(str(op.n) + "   /   " + str(op.status).to_upper(), 18))
 		ops.add_child(UI.label(str(op.desc), 15, UI.MUTED))
@@ -233,6 +239,7 @@ func _report() -> void:
 	var rivals_box := _card(row)
 	rivals_box.get_parent().size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rivals_box.add_child(UI.label("THE SITH ARE LEARNING", 18, RED))
+	if report.rivals.is_empty(): rivals_box.add_child(UI.label("No rival movements detected yet.", 16, UI.MUTED))
 	for r in report.rivals:
 		rivals_box.add_child(UI.label("%s   /   %d%% knowledge" % [r.n, int(r.knowledge)], 18))
 		rivals_box.add_child(UI.label("%s · %d defeats · %d countermeasures" % [str(r.phase).capitalize(), int(r.defeats), r.revealed.size()], 15, UI.MUTED))

@@ -32,13 +32,7 @@ func _ready() -> void:
 	var space := Control.new()
 	space.size_flags_vertical = SIZE_EXPAND_FILL
 	identity.add_child(space)
-	var legend := UI.panel(Color(0.04,0.07,0.08,0.88))
-	identity.add_child(legend)
-	var lore := UI.column(8)
-	legend.add_child(lore)
-	lore.add_child(UI.label("A VISION OF FIRE",23,UI.ACCENT))
-	lore.add_child(UI.label("In meditation, the whole Council saw the same thing: the Temple burning, clone soldiers on its steps, a hooded figure in a red-lit office. Nobody knows when. Grand Master Zym orders it sealed in the Archives.",16))
-	lore.add_child(UI.label("Run the Temple, send squads where they matter, and bend what’s coming.",16,UI.MUTED))
+	identity.add_child(UI.label("Your first order: hold the Temple gate.", 18, UI.GOLD))
 	var frame := UI.panel(Color(0.04,0.075,0.09,0.96))
 	frame.custom_minimum_size.x = 490
 	row.add_child(frame)
@@ -109,12 +103,7 @@ func _build_phone() -> void:
 	var continuing := UI.button("CONTINUE", flow.continue_campaign, saved.load_save(flow.save_path))
 	continuing.name = "ContinueButton"; actions.add_child(continuing)
 	actions.add_child(UI.button("DIRECT RESCUE", _start))
-	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; body.add_child(scroll)
-	var lore := UI.column(5); lore.size_flags_horizontal = SIZE_EXPAND_FILL; scroll.add_child(lore)
-	lore.add_child(UI.label("A VISION OF FIRE", 18, UI.GOLD))
-	lore.add_child(UI.label("In meditation, the whole Council saw the same thing: the Temple burning, clone soldiers on its steps, a hooded figure in a red-lit office. Nobody knows when. Grand Master Zym orders it sealed in the Archives.", 14))
-	lore.add_child(UI.label("Run the Temple, send squads where they matter, and bend what’s coming.", 14, UI.MUTED))
+	body.add_child(UI.label("Your first order: hold the Temple gate.", 15, UI.GOLD))
 
 func _phone_settings(body: VBoxContainer) -> void:
 	if body.has_node("PhoneGraphics"):
