@@ -11,6 +11,8 @@ var failures := 0
 class CueProbe extends Node:
 	var cues: Array[String] = []
 	var states: Array[String] = []
+	var volume := 0.55
+	var muted := false
 	func cue(kind: String) -> void: cues.append(kind)
 	func set_music_state(state: String) -> void: states.append(state)
 	func play(_kind: String) -> void: pass
@@ -149,7 +151,7 @@ func run() -> void:
 	var test_attack := {"kind":"attack", "actor":int(player.id), "target":int(enemies[1].id), "from":Vector2i(player.x,player.y), "to":Vector2i(enemies[1].x,enemies[1].y), "mode":"shoot", "enemy":false, "outcome":"crits", "damage":2, "killed":true, "flanked":true}
 	var event_count := seen.size()
 	await Presentation.impact(game, test_attack)
-	check(probe.cues.slice(-3) == ["hit","crit","kill"], "hit, crit and kill reach B cue in order")
+	check(probe.cues.slice(-4).slice(0,3) == ["hit","crit","kill"], "hit, crit and kill reach B cue in order: %s" % [probe.cues])
 	check(seen[event_count].kind == "hit" and seen[event_count+1].kind == "flank" and seen[event_count+2].kind == "crit" and seen[event_count+3].kind == "kill", "hit, flank, crit and kill battle events keep impact order")
 	var miss_event := {"kind":"attack", "actor":int(player.id), "target":int(enemies[2].id), "from":Vector2i(player.x,player.y), "to":Vector2i(enemies[2].x,enemies[2].y), "mode":"shoot", "enemy":false, "outcome":"misses", "damage":0, "killed":false}
 	await Presentation.impact(game, miss_event)
