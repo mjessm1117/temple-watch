@@ -8,6 +8,9 @@ uniform vec2 hover_tile = vec2(-100.0);
 uniform float grid_strength = 0.0;
 uniform float detail_quality = 0.0;
 uniform float map_seed = 0.0;
+uniform int atlas_quadrant = 0;
+uniform sampler2D atlas_albedo : source_color, filter_linear_mipmap, repeat_disable;
+uniform sampler2D atlas_roughness : filter_linear_mipmap, repeat_disable;
 varying vec3 world_pos;
 varying vec3 world_normal;
 float hash(vec2 p) { return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
@@ -23,32 +26,30 @@ void fragment() {
 	vec2 p=world_pos.xz;
 	float broad=noise(p*0.22), grain=noise(p*32.0);
 	float detail=noise(p*4.0)*0.23+grain*0.08;
-	vec2 cell=floor(p+0.5);
-	float tile=hash(cell+vec2(map_seed*0.017,map_seed*0.031));
+	vec2 quad=vec2(float(atlas_quadrant%2),float(atlas_quadrant/2));
+	vec2 uv=(quad+clamp(fract(p*0.32+map_seed*0.0001),vec2(0.012),vec2(0.988)))*0.5;
+	vec3 tex=texture(atlas_albedo,uv).rgb;
+	float rough_tex=texture(atlas_roughness,uv).r;
+	float tile=noise(p*0.31+vec2(map_seed*0.017,map_seed*0.031));
 	float wear=noise(p*0.78+vec2(map_seed*0.011,map_seed*0.023));
-	vec3 col=base_color.rgb*(0.84+broad*0.24+detail+tile*0.10);
+	vec3 col=base_color.rgb*(0.72+broad*0.18+detail*0.55+tile*0.06);
+	col=mix(col,col*tex*2.0,0.27);
 	col*=mix(0.88,1.06,smoothstep(0.12,0.84,wear));
-	float rough=0.9, metal=0.015;
+	float rough=clamp(0.61+rough_tex*0.33+grain*0.07,0.55,0.98), metal=0.015;
 	if(biome==0) {
-		vec2 slab=abs(fract((p+0.5)/vec2(2.0,1.0))-0.5);
-		float joint=smoothstep(0.44,0.50,max(slab.x,slab.y));
 		float vein=sin(p.x*7.0+p.y*3.0+noise(p)*8.0)*0.025;
-		float crack=1.0-smoothstep(0.012,0.032,abs(fract(p.x*0.39+p.y*0.22+tile*4.0)-0.5));
-		col*=1.0-joint*0.10+vein-crack*step(0.78,tile)*0.12;
-		// Contact tint is baked into the material and costs no screen pass on Low.
-		col*=1.0-joint*0.035;
+		float crack=smoothstep(0.76,0.88,noise(p*1.37+vec2(4.0,7.0)));
+		col*=1.0+vein-crack*0.11;
 		if(detail_quality>0.5) {
 			float chips=noise(p*11.0+vec2(3.7,8.1));
 			col*=0.94+chips*0.10;
-			rough=0.73+grain*0.15+chips*0.08;
+			rough=clamp(0.56+rough_tex*0.30+chips*0.08,0.55,0.95);
 		}
 	} else if(biome==1) {
-		vec2 plate=abs(fract((p+0.5)/vec2(2.0,3.0))-0.5);
-		float seam=smoothstep(0.485,0.499,max(plate.x,plate.y));
 		float tread=step(0.85,sin((p.x+p.y)*55.0))*step(0.6,sin((p.x-p.y)*32.0));
 		float scorch=smoothstep(0.70,0.86,noise(p*0.55+vec2(map_seed*0.01)));
-		col*=1.0-seam*0.22+tread*0.09-scorch*0.19;
-		rough=0.50+grain*0.15; metal=0.65;
+		col*=1.0+tread*0.06-scorch*0.19;
+		rough=0.35+rough_tex*0.32; metal=0.65;
 		float puddle=smoothstep(0.77,0.89,wear)*step(0.65,tile);
 		col=mix(col,col*vec3(0.64,0.82,0.91),puddle*0.58);
 		rough=mix(rough,0.20,puddle*0.72);
