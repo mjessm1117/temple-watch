@@ -130,6 +130,9 @@ func _show(g: Node, event: String, players: Array) -> void:
 func show_radio(speaker: String, portrait_key: String, text: String, priority: int) -> void:
 	var g: Node = game.get_ref()
 	if g == null or not is_instance_valid(g) or text.is_empty(): return
+	if g.get("hud_controls") != null and g.hud_controls.phone != null and g.hud_controls.phone.has_method("queue_radio") and g.get_viewport().get_visible_rect().size.y > g.get_viewport().get_visible_rect().size.x:
+		g.hud_controls.phone.queue_radio(speaker, text, priority)
+		return
 	if layer == null: _build(g)
 	who_label.text = speaker.to_upper()
 	text_label.text = text

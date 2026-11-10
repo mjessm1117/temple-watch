@@ -166,15 +166,16 @@ func _build_shell() -> void:
 	mini_galaxy.opened.connect(_open_galaxy)
 	mini_galaxy.position = Vector2(safe.x + (12 if compact else 25), safe.y + (56 if compact else 340))
 	if portrait: mini_galaxy.hide()
-	station_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.97)); add_child(station_panel)
+	station_panel = UI.panel(UI.SURFACE_RAISED); add_child(station_panel)
 	station_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	station_panel.anchor_left = 0.0 if portrait else 0.53 if compact else 0.55; station_panel.offset_left = safe.x + 12 if portrait else 0
-	station_panel.offset_top = safe.y + (58 if compact else 113); station_panel.offset_right = -safe.z - 12 if portrait else -safe.z - 12 if compact else -20
+	station_panel.anchor_top = 1.0 if portrait else 0.0
+	station_panel.offset_top = -minf(440.0, get_viewport_rect().size.y * 0.53) if portrait else safe.y + (58 if compact else 113); station_panel.offset_right = -safe.z - 12 if portrait else -safe.z - 12 if compact else -20
 	station_panel.offset_bottom = -safe.w - (118 if portrait else 66 if compact else 100)
 	station_panel.visible = panel_open
 	var column := UI.column(8); station_panel.add_child(column)
 	var top := HBoxContainer.new(); column.add_child(top)
-	var heading := UI.label("TEMPLE STATION", 13, UI.MUTED); heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top.add_child(heading)
+	var heading := UI.label("TEMPLE STATION", UI.TYPE_CAPTION, UI.GOLD); heading.name = "StationHeading"; heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top.add_child(heading)
 	top.add_child(UI.button("Temple view" if Phone.touch_device() else "← Temple view", _close_station))
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
@@ -183,13 +184,17 @@ func _build_shell() -> void:
 		_build_room_picker()
 		if portrait: room_picker.show()
 		phone_grid = null
+	_sync_ui_safe_rect.call_deferred()
 
 func _build_room_picker() -> void:
 	var safe := Phone.safe_margins(get_viewport_rect().size)
-	room_picker = UI.panel(Color(0.045, 0.09, 0.115, 0.98)); room_picker.visible = false
+	room_picker = UI.panel(UI.SURFACE_RAISED); room_picker.visible = false
 	room_picker.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var portrait := get_viewport_rect().size.x < get_viewport_rect().size.y
-	room_picker.offset_left = safe.x + 12; room_picker.offset_right = -safe.z - 12; room_picker.offset_top = safe.y + 58; room_picker.offset_bottom = -safe.w - (118 if portrait else 66)
+	room_picker.offset_left = safe.x + 12; room_picker.offset_right = -safe.z - 12
+	room_picker.anchor_top = 1.0 if portrait else 0.0
+	room_picker.offset_top = -minf(430.0, get_viewport_rect().size.y * 0.52) if portrait else safe.y + 58
+	room_picker.offset_bottom = -safe.w - (118 if portrait else 66)
 	add_child(room_picker)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	room_picker.add_child(scroll)
@@ -214,6 +219,7 @@ func _build_room_picker() -> void:
 
 func _toggle_rooms() -> void:
 	if room_picker != null: room_picker.visible = not room_picker.visible
+	_sync_ui_safe_rect.call_deferred()
 
 func _toggle_more() -> void:
 	if more_panel != null: more_panel.visible = not more_panel.visible
@@ -221,6 +227,7 @@ func _toggle_more() -> void:
 func _select_phone_room(id: String) -> void:
 	room_picker.hide()
 	temple_view.activate_room(id)
+	_sync_ui_safe_rect.call_deferred()
 
 func _open_room(id: String, target: String) -> void:
 	_change_page(target, id)
@@ -229,6 +236,7 @@ func _close_station() -> void:
 	panel_open = false
 	temple_view.restore_camera()
 	if room_picker != null and get_viewport_rect().size.x < get_viewport_rect().size.y: room_picker.show()
+	_sync_ui_safe_rect.call_deferred()
 	HomeTabs.update(nav_buttons, HomeBadges.collect(campaign), page, panel_open)
 	if panel_tween != null: panel_tween.kill()
 	if Prefs.get_value("motion"):
@@ -245,6 +253,7 @@ func _slide_station() -> void:
 		await get_tree().create_timer(0.5).timeout
 		if not panel_open: return
 	station_panel.show()
+	_sync_ui_safe_rect.call_deferred()
 	var portrait := get_viewport_rect().size.x < get_viewport_rect().size.y
 	station_panel.offset_bottom = -Phone.safe_margins(get_viewport_rect().size).w - (118 if portrait else 66 if Phone.narrow(Phone.window_size()) else 100)
 	if Prefs.get_value("motion"):
@@ -275,6 +284,8 @@ func _change_page(name: String, room_id: String = "") -> void:
 
 func _show_page() -> void:
 	UI.clear(page_content)
+	var heading := station_panel.find_child("StationHeading", true, false) as Label
+	if heading != null: heading.text = (str(temple_view.rooms[selected_room].name).to_upper() if selected_room != "" and temple_view.rooms.has(selected_room) else page.to_upper())
 	HomeTabs.update(nav_buttons, HomeBadges.collect(campaign), page, panel_open)
 	status_label.text = "M%d · D%d" % [int(campaign.state.month), int(campaign.state.day)] if Phone.narrow(Phone.window_size()) and Phone.logical_size(Phone.window_size()).x < 700 else "MONTH %d  ·  DAY %d  ·  WEEK %d" % [int(campaign.state.month), int(campaign.state.day), campaign.week()]
 	if selected_room == "training" and page == "Roster":
@@ -309,8 +320,17 @@ func _show_page() -> void:
 		"Council": StrategyUI.council(self)
 		"Settings": StrategyUI.settings(self)
 
+func _sync_ui_safe_rect() -> void:
+	if not is_instance_valid(temple_view) or not temple_view.has_method("set_ui_safe_rect"): return
+	var covered := Rect2()
+	if is_instance_valid(station_panel) and panel_open and station_panel.visible:
+		covered = station_panel.get_global_rect()
+	elif is_instance_valid(room_picker) and room_picker.visible:
+		covered = room_picker.get_global_rect()
+	temple_view.call("set_ui_safe_rect", covered)
+
 func _card(title: String, description: String = "") -> VBoxContainer:
-	var panel := UI.panel(UI.PANEL_ALT); page_content.add_child(panel)
+	var panel := UI.panel(UI.SURFACE_RAISED); page_content.add_child(panel)
 	var box := UI.column(7); panel.add_child(box)
 	box.add_child(UI.label(title, 21, UI.GOLD))
 	if description != "": box.add_child(UI.label(description, 15, UI.MUTED))

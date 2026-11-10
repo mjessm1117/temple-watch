@@ -13,9 +13,10 @@ static func boxes(size: Vector2) -> Dictionary:
 	var physical := tree.root.content_scale_size if tree != null else DisplayServer.window_get_size()
 	var scale := width / float(physical.x) if physical.x > 0 else 1.0
 	var short := width / scale < 750.0
-	var plate_width := (230.0 if short else 260.0) * scale
-	var height := (70.0 if short else 76.0) * scale
-	var tray_left := plate_width + 11.0 * scale
+	var portrait := size.y > size.x
+	var plate_width := (minf(width * 0.43, 174.0 * scale) if portrait else (230.0 if short else 260.0) * scale)
+	var height := (62.0 if portrait else 70.0 if short else 76.0) * scale
+	var tray_left := plate_width + (8.0 if portrait else 11.0) * scale
 	var tray_right := width - 4.0 * scale
 	return {
 		"header": Rect2(0, 0, width, 44),

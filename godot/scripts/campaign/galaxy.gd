@@ -33,6 +33,9 @@ var detail_panel: PanelContainer
 var detail_open := false
 var detail_left := 0.0
 var detail_right := 0.0
+var selected_card: PanelContainer
+var selected_title: Label
+var selected_forecast: Label
 
 func _ready() -> void:
 	campaign = get_node("/root/CampaignFlow").session()
@@ -89,7 +92,7 @@ func _build() -> void:
 	map_view = GalaxyMap.new(); map_view.campaign = campaign; map_view.clip_contents = true; map_panel.add_child(map_view)
 	if compact: map_view.custom_minimum_size = Vector2(260, 130)
 	map_view.field_selected.connect(_field); map_view.mission_selected.connect(_select); map_view.planet_selected.connect(_planet); map_view.region_selected.connect(_region)
-	var right := UI.panel(Color("15232a")); detail_panel = right
+	var right := UI.panel(UI.SURFACE_RAISED); detail_panel = right
 	if compact:
 		var overlay := Control.new()
 		overlay.name = "SiteOverlay"
@@ -99,9 +102,10 @@ func _build() -> void:
 		overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		overlay.add_child(right)
 		right.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT if portrait else Control.PRESET_RIGHT_WIDE)
+		right.anchor_top = 1.0 if portrait else right.anchor_top
 		right.offset_left = safe.x + 12 if portrait else -minf(370.0, get_viewport_rect().size.x * 0.30)
 		right.offset_right = -safe.z - 12
-		right.offset_top = safe.y + 94 if portrait else safe.y + 56
+		right.offset_top = -minf(450.0, get_viewport_rect().size.y * 0.55) if portrait else safe.y + 56
 		right.offset_bottom = -safe.w - 12
 		detail_left = right.offset_left; detail_right = right.offset_right
 		right.visible = false
@@ -157,6 +161,7 @@ func _build() -> void:
 	if compact: _phone_text_floor(self)
 	_refresh_chips()
 	if compact: _phone_text_floor(chips)
+	_sync_ui_safe_rect.call_deferred()
 
 func _phone_text_floor(node: Node) -> void:
 	if node is Label and node.get_theme_font_size("font_size") < 14:
@@ -179,6 +184,9 @@ func _show_details() -> void:
 	if transition and transition.is_running(): transition.kill()
 	detail.position.x = 0; detail.modulate.a = 1
 	UI.clear(detail); scroll.scroll_vertical = 0
+	if get_viewport_rect().size.y > get_viewport_rect().size.x and page == "Briefing" and not campaign.state.options.is_empty():
+		_build_selected_card()
+	_sync_ui_safe_rect.call_deferred()
 	if excerpt != null:
 		excerpt.get_parent().visible = page == "Briefing" and not phone_more and not campaign.state.options.is_empty()
 		if not campaign.state.options.is_empty():
@@ -210,6 +218,22 @@ func _show_details() -> void:
 	Details.events_panel(self)
 	_wire_buttons(detail)
 	if Phone.narrow(Phone.window_size()): _phone_text_floor(detail)
+
+func _build_selected_card() -> void:
+	var offer: Dictionary = campaign.state.options[clampi(selected, 0, campaign.state.options.size() - 1)]
+	var mission: Dictionary = campaign.story.mission(str(offer.mission))
+	var risk: Dictionary = Intel.risk(campaign, mission, offer)
+	var reward := "UNKNOWN · build Comms Hub" if int(campaign.state.wings.comms) <= 0 and not offer.get("story", false) else Intel.resources(mission.get("reward", {}))
+	selected_card = UI.panel(UI.SURFACE)
+	selected_card.name = "SelectedMissionCard"
+	detail.add_child(selected_card)
+	var copy := UI.column(2)
+	selected_card.add_child(copy)
+	selected_title = UI.label(str(offer.get("n", mission.get("n", offer.mission))), UI.TYPE_ACTION, UI.GOLD)
+	copy.add_child(selected_title)
+	selected_forecast = UI.label("THREAT  %d/4 %s   ·   REWARD  %s" % [int(risk.level), str(risk.name).to_upper(), reward], UI.TYPE_CAPTION, risk.color)
+	selected_forecast.max_lines_visible = 2
+	copy.add_child(selected_forecast)
 
 func _choose_event(index: int) -> void:
 	if preload("res://scripts/campaign/events11_engine.gd").choose(campaign, index):
@@ -259,6 +283,11 @@ func _overview() -> void:
 	map_view.return_to_overview(); planet = ""; detail_open = false; _show_details()
 	if Phone.narrow(Phone.window_size()):
 		detail_panel.offset_left = detail_left; detail_panel.offset_right = detail_right
+	_sync_ui_safe_rect.call_deferred()
+
+func _sync_ui_safe_rect() -> void:
+	if not is_instance_valid(map_view) or not map_view.has_method("set_ui_safe_rect"): return
+	map_view.call("set_ui_safe_rect", detail_panel.get_global_rect() if detail_open and is_instance_valid(detail_panel) else Rect2())
 
 func _back() -> void:
 	if detail_open or not map_view.focused.is_empty(): _overview()

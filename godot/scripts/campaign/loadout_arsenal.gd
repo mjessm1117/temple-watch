@@ -160,8 +160,9 @@ func _build_slots(r: Dictionary, jedi: bool) -> void:
 
 func _slot(key: String, title: String, value: String, mark: int, icon: String) -> void:
 	var compact := Phone.narrow(get_tree().root.size)
+	var portrait := compact and host.size.x < 500
 	var b := S.button("", _select_slot.bind(key)); b.name = "Slot_" + key
-	b.custom_minimum_size = Vector2(84 if compact else 116, 68)
+	b.custom_minimum_size = Vector2(84 if compact else 116, 88 if portrait else 68)
 	b.size_flags_horizontal = SIZE_EXPAND_FILL
 	b.tooltip_text = value
 	var art_key: String = str({"weapon":"saber" if icon == "strike" else "blaster", "armor":icon, "utility":"utility", "base_mod":"module", "armor_mod":"armor_mod", "form":"form", "color":"crystal", "evolution":"path"}.get(key, "module"))
@@ -175,14 +176,14 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 	var art_height := 40.0 if compact else 48.0
 	var narrow_tile := compact and get_tree().root.size.x < 900 and key in ["weapon", "form"]
 	var art_width := minf(art_height * cropped.region.size.x / cropped.region.size.y, 14.0 if narrow_tile else 24.0 if compact else 42.0)
-	glyph.position = Vector2(2.0 if narrow_tile else 3.0 + ((30.0 if compact else 42.0) - art_width) * 0.5, 26 if compact else 10)
+	glyph.position = Vector2(2.0 if narrow_tile else 3.0 + ((30.0 if compact else 42.0) - art_width) * 0.5, 37 if portrait else 26 if compact else 10)
 	glyph.size = Vector2(art_width, art_height)
 	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(glyph)
 	var short_title: String = {"SABER MOD":"SAB MOD", "WEAPON MOD":"WPN MOD", "ARMOR MOD":"ARM MOD", "SABER FORM":"FORM"}.get(title, title) if compact else title
 	var name_label := UI.label(short_title, 14 if compact else 7, S.CYAN)
 	name_label.name = "SlotLabel"
-	name_label.position = Vector2(4 if compact else 51, 2 if compact else 5)
-	name_label.size = Vector2(76 if compact else 62, 19 if compact else 16)
+	name_label.position = Vector2(4 if compact else 51, 4 if portrait else 2 if compact else 5)
+	name_label.size = Vector2(76 if compact else 62, 23 if portrait else 19 if compact else 16)
 	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	name_label.clip_text = true
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
@@ -190,21 +191,22 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 	display_value = display_value.trim_suffix(" saber").trim_suffix(" robes")
 	var item_label := UI.label(display_value, 9 if compact else 10)
 	var item_left := 17 if narrow_tile else 31 if compact else 51
-	item_label.name = "ItemName"; item_label.position = Vector2(item_left, 20 if compact else 24)
+	item_label.name = "ItemName"; item_label.position = Vector2(item_left, 29 if portrait else 20 if compact else 24)
 	item_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	item_label.clip_text = true
 	item_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	item_label.size = Vector2(maxf(51, b.custom_minimum_size.x - item_left - 4), 19)
+	item_label.size = Vector2(maxf(51, b.custom_minimum_size.x - item_left - 4), 23 if portrait else 19)
 
 	b.add_child(item_label)
 	var tier := UI.label("Mk " + _mark(mark), 9, _tier_color(mark))
-	tier.name = "Tier"; tier.position = Vector2(31 if compact else 51, 39 if compact else 45)
+	tier.name = "Tier"; tier.position = Vector2(31 if compact else 51, 55 if portrait else 39 if compact else 45)
+	if portrait: tier.size = Vector2(48, 22)
 	tier.autowrap_mode = TextServer.AUTOWRAP_OFF
 	tier.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(tier)
 	for i in 3:
 		var pip := ColorRect.new(); pip.name = "TierPip%d" % i
 		pip.color = _tier_color(mark) if i < mark else Color("2b3d44")
-		pip.position = Vector2((31 if compact else 51) + i * 14, 63 if compact else 61)
+		pip.position = Vector2((31 if compact else 51) + i * 14, 82 if portrait else 63 if compact else 61)
 		pip.size = Vector2(10, 3); pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b.add_child(pip)
 	slot_row.add_child(b); host.wire_button(b)
