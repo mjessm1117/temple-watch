@@ -5,6 +5,7 @@ const Story = preload("res://scripts/story/story_engine.gd")
 const Battle = preload("res://scripts/campaign/battle_bridge.gd")
 const Settings = preload("res://scripts/settings.gd")
 const Villain11Battle = preload("res://scripts/villain11_battle.gd")
+const SaveSlots = preload("res://scripts/campaign/save_slots.gd")
 var campaign: RefCounted
 var story: RefCounted
 var active := false
@@ -14,6 +15,9 @@ var battle_game: Node
 var transitioning := false
 var save_path := Campaign.SAVE_PATH
 var intelligence: Control
+var launch_origin := "galaxy"
+var settings_panel: Control
+var fade_duration := 0.24
 
 func session() -> RefCounted:
 	if campaign == null:
@@ -24,6 +28,41 @@ func session() -> RefCounted:
 
 func save() -> bool:
 	return campaign.save(save_path)
+
+func save_slot(slot: int) -> bool:
+	return SaveSlots.write(session(), slot)
+
+func load_slot(slot: int) -> bool:
+	var next := Campaign.new()
+	if not SaveSlots.read(next, slot): return false
+	campaign = next
+	story = Story.new(campaign.state)
+	active = true
+	_resume_loaded()
+	return true
+
+func open_settings() -> void:
+	var scene := get_tree().current_scene
+	if scene == null: return
+	if is_instance_valid(settings_panel):
+		settings_panel.queue_free()
+		settings_panel = null
+		return
+	var panel := PanelContainer.new()
+	panel.name = "SharedSettings"
+	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	panel.custom_minimum_size = Vector2(280, 160)
+	panel.add_theme_stylebox_override("panel", preload("res://scripts/campaign/ui.gd").style())
+	var content := VBoxContainer.new()
+	panel.add_child(content)
+	content.add_child(preload("res://scripts/graphics_options.gd").new())
+	content.add_child(preload("res://scripts/campaign/ui.gd").button("BACK", open_settings))
+	scene.add_child(panel)
+	settings_panel = panel
+
+func open_saves(origin: String = "menu") -> void:
+	launch_origin = origin
+	go("save_load")
 
 func new_campaign(difficulty: String) -> void:
 	campaign = Campaign.new(difficulty)
@@ -45,6 +84,9 @@ func continue_campaign() -> void:
 	if not campaign.load_save(save_path): return
 	story = Story.new(campaign.state)
 	active = true
+	_resume_loaded()
+
+func _resume_loaded() -> void:
 	var stage: String = campaign.state.get("flow_stage", "temple")
 	if stage == "opening": go("opening")
 	elif stage in ["briefing", "debrief", "interlude", "arc_transition"]:
@@ -60,9 +102,27 @@ func direct_rescue(difficulty: String) -> void:
 	go("rescue")
 
 func go(scene: String) -> void:
-	get_tree().change_scene_to_file("res://scenes/%s.tscn" % scene)
+	var tree := get_tree()
+	var layer := CanvasLayer.new()
+	layer.name = "CampaignFadeLayer"
+	layer.layer = 100
+	tree.root.add_child(layer)
+	var veil := ColorRect.new()
+	veil.name = "CampaignFade"
+	veil.color = Color.BLACK
+	veil.mouse_filter = Control.MOUSE_FILTER_STOP
+	veil.modulate.a = 1.0
+	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	layer.add_child(veil)
+	tree.change_scene_to_file("res://scenes/%s.tscn" % scene)
+	var back := tree.create_tween()
+	back.tween_property(veil, "modulate:a", 0.0, fade_duration)
+	await back.finished
+	layer.queue_free()
 
 func prepare_briefing(index: int) -> void:
+	launch_origin = get_tree().current_scene.name.to_snake_case() if get_tree().current_scene != null else "galaxy"
+	if launch_origin not in ["galaxy", "temple"]: launch_origin = "galaxy"
 	var option: Dictionary = campaign.state.options[index]
 	campaign.state.launch_index = index
 	campaign.state.launch_option = option.duplicate(true)
@@ -79,6 +139,18 @@ func prepare_briefing(index: int) -> void:
 	screen.goal = mission_goal if option.get("story", false) and not mission_goal.is_empty() else "%s · %s. Complete the objective, then reach evacuation." % [map.get("name",option.mission),str(map.get("family","rescue")).replace("_"," ")]
 	if option.has("sith_offer_id"): screen.goal = str(option.n) + " · " + str(option.get("risk",screen.goal))
 	screen_return = "squad"
+	save()
+	go("briefing")
+
+func back_from_briefing() -> void:
+	campaign.state.flow_stage = "temple"
+	campaign.state.erase("pending")
+	screen = {}
+	save()
+	go(launch_origin)
+
+func back_from_squad() -> void:
+	campaign.state.flow_stage = "briefing"
 	save()
 	go("briefing")
 

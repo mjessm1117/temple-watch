@@ -87,9 +87,9 @@ func run() -> void:
 	root.add_child(menu); current_scene = menu; await settle()
 	check(menu.buttons.size() == 4, "Title difficulty choices fit")
 	if phone:
-		var body: VBoxContainer = menu.get_child(menu.get_child_count() - 1).get_child(0)
-		menu._phone_settings(body); await settle()
-		check(body.has_node("PhoneGraphics"), "Phone settings opens")
+		flow.open_settings(); await settle()
+		check(menu.find_child("GraphicsTier", true, false) != null, "Phone Settings opens shared graphics options")
+		flow.open_settings()
 	if FileAccess.file_exists(flow.save_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(flow.save_path))
 	print("HOME14 TEST RESULTS: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)

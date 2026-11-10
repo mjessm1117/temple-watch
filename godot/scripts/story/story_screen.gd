@@ -157,6 +157,12 @@ func _build_story() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	frame.add_child(scroll)
 	scroll.add_child(content)
+	var campaign_flow := get_node_or_null("/root/CampaignFlow")
+	var live_briefing: bool = mode == "briefing" and campaign_flow != null and campaign_flow.active and campaign_flow.campaign != null
+	if live_briefing:
+		var back := UI.button("← BACK TO MISSION", campaign_flow.back_from_briefing)
+		back.name = "BriefingBack"
+		content.add_child(back)
 	var speaking := HBoxContainer.new()
 	speaking.add_theme_constant_override("separation",12)
 	content.add_child(speaking)
@@ -171,7 +177,7 @@ func _build_story() -> void:
 	skip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	skip.add_theme_font_size_override("font_size",14 if phone else 11)
 	speaking.add_child(skip)
-	content.add_child(UI.label(str(scene_data.get("eyebrow","TEMPLE")).to_upper(),13,UI.GOLD))
+	content.add_child(UI.label(str(scene_data.get("eyebrow","TEMPLE")).to_upper(),14,UI.GOLD))
 	content.add_child(UI.label(scene_data.get("title","The Temple"),23 if phone else 32,UI.ACCENT))
 	dialogue_lines = str(scene_data.get("text","")).split("\n",false)
 	if dialogue_lines.is_empty(): dialogue_lines = PackedStringArray([""])
@@ -187,8 +193,12 @@ func _build_story() -> void:
 	if scene_data.get("goal","") != "":
 		var goal := str(scene_data.goal)
 		if phone: goal = goal.get_slice(".",0)
-		content.add_child(UI.label("OBJECTIVE  /  " + goal,12 if phone else 16,UI.GOLD))
-	content.add_child(UI.label("YOUR DECISION",13,UI.MUTED))
+		content.add_child(UI.label("OBJECTIVE  /  " + goal,14 if phone else 16,UI.GOLD))
+	if live_briefing:
+		var option: Dictionary = campaign_flow.campaign.state.get("launch_option", {})
+		var ready: Array = campaign_flow.campaign.default_squad(option)
+		content.add_child(UI.label("SQUAD READY  /  %d available · review loadout before Deploy" % ready.size(),14,UI.ACCENT))
+	content.add_child(UI.label("YOUR DECISION",14,UI.MUTED))
 	choices_box = UI.column(8)
 	content.add_child(choices_box)
 	choices_box.visible = false
@@ -204,7 +214,7 @@ func _build_story() -> void:
 		card.add_child(button)
 		choice_buttons.append(button)
 		var preview := _preview(choice)
-		if not preview.is_empty(): card.add_child(UI.label(preview,13,UI.MUTED))
+		if not preview.is_empty(): card.add_child(UI.label(preview,14,UI.MUTED))
 		if choice.get("text","") != "": card.add_child(UI.label(choice.text,14,UI.MUTED))
 	if scene_data.get("choices",[]).is_empty():
 		choices_box.add_child(UI.button("Return to Temple" if kind == "debrief" else "Continue",_finish))
@@ -212,7 +222,7 @@ func _build_story() -> void:
 	content.add_child(result_label)
 	var foot := HBoxContainer.new()
 	body.add_child(foot)
-	var hint := UI.label("Every choice leaves a record in the Temple archive.",13,UI.MUTED)
+	var hint := UI.label("Every choice leaves a record in the Temple archive.",14 if phone else 13,UI.MUTED)
 	hint.size_flags_horizontal = SIZE_EXPAND_FILL
 	foot.add_child(hint)
 	var vision := UI.label("THE VISION  %d / 10" % int(campaign_state.story.shadow),14,UI.GOLD)
@@ -370,7 +380,7 @@ func _build_codex() -> void:
 		var all: Array = engine.codex_entries(campaign_state,category,false)
 		var met: Array = engine.codex_entries(campaign_state,category)
 		var button := UI.button("%s  %d/%d" % [item[1],met.size(),all.size()],_category.bind(category))
-		button.add_theme_font_size_override("font_size",13)
+		button.add_theme_font_size_override("font_size",14 if Phone.narrow(Phone.window_size()) else 13)
 		button.toggle_mode = true
 		button.button_pressed = category == codex_category
 		tabs.add_child(button)
@@ -405,7 +415,7 @@ func _build_codex() -> void:
 		row.add_child(content)
 		content.add_child(UI.label(str(entry.name).replace("_"," ").capitalize() if unlocked else "Sealed holocron",23,UI.ACCENT if unlocked else UI.MUTED))
 		content.add_child(UI.label(entry.lore if unlocked else "UNDISCOVERED · Encounter this record’s subject to unlock its history.",16,UI.TEXT if unlocked else UI.MUTED))
-	body.add_child(UI.label("New records unlock as missions, people and places become known to your Order.",13,UI.MUTED))
+	body.add_child(UI.label("New records unlock as missions, people and places become known to your Order.",14 if Phone.narrow(Phone.window_size()) else 13,UI.MUTED))
 	body.add_child(UI.button("← Return to Temple",_finish))
 
 func _build_journal(list: VBoxContainer) -> void:
