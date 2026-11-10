@@ -1,6 +1,6 @@
 extends RefCounted
 ## Battle gestures. Mouse emulation remains enabled for normal UI controls.
-const THRESHOLD := 12.0
+const THRESHOLD := 18.0 # Viewport positions are logical pixels on high-density phones.
 const CameraRules = preload("res://scripts/battle11_camera.gd")
 var g
 var fingers: Dictionary = {}
@@ -8,6 +8,7 @@ var start := Vector2.ZERO
 var moved := false
 var pinching := false
 var pinch_distance := 0.0
+var pinch_target := 0.0
 var twist_angle := 0.0
 var twist_accum := 0.0
 var board_start := false
@@ -42,6 +43,7 @@ func handle(event: InputEvent) -> void:
 			elif fingers.size() == 2:
 				pinching = true; moved = true
 				pinch_distance = _distance()
+				pinch_target = g.zoom
 				twist_angle = _angle(); twist_accum = 0.0
 		else:
 			var tap := fingers.size() == 1 and should_click(start, event.position, moved, pinching)
@@ -80,8 +82,10 @@ func handle(event: InputEvent) -> void:
 				g.yaw = snap_twist(g.yaw, twist_accum)
 				twist_accum = 0.0
 			if pinch_distance > 0.0:
-				g.zoom = pinched_zoom(g.zoom, pinch_distance, next_distance)
-				g._update_camera()
+				pinch_target = pinched_zoom(pinch_target, pinch_distance, next_distance)
+				if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
+				g.camera_tween = g.create_tween()
+				g.camera_tween.tween_property(g, "zoom", pinch_target, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 			pinch_distance = next_distance
 		elif not pinching:
 			if not moved and start.distance_to(event.position) > THRESHOLD:

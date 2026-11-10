@@ -21,6 +21,6 @@ static func boxes(size: Vector2) -> Dictionary:
 		"header": Rect2(0, 0, width, 44),
 		"plate": Rect2(3 * scale, size.y - height - scale, plate_width, height),
 		"tray": Rect2(tray_left, size.y - height - scale, tray_right - tray_left, height),
-		"camera": Rect2(width - 48, 104, 44, 132),
+		"camera": Rect2(width - 56, 60, 48, 144),
 		"map": Rect2(0, 44, width, size.y - 44),
 	}
