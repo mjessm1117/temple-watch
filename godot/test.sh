@@ -79,3 +79,4 @@ run_suite phoneui18_test --rendering-method gl_compatibility --resolution 844x39
 run_suite rankup19_test --rendering-method gl_compatibility --resolution 844x390
 run_suite battle19_test --rendering-method gl_compatibility --resolution 667x375 -- --graphics=low
 run_suite phone_detect20_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
+run_suite loadout20_test --rendering-method gl_compatibility --resolution 956x440

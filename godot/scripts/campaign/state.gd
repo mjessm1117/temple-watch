@@ -58,12 +58,12 @@ func new_campaign(difficulty: String = "normal") -> void:
 		"staff": {}, "teams": [], "field": {"list": [], "log": []}, "unrest": {},
 		"team_assignments": {},
 		"bonds": {}, "quests": {}, "legacy": {"retired": [], "generals": {}}, "flags": {},
-		"legends": [], "mentor_memorials": [], "news": [], "pending_mission": {}, "chosen": -1}
+		"legends": [], "mentor_memorials": [], "news": [], "pending_mission": {}, "chosen": -1, "skill_picks_locked": false}
 	var id := 1
 	for item in core.START_ROSTER:
 		var r: Dictionary = item.duplicate(true)
 		r.id = "u%d" % id; id += 1
-		r.rank = int(r.get("rank", 2)); r.xp = int(r.get("xp", 30))
+		r.rank = int(r.get("rank", 2)); r.skill_rank = 3; r.xp = int(r.get("xp", 30))
 		r.dark = 0; r.picks = r.get("picks", []); r.pick = 0
 		r.classes = [Classes.class_id(str(r.cls))]; r.cross_picks = []; r.trained_padawans = []; r.legacies = []
 		r.wound = 0; r.status = "active"; r.kills = 0; r.missions = 0

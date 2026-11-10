@@ -20,7 +20,7 @@ static func make(c, r: Dictionary, slot: Button, phone: bool) -> PanelContainer:
 	var slot_key := slot.name.trim_prefix("Slot_")
 	var mark := ["Mk I", "Mk II", "Mk III"].find(slot.get_node("Tier").text) + 1
 	icon.texture = slot.get_node("GearArt").texture
-	if slot_key in ["weapon", "armor", "color", "base_mod", "armor_mod"]:
+	if slot_key in ["weapon", "armor", "color", "base_mod", "armor_mod"] and not (slot_key == "weapon" and Progression.is_jedi(r)):
 		var source: Texture2D = Art16.texture_for(slot_key, Progression.is_jedi(r), mark, str(r.get("col", "#62b3ff")), "saber")
 		var cropped := AtlasTexture.new()
 		cropped.atlas = source

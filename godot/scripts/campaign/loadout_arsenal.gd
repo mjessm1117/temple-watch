@@ -8,6 +8,7 @@ const Preview = preload("res://scripts/campaign/armory12_preview.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
 const Preview15 = preload("res://scripts/campaign/armory15_preview.gd")
 const Art16 = preload("res://scripts/campaign/armory16_art.gd")
+const SkillTree = preload("res://scripts/campaign/loadout_skill_tree.gd")
 var host: Control
 var soldier_id := ""
 var offers: Array[Dictionary] = []
@@ -162,15 +163,16 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 	b.tooltip_text = value
 	var art_key: String = str({"weapon":"saber" if icon == "strike" else "blaster", "armor":icon, "utility":"utility", "base_mod":"module", "armor_mod":"armor_mod", "form":"form", "color":"crystal", "evolution":"path"}.get(key, "module"))
 	var glyph := TextureRect.new(); glyph.name = "GearArt"
-	var source: Texture2D = Art16.tile_for(key, jedi_actor, mark, actor_color, art_key)
+	var source: Texture2D = _baked_icon(str(host.flow.session().soldier(soldier_id).cls).to_lower()) if key == "evolution" else _baked_icon("strike") if key == "form" else load("res://assets/loadout/icons13/saber.png") if key == "weapon" and jedi_actor else Art16.tile_for(key, jedi_actor, mark, actor_color, art_key)
 	var cropped := AtlasTexture.new()
 	cropped.atlas = source
 	cropped.region = source.get_image().get_used_rect()
 	glyph.texture = cropped
 	glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; glyph.stretch_mode = TextureRect.STRETCH_SCALE
 	var art_height := 40.0 if compact else 48.0
-	var art_width := minf(art_height * cropped.region.size.x / cropped.region.size.y, 24.0 if compact else 42.0)
-	glyph.position = Vector2(3.0 + ((30.0 if compact else 42.0) - art_width) * 0.5, 26 if compact else 10)
+	var narrow_tile := compact and get_tree().root.size.x < 900 and key in ["weapon", "form"]
+	var art_width := minf(art_height * cropped.region.size.x / cropped.region.size.y, 14.0 if narrow_tile else 24.0 if compact else 42.0)
+	glyph.position = Vector2(2.0 if narrow_tile else 3.0 + ((30.0 if compact else 42.0) - art_width) * 0.5, 26 if compact else 10)
 	glyph.size = Vector2(art_width, art_height)
 	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(glyph)
 	var short_title: String = {"SABER MOD":"SAB MOD", "WEAPON MOD":"WPN MOD", "ARMOR MOD":"ARM MOD", "SABER FORM":"FORM"}.get(title, title) if compact else title
@@ -182,12 +184,13 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
 	var display_value := value.get_slice(" (", 0) if key == "form" else value
 	display_value = display_value.trim_suffix(" saber").trim_suffix(" robes")
-	var item_label := S.label(display_value, 6 if compact else 8)
-	item_label.name = "ItemName"; item_label.position = Vector2(31 if compact else 51, 18 if compact else 24)
+	var item_label := S.label(display_value, 9 if compact else 10)
+	var item_left := 17 if narrow_tile else 31 if compact else 51
+	item_label.name = "ItemName"; item_label.position = Vector2(item_left, 18 if compact else 24)
 	item_label.clip_text = true
 	item_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	item_label.size = Vector2(51 if compact else 62, 17)
-	if compact: item_label.scale.x = 0.8
+	item_label.size = Vector2(maxf(51, b.custom_minimum_size.x - item_left - 4), 19)
+
 	b.add_child(item_label)
 	var tier := S.label("Mk " + _mark(mark), 9, _tier_color(mark))
 	tier.name = "Tier"; tier.position = Vector2(31 if compact else 51, 33 if compact else 45)
@@ -199,6 +202,11 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 		pip.size = Vector2(10, 3); pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b.add_child(pip)
 	slot_row.add_child(b); host.wire_button(b)
+
+func _baked_icon(key: String) -> Texture2D:
+	var image := S.icon(key).get_image()
+	image.resize(128, 128, Image.INTERPOLATE_LANCZOS)
+	return ImageTexture.create_from_image(image)
 
 func _tier_color(mark: int) -> Color:
 	return S.GOLD if mark >= 3 else S.CYAN if mark == 2 else S.MUTED
@@ -225,14 +233,8 @@ func _update_preview() -> void:
 	if tile == null: return
 	var phone := Phone.narrow(get_tree().root.size)
 	preview_card = Preview15.make(host.flow.session(), host.flow.session().soldier(soldier_id), tile, phone)
-	if phone:
-		feature_row.add_child(preview_card)
-		feature_row.move_child(preview_card, 0)
-	else:
-		host.stage_container.add_child(preview_card)
-		preview_card.set_anchors_preset(Control.PRESET_TOP_LEFT)
-		preview_card.offset_left = 12; preview_card.offset_right = 232
-		preview_card.offset_top = 22; preview_card.offset_bottom = 292
+	feature_row.add_child(preview_card)
+	feature_row.move_child(preview_card, 0)
 
 func _exit_tree() -> void:
 	if is_instance_valid(preview_card) and preview_card.get_parent() != self:
@@ -240,11 +242,11 @@ func _exit_tree() -> void:
 	if is_instance_valid(hangar_sign): hangar_sign.queue_free()
 
 func _show_gear() -> void:
-	skill_view = false; _filter()
+	skill_view = false; feature_row.visible = true; _filter()
 	if get_parent() is ScrollContainer: get_parent().scroll_vertical = 0
 
 func _show_skills() -> void:
-	skill_view = true; _filter()
+	skill_view = true; feature_row.visible = false; _filter()
 	if get_parent() is ScrollContainer: get_parent().scroll_vertical = 0
 
 func _filter() -> void:
@@ -257,28 +259,12 @@ func _filter() -> void:
 	if skill_view and existing == null: _build_skills()
 
 func _build_skills() -> void:
-	var tree := S.column(5); tree.name = "SkillTree"; picker.add_child(tree)
-	var r: Dictionary = host.flow.session().soldier(soldier_id)
-	var rank_now := Progression.pending_rank(r)
-	tree.add_child(S.label("PROMOTION  /  %s  /  RANK %d" % [str(r.cls).to_upper(), int(r.rank)], 13, S.GOLD))
-	var perks: Dictionary = Data.get_table("temple", "PERKS")
-	var abilities: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/abilities.json"))
-	for rank in range(1, maxi(3, int(r.rank) + 1)):
-		var options: Array = Progression.tree_options(r, rank)
-		if options.is_empty(): continue
-		var row := HBoxContainer.new(); tree.add_child(row)
-		row.add_child(S.label("R%d" % rank, 12, S.CYAN))
-		for key in options:
-			var info: Dictionary = perks.get(str(key), abilities.get(str(key), {}))
-			var picked: bool = str(key) in r.get("picks", [])
-			var label := str(info.get("name", str(key).capitalize()))
-			var b := S.button(("✓ " if picked else "") + label, _choose_skill.bind(str(key)), rank == rank_now)
-			b.custom_minimum_size.y = 44; b.size_flags_horizontal = SIZE_EXPAND_FILL
-			b.tooltip_text = str(info.get("desc", "")); row.add_child(b); host.wire_button(b)
-	if rank_now == 0: tree.add_child(S.label("Next choices unlock when this soldier earns a rank.", 12, S.MUTED))
+	var tree := SkillTree.new(); picker.add_child(tree); tree.setup(host, soldier_id)
 
 func _choose_skill(key: String) -> void:
-	if Progression.choose(host.flow.session().soldier(soldier_id), key):
+	# Legacy direct action used by promotion tests; tree taps use preview then confirm.
+	var r: Dictionary = host.flow.session().soldier(soldier_id)
+	if Progression.choose(r, key):
 		host.flow.save(); host._refresh(); host.arsenal._show_skills()
 
 func section(title: String) -> void:
@@ -303,8 +289,8 @@ func offer(action: String, kind: String, key: String, title: String, reason: Str
 	picker.add_child(card); offer_cards.append({"slot":slot, "node":card})
 	var column := S.column(2); card.add_child(column)
 	var heading := HBoxContainer.new(); heading.add_theme_constant_override("separation", 5); column.add_child(heading)
-	var icon := TextureRect.new(); icon.texture = S.icon(_offer_icon(action, kind))
-	icon.custom_minimum_size = Vector2(30, 30); icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	var icon := TextureRect.new(); icon.texture = Art16.tile_for(slot, jedi_actor, _offer_mark(action, kind, key), actor_color, {"weapon":"saber" if jedi_actor else "blaster", "armor":"armor", "utility":"utility", "base_mod":"module", "armor_mod":"armor_mod", "form":"form", "evolution":"path"}.get(slot, "module"))
+	icon.custom_minimum_size = Vector2(42, 42); icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; heading.add_child(icon)
 	var info := S.column(0); info.size_flags_horizontal = SIZE_EXPAND_FILL; heading.add_child(info)
 	var upgrade := action in ["upgrade", "base_mark", "armor_mark"]
