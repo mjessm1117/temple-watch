@@ -75,6 +75,7 @@ run_suite soldier18_test
 run_suite balance18_audit
 run_suite phone17_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
 run_suite hud18_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
+run_suite decision22_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low; run_suite decision22_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low --portrait
 run_suite phoneui18_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
 run_suite rankup19_test --rendering-method gl_compatibility --resolution 844x390
 run_suite battle19_test --rendering-method gl_compatibility --resolution 667x375 -- --graphics=low

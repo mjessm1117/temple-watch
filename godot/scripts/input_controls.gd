@@ -14,13 +14,16 @@ static func move_preview(m: RefCounted, unit: Dictionary, dest: Vector2i) -> Dic
 	for entry in [["N", Vector2i.UP], ["E", Vector2i.RIGHT], ["S", Vector2i.DOWN], ["W", Vector2i.LEFT]]:
 		shields[entry[0]] = Shot.cover(m, dest, dest + entry[1] * 2)
 	var flanks: Array[String] = []
+	var seen_by: Array[String] = []
 	var probe: Dictionary = unit.duplicate()
 	probe.x = dest.x; probe.y = dest.y
 	for enemy in m.living("enemy"):
-		if not bool(enemy.awake) and not bool(enemy.get("spotted", false)): continue
+		if not bool(enemy.get("spotted", false)) and not bool(enemy.get("detected", false)): continue
 		var shot_info: Dictionary = Shot.calculate(m, enemy, probe)
-		if bool(shot_info.flanked) and bool(shot_info.los) and bool(shot_info.range_ok): flanks.append(str(enemy.name))
-	return {"ap": ap_cost, "tiles": cost, "prev": route.prev, "shields": shields, "flanks": flanks}
+		if bool(shot_info.los) and bool(shot_info.range_ok):
+			seen_by.append(str(enemy.name))
+			if bool(shot_info.flanked): flanks.append(str(enemy.name))
+	return {"ap": ap_cost, "tiles": cost, "prev": route.prev, "shields": shields, "flanks": flanks, "seen_by": seen_by}
 
 static func valid_targets(m: RefCounted, unit: Dictionary, mode: String) -> Array[Dictionary]:
 	var targets: Array[Dictionary] = []

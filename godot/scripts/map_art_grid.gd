@@ -44,7 +44,7 @@ func _process(_delta: float) -> void:
 		var transform: Transform3D = child.transform*Transform3D(Basis.from_scale(size),Vector3.ZERO)
 		mm.set_instance_transform(index,transform)
 		var tint: Color = child.material_override.albedo_color
-		tint.a = 0.22 if fill else 0.58
+		tint.a = 0.12 if fill else 0.68
 		if focus.x > -900:
 			tint.a *= focus_alpha(child.position,focus)
 		mm.set_instance_color(index,tint); index += 1

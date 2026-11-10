@@ -14,7 +14,7 @@ func _draw() -> void:
 		if not button.visible or not button.is_visible_in_tree(): continue
 		visible_buttons.append(button)
 		offsets.append(button.get_global_rect().position - get_global_rect().position)
-	var font := ThemeDB.fallback_font
+	var font := preload("res://scripts/campaign/ui.gd").font("body")
 	# Draw each primitive and font size together across the whole row.
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
@@ -43,7 +43,7 @@ func _draw() -> void:
 		var at := offsets[index]
 		var badge := "%s AP" % button.cost
 		if button.cooldown > 0: badge = "%d CD" % button.cooldown
-		draw_string(font, at + Vector2(button.size.x - 30, 11), badge, HORIZONTAL_ALIGNMENT_CENTER, 30, 11, Color("f9e5b8"))
+		draw_string(font, at + Vector2(button.size.x - 30, 14), badge, HORIZONTAL_ALIGNMENT_CENTER, 30, 14, Color("f9e5b8"))
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
 		var at := offsets[index]
@@ -55,10 +55,9 @@ func _draw() -> void:
 		var button = visible_buttons[index]
 		var at := offsets[index]
 		var caption: String = caption_for(button.display_name)
-		var size := 10
-		while size > 7 and font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > button.size.x - 4:
-			size -= 1
-		draw_string(font, at + Vector2(1, 29 if preload("res://scripts/phone_layout.gd").touch_device() else 39), caption, HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, size, Color("edf3f4") if not button.disabled else Color("87919b"))
+		while caption.length() > 1 and font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x > button.size.x - 4:
+			caption = caption.substr(0, caption.length() - 1)
+		draw_string(font, at + Vector2(1, 32 if preload("res://scripts/phone_layout.gd").touch_device() else 39), caption, HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, 14, Color("edf3f4") if not button.disabled else Color("9bb2b5"))
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
 		var at := offsets[index]
