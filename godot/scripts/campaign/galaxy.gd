@@ -58,22 +58,28 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _build() -> void:
 	var compact := Phone.narrow(Phone.window_size())
+	var portrait := compact and get_viewport_rect().size.x < get_viewport_rect().size.y
 	var safe := Phone.safe_margins(get_viewport_rect().size)
 	var bg := ColorRect.new(); bg.color = Color("0a1113"); bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); add_child(bg)
 	var outer := UI.column(6); outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	outer.offset_left = safe.x + (8 if compact else 22); outer.offset_top = safe.y + (5 if compact else 16)
-	outer.offset_right = -safe.z - (8 if compact else 22); outer.offset_bottom = -safe.w - (5 if compact else 12); add_child(outer)
-	var head := HBoxContainer.new(); head.add_theme_constant_override("separation", 8 if compact else 4); outer.add_child(head)
+	outer.offset_left = safe.x + (12 if compact else 22); outer.offset_top = safe.y + (12 if compact else 16)
+	outer.offset_right = -safe.z - (12 if compact else 22); outer.offset_bottom = -safe.w - (12 if compact else 12); add_child(outer)
+	var head: BoxContainer = VBoxContainer.new() if portrait else HBoxContainer.new()
+	head.add_theme_constant_override("separation", 6 if portrait else 8 if compact else 4); outer.add_child(head)
 	var title := UI.column(0); title.size_flags_horizontal = Control.SIZE_EXPAND_FILL; head.add_child(title)
 	if not compact: title.add_child(UI.label("J E D I   T E M P L E   /   W A R   R O O M",12,Color("79d3e2")))
 	title.add_child(UI.label("Galaxy command",20 if compact else 30,Color("dbe7e4")))
-	back_button = UI.button("GALAXY" if Phone.touch_device() else "←  GALAXY", _overview); back_button.name = "GalaxyOverview"; back_button.visible = false; head.add_child(back_button)
-	var intelligence := UI.button("SITH INTELLIGENCE",func(): get_node("/root/CampaignFlow").open_intelligence()); intelligence.name = "Intelligence"
+	var actions: BoxContainer = HBoxContainer.new() if portrait else head
+	if portrait: head.add_child(actions)
+	back_button = UI.button("← MAP" if portrait else "GALAXY" if Phone.touch_device() else "←  GALAXY", _overview); back_button.name = "GalaxyOverview"; back_button.visible = false; actions.add_child(back_button)
+	var intelligence := UI.button("SITH" if portrait else "SITH INTELLIGENCE",func(): get_node("/root/CampaignFlow").open_intelligence()); intelligence.name = "Intelligence"
 	if compact: intelligence.custom_minimum_size.y = 44
-	head.add_child(intelligence)
+	actions.add_child(intelligence)
 	var temple_button := UI.button("TEMPLE" if Phone.touch_device() else "←  TEMPLE",_temple); temple_button.name = "TempleReturn"
 	if compact: temple_button.custom_minimum_size.y = 44
-	head.add_child(temple_button)
+	actions.add_child(temple_button)
+	if portrait:
+		for button in actions.get_children(): button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	status = UI.label("",14,Color("8aa2a5")); outer.add_child(status)
 	var body := HBoxContainer.new(); body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation",12); outer.add_child(body)
@@ -92,18 +98,18 @@ func _build() -> void:
 		add_child(overlay)
 		overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		overlay.add_child(right)
-		right.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
-		right.offset_left = -minf(370.0, get_viewport_rect().size.x * 0.65)
-		right.offset_right = -safe.z - 4
-		right.offset_top = safe.y + 50
-		right.offset_bottom = -safe.w - 4
+		right.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT if portrait else Control.PRESET_RIGHT_WIDE)
+		right.offset_left = safe.x + 12 if portrait else -minf(370.0, get_viewport_rect().size.x * 0.30)
+		right.offset_right = -safe.z - 12
+		right.offset_top = safe.y + 94 if portrait else safe.y + 56
+		right.offset_bottom = -safe.w - 12
 		detail_left = right.offset_left; detail_right = right.offset_right
 		right.visible = false
 	else:
 		right.custom_minimum_size.x = 330; body.add_child(right)
 	var column := UI.column(8 if compact else 7); column.custom_minimum_size.x = 0 if compact else 304; right.add_child(column)
 	if compact:
-		var close := UI.button("CLOSE", _overview)
+		var close := UI.button("← BACK TO MAP" if portrait else "CLOSE", _overview)
 		close.name = "CloseSite"; close.custom_minimum_size.y = 44
 		column.add_child(close)
 	tabs = HBoxContainer.new()
@@ -135,7 +141,7 @@ func _build() -> void:
 	chips = HFlowContainer.new(); chips.size_flags_horizontal = Control.SIZE_EXPAND_FILL; offer_scroll.add_child(chips)
 	if compact:
 		var summary := HBoxContainer.new(); column.add_child(summary)
-		excerpt = UI.label("", 12, UI.TEXT); excerpt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		excerpt = UI.label("", 14, UI.TEXT); excerpt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		excerpt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		summary.add_child(excerpt)
 		var more := UI.button("MORE", func(): phone_more = true; _show_details())
@@ -143,12 +149,21 @@ func _build() -> void:
 	scroll = preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
 	detail = UI.column(10); detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(detail)
-	launch_button = UI.button("MISSION BRIEFING  >" if Phone.touch_device() else "MISSION BRIEFING  →",_launch)
+	launch_button = UI.button("BRIEFING  >" if compact else "MISSION BRIEFING  →",_launch)
 	if compact: launch_button.custom_minimum_size.y = 44
 	column.add_child(launch_button)
 	message = UI.label("Tap a world or signal to inspect it." if Phone.touch_device() else "Select a world or a signal.  ↑ ↓ offers  ·  Enter briefing  ·  Esc back  ·  T Temple",12,Color("8aa2a5")); outer.add_child(message)
 	if compact: message.hide(); status.hide()
+	if compact: _phone_text_floor(self)
 	_refresh_chips()
+	if compact: _phone_text_floor(chips)
+
+func _phone_text_floor(node: Node) -> void:
+	if node is Label and node.get_theme_font_size("font_size") < 14:
+		node.add_theme_font_size_override("font_size", 14)
+	if node is BaseButton and node.get_theme_font_size("font_size") < 14:
+		node.add_theme_font_size_override("font_size", 14)
+	for child in node.get_children(): _phone_text_floor(child)
 
 func _refresh_chips() -> void:
 	UI.clear(chips)
@@ -165,7 +180,7 @@ func _show_details() -> void:
 	detail.position.x = 0; detail.modulate.a = 1
 	UI.clear(detail); scroll.scroll_vertical = 0
 	if excerpt != null:
-		excerpt.get_parent().visible = page == "Briefing" and not campaign.state.options.is_empty()
+		excerpt.get_parent().visible = page == "Briefing" and not phone_more and not campaign.state.options.is_empty()
 		if not campaign.state.options.is_empty():
 			var offer: Dictionary = campaign.state.options[clampi(selected, 0, campaign.state.options.size() - 1)]
 			var mission: Dictionary = campaign.story.mission(str(offer.mission))
@@ -184,7 +199,8 @@ func _show_details() -> void:
 		detail.add_child(UI.button("Auto resolve (%d%%)" % preload("res://scripts/mission_fronts.gd").auto_odds(campaign.state,campaign.default_squad()),_front_auto))
 		detail.add_child(UI.button("Stand down Front B",_front_stand_down))
 	for b in tabs.get_children(): b.modulate = Color("79d3e2") if b.text == page else Color.WHITE
-	map_view.selected = selected; back_button.visible = not map_view.focused.is_empty()
+	map_view.selected = selected
+	back_button.visible = not map_view.focused.is_empty() and not (Phone.narrow(Phone.window_size()) and get_viewport_rect().size.x < get_viewport_rect().size.y)
 	match page:
 		"Regions": Details.region_panel(self)
 		"Field ops": _field_panel()
@@ -193,6 +209,7 @@ func _show_details() -> void:
 		_: Details.mission_panel(self)
 	Details.events_panel(self)
 	_wire_buttons(detail)
+	if Phone.narrow(Phone.window_size()): _phone_text_floor(detail)
 
 func _choose_event(index: int) -> void:
 	if preload("res://scripts/campaign/events11_engine.gd").choose(campaign, index):
@@ -212,7 +229,7 @@ func _slide(open_panel: bool = false) -> void:
 	transition = create_tween().set_parallel(true)
 	transition.tween_property(detail,"modulate:a",1.0,0.32)
 	transition.tween_property(detail,"position:x",home,0.38).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	if open_panel and Phone.narrow(Phone.window_size()) and detail_panel != null:
+	if open_panel and Phone.narrow(Phone.window_size()) and detail_panel != null and get_viewport_rect().size.x >= get_viewport_rect().size.y:
 		detail_panel.offset_left = detail_left + detail_panel.size.x
 		detail_panel.offset_right = detail_right + detail_panel.size.x
 		transition.tween_property(detail_panel, "offset_left", detail_left, 0.32).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
@@ -224,6 +241,7 @@ func _tab(value: String) -> void:
 func _select(index: int) -> void:
 	if campaign.state.options.is_empty(): return
 	selected = clampi(index,0,campaign.state.options.size()-1); page = "Briefing"
+	if get_viewport_rect().size.x < get_viewport_rect().size.y: phone_more = true
 	var m: Dictionary = campaign.story.mission(str(campaign.state.options[selected].mission))
 	planet = Intel.planet_for(m); region = str(Data.get_table("galaxy","PLANETS")[planet].reg)
 	map_view.focus_offer(selected); detail_open = true; _show_details(); _slide(true)

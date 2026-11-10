@@ -6,6 +6,7 @@ signal close_requested
 const Layer = preload("res://scripts/campaign/sith_layer.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const Art = preload("res://scripts/campaign/sith_art.gd")
+const Phone = preload("res://scripts/phone_layout.gd")
 const RED = Color("ec8593")
 const GOLD = Color("dec28e")
 var layer: RefCounted
@@ -15,6 +16,8 @@ var page_content: VBoxContainer
 var status_line: Label
 var message := "Choose where to push back. The remaining operations will proceed at month end."
 var selected_id := ""
+var portrait := false
+var compact := false
 
 func bind_state(campaign_state: Dictionary) -> void:
 	layer = Layer.new(campaign_state)
@@ -38,6 +41,9 @@ static func preview_layer():
 
 func show_page(value: String) -> void:
 	page = value
+	var view_size := get_viewport_rect().size if is_inside_tree() else size
+	compact = Phone.narrow(Phone.window_size()) and view_size.x <= 750
+	portrait = compact and view_size.x < view_size.y
 	for child in get_children():
 		remove_child(child)
 		child.queue_free()
@@ -46,22 +52,29 @@ func show_page(value: String) -> void:
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
+	# The shared graphics adapter applies the old horizontal phone layout unless
+	# these nodes signal that this screen already owns its portrait arrangement.
+	if compact:
+		var close_guard := Node.new(); close_guard.name = "PhoneClose"; add_child(close_guard)
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for edge in ["left", "right"]: margin.add_theme_constant_override("margin_" + edge, 34)
-	for edge in ["top", "bottom"]: margin.add_theme_constant_override("margin_" + edge, 22)
+	for edge in ["left", "right"]: margin.add_theme_constant_override("margin_" + edge, 12 if compact else 34)
+	for edge in ["top", "bottom"]: margin.add_theme_constant_override("margin_" + edge, 12 if compact else 22)
 	add_child(margin)
-	body = UI.column(14)
+	body = UI.column(8 if compact else 14)
 	margin.add_child(body)
 	_header()
 	_project()
-	var tabs := HBoxContainer.new()
+	var tabs: Container = HFlowContainer.new() if portrait else HBoxContainer.new()
+	tabs.name = "WarTabs"
 	tabs.add_theme_constant_override("separation", 10)
+	if portrait: tabs.add_theme_constant_override("h_separation", 8); tabs.add_theme_constant_override("v_separation", 8)
 	body.add_child(tabs)
 	for entry in [["operations", "01   SITH OPERATIONS"], ["rivals", "02   RIVAL DOSSIERS"], ["report", "03   COUNCIL REPORT"]]:
 		var key: String = entry[0]
 		var button := UI.button(entry[1], func(): show_page(key))
-		button.custom_minimum_size.x = 240
+		button.custom_minimum_size = Vector2(174 if portrait else 190 if compact else 240, 44)
+		if compact: button.text = entry[1].substr(5) if portrait else {"operations":"OPERATIONS", "rivals":"RIVALS", "report":"REPORT"}[key]
 		if key == page: button.add_theme_stylebox_override("normal", UI.style(Color("29212e"), RED))
 		tabs.add_child(button)
 	var scroll := preload("res://scripts/touch_scroll.gd").new()
@@ -76,21 +89,33 @@ func show_page(value: String) -> void:
 	else: _operations()
 	status_line = UI.label(message, 14, UI.MUTED)
 	body.add_child(status_line)
+	if compact:
+		var layout_guard := Node.new(); layout_guard.name = "PhoneTabScroll"; body.add_child(layout_guard)
+	if Phone.narrow(Phone.window_size()): _phone_text_floor(self)
+
+func _phone_text_floor(node: Node) -> void:
+	if node is Label and node.get_theme_font_size("font_size") < 14:
+		node.add_theme_font_size_override("font_size", 14)
+	if node is BaseButton and node.get_theme_font_size("font_size") < 14:
+		node.add_theme_font_size_override("font_size", 14)
+	for child in node.get_children(): _phone_text_floor(child)
 
 func _header() -> void:
-	var row := HBoxContainer.new()
+	var row: BoxContainer = VBoxContainer.new() if portrait else HBoxContainer.new()
 	body.add_child(row)
 	var title := UI.column(2)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(title)
-	title.add_child(UI.label("TEMPLE WATCH     /     COUNCIL INTELLIGENCE", 13, GOLD))
-	title.add_child(UI.label("THE SHADOW WAR", 34))
+	if not compact: title.add_child(UI.label("TEMPLE WATCH     /     COUNCIL INTELLIGENCE", 13, GOLD))
+	title.add_child(UI.label("SHADOW WAR" if compact and not portrait else "THE SHADOW WAR", 24 if compact else 34))
 	var dates := UI.column(4)
-	dates.custom_minimum_size.x = 245
+	dates.custom_minimum_size.x = 0 if portrait else 150 if compact else 245
 	row.add_child(dates)
-	dates.add_child(UI.label("MONTH %02d  /  DAY %02d" % [int(layer.s.month), int(layer.s.day) % 30 + 1], 18, GOLD))
+	dates.add_child(UI.label(("M%02d  D%02d" if compact and not portrait else "MONTH %02d  /  DAY %02d") % [int(layer.s.month), int(layer.s.day) % 30 + 1], 18, GOLD))
 	dates.add_child(UI.label("%d Intel available" % int(layer.state.get("res", {}).get("intel", 0)), 14, UI.MUTED))
-	row.add_child(UI.button("Close", _close))
+	var close := UI.button("CLOSE", _close)
+	close.custom_minimum_size.y = 44
+	row.add_child(close)
 
 func _close() -> void:
 	if close_requested.get_connections().is_empty(): get_tree().quit()
@@ -101,7 +126,7 @@ func _project() -> void:
 	body.add_child(card)
 	var box := UI.column(8)
 	card.add_child(box)
-	var row := HBoxContainer.new()
+	var row: BoxContainer = VBoxContainer.new() if portrait else HBoxContainer.new()
 	box.add_child(row)
 	var title := UI.label("DARKNESS   /   %02d OF 12 SEGMENTS" % int(layer.s.segments), 17, RED)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -109,6 +134,7 @@ func _project() -> void:
 	var deadline := "Next escalation: " + date_label(int(layer.s.next_escalation))
 	if int(layer.s.collapse_day) >= 0: deadline = "ORDER FALLS: " + date_label(int(layer.s.collapse_day))
 	if layer.s.defeated: deadline = "THE ORDER HAS FALLEN"
+	if compact and not portrait and not layer.s.defeated: deadline = "ESCALATES %s" % date_label(int(layer.s.next_escalation))
 	var date := UI.label(deadline, 15, GOLD)
 	date.autowrap_mode = TextServer.AUTOWRAP_OFF
 	row.add_child(date)
@@ -121,14 +147,16 @@ func _project() -> void:
 		pip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		pip.color = RED if i < int(layer.s.segments) else Color("39313f")
 		segments.add_child(pip)
-	box.add_child(UI.label("Destroy a shadow conduit: −2 segments   ·   Breach a stronghold: −1   ·   End a final pursuit: −2", 14, UI.MUTED))
+	var help := UI.label("Destroy a shadow conduit: −2 segments   ·   Breach a stronghold: −1   ·   End a final pursuit: −2", 14, UI.MUTED)
+	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if not compact or portrait: box.add_child(help)
 
 func _operations() -> void:
-	var row := HBoxContainer.new()
+	var row: BoxContainer = VBoxContainer.new() if compact else HBoxContainer.new()
 	row.add_theme_constant_override("separation", 20)
 	page_content.add_child(row)
 	var left := UI.column(12)
-	left.custom_minimum_size.x = 590
+	left.custom_minimum_size.x = 0 if compact else 590
 	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	left.size_flags_stretch_ratio = 1.0
 	row.add_child(left)
@@ -141,7 +169,7 @@ func _operations() -> void:
 		box.add_child(UI.label(str(op.status).to_upper() + "   /   " + date_label(int(op.deadline)), 12, RED))
 		box.add_child(UI.label(str(op.n), 23))
 		box.add_child(UI.label(str(op.desc), 16, UI.MUTED))
-		var buttons := HBoxContainer.new()
+		var buttons: BoxContainer = VBoxContainer.new() if portrait else HBoxContainer.new()
 		buttons.add_theme_constant_override("separation", 8)
 		box.add_child(buttons)
 		var available: bool = op.status == "open" and not layer.s.defeated
@@ -152,7 +180,7 @@ func _operations() -> void:
 		else:
 			buttons.add_child(UI.button("Reveal · 1 Intel", func(): _reveal(str(op.id)), available and int(layer.state.res.intel) >= 1))
 	var right := UI.column(12)
-	right.custom_minimum_size.x = 590
+	right.custom_minimum_size.x = 0 if compact else 590
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	right.size_flags_stretch_ratio = 1.0
 	row.add_child(right)
@@ -177,7 +205,7 @@ func _rivals() -> void:
 	if layer.rivals().is_empty():
 		page_content.add_child(UI.label("No Sith movements detected yet.", 16, UI.MUTED))
 		return
-	var row := HBoxContainer.new()
+	var row: BoxContainer = VBoxContainer.new() if compact else HBoxContainer.new()
 	row.add_theme_constant_override("separation", 16)
 	page_content.add_child(row)
 	var index := 0
@@ -217,7 +245,7 @@ func _report() -> void:
 	var report: Dictionary = layer.s.reports.back()
 	page_content.add_child(UI.label("MONTH %02d   /   %s" % [int(report.month), str(report.assessment).to_upper()], 28, GOLD))
 	page_content.add_child(UI.label("The Council records our victories, the cost of unanswered calls, and the enemy's growing knowledge.", 16, UI.MUTED))
-	var stats := HBoxContainer.new()
+	var stats: Container = HFlowContainer.new() if compact else HBoxContainer.new()
 	stats.add_theme_constant_override("separation", 14)
 	page_content.add_child(stats)
 	for entry in [["won", "MISSIONS WON"], ["operations_countered", "OPERATIONS STOPPED"], ["crises_ignored", "UNANSWERED CRISES"], ["rivals_defeated", "RIVALS REPULSED"]]:
@@ -225,7 +253,7 @@ func _report() -> void:
 		box.get_parent().size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		box.add_child(UI.label("%02d" % int(report.metrics.get(entry[0], 0)), 40, GOLD))
 		box.add_child(UI.label(entry[1], 13, UI.MUTED))
-	var row := HBoxContainer.new()
+	var row: BoxContainer = VBoxContainer.new() if compact else HBoxContainer.new()
 	row.add_theme_constant_override("separation", 16)
 	page_content.add_child(row)
 	var ops := _card(row)
