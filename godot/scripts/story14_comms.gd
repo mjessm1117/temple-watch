@@ -2,6 +2,7 @@ extends RefCounted
 ## Battle narrative cards and legacy state barks.
 const Portraits = preload("res://scripts/story14_portraits.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
+const Beats = preload("res://scripts/story/story14_beats.gd")
 var game: WeakRef
 var lines: Dictionary
 var legacy_barks: Dictionary
@@ -107,8 +108,22 @@ func _show(g: Node, event: String, players: Array) -> void:
 	var options: Array = lines[name].get(event,[])
 	if options.size() < 3: return
 	var sentence: String = options[bark_number % options.size()]
+	var portrait_key := name
+	var kind: String = {"contact":"reveal", "ally_down":"hurt", "villain":"villain_reveal"}.get(event, "")
+	if not kind.is_empty():
+		var actor_id := ""
+		var target_id := ""
+		for ally in players:
+			var story_id: Variant = Beats.NAMES.find_key(str(ally.get("name", "")))
+			var id := str(story_id) if story_id != null else str(ally.get("rid", ally.get("id", "")))
+			if str(ally.get("name", "")) == name: actor_id = id
+			if event == "ally_down" and (str(ally.get("status", "")) == "down" or int(ally.get("hp", 1)) <= 0): target_id = id
+		var context := {"villain_name":str(g.mission.objective_state.get("villain_name", ""))}
+		var bark: Dictionary = Beats.pick_bark(kind, actor_id, target_id, context)
+		if not bark.is_empty():
+			name = str(bark.get("speaker", name)); portrait_key = str(bark.get("portrait_key", name)); sentence = str(bark.get("text", sentence))
 	bark_number += 1
-	show_radio(name,name,sentence,1)
+	show_radio(name,portrait_key,sentence,1)
 
 func show_radio(speaker: String, portrait_key: String, text: String, priority: int) -> void:
 	var g: Node = game.get_ref()

@@ -164,6 +164,12 @@ func _refresh_figures() -> void:
 func arrange_labels() -> void:
 	var placed: Array[Rect2] = []
 	var ids: Array = g.views.keys()
+	var viewport: Vector2 = g.get_viewport().get_visible_rect().size
+	if viewport.x <= 485 or viewport.y <= 302:
+		for id in ids:
+			var view: Node3D = g.views[id]
+			if view.status_label != null: view.status_label.visible = false
+		return
 	ids.sort_custom(func(a,b): return a != b and (a == g.selected_id or (b != g.selected_id and int(a)<int(b))))
 	for id in ids:
 		var view: Node3D = g.views[id]
@@ -171,7 +177,6 @@ func arrange_labels() -> void:
 		var label: Label3D = view.status_label
 		var at: Vector2 = g.camera.unproject_position(view.global_position+Vector3.UP*2)
 		var rect := Rect2(at-Vector2(120,32),Vector2(240,64))
-		var viewport: Vector2 = g.get_viewport().get_visible_rect().size
 		var overlap := not Rect2(Vector2(220, 64), viewport - Vector2(485, 302)).encloses(rect)
 		for used in placed:
 			if used.intersects(rect): overlap = true; break

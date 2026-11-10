@@ -454,6 +454,7 @@ func _update_actions(from_game: bool) -> void:
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var available: int = int(unit.get("ap", 0))
 	var primary_limit := mini(4, maxi(3, int(floor((ability_tray.size.x - 8.0) / 48.0)) - 2))
+	if overlay.size.y > overlay.size.x and ability_tray.size.y < 192.0: primary_limit = 2
 	last_unit_id = g.selected_id; last_unit_ap = available
 	if from_game:
 		for button in ability_buttons: button.set_meta("battle12_available", button.visible and not button.disabled)
