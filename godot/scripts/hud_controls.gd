@@ -267,7 +267,7 @@ func _build_ui() -> void:
 	result_box.add_child(_button("Restart mission", func() -> void: g.get_tree().reload_current_scene()))
 	result_box.add_child(_button("Main menu", func() -> void: g.get_node("/root/CampaignFlow").go("menu")))
 	night = preload("res://scripts/hud_night1.gd").new(); night.g = g; root.add_child(night); night.setup(left_box, right_box)
-	if g.has_signal("battle_event"): g.connect("battle_event", _on_battle_event)
+	if g.has_signal("battle_event") and not g.is_connected("battle_event", _on_battle_event): g.connect("battle_event", _on_battle_event)
 	aim_ui = preload("res://scripts/battle12_aim.gd").new()
 	aim_ui.setup(g, root, Phone.narrow(Phone.window_size()))
 	if Phone.narrow(Phone.window_size()):
