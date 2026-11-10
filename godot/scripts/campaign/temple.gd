@@ -68,19 +68,20 @@ func _build_shell() -> void:
 	var head := UI.panel(Color(0.035, 0.075, 0.09, 0.94)); add_child(head)
 	head.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	head.offset_left = safe.x + (8 if compact else 20); head.offset_right = -safe.z - (8 if compact else 20)
-	head.offset_top = safe.y + (3 if compact else 14); head.offset_bottom = safe.y + (95 if compact else 106)
+	head.offset_top = safe.y + (3 if compact else 14); head.offset_bottom = safe.y + (52 if compact else 106)
 	if compact:
 		var head_style: StyleBoxFlat = head.get_theme_stylebox("panel").duplicate()
 		head_style.set_content_margin_all(6); head.add_theme_stylebox_override("panel", head_style)
 	var rows := UI.column(5); head.add_child(rows)
 	var title := HBoxContainer.new(); rows.add_child(title)
-	var brand := UI.label("TEMPLE WATCH", 22 if compact else 27, Color("78d2df")); brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL; title.add_child(brand)
+	var brand := UI.label("TEMPLE WATCH", 18 if compact else 27, Color("78d2df")); brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL; title.add_child(brand)
 	if compact:
-		var rooms_button := UI.button("ROOMS", _toggle_rooms); rooms_button.custom_minimum_size.y = 56
+		var rooms_button := UI.button("ROOMS", _toggle_rooms); rooms_button.name = "RoomsDrawer"; rooms_button.custom_minimum_size.y = 44
 		title.add_child(rooms_button)
 	status_label = UI.label("", 15, UI.GOLD); title.add_child(status_label)
 	var resources := HBoxContainer.new(); resources.add_theme_constant_override("separation", 8 if compact else 18)
 	rows.add_child(resources)
+	if compact: resources.hide()
 	HomeResources.add_row(resources, campaign)
 	resources.add_child(HomeResources.power_label(campaign))
 	resources.add_child(UI.label("Order Darkness  %d/100" % int(campaign.state.orderDark), 13, Color("b5a2d3")))
@@ -101,11 +102,11 @@ func _build_shell() -> void:
 		for child in row.get_children():
 			if child is Label: child.autowrap_mode = TextServer.AUTOWRAP_OFF
 	var foot_bg := ColorRect.new(); add_child(foot_bg); foot_bg.color = Color(0.02, 0.05, 0.065, 0.84)
-	foot_bg.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); foot_bg.offset_top = -64 if compact else -97
+	foot_bg.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); foot_bg.offset_top = -52 if compact else -97
 	foot_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var footer := UI.column(7); add_child(footer); footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	footer.offset_left = safe.x + (8 if compact else 20); footer.offset_right = -safe.z - (8 if compact else 20)
-	footer.offset_top = -safe.w - (60 if compact else 88); footer.offset_bottom = -safe.w - (4 if compact else 14)
+	footer.offset_top = -safe.w - (48 if compact else 88); footer.offset_bottom = -safe.w - (2 if compact else 14)
 	notice_label = UI.label("Select a room to manage the Order.  •  Gold: module ready  •  Dark: awaiting construction", 14, UI.MUTED)
 	if compact: notice_label.hide()
 	notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; footer.add_child(notice_label)
@@ -117,7 +118,7 @@ func _build_shell() -> void:
 	for name in names:
 		var target: String = "Council" if name == "Command" else name
 		var button := UI.button(name, _change_page.bind(target)); button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.custom_minimum_size.y = 56 if compact else 44
+		button.custom_minimum_size.y = 44
 		HomeTabs.decorate(button, name)
 		button.text = "   " + str(titles[name])
 		if compact: button.add_theme_font_size_override("font_size", 14)
@@ -126,15 +127,15 @@ func _build_shell() -> void:
 		nav_buttons[name] = button
 	var menu_button := UI.button("Menu", func(): get_node("/root/CampaignFlow").go("menu"))
 	menu_button.name = "MenuCommand"
-	menu_button.custom_minimum_size.y = 56 if compact else 44; menu_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	menu_button.custom_minimum_size.y = 44; menu_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if compact:
 		var more := UI.button("More" if Phone.touch_device() else "⋯  More", _toggle_more); more.name = "MoreCommands"
-		more.custom_minimum_size.y = 56; more.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		more.custom_minimum_size.y = 48; more.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		nav.add_child(more)
 		more_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.98)); add_child(more_panel)
 		more_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 		more_panel.offset_left = 8; more_panel.offset_right = -8
-		more_panel.offset_top = -112; more_panel.offset_bottom = -57
+		more_panel.offset_top = -100; more_panel.offset_bottom = -48
 		var extras := HBoxContainer.new(); more_panel.add_child(extras)
 		for name in ["Roster", "Legacy", "Teams", "Codex"]:
 			var button: Button = nav_buttons[name]
@@ -159,12 +160,12 @@ func _build_shell() -> void:
 	mini_galaxy = GalaxyCard.new(); add_child(mini_galaxy)
 	mini_galaxy.setup(campaign, compact)
 	mini_galaxy.opened.connect(_open_galaxy)
-	mini_galaxy.position = Vector2(safe.x + (8 if compact else 25), safe.y + (100 if compact else 340))
+	mini_galaxy.position = Vector2(safe.x + (8 if compact else 25), safe.y + (56 if compact else 340))
 	station_panel = UI.panel(Color(0.045, 0.09, 0.115, 0.97)); add_child(station_panel)
 	station_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	station_panel.anchor_left = 0.0 if compact else 0.35; station_panel.offset_left = 0
-	station_panel.offset_top = safe.y + (98 if compact else 113); station_panel.offset_right = -safe.z if compact else -20
-	station_panel.offset_bottom = -safe.w - (57 if compact else 100)
+	station_panel.offset_top = safe.y + (54 if compact else 113); station_panel.offset_right = -safe.z if compact else -20
+	station_panel.offset_bottom = -safe.w - (48 if compact else 100)
 	station_panel.visible = panel_open
 	var column := UI.column(8); station_panel.add_child(column)
 	var top := HBoxContainer.new(); column.add_child(top)
@@ -181,7 +182,7 @@ func _build_room_picker() -> void:
 	var safe := Phone.safe_margins(get_viewport_rect().size)
 	room_picker = UI.panel(Color(0.045, 0.09, 0.115, 0.98)); room_picker.visible = false
 	room_picker.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	room_picker.offset_left = safe.x + 8; room_picker.offset_right = -safe.z - 8; room_picker.offset_top = safe.y + 98; room_picker.offset_bottom = -safe.w - 57
+	room_picker.offset_left = safe.x + 8; room_picker.offset_right = -safe.z - 8; room_picker.offset_top = safe.y + 54; room_picker.offset_bottom = -safe.w - 48
 	add_child(room_picker)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	room_picker.add_child(scroll)

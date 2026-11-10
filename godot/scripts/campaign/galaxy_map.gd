@@ -21,19 +21,19 @@ var focused := ""
 var hovered := ""
 var target := Vector3(0,0,-1.7)
 var look_at_point := Vector3.ZERO
-var zoom := 79.0
+var zoom := 66.0 if Phone.narrow(Phone.window_size()) else 79.0
 var elapsed := 0.0
 var dragging := false
 var drag_distance := 0.0
 var press_position := Vector2.ZERO
 var pointer_inside := false
 var overview_target := Vector3(0,0,-1.7)
-var overview_zoom := 79.0
+var overview_zoom := 66.0 if Phone.narrow(Phone.window_size()) else 79.0
 var haze_timer := 0.0
 var mini := false
 
 func _ready() -> void:
-	custom_minimum_size = Vector2.ZERO if mini else Vector2(400, 330)
+	custom_minimum_size = Vector2.ZERO if mini or Phone.narrow(Phone.window_size()) else Vector2(400, 330)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE if mini else Control.MOUSE_FILTER_STOP
 	var container := SubViewportContainer.new(); container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	container.stretch = true; container.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(container)

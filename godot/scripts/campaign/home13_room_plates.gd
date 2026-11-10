@@ -20,7 +20,7 @@ static func layout(button: Button, info: Dictionary, phone: bool) -> void:
 	var name_label: Label = button.get_node("RoomName")
 	var detail: Label = button.get_node("RoomDetail")
 	detail.text = state_text(info)
-	var preferred := 8 if info.kind in ["spire", "council"] else 9
+	var preferred := (11 if info.kind in ["spire", "council"] else 12) if phone else 8 if info.kind in ["spire", "council"] else 9
 	var name_width := name_label.get_theme_font("font").get_string_size(name_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, preferred).x
 	if name_width > button.size.x - 4.0 and " " in name_label.text:
 		name_label.add_theme_font_size_override("font_size", preferred)
@@ -30,14 +30,15 @@ static func layout(button: Button, info: Dictionary, phone: bool) -> void:
 		fit(name_label, button.size.x, preferred)
 	# Keep all three lines in the upper part of each target. Adjacent floors
 	# project only about 57 pixels apart at desktop resolution.
-	name_label.offset_top = 2
-	name_label.offset_bottom = 17 if info.built else 28
+	var phone_height := 24.0 if name_label.autowrap_mode == TextServer.AUTOWRAP_WORD else 16.0
+	name_label.offset_top = maxf(2.0, (button.size.y - phone_height) * 0.5) if phone else 2
+	name_label.offset_bottom = name_label.offset_top + phone_height if phone else 17 if info.built else 28
 	name_label.clip_text = false
 	fit(detail, button.size.x, 9)
 	detail.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	detail.offset_top = 44 if info.built else 30
 	detail.offset_bottom = 57 if info.built else 43
-	name_label.visible = not phone
+	name_label.visible = true
 	detail.visible = not phone
 	if button.has_node("BattleBonus"):
 		var bonus: Label = button.get_node("BattleBonus")

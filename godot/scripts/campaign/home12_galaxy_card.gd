@@ -7,13 +7,13 @@ var map: Control
 
 func setup(campaign, compact: bool) -> void:
 	name = "MiniGalaxy"
-	custom_minimum_size = Vector2(164, 82) if compact else Vector2(192, 136)
+	custom_minimum_size = Vector2(120, 44) if compact else Vector2(192, 136)
 	var backing := UI.panel(Color(0.025, 0.065, 0.09, 0.94))
 	add_child(backing); backing.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	backing.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	map = Map.new(); map.mini = true; map.campaign = campaign
 	add_child(map); map.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	map.offset_top = 16; map.offset_bottom = -17
+	map.offset_top = 0 if compact else 16; map.offset_bottom = 0 if compact else -17
 	var button := Button.new(); button.name = "OpenGalaxy"
 	button.flat = true; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	add_child(button); button.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -27,3 +27,4 @@ func setup(campaign, compact: bool) -> void:
 	add_child(badge); badge.position = Vector2(8, custom_minimum_size.y - 17)
 	badge.size.x = custom_minimum_size.x - 16
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if compact: badge.hide()
