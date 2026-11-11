@@ -37,23 +37,45 @@ func _ready() -> void:
 	add_child(light)
 	wave_label = Label3D.new()
 	wave_label.font = load("res://assets/fonts/NotoSans-Bold.ttf")
-	wave_label.font_size = 32
-	wave_label.pixel_size = 0.006
+	wave_label.font_size = 24
+	wave_label.pixel_size = 0.004
 	wave_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	wave_label.modulate = Color("ffe4c4")
 	wave_label.outline_modulate = Color("17212b")
 	wave_label.outline_size = 8
-	wave_label.position.y = 1.15
+	wave_label.position.y = 0.55
 	add_child(wave_label)
 
 func show_tile(tile: Vector2i, mission: RefCounted) -> void:
 	visible = tile.x >= 0
 	if not visible: return
 	shown_tile = tile
-	position = Vector3(tile.x, Shot.elevation(mission, tile) * 0.7 + 0.17, tile.y)
+	var width := int(mission.spec.get("width", 24))
+	var height := int(mission.spec.get("height", 20))
+	var distances := [tile.x, width - 1 - tile.x, tile.y, height - 1 - tile.y]
+	var side := distances.find(distances.min())
+	var edge := tile
+	var arrow := edge_arrow(tile, mission)
+	match side:
+		0: edge.x = 1
+		1: edge.x = width - 2
+		2: edge.y = 1
+		3: edge.y = height - 2
+	position = Vector3(edge.x, Shot.elevation(mission, edge) * 0.7 + 0.17, edge.y)
 	var summary: Dictionary = preload("res://scripts/mission_pressure.gd").threat_summary(mission)
-	wave_label.text = "ENTRY POINT · INBOUND"
+	wave_label.text = arrow + " INBOUND"
 	for wave in summary.pending_groups:
 		if wave.entry_pos == tile:
-			wave_label.text = "ENTRY (%d,%d) · %d IN %d TURN%s" % [tile.x, tile.y, int(wave.count), int(wave.turns), "" if int(wave.turns) == 1 else "S"]
+			wave_label.text = "%s %d in %dT" % [arrow, int(wave.count), int(wave.turns)]
 			break
+
+static func edge_arrow(tile: Vector2i, mission: RefCounted) -> String:
+	var width := int(mission.spec.get("width", 24))
+	var height := int(mission.spec.get("height", 20))
+	var distances := [tile.x, width - 1 - tile.x, tile.y, height - 1 - tile.y]
+	match distances.find(distances.min()):
+		0: return ">"
+		1: return "<"
+		2: return "v"
+		3: return "^"
+	return ">"

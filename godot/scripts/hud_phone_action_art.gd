@@ -18,10 +18,9 @@ func _draw() -> void:
 	# Draw each primitive and font size together across the whole row.
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
-		if button.ability_id == "overwatch": continue
 		var at := offsets[index]
 		var gold := Color("f5d68b") if button.active else Color("b69b65") if not button.disabled else Color("67737d")
-		draw_arc(at + Vector2(button.size.x * 0.5, 18), 15, 0, TAU, 32, Color("9ef6b3") if button.combo_ready else gold, 2.5)
+		draw_arc(at + Vector2(button.size.x * 0.5, 23), 14, 0, TAU, 32, Color("9ef6b3") if button.combo_ready else gold, 2.5)
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
 		var at := offsets[index]
@@ -49,21 +48,17 @@ func _draw() -> void:
 		var button = visible_buttons[index]
 		var at := offsets[index]
 		var blue := Color("7ecde7") if not button.disabled else Color("67737d")
-		var glyphs := {"move":"➜", "shoot":"◎", "overwatch":"⌖", "hunker":"⬟", "strike":"⚔", "push":"⇥", "reload":"↻"}
+		var glyphs := {"move":"M", "shoot":"F", "overwatch":"O", "hunker":"H", "strike":"S", "push":"P", "reload":"R"}
 		if not preload("res://scripts/phone_layout.gd").touch_device():
-			draw_string(font, at + Vector2(2, 28), str(glyphs.get(button.ability_id, "✦")), HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 4, 18, blue)
+			draw_string(font, at + Vector2(2, 29), str(glyphs.get(button.ability_id, "A")), HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 4, 18, blue)
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
 		var at := offsets[index]
-		if button.ability_id == "overwatch":
-			var ink := Color("edf3f4") if not button.disabled else Color("9bb2b5")
-			draw_string(font, at + Vector2(1, 27), "OVER", HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, 11, ink)
-			draw_string(font, at + Vector2(1, 40), "WATCH", HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, 11, ink)
-			continue
 		var caption: String = caption_for(button.display_name)
-		while caption.length() > 1 and font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x > button.size.x - 4:
+		while caption.length() > 1 and font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x > button.size.x - 2:
 			caption = caption.substr(0, caption.length() - 1)
-		draw_string(font, at + Vector2(1, 32 if preload("res://scripts/phone_layout.gd").touch_device() else 39), caption, HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, 14, Color("edf3f4") if not button.disabled else Color("9bb2b5"))
+		# The caption row starts below the 44 px button hit box.
+		draw_string(font, at + Vector2(1, button.size.y + 13), caption, HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, 11, Color("edf3f4") if not button.disabled else Color("9bb2b5"))
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
 		var at := offsets[index]
@@ -71,7 +66,7 @@ func _draw() -> void:
 			var mark: Dictionary = button.chain_marks[i]
 			var center := at + Vector2(button.size.x - 10.0 - i * 15.0, 11.0)
 			var color := Color(Marks.COLORS.get(str(mark.tag), "dcebf0"))
-			var glyph: String = str(mark.tag).substr(0, 1) if preload("res://scripts/phone_layout.gd").touch_device() else Marks.GLYPHS.get(str(mark.tag), "•")
+			var glyph: String = str(mark.tag).substr(0, 1).to_upper()
 			draw_string(font, center + Vector2(-4, 4), glyph, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, color)
 
 static func caption_for(display_name: String) -> String:

@@ -8,7 +8,7 @@ func _draw() -> void:
 	var chip := StyleBoxFlat.new()
 	chip.bg_color = Color("101b26f5"); chip.set_corner_radius_all(9)
 	draw_style_box(chip, Rect2(0, 0, 48, 144))
-	var font := ThemeDB.fallback_font
+	var font := preload("res://scripts/campaign/ui.gd").font("body")
 	for index in 3:
-		var glyph: String = ["↶", "⌖", "↷"][index]
+		var glyph: String = ["L", "C", "R"][index]
 		draw_string(font, Vector2(0, index * 48 + 32), glyph, HORIZONTAL_ALIGNMENT_CENTER, 48, 16, Color("f2d99a"))
