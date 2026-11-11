@@ -42,7 +42,7 @@ func run() -> void:
 	var stage: Control = home.temple_view
 	var rail: Button = home.find_child("TaskRailCard", true, false)
 	check(rail != null and rail.size.y >= 44, "one task rail card")
-	check(not c.has_method("strategic_snapshot25") and home.priority_room != "", "badge fallback without economy snapshot")
+	check(c.has_method("strategic_snapshot25") and home.priority_room == str(c.strategic_snapshot25().top_priority.room_id), "task rail uses economy priority snapshot")
 	var center := Rect2(Vector2(size.x * 0.34, size.y * 0.21), Vector2(size.x * 0.50, size.y * 0.55))
 	for key in stage.edge_badges:
 		var badge: Button = stage.edge_badges[key]
