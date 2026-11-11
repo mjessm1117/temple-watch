@@ -20,6 +20,7 @@ var narrative: Label
 var bond_meter: ProgressBar
 var bond_label: Label
 var choices_box: VBoxContainer
+var phone_decisions: VBoxContainer
 var choice_buttons: Array[Button] = []
 var typed := 0.0
 var decision_recorded := false
@@ -70,6 +71,7 @@ func _build() -> void:
 	narrative = null
 	bond_meter = null
 	portrait_count = 0
+	phone_decisions = null
 	big_speaker_portrait = null
 	big_speaker_caption = null
 	var bg := World.new()
@@ -156,13 +158,14 @@ func _build_story() -> void:
 	frame.add_theme_stylebox_override("panel", frame_style)
 	frame.size_flags_horizontal = SIZE_EXPAND_FILL
 	if phone:
-		frame.size_flags_vertical = SIZE_SHRINK_BEGIN
-		frame.custom_minimum_size.y = minf(500.0, get_viewport_rect().size.y * 0.62)
+		frame.size_flags_vertical = SIZE_EXPAND_FILL
+		frame.custom_minimum_size.y = 90
 	row.add_child(frame)
 	var content := UI.column(8 if phone else 12)
 	content.size_flags_horizontal = SIZE_EXPAND_FILL
 	var scroll := preload("res://scripts/touch_scroll.gd").new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_vertical = SIZE_EXPAND_FILL
 	frame.add_child(scroll)
 	scroll.add_child(content)
 	var campaign_flow := get_node_or_null("/root/CampaignFlow")
@@ -177,7 +180,7 @@ func _build_story() -> void:
 	if phone:
 		speaker_portrait = Portraits14.picture(speaker,Vector2(60,70))
 		speaking.add_child(speaker_portrait)
-	speaker_plate = UI.label("SPEAKER  " + speaker.to_upper(),14,UI.ACCENT)
+	speaker_plate = UI.label(speaker.to_upper() if phone else "SPEAKER  " + speaker.to_upper(),14,UI.ACCENT)
 	speaker_plate.size_flags_horizontal = SIZE_EXPAND_FILL
 	speaking.add_child(speaker_plate)
 	var skip := UI.button("SKIP",_skip_dialogue)
@@ -213,10 +216,17 @@ func _build_story() -> void:
 		var option: Dictionary = campaign_flow.campaign.state.get("launch_option", {})
 		var ready: Array = campaign_flow.campaign.default_squad(option)
 		content.add_child(UI.label("SQUAD READY  /  %d available · review loadout before Deploy" % ready.size(),14,UI.ACCENT))
-	content.add_child(UI.label("YOUR DECISION",14,UI.MUTED))
+	var decision_host: VBoxContainer = content
+	if phone:
+		decision_host = UI.column(4)
+		body.add_child(decision_host)
+		phone_decisions = decision_host
+	if not scene_data.get("choices", []).is_empty():
+		decision_host.add_child(UI.label("YOUR DECISION",14,UI.ACCENT))
 	choices_box = UI.column(8)
-	content.add_child(choices_box)
+	decision_host.add_child(choices_box)
 	choices_box.visible = false
+	if is_instance_valid(phone_decisions): phone_decisions.visible = false
 	for choice in scene_data.get("choices",[]):
 		var card := UI.column(3)
 		choices_box.add_child(card)
@@ -225,7 +235,7 @@ func _build_story() -> void:
 		var button := UI.button(label,_choose.bind(choice.get("id",""),true))
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		button.custom_minimum_size.y = 64 if kind == "arc_resolution" else 56 if phone else 44
+		button.custom_minimum_size.y = 64 if kind == "arc_resolution" else 44 if phone and get_viewport_rect().size.x > get_viewport_rect().size.y else 56 if phone else 44
 		card.add_child(button)
 		choice_buttons.append(button)
 		var preview := _preview(choice)
@@ -325,6 +335,7 @@ func _advance_dialogue() -> void:
 		return
 	if dialogue_index + 1 >= dialogue_lines.size():
 		choices_box.visible = true
+		if is_instance_valid(phone_decisions): phone_decisions.visible = true
 		return
 	dialogue_index += 1
 	page_counter.text = "PAGE %d / %d" % [dialogue_index + 1,dialogue_lines.size()]
@@ -336,7 +347,9 @@ func _advance_dialogue() -> void:
 	narrative.text = _dialogue_text(line)
 	narrative.visible_characters = 0
 	typed = 0
-	if dialogue_index + 1 == dialogue_lines.size(): choices_box.visible = true
+	if dialogue_index + 1 == dialogue_lines.size():
+		choices_box.visible = true
+		if is_instance_valid(phone_decisions): phone_decisions.visible = true
 
 func _skip_dialogue() -> void:
 	dialogue_index = dialogue_lines.size()-1
@@ -347,6 +360,7 @@ func _skip_dialogue() -> void:
 	narrative.text = _dialogue_text(line)
 	_reveal()
 	choices_box.visible = true
+	if is_instance_valid(phone_decisions): phone_decisions.visible = true
 
 func _fast_forward() -> void:
 	if narrative.visible_characters != -1:
@@ -356,7 +370,7 @@ func _fast_forward() -> void:
 		_reveal()
 
 func _set_speaker(name: String) -> void:
-	speaker_plate.text = "SPEAKER  " + name.to_upper()
+	speaker_plate.text = name.to_upper() if Phone.narrow(Phone.window_size()) else "SPEAKER  " + name.to_upper()
 	if is_instance_valid(speaker_portrait): speaker_portrait.texture = Portraits14.display_texture(name)
 	if is_instance_valid(big_speaker_portrait): big_speaker_portrait.texture = Portraits14.display_texture(name)
 	if is_instance_valid(big_speaker_caption): big_speaker_caption.text = name.to_upper()
@@ -449,6 +463,10 @@ func _build_journal(list: VBoxContainer) -> void:
 	list.add_child(UI.label("BATTLE TRANSMISSIONS  /  %d" % record.get("transcript",[]).size(),16,UI.ACCENT))
 	for row in record.get("transcript",[]):
 		list.add_child(UI.label("TURN %d · %s: %s" % [int(row.get("turn",0)),str(row.get("speaker","")),str(row.get("text",""))],16,UI.TEXT))
+	var room_lines: Array = campaign_state.get("w25_room_journal", [])
+	if not room_lines.is_empty():
+		list.add_child(UI.label("ROOM CONVERSATIONS",16,UI.ACCENT))
+		for line in room_lines: list.add_child(UI.label(str(line),16,UI.TEXT))
 	for section in [["CHOICES REMEMBERED",record.choices],["PERSONAL ARCS",record.arcs],["VILLAIN TRANSMISSIONS",record.get("villain",[])],["SQUAD SCENES",record.get("squad",[])],["FALLEN",record.fallen]]:
 		list.add_child(UI.label(str(section[0]),16,UI.ACCENT))
 		if section[1].is_empty(): list.add_child(UI.label("No entries yet.",14,UI.MUTED))
