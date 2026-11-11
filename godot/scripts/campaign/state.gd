@@ -272,6 +272,9 @@ func _tick_research(days: int) -> void:
 		ResearchQueue.complete(self, id)
 
 func _month_tick() -> void:
+	var galaxy_strategy: Script = preload("res://scripts/w25_galaxy_strategy.gd")
+	if galaxy_strategy.has_method("settle_months"):
+		galaxy_strategy.call("settle_months", self)
 	var credits := monthly_credits25()
 	gain("credits", int(credits.net))
 	if int(state.res.credits) < 0:

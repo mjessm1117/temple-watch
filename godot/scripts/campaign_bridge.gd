@@ -499,6 +499,18 @@ func advance_era() -> void:
 		campaign.state.flow_stage = "interlude"
 		save(); go("dialogue")
 
+func open_intel_view25() -> void:
+	var current := get_tree().current_scene
+	if current != null and current.has_method("open_intel_view25"):
+		current.call("open_intel_view25")
+		return
+	save()
+	get_tree().change_scene_to_file("res://scenes/galaxy.tscn")
+	await get_tree().process_frame
+	current = get_tree().current_scene
+	if current != null and current.has_method("open_intel_view25"):
+		current.call("open_intel_view25")
+
 func open_intelligence(page: String = "operations") -> void:
 	if int(campaign.state.era) == 1 and int(campaign.state.story.get("done", 0)) == 0: return
 	var current := get_tree().current_scene

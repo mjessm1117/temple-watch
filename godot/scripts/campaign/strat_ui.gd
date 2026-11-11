@@ -128,18 +128,14 @@ static func soldier(view, box: VBoxContainer, r: Dictionary) -> void:
 	# --- wave10 story ---
 	box.add_child(UI.label("BONDS  " + preload("res://scripts/campaign/bond_overlay.gd").summary(c.state,str(r.id)),13,UI.ACCENT))
 	if int(r.fatigue) >= 34: box.add_child(UI.label("Tired: −5 aim, −10 will. Exhausted at 67: cannot deploy. Rest to recover.", 13, UI.MUTED))
-	var roster_api: Variant = load("res://scripts/campaign/strat_roster.gd")
-	if roster_api.has_method("patient_actions25"):
-		var actions: Array = []
-		for method in roster_api.get_script_method_list():
-			if str(method.name) != "patient_actions25": continue
-			if method.args.size() == 1: actions = roster_api.call("patient_actions25", str(r.id))
-			elif method.args.size() == 2: actions = roster_api.call("patient_actions25", c, str(r.id))
+	var people_script: Script = preload("res://scripts/w25_roster_people.gd")
+	if people_script.has_method("patient_actions"):
+		var actions: Array = people_script.call("patient_actions", c, str(r.id))
 		for patient_action in actions:
 			box.add_child(UI.label("%s · %d days · %s" % [patient_action.get("label", "Care"), int(patient_action.get("days", 0)), patient_action.get("effect", "")], 14, UI.ACCENT))
 			var job := str(patient_action.get("id", ""))
-			if job in ["rest", "calm", "staff:medical", "", "staff:gardens"]:
-				button(view, box, str(patient_action.get("label", "Care")), c.assign.bind(str(r.id), job))
+			if people_script.has_method("apply_patient"):
+				button(view, box, str(patient_action.get("label", "Care")), Callable(people_script, "apply_patient").bind(c, str(r.id), job), bool(patient_action.get("enabled", false)))
 	var row := HFlowContainer.new(); box.add_child(row)
 	button(view, row, "Retrain · 40 Cr", Roster.train.bind(c, str(r.id), "retrain"), Roster.ready(r))
 	button(view, row, "Extra ability slot · 75 Cr", Roster.train.bind(c, str(r.id), "slot"), Roster.ready(r) and int(r.ability_slots) < 2)

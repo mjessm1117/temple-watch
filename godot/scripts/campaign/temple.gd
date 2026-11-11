@@ -248,6 +248,9 @@ func _open_room(id: String, target: String) -> void:
 	if id in ["medical", "comms"] and W25UI.defer_story_route(self, id, target): return
 	if id == "comms":
 		var flow := get_node("/root/CampaignFlow")
+		if flow.has_method("open_intel_view25"):
+			flow.call("open_intel_view25")
+			return
 		if flow.has_method("open_intelligence"):
 			flow.call("open_intelligence")
 			if is_instance_valid(flow.get("intelligence")): return
@@ -261,7 +264,7 @@ func _open_room(id: String, target: String) -> void:
 func _open_medical25() -> bool:
 	var roster_api: Script = Roster25
 	if roster_api.has_method("open_from_temple"):
-		roster_api.call("open_from_temple", "medical")
+		roster_api.call("open_from_temple", get_tree(), "medical", selected_id)
 		return true
 	var squad_api: Script = Squad
 	for method in squad_api.get_script_method_list():
