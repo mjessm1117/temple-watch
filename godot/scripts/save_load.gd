@@ -49,16 +49,19 @@ func _refresh() -> void:
 	UI.clear(confirm_host)
 	var flow := get_node("/root/CampaignFlow")
 	for slot in 4:
-		var row := UI.panel()
+		var current: bool = flow.active and slot == int(flow.w25_current_slot)
+		var row := UI.panel(UI.PANEL_ALT if current else UI.PANEL)
 		list.add_child(row)
 		var col := UI.column(4)
 		row.add_child(col)
-		col.add_child(UI.label("AUTOSAVE" if slot == 0 else "SLOT %d" % slot, 16, UI.ACCENT))
+		col.add_child(UI.label(("CURRENT  ·  " if current else "") + ("AUTOSAVE" if slot == 0 else "SLOT %d" % slot), 16, UI.GOLD if current else UI.ACCENT))
 		col.add_child(UI.label(Slots.description(slot), 14, UI.TEXT))
 		var actions := HBoxContainer.new()
 		col.add_child(actions)
 		if slot > 0: actions.add_child(UI.button("SAVE", _request.bind("save", slot), flow.active))
 		actions.add_child(UI.button("LOAD", _request.bind("load", slot), not Slots.metadata(slot).is_empty()))
+		var mission := _mission_name(slot)
+		if not mission.is_empty(): col.add_child(UI.label("MISSION  /  " + mission, 14, UI.MUTED))
 	if pending_slot >= 0:
 		var confirm := UI.panel()
 		confirm_host.add_child(confirm)
@@ -67,6 +70,19 @@ func _refresh() -> void:
 		buttons.add_child(UI.label("%s %s?" % [pending_action.to_upper(), "AUTOSAVE" if pending_slot == 0 else "SLOT %d" % pending_slot], 16, UI.GOLD))
 		buttons.add_child(UI.button("CONFIRM", _confirm))
 		buttons.add_child(UI.button("CANCEL", _cancel))
+
+func _mission_name(slot: int) -> String:
+	var path := Slots.path(slot)
+	if not FileAccess.file_exists(path): return ""
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not parsed is Dictionary or not parsed.get("C") is Dictionary: return ""
+	var state: Dictionary = parsed.C
+	var mission: Dictionary = state.get("pending_mission", {})
+	if mission.is_empty(): mission = state.get("launch_option", {})
+	if mission.is_empty() and state.get("options", []) is Array and int(state.get("chosen", -1)) >= 0 and int(state.chosen) < state.options.size(): mission = state.options[int(state.chosen)]
+	if mission.is_empty() and state.get("options", []) is Array and not state.options.is_empty(): mission = state.options[0]
+	if not mission.is_empty(): return str(mission.get("n", mission.get("mission", mission.get("mission_id", "")))).capitalize()
+	return "After mission %d" % int(state.get("step", 0))
 
 func _request(action: String, slot: int) -> void:
 	pending_action = action

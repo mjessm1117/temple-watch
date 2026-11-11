@@ -18,6 +18,11 @@ var save_path := Campaign.SAVE_PATH
 var intelligence: Control
 var launch_origin := "galaxy"
 var settings_panel: Control
+var settings_layer: CanvasLayer
+var w25_settings_scroll := 0
+var w25_settings_loaded := false
+var w25_launch_index := -1
+var w25_current_slot := 0
 var fade_duration := 0.24
 var last_bark_at := -4000
 var actor_bark_turn: Dictionary = {}
@@ -28,42 +33,90 @@ func session() -> RefCounted:
 	if campaign == null:
 		campaign = Campaign.new()
 		campaign.load_save(save_path)
+		_ensure_w25_state()
 		story = Story.new(campaign.state)
 	return campaign
+
+func _ensure_w25_state() -> void:
+	if campaign == null: return
+	if not campaign.state.has("w25_room_seen"): campaign.state.w25_room_seen = {}
+	if not campaign.state.has("w25_room_journal"): campaign.state.w25_room_journal = []
 
 func save() -> bool:
 	return campaign.save(save_path)
 
 func save_slot(slot: int) -> bool:
-	return SaveSlots.write(session(), slot)
+	var ok := SaveSlots.write(session(), slot)
+	if ok: w25_current_slot = slot
+	return ok
 
 func load_slot(slot: int) -> bool:
 	var next := Campaign.new()
 	if not SaveSlots.read(next, slot): return false
 	campaign = next
+	_ensure_w25_state()
 	story = Story.new(campaign.state)
 	active = true
+	w25_current_slot = slot
 	_resume_loaded()
 	return true
 
 func open_settings() -> void:
 	var scene := get_tree().current_scene
 	if scene == null: return
+	if not w25_settings_loaded:
+		var stored := ConfigFile.new()
+		stored.load("user://settings25.cfg")
+		w25_settings_scroll = int(stored.get_value("settings", "w25_scroll", 0))
+		w25_settings_loaded = true
 	if is_instance_valid(settings_panel):
+		var old_scroll := settings_panel.find_child("SettingsScroll", true, false) as ScrollContainer
+		if old_scroll != null: w25_settings_scroll = old_scroll.scroll_vertical
+		var stored := ConfigFile.new()
+		stored.set_value("settings", "w25_scroll", w25_settings_scroll)
+		stored.save("user://settings25.cfg")
 		settings_panel.queue_free()
 		settings_panel = null
+		if is_instance_valid(settings_layer): settings_layer.queue_free()
+		settings_layer = null
 		return
+	var layer := CanvasLayer.new()
+	layer.name = "SharedSettingsLayer"
+	layer.layer = 95
+	scene.add_child(layer)
 	var panel := PanelContainer.new()
 	panel.name = "SharedSettings"
-	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(280, 160)
+	var viewport_size := get_viewport().get_visible_rect().size
+	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	panel.add_theme_stylebox_override("panel", preload("res://scripts/campaign/ui.gd").style())
+	var safe := preload("res://scripts/phone_layout.gd").safe_margins(viewport_size)
+	var margin := MarginContainer.new()
+	for side in ["left", "right", "top", "bottom"]:
+		var extra := safe.x if side == "left" else safe.z if side == "right" else safe.y if side == "top" else safe.w
+		margin.add_theme_constant_override("margin_" + side, 8 + int(extra))
+	panel.add_child(margin)
 	var content := VBoxContainer.new()
-	panel.add_child(content)
-	content.add_child(preload("res://scripts/graphics_options.gd").build_settings_panel())
-	content.add_child(preload("res://scripts/campaign/ui.gd").button("BACK", open_settings))
-	scene.add_child(panel)
+	margin.add_child(content)
+	var head := HBoxContainer.new()
+	content.add_child(head)
+	var title := preload("res://scripts/campaign/ui.gd").label("SETTINGS / CONTROLS", 20, preload("res://scripts/campaign/ui.gd").GOLD)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(title)
+	var back := preload("res://scripts/campaign/ui.gd").button("BACK", open_settings)
+	back.name = "SettingsBack"
+	head.add_child(back)
+	var scroll := preload("res://scripts/touch_scroll.gd").new()
+	scroll.name = "SettingsScroll"
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content.add_child(scroll)
+	var settings := preload("res://scripts/graphics_options.gd").build_settings_panel()
+	settings.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(settings)
+	layer.add_child(panel)
+	settings_layer = layer
 	settings_panel = panel
+	scroll.set_deferred("scroll_vertical", w25_settings_scroll)
 
 func open_saves(origin: String = "menu") -> void:
 	launch_origin = origin
@@ -71,6 +124,7 @@ func open_saves(origin: String = "menu") -> void:
 
 func new_campaign(difficulty: String) -> void:
 	campaign = Campaign.new(difficulty)
+	_ensure_w25_state()
 	story = Story.new(campaign.state)
 	active = true
 	campaign.state.flow_stage = "opening"
@@ -87,8 +141,10 @@ func opening_finished() -> void:
 func continue_campaign() -> void:
 	campaign = Campaign.new()
 	if not campaign.load_save(save_path): return
+	_ensure_w25_state()
 	story = Story.new(campaign.state)
 	active = true
+	w25_current_slot = 0
 	_resume_loaded()
 
 func _resume_loaded() -> void:
@@ -126,6 +182,10 @@ func go(scene: String) -> void:
 	layer.queue_free()
 
 func prepare_briefing(index: int) -> void:
+	_prepare_briefing25(index)
+	go("briefing")
+
+func _prepare_briefing25(index: int) -> void:
 	launch_origin = get_tree().current_scene.name.to_snake_case() if get_tree().current_scene != null else "galaxy"
 	if launch_origin not in ["galaxy", "temple"]: launch_origin = "galaxy"
 	var option: Dictionary = campaign.state.options[index]
@@ -145,7 +205,58 @@ func prepare_briefing(index: int) -> void:
 	if option.has("sith_offer_id"): screen.goal = str(option.n) + " · " + str(option.get("risk",screen.goal))
 	screen_return = "squad"
 	save()
-	go("briefing")
+
+func launch_ready25(mission_id: String) -> void:
+	if not active or campaign == null or not campaign.state.get("pending_mission", {}).is_empty(): return
+	var galaxy := get_tree().current_scene
+	if galaxy != null and galaxy.has_method("_select"):
+		var selected_index := int(galaxy.get("selected"))
+		if selected_index >= 0 and selected_index < campaign.state.options.size():
+			var selected_option: Dictionary = campaign.state.options[selected_index]
+			if mission_id in [str(selected_option.get("mission", "")), str(selected_option.get("id", "")), str(selected_option.get("n", ""))]:
+				w25_launch_index = selected_index
+				_prepare_briefing25(selected_index)
+				_show_ready25()
+				return
+	for i in campaign.state.options.size():
+		var option: Dictionary = campaign.state.options[i]
+		if mission_id in [str(option.get("mission", "")), str(option.get("id", "")), str(option.get("n", ""))]:
+			w25_launch_index = i
+			_prepare_briefing25(i)
+			_show_ready25()
+			return
+
+func _show_ready25() -> void:
+	var ready := preload("res://scripts/w25_menus_readiness.gd").new()
+	var previous := get_tree().current_scene
+	get_tree().root.add_child(ready)
+	get_tree().current_scene = ready
+	if previous != null: previous.queue_free()
+
+func back_from_ready25() -> void:
+	campaign.state.flow_stage = "temple"
+	campaign.state.erase("pending")
+	screen = {}
+	save()
+	await go("galaxy")
+	var galaxy := get_tree().current_scene
+	if galaxy != null and galaxy.has_method("_select") and w25_launch_index >= 0:
+		galaxy.call("_select", w25_launch_index)
+
+func open_room_story25(room_id: String) -> bool:
+	if not active or campaign == null or get_tree().current_scene == null: return false
+	var helper := preload("res://scripts/w25_menus_room_story.gd")
+	var beat: Dictionary = helper.due(campaign, room_id)
+	if beat.is_empty(): return false
+	var previous := get_tree().current_scene.find_child("RoomStory25", true, false)
+	if previous != null: previous.queue_free()
+	if not campaign.state.has("w25_room_seen"): campaign.state.w25_room_seen = {}
+	campaign.state.w25_room_seen[str(beat.id)] = true
+	save()
+	var card := helper.new()
+	get_tree().current_scene.add_child(card)
+	card.present(self, beat)
+	return true
 
 func back_from_briefing() -> void:
 	campaign.state.flow_stage = "temple"
@@ -390,6 +501,10 @@ func advance_era() -> void:
 
 func open_intelligence(page: String = "operations") -> void:
 	if int(campaign.state.era) == 1 and int(campaign.state.story.get("done", 0)) == 0: return
+	var current := get_tree().current_scene
+	if current != null and current.has_method("open_intel_view25"):
+		current.call("open_intel_view25")
+		return
 	if is_instance_valid(intelligence): intelligence.queue_free()
 	intelligence = load("res://scenes/sith_report.tscn").instantiate()
 	intelligence.bind_state(campaign.state)

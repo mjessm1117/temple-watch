@@ -6,6 +6,8 @@ const PANEL_ALT = Color("15232a")
 const BORDER = Color("22363c")
 const TEXT = Color("dbe7e4")
 const MUTED = Color("8aa2a5")
+const SECONDARY = Color("9bb2b5")
+const HINT = Color("9bb2b5")
 const ACCENT = Color("79d3e2")
 const GOLD = Color("e0bd78")
 const DANGER = Color("ef6a5d")
@@ -53,9 +55,25 @@ static func label(message: String, size: int = 17, color: Color = TEXT) -> Label
 	var tree := Engine.get_main_loop() as SceneTree
 	var phone := Phone.narrow(Vector2i(tree.root.size)) if tree != null else Phone.narrow(Phone.window_size())
 	l.add_theme_font_size_override("font_size", maxi(14, roundi(size * float(StylePrefs.get_value("text_scale")))) if phone else roundi(size * float(StylePrefs.get_value("text_scale"))))
-	l.add_theme_color_override("font_color", color)
+	l.add_theme_color_override("font_color", readable(color))
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return l
+
+static func readable(color: Color) -> Color:
+	var result := color
+	while _contrast(result, PANEL_ALT) < 4.5:
+		result = result.lerp(Color.WHITE, 0.08)
+	return result
+
+static func _contrast(foreground: Color, background: Color) -> float:
+	var a := _luminance(foreground)
+	var b := _luminance(background)
+	return (maxf(a, b) + 0.05) / (minf(a, b) + 0.05)
+
+static func _luminance(color: Color) -> float:
+	var channels := [color.r, color.g, color.b]
+	for i in 3: channels[i] = channels[i] / 12.92 if channels[i] <= 0.04045 else pow((channels[i] + 0.055) / 1.055, 2.4)
+	return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
 
 static func button(message: String, action: Callable, enabled: bool = true) -> Button:
 	var b := Button.new()

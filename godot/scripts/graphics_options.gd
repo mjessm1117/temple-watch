@@ -13,6 +13,8 @@ static func build_settings_panel() -> Control:
 	return panel
 
 func _ready() -> void:
+	visibility_changed.connect(_maybe_open_shared)
+	_maybe_open_shared.call_deferred()
 	AudioServer.set_bus_mute(0, not bool(StylePrefs.get_value("sound")))
 	add_theme_constant_override("separation", 6)
 	add_child(UI.label("SETTINGS", 20, UI.GOLD))
@@ -35,6 +37,17 @@ func _ready() -> void:
 	controls.name = "ControlsSection"
 	add_child(controls)
 	refresh()
+
+func _maybe_open_shared() -> void:
+	if not is_inside_tree() or not is_visible_in_tree(): return
+	var scene := get_tree().current_scene
+	if scene == null or not scene.scene_file_path.ends_with("rescue.tscn"): return
+	var ancestor := get_parent()
+	while ancestor != null:
+		if ancestor.name == "SharedSettings": return
+		ancestor = ancestor.get_parent()
+	var flow := get_node_or_null("/root/CampaignFlow")
+	if flow != null and not is_instance_valid(flow.settings_panel): flow.open_settings.call_deferred()
 
 func _option(key: String, title: String, labels: Array, value: Variant, save: Callable) -> void:
 	var row := HBoxContainer.new(); row.name = key + "Row"
