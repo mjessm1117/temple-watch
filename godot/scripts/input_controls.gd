@@ -87,6 +87,51 @@ static func move_preview(m: RefCounted, unit: Dictionary, dest: Vector2i) -> Dic
 			if bool(shot_info.flanked): flanks.append(str(enemy.name))
 	return {"ap": ap_cost, "tiles": cost, "prev": route.prev, "shields": shields, "flanks": flanks, "seen_by": seen_by}
 
+static func sight26(m: RefCounted, actor: Dictionary, tile: Vector2i) -> Dictionary:
+	var seen_by := 0
+	var flanked := false
+	var cover_pct := 0
+	if actor.is_empty() or not m.in_bounds(tile): return {"seen_by": 0, "flanked": false, "cover_pct": 0}
+	var probe: Dictionary = actor.duplicate()
+	probe.x = tile.x; probe.y = tile.y
+	for enemy in m.living("enemy"):
+		if not bool(enemy.get("awake", false)): continue
+		var info: Dictionary = Shot.calculate(m, enemy, probe)
+		if not bool(info.los) or not bool(info.range_ok): continue
+		seen_by += 1
+		flanked = flanked or bool(info.flanked)
+		cover_pct = maxi(cover_pct, int(info.cover))
+	return {"seen_by": seen_by, "flanked": flanked, "cover_pct": cover_pct}
+
+static func preview26(m: RefCounted, tile: Vector2i, actor_id: int) -> Dictionary:
+	var result := {"cover_pct": 0, "flanked": false, "seen_by": 0, "hit_pct_vs_nearest": 0, "route_safe": false}
+	if m == null or not m.in_bounds(tile): return result
+	var actor: Dictionary = m.unit_by_id(actor_id)
+	if actor.is_empty(): return result
+	var sight := sight26(m, actor, tile)
+	result.cover_pct = sight.cover_pct
+	result.flanked = sight.flanked
+	result.seen_by = sight.seen_by
+	var probe: Dictionary = actor.duplicate()
+	probe.x = tile.x; probe.y = tile.y
+	var nearest: Dictionary = {}
+	var nearest_distance := INF
+	for enemy in m.living("enemy"):
+		if not bool(enemy.get("awake", false)): continue
+		var distance := Shot.distance(tile, Shot.pos(enemy))
+		if distance < nearest_distance: nearest_distance = distance; nearest = enemy
+	if not nearest.is_empty():
+		var odds: Dictionary = Shot.calculate(m, probe, nearest)
+		if bool(odds.los) and bool(odds.range_ok): result.hit_pct_vs_nearest = int(odds.hit)
+	var move: Dictionary = move_preview(m, actor, tile)
+	if not move.is_empty():
+		result.route_safe = true
+		var cursor := tile
+		while move.prev.has(cursor):
+			if int(sight26(m, actor, cursor).seen_by) > 0: result.route_safe = false; break
+			cursor = move.prev[cursor]
+	return result
+
 static func valid_targets(m: RefCounted, unit: Dictionary, mode: String) -> Array[Dictionary]:
 	var targets: Array[Dictionary] = []
 	if mode not in ["shoot", "strike", "push"]:
