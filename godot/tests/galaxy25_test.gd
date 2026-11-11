@@ -7,8 +7,11 @@ class ScanCampaign extends "res://scripts/campaign/state.gd":
 	var interrupt_on := 0
 	func advance_strategy_day25(days: int, _reason: String) -> Dictionary:
 		calls += 1
-		advance_days(days)
+		super.advance_strategy_day25(days, _reason)
 		return {"days_advanced": days, "events": ["incoming signal"] if calls == interrupt_on else []}
+
+class NoClockCampaign extends RefCounted:
+	var state: Dictionary = Campaign.new().state
 
 var checks := 0
 var failures := 0
@@ -42,7 +45,7 @@ func run() -> void:
 	c.interrupt_on = 0
 	var resumed := Strategy.scan(c,"outer_cache")
 	check(int(resumed.days_advanced) == 2 and c.state.w25_scans_done.has("outer_cache"), "Scan resumes with remaining days")
-	var absent := Strategy.scan(Campaign.new(),str(site.id))
+	var absent := Strategy.scan(NoClockCampaign.new(),str(site.id))
 	check(int(absent.days_advanced) == 0, "Absent time contract is safe")
 	var poor := Campaign.new()
 	poor.state.res.intel = 10; poor.state.res.credits = 500
@@ -55,6 +58,9 @@ func run() -> void:
 	poor.state.month = 2
 	check(Strategy.settle_months(poor) == Strategy.monthly_income(poor.state), "Contacted regions add monthly income")
 	check(int(poor.state.res.credits) == income_before + Strategy.monthly_income(poor.state), "Monthly income paid")
+	poor.state.day = 30
+	poor.advance_strategy_day25(1, "month rollover")
+	check(int(poor.state.month) == 3 and int(poor.state.w25_contact_income_paid_month) == 3 and Strategy.settle_months(poor) == 0, "Contact income settles with Galaxy closed")
 	var save_path := "user://galaxy25-contact-%d.json" % OS.get_process_id()
 	check(poor.save(save_path), "Contact state saves")
 	var loaded := Campaign.new()
@@ -109,7 +115,12 @@ func run() -> void:
 			check(int(flow.campaign.state.elapsed_days) == before_day + 2 and int(flow.campaign.state.res.intel) == before_intel + 2, "Portrait scan commits and pays")
 			check(view.deadline_rail.visible and view.deadline_rail.text.contains("DAY 2"), "Threat countdown remains visible after scan")
 			view._overview(); await frames(2)
-		else: check(view.map_view.scans.is_empty(), "Scan hidden without contract")
+		else:
+			check(view.map_view.scans.size() == 3, "Real Campaign exposes Scan sites")
+			view._scan_site_open("outer_relay")
+			var real_scan: Button = view.find_child("ScanCommit25",true,false)
+			check(real_scan != null and not real_scan.disabled, "Real Campaign enables Scan action")
+			view._overview(); await frames(2)
 		var rail_rect: Rect2 = view.deadline_rail.get_global_rect()
 		if view.deadline_rail.visible: check(rail_rect.position.y >= 0 and rail_rect.end.y <= dims.y, "Deadline rail inside viewport %s" % dims)
 		if capture:
@@ -141,6 +152,7 @@ func run() -> void:
 		view.queue_free(); await frames(2); stage.free()
 	Phone.test_scale = 3.0; Phone.test_touch = 1; Phone.test_mobile = 1
 	flow.campaign = Campaign.new(); flow.story = flow.campaign.story
+	flow.active = true
 	change_scene_to_file("res://scenes/galaxy.tscn"); await frames(12)
 	var round_trip = current_scene
 	check(round_trip.campaign.state.options.size() > 1, "Round trip has another mission")
@@ -151,9 +163,16 @@ func run() -> void:
 		if chosen_region != "" and not Strategy.contacted(round_trip.campaign.state,chosen_region): round_trip.campaign.state.w25_contacts.append(chosen_region)
 		round_trip._launch()
 		await create_timer(0.8).timeout
-		check(int(flow.campaign.state.get("launch_index",-1)) == 1, "Ready fallback opens today's Briefing")
-		flow.back_from_briefing(); await create_timer(0.8).timeout
-		check(current_scene != null and current_scene.has_method("open_intel_view25") and current_scene.selected == 1, "Briefing Back restores selected mission")
+		var ready_scene = current_scene
+		check(ready_scene != null, "readiness scene not null")
+		if ready_scene != null:
+			check(ready_scene.name == "Readiness25", "scene is Readiness25 (got: " + str(ready_scene.name) + ")")
+			check(ready_scene.find_child("ReadyBack",true,false) != null, "ReadyBack button exists")
+		check(int(flow.campaign.state.get("launch_index",-1)) == 1, "launch_index is 1 (got: " + str(flow.campaign.state.get("launch_index",-1)) + ")")
+		check(str(flow.campaign.state.get("launch_option",{}).get("mission","")) == chosen_id, "launch_option.mission matches chosen_id (got: " + str(flow.campaign.state.get("launch_option",{}).get("mission","")) + " want: " + chosen_id + ")")
+		await flow.back_from_ready25()
+		await create_timer(0.2).timeout
+		check(current_scene != null and current_scene.has_method("open_intel_view25") and current_scene.selected == 1 and str(flow.campaign.state.w25_selected_mission_id) == chosen_id, "Readiness Back restores selected mission")
 	if FileAccess.file_exists(flow.save_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(flow.save_path))
 	print("Galaxy25: %d checks, %d failures" % [checks,failures])
 	quit(1 if failures else 0)
