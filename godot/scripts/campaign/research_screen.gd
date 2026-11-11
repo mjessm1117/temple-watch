@@ -1,6 +1,7 @@
 extends RefCounted
 const Data = preload("res://scripts/campaign/data.gd")
 const Queue = preload("res://scripts/campaign/research_queue.gd")
+const Base = preload("res://scripts/campaign/strat_base.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const Theme13 = preload("res://scripts/armory13_theme.gd")
 
@@ -20,6 +21,7 @@ static func _remove(view, id: String) -> void:
 		view._show_page()
 
 static func render(view) -> void:
+	if view.room_picker != null: view.room_picker.hide()
 	var c = view.campaign
 	Queue.ensure(c.state)
 	var data: Dictionary = Data.get_table("research", "RESEARCH")
@@ -33,6 +35,24 @@ static func render(view) -> void:
 	var queue_names := []
 	for id in c.state.research.queue: queue_names.append(str(data[id].n))
 	var top: VBoxContainer = view._card("RESEARCH", "%s · Next: %s" % [progress, " → ".join(queue_names) if not queue_names.is_empty() else "none"])
+	var workers := []
+	for worker in c.state.facility.workers:
+		if str(worker.wing) == "archives": workers.append(str(worker.n))
+	if c.state.staff.has("archives"):
+		var soldier: Dictionary = c.soldier(str(c.state.staff.archives))
+		if not soldier.is_empty(): workers.append(str(soldier.n))
+	var team := ", ".join(workers) if not workers.is_empty() else "No archivist assigned"
+	if active != "" and data.has(active):
+		if Base.operational(c.state, "archives"):
+			var speed := (1.5 if int(c.state.wings.archives) >= 2 else 1.0) * (1.0 + 0.5 * Base.staff_count(c.state, "archives"))
+			if "scholarship" in c.state.strategy.edict: speed *= 1.5
+			var eta := ceili((float(data[active].days) - float(c.state.research.prog)) / speed)
+			top.add_child(UI.label("Working: %s · %d days left" % [team, maxi(0, eta)], 14, UI.GOLD))
+		else:
+			top.add_child(UI.label("Paused: %s · restore power for ETA" % team, 14, UI.DANGER))
+		top.add_child(UI.label("Unlocks: %s" % str(data[active].desc), 14, UI.ACCENT))
+	else:
+		top.add_child(UI.label("Lab idle · %s" % team, 14, UI.GOLD))
 	var first := ""
 	for branch in Data.get_table("research", "RES_TREE"):
 		for id in branch.ids:
@@ -73,3 +93,4 @@ static func render(view) -> void:
 			var can := Queue.can_queue(c, str(id))
 			row.add_child(UI.button("Queue", _queue.bind(view, str(id)), can))
 	Theme13.apply_tree(view.page_content)
+	(view.page_content.get_parent() as ScrollContainer).scroll_vertical = 0

@@ -18,6 +18,7 @@ static func button(view, box: Control, text: String, action: Callable, enabled: 
 	box.add_child(UI.button(text, act.bind(view, action), enabled))
 
 static func build(view) -> void:
+	if view.room_picker != null: view.room_picker.hide()
 	var c = view.campaign
 	var p := Base.power(c.state)
 	var box: VBoxContainer = view._card("TEMPLE WORKS", "Power %d / %d · rooms take 7 work days; free artisans add 50%% speed. Excavation needs a free artisan for 5 days." % [p.used, p.capacity])
@@ -25,41 +26,60 @@ static func build(view) -> void:
 	if c.state.build != "": box.add_child(UI.label("%s · %.1f work days remaining" % [c.state.build, c.state.facility.build_left], 15, UI.GOLD))
 	var grid: VBoxContainer = view._card("BUILD GRID", "Choose a bay to excavate or place a wing. Linked wings share a wall; staff doubles their adjacency bonus.")
 	for tier in ["t", "m", "b", "a", "u"]:
-		var cells := HBoxContainer.new(); cells.alignment = BoxContainer.ALIGNMENT_CENTER; grid.add_child(cells)
+		var cells := HFlowContainer.new(); cells.alignment = FlowContainer.ALIGNMENT_CENTER; grid.add_child(cells)
 		for slot in Data.get_table("temple", "SLOTS"):
 			if slot.tier != tier: continue
 			var occupant: String = c.state.slots.get(slot.id, "")
 			var label: String = occupant.capitalize() if occupant != "" else "Clear" if c.state.facility.clear.has(slot.id) else "Sealed"
 			if c.state.facility.dig.get("slot", "") == slot.id: label = "Digging"
-			var cell := UI.button("%s · %s" % [slot.sn, label], func(): view.build_slot = str(slot.id); view._show_page())
-			cell.name = "Bay_" + str(slot.id); cell.custom_minimum_size = Vector2(155, 44)
+			var cell := UI.button("%s · %s" % [slot.sn, label], func():
+				view.build_slot = str(slot.id)
+				view.set_meta("w25_build_wing", "")
+				view._show_page())
+			cell.name = "Bay_" + str(slot.id); cell.custom_minimum_size = Vector2(140, 44)
 			cell.modulate = UI.ACCENT if view.build_slot == slot.id else Color.WHITE
 			cells.add_child(cell)
+	var selected_wing := ""
 	for slot in Data.get_table("temple", "SLOTS"):
 		if slot.tier == "sp" or slot.id != view.build_slot: continue
 		var current: String = c.state.slots.get(slot.id, "")
+		selected_wing = current
 		var clear: bool = c.state.facility.clear.has(slot.id)
 		box = view._card(str(slot.n), "Occupied by " + current if current != "" else "Excavated bay" if clear else "Sealed bay")
 		if not clear:
 			if c.state.facility.dig.get("slot", "") == slot.id: box.add_child(UI.label("Excavating · %d days left" % c.state.facility.dig.left, 14, UI.GOLD))
 			else: button(view, box, "Excavate · %d Cr" % int(Data.get_table("temple", "UNDER_DIG").get(slot.id, 40)), Base.excavate.bind(c, str(slot.id)))
-		elif current == "" and int(slot.wing) == 1:
+		elif int(slot.wing) == 1:
 			var row := HFlowContainer.new(); box.add_child(row)
 			for wing in c.state.wings:
-				if int(c.state.wings[wing]) > 0: continue
-				button(view, row, "Place " + str(wing), Base.place.bind(c, str(wing), str(slot.id)))
+				if current != "" and current != wing: continue
+				if current == "" and int(c.state.wings[wing]) > 0: continue
+				var wing_data: Dictionary = Data.get_table("core", "WINGS")[wing]
+				if int(c.state.wings[wing]) + 1 >= wing_data.cost.size(): continue
+				var select := UI.button("Preview " + str(wing_data.n), func():
+					view.set_meta("w25_build_wing", wing)
+					view._show_page())
+				select.custom_minimum_size.y = 44; row.add_child(select)
+			var chosen := str(view.get_meta("w25_build_wing", ""))
+			if chosen != "" and (current == "" or current == chosen):
+				selected_wing = chosen
+				var preview: Dictionary = c.build_preview25(str(slot.id), chosen)
+				var bonus: Array = preview.get("adjacency_bonus", [])
+				var details := "%d Cr · Power %d → %d / %d · %s · finishes M%d D%d" % [int(preview.get("cost", 0)), int(preview.get("power_used", 0)), int(preview.get("power_after", 0)), int(preview.get("power_cap", 0)), ", ".join(bonus) if not bonus.is_empty() else "No adjacency bonus", int(preview.get("finish_month", 0)), int(preview.get("finish_day", 0))]
+				box = view._card("BUILD PREVIEW · " + str(Data.get_table("core", "WINGS")[chosen].n), details)
+				box.add_child(UI.label(str(preview.get("reason", "")), 14, UI.GOLD))
+				button(view, box, "Confirm · %d Cr" % int(preview.get("cost", 0)), c.confirm_build25.bind(str(slot.id), chosen), bool(preview.get("valid", false)))
 		elif slot.tier == "u":
 			var feature: Dictionary = Data.get_table("temple", "BAY_FEAT").get(c.state.mods.features.get(slot.id, ""), {})
 			box.add_child(UI.label(str(feature.get("tip", "Vault open")), 14))
 	for wing in c.state.wings:
+		if wing != selected_wing: continue
 		var data: Dictionary = Data.get_table("core", "WINGS")[wing]
 		var level := int(c.state.wings[wing]); var next := level + 1
 		box = view._card("%s · L%d · %s" % [data.n, level, Base.slot_of(c.state, wing)], Base.summary(c.state, wing))
 		box.add_child(UI.label(str(data.eff[level]), 14))
 		box.add_child(UI.label(Base.production(c.state, wing), 13, UI.ACCENT))
-		if next < data.cost.size():
-			var req := str(data.get("req", [])[next]) if next < data.get("req", []).size() else ""
-			button(view, box, "Build level %d · %d Cr%s" % [next, data.cost[next], " · needs " + req if not c.researched(req) else ""], c.build_wing.bind(str(wing)), c.state.build == "" and c.researched(req))
+		if next < data.cost.size(): box.add_child(UI.label("Next level %d · %d Cr · select its bay above to preview" % [next, data.cost[next]], 14, UI.MUTED))
 		var row := HFlowContainer.new(); box.add_child(row)
 		for worker in c.state.facility.workers:
 			if worker.wing == wing: button(view, row, "Release " + str(worker.n), Base.assign_worker.bind(c, str(worker.id), ""))
@@ -108,6 +128,18 @@ static func soldier(view, box: VBoxContainer, r: Dictionary) -> void:
 	# --- wave10 story ---
 	box.add_child(UI.label("BONDS  " + preload("res://scripts/campaign/bond_overlay.gd").summary(c.state,str(r.id)),13,UI.ACCENT))
 	if int(r.fatigue) >= 34: box.add_child(UI.label("Tired: −5 aim, −10 will. Exhausted at 67: cannot deploy. Rest to recover.", 13, UI.MUTED))
+	var roster_api: Variant = load("res://scripts/campaign/strat_roster.gd")
+	if roster_api.has_method("patient_actions25"):
+		var actions: Array = []
+		for method in roster_api.get_script_method_list():
+			if str(method.name) != "patient_actions25": continue
+			if method.args.size() == 1: actions = roster_api.call("patient_actions25", str(r.id))
+			elif method.args.size() == 2: actions = roster_api.call("patient_actions25", c, str(r.id))
+		for patient_action in actions:
+			box.add_child(UI.label("%s · %d days · %s" % [patient_action.get("label", "Care"), int(patient_action.get("days", 0)), patient_action.get("effect", "")], 14, UI.ACCENT))
+			var job := str(patient_action.get("id", ""))
+			if job in ["rest", "calm", "staff:medical", "", "staff:gardens"]:
+				button(view, box, str(patient_action.get("label", "Care")), c.assign.bind(str(r.id), job))
 	var row := HFlowContainer.new(); box.add_child(row)
 	button(view, row, "Retrain · 40 Cr", Roster.train.bind(c, str(r.id), "retrain"), Roster.ready(r))
 	button(view, row, "Extra ability slot · 75 Cr", Roster.train.bind(c, str(r.id), "slot"), Roster.ready(r) and int(r.ability_slots) < 2)
