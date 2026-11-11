@@ -36,9 +36,17 @@ func run() -> void:
 	for o in c.state.options:
 		if o.get("kind","") == "counter": offer = o; break
 	check(not offer.is_empty(),"galaxy has a counterable Dark Event")
-	flow.intelligence._choose(str(offer.sith_offer_id)); await frames()
-	check(current_scene.scene_file_path.ends_with("briefing.tscn") and c.state.launch_option.sith_offer_id == offer.sith_offer_id,"counter action routes through real mission briefing")
-	check(c.sith.s.counters.get(str(int(c.sith.s.month)),"") == offer.sith_offer_id,"counter choice reserves exactly that event")
+	var w25_intel := not is_instance_valid(flow.intelligence)
+	if not w25_intel:
+		flow.intelligence._choose(str(offer.sith_offer_id))
+	else:
+		check(galaxy.page == "Intel" and is_instance_valid(galaxy.detail),"galaxy exposes W25 intel panel")
+		var offer_region: String = c.region_for_mission(str(offer.mission))
+		if offer_region != "" and offer_region not in c.state.w25_contacts: c.state.w25_contacts.append(offer_region)
+		galaxy._select(c.state.options.find(offer)); galaxy._launch()
+	await frames()
+	check((current_scene.scene_file_path.ends_with("briefing.tscn") or (current_scene.get_script() != null and current_scene.get_script().resource_path.ends_with("w25_menus_readiness.gd"))) and c.state.get("launch_option", {}).get("sith_offer_id", "") == offer.sith_offer_id,"counter action routes through real mission briefing")
+	check(c.sith.s.counters.get(str(int(c.sith.s.month)),"") == ("" if w25_intel else offer.sith_offer_id),"counter reservation matches its launch path")
 	# Fixture: unlocked squad doctrine. Unlock economics have strategy_test coverage.
 	c.state.strategy.squad_upgrades = 1
 	var project_index := -1

@@ -90,9 +90,11 @@ run_suite feelcam22_test --rendering-method gl_compatibility --resolution 844x39
 run_suite feelcam24_test --rendering-method gl_compatibility --resolution 390x844
 run_suite story20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite strategy20_test --rendering-method gl_compatibility --resolution 844x390
+run_suite economy25_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite art20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite temple21_test --rendering-method gl_compatibility --resolution 844x390; run_suite temple21_test --rendering-method gl_compatibility --resolution 390x844 -- --portrait; run_suite temple21_test --rendering-method gl_compatibility --resolution 1366x768 -- --desktop
 run_suite galaxy21_test --rendering-method gl_compatibility -- --graphics=low
+run_suite galaxy25_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite menus21_test --rendering-method gl_compatibility --resolution 844x390
 run_suite impact22_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
 run_suite lightfx23_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
@@ -105,3 +107,6 @@ run_suite threat24_test
 run_suite command24_test --rendering-method gl_compatibility --resolution 1280x720
 run_suite camgest24_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite hud24_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite temple25_test --rendering-method gl_compatibility --resolution 844x390; run_suite temple25_test --rendering-method gl_compatibility --resolution 390x844 -- --portrait; run_suite temple25_test --rendering-method gl_compatibility --resolution 1366x768 -- --desktop
+run_suite roster25_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite menus25_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low

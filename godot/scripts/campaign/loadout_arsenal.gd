@@ -24,23 +24,32 @@ var feature_row: BoxContainer
 var skill_view := false
 var jedi_actor := false
 var actor_color := "#62b3ff"
+var secondary_open := false
+var secondary_button: Button
 
 func setup(owner_screen: Control, id: String) -> void:
 	host = owner_screen; soldier_id = id; active_slot = host.armory_slot
+	if active_slot == "" and host.from_temple: active_slot = "weapon"; host.armory_slot = active_slot
 	add_theme_constant_override("separation", 7)
 	var c = host.flow.session(); var r: Dictionary = c.soldier(id)
 	var jedi := Progression.is_jedi(r)
 	jedi_actor = jedi; actor_color = str(r.get("col", actor_color))
-	feature_row = VBoxContainer.new() if host.size.x < 500 else HBoxContainer.new()
+	feature_row = VBoxContainer.new() if host.size.x < 600 else HBoxContainer.new()
 	feature_row.add_theme_constant_override("separation", 6); add_child(feature_row)
-	slot_row = GridContainer.new(); slot_row.columns = 3 if host.size.x < 500 else 4
+	slot_row = GridContainer.new(); slot_row.columns = 2 if host.size.x < 500 else 3 if host.size.x < 720 else 4
 	slot_row.size_flags_horizontal = SIZE_EXPAND_FILL
 	slot_row.add_theme_constant_override("h_separation", 8 if Phone.narrow(Phone.window_size()) else 5)
 	slot_row.add_theme_constant_override("v_separation", 8 if Phone.narrow(Phone.window_size()) else 4)
 	feature_row.add_child(slot_row)
 	_build_slots(r, jedi)
+	secondary_button = S.button("MORE SLOTS  ▾", _toggle_secondary)
+	secondary_button.name = "SecondarySlots"; secondary_button.custom_minimum_size.y = 44
+	secondary_button.add_theme_color_override("font_disabled_color", Color("e5eff1"))
+	add_child(secondary_button)
+	secondary_button.visible = Phone.narrow(Phone.window_size())
+	_apply_secondary()
 	_update_preview()
-	hangar_sign = UI.label("HANGAR 07", 12, S.CYAN)
+	hangar_sign = UI.label("HANGAR 07", 14, S.CYAN)
 	hangar_sign.add_theme_color_override("font_shadow_color", Color("00131b"))
 	hangar_sign.add_theme_constant_override("shadow_offset_x", 1)
 	hangar_sign.add_theme_constant_override("shadow_offset_y", 2)
@@ -49,7 +58,7 @@ func setup(owner_screen: Control, id: String) -> void:
 	hangar_sign.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	host.stage_container.add_child(hangar_sign)
 	picker = S.column(6); add_child(picker)
-	slot_prompt = UI.label("SELECT A GEAR SLOT TO COMPARE EQUIPMENT", 12, S.CYAN); picker.add_child(slot_prompt)
+	slot_prompt = UI.label("SELECT A GEAR SLOT TO COMPARE EQUIPMENT", 14, S.CYAN); picker.add_child(slot_prompt)
 	var color_row := HBoxContainer.new(); picker.add_child(color_row)
 	for color in (Data.get_table("gear", "CRYSTALS").values() if jedi else ["#e0bd78", "#d9a05b", "#9fc6d6", "#c9d27a", "#d6a3a3"]):
 		var b := S.button("●", host.change_gear.bind("color", "", color)); b.modulate = Color(color); b.custom_minimum_size = Vector2(48, 44)
@@ -126,6 +135,15 @@ func setup(owner_screen: Control, id: String) -> void:
 		offer("evolve", "", "", str(evolution.n), reason, int(Data.get_table("gear", "EVO_COST").credits), 0, str(evolution.get("desc", "")))
 	_filter()
 
+func _toggle_secondary() -> void:
+	secondary_open = not secondary_open
+	_apply_secondary()
+
+func _apply_secondary() -> void:
+	if slot_row == null: return
+	for slot in slot_row.get_children():
+		if slot is Control: slot.visible = not Phone.narrow(Phone.window_size()) or secondary_open or slot.name in ["Slot_weapon", "Slot_armor", "Slot_utility"]
+
 func _build_slots(r: Dictionary, jedi: bool) -> void:
 	var primary := "SABER" if jedi else "WEAPON"
 	var base_kind := "s" if jedi else "w"
@@ -180,7 +198,7 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 	glyph.size = Vector2(art_width, art_height)
 	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(glyph)
 	var short_title: String = {"SABER MOD":"SAB MOD", "WEAPON MOD":"WPN MOD", "ARMOR MOD":"ARM MOD", "SABER FORM":"FORM"}.get(title, title) if compact else title
-	var name_label := UI.label(short_title, 14 if compact else 7, S.CYAN)
+	var name_label := UI.label(short_title, 14 if compact else 10, S.CYAN)
 	name_label.name = "SlotLabel"
 	name_label.position = Vector2(4 if compact else 51, 4 if portrait else 2 if compact else 5)
 	name_label.size = Vector2(76 if compact else 62, 23 if portrait else 19 if compact else 16)
@@ -189,16 +207,22 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE; b.add_child(name_label)
 	var display_value := value.get_slice(" (", 0) if key == "form" else value
 	display_value = display_value.trim_suffix(" saber").trim_suffix(" robes")
-	var item_label := UI.label(display_value, 9 if compact else 10)
+	var item_label := UI.label(display_value, 14)
 	var item_left := 17 if narrow_tile else 31 if compact else 51
 	item_label.name = "ItemName"; item_label.position = Vector2(item_left, 29 if portrait else 20 if compact else 24)
 	item_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	item_label.clip_text = true
 	item_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	item_label.size = Vector2(maxf(51, b.custom_minimum_size.x - item_left - 4), 23 if portrait else 19)
+	var fit_item := func() -> void:
+		item_label.size.x = maxf(51, b.size.x - item_left - 4)
+		var full_width := ThemeDB.fallback_font.get_string_size(display_value, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+		item_label.text = display_value if full_width <= item_label.size.x else display_value.get_slice(" ", 0)
+	b.resized.connect(fit_item)
+	fit_item.call()
 
 	b.add_child(item_label)
-	var tier := UI.label("Mk " + _mark(mark), 9, _tier_color(mark))
+	var tier := UI.label("Mk " + _mark(mark), 14, _tier_color(mark))
 	tier.name = "Tier"; tier.position = Vector2(31 if compact else 51, 55 if portrait else 39 if compact else 45)
 	if portrait: tier.size = Vector2(48, 22)
 	tier.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -251,7 +275,7 @@ func _update_preview() -> void:
 	var phone := Phone.narrow(get_tree().root.size)
 	preview_card = Preview15.make(host.flow.session(), host.flow.session().soldier(soldier_id), tile, phone)
 	feature_row.add_child(preview_card)
-	feature_row.move_child(preview_card, 0)
+	if feature_row is HBoxContainer: feature_row.move_child(preview_card, 0)
 
 func _exit_tree() -> void:
 	if is_instance_valid(preview_card) and preview_card.get_parent() != self:
@@ -259,11 +283,11 @@ func _exit_tree() -> void:
 	if is_instance_valid(hangar_sign): hangar_sign.queue_free()
 
 func _show_gear() -> void:
-	skill_view = false; feature_row.visible = true; _filter()
+	skill_view = false; feature_row.visible = true; secondary_button.visible = Phone.narrow(Phone.window_size()); _filter()
 	if get_parent() is ScrollContainer: get_parent().scroll_vertical = 0
 
 func _show_skills() -> void:
-	skill_view = true; feature_row.visible = false; _filter()
+	skill_view = true; feature_row.visible = false; secondary_button.visible = false; _filter()
 	if get_parent() is ScrollContainer: get_parent().scroll_vertical = 0
 
 func _filter() -> void:
@@ -314,27 +338,27 @@ func offer(action: String, kind: String, key: String, title: String, reason: Str
 	var mark := _offer_mark(action, kind, key)
 	var item_name := title
 	if upgrade: item_name = "Forge to Mk " + _mark(mark)
-	var name_label := UI.label(item_name, 12 if compact else 13)
+	var name_label := UI.label(item_name, 14)
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; info.add_child(name_label)
-	var tier_label := UI.label("Mk " + _mark(mark) + ("  ·  %d Cr" % cost if cost > 0 else "") + (" + %d Ky" % kyber if kyber > 0 else ""), 10, _tier_color(mark))
+	var tier_label := UI.label("Mk " + _mark(mark) + ("  ·  %d Cr" % cost if cost > 0 else "") + (" + %d Ky" % kyber if kyber > 0 else ""), 14, _tier_color(mark))
 	info.add_child(tier_label)
 	var callback: Callable = armor_upgrade if action == "armor_mark" else base_upgrade.bind(kind) if action == "base_mark" else host.change_gear.bind(action, kind, key)
 	var b := S.button("EQUIPPED" if equipped else "UPGRADE" if upgrade else "EQUIP", callback, reason == "")
 	b.custom_minimum_size = Vector2(90 if compact else 86, 44)
 	b.tooltip_text = tip; heading.add_child(b); host.wire_button(b)
-	var delta: Array = Preview.changes(host.flow.session(), soldier_id, action, kind, key)
+	var delta: Array = host.loadout_delta25(soldier_id, {"action":action, "kind":kind, "key":key})
 	var details := VBoxContainer.new(); details.add_theme_constant_override("separation", 2); column.add_child(details)
-	var stat_line := UI.label(tip.get_slice("\n", 0) if tip != "" else "Stats unchanged" if delta.is_empty() else "STAT CHANGE", 10, S.MUTED)
+	var stat_line := UI.label(tip.get_slice("\n", 0) if tip != "" else "Stats unchanged" if delta.is_empty() else "STAT CHANGE", 14, S.MUTED)
 	stat_line.clip_text = true; stat_line.autowrap_mode = TextServer.AUTOWRAP_OFF; stat_line.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; details.add_child(stat_line)
 	if not delta.is_empty():
-		var stats := HFlowContainer.new(); stats.name = "Deltas"; stats.add_theme_constant_override("h_separation", 9); details.add_child(stats)
+		var stats := HBoxContainer.new(); stats.name = "Deltas"; stats.add_theme_constant_override("separation", 9); details.add_child(stats)
 		for change in delta:
-			var gain := int(change.value) >= 0 and int(change.get("high", change.value)) >= 0
-			var delta_label := UI.label(Preview.text_for(change), 11, S.GREEN if gain else S.RED)
+			var gain := int(change.after[0]) >= int(change.before[0]) if change.after is Array else int(change.after) >= int(change.before)
+			var delta_label := UI.label("%s %s→%s" % [change.stat, str(change.before), str(change.after)], 14, S.GREEN if gain else S.RED)
 			delta_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 			stats.add_child(delta_label)
 	if reason != "" and not equipped:
-		var why := UI.label("LOCKED  ·  " + reason, 11, S.RED); why.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; column.add_child(why)
+		var why := UI.label("LOCKED  ·  " + reason, 14, S.RED); why.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; column.add_child(why)
 	offers.append({"action":action, "kind":kind, "key":key, "slot":slot, "enabled":reason == "", "button":b, "card":card, "delta":delta})
 
 func _offer_slot(action: String, kind: String) -> String:

@@ -2,6 +2,7 @@ extends RefCounted
 ## Temple room identities and level bonuses shared by plates, briefing and battle setup.
 const Data = preload("res://scripts/campaign/data.gd")
 const Base = preload("res://scripts/campaign/strat_base.gd")
+const W25UI = preload("res://scripts/w25_temple_ui.gd")
 static func bonus(wing: String, level: int) -> Dictionary:
 	var levels: Array = Data.get_table("temple", "BATTLE_BONUS").get(wing, [])
 	return levels[clampi(level, 0, levels.size() - 1)] if not levels.is_empty() else {}
@@ -93,6 +94,7 @@ static func describe(row: Array, state: Dictionary) -> Dictionary:
 		if not slot.is_empty(): at = Vector3(-7.8 + float(slot.x) * 5.2, 1.7 + (2 - int(slot.row)) * 2.9, 0)
 		staff = Base.staff_count(state, wing)
 		detail = status + " · " + Base.summary(state, wing)
+		if wing == "medical" and built: detail += " · " + W25UI.medical_status_state(state)
 		if built: detail += " · Battle: " + (str(bonus(wing, level).get("text", "")) if Base.operational(state, wing) else "offline until power restored")
 		if Base.operational(state, wing): battle_plate = str(bonus(wing, level).get("plate", ""))
 	if id == "works": detail = "Power %d / %d · staff & excavation" % [Base.power(state).used, Base.power(state).capacity]

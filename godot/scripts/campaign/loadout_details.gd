@@ -68,7 +68,7 @@ static func card(c, r: Dictionary, action: Callable, portrait: Texture2D = null)
 	var content := S.column(2); compact.add_child(content)
 	var select := S.button("", action); select.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	select.custom_minimum_size.y = 44; content.add_child(select)
-	var name := UI.label("", 14 if phone else 11); name.name = "SoldierName"
+	var name := UI.label("", 14); name.name = "SoldierName"
 	name.autowrap_mode = TextServer.AUTOWRAP_OFF
 	name.clip_text = true
 	name.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -83,7 +83,7 @@ static func card(c, r: Dictionary, action: Callable, portrait: Texture2D = null)
 	if portrait != null:
 		var face := Sprite2D.new(); face.texture = portrait; face.position = Vector2(21, 21)
 		face.scale = Vector2(0.26, 0.26); select.add_child(face)
-	var summary := UI.label("T%d · HP %d" % [Progression.skill_rank(r), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))] if phone else "%s · R%d / T%d · HP %d" % [r.cls, int(r.rank), Progression.skill_rank(r), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 9 if phone else 10, S.GOLD)
+	var summary := UI.label("T%d · HP %d" % [Progression.skill_rank(r), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))] if phone else "%s · R%d / T%d · HP %d" % [r.cls, int(r.rank), Progression.skill_rank(r), int(Gear.battle_stats(c, str(r.id)).get("hp", 0))], 14, S.GOLD)
 	summary.autowrap_mode = TextServer.AUTOWRAP_OFF
 	summary.clip_text = true
 	content.add_child(summary)

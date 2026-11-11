@@ -52,7 +52,7 @@ func setup(c: RefCounted, id: String) -> void:
     portrait_column.add_theme_constant_override("separation", 2)
     portrait_panel.add_child(portrait_column)
     var r: Dictionary = campaign.soldier(unit_id)
-    var eyebrow := UI.label("FIELD RECORD  /  PROMOTION", 10, UI.ACCENT)
+    var eyebrow := UI.label("FIELD RECORD  /  PROMOTION", 14, UI.ACCENT)
     portrait_column.add_child(eyebrow)
     var portrait_height: float = minf(270.0, get_viewport_rect().size.y - 130.0)
     var portrait_width: float = minf(246.0, portrait_panel.custom_minimum_size.x - 28.0)
@@ -64,7 +64,7 @@ func setup(c: RefCounted, id: String) -> void:
     portrait_column.add_child(image)
     var name_label := UI.label(str(r.get("n", "")), 17, UI.GOLD)
     portrait_column.add_child(name_label)
-    var path_label := UI.label("Paths: " + _path_names(r.get("classes", [])), 12, UI.TEXT)
+    var path_label := UI.label("Paths: " + _path_names(r.get("classes", [])), 14, UI.TEXT)
     portrait_column.add_child(path_label)
     var right := VBoxContainer.new()
     right.name = "RankupRight"
@@ -87,7 +87,7 @@ func setup(c: RefCounted, id: String) -> void:
     var level := int(r.get("rank", 1))
     var before := maxi(1, level - 1)
     transition.add_child(_rank_mark(side_name, before, 46))
-    var from_label := UI.label(str(Classes.rank_data(side_name, before).get("title", "")), 13, UI.MUTED)
+    var from_label := UI.label(str(Classes.rank_data(side_name, before).get("title", "")), 14, UI.MUTED)
     from_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     transition.add_child(from_label)
     transition.add_child(UI.label("›", 22, UI.GOLD))
@@ -96,7 +96,7 @@ func setup(c: RefCounted, id: String) -> void:
     var to_label := UI.label(str(Classes.rank_data(side_name, level).get("title", "")), 15, UI.GOLD)
     to_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     transition.add_child(to_label)
-    var gains := UI.label(_gain_text(r), 12, UI.ACCENT)
+    var gains := UI.label(_gain_text(r), 14, UI.ACCENT)
     gains.name = "StatGains"
     right.add_child(gains)
     scroll = preload("res://scripts/touch_scroll.gd").new()
@@ -249,7 +249,7 @@ func _ability_card(id: String, active: bool, earned: bool = false, show_metric: 
         metric.mouse_filter = Control.MOUSE_FILTER_IGNORE
         metric.autowrap_mode = TextServer.AUTOWRAP_OFF
         stack.add_child(metric)
-    var effect := UI.label(_effect_text(definition), 12, UI.TEXT if active or earned else UI.MUTED)
+    var effect := UI.label(_effect_text(definition), 14, UI.TEXT if active or earned else UI.MUTED)
     effect.name = "Effect_" + id
     effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
     effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if active else TextServer.AUTOWRAP_OFF
@@ -258,7 +258,7 @@ func _ability_card(id: String, active: bool, earned: bool = false, show_metric: 
     stack.add_child(effect)
     var chain_text := _chain_text(definition)
     if chain_text != "":
-        var chains := UI.label(chain_text, 11, UI.ACCENT if active or earned else UI.MUTED)
+        var chains := UI.label(chain_text, 14, UI.ACCENT if active or earned else UI.MUTED)
         chains.mouse_filter = Control.MOUSE_FILTER_IGNORE
         chains.autowrap_mode = TextServer.AUTOWRAP_OFF
         chains.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -303,7 +303,7 @@ func _refresh() -> void:
     var side_name := Classes.side(str(r.cls))
     var rank := int(r.get("rank", 1))
     var pending := int(r.get("pick", 0))
-    content.add_child(UI.label("ABILITY GRID  /  %s" % str(Classes.rank_data(side_name, rank).get("tier", "")), 12, UI.GOLD))
+    content.add_child(UI.label("ABILITY GRID  /  %s" % str(Classes.rank_data(side_name, rank).get("tier", "")), 14, UI.GOLD))
     for level in range(1, Classes.ranks(side_name).size() + 1):
         var row := VBoxContainer.new()
         row.name = "RankRow_%d" % level
@@ -312,7 +312,7 @@ func _refresh() -> void:
         rank_rows[level] = row
         var title := "%02d   %s" % [level, str(Classes.rank_data(side_name, level).get("title", ""))]
         title += "   /   CHOOSE" if level == pending else "   /   EARNED" if level < pending or pending == 0 and level <= rank else "   /   LOCKED"
-        row.add_child(UI.label(title, 11, UI.GOLD if level == pending else UI.ACCENT if level <= rank else UI.MUTED))
+        row.add_child(UI.label(title, 14, UI.GOLD if level == pending else UI.ACCENT if level <= rank else UI.MUTED))
         var picks: Array = r.get("picks", [])
         if level == pending:
             var options := Progression.tree_options(r, level)
@@ -327,17 +327,17 @@ func _refresh() -> void:
             row.add_child(_ability_card(str(picks[level - 1]), false, true))
         elif level > rank:
             var options := Progression.tree_options(r, level)
-            row.add_child(UI.label("◆  " + (" / ".join(options.map(func(item): return _ability_name(str(item), false))) if not options.is_empty() else "Awaiting rank"), 11, UI.MUTED))
+            row.add_child(UI.label("◆  " + (" / ".join(options.map(func(item): return _ability_name(str(item), false))) if not options.is_empty() else "Awaiting rank"), 14, UI.MUTED))
     var rank_data: Dictionary = Classes.rank_data(side_name, rank)
-    if rank_data.has("aura"): content.add_child(UI.label("Aura ×%d  ·  third action once per mission" % int(rank_data.aura), 12))
-    elif rank_data.has("saber_forms"): content.add_child(UI.label("Second Focus pip  ·  saber forms", 12))
-    content.add_child(UI.label("BLEND SLOTS  %d / %d" % [r.get("classes", []).size(), Classes.blend_slots(side_name, rank)], 12, UI.ACCENT))
+    if rank_data.has("aura"): content.add_child(UI.label("Aura ×%d  ·  third action once per mission" % int(rank_data.aura), 14))
+    elif rank_data.has("saber_forms"): content.add_child(UI.label("Second Focus pip  ·  saber forms", 14))
+    content.add_child(UI.label("BLEND SLOTS  %d / %d" % [r.get("classes", []).size(), Classes.blend_slots(side_name, rank)], 14, UI.ACCENT))
     if side_name == "jedi" and rank <= 2:
         if str(r.get("mentor_id", "")) != "":
             var master: Dictionary = campaign.soldier(str(r.mentor_id))
-            content.add_child(UI.label("Mentor: %s  ·  taught %s" % [master.get("n", ""), _ability_name(str(r.get("taught_ability", "")), false)], 12, UI.GOLD))
+            content.add_child(UI.label("Mentor: %s  ·  taught %s" % [master.get("n", ""), _ability_name(str(r.get("taught_ability", "")), false)], 14, UI.GOLD))
         else:
-            content.add_child(UI.label("CHOOSE A MASTER MENTOR", 12, UI.GOLD))
+            content.add_child(UI.label("CHOOSE A MASTER MENTOR", 14, UI.GOLD))
             for master in campaign.state.roster:
                 if master == r or str(master.get("status", "")) != "active" or Classes.side(str(master.get("cls", ""))) != "jedi" or int(master.get("rank", 0)) < 5: continue
                 var pupils := 0
@@ -347,18 +347,18 @@ func _refresh() -> void:
                 var signature := str(Classes.class_data(str(master.cls)).get("signature", ""))
                 if signature != "": _add_button("Train with %s · %s" % [master.n, _ability_name(signature, false)], _mentor.bind(str(master.id), signature))
     for legacy in r.get("legacies", []):
-        content.add_child(UI.label("Legacy: %s · %s at 50%% power" % [legacy.get("mentor", ""), _ability_name(str(legacy.get("ability", "")), false)], 12, UI.GOLD))
+        content.add_child(UI.label("Legacy: %s · %s at 50%% power" % [legacy.get("mentor", ""), _ability_name(str(legacy.get("ability", "")), false)], 14, UI.GOLD))
     _droid_modules(r)
     if r.get("classes", []).size() < Classes.blend_slots(side_name, rank):
-        content.add_child(UI.label("CHOOSE ANOTHER PATH", 12, UI.GOLD))
+        content.add_child(UI.label("CHOOSE ANOTHER PATH", 14, UI.GOLD))
         for id in Classes.IDS[side_name]:
             if Classes.can_blend(r, str(id)): _add_button("Train %s" % Classes.class_data(str(id)).get("name", id), _blend.bind(str(id)))
     var options := Progression.cross_options(r)
     if not options.is_empty():
-        content.add_child(UI.label("CROSS-TRAINED ABILITIES", 12, UI.GOLD))
+        content.add_child(UI.label("CROSS-TRAINED ABILITIES", 14, UI.GOLD))
         for id in options: _add_button(_ability_name(str(id)), _cross_pick.bind(str(id)))
     if options.is_empty() and pending == 0:
-        content.add_child(UI.label("Next ability choices unlock with rank and training.", 12, UI.MUTED))
+        content.add_child(UI.label("Next ability choices unlock with rank and training.", 14, UI.MUTED))
     confirm.disabled = true
     confirm.text = "SELECT AN ABILITY" if pending > 0 else "ALL CURRENT CHOICES COMPLETE"
     if offset > 0: scroll.set_deferred("scroll_vertical", offset)

@@ -8,6 +8,7 @@ const Intel = preload("res://scripts/campaign/galaxy_intel.gd")
 const Details = preload("res://scripts/campaign/galaxy_details.gd")
 const Art = preload("res://scripts/campaign/galaxy_art.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
+const Strategy25 = preload("res://scripts/w25_galaxy_strategy.gd")
 var campaign: Campaign
 var selected := 0
 var detail: VBoxContainer
@@ -36,9 +37,20 @@ var detail_right := 0.0
 var selected_card: PanelContainer
 var selected_title: Label
 var selected_forecast: Label
+var contact_action: Button
+var scan_site := ""
+var scan_feedback := ""
+var scan_events: Array = []
+var deadline_rail: Label
+var region_strip: HBoxContainer
 
 func _ready() -> void:
 	campaign = get_node("/root/CampaignFlow").session()
+	Strategy25.ensure(campaign.state)
+	if Strategy25.settle_months(campaign) > 0: get_node("/root/CampaignFlow").save()
+	if campaign.has_signal("month_advanced"): campaign.month_advanced.connect(_month_advanced25)
+	for i in campaign.state.options.size():
+		if str(campaign.state.options[i].mission) == str(campaign.state.w25_selected_mission_id): selected = i; break
 	_build(); _show_details()
 	if Phone.narrow(Phone.window_size()):
 		detail_panel.show(); detail_panel.modulate.a = 0.0
@@ -49,6 +61,10 @@ func _ready() -> void:
 func _hide_initial_detail() -> void:
 	if not detail_open: detail_panel.hide()
 	detail_panel.modulate.a = 1.0
+
+func _month_advanced25(_month: int, _snapshot: Dictionary) -> void:
+	if Strategy25.settle_months(campaign) > 0:
+		get_node("/root/CampaignFlow").save()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -75,7 +91,7 @@ func _build() -> void:
 	var actions: BoxContainer = HBoxContainer.new() if portrait else head
 	if portrait: head.add_child(actions)
 	back_button = UI.button("← MAP" if portrait else "GALAXY" if Phone.touch_device() else "←  GALAXY", _overview); back_button.name = "GalaxyOverview"; back_button.visible = false; actions.add_child(back_button)
-	var intelligence := UI.button("SITH" if portrait else "SITH INTELLIGENCE",func(): get_node("/root/CampaignFlow").open_intelligence()); intelligence.name = "Intelligence"
+	var intelligence := UI.button("INTEL" if portrait else "INTEL WORKBENCH",open_intel_view25); intelligence.name = "Intelligence"
 	if compact: intelligence.custom_minimum_size.y = 44
 	actions.add_child(intelligence)
 	var temple_button := UI.button("TEMPLE" if Phone.touch_device() else "←  TEMPLE",_temple); temple_button.name = "TempleReturn"
@@ -84,6 +100,14 @@ func _build() -> void:
 	if portrait:
 		for button in actions.get_children(): button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	status = UI.label("",14,Color("8aa2a5")); outer.add_child(status)
+	deadline_rail = UI.label("", 14, UI.GOLD); deadline_rail.name = "ThreatCountdown25"; outer.add_child(deadline_rail)
+	contact_action = UI.button("",_contact_primary25)
+	contact_action.name = "ContactChoice25"; contact_action.custom_minimum_size.y = 44
+	contact_action.add_theme_font_size_override("font_size",14)
+	if compact and not portrait:
+		contact_action.custom_minimum_size.x = 185
+		actions.add_child(contact_action)
+	else: outer.add_child(contact_action)
 	var body := HBoxContainer.new(); body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation",12); outer.add_child(body)
 	var left := UI.column(8); left.size_flags_horizontal = Control.SIZE_EXPAND_FILL; body.add_child(left)
@@ -91,7 +115,7 @@ func _build() -> void:
 	var style := map_panel.get_theme_stylebox("panel").duplicate(); style.set_content_margin_all(0); map_panel.add_theme_stylebox_override("panel",style)
 	map_view = GalaxyMap.new(); map_view.campaign = campaign; map_view.clip_contents = true; map_panel.add_child(map_view)
 	if compact: map_view.custom_minimum_size = Vector2(260, 130)
-	map_view.field_selected.connect(_field); map_view.mission_selected.connect(_select); map_view.planet_selected.connect(_planet); map_view.region_selected.connect(_region)
+	map_view.field_selected.connect(_field); map_view.mission_selected.connect(_select); map_view.planet_selected.connect(_planet); map_view.region_selected.connect(_region); map_view.scan_selected.connect(_scan_site_open)
 	var right := UI.panel(UI.SURFACE_RAISED); detail_panel = right
 	if compact:
 		var overlay := Control.new()
@@ -116,6 +140,8 @@ func _build() -> void:
 		var close := UI.button("← BACK TO MAP" if portrait else "CLOSE", _overview)
 		close.name = "CloseSite"; close.custom_minimum_size.y = 44
 		column.add_child(close)
+		region_strip = HBoxContainer.new(); region_strip.name = "SelectedRegionStrip25"
+		region_strip.size_flags_horizontal = Control.SIZE_EXPAND_FILL; column.add_child(region_strip)
 	tabs = HBoxContainer.new()
 	if compact:
 		var tab_row := HBoxContainer.new(); tab_row.add_theme_constant_override("separation", 8); column.add_child(tab_row)
@@ -153,7 +179,7 @@ func _build() -> void:
 	scroll = preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; column.add_child(scroll)
 	detail = UI.column(10); detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(detail)
-	launch_button = UI.button("BRIEFING  >" if compact else "MISSION BRIEFING  →",_launch)
+	launch_button = UI.button("READY  >" if compact else "READY FOR MISSION  →",_launch)
 	if compact: launch_button.custom_minimum_size.y = 44
 	column.add_child(launch_button)
 	message = UI.label("Tap a world or signal to inspect it." if Phone.touch_device() else "Select a world or a signal.  ↑ ↓ offers  ·  Enter briefing  ·  Esc back  ·  T Temple",12,Color("8aa2a5")); outer.add_child(message)
@@ -175,7 +201,8 @@ func _refresh_chips() -> void:
 	for i in campaign.state.options.size():
 		var o: Dictionary = campaign.state.options[i]; var m: Dictionary = campaign.story.mission(str(o.mission))
 		var rk := Intel.risk(campaign,m,o)
-		var b := UI.button("%d  %s\n%s · %s risk" % [i+1,o.get("n",m.get("n",o.mission)),Intel.planet_for(m),rk.name],_select.bind(i))
+		var contacted: bool = Strategy25.contacted(campaign.state,campaign.region_for_mission(str(o.mission))) or bool(o.get("story",false))
+		var b := UI.button("%d  %s\n%s · %s" % [i+1,o.get("n",m.get("n",o.mission)) if contacted else "Rumour",Intel.planet_for(m),rk.name if contacted else "uncontacted"],_select.bind(i))
 		b.add_theme_font_size_override("font_size",13); b.add_theme_color_override("font_color",rk.color)
 		b.tooltip_text = Intel.deadline(o,campaign.state.options); chips.add_child(b)
 
@@ -184,6 +211,7 @@ func _show_details() -> void:
 	if transition and transition.is_running(): transition.kill()
 	detail.position.x = 0; detail.modulate.a = 1
 	UI.clear(detail); scroll.scroll_vertical = 0
+	_refresh_strategy25()
 	if get_viewport_rect().size.y > get_viewport_rect().size.x and page == "Briefing" and not campaign.state.options.is_empty():
 		_build_selected_card()
 	_sync_ui_safe_rect.call_deferred()
@@ -202,6 +230,9 @@ func _show_details() -> void:
 	if Phone.narrow(Phone.window_size()):
 		status.text = "Cr %d · Intel %d · Favor %d · Darkness %d/100 · Sith %d/12 · M%d D%d" % [campaign.state.res.credits,campaign.state.res.intel,campaign.state.res.favor,campaign.state.orderDark,project.segments,campaign.state.month,campaign.state.day]
 	launch_button.disabled = launch_button.disabled or project.defeated
+	if not campaign.state.options.is_empty():
+		var offer_region := campaign.region_for_mission(str(campaign.state.options[selected].mission))
+		launch_button.disabled = launch_button.disabled or (offer_region != "" and not Strategy25.contacted(campaign.state, offer_region) and not campaign.state.options[selected].get("story", false))
 	if campaign.state.get("twin",{}).get("stage", "") == "b":
 		detail.add_child(UI.label("FRONT B · fresh squad · up to 4, at most 2 Jedi",16,UI.GOLD))
 		detail.add_child(UI.button("Auto resolve (%d%%)" % preload("res://scripts/mission_fronts.gd").auto_odds(campaign.state,campaign.default_squad()),_front_auto))
@@ -210,6 +241,9 @@ func _show_details() -> void:
 	map_view.selected = selected
 	back_button.visible = not map_view.focused.is_empty() and not (Phone.narrow(Phone.window_size()) and get_viewport_rect().size.x < get_viewport_rect().size.y)
 	match page:
+		"Event": _scan_event_panel25()
+		"Scan": _scan_panel25()
+		"Intel": _intel_panel25()
 		"Regions": Details.region_panel(self)
 		"Field ops": _field_panel()
 		"Teams": Details.teams_panel(self)
@@ -223,15 +257,17 @@ func _build_selected_card() -> void:
 	var offer: Dictionary = campaign.state.options[clampi(selected, 0, campaign.state.options.size() - 1)]
 	var mission: Dictionary = campaign.story.mission(str(offer.mission))
 	var risk: Dictionary = Intel.risk(campaign, mission, offer)
-	var reward := "UNKNOWN · build Comms Hub" if int(campaign.state.wings.comms) <= 0 and not offer.get("story", false) else Intel.resources(mission.get("reward", {}))
+	var contacted := Strategy25.contacted(campaign.state,campaign.region_for_mission(str(offer.mission)))
+	var reward := "RUMOUR" if not contacted and not offer.get("story",false) else "UNKNOWN · build Comms Hub" if int(campaign.state.wings.comms) <= 0 and not offer.get("story", false) else Intel.resources(mission.get("reward", {}))
 	selected_card = UI.panel(UI.SURFACE)
 	selected_card.name = "SelectedMissionCard"
 	detail.add_child(selected_card)
 	var copy := UI.column(2)
 	selected_card.add_child(copy)
-	selected_title = UI.label(str(offer.get("n", mission.get("n", offer.mission))), UI.TYPE_ACTION, UI.GOLD)
+	selected_title = UI.label(str(offer.get("n", mission.get("n", offer.mission))) if contacted or offer.get("story",false) else "Mission rumour", UI.TYPE_ACTION, UI.GOLD)
 	copy.add_child(selected_title)
-	selected_forecast = UI.label("THREAT  %d/4 %s   ·   REWARD  %s" % [int(risk.level), str(risk.name).to_upper(), reward], UI.TYPE_CAPTION, risk.color)
+	var deadline_chip := "NO DEADLINE" if offer.get("story",false) else "NEXT MISSION" if offer.get("adv",false) else "THIS STEP"
+	selected_forecast = UI.label("THREAT  %d/4   ·   REWARD  %s\nDEADLINE  %s" % [int(risk.level),reward,deadline_chip], 14, risk.color)
 	selected_forecast.max_lines_visible = 2
 	copy.add_child(selected_forecast)
 
@@ -265,6 +301,8 @@ func _tab(value: String) -> void:
 func _select(index: int) -> void:
 	if campaign.state.options.is_empty(): return
 	selected = clampi(index,0,campaign.state.options.size()-1); page = "Briefing"
+	campaign.state.w25_selected_mission_id = str(campaign.state.options[selected].mission)
+	get_node("/root/CampaignFlow").save()
 	if get_viewport_rect().size.x < get_viewport_rect().size.y: phone_more = true
 	var m: Dictionary = campaign.story.mission(str(campaign.state.options[selected].mission))
 	planet = Intel.planet_for(m); region = str(Data.get_table("galaxy","PLANETS")[planet].reg)
@@ -298,7 +336,123 @@ func _temple() -> void:
 
 func _launch() -> void:
 	if campaign.state.options.is_empty() or not campaign.state.pending_mission.is_empty(): return
-	get_node("/root/CampaignFlow").prepare_briefing(selected)
+	var flow := get_node("/root/CampaignFlow")
+	var mission_id := str(campaign.state.options[selected].mission)
+	var offer_region := campaign.region_for_mission(mission_id)
+	if offer_region != "" and not Strategy25.contacted(campaign.state,offer_region) and not campaign.state.options[selected].get("story",false): return
+	if flow.has_method("launch_ready25"): flow.call("launch_ready25", mission_id)
+	else: flow.prepare_briefing(selected)
+
+func _refresh_strategy25() -> void:
+	var s: Dictionary = campaign.state
+	var project: Dictionary = campaign.sith.project_status()
+	deadline_rail.text = "DAY %d · SITH ESCALATION IN %d DAYS · %d/%d CONTACTS · +%d Cr/MO" % [int(s.elapsed_days), maxi(0, int(project.next_escalation) - int(s.elapsed_days)), s.w25_contacts.size(), Strategy25.contact_capacity(s), Strategy25.monthly_income(s)]
+	var phone_landscape := Phone.narrow(Phone.window_size()) and get_viewport_rect().size.x > get_viewport_rect().size.y
+	deadline_rail.visible = not phone_landscape
+	var next_region := _next_contact25()
+	var cost := Strategy25.contact_cost(next_region)
+	contact_action.text = "CONTACT %s · %d Intel + %d Cr · %d/%d SLOTS" % [Intel.region_name(next_region).to_upper(),int(cost.intel),int(cost.credits),s.w25_contacts.size(),Strategy25.contact_capacity(s)] if next_region != "" else "CONTACT NETWORK FULL · %d/%d SLOTS" % [s.w25_contacts.size(),Strategy25.contact_capacity(s)]
+	if phone_landscape:
+		contact_action.text = "%s %dI/%dCr · SITH %dD" % [Intel.region_name(next_region).to_upper(),int(cost.intel),int(cost.credits),maxi(0,int(project.next_escalation)-int(s.elapsed_days))] if next_region != "" else "CONTACTS FULL · SITH %dD" % maxi(0,int(project.next_escalation)-int(s.elapsed_days))
+	contact_action.disabled = next_region == "" or not campaign.can_afford(cost)
+	if region_strip != null:
+		UI.clear(region_strip)
+		if page == "Briefing" and not s.options.is_empty():
+			var offer: Dictionary = s.options[clampi(selected,0,s.options.size()-1)]
+			var key := campaign.region_for_mission(str(offer.mission))
+			if key == "": key = str(Data.get_table("galaxy", "PLANETS")[Intel.planet_for(campaign.story.mission(str(offer.mission)))].reg)
+			var rows: Array = Data.get_table("galaxy", "REGIONS")
+			var position := 0
+			for i in rows.size():
+				if str(rows[i][0]) == key: position = i; break
+			var neighbors := "%s  ›  [%s]  ›  %s" % [str(rows[maxi(0,position-1)][1]).to_upper(),Intel.region_name(key).to_upper(),str(rows[mini(rows.size()-1,position+1)][1]).to_upper()]
+			var strip := UI.label("%s\n%s" % [neighbors,Intel.deadline(offer,s.options)],14,UI.GOLD)
+			strip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			strip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			region_strip.add_child(strip)
+		region_strip.visible = page == "Briefing" and get_viewport_rect().size.x < get_viewport_rect().size.y
+
+func _contact25(key: String) -> void:
+	if Strategy25.make_contact(campaign,key):
+		get_node("/root/CampaignFlow").save()
+		map_view.refresh_signals(); _show_details()
+	else:
+		message.text = "Contact needs an open slot, Intel and credits."
+
+func _next_contact25() -> String:
+	if campaign.state.w25_contacts.size() >= Strategy25.contact_capacity(campaign.state): return ""
+	for key in ["mid","inner","colonies","core","deep","unknown"]:
+		if not Strategy25.contacted(campaign.state,key): return key
+	return ""
+
+func _contact_primary25() -> void:
+	var key := _next_contact25()
+	if key != "": _contact25(key)
+
+func _scan_site_open(id: String) -> void:
+	scan_site = id; scan_feedback = ""; page = "Scan"; detail_open = true
+	_show_details(); _slide(true)
+
+func _scan_panel25() -> void:
+	if not scan_feedback.is_empty(): detail.add_child(UI.label(scan_feedback,14,UI.GOLD))
+	for site in Strategy25.active_scans(campaign.state):
+		if str(site.id) != scan_site: continue
+		var remaining := maxi(0,int(site.days)-int(campaign.state.w25_scan_progress.get(scan_site,0)))
+		detail.add_child(UI.label("SCAN SITE · %s" % str(site.planet).to_upper(),14,UI.ACCENT))
+		detail.add_child(UI.label(str(site.n),21,UI.TEXT))
+		detail.add_child(UI.label("Commit %d days · gain %s. New events pause the scan." % [remaining,Intel.resources(site.reward)],14,UI.GOLD))
+		var button := UI.button("SCAN HERE · %d DAYS" % remaining,_scan_commit25)
+		button.name = "ScanCommit25"; button.custom_minimum_size.y = 44
+		button.disabled = not campaign.has_method("advance_strategy_day25")
+		detail.add_child(button)
+		return
+	detail.add_child(UI.label("Scan site no longer available.",14,UI.MUTED))
+
+func _scan_commit25() -> void:
+	var receipt := Strategy25.scan(campaign,scan_site)
+	scan_feedback = str(receipt.message)
+	scan_events = receipt.events
+	Strategy25.settle_months(campaign)
+	get_node("/root/CampaignFlow").save()
+	message.text = str(receipt.message)
+	map_view.refresh_signals(); _refresh_chips(); _show_details()
+	if not receipt.events.is_empty() or not preload("res://scripts/campaign/events11_engine.gd").pending(campaign.state).is_empty():
+		page = "Event"; _show_details()
+
+func _scan_event_panel25() -> void:
+	detail.add_child(UI.label("SCAN INTERRUPTED",20,UI.GOLD))
+	detail.add_child(UI.label(scan_feedback,14,UI.TEXT))
+	var pending: Dictionary = preload("res://scripts/campaign/events11_engine.gd").pending(campaign.state)
+	if not pending.is_empty():
+		detail.add_child(UI.label(str(pending.title),18,UI.DANGER))
+		detail.add_child(UI.label(str(pending.text),14,UI.TEXT))
+	elif not scan_events.is_empty():
+		detail.add_child(UI.label(str(scan_events[0]),16,UI.DANGER))
+
+func open_intel_view25() -> void:
+	page = "Intel"; detail_open = true; _show_details(); _slide(true)
+
+func _intel_panel25() -> void:
+	detail.add_child(UI.label("INTEL WORKBENCH",20,UI.ACCENT))
+	detail.add_child(UI.label("Trace Sith movements, choose a counter operation, then follow the research it exposes.",14,UI.MUTED))
+	var visible := 0
+	for op in campaign.sith.operations():
+		if op.status not in ["open","team"]: continue
+		var reg := Strategy25.operation_region(campaign,op)
+		if not Strategy25.operation_known(campaign,op): continue
+		visible += 1
+		var known_op := Strategy25.operation_display(campaign,op)
+		detail.add_child(UI.label("%s · day %d" % [str(known_op.n),int(op.deadline)],14,UI.DANGER))
+		detail.add_child(UI.label(str(known_op.desc),14,UI.TEXT))
+		for i in campaign.state.options.size():
+			if campaign.state.options[i].get("sith_offer_id", "") == op.mission_id:
+				detail.add_child(UI.button("COUNTER OP →",_select.bind(i)))
+	if visible == 0: detail.add_child(UI.label("No identified Sith operation in contacted space.",14,UI.MUTED))
+	detail.add_child(UI.label("SCAN LEADS · %d" % campaign.state.w25_leads.size(),14,UI.GOLD))
+	var done: Array = campaign.state.research.done
+	detail.add_child(UI.label("RESEARCH LINK · %s" % ("Sith Tactics complete · +5 squad aim" if "sithTactics" in done else "Codebreak → Sith Tactics · +5 squad aim"),14,UI.GOLD))
+	detail.add_child(UI.button("STUDY AT TEMPLE ARCHIVES",_temple))
+	detail.add_child(UI.button("OPEN SITH DOSSIER",func(): get_node("/root/CampaignFlow").open_intelligence()))
 
 func _assign_team(crisis: String, team_id: String) -> void:
 	if campaign.assign_team_to_crisis(crisis,team_id):
@@ -343,12 +497,15 @@ func _sith_panel() -> void:
 	detail.add_child(UI.label("DARK EVENTS",20,UI.DANGER))
 	detail.add_child(UI.label("Choose one counter mission this month. Intel and covert teams offer other ways to intervene.",14,UI.MUTED))
 	for op in campaign.sith.operations():
-		Details.fact(detail,str(op.n),"Day %d · %s" % [int(op.deadline),str(op.status).capitalize()],UI.GOLD)
-		detail.add_child(UI.label(str(op.desc),14))
+		var op_region := Strategy25.operation_region(campaign,op)
+		if not Strategy25.operation_known(campaign,op) and op_region != "": continue
+		var known_op := Strategy25.operation_display(campaign,op)
+		Details.fact(detail,str(known_op.n),"Day %d · %s" % [int(op.deadline),str(op.status).capitalize()],UI.GOLD)
+		detail.add_child(UI.label(str(known_op.desc),14))
 		for i in campaign.state.options.size():
 			var option: Dictionary = campaign.state.options[i]
 			if option.get("sith_offer_id", "") == op.mission_id:
-				detail.add_child(UI.button("COUNTER MISSION →",get_node("/root/CampaignFlow").prepare_briefing.bind(i),op.status == "open"))
+				detail.add_child(UI.button("COUNTER MISSION →",_select.bind(i),op.status == "open"))
 	detail.add_child(UI.button("Intel, teams & rival dossiers",func(): get_node("/root/CampaignFlow").open_intelligence()))
 	detail.add_child(UI.label("RIVAL OPERATIONS",18,UI.DANGER))
 	for rival in campaign.sith.rivals():
@@ -356,4 +513,4 @@ func _sith_panel() -> void:
 	for i in campaign.state.options.size():
 		var option: Dictionary = campaign.state.options[i]
 		if option.has("rival_id") or option.get("kind", "") in ["retaliation", "project"]:
-			detail.add_child(UI.button(str(option.n),get_node("/root/CampaignFlow").prepare_briefing.bind(i)))
+			detail.add_child(UI.button(str(option.n),_select.bind(i)))

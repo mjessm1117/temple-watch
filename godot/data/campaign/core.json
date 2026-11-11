@@ -431,13 +431,13 @@
       "n": "Kyber Forge",
       "cost": [
         0,
-        200,
+        230,
         300
       ],
       "up": [
         0,
-        15,
-        15
+        18,
+        18
       ],
       "eff": [
         "Not built",
@@ -451,13 +451,13 @@
       "n": "Armory",
       "cost": [
         0,
-        200,
+        220,
         300
       ],
       "up": [
         0,
-        15,
-        15
+        18,
+        18
       ],
       "eff": [
         "Not built",
@@ -493,8 +493,8 @@
       ],
       "up": [
         0,
-        10,
-        10
+        12,
+        12
       ],
       "eff": [
         "Not built",
@@ -568,12 +568,12 @@
     "graveL2": 20
   },
   "DAYS": 15,
-  "MISSION_CR": 0.6,
+  "MISSION_CR": 0.48,
   "STIPEND": [
-    60,
-    1.5
+    50,
+    1.0
   ],
-  "TROOP_PAY": 7,
+  "TROOP_PAY": 9,
   "HIRE_COST": 30,
   "TRAIN_XP": 12,
   "START_RES": {

@@ -15,6 +15,8 @@ const HomeResources = preload("res://scripts/campaign/home_resources.gd")
 const GalaxyCard = preload("res://scripts/campaign/home12_galaxy_card.gd")
 const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 const Squad = preload("res://scripts/campaign/squad.gd")
+const Roster25 = preload("res://scripts/campaign/strat_roster.gd")
+const W25UI = preload("res://scripts/w25_temple_ui.gd")
 var build_slot := "b0"
 var field_team: Array = []
 var edict_draft: Array = []
@@ -30,13 +32,15 @@ var station_panel: PanelContainer
 var panel_open := false
 var panel_tween: Tween
 var selected_room := ""
+var room_story_attempted: Dictionary = {}
+var room_story_played: Dictionary = {}
+var priority_room := ""
 const TempleView = preload("res://scripts/campaign/temple_view.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
 var room_picker: PanelContainer
 var phone_grid: Control
 var mini_galaxy: Control
 var more_panel: PanelContainer
-
 func _ready() -> void:
 	campaign = get_node("/root/CampaignFlow").session()
 	get_node("/root/CampaignFlow").active = true
@@ -61,7 +65,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_close_station(); get_viewport().set_input_as_handled()
 		elif event.keycode == KEY_G:
 			_open_galaxy(); get_viewport().set_input_as_handled()
-
 func _build_shell() -> void:
 	var compact := Phone.narrow(Phone.window_size())
 	var portrait := compact and get_viewport_rect().size.x < get_viewport_rect().size.y
@@ -76,6 +79,7 @@ func _build_shell() -> void:
 	if compact:
 		var head_style: StyleBoxFlat = head.get_theme_stylebox("panel").duplicate()
 		head_style.set_content_margin_all(6); head.add_theme_stylebox_override("panel", head_style)
+	W25UI.add_task_rail(self, compact, safe)
 	var rows := UI.column(5); head.add_child(rows)
 	var title := HBoxContainer.new(); rows.add_child(title)
 	var brand := UI.label("TEMPLE WATCH", 18 if compact else 27, Color("78d2df")); brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL; title.add_child(brand)
@@ -164,7 +168,12 @@ func _build_shell() -> void:
 	mini_galaxy = GalaxyCard.new(); add_child(mini_galaxy)
 	mini_galaxy.setup(campaign, compact)
 	mini_galaxy.opened.connect(_open_galaxy)
-	mini_galaxy.position = Vector2(safe.x + (12 if compact else 25), safe.y + (56 if compact else 340))
+	mini_galaxy.position = Vector2(get_viewport_rect().size.x - safe.z - mini_galaxy.custom_minimum_size.x - 12, safe.y + 56) if compact and not portrait else Vector2(safe.x + (12 if compact else 25), safe.y + (56 if compact else 340))
+	if compact and not portrait:
+		for child in mini_galaxy.get_children():
+			if child is Label and child.visible:
+				child.text = "GALAXY"; child.size.x = 104
+				child.add_theme_font_size_override("font_size", 14)
 	if portrait: mini_galaxy.hide()
 	station_panel = UI.panel(UI.SURFACE_RAISED); add_child(station_panel)
 	station_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -230,7 +239,39 @@ func _select_phone_room(id: String) -> void:
 	_sync_ui_safe_rect.call_deferred()
 
 func _open_room(id: String, target: String) -> void:
+	if room_picker != null: room_picker.hide()
+	if not room_story_attempted.has(id):
+		room_story_attempted[id] = true
+		var flow := get_node("/root/CampaignFlow")
+		if flow.has_method("open_room_story25"):
+			room_story_played[id] = bool(flow.call("open_room_story25", "memorial" if id == "u2" else id))
+	if id in ["medical", "comms"] and W25UI.defer_story_route(self, id, target): return
+	if id == "comms":
+		var flow := get_node("/root/CampaignFlow")
+		if flow.has_method("open_intel_view25"):
+			flow.call("open_intel_view25")
+			return
+		if flow.has_method("open_intelligence"):
+			flow.call("open_intelligence")
+			if is_instance_valid(flow.get("intelligence")): return
+		_open_galaxy(); return
+	if id == "medical" and _open_medical25(): return
+	if temple_view.rooms.has(id) and not bool(temple_view.rooms[id].built):
+		build_slot = id
+		set_meta("w25_build_wing", "")
 	_change_page(target, id)
+
+func _open_medical25() -> bool:
+	var roster_api: Script = Roster25
+	if roster_api.has_method("open_from_temple"):
+		roster_api.call("open_from_temple", get_tree(), "medical", selected_id)
+		return true
+	var squad_api: Script = Squad
+	for method in squad_api.get_script_method_list():
+		if str(method.name) == "open_from_temple" and method.args.size() >= 3:
+			squad_api.call("open_from_temple", get_tree(), "medical", selected_id)
+			return true
+	return false
 
 func _close_station() -> void:
 	panel_open = false
@@ -309,16 +350,36 @@ func _show_page() -> void:
 			context.add_child(UI.button(str(action.n), _module_action.bind(str(room.wing)), Modules.ready(campaign, str(room.wing)) and campaign.can_afford(action.cost)))
 		elif room.kind in ["spire", "vault", "annex"] and not room.built:
 			context.add_child(UI.label("Open Temple Works to excavate bays, construct spires and place new wings.", 14, UI.MUTED))
+		if selected_room == "medical": context.add_child(UI.label(W25UI.medical_status(campaign), 14, UI.GOLD))
+		if selected_room == "u2" and get_node("/root/CampaignFlow").has_method("open_room_story25") and bool(room_story_played.get("u2", false)):
+			var remember := UI.button("Remember", _remember25)
+			remember.name = "RememberAction"; remember.custom_minimum_size.y = 44
+			context.add_child(remember)
 	match page:
 		"Command": _command()
 		"Roster": _roster()
 		"Research": _research()
-		"Build": StrategyUI.build(self)
+		"Build":
+			if selected_room != "" and temple_view.rooms.has(selected_room) and not bool(temple_view.rooms[selected_room].built):
+				var preview_text := str(temple_view.rooms[selected_room].status)
+				var chosen := str(get_meta("w25_build_wing", ""))
+				if chosen != "" and campaign.has_method("build_preview25"):
+					var preview: Dictionary = campaign.call("build_preview25", build_slot, chosen)
+					preview_text = "%d Cr · Power %d/%d · %d days · %s" % [int(preview.get("cost", 0)), int(preview.get("power_after", 0)), int(preview.get("power_cap", 0)), int(preview.get("days", 0)), str(preview.get("reason", ""))]
+				_card("BAY PREVIEW · " + str(temple_view.rooms[selected_room].name), preview_text)
+			StrategyUI.build(self)
 		"Arsenal": _arsenal()
 		"Teams": _teams()
 		"Legacy": _legacy()
 		"Council": StrategyUI.council(self)
 		"Settings": StrategyUI.settings(self)
+
+func _remember25() -> void:
+	var flow := get_node("/root/CampaignFlow")
+	var played := flow.has_method("open_room_story25") and bool(flow.call("open_room_story25", "memorial"))
+	if not played:
+		var button := find_child("RememberAction", true, false)
+		if button != null: button.hide()
 
 func _sync_ui_safe_rect() -> void:
 	if not is_instance_valid(temple_view) or not temple_view.is_inside_tree() or not temple_view.has_method("set_ui_safe_rect"): return

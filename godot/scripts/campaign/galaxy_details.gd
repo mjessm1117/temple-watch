@@ -3,6 +3,7 @@ const Data = preload("res://scripts/campaign/data.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const Intel = preload("res://scripts/campaign/galaxy_intel.gd")
 const Art = preload("res://scripts/campaign/galaxy_art.gd")
+const Strategy25 = preload("res://scripts/w25_galaxy_strategy.gd")
 
 static func fact(box: VBoxContainer, title: String, value: String, color: Color = UI.TEXT) -> void:
 	var pair := UI.column(2); box.add_child(pair)
@@ -17,6 +18,11 @@ static func mission_panel(view) -> void:
 	view.selected = clampi(view.selected,0,c.state.options.size()-1)
 	var o: Dictionary = c.state.options[view.selected]; var m: Dictionary = c.story.mission(str(o.mission))
 	var planet := Intel.planet_for(m); var region: String = Data.get_table("galaxy","PLANETS")[planet].reg
+	if not Strategy25.contacted(c.state,region) and not o.get("story",false):
+		box.add_child(UI.label("UNCONTACTED · %s" % Intel.region_name(region).to_upper(),14,UI.GOLD))
+		box.add_child(UI.label("Mission rumour. Make contact to reveal the operation and launch.",16,UI.TEXT))
+		box.add_child(UI.button("VIEW CONTACT COST",view._tab.bind("Regions")))
+		return
 	var risk := Intel.risk(c,m,o)
 	box.add_child(UI.label("%s  /  %s" % ["STORY MISSION" if o.get("story",false) else str(o.get("kind","Mission")).to_upper(),Intel.region_name(region).to_upper()],12,Color("79d3e2")))
 	box.add_child(UI.label(str(o.get("n",m.get("n",o.mission))),19 if view.excerpt else 25,UI.TEXT))
@@ -89,6 +95,14 @@ static func region_panel(view) -> void:
 		fact(box,"Biome",str(Art.BIOMES.get(view.planet,["Uncharted"])[0]))
 		fact(box,"Planet threat","%d / 5" % preload("res://scripts/campaign/events11_engine.gd").threat(c.state,view.planet),UI.DANGER)
 	box.add_child(UI.label(str(row[1]),21,UI.ACCENT)); box.add_child(UI.label(str(row[3]),15))
+	if not Strategy25.contacted(c.state,key):
+		var cost := Strategy25.contact_cost(key)
+		box.add_child(UI.label("UNCONTACTED · %d Intel + %d Cr · %d/%d slots" % [int(cost.intel),int(cost.credits),c.state.w25_contacts.size(),Strategy25.contact_capacity(c.state)],14,UI.GOLD))
+		var contact := UI.button("MAKE CONTACT",view._contact25.bind(key),c.state.w25_contacts.size() < Strategy25.contact_capacity(c.state) and c.can_afford(cost))
+		contact.custom_minimum_size.y = 44; box.add_child(contact)
+		box.add_child(UI.label("Signals in this region remain rumours until contact.",14,UI.MUTED))
+		return
+	box.add_child(UI.label("CONTACTED · +%d Cr each month" % int(Data.get_table("galaxy","CONTACTS").get(key,{}).get("income",0)),14,UI.GOLD))
 	var unrest := Intel.unrest(c,key); var rules: Dictionary = Data.get_table("galaxy","UNREST")
 	fact(box,"Unrest","%d/5 · %s" % [unrest,Data.get_table("galaxy","UNREST_WORD")[unrest]],UI.DANGER if unrest >= 3 else UI.ACCENT)
 	fact(box,"Darkness","Order %d / 100 · regional haze reflects Darkness and unrest" % Intel.darkness(c),UI.DANGER)
@@ -109,8 +123,10 @@ static func region_panel(view) -> void:
 	if count == 0: box.add_child(UI.label("Nothing needs the Order here right now.",14,UI.MUTED))
 	for op in c.sith.operations():
 		if op.status not in ["open","team"]: continue
-		fact(box,"Dark Event",str(op.n)+" · day %d" % int(op.deadline),UI.DANGER)
-		box.add_child(UI.label(str(op.desc),14,UI.MUTED))
+		if Strategy25.operation_region(c,op) != key or not Strategy25.operation_known(c,op): continue
+		var known_op := Strategy25.operation_display(c,op)
+		fact(box,"Dark Event",str(known_op.n)+" · day %d" % int(op.deadline),UI.DANGER)
+		box.add_child(UI.label(str(known_op.desc),14,UI.MUTED))
 	box.add_child(UI.button("Counter a Dark Event →",func(): view.get_node("/root/CampaignFlow").open_intelligence()))
 	box.add_child(UI.button("Back to the briefing",view._tab.bind("Briefing")))
 
