@@ -1,8 +1,6 @@
 extends RefCounted
 const UI = preload("res://scripts/campaign/ui.gd")
-const Data = preload("res://scripts/campaign/data.gd")
 const Base = preload("res://scripts/campaign/strat_base.gd")
-const Progression = preload("res://scripts/campaign/progression.gd")
 const ITEMS = [
 	["Credits", "credits", "Pay for construction, research and equipment. Earn stipends and mission rewards."],
 	["Intel", "intel", "Fund research and reveal or counter Sith operations. Earn mission intel and staff the Comms Hub."],
@@ -12,17 +10,15 @@ const ITEMS = [
 ]
 
 static func projected_balance(c) -> int:
-	var core := Data.all("core")
-	var income := float(Data.get_table("missions", "DIFF").get(str(c.state.diff), {}).get("income", 1.0))
-	var stipend := roundi((float(core.STIPEND[0]) + float(core.STIPEND[1]) * int(c.state.res.favor)) * income)
-	var upkeep := 0
-	for wing in c.state.wings:
-		var costs: Array = core.WINGS[wing].up
-		upkeep += int(costs[mini(int(c.state.wings[wing]), costs.size() - 1)])
-	var troops := 0
-	for soldier in c.state.roster:
-		if str(soldier.status) == "active" and not Progression.is_jedi(soldier): troops += 1
-	return int(c.state.res.credits) + stipend - upkeep - troops * int(core.TROOP_PAY)
+	return int(c.state.res.credits) + int(c.monthly_credits25().net)
+
+static func forecast_label(c) -> Label:
+	var amount := int(c.strategic_snapshot25().forecast_month_credits)
+	var label := UI.label("%s%d Cr at month end" % ["+" if amount >= 0 else "", amount], 14, UI.ACCENT if amount >= 0 else UI.DANGER)
+	label.name = "MonthCreditForecast"
+	var breakdown: Dictionary = c.monthly_credits25()
+	label.tooltip_text = "Stipend +%d · wing upkeep -%d · troop pay -%d; Council and room effects included." % [breakdown.stipend, breakdown.upkeep, breakdown.troop_pay]
+	return label
 
 static func add_row(row: HBoxContainer, c) -> void:
 	for item in ITEMS:
@@ -36,6 +32,18 @@ static func add_row(row: HBoxContainer, c) -> void:
 			label.add_theme_color_override("font_color", UI.DANGER)
 			label.tooltip_text += " Next monthly stipend will not cover upkeep and troop pay; unpaid costs reduce Senate Favor."
 		row.add_child(label)
+	row.add_child(forecast_label(c))
+	if not row.visible and row.get_parent() != null:
+		var title := row.get_parent().get_child(0) as HBoxContainer
+		if title != null and title.get_child_count() > 0 and title.get_child(0) is Label:
+			var brand := title.get_child(0) as Label
+			var stack := VBoxContainer.new()
+			stack.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			stack.add_theme_constant_override("separation", 0)
+			title.remove_child(brand)
+			title.add_child(stack); title.move_child(stack, 0)
+			stack.add_child(brand)
+			stack.add_child(forecast_label(c))
 
 static func power_label(c) -> Label:
 	var power := Base.power(c.state)

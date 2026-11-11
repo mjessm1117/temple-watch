@@ -13,6 +13,7 @@ const Integration = preload("res://scripts/campaign/integration.gd")
 const SAVE_PATH = "user://campaign.json"
 var state: Dictionary = {}
 const Base = preload("res://scripts/campaign/strat_base.gd")
+const Contracts25 = preload("res://scripts/w25_economy_contracts.gd")
 # --- wave10 gear ---
 const ResearchQueue = preload("res://scripts/campaign/research_queue.gd")
 const Roster = preload("res://scripts/campaign/strat_roster.gd")
@@ -206,19 +207,45 @@ func heal_multiplier() -> float:
 	return (2.5 if level >= 3 else 2.0 if level >= 2 else 1.5 if level >= 1 else 1.0) * (1.25 if state.staff.has("medical") else 1.0)
 
 func advance_days(days: int) -> void:
-	if sith.project_status().defeated: return
+	advance_strategy_day25(days, "legacy")
+
+func advance_strategy_day25(days: int, reason: String) -> Dictionary:
+	var result := {"days_advanced": 0, "events": []}
+	if days <= 0 or sith.project_status().defeated: return result
 	ensure_strategy()
-	for _day in maxi(0, days):
+	for _day in days:
+		var before_news: int = state.news.size()
 		state.elapsed_days = int(state.elapsed_days) + 1; state.day = int(state.day) + 1
 		Crisis11.tick(self)
 		Base.tick(self); Roster.tick(self); _tick_research(1); Ops.tick(self)
 		if int(state.day) > 30:
 			state.day = 1; state.month = int(state.month) + 1
 			_month_tick()
-		sith.advance_day()
+		var threat_events: Array = sith.advance_day()
+		result.events.append_array(threat_events)
+		for entry in state.news.slice(before_news): result.events.append({"kind": "strategy", "text": entry})
+		result.days_advanced += 1
 		if sith.project_status().defeated: break
 	refresh_options()
 	Identity.reveal(self)
+	var tree := Engine.get_main_loop() as SceneTree
+	var flow := tree.root.get_node_or_null("CampaignFlow") if tree != null else null
+	if flow != null and flow.get("campaign") == self and flow.has_method("save"):
+		flow.save()
+	else: save()
+	return result
+
+func monthly_credits25() -> Dictionary:
+	return Contracts25.monthly_credits25(self)
+
+func strategic_snapshot25() -> Dictionary:
+	return Contracts25.strategic_snapshot25(self)
+
+func build_preview25(bay_id: String, wing_id: String) -> Dictionary:
+	return Contracts25.build_preview25(self, bay_id, wing_id)
+
+func confirm_build25(bay_id: String, wing_id: String) -> bool:
+	return Contracts25.confirm_build25(self, bay_id, wing_id)
 
 func advance_mission() -> void:
 	advance_days(int(Data.get_table("core", "DAYS")))
@@ -245,17 +272,8 @@ func _tick_research(days: int) -> void:
 		ResearchQueue.complete(self, id)
 
 func _month_tick() -> void:
-	var core: Dictionary = Data.all("core")
-	var income := float(Data.get_table("missions", "DIFF").get(str(state.diff), {}).get("income", 1.0))
-	var stipend := roundi((float(core.STIPEND[0]) + float(core.STIPEND[1]) * int(state.res.favor)) * income)
-	var upkeep := 0
-	for key in state.wings:
-		var up: Array = core.WINGS[key].up
-		upkeep += int(up[mini(int(state.wings[key]), up.size() - 1)])
-	var troop_count := 0
-	for r in state.roster:
-		if str(r.status) == "active" and not Progression.is_jedi(r): troop_count += 1
-	gain("credits", stipend - upkeep - troop_count * int(core.TROOP_PAY))
+	var credits := monthly_credits25()
+	gain("credits", int(credits.net))
 	if int(state.res.credits) < 0:
 		state.res.credits = 0; gain("favor", -5)
 	gain("recruits", 1 + int(state.res.favor) / 40)
@@ -265,7 +283,7 @@ func _month_tick() -> void:
 		if str(r.get("assign", "")) == "calm" and Progression.is_jedi(r):
 			r.dark = maxi(0, int(r.dark) - int([0, 1, 2][mini(int(state.wings.gardens), 2)]))
 	if Base.operational(state, "gardens"): gain("orderDark", -Base.staff_count(state, "gardens"))
-	state.news.append("Month %d: stipend +%d, upkeep -%d." % [state.month, stipend, upkeep])
+	state.news.append("Month %d: stipend +%d, upkeep -%d, troop pay -%d." % [state.month, credits.stipend, credits.upkeep, credits.troop_pay])
 	Council.month(self); Ops.spawn(self)
 	month_advanced.emit(int(state.month), {"day":state.day, "elapsed_days":state.elapsed_days, "darkness_segments":darkness_segments()})
 
