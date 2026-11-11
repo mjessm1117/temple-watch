@@ -24,6 +24,9 @@ static func cover_tint26(full: bool) -> Color:
 
 func cover_material26(name: String, cover_kind: String) -> Material:
 	if cover_kind not in ["#", "c", "h"]: return p[name]
+	# Small trim, metal and dark seams read through shape and lighting. Reuse
+	# their base opaque material so full/half cover does not split those batches.
+	if name in ["dark", "trim", "metal", "glow"]: return p[name]
 	var full := cover_kind == "#"
 	var key := name + ("_full26" if full else "_half26")
 	if cover_materials26.has(key): return cover_materials26[key]

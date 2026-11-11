@@ -50,6 +50,11 @@ var odds_modifiers: Label
 var odds_scroll: ScrollContainer
 var odds_badge: Label
 var alerts: Control
+var enemy_card: PanelContainer
+var enemy_text: Label
+var deferred_radio: Array[Dictionary] = []
+var deferred_story_comms: Dictionary = {}
+var enemy_was_active := false
 var feedback = preload("res://scripts/w24_hud_feedback.gd").new()
 var last_threat: Dictionary = {}
 const Targeting22 = preload("res://scripts/combat_targeting.gd")
@@ -80,7 +85,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	var strip := PanelContainer.new(); strip.name = "PhoneTopStrip"
 	preload("res://scripts/hud_phone_layout.gd").place(strip, layout.header)
 	var strip_style: StyleBoxFlat = night.panel_style(); strip_style.set_content_margin_all(0)
-	strip_style.content_margin_left = 12; strip_style.content_margin_right = 12
+	strip_style.content_margin_left = 230; strip_style.content_margin_right = 12
 	strip_style.bg_color = Color.TRANSPARENT; strip_style.border_color = Color.TRANSPARENT
 	strip.add_theme_stylebox_override("panel", strip_style); overlay.add_child(strip)
 	var heading := HBoxContainer.new(); top_heading = heading
@@ -96,7 +101,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	threat_chip.custom_minimum_size.x = 106; threat_chip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	threat_chip.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	var threat_style: StyleBoxFlat = night.panel_style(); threat_style.set_content_margin_all(0)
-	threat_chip.add_theme_stylebox_override("normal", threat_style); heading.add_child(threat_chip)
+	threat_chip.add_theme_stylebox_override("normal", threat_style); overlay.add_child(threat_chip)
 	objective_summary = night.label("", 12, Color("e9ca83")); objective_summary.name = "PhoneObjectiveSummary"
 	objective_summary.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	objective_summary.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -111,7 +116,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	reveal_timer.timeout.connect(_update_group_reveal)
 	overlay.add_child(reveal_timer); reveal_timer.start()
 	end_button = _button("END TURN", _end_turn); end_button.name = "PhoneEndTurn"
-	end_button.custom_minimum_size = Vector2(88, 44); heading.add_child(end_button)
+	end_button.custom_minimum_size = Vector2(88, 44); overlay.add_child(end_button)
 	heading.add_theme_constant_override("separation", 8)
 	var menu := _button("MENU" if preload("res://scripts/phone_layout.gd").touch_device() else "☰", _show_menu); menu.name = "PhoneMenu"
 	menu.custom_minimum_size = Vector2(44, 44); heading.add_child(menu)
@@ -257,11 +262,18 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	odds_box.add_child(odds_scroll)
 	odds_modifiers = night.label("", 14, Color("dbe7e4")); odds_modifiers.name = "DecisionModifiers"
 	odds_modifiers.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; odds_scroll.add_child(odds_modifiers)
+	enemy_card = PanelContainer.new(); enemy_card.name = "PhoneEnemyEvent"; enemy_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	enemy_card.add_theme_stylebox_override("panel", odds_style.duplicate()); enemy_card.hide(); overlay.add_child(enemy_card)
+	enemy_text = night.label("", 14, Color("f2d99a")); enemy_text.name = "PhoneEnemyEventText"
+	enemy_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; enemy_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	enemy_card.add_child(enemy_text)
 	feedback.setup(self, g, overlay)
 	if safe_size.y > safe_size.x:
 		alerts = preload("res://scripts/w23_uiart_alerts.gd").new()
 		alerts.name = "PhoneAlertLayer"
 		alerts.setup(g, night, overlay)
+	var guard := preload("res://scripts/w27c_phone_overlay_guard.gd").new()
+	guard.name = "PhoneOverlayGuard27"; guard.hud = self; overlay.add_child(guard)
 	root_control.resized.connect(_relayout)
 	_relayout.call_deferred()
 
@@ -279,6 +291,8 @@ func _relayout() -> void:
 	var logical_height := maxf(1.0, preload("res://scripts/phone_layout.gd").logical_size(preload("res://scripts/phone_layout.gd").window_size()).y)
 	layout.place(overlay.find_child("PhoneTopBackground", false, false), Rect2(0, 0, area.x, 44.0 * root_control.size.y / logical_height))
 	layout.place(overlay.find_child("PhoneTopStrip", false, false), boxes.header)
+	layout.place(threat_chip, Rect2(12, 0, 106, 44))
+	layout.place(end_button, Rect2(126, 0, 88, 44))
 	layout.place(unit_plate, boxes.plate)
 	layout.place(ability_tray, Rect2(boxes.tray.position, boxes.tray.size - Vector2(8, 0)))
 	layout.place(action_art, Rect2(boxes.tray.position, boxes.tray.size - Vector2(8, 0)))
@@ -306,15 +320,23 @@ func _relayout() -> void:
 	top_heading.alignment = BoxContainer.ALIGNMENT_END if portrait else BoxContainer.ALIGNMENT_BEGIN
 	g.objective_label.custom_minimum_size.y = 24 if portrait else 44
 	if portrait: layout.place(g.objective_label, Rect2(8, 44, minf(200.0, area.x - 16.0), 24))
-	threat_chip.custom_minimum_size.x = 100 if portrait else 106
+	threat_chip.custom_minimum_size.x = 106
 	threat_chip.text = Threat22.zone_text(last_threat)
-	layout.place(odds_plate, Rect2(12, 58 if portrait else 50, minf(170.0 if portrait else 340.0, area.x - 82.0), (280 if feedback.details_open else 88) if portrait else 96))
+	layout.place(odds_plate, Rect2(12, 72 if portrait else 50, minf(150.0 if portrait else 340.0, area.x - 82.0), 126 if portrait else 96))
+	layout.place(enemy_card, Rect2(12, 150 if portrait else 50, minf(250.0 if portrait else 350.0, area.x - 76.0), 76))
 	odds_title.add_theme_font_size_override("font_size", 12 if portrait else 14)
 	odds_hit.add_theme_font_size_override("font_size", 24)
-	odds_badge.visible = not portrait
-	odds_scroll.custom_minimum_size.y = 170 if portrait else 20
-	odds_scroll.visible = not portrait or feedback.details_open
+	odds_badge.visible = false if portrait else true
+	odds_scroll.custom_minimum_size.y = 52 if portrait else 20
+	odds_scroll.custom_minimum_size.x = 140 if portrait else 300
+	odds_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if portrait else ScrollContainer.SCROLL_MODE_AUTO
+	odds_modifiers.custom_minimum_size.x = 134 if portrait else 294
+	odds_modifiers.add_theme_font_size_override("font_size", 14)
+	odds_scroll.visible = true
 	feedback.relayout(area)
+	if portrait:
+		odds_scroll.show()
+		feedback.details_button.hide()
 	_place_reinforcement()
 	if is_instance_valid(alerts):
 		alerts.call("set_safe_area", area)
@@ -357,21 +379,30 @@ func _button(title: String, action: Callable) -> Button:
 func _place_reinforcement() -> void:
 	if feedback.reinforcement == null: return
 	var pending: Array = last_threat.get("pending_groups", [])
-	if pending.is_empty():
+	var wave: Dictionary = {}
+	var pressure_script: Script = load("res://scripts/mission_pressure.gd")
+	if pressure_script != null and pressure_script.has_method("wave_entry27"):
+		wave = pressure_script.call("wave_entry27", g.mission)
+	elif g.mission.has_method("wave_entry27"):
+		wave = g.mission.call("wave_entry27", g.mission)
+	if wave.is_empty() and not pending.is_empty(): wave = pending[0]
+	if wave.is_empty():
 		feedback.reinforcement.hide()
 		return
-	var wave: Dictionary = pending[0]
-	var tile: Vector2i = wave.get("entry_pos", Vector2i(-1, -1))
+	var entries: Array = wave.get("entry_tiles", [])
+	var tile: Vector2i = entries[0] if not entries.is_empty() else wave.get("entry_pos", Vector2i(-1, -1))
 	var arrow: String = preload("res://scripts/reinforcement_marker.gd").edge_arrow(tile, g.mission)
-	feedback.reinforcement.text = "%s %d in %dT" % [arrow, int(wave.get("count", 0)), int(wave.get("turns", 0))]
-	var portrait := overlay.size.y > overlay.size.x
-	var x := maxf(8.0, overlay.size.x - (112.0 if portrait else 168.0))
-	var y := 320.0 if portrait else 48.0
-	preload("res://scripts/hud_phone_layout.gd").place(feedback.reinforcement, Rect2(x, y, 104, 22))
-	feedback.reinforcement.visible = not odds_plate.visible and open_card == ""
+	feedback.reinforcement.text = "%s %d in %dT" % [arrow, int(wave.get("count", 0)), int(wave.get("turns_left", wave.get("turns", 0)))]
+	var point: Vector2 = g.camera.unproject_position(Vector3(tile.x, 1.9, tile.y)) - overlay.global_position
+	var x := clampf(point.x - 52.0, 8.0, maxf(8.0, overlay.size.x - 112.0))
+	var y := clampf(point.y - 22.0, 195.0 if overlay.size.y > overlay.size.x else 48.0, overlay.size.y - 145.0)
+	preload("res://scripts/hud_phone_layout.gd").place(feedback.reinforcement, Rect2(x, y, 104, 44))
+	feedback.reinforcement.visible = tile.x >= 0 and not odds_plate.visible and open_card == "" and g.mission.phase == "player"
 
 func _refresh_odds() -> void:
 	if odds_plate == null: return
+	if g.hud_controls != null and g.hud_controls.preview_card26 != null:
+		g.hud_controls.preview_card26.hide()
 	var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	var active: bool = g.action in ["shoot", "strike"] and g.mission.phase == "player" and g.mission.result == "" and not actor.is_empty() and not target.is_empty() and (bool(target.get("spotted", false)) or bool(target.get("detected", false)) or bool(target.get("awake", false)))
@@ -388,7 +419,12 @@ func _refresh_odds() -> void:
 		odds_badge.text = "◆ FLANKED BY %d" % flank.size() if not flank.is_empty() else "◆ SEEN BY %d" % seen.size() if not seen.is_empty() else "◆ NO KNOWN LOS"
 		odds_badge.add_theme_color_override("font_color", Color("ef6a5d") if not flank.is_empty() else Color("e0bd78"))
 		odds_modifiers.text = compact_names(flank if not flank.is_empty() else seen) if not flank.is_empty() or not seen.is_empty() else "No visible enemy can shoot here"
+		if g.mission.has_method("decision_preview27"):
+			var preview: Dictionary = g.mission.call("decision_preview27", g.selected_id, g.hud_controls.move_destination)
+			if not preview.is_empty(): odds_modifiers.text = preload("res://scripts/w27c_phone_preview.gd").move_text(preview)
 		feedback.refresh_odds()
+		if overlay.size.y > overlay.size.x:
+			odds_scroll.show(); feedback.details_button.hide()
 		return
 	if not active:
 		feedback.refresh_odds()
@@ -400,15 +436,17 @@ func _refresh_odds() -> void:
 	odds_hit.add_theme_color_override("font_color", Color("f2d99a"))
 	odds_badge.text = "◆ " + str(decision.badge)
 	odds_badge.add_theme_color_override("font_color", Color("ef6a5d") if str(decision.badge) == "FLANKED" else Color("e0bd78"))
-	var reason_lines: Array[String] = []
-	var targeting: Object = g.hud_controls.targeting
-	if targeting != null and targeting.has_method("decision_details24"):
-		targeting.g = g
-		for item in targeting.call("decision_details24", actor, target):
-			if item is Dictionary: reason_lines.append("%s %s" % [str(item.get("label", "")), str(item.get("value", ""))])
-	if reason_lines.is_empty(): reason_lines = decision.modifiers
-	odds_modifiers.text = "\n".join(reason_lines) if overlay.size.y > overlay.size.x else "  ·  ".join(reason_lines)
+	var cover_reason := "NO COVER" if int(data.get("cover", 0)) == 0 else "COVER -%d" % int(data.cover)
+	var height_delta := 0
+	for item in data.get("lines", []):
+		if str(item[0]) == "High ground": height_delta = int(item[1]); break
+	var height_reason := "HEIGHT %+d" % height_delta
+	var flank_reason := "FLANKED" if bool(data.get("flanked", false)) else "NO FLANK"
+	var reason_lines: Array[String] = [cover_reason, height_reason, flank_reason]
+	odds_modifiers.text = "  ·  ".join(reason_lines)
 	feedback.refresh_odds()
+	if overlay.size.y > overlay.size.x:
+		odds_scroll.show(); feedback.details_button.hide()
 
 static func compact_names(names: Array) -> String:
 	var counts: Dictionary = {}
@@ -445,6 +483,9 @@ func _show_menu() -> void:
 	open_card = "menu"; refresh()
 
 func queue_radio(speaker: String, words: String, priority: int = 1) -> void:
+	if g.mission.phase == "enemy":
+		deferred_radio.append({"speaker": speaker, "words": words, "priority": priority})
+		return
 	if words == "EAST FLANK APPROACHING":
 		group_reveal.text = words
 		radio_until = Time.get_ticks_msec() + 2500
@@ -457,6 +498,34 @@ func queue_radio(speaker: String, words: String, priority: int = 1) -> void:
 
 func _update_group_reveal() -> void:
 	if not is_instance_valid(overlay): return
+	if g.hud_controls != null and g.hud_controls.preview_card26 != null:
+		g.hud_controls.preview_card26.hide()
+	var enemy_active: bool = g.mission.phase == "enemy" or g.playing_enemy_events
+	if enemy_active:
+		enemy_was_active = true
+		var reason := str(g.phase_banner.text).strip_edges()
+		var outcome := str(night.activity.text).strip_edges() if night.activity != null else ""
+		if reason.is_empty(): reason = "Enemy is acting"
+		if outcome == reason: outcome = ""
+		enemy_text.text = reason + ("\n" + outcome if outcome != "" else "")
+		enemy_card.show()
+		g.phase_banner.hide()
+		night.phase_plate.hide(); night.activity_plate.hide()
+		group_reveal.hide()
+		if is_instance_valid(alerts): alerts.card.hide()
+		return
+	_place_reinforcement()
+	enemy_card.hide()
+	if enemy_was_active:
+		enemy_was_active = false
+		if not deferred_story_comms.is_empty() and g.has_meta("story_comms"):
+			var comms = g.get_meta("story_comms")
+			if comms != null and comms.has_method("show_radio"):
+				comms.show_radio(str(deferred_story_comms.speaker), str(deferred_story_comms.speaker), str(deferred_story_comms.words), 1)
+			deferred_story_comms.clear()
+	if not deferred_radio.is_empty() and (is_instance_valid(alerts) or Time.get_ticks_msec() >= radio_until):
+		var item: Dictionary = deferred_radio.pop_front()
+		queue_radio(str(item.speaker), str(item.words), int(item.priority))
 	var notes = g.get_node_or_null("ThreatNotes11")
 	if notes == null or notes.get("panel") == null: return
 	notes.panel.modulate.a = 0.0

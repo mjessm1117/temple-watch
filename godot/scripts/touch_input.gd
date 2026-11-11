@@ -1,6 +1,7 @@
 extends RefCounted
 ## Battle gestures. Mouse emulation remains enabled for normal UI controls.
 const THRESHOLD := 18.0 # Viewport positions are logical pixels on high-density phones.
+const UNIT_PICK_RADIUS27 := 36.0
 const CameraRules = preload("res://scripts/battle11_camera.gd")
 var g
 var fingers: Dictionary = {}
@@ -101,9 +102,12 @@ func handle(event: InputEvent) -> void:
 					pinching = false
 					return
 				if tap and not (pressed_control is BaseButton) and g.get_viewport().gui_get_hovered_control() == null and g._screen_tile(event.position).x >= 0:
-					var click := InputEventMouseButton.new()
-					click.button_index = MOUSE_BUTTON_LEFT; click.pressed = true; click.position = event.position
-					g.input_controls.handle_event(click)
+					# In Move mode, a tap on an empty board tile is a destination even
+					# when the larger ally pick halo reaches into that tile.
+					if (g.action == "move" and _empty_board(event.position)) or not _pick_unit27(event.position):
+						var click := InputEventMouseButton.new()
+						click.button_index = MOUSE_BUTTON_LEFT; click.pressed = true; click.position = event.position
+						g.input_controls.handle_event(click)
 				g.set_process_unhandled_input.call_deferred(true)
 				pinching = false
 				pressed_control = null
@@ -155,6 +159,22 @@ func _control_at(node: Node, point: Vector2) -> Control:
 	if node is Control and node != g.overlay and node.is_visible_in_tree() and node.mouse_filter != Control.MOUSE_FILTER_IGNORE and node.get_global_rect().has_point(point):
 		return node
 	return null
+
+func _pick_unit27(point: Vector2) -> bool:
+	if g.mission.phase != "player" or g.action not in ["free", "move"]: return false
+	for enemy in g.mission.living("enemy"):
+		if not (bool(enemy.get("spotted", false)) or bool(enemy.get("detected", false)) or bool(enemy.get("awake", false))): continue
+		if preload("res://scripts/input_controls.gd").unit_screen_distance(g, point, enemy) < 28.0: return false
+	var picked: Dictionary = {}
+	var closest := UNIT_PICK_RADIUS27
+	for unit in g.mission.living("player"):
+		var distance: float = preload("res://scripts/input_controls.gd").unit_screen_distance(g, point, unit)
+		if distance < closest:
+			closest = distance
+			picked = unit
+	if picked.is_empty(): return false
+	g._select(int(picked.id))
+	return true
 
 func _in_scroll(control: Control) -> bool:
 	var ancestor := control
