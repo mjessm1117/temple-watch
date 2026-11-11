@@ -67,15 +67,21 @@ func _opening_contract_and_trigger() -> void:
 	var fired := false
 	for actor in shot_m.living("player"):
 		if "shoot" not in actor.get("kit", []): continue
-		for target in shot_m.living("enemy"):
-			if not bool(target.awake): continue
-			var info: Dictionary = Shot.calculate(shot_m, actor, target)
-			if not bool(info.los) or not bool(info.range_ok): continue
-			if shot_m.shot(int(actor.id), int(target.id)):
-				fired = true
+		var origin := Shot.pos(actor)
+		for tile in shot_m.paths(actor, int(actor.mob)).costs:
+			if tile == origin or shot_m._opening_sight26(tile): continue
+			actor.x = tile.x; actor.y = tile.y
+			var target_id := -1
+			for target in shot_m.living("enemy"):
+				if not bool(target.awake): continue
+				var info: Dictionary = Shot.calculate(shot_m, actor, target)
+				if bool(info.los) and bool(info.range_ok): target_id = int(target.id); break
+			actor.x = origin.x; actor.y = origin.y
+			if target_id >= 0 and shot_m.move(int(actor.id), tile):
+				fired = shot_m.shot(int(actor.id), target_id)
 				break
 		if fired: break
-	check(fired, "shot fixture finds a legal opening attack")
+	check(fired, "a protected ally can move then fire on the west pod")
 	check(str(shot_m.opening_contact26().get("activation_trigger", "")) == "shot", "a player shot activates the east pod")
 
 	var turn_m = gate_campaign(1)

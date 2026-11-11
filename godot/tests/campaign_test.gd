@@ -61,9 +61,9 @@ func run() -> void:
 	game = Campaign.new()
 	check(game.state.options.filter(func(o): return o.get("story",false)).size() == 1 and game.state.options[0].mission == "relay", "opening story mission offered")
 	game.state.step = 1; game.refresh_options()
-	check(game.state.options.size() >= 3 and game.state.options[0].mission == "rescue" and game.state.options[1].mission == "shrine", "crisis plan offers web missions")
+	check(game.state.options.size() >= 2 and game.state.options[0].mission == "rescue" and game.state.options[1].mission == "archive", "opening crisis offers rescue and archive")
 	check(game.select_mission(0).mission_id == "rescue", "mission selection records chosen option")
-	check(game.state.res.favor == 42, "ignored escort-less crisis applies web favor penalty")
+	check(game.state.res.favor == 45, "ignored opening archive applies favor penalty")
 
 	game = Campaign.new()
 	var result: Dictionary = game.apply_mission_result({"mission_id": "relay", "win": true, "story": true, "units": [
@@ -86,8 +86,8 @@ func run() -> void:
 	check(Legacy.set_nickname(game, "u1", "Rook"), "identity nickname saved")
 	check(game.soldier("u1").nick == "Rook", "identity nickname stored")
 	game.state.step = 1; game.refresh_options()
-	check(game.assign_team_to_crisis("shrine", "t2"), "second squad can take another crisis")
-	check(game.state.team_assignments.shrine == "t2", "second squad assignment stored")
+	check(game.assign_team_to_crisis("archive", "t2"), "second squad can take another crisis")
+	check(game.state.team_assignments.archive == "t2", "second squad assignment stored")
 	var temple_scene: PackedScene = load("res://scenes/temple.tscn")
 	var temple: Control = temple_scene.instantiate()
 	root.add_child(temple)

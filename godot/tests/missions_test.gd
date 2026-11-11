@@ -146,8 +146,13 @@ func _rules() -> void:
 	for i in 2:
 		var invader: Dictionary = overrun.living("enemy")[i]
 		invader.x = gate_at.x + i - 1; invader.y = gate_at.y
+	for ally in overrun.living("player"): ally.x = 13; ally.y = 23
 	Objectives.enemy_end(overrun)
-	check(overrun.result == "loss","two attackers overrun an empty gate zone")
+	check(overrun.result == "" and int(overrun.objective_state.overrun) == 1,"gate grants a recovery turn after first contest")
+	Objectives.enemy_end(overrun)
+	check(overrun.result == "" and int(overrun.objective_state.overrun) == 2,"gate still allows recovery after second contest")
+	Objectives.enemy_end(overrun)
+	check(overrun.result == "loss","three consecutive contests overrun an empty gate zone")
 	var pods := {}
 	for enemy in defense.living("enemy"):
 		if int(enemy.group) >= 1000: pods[enemy.group] = int(pods.get(enemy.group,0))+1

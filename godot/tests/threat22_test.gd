@@ -43,7 +43,7 @@ func run() -> void:
 	plate.queue_free()
 	var relay: RefCounted = Mission.new(17, "res://data/maps/relay.json")
 	var summary: Dictionary = Pressure.threat_summary(relay)
-	check(summary.pending_groups.size() == 1 and int(summary.pending_groups[0].turns) == 1, "gate wave telegraphed one turn")
+	check(summary.pending_groups.size() == 1 and int(summary.pending_groups[0].turns) == 2, "gate wave gives two setup turns")
 	check(int(summary.pending_groups[0].count) == relay.spec.wave_roster[0].size(), "gate wave count matches roster")
 	check(summary.pending_groups[0].types.size() >= 1, "gate wave reports enemy types")
 	var marker_parent := Node3D.new()
