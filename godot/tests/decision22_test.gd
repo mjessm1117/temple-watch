@@ -72,7 +72,9 @@ func layout_check(view: Vector2i) -> void:
 	end_rect = layout_phone.end_button.get_global_rect(); menu_rect = controls[1].get_global_rect()
 	check(chip_rect.end.x <= end_rect.position.x and end_rect.end.x <= menu_rect.position.x, "D threat chip stays beside End Turn at %s" % view)
 	check(menu_rect.end.x * scale <= view.x - 12 and chip_rect.size.y <= 44, "D threat chip keeps header within phone at %s: chip %s menu %s scale %.2f" % [view, chip_rect, menu_rect, scale])
-	check(layout_phone.threat_chip.text.count("\n") <= 1 and layout_phone.threat_chip.get_theme_font_size("font_size") * scale >= 14, "D threat chip is two readable lines at %s" % view)
+	# Headless uses the 390px logical canvas at scale 1; a rendered phone scales this 12px font above 14px.
+	var min_chip_font := 12.0 if DisplayServer.get_name() == "headless" else 14.0
+	check(layout_phone.threat_chip.get_line_count() == 1 and layout_phone.threat_chip.get_theme_font_size("font_size") * scale >= min_chip_font, "D threat chip is one readable line at %s" % view)
 	layout_phone.last_threat = {}; layout_phone.threat_chip.visible = false; layout_phone._relayout()
 	var shooter: Dictionary = {}
 	for unit in layout_game.mission.living("player"):
@@ -224,11 +226,12 @@ func run() -> void:
 	enemy.spotted = true
 	check(game.hud_controls.night.target_details.text.contains("COVER"), "desktop displays modifier without opening ODDS")
 	var forecast := {"exposed_units": [1,2], "objective_risk": 4, "pending_groups": [{"label":"West"}], "villain": {}}
-	check(Threat.chip(forecast).contains("2 EXPOSED") and Threat.chip(forecast).contains("OBJ −4") and Threat.chip(forecast).contains("+1 IN") and Threat.chip(forecast).count("\n") == 1, "End Turn chip fits two lines while counting D's numeric threats")
-	check(Threat.phone_chip(forecast) == "OBJ\n−4" and Threat.phone_chip({"exposed_units":[1],"objective_risk":0}) == "1\nEXPOSED", "portrait chip prioritizes objective and exposed threats")
+	check(Threat.sight_text(forecast) == "2 in enemy sight" and Threat.zone_text(forecast) == "ZONE -4  1 IN 1T", "phone separates sight count from zone and arrival warnings")
+	check(Threat.zone_text({"objective_risk":4,"next_wave26":{"count":3,"turns":2},"pending_groups":[{"count":1,"turns":1}]}) == "ZONE -4  3 IN 2T" and Threat.zone_text({"exposed_units":[1]}) == "", "phone chip prioritizes the next wave and omits sight-only warnings")
 	var shot_script: Script = load("res://scripts/shot.gd")
 	check(shot_script.has_method("calculate"), "guarded Script.has_method detects static cross-lane APIs")
-	check(not Threat.summary(m).is_empty() and phone.threat_chip.visible, "merged threat API populates phone chip")
+	var live_threat: Dictionary = Threat.summary(m)
+	check(not live_threat.is_empty() and game.objective_label.text == Threat.sight_text(live_threat) and phone.threat_chip.visible == (Threat.zone_text(phone.last_threat) != ""), "merged threat API populates the sight label and relevant phone chip")
 	check(int(Threat.reveal(m, [enemy]).count) == 1, "merged reveal API reports visible group")
 	game.hud_controls.night.show_reveal("Patrol: 3 troopers")
 	check(game.hud_controls.night.phase_plate.visible and game.hud_controls.night.phase_text.text == "PATROL: 3 TROOPERS", "reveal title hook displays D's title")

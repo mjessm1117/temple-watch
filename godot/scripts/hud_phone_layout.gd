@@ -29,7 +29,7 @@ static func boxes(size: Vector2) -> Dictionary:
 	var tray_right := width - 4.0 * scale
 	return {
 		"header": Rect2(0, 0, width, 44),
-		"plate": Rect2(3 * scale, size.y - height - scale, plate_width, height),
+		"plate": Rect2(15 * scale, size.y - height - scale, plate_width, height),
 		"tray": Rect2(tray_left, size.y - height - scale, tray_right - tray_left, height),
 		"camera": Rect2(width - 56, 60, 48, 144),
 		"portrait": Rect2(8 * scale, 48, 60, 60),

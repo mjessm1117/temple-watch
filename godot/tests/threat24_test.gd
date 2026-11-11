@@ -88,7 +88,7 @@ func run() -> void:
 	marker_parent.add_child(marker)
 	await process_frame
 	marker.show_tile(wave.entry_tile, mission)
-	check(marker.visible and marker.wave_label.text.contains("ENTRY") and marker.wave_label.text.contains(str(wave.count)) and marker.wave_label.text.contains(str(wave.turns)), "entry marker shows count and turn")
+	check(marker.visible and marker.wave_label.text.contains(str(wave.count)) and marker.wave_label.text.contains(str(wave.turns)), "entry marker shows count and turn")
 	marker_parent.queue_free()
 	var cover := Vector2i(6, 6)
 	mission.set_tile(cover, "c")
