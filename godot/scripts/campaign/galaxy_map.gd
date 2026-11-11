@@ -21,16 +21,36 @@ var focused := ""
 var hovered := ""
 var target := Vector3(0,0,-1.7)
 var look_at_point := Vector3.ZERO
-var zoom := 66.0 if Phone.narrow(Phone.window_size()) else 79.0
+var zoom := 46.0 if Phone.narrow(Phone.window_size()) else 79.0
 var elapsed := 0.0
 var dragging := false
 var drag_distance := 0.0
 var press_position := Vector2.ZERO
 var pointer_inside := false
 var overview_target := Vector3(0,0,-1.7)
-var overview_zoom := 66.0 if Phone.narrow(Phone.window_size()) else 79.0
+var overview_zoom := 46.0 if Phone.narrow(Phone.window_size()) else 79.0
 var haze_timer := 0.0
 var mini := false
+var ui_safe_rect := Rect2()
+
+func set_ui_safe_rect(rect: Rect2) -> void:
+	if ui_safe_rect == rect: return
+	ui_safe_rect = rect
+	if camera != null: _update_camera(1.0)
+
+func _clear_area() -> Rect2:
+	var area := Rect2(Vector2.ZERO, size)
+	if ui_safe_rect.size.x <= 0 or ui_safe_rect.size.y <= 0: return area
+	var covered := area.intersection(ui_safe_rect)
+	if not covered.has_area(): return area
+	var strips := [Rect2(Vector2.ZERO, Vector2(size.x, covered.position.y)),
+		Rect2(Vector2(0, covered.end.y), Vector2(size.x, size.y - covered.end.y)),
+		Rect2(Vector2.ZERO, Vector2(covered.position.x, size.y)),
+		Rect2(Vector2(covered.end.x, 0), Vector2(size.x - covered.end.x, size.y))]
+	var best := Rect2()
+	for strip in strips:
+		if strip.get_area() > best.get_area(): best = strip
+	return best if best.has_area() else area
 
 func _ready() -> void:
 	custom_minimum_size = Vector2.ZERO if mini or Phone.narrow(Phone.window_size()) else Vector2(400, 330)
@@ -111,7 +131,7 @@ func _update_haze() -> void:
 func focus_planet(title: String) -> void:
 	if not planets.has(title): return
 	if focused.is_empty(): overview_target = target; overview_zoom = zoom
-	focused = title; target = planets[title].position; zoom = 23.0
+	focused = title; target = planets[title].position; zoom = 18.0 if Phone.narrow(Phone.window_size()) else 23.0
 
 func focus_offer(index: int) -> void:
 	selected = index
@@ -146,8 +166,12 @@ func _clamp_target() -> void:
 
 func _update_camera(weight: float) -> void:
 	look_at_point = look_at_point.lerp(target,weight); camera.size = lerpf(camera.size,zoom,weight)
-	camera.position = look_at_point + Vector3(sin(elapsed*0.025)*0.3,48,34)
-	camera.look_at(look_at_point,Vector3.UP)
+	var area := _clear_area()
+	var center := area.get_center() / size if size.x > 0 and size.y > 0 else Vector2(0.5, 0.5)
+	var height := camera.size * size.y / maxf(size.x, 1.0)
+	var offset := -camera.global_transform.basis.x * ((center.x - 0.5) * camera.size) + camera.global_transform.basis.y * ((center.y - 0.5) * height)
+	camera.position = look_at_point + Vector3(sin(elapsed*0.025)*0.3,48,34) + offset
+	camera.look_at(camera.position - Vector3(0,48,34),Vector3.UP)
 
 func projected(position_3d: Vector3) -> Vector2:
 	return camera.unproject_position(position_3d) * size / Vector2(viewport.size)
@@ -167,9 +191,10 @@ func marker_label_layout() -> Array:
 		var pa := (4 if a.urgency == "LAST" else 3 if a.urgency == "NEXT" else 1) + (2 if a.index == selected else 0)
 		var pb := (4 if b.urgency == "LAST" else 3 if b.urgency == "NEXT" else 1) + (2 if b.index == selected else 0)
 		return pa > pb if pa != pb else a.index < b.index)
-	var width := minf(174.0, maxf(120.0, size.x - 36.0))
-	var height := 44.0
-	var area := Rect2(Vector2(12, 42), Vector2(size.x - 24, size.y - 78))
+	var width := minf(150.0 if Phone.narrow(Phone.window_size()) else 174.0, maxf(120.0, size.x - 36.0))
+	var height := 48.0 if Phone.narrow(Phone.window_size()) else 44.0
+	var clear := _clear_area()
+	var area := Rect2(clear.position + Vector2(12, 42), clear.size - Vector2(24, 78))
 	for offer in order:
 		var marker := marker_position(int(offer.index))
 		if not Rect2(Vector2.ZERO, size).has_point(marker): continue
@@ -209,13 +234,19 @@ func _draw_labels(overlay: Control) -> void:
 			var p := projected(planets[offer.planet].position)
 			overlay.draw_circle(p + Vector2(7, -7), 3, Color("f6bf67"))
 		return
-	var bounds := Rect2(Vector2(12,28),size-Vector2(24,54))
+	var clear := _clear_area()
+	var bounds := Rect2(clear.position + Vector2(12,28),clear.size-Vector2(24,54))
 	var compact := Phone.narrow(Phone.window_size())
 	var selected_planet := str(offers[selected].planet) if selected < offers.size() else "Coruscant"
+	var signal_layout := marker_label_layout()
 	for title in planets:
 		if compact and title != focused and title != selected_planet and title != "Coruscant": continue
 		var p := projected(planets[title].position)
 		if not bounds.has_point(p): continue
+		var in_signal := false
+		for label in signal_layout:
+			if label.rect.grow(8).has_point(p): in_signal = true; break
+		if in_signal and title != focused: continue
 		var active: bool = title == hovered or title == focused
 		var label_size := 16 if active else 14
 		var color := Color("dbe7e4") if active else Color("91afb9")
@@ -239,7 +270,7 @@ func _draw_labels(overlay: Control) -> void:
 		overlay.draw_arc(p,11*pulse,0,TAU,40,Color(color,0.7),1.2,true)
 		overlay.draw_circle(p,6,color)
 		overlay.draw_string(font,p+Vector2(-5,5),str(int(offer.index)+1),HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("081317"))
-	for label in marker_label_layout():
+	for label in signal_layout:
 		var rect: Rect2 = label.rect
 		var offer: Dictionary = label.offer
 		var standout: bool = int(label.index) == selected or offer.urgency in ["LAST", "NEXT"]

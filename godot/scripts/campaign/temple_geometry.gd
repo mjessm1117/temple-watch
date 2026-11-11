@@ -1,6 +1,8 @@
 extends RefCounted
 ## Low-cost procedural architecture; all movement is driven by TempleView.
 const HUMAN = preload("res://assets/temple/human.glb")
+const HUMAN_LOD = preload("res://assets/temple/human_lod.glb")
+const SURFACE_ATLAS = preload("res://assets/temple/surface_atlas.png")
 const Data = preload("res://scripts/campaign/data.gd")
 var people: Array[Dictionary] = []
 var pulses: Array[MeshInstance3D] = []
@@ -13,6 +15,10 @@ func material(color: Color, glow: float = 0.0) -> StandardMaterial3D:
 	if materials.has(key): return materials[key]
 	var m := StandardMaterial3D.new()
 	m.albedo_color = color; m.roughness = 0.74
+	m.albedo_texture = SURFACE_ATLAS
+	m.uv1_scale = Vector3(0.5, 0.5, 1.0)
+	var tile := 0 if color.get_luminance() < 0.28 else 1 if glow > 0.0 else 2 if color.b > color.r else 3
+	m.uv1_offset = Vector3(float(tile % 2) * 0.5, float(tile / 2) * 0.5, 0.0)
 	if glow > 0.0:
 		m.emission_enabled = true; m.emission = color; m.emission_energy_multiplier = glow
 	materials[key] = m
@@ -77,28 +83,46 @@ func room(parent: Node3D, info: Dictionary) -> Node3D:
 	for x in [-width / 2, width / 2]:
 		box(cell, Vector3(x, height / 2, 0.0), Vector3(0.12, height, 3.3), Color("637177") if built else Color("3e484b"))
 		box(cell, Vector3(x * 0.86, height * 0.56, -1.33), Vector3(0.1, height * 0.72, 0.08), color if built else Color("886b44"), 0.6 if built else 0.0)
-	box(cell, Vector3(0, height, 0), Vector3(width, 0.13, 3.3), Color("5a6567"))
+	if info.kind in ["garden", "hangar", "forge"]:
+		# Open canopy: the room prop and rear wall stay visible below the tier above.
+		var canopy := box(cell, Vector3(0, height, -1.20), Vector3(width, 0.13, 0.55), Color("5a6567")); canopy.name = "OpenCanopy"
+		for x in [-width * 0.42, width * 0.42]:
+			box(cell, Vector3(x, height, 0.45), Vector3(0.42, 0.13, 2.3), Color("5a6567"))
+	elif info.kind in ["spire", "council", "holo", "vault"]:
+		var portal := box(cell, Vector3(0, height, -0.28), Vector3(width * 0.78, 0.16, 2.5), Color("5a6567")); portal.name = "SteppedPortal"
+		for x in [-width * 0.43, width * 0.43]:
+			var pier := box(cell, Vector3(x, height * 0.65, 1.05), Vector3(0.22, height * 0.6, 0.35), Color("637177"))
+			pier.rotation.z = 0.18 if x < 0 else -0.18
+	else:
+		var rib := box(cell, Vector3(0, height, 0), Vector3(width, 0.13, 3.3), Color("5a6567")); rib.name = "CeilingRib"
+		box(cell, Vector3(0, height - 0.2, 1.34), Vector3(width * 0.64, 0.23, 0.24), Color("637177"))
 	box(cell, Vector3(0, 0.13, 1.7), Vector3(width - 0.2, 0.045, 0.04), color if built else Color("76634d"), 1.1 if built else 0.15)
+	var alcove := box(cell, Vector3(0, height * 0.61, -1.36), Vector3(width * 0.62, height * 0.66, 0.04), Color("10242d")); alcove.name = "RearAlcove"
+	var lip := box(cell, Vector3(0, 0.22, 1.61), Vector3(width * 0.58, 0.28, 0.18), Color("a09275")); lip.name = "FrontCutaway"
+	var light := OmniLight3D.new(); light.name = "RoomPractical"; light.position = Vector3(-width * 0.25, height - 0.35, -0.75)
+	light.light_color = color; light.light_energy = 0.8 if built else 0.18; light.omni_range = 2.9 if built else 1.6; cell.add_child(light)
 	if not built:
 		for x in [-width * 0.3, width * 0.3]:
 			var brace := box(cell, Vector3(x, height * 0.5, -0.7), Vector3(0.07, height * 1.2, 0.07), Color("5d6058"))
 			brace.rotation.z = 0.55 if x < 0 else -0.55
 		for y in [0.6, 1.4]: box(cell, Vector3(0, y, -0.7), Vector3(width, 0.05, 0.05), Color("4c514b"))
+		furnish(cell, str(info.kind), Color("5c989e"), false)
+		cell.set_meta("focal_kind", str(info.kind))
 		return cell
-	# Broad illuminated wall and a shared animated monitor are legible at phone scale.
-	box(cell, Vector3(0, height * 0.55, -1.30), Vector3(width * 0.70, height * 0.52, 0.04), color.darkened(0.1), 1.75)
-	box(cell, Vector3(width * 0.23, height * 0.59, -1.24), Vector3(width * 0.31, 0.76, 0.055), Color("61cbd2"), 1.8)
-	# Recessed practicals and a worn floor strip give each occupied bay depth.
-	box(cell, Vector3(0, height * 0.66, -1.36), Vector3(width * 0.46, 0.52, 0.035), Color("10242d"))
-	box(cell, Vector3(0, height * 0.66, -1.32), Vector3(width * 0.32, 0.025, 0.04), color, 1.4)
+	# A narrow rear alcove leaves the room's focal prop visible in silhouette.
+	box(cell, Vector3(0, height * 0.88, -1.32), Vector3(width * 0.57, 0.035, 0.04), color, 0.7)
 	box(cell, Vector3(0, 0.105, 0.84), Vector3(width * 0.48, 0.018, 1.12), color.darkened(0.72))
-	for x in [-width * 0.34, width * 0.34]:
-		box(cell, Vector3(x, height - 0.15, 0.3), Vector3(0.85, 0.04, 0.28), color, 1.4)
-	for x in [-1.0, 0.0, 1.0]:
-		box(cell, Vector3(x, 1.2, -1.42), Vector3(0.02, 1.7, 0.025), color.darkened(0.3), 0.4)
-	var light := OmniLight3D.new(); light.position = Vector3(0, 1.6, 0.4)
-	light.light_color = color; light.light_energy = 0.65; light.omni_range = 3.5; cell.add_child(light)
+	# Staggered rear piers and a low foreground lip make an open cutaway, not a box face.
+	for x in [-width * 0.38, width * 0.38]:
+		box(cell, Vector3(x, height * 0.50, -1.10), Vector3(0.22, height * 0.82, 0.46), Color("5a6567"))
+	if info.kind in ["garden", "hangar", "forge"]:
+		box(cell, Vector3(-width * 0.38, 0.57, 1.32), Vector3(0.5, 0.8, 0.36), Color("55616a"))
+	elif info.kind in ["medical", "beds", "training"]:
+		box(cell, Vector3(width * 0.36, 0.44, 1.30), Vector3(0.68, 0.45, 0.42), Color("637177"))
+	else:
+		cylinder(cell, Vector3(-width * 0.38, 0.33, 1.22), 0.28, 0.48, Color("55616a"), 0.22)
 	furnish(cell, str(info.kind), color)
+	cell.set_meta("focal_kind", str(info.kind))
 	if info.kind == "vault": person(cell, Vector3(-0.9, 0.1, 0.65), color, false)
 	if info.kind != "vault":
 		person(cell, Vector3(-1.1, 0.1, 0.6), color, true)
@@ -109,16 +133,17 @@ func room(parent: Node3D, info: Dictionary) -> Node3D:
 		cylinder(cell, Vector3(0, 0.5, 0), 0.65, 0.9, Color("75d4df"), 0.3, 1.0)
 	return cell
 
-func furnish(cell: Node3D, kind: String, color: Color) -> void:
+func furnish(cell: Node3D, kind: String, color: Color, active: bool = true) -> void:
 	match kind:
 		"holo", "council", "spire":
 			cylinder(cell, Vector3(0, 0.38, 0), 0.75, 0.7, Color("3a4e57"))
 			cylinder(cell, Vector3(0, 0.75, 0), 0.78, 0.04, color, -1, 2.0)
-			var globe := SphereMesh.new(); globe.radius = 0.36; globe.height = 0.72
-			var orb := shape(cell, globe, Vector3(0, 1.25, 0), color, 1.0)
-			var mat := material(color, 1.0).duplicate() as StandardMaterial3D
-			mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; mat.albedo_color.a = 0.38
-			orb.material_override = mat; orb.set_meta("animated", true); pulses.append(orb)
+			if active:
+				var globe := SphereMesh.new(); globe.radius = 0.36; globe.height = 0.72
+				var orb := shape(cell, globe, Vector3(0, 1.25, 0), color, 1.0)
+				var mat := material(color, 1.0).duplicate() as StandardMaterial3D
+				mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; mat.albedo_color.a = 0.38
+				orb.material_override = mat; orb.set_meta("animated", true); pulses.append(orb)
 		"medical", "beds":
 			for x in [-1.1, 0.4, 1.7]:
 				box(cell, Vector3(x, 0.35, -0.3), Vector3(0.8, 0.5, 1.7), Color("647c7e"))
@@ -132,10 +157,11 @@ func furnish(cell: Node3D, kind: String, color: Color) -> void:
 		"forge":
 			box(cell, Vector3(0.6, 0.45, 0), Vector3(1.6, 0.8, 1.15), Color("5e5550"))
 			box(cell, Vector3(0.6, 0.88, 0), Vector3(1.0, 0.05, 0.65), Color("ffb357"), 3)
-			for i in 12:
-				var ember := box(cell, Vector3.ZERO, Vector3(0.025, 0.085, 0.025), Color("ffc77a"), 4)
-				ember.set_meta("animated", true)
-				sparks.append({"node":ember, "phase":float(i) / 12})
+			if active:
+				for i in 12:
+					var ember := box(cell, Vector3.ZERO, Vector3(0.025, 0.085, 0.025), Color("ffc77a"), 4)
+					ember.set_meta("animated", true)
+					sparks.append({"node":ember, "phase":float(i) / 12})
 		"training":
 			for x in [-1.2, 1.2]:
 				cylinder(cell, Vector3(x, 0.07, 0.0), 0.7, 0.05, Color("4f797f"))
@@ -152,7 +178,8 @@ func furnish(cell: Node3D, kind: String, color: Color) -> void:
 
 func person(cell: Node3D, at: Vector3, color: Color, walking: bool) -> void:
 	var actor := Node3D.new(); actor.set_meta("animated", true); cell.add_child(actor); actor.position = at
-	var model := HUMAN.instantiate() as Node3D; actor.add_child(model); model.scale = Vector3.ONE * 1.3
+	var low := RenderingServer.get_current_rendering_method() == "gl_compatibility"
+	var model := (HUMAN_LOD if low else HUMAN).instantiate() as Node3D; actor.add_child(model); model.scale = Vector3.ONE * 1.3
 	var animator: AnimationPlayer = null
 	for node in model.find_children("*", "AnimationPlayer", true, false): animator = node; break
 	for node in model.find_children("*", "MeshInstance3D", true, false):
