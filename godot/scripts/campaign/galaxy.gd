@@ -286,7 +286,7 @@ func _overview() -> void:
 	_sync_ui_safe_rect.call_deferred()
 
 func _sync_ui_safe_rect() -> void:
-	if not is_instance_valid(map_view) or not map_view.has_method("set_ui_safe_rect"): return
+	if not is_instance_valid(map_view) or not map_view.is_inside_tree() or not map_view.has_method("set_ui_safe_rect"): return
 	map_view.call("set_ui_safe_rect", detail_panel.get_global_rect() if detail_open and is_instance_valid(detail_panel) else Rect2())
 
 func _back() -> void:

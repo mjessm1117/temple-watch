@@ -321,7 +321,7 @@ func _show_page() -> void:
 		"Settings": StrategyUI.settings(self)
 
 func _sync_ui_safe_rect() -> void:
-	if not is_instance_valid(temple_view) or not temple_view.has_method("set_ui_safe_rect"): return
+	if not is_instance_valid(temple_view) or not temple_view.is_inside_tree() or not temple_view.has_method("set_ui_safe_rect"): return
 	var covered := Rect2()
 	if is_instance_valid(station_panel) and panel_open and station_panel.visible:
 		covered = station_panel.get_global_rect()
