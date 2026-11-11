@@ -1,9 +1,17 @@
 extends RefCounted
 ## Compatibility-safe material rim and low, unobtrusive selection marker.
 const RIM = preload("res://assets/env/unit_rim.gdshader")
-const BLUE := Color(0.31,0.77,1.0,0.42)
-const GOLD := Color(1.0,0.76,0.36,0.44)
-const RED := Color(1.0,0.30,0.34,0.48)
+const BLUE := Color(0.0,0.831,1.0,0.72)
+const GOLD := Color(1.0,0.76,0.36,0.72)
+const RED := Color(1.0,0.188,0.188,0.72)
+static var _accent_shader26: Shader
+
+static func accent_shader26() -> Shader:
+	if _accent_shader26 != null: return _accent_shader26
+	_accent_shader26 = Shader.new()
+	# Reuse the rim overlay, adding a narrow material color band across the torso.
+	_accent_shader26.code = RIM.code.replace("void fragment() {", "uniform vec4 accent_color : source_color;\nvarying vec3 torso_pos;\nvoid vertex() { torso_pos = VERTEX; }\nvoid fragment() {").replace("ALPHA = edge * rim_color.a;", "float band = smoothstep(1.22, 1.25, torso_pos.y) * (1.0 - smoothstep(1.32, 1.35, torso_pos.y));\n\tband *= 1.0 - smoothstep(0.26, 0.34, abs(torso_pos.x));\n\tALBEDO = mix(ALBEDO, accent_color.rgb, band);\n\tEMISSION += accent_color.rgb * band * 0.7;\n\tALPHA = max(edge * rim_color.a, band * 0.55);")
+	return _accent_shader26
 
 static func unit_of(node: Node) -> Node:
 	var current := node.get_parent()
@@ -27,10 +35,11 @@ static func apply(node: GeometryInstance3D) -> void:
 	if game == null or game.mission == null: return
 	var data: Dictionary = game.mission.unit_by_id(unit.unit_id)
 	if data.is_empty(): return
-	var color := RED if str(data.side) == "enemy" else GOLD if str(data.get("class_name","")) in ["Guardian","Consular"] else BLUE
+	var color := RED if str(data.side) == "enemy" else BLUE
 	var material := ShaderMaterial.new()
-	material.shader = RIM
+	material.shader = accent_shader26()
 	material.set_shader_parameter("rim_color",color)
+	material.set_shader_parameter("accent_color", preload("res://scripts/unit_view.gd").side_color26(str(data.side)))
 	node.material_overlay = material
 	node.set_meta("gfx_rim",true)
 
