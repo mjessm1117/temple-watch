@@ -30,6 +30,7 @@ var enemy_side := false
 var aim_ready := false
 var footfalls := 0
 static var _corpses: Array[Node3D] = []
+static var _active_feet24: Array[AudioStreamPlayer] = []
 const CORPSE_CAP := 6
 const CORPSE_LIFETIME := 9.0
 const FALL_SECONDS := 0.78
@@ -275,6 +276,13 @@ func act(clip: String) -> void:
 	get_tree().create_timer(0.52/(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if enemy_side else 1.0))).timeout.connect(func() -> void:
 		if is_instance_valid(self) and alive and serial == _action_serial: play(base_clip))
 
+func flinch24() -> void:
+	if not alive or downed or model == null: return
+	if pose_motion != null and pose_motion.is_running(): pose_motion.kill()
+	pose_motion = _paced_tween()
+	pose_motion.tween_property(model, "rotation:z", -0.18, 0.09)
+	pose_motion.tween_property(model, "rotation:z", 0.0, 0.18).set_trans(Tween.TRANS_BACK)
+
 func face(point: Vector3) -> void:
 	var direction := point - global_position
 	direction.y = 0
@@ -295,24 +303,61 @@ func set_aim_ready(value: bool, point: Vector3) -> void:
 	pose_motion.tween_property(model, "rotation:z", -0.08 if value and base_clip == "saberIdle" else 0.0, 0.17)
 
 func travel(route: Array) -> void:
+	travel24(route, false)
+
+static func travel_speed24(dash: bool) -> float:
+	return 5.6 if dash else 4.0
+
+func travel24(path: Array, dash: bool, segments: Array = []) -> void:
 	if motion != null and motion.is_running(): motion.kill()
-	if route.is_empty() or not alive or downed: return
+	if path.is_empty() or not alive or downed: return
 	_action_serial += 1
 	motion = _paced_tween()
 	play("run")
 	var previous := position
-	for item in route:
+	var step_index := 0
+	for item in path:
 		var point: Vector3 = item
 		var flat: Vector3 = point - previous
-		if flat.length_squared() < 0.001: continue
+		if flat.length_squared() < 0.001:
+			step_index += 1
+			continue
+		var kind := "walk"
+		if step_index < segments.size():
+			var segment: Variant = segments[step_index]
+			kind = str(segment.get("kind", segment.get("type", "walk"))) if segment is Dictionary else str(segment)
+		var duration := maxf(0.08, flat.length() / travel_speed24(dash))
 		motion.tween_callback(func() -> void: face(point))
-		motion.tween_property(self, "position", point, maxf(0.08, flat.length() / 4.0)).set_trans(Tween.TRANS_LINEAR)
-		motion.parallel().tween_callback(_footstep).set_delay(0.07)
+		motion.tween_callback(func() -> void:
+			if model != null: model.rotation.z = -0.16 if dash else 0.0)
+		if kind in ["vault", "climb", "door"]:
+			var rise := 0.55 if kind == "vault" else 0.38 if kind == "climb" else 0.16
+			var middle := previous.lerp(point, 0.5) + Vector3.UP * rise
+			motion.tween_property(self, "position", middle, duration * 0.5).set_trans(Tween.TRANS_SINE)
+			motion.parallel().tween_callback(_footstep).set_delay(duration * 0.18)
+			motion.tween_property(self, "position", point, duration * 0.5).set_trans(Tween.TRANS_SINE)
+			motion.parallel().tween_callback(_footstep).set_delay(duration * 0.35)
+		else:
+			motion.tween_property(self, "position", point, duration).set_trans(Tween.TRANS_LINEAR)
+			motion.parallel().tween_callback(_footstep).set_delay(duration * 0.22)
+			if duration >= 0.17: motion.parallel().tween_callback(_footstep).set_delay(duration * 0.76)
 		previous = point
-	motion.tween_callback(func() -> void: if alive: play(base_clip))
+		step_index += 1
+	motion.tween_callback(func() -> void:
+		if model != null: model.rotation.z = 0.0
+		if alive: play(base_clip))
 
 func fall() -> void:
+	fall24(0, Vector3.ZERO)
+
+static func choose_fall24(dir: Vector3) -> int:
+	if absf(dir.x) > absf(dir.z) * 1.3: return 2
+	return 1 if dir.z > 0.25 else 0
+
+func fall24(variant: int, dir: Vector3) -> void:
 	if not alive: return
+	if variant < -1 or variant > 2: return
+	if variant < 0: variant = choose_fall24(dir)
 	alive = false
 	set_saber_active(false)
 	if ring != null: ring.hide()
@@ -330,8 +375,19 @@ func fall() -> void:
 	if pose_motion != null and pose_motion.is_running(): pose_motion.kill()
 	play("death")
 	var tween := _paced_tween().set_parallel(true)
-	tween.tween_property(model, "rotation:z", 1.5, FALL_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tween.tween_property(model, "position:y", -0.28, FALL_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	match variant:
+		0: # Stumble backward, then hold the body.
+			tween.tween_property(model, "rotation:z", 1.5, FALL_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+			tween.tween_property(model, "position:y", -0.28, FALL_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+			tween.tween_property(model, "position:x", -0.24, FALL_SECONDS * 0.55)
+		1: # Drop to a knee before tipping forward.
+			tween.tween_property(model, "rotation:x", -1.15, FALL_SECONDS).set_trans(Tween.TRANS_CUBIC)
+			tween.tween_property(model, "rotation:z", 0.4, FALL_SECONDS)
+			tween.tween_property(model, "position:y", -0.53, FALL_SECONDS * 0.7)
+		2: # Side impact spins the torso into the fall.
+			tween.tween_property(model, "rotation:y", PI * (-1.0 if dir.x < 0.0 else 1.0), FALL_SECONDS)
+			tween.tween_property(model, "rotation:z", 1.45, FALL_SECONDS).set_trans(Tween.TRANS_CUBIC)
+			tween.tween_property(model, "position:y", -0.3, FALL_SECONDS)
 	tween.chain().tween_interval(CORPSE_LIFETIME)
 	tween.chain().tween_callback(queue_free)
 	var game := get_parent().get_parent() if get_parent() != null else null
@@ -362,8 +418,12 @@ func _footstep() -> void:
 		var sound: Node = game.get("sound") if game != null else null
 		if sound != null:
 			foot.volume_linear = 0.0 if bool(sound.get("muted")) else float(sound.get("volume")) * 0.11
-		foot.stop()
-		foot.play()
+		for i in range(_active_feet24.size() - 1, -1, -1):
+			if not is_instance_valid(_active_feet24[i]) or not _active_feet24[i].playing: _active_feet24.remove_at(i)
+		if _active_feet24.size() < 2:
+			foot.stop()
+			foot.play()
+			if not _active_feet24.has(foot): _active_feet24.append(foot)
 	_dust()
 
 var status_label: Label3D
