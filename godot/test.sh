@@ -99,3 +99,4 @@ run_suite storydelivery22_test --rendering-method gl_compatibility --resolution 
 run_suite units23_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite spaces23_test --rendering-method gl_compatibility --resolution 390x844 -- --portrait; run_suite spaces23_test --rendering-method forward_plus --resolution 1280x720
 run_suite uiart23_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite camgest24_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low

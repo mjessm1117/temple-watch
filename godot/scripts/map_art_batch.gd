@@ -99,7 +99,7 @@ func put(shape: String, mat: Material, at: Vector3, size: Vector3, angle := 0.0)
 
 func add_mesh(mesh: Mesh, mat: Material, transform: Transform3D) -> AABB:
 	var role := str(current.get("role","terrain"))
-	var shadows := role not in ["detail","objective"] and str(current.get("kind","")) not in ["skyline","distant landscape"]
+	var shadows := role not in ["detail","objective","scenery"]
 	# The mesh and material already define a compatible static batch. Only the
 	# visibility/shadow policy needs to split it; cover and terrain can share.
 	var visibility := "scenery" if role == "scenery" else "board"
@@ -143,17 +143,50 @@ func model(path: String, at: Vector3, width: float, height: float, angle := 0.0,
 	return actual
 
 func flush(parent: Node3D) -> void:
+	# LOD holders require MultiMeshInstance3D for their range bounds contract.
+	if parent.name.begins_with("MeshyLOD"):
+		for bucket in buckets.values(): _flush_multimesh(parent, bucket)
+		buckets.clear()
+		return
+	# Static procedural shapes sharing a material render as one surface. Imported
+	# unoverridden meshes retain their own surface materials and instancing.
+	var merged: Dictionary = {}
 	for bucket in buckets.values():
-		var mm := MultiMesh.new(); mm.transform_format = MultiMesh.TRANSFORM_3D
-		mm.mesh = bucket.mesh; mm.instance_count = bucket.transforms.size()
-		for i in mm.instance_count: mm.set_instance_transform(i,bucket.transforms[i])
-		var instance := MultiMeshInstance3D.new(); instance.multimesh = mm; instance.material_override = bucket.material
-		if not bucket.shadows: instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		if bucket.role == "scenery":
-			instance.visibility_range_end = 95.0
-			instance.visibility_range_end_margin = 8.0
+		if bucket.material == null:
+			_flush_multimesh(parent, bucket)
+			continue
+		var key := "%d:%s:%s" % [bucket.material.get_instance_id(), bucket.role == "scenery", bucket.shadows]
+		if not merged.has(key): merged[key] = {"material":bucket.material,"role":bucket.role,"shadows":bucket.shadows,"buckets":[]}
+		merged[key].buckets.append(bucket)
+	for group in merged.values():
+		if group.buckets.size() == 1:
+			_flush_multimesh(parent, group.buckets[0])
+			continue
+		var surface := SurfaceTool.new()
+		for bucket in group.buckets:
+			for transform in bucket.transforms:
+				for index in bucket.mesh.get_surface_count():
+					surface.append_from(bucket.mesh, index, transform)
+		var instance := MeshInstance3D.new()
+		instance.mesh = surface.commit()
+		instance.material_override = group.material
+		_apply_visibility(instance, group)
 		parent.add_child(instance)
 	buckets.clear()
+
+func _flush_multimesh(parent: Node3D, bucket: Dictionary) -> void:
+	var mm := MultiMesh.new(); mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = bucket.mesh; mm.instance_count = bucket.transforms.size()
+	for i in mm.instance_count: mm.set_instance_transform(i,bucket.transforms[i])
+	var instance := MultiMeshInstance3D.new(); instance.multimesh = mm; instance.material_override = bucket.material
+	_apply_visibility(instance, bucket)
+	parent.add_child(instance)
+
+func _apply_visibility(instance: GeometryInstance3D, bucket: Dictionary) -> void:
+	if not bucket.shadows: instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if bucket.role == "scenery":
+		instance.visibility_range_end = 95.0
+		instance.visibility_range_end_margin = 8.0
 
 func begin_record(data: Dictionary) -> void:
 	current = data.duplicate(); current.parts = []; record_first = true

@@ -110,7 +110,7 @@ func exercise(dimensions: Vector2i) -> void:
 		await process_frame
 	touch(previous, false)
 	await process_frame
-	check(game.pivot.distance_to(pivot) > 0.03, "drag from tag pans camera")
+	check(game.pivot.distance_to(pivot) < 0.03, "drag from tag leaves camera still")
 	check(not hud.explanation.visible, "tag drag does not open explanation")
 	var pip_start: Vector2 = phone.momentum_pips.get_global_rect().get_center()
 	pivot = game.pivot
@@ -120,7 +120,7 @@ func exercise(dimensions: Vector2i) -> void:
 		drag(previous, next); previous = next
 		await process_frame
 	touch(previous, false); await process_frame
-	check(game.pivot.distance_to(pivot) > 0.03, "drag from pips pans camera")
+	check(game.pivot.distance_to(pivot) < 0.03, "drag from pips leaves camera still")
 	first.combo_tags = {}
 	await process_frame
 	check(hud.icons[int(first.id)].is_empty(), "icons clear with tags")

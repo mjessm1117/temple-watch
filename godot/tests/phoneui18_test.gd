@@ -130,7 +130,10 @@ func battle(value: Vector2i) -> void:
 	for control in [phone.ability_buttons[0], badge, phone.unit_card]:
 		var before: Vector3 = game.pivot
 		await swipe(control.get_global_rect().get_center())
-		check(game.pivot.distance_to(before) > 0.03, "%s drag from %s pans" % [value, control.name])
+		if control == phone.ability_buttons[0]:
+			check(game.pivot.distance_to(before) > 0.03, "%s ability drag still pans in HUD lane" % value)
+		else:
+			check(game.pivot.distance_to(before) < 0.03, "%s drag from %s leaves board still" % [value, control.name])
 	var selected_before: int = game.selected_id
 	await swipe(phone.unit_portrait.get_global_rect().get_center())
 	check(game.selected_id != selected_before, "%s plate swipe cycles unit" % value)
