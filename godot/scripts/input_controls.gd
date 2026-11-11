@@ -2,6 +2,68 @@ extends RefCounted
 
 const Shot = preload("res://scripts/shot.gd")
 const Ability = preload("res://scripts/abilities_engine.gd")
+const Phone = preload("res://scripts/phone_layout.gd")
+
+const DEFAULT_BINDINGS := {"move": [KEY_1], "shoot": [KEY_2], "strike": [KEY_3], "push": [KEY_4], "interact": [KEY_5], "free": [KEY_5], "overwatch": [KEY_6, KEY_Y], "hunker": [KEY_7], "ability8": [KEY_8], "ability9": [KEY_9], "ability10": [KEY_0], "reload": [KEY_R], "end_turn": [KEY_END, KEY_BACKSPACE], "confirm": [KEY_ENTER, KEY_KP_ENTER], "cancel": [KEY_ESCAPE], "next_unit": [KEY_TAB], "rotate_left": [KEY_Q], "rotate_right": [KEY_E], "recenter": [KEY_C]}
+
+static func bindings24() -> Dictionary:
+	var result: Dictionary = DEFAULT_BINDINGS.duplicate(true)
+	var cfg := ConfigFile.new()
+	if cfg.load("user://controls24.cfg") != OK: return result
+	var overrides: Variant = cfg.get_value("controls", "keymap", {})
+	if not overrides is Dictionary: return result
+	for action in overrides:
+		if not result.has(action): continue
+		var keys: Array = overrides[action] if overrides[action] is Array else [overrides[action]]
+		var parsed: Array[int] = []
+		for key in keys:
+			var code: int = int(key) if key is int else OS.find_keycode_from_string(str(key))
+			if code > 0 and code not in parsed: parsed.append(code)
+		if not parsed.is_empty(): result[action] = parsed
+	return result
+
+func get_bindings24() -> Dictionary:
+	return bindings24()
+
+func set_binding24(action_name: String, key: Variant) -> bool:
+	if not DEFAULT_BINDINGS.has(action_name): return false
+	var code := OS.find_keycode_from_string(str(key)) if not key is int else int(key)
+	if code <= 0: return false
+	var cfg := ConfigFile.new()
+	cfg.load("user://controls24.cfg")
+	var overrides: Dictionary = cfg.get_value("controls", "keymap", {})
+	overrides[action_name] = [str(key)]
+	cfg.set_value("controls", "keymap", overrides)
+	return cfg.save("user://controls24.cfg") == OK
+
+static func confirm_move24(touch: bool) -> bool:
+	var cfg := ConfigFile.new()
+	if cfg.load("user://controls24.cfg") != OK: return touch
+	return bool(cfg.get_value("controls", "confirm_move", touch))
+
+static func magnet_tile24(game, point: Vector2, actor: Dictionary, route: Dictionary = {}) -> Vector2i:
+	if actor.is_empty() or int(actor.get("ap", 0)) <= 0: return Vector2i(-1, -1)
+	if route.is_empty(): route = game.mission.paths(actor, int(actor.mob) * 2)
+	var best := Vector2i(-1, -1)
+	var distance := 28.0
+	for tile in route.costs:
+		if tile == Shot.pos(actor) or int(route.costs[tile]) > int(actor.mob) * int(actor.ap): continue
+		var center: Vector2 = game.camera.unproject_position(Vector3(tile.x, Shot.elevation(game.mission, tile) * 0.7 + 0.15, tile.y))
+		var d := point.distance_to(center)
+		if d < distance: distance = d; best = tile
+	return best
+
+static func valid_move_tile24(route: Dictionary, actor: Dictionary, tile: Vector2i) -> bool:
+	if actor.is_empty() or tile == Shot.pos(actor) or not route.get("costs", {}).has(tile): return false
+	var cost: int = int(route.costs[tile])
+	return cost <= int(actor.mob) * int(actor.ap)
+
+static func extra_abilities24(unit: Dictionary) -> Array[String]:
+	var extra: Array[String] = []
+	var shared: Array = ["revive"] if str(unit.get("class_name", "")) == "Medic" else ["medpac", "revive"]
+	for id in shared + unit.get("kit", []):
+		if id not in ["move", "shoot", "strike", "push", "free", "interact", "overwatch", "hunker"] and id not in extra: extra.append(str(id))
+	return extra
 
 static func move_preview(m: RefCounted, unit: Dictionary, dest: Vector2i) -> Dictionary:
 	if unit.is_empty() or int(unit.get("ap", 0)) <= 0: return {}
@@ -74,9 +136,49 @@ static func unit_screen_distance(game, point: Vector2, unit: Dictionary) -> floa
 	var center: Vector2 = game.camera.unproject_position(Vector3(tile.x, Shot.elevation(game.mission, tile) * 0.7 + 1.0, tile.y))
 	return center.distance_to(point)
 
+static func selection_at24(game, point: Vector2) -> Dictionary:
+	var players: Array[Dictionary] = game.mission.living("player")
+	var near := near_unit(game, point, players)
+	if not near.is_empty(): return near
+	var tile: Vector2i = game._screen_tile(point)
+	for unit in players:
+		if Shot.pos(unit) == tile: return unit
+	return {}
+
 var g
+var queued_selection24 := -1
+var busy_connected24 := false
+var right_start24 := Vector2.ZERO
+var right_moved24 := false
+
+func _busy24() -> bool:
+	if not g.has_method("is_input_busy24"): return false
+	return bool(g.is_input_busy24())
+
+func connect_busy24() -> void:
+	if not busy_connected24 and g.has_signal("input_busy_changed24"):
+		g.input_busy_changed24.connect(_busy_changed24)
+		busy_connected24 = true
+
+func _busy_changed24(busy: bool) -> void:
+	if busy or queued_selection24 < 0: return
+	var selected := queued_selection24
+	queued_selection24 = -1
+	var unit: Dictionary = g.mission.unit_by_id(selected)
+	if not unit.is_empty() and int(unit.get("hp", 0)) > 0 and str(unit.get("side", "")) == "player": g._select(selected)
+
+func _queue_selection24(id: int) -> void:
+	if id >= 0: queued_selection24 = id
 
 func handle_event(event: InputEvent) -> void:
+	connect_busy24()
+	if _busy24():
+		if event is InputEventKey and event.pressed and event.keycode == KEY_TAB:
+			_queue_selection24(next_squad(g.mission, g.selected_id, -1 if event.shift_pressed else 1))
+		elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			var unit := selection_at24(g, event.position)
+			if not unit.is_empty(): _queue_selection24(int(unit.id))
+		return
 	if event is InputEventMouseButton:
 		if event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN] and event.pressed:
 			if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
@@ -85,8 +187,23 @@ func handle_event(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_MIDDLE:
 			g.drag_button = MOUSE_BUTTON_MIDDLE if event.pressed else 0
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
-			if event.pressed and (g.action != "move" or g.preview_tile.x >= 0): g._cancel_order(); return
-			g.drag_button = MOUSE_BUTTON_RIGHT if event.pressed else 0
+			if event.pressed:
+				right_start24 = event.position; right_moved24 = false
+				g.drag_button = MOUSE_BUTTON_RIGHT
+				return
+			g.drag_button = 0
+			if right_moved24: return
+			if g.action == "move":
+				var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
+				var route: Dictionary = g.mission.paths(actor, int(actor.mob) * 2) if not actor.is_empty() else {}
+				var tile := magnet_tile24(g, event.position, actor, route)
+				if tile.x < 0: tile = g._screen_tile(event.position)
+				if valid_move_tile24(route, actor, tile):
+					if confirm_move24(false) and g.preview_tile != tile:
+						g.preview_tile = tile; g._refresh_highlights()
+					else: g._move_selected(tile)
+					return
+			if g.action != "move" or g.preview_tile.x >= 0: g._cancel_order()
 		elif event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			if g.cam.preview_active and g.cam.preview_tween != null and g.cam.preview_tween.is_running():
 				g.cam.skip_preview_transition(); return
@@ -134,9 +251,12 @@ func handle_event(event: InputEvent) -> void:
 					g._frame_target(); g._refresh_highlights(); g._show_shot(); g._refresh()
 					return
 			if g.action == "move":
-				var preview: Dictionary = move_preview(g.mission, g.mission.unit_by_id(g.selected_id), p)
-				if preview.is_empty(): return
-				if g.preview_tile == p: g._move_selected(p)
+				var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
+				var route: Dictionary = g.mission.paths(actor, int(actor.mob) * 2) if not actor.is_empty() else {}
+				var snapped := magnet_tile24(g, event.position, actor, route)
+				if snapped.x >= 0: p = snapped
+				if not valid_move_tile24(route, actor, p): return
+				if g.preview_tile == p or (Phone.touch_device() and not confirm_move24(true)): g._move_selected(p)
 				else:
 					g.preview_tile = p
 					g._refresh_highlights()
@@ -155,6 +275,8 @@ func handle_event(event: InputEvent) -> void:
 			if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
 			g.yaw -= event.relative.x * 0.008; g.pitch += event.relative.y * 0.008; g._update_camera()
 		elif g.drag_button == MOUSE_BUTTON_RIGHT:
+			if event.position.distance_to(right_start24) > 6.0: right_moved24 = true
+			if not right_moved24: return
 			if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
 			var right: Vector3 = g.camera.global_basis.x
 			var forward: Vector3 = -g.camera.global_basis.z; forward.y = 0; forward = forward.normalized()
@@ -164,14 +286,16 @@ func handle_event(event: InputEvent) -> void:
 			var p: Vector2i = g._screen_tile(event.position)
 			if p != g.hovered: g.hovered = p; g._refresh_highlights(); g._show_shot()
 	elif event is InputEventKey and event.pressed and not event.echo:
+		var binding := bindings24()
+		var key: int = event.keycode
 		if event.keycode == KEY_SPACE: g._skip_activity()
-		elif event.keycode == KEY_ESCAPE: g._cancel_order()
-		elif event.keycode == KEY_TAB:
+		elif key in binding.cancel: g._cancel_order()
+		elif key in binding.next_unit:
 			if g.action != "move" and g.action != "free": g._cycle_target(-1 if event.shift_pressed else 1)
 			else:
 				var id: int = next_squad(g.mission, g.selected_id, -1 if event.shift_pressed else 1)
 				if id >= 0: g._select(id)
-		elif event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
+		elif key in binding.confirm:
 			if g.action in ["shoot", "strike", "push"]:
 				if g.target_id >= 0: g._attack(g.target_id, g.action)
 			elif g.action != "move" and g.action != "free":
@@ -179,21 +303,27 @@ func handle_event(event: InputEvent) -> void:
 				elif g.preview_tile.x >= 0: g._use_ability(-1, g.preview_tile)
 			elif g.action == "move" and g.preview_tile.x >= 0: g._move_selected(g.preview_tile)
 			else: g._request_end_turn()
-		elif event.keycode == KEY_Q:
+		elif key in binding.rotate_left:
 			if g.action in ["shoot", "strike", "push"]: g._cycle_target(-1)
 			else: g._rotate_camera(-PI / 2.0)
-		elif event.keycode == KEY_E:
+		elif key in binding.rotate_right:
 			if g.action in ["shoot", "strike", "push"]: g._cycle_target(1)
 			else: g._rotate_camera(PI / 2.0)
-		elif event.keycode == KEY_C: g._recenter()
-		elif event.keycode == KEY_R: g.get_tree().reload_current_scene()
-		elif event.keycode >= KEY_1 and event.keycode <= KEY_7:
-			g._choose_action(["move", "shoot", "strike", "push", "interact" if g.mission.modern else "free", "overwatch", "hunker"][event.keycode - KEY_1])
-		elif event.keycode >= KEY_F1 and event.keycode <= KEY_F12:
-			var extra: Array = []
+		elif key in binding.recenter: g._recenter()
+		elif key in binding.end_turn: g._request_end_turn()
+		elif key in binding.reload:
 			var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
-			var shared: Array = ["revive"] if str(unit.get("class_name", "")) == "Medic" else ["medpac", "revive"]
-			for id in shared + unit.get("kit", []):
-				if id not in ["move", "shoot", "strike", "push", "free", "overwatch", "hunker"] and id not in extra: extra.append(id)
-			var index: int = event.keycode - KEY_F1
-			if index < extra.size(): g._choose_action(str(extra[index]))
+			if "reload" in unit.get("kit", []): g._choose_action("reload")
+		else:
+			var actions := ["move", "shoot", "strike", "push", "interact" if g.mission.modern else "free", "overwatch", "hunker"]
+			var handled := false
+			var extra := extra_abilities24(g.mission.unit_by_id(g.selected_id))
+			for i in range(actions.size()):
+				var name: String = actions[i]
+				if key in binding.get(name, []): g._choose_action(actions[i]); handled = true; break
+			if not handled:
+				for i in range(mini(3, extra.size())):
+					if key in binding["ability%d" % (i + 8)]: g._choose_action(extra[i]); handled = true; break
+			if not handled and key >= KEY_F1 and key <= KEY_F12:
+				var index := key - KEY_F1
+				if index < extra.size(): g._choose_action(extra[index])

@@ -150,14 +150,14 @@ func exercise(size: Vector2i) -> void:
 		check(Vector2(game.pivot.x, game.pivot.z).distance_to(Vector2(unit.x, unit.y)) < 2.0, "%s camera stays with moved unit pivot=%s unit=%s" % [tag, game.pivot, Vector2(unit.x, unit.y)])
 		await shot("move-" + tag)
 	else: check(false, tag + " one-step move exists")
-	# A non-scrolling card drag pans the board and cannot open the card.
+	# A card-origin drag stays with the control and cannot open the card.
 	var card: Button = phone.unit_card
 	var card_at := card.get_global_rect().get_center()
 	var old_pivot: Vector3 = game.pivot
 	var old_card: String = phone.open_card
 	await swipe(card_at, Vector2(-100, 0))
 	check(phone.open_card == old_card, "%s unit card drag does not activate card=%s" % [tag, phone.open_card])
-	check(game.pivot.distance_to(old_pivot) > 0.03, "%s unit card drag pans from=%s to=%s" % [tag, old_pivot, game.pivot])
+	check(game.pivot.distance_to(old_pivot) < 0.03, "%s unit card drag leaves board still from=%s to=%s" % [tag, old_pivot, game.pivot])
 	# Battle ability buttons sit inside a horizontal scroll area.
 	var scroll: ScrollContainer = phone.overlay.find_child("Abilities", true, false)
 	var button: Button = phone.ability_buttons[0]

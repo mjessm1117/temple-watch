@@ -87,6 +87,7 @@ run_suite loadout20_test --rendering-method gl_compatibility --resolution 956x44
 run_suite armory21_test --rendering-method gl_compatibility --resolution 844x390
 run_suite camera20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite feelcam22_test --rendering-method gl_compatibility --resolution 844x390
+run_suite feelcam24_test --rendering-method gl_compatibility --resolution 390x844
 run_suite story20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite strategy20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite art20_test --rendering-method gl_compatibility --resolution 844x390
@@ -95,7 +96,12 @@ run_suite galaxy21_test --rendering-method gl_compatibility -- --graphics=low
 run_suite menus21_test --rendering-method gl_compatibility --resolution 844x390
 run_suite impact22_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
 run_suite lightfx23_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite impact24_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite storydelivery22_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
 run_suite units23_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite spaces23_test --rendering-method gl_compatibility --resolution 390x844 -- --portrait; run_suite spaces23_test --rendering-method forward_plus --resolution 1280x720
 run_suite uiart23_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite threat24_test
+run_suite command24_test --rendering-method gl_compatibility --resolution 1280x720
+run_suite camgest24_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite hud24_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low

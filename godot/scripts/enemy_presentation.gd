@@ -2,6 +2,7 @@ extends RefCounted
 const Shot = preload("res://scripts/shot.gd")
 const Events = preload("res://scripts/feelcam22_events.gd")
 const Pressure = preload("res://scripts/mission_pressure.gd")
+const FeelBeats24 = preload("res://scripts/w24_feelcam_beats.gd")
 
 static func _point(m: RefCounted, tile: Vector2i, height: float = 0.0) -> Vector3:
 	return Vector3(tile.x, Shot.elevation(m, tile) * 0.7 + height, tile.y)
@@ -19,11 +20,14 @@ static func drain(game: Node3D) -> void:
 		var view: Node3D = game.views.get(int(id))
 		if view == null or int(u.get("hp",0)) <= 0: continue
 		if not game.cam.skip_requested:
-			view.travel(game.presentation_routes[id])
+			var meta24: Dictionary = game.presentation_route_meta24.get(id, {})
+			if view.has_method("travel24"): view.travel24(game.presentation_routes[id], bool(meta24.get("dash", false)), meta24.get("segments", []))
+			else: view.travel(game.presentation_routes[id])
 			while view.motion != null and view.motion.is_running() and not game.cam.skip_requested: await game.get_tree().process_frame
 		if view.motion != null and view.motion.is_running(): view.motion.kill()
 		view.position = _point(game.mission, Shot.pos(u))
 	game.presentation_routes.clear()
+	game.presentation_route_meta24.clear()
 
 static func flush_quiet(game: Node3D) -> void:
 	for view in game.quiet_motions:
@@ -42,8 +46,15 @@ static func play(game: Node3D, events: Array[Dictionary], _sequence: int) -> voi
 	await flush_quiet(game)
 
 static func show_event(game: Node3D, event: Dictionary) -> void:
-	var actor: Node3D = game.views.get(int(event.actor))
+	var actor: Node3D = game.views.get(int(event.get("actor", -1)))
 	var kind := str(event.kind)
+	if game.playing_enemy_events and kind in ["intent", "attack", "push", "move", "overwatch", "reload", "objective_attack", "vip_attack"]:
+		var reason := str(event.get("intent_reason24", event.get("intent_reason", "")))
+		if reason == "" and game.mission.has_method("intent_reason24"): reason = str(game.mission.call("intent_reason24", event))
+		if reason != "": game.phase_banner.text = reason
+		game.phase_banner.visible = true
+		if reason != "" and actor != null and game.fx != null and game.fx.has_method("float_text"):
+			game.fx.float_text(actor.position + Vector3.UP * 2.2, game.phase_banner.text, Color("ffe39b"))
 	if kind == "intent":
 		var a: Dictionary = game.mission.unit_by_id(int(event.actor))
 		var t: Dictionary = game.mission.unit_by_id(int(event.target))
@@ -123,9 +134,15 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 					if past: remainder.append(_point(game.mission,p))
 					else: points.append(_point(game.mission,p))
 					if p == stop: past = true
-				if not remainder.is_empty(): game.presentation_routes[int(event.actor)] = remainder
+				if not remainder.is_empty():
+					game.presentation_routes[int(event.actor)] = remainder
+					var remaining_segments24: Array = preload("res://scripts/w24_threat_route.gd").segments(game.mission, event.get("path", [event.to]), event.from).slice(points.size()) if game.mission.has_method("route_segments24") else []
+					game.presentation_route_meta24[int(event.actor)] = {"dash":bool(event.get("dash24", false)), "segments":remaining_segments24}
 				if not game.cam.skip_requested:
-					actor.travel(points)
+					var route24: Array = event.get("path", [event.to])
+					var segments24: Array = preload("res://scripts/w24_threat_route.gd").segments(game.mission, route24, event.from) if game.mission.has_method("route_segments24") else []
+					if actor.has_method("travel24"): actor.travel24(points, bool(event.get("dash24", false)), segments24.slice(0, points.size()))
+					else: actor.travel(points)
 					if not game.quiet_motions.has(actor): game.quiet_motions.append(actor)
 					game.quiet_targets[int(event.actor)] = _point(game.mission, stop)
 				else: actor.position = _point(game.mission, stop)
@@ -137,6 +154,9 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 				game.fx.float_text(actor.position + Vector3.UP * 1.7, kind.to_upper(), Color("f2ba47"))
 				if kind == "reload": actor.act("reload")
 			await game.cam.wait(0.2)
+		"cover_break":
+			FeelBeats24.clutch(game, event, _point(game.mission, event.get("at", Vector2i.ZERO)))
+			FeelBeats24.cue(game, "cover_break", _point(game.mission, event.get("at", Vector2i.ZERO)))
 	if kind != "move": game.cam.finish()
 	decorate(game)
 
@@ -182,6 +202,7 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 			game.villain_retreat_seen = true
 			Events.emit(game, "villain_retreat", event, to)
 	elif mode != "push": Events.emit(game, "miss", event, to)
+	FeelBeats24.impact(game, event, from, to, victim)
 	var word := "DEFLECT" if "deflected" in outcome else "MISS" if damage == 0 and mode != "push" else "CRIT %d" % damage if outcome == "crits" else "GRAZE %d" % damage if outcome == "grazes" else "-%d" % damage if damage > 0 else "PUSH"
 	game.fx.float_text(to + Vector3.UP * 0.6, word, Color("ffca70") if outcome == "crits" else Color("a8eaff") if outcome == "grazes" else Color.WHITE, outcome == "crits")
 	if int(event.get("armor_lost", 0)) > 0: game.fx.float_text(to + Vector3.UP * 0.15, "SHRED -%d" % int(event.armor_lost), Color("f0c68b"))
@@ -191,9 +212,11 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 		if bool(event.killed):
 			var target: Dictionary = game.mission.unit_by_id(int(event.target))
 			if str(target.side) == "player": victim.set_downed(true)
-			else: victim.fall(); game.views.erase(int(event.target))
+			else:
+				if victim.has_method("fall24"): victim.call("fall24", -1, to - from)
+				else: victim.fall()
+				game.views.erase(int(event.target))
 	if damage > 0: game.sound.play("hit")
-	if not game.cam.skip_requested and (outcome == "crits" or bool(event.killed)): game.fx.hit_stop()
 	if not game.cam.skip_requested and (outcome == "crits" or bool(event.killed)) and not bool(event.get("killcam_played", false)):
 		await game.cam.impact_beat(to)
 	if victim != null and not bool(event.killed): victim.set_status(game.mission.unit_by_id(int(event.target)))

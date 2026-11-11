@@ -58,6 +58,21 @@ func _update_mix() -> void:
 func cue(kind: String) -> void:
 	play(kind)
 
+func impact_layers24(kind: String) -> void:
+	match kind:
+		"blaster":
+			play("hit")
+			play("crit")
+		"saber":
+			play("saber_clash")
+			play("hit")
+		"force":
+			play("push")
+			play("hit")
+		"miss":
+			play("whiz")
+			play("hit")
+
 func set_music_state(state: String) -> void:
 	if state not in MUSIC_STATES or state == _music_state: return
 	_music_state = state

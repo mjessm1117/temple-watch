@@ -19,6 +19,9 @@ func configure(low: bool) -> void:
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	mat.no_depth_test = true
 	mat.vertex_color_use_as_albedo = true
+	mat.emission_enabled = true
+	mat.emission = Color.WHITE
+	mat.emission_energy_multiplier = 1.45
 	mat.albedo_texture = _soft_texture()
 	plane.material = mat
 	var pool := MultiMesh.new(); pool.transform_format = MultiMesh.TRANSFORM_3D

@@ -138,7 +138,7 @@ func set_tile(p: Vector2i, c: String) -> void:
 func _destructible(p: Vector2i) -> bool:
 	if not in_bounds(p) or p.x == 0 or p.y == 0 or p.x == int(spec.width) - 1 or p.y == int(spec.height) - 1: return false
 	return tile(p) in ["#", "c", "h", "k"]
-func damage_cover(p: Vector2i, damage: int) -> String:
+func damage_cover(p: Vector2i, damage: int, cause: Dictionary = {}) -> String:
 	if not _destructible(p) or damage <= 0: return tile(p)
 	var before := tile(p)
 	if not cover_hp.has(p): cover_hp[p] = 8 if tile(p) == "#" else 4
@@ -151,14 +151,15 @@ func damage_cover(p: Vector2i, damage: int) -> String:
 		cover_hp[p] = remaining
 		message("Full cover cracks into half cover.")
 	else: cover_hp[p] = remaining
-	if tile(p) != before: terrain_revision += 1
+	if tile(p) != before:
+		terrain_revision += 1
+		action_events.append({"kind":"cover_break", "at":p, "from_tile":before, "to_tile":tile(p), "cause":cause.get("kind", "environment"), "actor":int(cause.get("actor", -1))})
 	return tile(p)
-
-func explode(center: Vector2i, damage: int, radius: int = 1) -> void:
+func explode(center: Vector2i, damage: int, radius: int = 1, cause: Dictionary = {}) -> void:
 	for y in range(center.y - radius, center.y + radius + 1):
 		for x in range(center.x - radius, center.x + radius + 1):
 			var p := Vector2i(x, y)
-			if center.distance_to(p) <= float(radius): damage_cover(p, damage)
+			if center.distance_to(p) <= float(radius): damage_cover(p, damage, cause)
 
 func passable(p: Vector2i) -> bool:
 	return in_bounds(p) and tile(p) not in ["#", "c", "h", "k"] and (not modern or tile(p) != "w")
@@ -345,7 +346,7 @@ func _apply_attack(a: Dictionary, t: Dictionary, info: Dictionary, mode: String)
 		if armor > 0: t.armor = armor - 1
 		if str(a.get("class_name", "")) == "Heavy" and mode == "shoot":
 			var direction := Vector2i(signi(int(a.x) - int(t.x)), signi(int(a.y) - int(t.y)))
-			for q in [Shot.pos(t) + Vector2i(direction.x, 0), Shot.pos(t) + Vector2i(0, direction.y)]: damage_cover(q, 3)
+			for q in [Shot.pos(t) + Vector2i(direction.x, 0), Shot.pos(t) + Vector2i(0, direction.y)]: damage_cover(q, 3, {"kind":"heavy_shot", "actor":int(a.id)})
 	message("%s %s %s%s" % [a.name, outcome, t.name, " for %d." % damage if damage > 0 else "."])
 	if phase == "enemy": action_events.append({"kind": "attack", "actor": int(a.id), "target": int(t.id), "from": Shot.pos(a), "to": Shot.pos(t), "mode": mode, "enemy": str(a.side) == "enemy", "outcome": outcome, "damage": before_hp - int(t.hp), "killed": int(t.hp) <= 0})
 	if int(t.hp) <= 0 and str(t.side) == "player": t.wounded = true
@@ -371,7 +372,7 @@ func push(id: int, target_id: int) -> bool:
 		if not passable(q) or occupied(q, int(t.id)):
 			apply_damage(t, int(abilities.push.collision_damage), a)
 			message("%s slams %s into cover for 3." % [a.name, t.name])
-			if in_bounds(q): damage_cover(q, 4)
+			if in_bounds(q): damage_cover(q, 4, {"kind":"force_push", "actor":id})
 			break
 		t.x = q.x; t.y = q.y
 	message("%s pushes %s out of position." % [a.name, t.name])

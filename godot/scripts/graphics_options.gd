@@ -31,6 +31,9 @@ func _ready() -> void:
 	_option("ActionCamera", "Action camera", ["On", "Off"], bool(Prefs.get_value("cine")), func(value: int): Prefs.set_value("cine", value == 0))
 	_option("CameraMotion", "Camera motion", ["Full", "Reduced"], not bool(Prefs.get_value("motion")), func(value: int): Prefs.set_value("motion", value == 1))
 	_option("AutoSelect", "Auto select next unit", ["On", "Off"], bool(RescueSettings.battle_value("auto_select")), func(value: int): RescueSettings.set_battle_value("auto_select", value == 0))
+	var controls := preload("res://scripts/w24_hud_controls_settings.gd").new()
+	controls.name = "ControlsSection"
+	add_child(controls)
 	refresh()
 
 func _option(key: String, title: String, labels: Array, value: Variant, save: Callable) -> void:

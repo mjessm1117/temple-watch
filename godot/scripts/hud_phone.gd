@@ -38,8 +38,10 @@ var odds_plate: PanelContainer
 var odds_title: Label
 var odds_hit: Label
 var odds_modifiers: Label
+var odds_scroll: ScrollContainer
 var odds_badge: Label
 var alerts: Control
+var feedback = preload("res://scripts/w24_hud_feedback.gd").new()
 var last_threat: Dictionary = {}
 const Targeting22 = preload("res://scripts/combat_targeting.gd")
 const Threat22 = preload("res://scripts/decision22_threat.gd")
@@ -84,6 +86,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	threat_chip.add_theme_stylebox_override("normal", threat_style); heading.add_child(threat_chip)
 	end_button = _button("END TURN", _end_turn); end_button.name = "PhoneEndTurn"
 	end_button.custom_minimum_size = Vector2(88, 44); heading.add_child(end_button)
+	heading.add_theme_constant_override("separation", 8)
 	var menu := _button("MENU" if preload("res://scripts/phone_layout.gd").touch_device() else "☰", _show_menu); menu.name = "PhoneMenu"
 	menu.custom_minimum_size = Vector2(44, 44); heading.add_child(menu)
 	for button in [end_button, menu]:
@@ -160,6 +163,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	for node in abilities.get_children():
 		var button: Button = node
 		button.reparent(track); button.custom_minimum_size = Vector2(48, 44)
+		button.flat = true
 		ability_buttons.append(button)
 		button.set_meta("graphics_custom_minimum_size", Vector2(48, 44))
 		button.set_meta("shared_phone_art", true)
@@ -199,7 +203,12 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	odds_title = night.label("", 14, Color("dbe7e4")); odds_title.name = "DecisionTarget"; odds_box.add_child(odds_title)
 	odds_hit = night.label("", 24, Color("f2d99a")); odds_hit.name = "DecisionHit"; odds_box.add_child(odds_hit)
 	odds_badge = night.label("", 14, Color("ef6a5d")); odds_badge.name = "DecisionBadge"; odds_box.add_child(odds_badge)
-	odds_modifiers = night.label("", 14, Color("dbe7e4")); odds_modifiers.name = "DecisionModifiers"; odds_modifiers.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; odds_box.add_child(odds_modifiers)
+	odds_scroll = preload("res://scripts/touch_scroll.gd").new(); odds_scroll.name = "OddsReasonsScroll"
+	odds_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	odds_box.add_child(odds_scroll)
+	odds_modifiers = night.label("", 14, Color("dbe7e4")); odds_modifiers.name = "DecisionModifiers"
+	odds_modifiers.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; odds_scroll.add_child(odds_modifiers)
+	feedback.setup(self, g, overlay)
 	if safe_size.y > safe_size.x:
 		alerts = preload("res://scripts/w23_uiart_alerts.gd").new()
 		alerts.name = "PhoneAlertLayer"
@@ -221,7 +230,7 @@ func _relayout() -> void:
 	var logical_height := maxf(1.0, preload("res://scripts/phone_layout.gd").logical_size(preload("res://scripts/phone_layout.gd").window_size()).y)
 	layout.place(overlay.find_child("PhoneTopBackground", false, false), Rect2(0, 0, area.x, 44.0 * root_control.size.y / logical_height))
 	layout.place(overlay.find_child("PhoneTopStrip", false, false), boxes.header)
-	layout.place(unit_plate, Rect2(Vector2(11, boxes.plate.position.y), boxes.plate.size - Vector2(9, 0)))
+	layout.place(unit_plate, boxes.plate)
 	layout.place(ability_tray, Rect2(boxes.tray.position, boxes.tray.size - Vector2(8, 0)))
 	layout.place(action_art, Rect2(boxes.tray.position, boxes.tray.size - Vector2(8, 0)))
 	layout.place(camera_rail, Rect2(boxes.camera.position - Vector2(4, 0), boxes.camera.size))
@@ -229,11 +238,13 @@ func _relayout() -> void:
 	var portrait := area.y > area.x
 	threat_chip.custom_minimum_size.x = 72 if portrait else 104
 	threat_chip.text = Threat22.phone_chip(last_threat) if portrait else Threat22.chip(last_threat)
-	layout.place(odds_plate, Rect2(12, 58 if portrait else 50, minf(170.0 if portrait else 340.0, area.x - 82.0), 78 if portrait else 96))
+	layout.place(odds_plate, Rect2(12, 58 if portrait else 50, minf(170.0 if portrait else 340.0, area.x - 82.0), (280 if feedback.details_open else 88) if portrait else 96))
 	odds_title.add_theme_font_size_override("font_size", 12 if portrait else 14)
 	odds_hit.add_theme_font_size_override("font_size", 24)
 	odds_badge.visible = not portrait
-	odds_modifiers.visible = not portrait
+	odds_scroll.custom_minimum_size.y = 170 if portrait else 20
+	odds_scroll.visible = not portrait or feedback.details_open
+	feedback.relayout(area)
 	if is_instance_valid(alerts): alerts.call("set_safe_area", area)
 	if g.hud_controls != null and g.hud_controls.aim_ui != null:
 		var aim = g.hud_controls.aim_ui
@@ -288,8 +299,11 @@ func _refresh_odds() -> void:
 		odds_badge.text = "◆ FLANKED BY %d" % flank.size() if not flank.is_empty() else "◆ SEEN BY %d" % seen.size() if not seen.is_empty() else "◆ NO KNOWN LOS"
 		odds_badge.add_theme_color_override("font_color", Color("ef6a5d") if not flank.is_empty() else Color("e0bd78"))
 		odds_modifiers.text = compact_names(flank if not flank.is_empty() else seen) if not flank.is_empty() or not seen.is_empty() else "No visible enemy can shoot here"
+		feedback.refresh_odds()
 		return
-	if not active: return
+	if not active:
+		feedback.refresh_odds()
+		return
 	var data: Dictionary = Targeting22.shot_breakdown(g.mission, actor, target, g.action == "strike", int(actor.get("leap_aim", 0)) if g.action == "strike" else 0)
 	var decision: Dictionary = Targeting22.decision_summary(data, str(target.name), g.action == "strike")
 	odds_title.text = str(decision.target).to_upper()
@@ -297,7 +311,15 @@ func _refresh_odds() -> void:
 	odds_hit.add_theme_color_override("font_color", Color("f2d99a"))
 	odds_badge.text = "◆ " + str(decision.badge)
 	odds_badge.add_theme_color_override("font_color", Color("ef6a5d") if str(decision.badge) == "FLANKED" else Color("e0bd78"))
-	odds_modifiers.text = "\n".join(decision.modifiers) if overlay.size.y > overlay.size.x else "  ·  ".join(decision.modifiers)
+	var reason_lines: Array[String] = []
+	var targeting: Object = g.hud_controls.targeting
+	if targeting != null and targeting.has_method("decision_details24"):
+		targeting.g = g
+		for item in targeting.call("decision_details24", actor, target):
+			if item is Dictionary: reason_lines.append("%s %s" % [str(item.get("label", "")), str(item.get("value", ""))])
+	if reason_lines.is_empty(): reason_lines = decision.modifiers
+	odds_modifiers.text = "\n".join(reason_lines) if overlay.size.y > overlay.size.x else "  ·  ".join(reason_lines)
+	feedback.refresh_odds()
 
 static func compact_names(names: Array) -> String:
 	var counts: Dictionary = {}
@@ -308,15 +330,14 @@ static func compact_names(names: Array) -> String:
 
 func _show_ability(button: Button) -> void:
 	action_name.text = button.tooltip_text
+	feedback.show_ability(button)
 
 func _ability_input(event: InputEvent, button: Button) -> void:
-	if event is InputEventScreenTouch and event.pressed: _show_ability(button)
+	if event is InputEventScreenTouch and event.pressed or event is InputEventMouseButton and event.pressed: _show_ability(button)
 	if event is InputEventScreenDrag:
-		if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
-		var right: Vector3 = g.camera.global_basis.x
-		var forward: Vector3 = -g.camera.global_basis.z; forward.y = 0.0; forward = forward.normalized()
-		g.pivot += (-right * event.relative.x + forward * event.relative.y) * g.zoom * 0.0015
-		g._update_camera()
+		# An ability drag belongs to the HUD; only touches begun on the map pan it.
+		if g.cam.touch.has_method("gesture_owns_touch24") and g.cam.touch.gesture_owns_touch24(): return
+		return
 
 func _plate_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -342,7 +363,10 @@ func _cycle_unit(direction: int) -> void:
 	if id >= 0: g._select(id)
 
 func _end_turn() -> void:
-	if not end_confirm:
+	var ap_remains := false
+	for member in g.mission.living("player"):
+		if int(member.get("ap", 0)) > 0: ap_remains = true; break
+	if ap_remains and not end_confirm:
 		end_confirm = true
 		action_name.text = "End the squad turn? Tap END TURN again."
 		return
@@ -367,6 +391,7 @@ func refresh(from_game: bool = false) -> void:
 		threat_chip.tooltip_text = str(forecast)
 		threat_chip.visible = not forecast.is_empty()
 	_refresh_odds()
+	feedback.refresh_pressure(last_threat)
 	var pips: int = clampi(int(g.mission.chain_momentum), 0, 3)
 	var used_this_turn: bool = int(g.mission.chain_strike_used_turn) == int(g.mission.turn)
 	momentum_row.visible = false
@@ -425,6 +450,7 @@ func refresh(from_game: bool = false) -> void:
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	target_card.text = "%s  %s  %s" % [str(target.get("name", "TARGET")), g.hit_big_label.text, "v" if preload("res://scripts/phone_layout.gd").touch_device() else "▾"]
 	popup.visible = open_card != ""
+	if is_instance_valid(alerts): alerts.visible = open_card == ""
 	if open_card == "": return
 	if open_card == "settings": return
 	if detail_scroll.touch_dragging: return
@@ -432,11 +458,19 @@ func refresh(from_game: bool = false) -> void:
 	for child in popup_body.get_children(): child.queue_free()
 	if open_card == "more":
 		popup_body.add_child(night.label("MORE ACTIONS", 16, Color("efd49b")))
+		var reason_label: Label = night.label("", 14, Color("f2d99a"))
+		reason_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		reason_label.hide(); popup_body.add_child(reason_label)
 		for button in ability_buttons:
 			if button.visible or not bool(button.get_meta("battle12_available", false)) or button.ability_id == "": continue
 			var mode: String = button.ability_id
-			var item := _button("%s %s  ·  %s AP%s" % [button.display_name, preload("res://scripts/hud18_icon.gd").marks(g.mission.abilities.get(mode, {})), button.cost, "  ·  %d TURN CD" % button.cooldown if button.cooldown > 0 else ""], func() -> void: g._choose_action(mode); _close())
-			item.disabled = button.disabled; popup_body.add_child(item)
+			var item := _button("%s %s  ·  %s AP%s" % [button.display_name, preload("res://scripts/hud18_icon.gd").marks(g.mission.abilities.get(mode, {})), button.cost, "  ·  %d TURN CD" % button.cooldown if button.cooldown > 0 else ""], func() -> void:
+				if button.disabled:
+					feedback.show_ability(button)
+					reason_label.text = button.tooltip_text; reason_label.show()
+				else: g._choose_action(mode); _close())
+			item.modulate = Color("9aa9ac") if button.disabled else Color.WHITE
+			popup_body.add_child(item)
 	elif open_card == "unit":
 		popup_body.add_child(night.label("SQUAD  ·  tap a name to select", 14, Color("efd49b")))
 		var squad := HFlowContainer.new(); squad.add_theme_constant_override("h_separation", 8); squad.add_theme_constant_override("v_separation", 8); popup_body.add_child(squad)
@@ -456,7 +490,7 @@ func refresh(from_game: bool = false) -> void:
 		popup_body.add_child(night.label("COMBAT LOG\n" + g.log_label.text, 12))
 	else:
 		popup_body.add_child(_button("RESUME", _close))
-		popup_body.add_child(_button("Settings", func() -> void: g.get_node("/root/CampaignFlow").open_settings()))
+		popup_body.add_child(_button("Settings", _show_settings))
 		popup_body.add_child(_button("SAVE / LOAD", func() -> void: g.get_node("/root/CampaignFlow").open_saves("rescue")))
 		popup_body.add_child(_button("ACTION CAM: %s" % ("ON" if g.action_camera else "OFF"), func() -> void: g.action_camera = not g.action_camera; refresh()))
 		popup_body.add_child(_button("SOUND: %s" % ("OFF" if g.sound.muted else "ON"), func() -> void: g.sound.muted = not g.sound.muted; refresh()))
@@ -470,17 +504,22 @@ func refresh(from_game: bool = false) -> void:
 func _update_actions(from_game: bool) -> void:
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var available: int = int(unit.get("ap", 0))
-	var primary_limit := mini(4, maxi(3, int(floor((ability_tray.size.x - 8.0) / 48.0)) - 2))
-	if overlay.size.y > overlay.size.x and ability_tray.size.y < 192.0: primary_limit = 2
+	var primary_limit := mini(4, maxi(3, int(floor((ability_tray.size.x - 8.0) / 52.0)) - 2))
 	last_unit_id = g.selected_id; last_unit_ap = available
 	if from_game:
-		for button in ability_buttons: button.set_meta("battle12_available", button.visible and not button.disabled)
+		for button in ability_buttons: button.set_meta("battle12_available", button.visible)
 	var primary: Array[String] = []
-	for mode in ["move", "shoot", "strike", "push", "overwatch", "reload", "hunker", "medpac"]:
+	for mode in ["move", "shoot", "strike", "overwatch", "push", "reload", "hunker", "medpac"]:
 		if primary.size() >= primary_limit: break
 		for button in ability_buttons:
 			if button.ability_id == mode and bool(button.get_meta("battle12_available", false)):
 				primary.append(mode); break
+	if overlay.size.y > overlay.size.x and "overwatch" not in primary:
+		for button in ability_buttons:
+			if button.ability_id == "overwatch" and bool(button.get_meta("battle12_available", false)):
+				if primary.size() >= primary_limit: primary.pop_back()
+				primary.append("overwatch")
+				break
 	for button in ability_buttons:
 		if primary.size() >= primary_limit: break
 		if bool(button.get_meta("battle12_available", false)) and button.ability_id not in primary:
@@ -516,6 +555,8 @@ func _unit_details(unit: Dictionary) -> String:
 
 func _show_settings() -> void:
 	open_card = "settings"
+	if is_instance_valid(alerts): alerts.hide()
+	feedback.ability_reason.hide()
 	for child in popup_body.get_children(): child.queue_free()
 	popup_body.add_child(_button("BACK", _show_menu))
 	popup_body.add_child(preload("res://scripts/graphics_options.gd").build_settings_panel())

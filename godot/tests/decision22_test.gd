@@ -212,7 +212,13 @@ func run() -> void:
 	game.action = "shoot"; game.target_id = int(enemy.id); game._refresh(); await process_frame
 	check(phone.odds_plate.visible and phone.odds_hit.text.contains("%d%%" % int(data.hit)), "phone displays large live hit odds: %s vs %s" % [phone.odds_hit.text, data.hit])
 	check(phone.odds_title.text == str(enemy.name).to_upper() and phone.odds_badge.text.contains("COVER"), "phone shows target and cover badge")
-	check(phone.odds_modifiers.text.contains("COVER"), "phone displays modifier without opening details")
+	var compact_odds: bool = phone.overlay.size.y > phone.overlay.size.x
+	var modifiers_accessible: bool = phone.feedback.details_button.visible and not phone.odds_scroll.visible if compact_odds else phone.odds_scroll.visible
+	check(phone.odds_modifiers.text.to_upper().contains("COVER") and modifiers_accessible, "phone exposes modifiers in the active layout")
+	if compact_odds:
+		phone.feedback.details_button.pressed.emit(); await process_frame
+		check(phone.odds_scroll.visible, "phone expands modifier reasons on request")
+		phone.feedback.details_button.pressed.emit(); await process_frame
 	enemy.spotted = false; enemy.awake = true; phone._refresh_odds()
 	check(phone.odds_plate.visible, "active known aim target keeps odds visible")
 	enemy.spotted = true

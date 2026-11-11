@@ -5,6 +5,25 @@ var g
 var trace_root: Node3D
 var detection_root: Node3D
 
+func decision_details24(attacker: Dictionary, target: Dictionary) -> Array:
+	if g == null or attacker.is_empty() or target.is_empty(): return []
+	var melee: bool = str(g.action) == "strike"
+	var modifier: int = int(attacker.get("leap_aim", 0)) if melee else 0
+	var data: Dictionary = shot_breakdown(g.mission, attacker, target, melee, modifier)
+	var details: Array = []
+	var present: Dictionary = {}
+	for line in data.get("lines", []):
+		var label: String = str(line[0])
+		details.append({"label": label, "value": int(line[1])})
+		present[label] = true
+	if not melee and not (present.has("Full cover") or present.has("Half cover") or present.has("No cover")):
+		details.append({"label": "No cover", "value": 0})
+	for missing in ["High ground", "Flanking critical chance", "Ability", "Range"]:
+		if not present.has(missing): details.append({"label": missing, "value": 0})
+	for item in data.get("aim_lines", []):
+		if str(item[0]) == "Hit chance cap": details.append({"label": "Hit chance cap", "value": int(item[1])})
+	return details
+
 static func shot_breakdown(m: RefCounted, actor: Dictionary, target: Dictionary, melee: bool = false, modifier: int = 0) -> Dictionary:
 	var data: Dictionary = Shot.calculate(m, actor, target, melee, modifier)
 	var aim_lines: Array = []

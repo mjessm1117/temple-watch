@@ -18,6 +18,7 @@ func _draw() -> void:
 	# Draw each primitive and font size together across the whole row.
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
+		if button.ability_id == "overwatch": continue
 		var at := offsets[index]
 		var gold := Color("f5d68b") if button.active else Color("b69b65") if not button.disabled else Color("67737d")
 		draw_arc(at + Vector2(button.size.x * 0.5, 18), 15, 0, TAU, 32, Color("9ef6b3") if button.combo_ready else gold, 2.5)
@@ -54,6 +55,11 @@ func _draw() -> void:
 	for index in visible_buttons.size():
 		var button = visible_buttons[index]
 		var at := offsets[index]
+		if button.ability_id == "overwatch":
+			var ink := Color("edf3f4") if not button.disabled else Color("9bb2b5")
+			draw_string(font, at + Vector2(1, 27), "OVER", HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, 11, ink)
+			draw_string(font, at + Vector2(1, 40), "WATCH", HORIZONTAL_ALIGNMENT_CENTER, button.size.x - 2, 11, ink)
+			continue
 		var caption: String = caption_for(button.display_name)
 		while caption.length() > 1 and font.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x > button.size.x - 4:
 			caption = caption.substr(0, caption.length() - 1)
