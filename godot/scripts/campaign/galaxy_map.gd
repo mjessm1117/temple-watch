@@ -3,10 +3,12 @@ signal mission_selected(index: int)
 signal planet_selected(planet: String)
 signal region_selected(region: String)
 signal field_selected(key: String)
+signal scan_selected(id: String)
 const Data = preload("res://scripts/campaign/data.gd")
 const Art = preload("res://scripts/campaign/galaxy_art.gd")
 const Intel = preload("res://scripts/campaign/galaxy_intel.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
+const Strategy25 = preload("res://scripts/w25_galaxy_strategy.gd")
 var campaign
 var selected := 0
 var viewport: SubViewport
@@ -17,6 +19,7 @@ var regions: Dictionary = {}
 var offers: Array = []
 var ships: Array[Node3D] = []
 var operations: Array = []
+var scans: Array = []
 var focused := ""
 var hovered := ""
 var target := Vector3(0,0,-1.7)
@@ -95,17 +98,22 @@ func planet_position(title: String) -> Vector3:
 
 func refresh_signals() -> void:
 	offers.clear()
+	scans = Strategy25.active_scans(campaign.state) if campaign.has_method("advance_strategy_day25") else []
 	for i in campaign.state.options.size():
 		var option: Dictionary = campaign.state.options[i]; var m: Dictionary = campaign.story.mission(str(option.mission))
 		var urgency := "NO LIMIT" if option.get("story", false) else "LAST" if option.get("adv", false) and campaign.state.options.size() == 1 else "NEXT" if option.get("adv", false) else "OPEN"
 		var reward: Dictionary = m.get("reward", {})
 		var reward_key := str(reward.keys()[0]).capitalize() if not reward.is_empty() else "Intel"
-		offers.append({"index":i, "planet":Intel.planet_for(m), "name":str(option.get("n",m.get("n",option.mission))), "risk":Intel.risk(campaign,m,option), "type":str(m.get("type", option.get("kind", "Mission"))).replace("_", " ").to_upper(), "urgency":urgency, "reward":reward_key})
+		var place := Intel.planet_for(m)
+		var contacted: bool = Strategy25.contacted(campaign.state,str(Data.get_table("galaxy", "PLANETS")[place].reg)) or bool(option.get("story",false))
+		offers.append({"index":i, "planet":place, "name":str(option.get("n",m.get("n",option.mission))) if contacted else "Rumour", "risk":Intel.risk(campaign,m,option), "type":str(m.get("type", option.get("kind", "Mission"))).replace("_", " ").to_upper() if contacted else "RUMOUR", "urgency":urgency, "reward":reward_key if contacted else "?", "contacted":contacted})
 	operations.clear()
 	for op in campaign.sith.operations():
 		if op.status in ["open","team"]:
 			var offer: Dictionary = campaign.state.sith.missions.get(op.mission_id,{})
-			operations.append({"planet":Intel.planet_for(campaign.story.mission(str(offer.get("mission","archive")))),"name":op.n,"id":op.id})
+			var place := Intel.planet_for(campaign.story.mission(str(offer.get("mission","archive"))))
+			if Strategy25.operation_known(campaign,op) or offer.is_empty():
+				operations.append({"planet":place,"name":Strategy25.operation_display(campaign,op).n,"id":op.id})
 	for active in campaign.state.crises11.active:
 		var crisis: Dictionary = preload("res://scripts/campaign/crisis11_engine.gd").definition(str(active.id))
 		operations.append({"planet":str(crisis.planet),"name":"%s · %d days" % [crisis.title,maxi(0,int(active.deadline)-int(campaign.state.elapsed_days))],"id":active.id})
@@ -270,6 +278,17 @@ func _draw_labels(overlay: Control) -> void:
 		overlay.draw_arc(p,11*pulse,0,TAU,40,Color(color,0.7),1.2,true)
 		overlay.draw_circle(p,6,color)
 		overlay.draw_string(font,p+Vector2(-5,5),str(int(offer.index)+1),HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("081317"))
+	for site in scans:
+		var p := projected(planets[str(site.planet)].position) + Vector2(24,24)
+		if not bounds.has_point(p): continue
+		overlay.draw_arc(p,14,0,TAU,28,Color("79d3e2"),2,true)
+		overlay.draw_string(font,p+Vector2(-6,5),"S",HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("dbe7e4"))
+		var reward := Intel.resources(site.reward)
+		var remaining := maxi(0,int(site.days)-int(campaign.state.w25_scan_progress.get(str(site.id),0)))
+		var caption := "SCAN %dd · %s" % [remaining,reward]
+		var x := p.x + 19 if p.x < size.x * 0.5 else p.x - 160
+		overlay.draw_string_outline(font,Vector2(x,p.y+5),caption,HORIZONTAL_ALIGNMENT_LEFT,150,14,4,Color("061017"))
+		overlay.draw_string(font,Vector2(x,p.y+5),caption,HORIZONTAL_ALIGNMENT_LEFT,150,14,Color("b9e6ed"))
 	for label in signal_layout:
 		var rect: Rect2 = label.rect
 		var offer: Dictionary = label.offer
@@ -343,6 +362,9 @@ func _pick(point: Vector2) -> void:
 		for offer in offers:
 			var distance := marker_position(offer.index).distance_to(point)
 			if distance < nearest: nearest = distance; choice = mission_selected.emit.bind(offer.index)
+		for site in scans:
+			var distance := (projected(planets[str(site.planet)].position) + Vector2(24,24)).distance_to(point)
+			if distance < nearest: nearest = distance; choice = scan_selected.emit.bind(str(site.id))
 		for title in planets:
 			var distance := projected(planets[title].position).distance_to(point)
 			if distance < nearest: nearest = distance; choice = planet_selected.emit.bind(title)
@@ -355,6 +377,9 @@ func _pick(point: Vector2) -> void:
 	for offer in offers:
 		if marker_position(offer.index).distance_to(point) < 18:
 			mission_selected.emit(offer.index); return
+	for site in scans:
+		if (projected(planets[str(site.planet)].position) + Vector2(24,24)).distance_to(point) < 18:
+			scan_selected.emit(str(site.id)); return
 	for title in planets:
 		if projected(planets[title].position).distance_to(point) < 24:
 			planet_selected.emit(title); return

@@ -43,6 +43,21 @@
       "Unmapped space beyond the western rim. Ilum hides here."
     ]
   ],
+  "CONTACTS": {
+    "deep": {"intel": 5, "credits": 200, "income": 65},
+    "core": {"intel": 3, "credits": 120, "income": 55},
+    "colonies": {"intel": 2, "credits": 100, "income": 45},
+    "inner": {"intel": 2, "credits": 90, "income": 40},
+    "mid": {"intel": 2, "credits": 80, "income": 35},
+    "unknown": {"intel": 5, "credits": 180, "income": 25}
+  },
+  "SCAN_SITES": [
+    {"id":"outer_relay", "n":"Abandoned relay", "planet":"Taris", "days":2, "reward":{"intel":2}},
+    {"id":"outer_cache", "n":"Drifting supply cache", "planet":"Dantooine", "days":3, "reward":{"credits":90}},
+    {"id":"outer_cave", "n":"Crystal echo", "planet":"Ossus", "days":2, "reward":{"kyber":1}},
+    {"id":"mid_signal", "n":"Lost scout signal", "planet":"Ord Mantell", "days":2, "reward":{"recruits":1}},
+    {"id":"core_lead", "n":"Senate lead", "planet":"Coruscant", "days":3, "reward":{"lead":1}}
+  ],
   "PLANETS": {
     "Coruscant": {
       "x": 300,
