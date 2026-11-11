@@ -198,7 +198,7 @@ func _build_ui() -> void:
 	for u in g.mission.living("player"):
 		var id: int = int(u.id)
 		var squad_button := _button(str(u.name), func() -> void: g._select(id))
-		squad_button.custom_minimum_size.y = 38; left_box.add_child(squad_button)
+		squad_button.custom_minimum_size.y = 44; left_box.add_child(squad_button)
 	g.portrait_viewport = SubViewport.new(); g.portrait_viewport.size = Vector2i(132, 100); g.portrait_viewport.transparent_bg = true; g.portrait_viewport.own_world_3d = true; g.portrait_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS; g.add_child(g.portrait_viewport)
 	var portrait_camera := Camera3D.new(); portrait_camera.position = Vector3(0.12, 1.6, 1.15); portrait_camera.fov = 30; g.portrait_viewport.add_child(portrait_camera); portrait_camera.look_at(Vector3(0, 1.45, 0)); portrait_camera.current = true
 	var portrait_light := DirectionalLight3D.new(); portrait_light.rotation_degrees = Vector3(-30, -35, 0); portrait_light.light_energy = 2.0; g.portrait_viewport.add_child(portrait_light)
@@ -250,7 +250,7 @@ func _build_ui() -> void:
 	cine_button.name = "CineButton"; command_row.add_child(cine_button)
 	var mute_button := _button("SOUND", func() -> void: g.sound.muted = not g.sound.muted)
 	command_row.add_child(mute_button)
-	g.audio_slider = HSlider.new(); g.audio_slider.custom_minimum_size = Vector2(75, 0); g.audio_slider.max_value = 100; g.audio_slider.value = 55; g.audio_slider.value_changed.connect(func(value: float) -> void: g.sound.volume = value / 100.0); command_row.add_child(g.audio_slider)
+	g.audio_slider = HSlider.new(); g.audio_slider.custom_minimum_size = Vector2(75, 44); g.audio_slider.max_value = 100; g.audio_slider.value = 55; g.audio_slider.value_changed.connect(func(value: float) -> void: g.sound.volume = value / 100.0); command_row.add_child(g.audio_slider)
 	desktop_threat_chip = _label("", 14); desktop_threat_chip.name = "DesktopThreatChip"
 	desktop_threat_chip.add_theme_font_override("font", preload("res://scripts/campaign/ui.gd").font("body"))
 	desktop_threat_chip.custom_minimum_size.x = 104; desktop_threat_chip.visible = false
