@@ -41,6 +41,57 @@ func _cue(kind: String) -> void:
 	voice.play()
 	voice.finished.connect(voice.queue_free)
 
+func _impact_audio24(kind: String) -> void:
+	var game := get_parent()
+	var sound: Node = game.get("sound") if game != null else null
+	if sound != null:
+		if sound.has_method("impact_layers24"): sound.impact_layers24(kind)
+		return
+	_cue("whiz" if kind == "miss" else "saber_clash" if kind == "saber" else "push" if kind == "force" else "hit")
+
+func impact24_cue(kind: String, pos: Vector3, power: float = 1.0) -> void:
+	var strength := clampf(power, 0.25, 2.0)
+	match kind:
+		"hit", "crit", "kill", "saber", "force":
+			var color := Color("89efff") if kind == "force" else Color("d8f9ff") if kind == "saber" else Color("ffe2a5")
+			_layer(pos, 0.47 * strength, Color(color, 0.92), 0.13)
+			_layer(pos + Vector3.UP * 0.08, 0.23 * strength, Color.WHITE, 0.08)
+			burst(pos, color, 6)
+			_impact_audio24("force" if kind == "force" else "saber" if kind == "saber" else "blaster")
+			if kind == "hit": hit_stop(0.04)
+			elif kind == "crit" or kind == "kill": hit_stop(0.055)
+		"miss_near": _miss_contact24(pos, pos, strength)
+		"blast": blast(pos)
+		"leap_land":
+			ring(pos - Vector3.UP * 0.95, Color("d4c3a1"), 1.15 * strength)
+			for i in 3: _layer(pos + Vector3(float(i - 1) * 0.28, -0.65, 0), 0.42, Color("a8a092", 0.55), 0.48, Vector3(float(i - 1) * 0.38, 0.48, 0))
+			_cue("step")
+		"cover_break":
+			cover_chunks(pos)
+			_impact_audio24("blaster")
+
+func _miss_contact24(at: Vector3, target: Vector3, strength: float = 1.0) -> void:
+	_layer(at, 0.28 * strength, Color("e8ca9a", 0.9), 0.14)
+	burst(at, Color("e8c896"), 4)
+	_scorch(at)
+	_flinch_near24(target)
+	_impact_audio24("miss")
+
+func _flinch_near24(pos: Vector3) -> void:
+	var game := get_parent()
+	if game == null: return
+	var candidates: Variant = game.get("views")
+	if not candidates is Dictionary: return
+	var nearest: Node3D
+	var distance := 2.25 * 2.25
+	for view in candidates.values():
+		if not view is Node3D or not is_instance_valid(view): continue
+		var delta: Vector3 = view.global_position + Vector3.UP - pos
+		if delta.length_squared() < distance:
+			distance = delta.length_squared()
+			nearest = view
+	if nearest != null and nearest.has_method("flinch24"): nearest.flinch24()
+
 func setup(cam: Camera3D, ui: Control) -> void:
 	view_camera = cam
 	overlay = ui
@@ -132,8 +183,9 @@ func blast(at: Vector3, ion := false) -> void:
 	for i in (2 if _tier() == "low" else 4):
 		var offset := Vector3(float(i) * 0.28 - 0.2, 0.1, float(i % 2) * 0.3)
 		_layer(at + offset, 0.28, Color(color, 0.65), 0.45, offset + Vector3.UP * 0.8)
-	_layer(at + Vector3(0.75, 0.25, 0.45), 1.55, Color("3d4650", 0.72), 0.9, Vector3(0.22, 0.5, 0.1))
-	_layer(at + Vector3(-0.65, 0.15, -0.1), 1.25, Color("58606b", 0.58), 0.78, Vector3(-0.15, 0.45, 0))
+	# Column and ground contact share the existing billboard draw on Low.
+	for i in 3:
+		_layer(at + Vector3(float(i - 1) * 0.18, -0.18 + float(i) * 0.5, 0), 1.15 + float(i) * 0.25, Color("879195", 0.82 - float(i) * 0.07), 1.45, Vector3(float(i - 1) * 0.08, 0.85, 0))
 	var visual_scale := blast_screen_scale(get_viewport().get_visible_rect().size)
 	var core := _sphere(at, 0.18 if _tier() == "low" else 0.30, Color("fff2cc") if not ion else Color("e1d6ff"))
 	core.name = "BlastCore"
@@ -150,7 +202,7 @@ func blast(at: Vector3, ion := false) -> void:
 	second.tween_property(shell, "scale", Vector3(4.5, 2.5, 4.5) * visual_scale, BLAST_SHELL_SECONDS)
 	second.tween_property(shell, "transparency", 1.0, BLAST_SHELL_SECONDS)
 	second.chain().tween_callback(shell.queue_free)
-	ring(at - Vector3.UP * 0.8, color, 2.1 * visual_scale)
+	ring(at - Vector3.UP * 0.96, color, 2.4 * visual_scale)
 	burst(at, color, 12)
 	camera_impulse()
 	var game := get_parent()
@@ -195,8 +247,8 @@ func _battle_turn() -> int:
 func bolt(from: Vector3, to: Vector3, enemy: bool, miss: bool) -> void:
 	var color := Color("ff5364") if enemy else Color("70dfff")
 	var direction := (to - from).normalized()
-	var end := to + direction * 1.4 if miss else to
-	if miss: _cue("whiz")
+	var side := direction.cross(Vector3.UP).normalized()
+	var end := to + direction * 1.35 + side * 0.55 if miss else to
 	_flash(from, color, 2.0, 0.09)
 	_layer(from, 0.42, Color(color, 0.85), 0.10)
 	burst(from, color, 4)
@@ -229,10 +281,12 @@ func bolt(from: Vector3, to: Vector3, enemy: bool, miss: bool) -> void:
 	tween.tween_property(glow, "position", end, duration)
 	tween.chain().tween_callback(func() -> void:
 		_flash(end, Color("ffd7a4"), 0.9, 0.1)
-		if not miss: contact(end)
+		if miss: _miss_contact24(end, to)
+		else: impact24_cue("hit", end)
 		_layer(end, 0.25, Color("a5a6a8", 0.38), 0.42, Vector3.UP * 0.35)
-		burst(end, Color("e8c896") if miss else color, 10)
-		_scorch(end)
+		if not miss:
+			burst(end, color, 10)
+			_scorch(end)
 		core.queue_free(); glow.queue_free())
 
 func shockwave(from: Vector3, to: Vector3) -> void:
@@ -250,6 +304,7 @@ func shockwave(from: Vector3, to: Vector3) -> void:
 		ring(to - Vector3.UP * 0.8, Color("a1eeff"), 1.6)
 		if _tier() == "high": ring(to - Vector3.UP * 0.78, Color("c7f6ff"), 2.4)
 		cover_chunks(to)
+		impact24_cue("force", to)
 		wave.queue_free())
 
 func saber(from: Vector3, to: Vector3) -> void:
@@ -270,9 +325,7 @@ func saber(from: Vector3, to: Vector3) -> void:
 	ribbon_fade.tween_property(ribbon,"transparency",1.0,0.24)
 	ribbon_fade.tween_callback(ribbon.queue_free)
 	burst(to, Color("f1fbff"), 12)
-	contact(to, true)
-	get_tree().create_timer(0.14/float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed"))).timeout.connect(func() -> void:
-		if is_instance_valid(self): _cue("saber_clash"))
+	impact24_cue("saber", to)
 
 func _saber_ribbon(from: Vector3, to: Vector3) -> MeshInstance3D:
 	var steps := 4 if _tier() == "low" else 10
