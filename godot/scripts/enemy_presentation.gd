@@ -204,8 +204,8 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 			Events.emit(game, "villain_retreat", event, to)
 	elif mode != "push": Events.emit(game, "miss", event, to)
 	FeelBeats24.impact(game, event, from, to, victim)
-	var word := "DEFLECT" if "deflected" in outcome else "MISS" if damage == 0 and mode != "push" else "CRIT %d" % damage if outcome == "crits" else "GRAZE %d" % damage if outcome == "grazes" else "-%d" % damage if damage > 0 else "PUSH"
-	game.fx.float_text(to + Vector3.UP * 0.6, word, Color("ffca70") if outcome == "crits" else Color("a8eaff") if outcome == "grazes" else Color.WHITE, outcome == "crits")
+	var word := "DEFLECT" if "deflected" in outcome else "MISS" if damage == 0 and mode != "push" else "KILL -%d" % damage if bool(event.get("killed", false)) else "CRIT %d" % damage if outcome == "crits" else "GRAZE %d" % damage if outcome == "grazes" else "-%d" % damage if damage > 0 else "PUSH"
+	game.fx.float_text(to + Vector3.UP * 0.6, word, Color("ffca70") if outcome == "crits" or bool(event.get("killed", false)) else Color("a8eaff") if outcome == "grazes" else Color.WHITE, outcome == "crits" or bool(event.get("killed", false)))
 	if int(event.get("armor_lost", 0)) > 0: game.fx.float_text(to + Vector3.UP * 0.15, "SHRED -%d" % int(event.armor_lost), Color("f0c68b"))
 	if victim != null:
 		if mode == "push": victim.stagger_to(_point(game.mission, event.destination))
@@ -224,4 +224,4 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 	if actor != null: actor.set_status(game.mission.unit_by_id(int(event.actor)))
 	game.cam.trace.append("impact_%d" % int(event.actor))
 	game._sync_terrain()
-	await game.cam.wait(0.06 if bool(event.killed) else 0.10)
+	await game.cam.wait(0.06 if bool(event.killed) or game.playing_enemy_events else 0.10)

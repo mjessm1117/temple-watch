@@ -1,6 +1,7 @@
 extends Node3D
 
 const Audio = preload("res://scripts/audio.gd")
+const Signature27 = preload("res://scripts/w27d_ability_signature.gd")
 var view_camera: Camera3D
 var overlay: Control
 var _scorches: Array[Node3D] = []
@@ -12,6 +13,13 @@ const BLAST_CORE_SECONDS := 0.19
 const BLAST_SHELL_SECONDS := 0.48
 const CAMERA_IMPULSE_MAX := 0.16
 const HIT_STOP_LIMIT := 0.3
+
+func impact_budget27() -> Dictionary:
+	return Signature27.budget()
+
+func contact_scale27(at: Vector3) -> float:
+	if view_camera == null: return 1.0
+	return clampf(view_camera.global_position.distance_to(at) / 11.0, 1.0, 3.2)
 
 func hit_stop(seconds := 0.055) -> void:
 	if _hit_stop_serial == 0: _time_scale_before = Engine.time_scale
@@ -51,11 +59,12 @@ func _impact_audio24(kind: String) -> void:
 
 func impact24_cue(kind: String, pos: Vector3, power: float = 1.0) -> void:
 	var strength := clampf(power, 0.25, 2.0)
+	var read_scale := contact_scale27(pos)
 	match kind:
 		"hit", "crit", "kill", "saber", "force":
 			var color := Color("89efff") if kind == "force" else Color("d8f9ff") if kind == "saber" else Color("ffe2a5")
-			_layer(pos, 0.47 * strength, Color(color, 0.92), 0.13)
-			_layer(pos + Vector3.UP * 0.08, 0.23 * strength, Color.WHITE, 0.08)
+			_layer(pos, 0.47 * strength * read_scale, Color(color, 0.92), 0.16)
+			_layer(pos + Vector3.UP * 0.08, 0.23 * strength * read_scale, Color.WHITE, 0.10)
 			burst(pos, color, 6)
 			_impact_audio24("force" if kind == "force" else "saber" if kind == "saber" else "blaster")
 			if kind == "hit": hit_stop(0.04)
@@ -71,7 +80,7 @@ func impact24_cue(kind: String, pos: Vector3, power: float = 1.0) -> void:
 			_impact_audio24("blaster")
 
 func _miss_contact24(at: Vector3, target: Vector3, strength: float = 1.0) -> void:
-	_layer(at, 0.28 * strength, Color("e8ca9a", 0.9), 0.14)
+	_layer(at, 0.28 * strength * contact_scale27(at), Color("e8ca9a", 0.9), 0.14)
 	burst(at, Color("e8c896"), 4)
 	_scorch(at)
 	_flinch_near24(target)
@@ -146,11 +155,13 @@ func _flash(at: Vector3, color: Color, energy: float, duration: float) -> void:
 func contact(at: Vector3, clash := false) -> void:
 	# The two emissive meshes remain legible without dynamic lighting or glow.
 	var color := Color("a5f2ff") if clash else Color("ffe2ab")
-	_layer(at, 0.72 if clash else 0.5, Color(color, 0.75), 0.10)
-	_layer(at + Vector3.UP * 0.1, 0.34, Color.WHITE, 0.16)
-	_layer(at, 0.40, Color("8e8c88", 0.28), 0.36, Vector3(0.1, 0.5, 0))
+	var read_scale := contact_scale27(at)
+	_layer(at, (0.72 if clash else 0.5) * read_scale, Color(color, 0.75), 0.10)
+	_layer(at + Vector3.UP * 0.1, 0.34 * read_scale, Color.WHITE, 0.16)
+	_layer(at, 0.40 * read_scale, Color("8e8c88", 0.28), 0.36, Vector3(0.1, 0.5, 0))
 	var core := _sphere(at, 0.22 if clash else 0.16, color)
 	core.name = "HitCore"
+	core.scale = Vector3.ONE * read_scale
 	var rim := MeshInstance3D.new()
 	rim.name = "HitRim"
 	var mesh := TorusMesh.new()
@@ -158,11 +169,12 @@ func contact(at: Vector3, clash := false) -> void:
 	rim.mesh = mesh
 	rim.material_override = _material(color)
 	rim.position = at
+	rim.scale = Vector3.ONE * read_scale
 	rim.rotation.x = PI * 0.5
 	add_child(rim)
 	var tween := _paced_tween().set_parallel(true)
 	tween.tween_property(core, "scale", Vector3.ZERO, 0.22)
-	tween.tween_property(rim, "scale", Vector3.ONE * 2.0, 0.22)
+	tween.tween_property(rim, "scale", Vector3.ONE * 2.0 * read_scale, 0.22)
 	tween.tween_property(rim, "transparency", 1.0, 0.22)
 	tween.chain().tween_callback(func() -> void: core.queue_free(); rim.queue_free())
 
@@ -214,11 +226,12 @@ static func blast_screen_scale(size: Vector2) -> float:
 
 func burst(at: Vector3, color: Color, count := 8) -> void:
 	count = mini(count,4 if _tier() == "low" else 8 if _tier() == "medium" else count)
+	var read_scale := contact_scale27(at)
 	var rng := RandomNumberGenerator.new(); rng.randomize()
 	for i in range(count):
 		var vector := Vector3(rng.randf_range(-1, 1), rng.randf_range(0.15, 1.1), rng.randf_range(-1, 1))
 		if _tier() == "low":
-			_layer(at, 0.12 if i % 3 else 0.18, Color(color, 0.85), 0.26, vector * 2.7)
+			_layer(at, (0.12 if i % 3 else 0.18) * read_scale, Color(color, 0.85), 0.26, vector * 2.7 * read_scale)
 			continue
 		var spark := _sphere(at, 0.025 if i % 3 else 0.04, color)
 		var tween := _paced_tween().set_parallel(true)
@@ -228,7 +241,7 @@ func burst(at: Vector3, color: Color, count := 8) -> void:
 
 func _scorch(at: Vector3) -> void:
 	var mesh := CylinderMesh.new()
-	mesh.top_radius = 0.19; mesh.bottom_radius = 0.19; mesh.height = 0.007
+	mesh.top_radius = 0.19 * contact_scale27(at); mesh.bottom_radius = mesh.top_radius; mesh.height = 0.007
 	var decal := MeshInstance3D.new()
 	decal.mesh = mesh
 	decal.material_override = _material(Color("25201e"), false)
@@ -252,22 +265,29 @@ func bolt(from: Vector3, to: Vector3, enemy: bool, miss: bool) -> void:
 	_flash(from, color, 2.0, 0.09)
 	_layer(from, 0.42, Color(color, 0.85), 0.10)
 	burst(from, color, 4)
-	var core := _sphere(from, 0.075, Color.WHITE)
-	core.scale = Vector3(0.8, 0.8, 4.5)
-	core.look_at(end, Vector3.UP)
-	var glow := _sphere(from, 0.15, color)
-	glow.scale = Vector3(0.6, 0.6, 3.0)
-	glow.look_at(end, Vector3.UP)
-	var beam_mesh := CylinderMesh.new(); beam_mesh.top_radius = 0.018; beam_mesh.bottom_radius = 0.018; beam_mesh.height = from.distance_to(end)
-	var beam := MeshInstance3D.new(); beam.mesh = beam_mesh; beam.material_override = _material(color)
-	beam.position = (from + end) * 0.5
-	beam.quaternion = Quaternion(Vector3.UP, direction)
-	add_child(beam)
-	var beam_fade := _paced_tween()
-	beam_fade.tween_interval(0.08)
-	beam_fade.tween_property(beam, "scale", Vector3.ZERO, 0.13)
-	beam_fade.tween_callback(beam.queue_free)
-	if overlay != null and view_camera != null:
+	var core: MeshInstance3D
+	var duration := clampf(from.distance_to(end) / 38.0, 0.11, 0.31)
+	if _tier() == "low":
+		_layer(from, 0.25, Color(color, 0.95), duration, (end - from) / duration)
+	else:
+		core = _sphere(from, 0.075, Color.WHITE)
+		core.scale = Vector3(0.8, 0.8, 4.5)
+		core.look_at(end, Vector3.UP)
+	var glow: MeshInstance3D
+	if _tier() != "low":
+		glow = _sphere(from, 0.15, color)
+		glow.scale = Vector3(0.6, 0.6, 3.0)
+		glow.look_at(end, Vector3.UP)
+		var beam_mesh := CylinderMesh.new(); beam_mesh.top_radius = 0.018; beam_mesh.bottom_radius = 0.018; beam_mesh.height = from.distance_to(end)
+		var beam := MeshInstance3D.new(); beam.mesh = beam_mesh; beam.material_override = _material(color)
+		beam.position = (from + end) * 0.5
+		beam.quaternion = Quaternion(Vector3.UP, direction)
+		add_child(beam)
+		var beam_fade := _paced_tween()
+		beam_fade.tween_interval(0.08)
+		beam_fade.tween_property(beam, "scale", Vector3.ZERO, 0.13)
+		beam_fade.tween_callback(beam.queue_free)
+	if overlay != null and view_camera != null and _tier() != "low":
 		var streak := Line2D.new()
 		streak.points = PackedVector2Array([view_camera.unproject_position(from), view_camera.unproject_position(end)])
 		streak.width = 3.0; streak.default_color = color
@@ -275,10 +295,10 @@ func bolt(from: Vector3, to: Vector3, enemy: bool, miss: bool) -> void:
 		var fade := _paced_tween()
 		fade.tween_property(streak, "modulate:a", 0.0, 0.18).set_delay(0.04)
 		fade.tween_callback(streak.queue_free)
-	var duration := clampf(from.distance_to(end) / 38.0, 0.11, 0.31)
 	var tween := _paced_tween().set_parallel(true)
-	tween.tween_property(core, "position", end, duration)
-	tween.tween_property(glow, "position", end, duration)
+	if core != null: tween.tween_property(core, "position", end, duration)
+	else: tween.tween_interval(duration)
+	if glow != null: tween.tween_property(glow, "position", end, duration)
 	tween.chain().tween_callback(func() -> void:
 		_flash(end, Color("ffd7a4"), 0.9, 0.1)
 		if miss: _miss_contact24(end, to)
@@ -287,7 +307,8 @@ func bolt(from: Vector3, to: Vector3, enemy: bool, miss: bool) -> void:
 		if not miss:
 			burst(end, color, 10)
 			_scorch(end)
-		core.queue_free(); glow.queue_free())
+		if core != null: core.queue_free()
+		if glow != null: glow.queue_free())
 
 func shockwave(from: Vector3, to: Vector3) -> void:
 	_layer(from, 0.8, Color("b9f3ff", 0.55), 0.16)
@@ -396,6 +417,10 @@ func ring(at: Vector3, color: Color, radius: float = 1.0) -> void:
 	tween.chain().tween_callback(node.queue_free)
 
 func ability(id: String, from: Vector3, to: Vector3) -> void:
+	var signature: Dictionary = Signature27.profile(id)
+	if not signature.is_empty():
+		_ability_signature27(id, from, to, signature)
+		return
 	# The web's blue telekinesis / gold mind / green life / violet stasis vocabulary.
 	if id == "pull": shockwave(to, from)
 	elif id in ["push", "forceWave"]: shockwave(from, to); ring(from - Vector3.UP * 0.8, Color("9fe7ff"), 2.8)
@@ -418,6 +443,79 @@ func ability(id: String, from: Vector3, to: Vector3) -> void:
 		ring(from - Vector3.UP * 0.8, Color("79d3e2"), 2.2); ring(to - Vector3.UP * 0.8, Color("79d3e2"), 1.0)
 	elif id in ["rapidFire", "deadeye", "chainShot", "snipe", "fanFire", "coverFire", "suppress", "backup"]: bolt(from, to, false, false)
 	else: ring(to, Color("79d3e2"), 0.7)
+
+func _ability_signature27(id: String, from: Vector3, to: Vector3, signature: Dictionary) -> void:
+	_cue(str(signature.sound))
+	var shape := str(signature.shape)
+	var spacing := float(signature.spacing)
+	var read_scale := contact_scale27(to)
+	var color := Color("79dfff") if id in ["rapidFire", "suppress"] else Color("82edb4") if id in ["forceHeal", "barrier"] else Color("a9e9ff") if id in ["push", "pull"] else Color("f2dd9e")
+	var side := (to - from).cross(Vector3.UP).normalized()
+	if side.length_squared() < 0.01: side = Vector3.RIGHT
+	match shape:
+		"triple", "fan":
+			for i in 3:
+				var offset := side * float(i - 1) * (0.23 if shape == "triple" else 0.62)
+				var delay := float(i) * float(signature.spacing)
+				get_tree().create_timer(delay).timeout.connect(func() -> void:
+					if is_inside_tree():
+						_layer(from + offset, 0.35 * read_scale, color, 0.13, (to - from) / 0.13)
+						_delayed_layer27(0.13, to + offset, 0.5 * read_scale, color, 0.17))
+		"cone":
+			var cone_mesh := CylinderMesh.new()
+			cone_mesh.top_radius = 0.85 * read_scale
+			cone_mesh.bottom_radius = 0.08
+			cone_mesh.height = from.distance_to(to)
+			var cone := MeshInstance3D.new()
+			cone.mesh = cone_mesh
+			var cone_mat := _material(Color(color, 0.45))
+			cone_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			cone.material_override = cone_mat
+			cone.position = from.lerp(to, 0.5)
+			cone.quaternion = Quaternion(Vector3.UP, (to - from).normalized())
+			add_child(cone)
+			var fade_cone := _paced_tween()
+			fade_cone.tween_property(cone, "transparency", 1.0, 0.30)
+			fade_cone.tween_callback(cone.queue_free)
+			_layer(from, 0.55 * read_scale, color, 0.12)
+			_delayed_layer27(spacing, from.lerp(to, 0.55), 1.15 * read_scale, color, 0.18)
+			_delayed_layer27(spacing * 2.0, to, 1.45 * read_scale, color, 0.23)
+		"inward":
+			for i in 3: _delayed_layer27(float(i) * spacing, to + side * float(i - 1) * 0.85 * read_scale, 0.65 * read_scale, color, 0.18, (from - to).normalized() * 1.6)
+		"cross":
+			var index := 0
+			for offset in [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]:
+				_delayed_layer27(float(index) * spacing, to + offset * 0.55 * read_scale, 0.68 * read_scale, color, 0.34, Vector3.UP * 0.8)
+				index += 1
+		"hex":
+			var hex_mesh := CylinderMesh.new()
+			hex_mesh.radial_segments = 6
+			hex_mesh.top_radius = 0.9 * read_scale
+			hex_mesh.bottom_radius = 0.9 * read_scale
+			hex_mesh.height = 1.9 * read_scale
+			var shield := MeshInstance3D.new()
+			shield.mesh = hex_mesh
+			var shield_mat := _material(Color(color, 0.35))
+			shield_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			shield.material_override = shield_mat
+			shield.position = to
+			add_child(shield)
+			var tween := _paced_tween(); tween.tween_property(shield, "transparency", 1.0, 0.55); tween.tween_callback(shield.queue_free)
+		"arc":
+			_layer(from.lerp(to, 0.5) + Vector3.UP * 0.9, 0.72 * read_scale, color, 0.2)
+			get_tree().create_timer(spacing).timeout.connect(func() -> void:
+				if is_inside_tree(): saber(from, to))
+		"burst":
+			_layer(to + Vector3.UP * 0.3, 1.2 * contact_scale27(to), color, 0.19)
+			get_tree().create_timer(spacing).timeout.connect(func() -> void:
+				if is_inside_tree(): blast(to))
+
+func _delayed_layer27(delay: float, at: Vector3, size: float, color: Color, life: float, drift := Vector3.ZERO) -> void:
+	if delay <= 0.0:
+		_layer(at, size, color, life, drift)
+	else:
+		get_tree().create_timer(delay).timeout.connect(func() -> void:
+			if is_inside_tree(): _layer(at, size, color, life, drift))
 
 func _process(delta: float) -> void:
 	var current_turn := _battle_turn()

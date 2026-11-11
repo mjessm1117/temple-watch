@@ -1,9 +1,9 @@
 extends Node
 ## One camera owner; completion (or an explicit skip) gates attack resolution.
 const Shot = preload("res://scripts/shot.gd")
-const BLEND := 0.20
-const REPEAT_BLEND := 0.12
-const PLAYER_SHOT_BLEND := 0.42
+const BLEND := 0.16
+const REPEAT_BLEND := 0.08
+const PLAYER_SHOT_BLEND := 0.36
 const AIM_BLEND := 0.28
 const RETURN_BLEND24 := 0.28
 const TACTICAL_V_OFFSET := -0.5

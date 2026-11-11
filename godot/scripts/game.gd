@@ -82,6 +82,9 @@ var camera_drag_serial24 := 0
 var camera_sensitivity24 := 1.0
 var clutch_turn24 := -1
 var _reported_busy24 := false
+func impact_budget27() -> Dictionary:
+	return fx.impact_budget27() if fx != null and fx.has_method("impact_budget27") else {"draws_per_beat": 4, "particles_max": 12}
+
 func _ready() -> void:
 	scene_view.g = self
 	cam.g = self
