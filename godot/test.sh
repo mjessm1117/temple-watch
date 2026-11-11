@@ -104,3 +104,4 @@ run_suite uiart23_test --rendering-method gl_compatibility --resolution 390x844 
 run_suite threat24_test
 run_suite command24_test --rendering-method gl_compatibility --resolution 1280x720
 run_suite camgest24_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite hud24_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
