@@ -165,7 +165,9 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 		"focus": u.focus_left = mini(int(u.focus), int(u.focus_left) + int(def.get("amount", 0)) + (1 if "wildBond" in u.get("passives", []) else 0))
 		"ap": u.ap = mini(Rules12.ACTIONS_PER_TURN, int(u.ap) + int(def.get("amount", 0)))
 		"master_action": u.ap = int(u.ap) + 1; u.master_action_used = true
-		"leap": u.x = tile.x; u.y = tile.y; u.leap_aim = int(def.get("next_strike_aim", 0)); m._wake_groups(); m._enemy_reaction_fire(u)
+		"leap":
+			m.action_events.append({"kind":"leap", "actor":actor_id, "from":Shot.pos(u), "to":tile})
+			u.x = tile.x; u.y = tile.y; u.leap_aim = int(def.get("next_strike_aim", 0)); m._wake_groups(); m._enemy_reaction_fire(u)
 		"area_attack":
 			for enemy in m.living("enemy"):
 				if max(abs(int(enemy.x) - int(u.x)), abs(int(enemy.y) - int(u.y))) <= 1: _attack(m, u, enemy, def, id)
@@ -264,7 +266,7 @@ static func _displace(m: RefCounted, u: Dictionary, t: Dictionary, def: Dictiona
 		var q: Vector2i = Shot.pos(t) + step
 		if not m.passable(q) or m.occupied(q, int(t.id)):
 			m.apply_damage(t, int(def.get("collision_damage", 3)), u)
-			if m.in_bounds(q): m.damage_cover(q, 4)
+			if m.in_bounds(q): m.damage_cover(q, 4, {"kind":"force_displace", "actor":int(u.id)})
 			break
 		t.x = q.x; t.y = q.y
 

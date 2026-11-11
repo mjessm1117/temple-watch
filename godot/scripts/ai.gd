@@ -110,6 +110,22 @@ static func scamper(m: RefCounted, e: Dictionary) -> void:
 		m.message("%s scrambles for cover." % e.name)
 		m._reaction_fire(e)
 
+static func _reason24(m: RefCounted, first: int, actor: Dictionary, reason: String) -> void:
+	for i in range(first, m.action_events.size()):
+		if int(m.action_events[i].get("actor", -1)) == int(actor.id): m.action_events[i].reason24 = reason
+
+static func _shot24(m: RefCounted, e: Dictionary, target: Dictionary, mode: String, info: Dictionary = {}) -> bool:
+	var first: int = m.action_events.size()
+	var ok: bool = m.shot(int(e.id), int(target.id), mode)
+	if ok: _reason24(m, first, e, "Flanking" if bool(info.get("flanked", false)) else "Threat in sight")
+	return ok
+
+static func _move24(m: RefCounted, e: Dictionary, destination: Vector2i, reason: String) -> bool:
+	var first: int = m.action_events.size()
+	var ok: bool = m.move(int(e.id), destination)
+	if ok: _reason24(m, first, e, reason)
+	return ok
+
 static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> void:
 	if int(e.hp) <= 0 or not bool(e.awake): return
 	if bool(e.get("stunned", false)):
@@ -134,18 +150,20 @@ static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> void:
 	var retreat := int(e.hp) * 3 <= int(e.max_hp)
 	if retreat:
 		var safe := choose_destination(m, e, int(e.mob), true)
-		if safe != Shot.pos(e): m.move(int(e.id), safe)
+		if safe != Shot.pos(e): _move24(m, e, safe, "Low health")
 	if str(e.class_name) == "Sith Warrior" and int(e.get("focus_left", 0)) >= 2 and not bool(e.get("pushed", false)):
 		for p in visible(m, e):
 			if Shot.distance(Shot.pos(e), Shot.pos(p)) > 1.5 and Shot.distance(Shot.pos(e), Shot.pos(p)) <= 4.0 and Shot.in_cover(m, Shot.pos(p)):
+				var first: int = m.action_events.size()
 				if m.push(int(e.id), int(p.id)):
+					_reason24(m, first, e, "Target in cover")
 					e.pushed = true
 					return
 	var target := choose_target(m, e, fired)
 	if not target.is_empty() and not bool(e.get("disarmed", false)):
 		var mode := "strike" if is_melee(e) else "shoot"
 		var info: Dictionary = Shot.calculate(m, e, target, is_melee(e))
-		if (is_melee(e) or int(info.hit) >= 55) and m.shot(int(e.id), int(target.id), mode):
+		if (is_melee(e) or int(info.hit) >= 55) and _shot24(m, e, target, mode, info):
 			fired[int(target.id)] = int(fired.get(int(target.id), 0)) + 1
 			return
 	if int(e.ap) >= 1:
@@ -153,18 +171,19 @@ static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> void:
 		if int(e.ap) >= 2 and not can_attack_from(m, e, dest):
 			var dash := choose_destination(m, e, int(e.mob) * 2)
 			if dash != Shot.pos(e) and destination_score(m, e, dash) > destination_score(m, e, dest) + 0.01:
-				m.move(int(e.id), dash)
+				_move24(m, e, dash, "Better position")
 				return
-		if dest != Shot.pos(e): m.move(int(e.id), dest)
+		if dest != Shot.pos(e): _move24(m, e, dest, "Better position")
 	if int(e.hp) <= 0: return
 	if int(e.ap) >= 1 and not bool(e.get("disarmed", false)):
 		target = choose_target(m, e, fired)
 		if not target.is_empty():
 			var mode := "strike" if is_melee(e) else "shoot"
-			if m.shot(int(e.id), int(target.id), mode):
+			var later_info: Dictionary = Shot.calculate(m, e, target, is_melee(e))
+			if _shot24(m, e, target, mode, later_info):
 				fired[int(target.id)] = int(fired.get(int(target.id), 0)) + 1
 				return
 	if not is_melee(e) and int(e.ap) > 0:
 		e.ap = 0; e.overwatch = true
-		m.action_events.append({"kind": "overwatch", "actor": int(e.id), "at": Shot.pos(e)})
+		m.action_events.append({"kind": "overwatch", "actor": int(e.id), "at": Shot.pos(e), "reason24":"No clear shot"})
 		m.message("%s watches a firing lane." % e.name)

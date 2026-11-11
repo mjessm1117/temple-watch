@@ -56,6 +56,14 @@ static func threat_summary(m: RefCounted) -> Dictionary:
 		villain = {"name":str(m.objective_state.villain_name), "status":status, "line":line}
 	return {"exposed_units":exposed, "objective_risk":risk, "pending_groups":pending, "villain":villain}
 
+static func next_reinforcement24(m: RefCounted) -> Dictionary:
+	var pending: Array = threat_summary(m).pending_groups
+	if pending.is_empty(): return {}
+	var next: Dictionary = pending[0]
+	for wave in pending:
+		if int(wave.turns) < int(next.turns): next = wave
+	return {"count":int(next.count), "turns":int(next.turns), "entry_tile":next.entry_pos}
+
 static func reveal_info(m: RefCounted, group: Array) -> Dictionary:
 	var kinds: Array = []
 	var number := -1

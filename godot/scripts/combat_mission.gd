@@ -1,6 +1,7 @@
 extends "res://scripts/mission.gd"
 ## Combat extension stays separate from the missions lane's objective implementation.
 const Round = preload("res://scripts/combat_round.gd")
+const ThreatRoute24 = preload("res://scripts/w24_threat_route.gd")
 const Concealment = preload("res://scripts/combat_concealment.gd")
 const Bonds = preload("res://scripts/combat_bonds.gd")
 var combat_initialized := false
@@ -14,6 +15,61 @@ var squad_uses: Dictionary = {}
 var identity: RefCounted
 var mercy_events: Array = []
 var action_serial := 0
+var cover_source24: Dictionary = {}
+
+func route_segments24(path: Array, actor_id: int = -1) -> Array:
+	var actor := unit_by_id(actor_id) if actor_id >= 0 else {}
+	var start: Vector2i = Shot.pos(actor) if not actor.is_empty() else (path[0] if not path.is_empty() else Vector2i.ZERO)
+	return ThreatRoute24.segments(self, path, start)
+
+func route_threat24(path: Array, actor_id: int) -> Dictionary:
+	var actor := unit_by_id(actor_id)
+	var overwatch_tiles: Array = []
+	var reveal_tiles: Array = []
+	var flanked_end := false
+	if actor.is_empty() or path.is_empty(): return {"overwatch_tiles":overwatch_tiles, "reveal_tiles":reveal_tiles, "flanked_end":false, "danger_index":0}
+	var fired: Dictionary = {}
+	var revealed: Dictionary = {}
+	var active_count := 0
+	for enemy in living("enemy"):
+		if bool(enemy.awake): active_count += 1
+	for step in path:
+		var q: Vector2i = step
+		var shots: Array = []
+		for watcher in living("enemy" if str(actor.side) == "player" else "player"):
+			var id := int(watcher.id)
+			if fired.has(id) and not preload("res://scripts/ability_chains.gd").has_tag(watcher, "READY"): continue
+			if not ThreatRoute24.reaction_info(self, watcher, actor, q).is_empty():
+				shots.append(id); fired[id] = true
+		if not shots.is_empty(): overwatch_tiles.append({"tile":q, "watchers":shots})
+		var groups: Array = []
+		for enemy in living("enemy"):
+			var group := int(enemy.get("group", -1))
+			if group < 0 or bool(enemy.awake) or revealed.has(group): continue
+			var distance := Shot.distance(q, Shot.pos(enemy))
+			var hidden_assassin: bool = str(enemy.get("kind", "")) == "assassin11" and not bool(enemy.get("revealed11", false)) and distance > 1.5 and not ("sense" in actor.get("passives", []) and distance <= 5.0 and Shot.los(self, q, Shot.pos(enemy)))
+			if not hidden_assassin and distance <= 8.0 and Shot.los(self, q, Shot.pos(enemy)) and (not modern or not bool(actor.get("concealed", false)) or distance <= 2.0):
+				if group not in groups: groups.append(group)
+		for group in groups:
+			var members := 0
+			for enemy in living("enemy"):
+				if int(enemy.get("group", -1)) == group: members += 1
+			if active_count + members > int(difficulty.get("active_cap", 6)): continue
+			active_count += members
+			revealed[group] = true
+			reveal_tiles.append({"tile":q, "group":group})
+	var end: Vector2i = path.back()
+	var probe := actor.duplicate(); probe.x = end.x; probe.y = end.y
+	for enemy in living("enemy" if str(actor.side) == "player" else "player"):
+		if str(enemy.side) == "enemy" and not bool(enemy.awake): continue
+		if bool(Shot.calculate(self, enemy, probe, false).flanked): flanked_end = true; break
+	return {"overwatch_tiles":overwatch_tiles, "reveal_tiles":reveal_tiles, "flanked_end":flanked_end, "danger_index":overwatch_tiles.size() * 2 + reveal_tiles.size() + (1 if flanked_end else 0)}
+
+func intent_reason24(event: Dictionary) -> String:
+	if event.has("reason24"): return str(event.reason24)
+	if bool(event.get("reaction", false)): return "Overwatch"
+	if bool(event.get("flanked", false)) or bool(event.get("info", {}).get("flanked", false)): return "Flanking"
+	return ""
 
 static func adopt(source: RefCounted, campaign_state: Dictionary = {}) -> RefCounted:
 	if source.get("combat_initialized") == true: return source
@@ -112,7 +168,12 @@ func resolve_intent(event: Dictionary) -> Dictionary:
 	if resolving_reaction and int(t.hp) > 0: t.x = destination.x; t.y = destination.y
 	resolving_reaction = false
 	defer_resolution = old_defer
-	return action_events[count] if action_events.size() > count else {}
+	for i in range(count, action_events.size()):
+		if str(action_events[i].get("kind", "")) not in ["attack", "push"]: continue
+		if int(action_events[i].get("actor", -1)) != int(event.actor): continue
+		if event.has("reason24"): action_events[i].reason24 = event.reason24
+		return action_events[i]
+	return {}
 
 func push(id: int, target_id: int) -> bool:
 	if defer_resolution:
@@ -179,14 +240,8 @@ func _reactions(mover: Dictionary, side: String) -> void:
 		mover.x = q.x; mover.y = q.y
 		for watcher in living(side):
 			if int(mover.hp) <= 0: break
-			if preload("res://scripts/ability_chains.gd").has_tag(watcher, "STAGGERED") or preload("res://scripts/ability_chains.gd").has_tag(watcher, "LIFTED"): continue
-			if str(watcher.side) == "enemy" and not bool(watcher.awake): continue
-			var pinned := int(mover.get("suppressed_by", -1)) == int(watcher.id)
-			var hold: bool = bool(watcher.get("hold_line", false)) and int(mover.id) not in watcher.get("ow_hit", [])
-			if not bool(watcher.overwatch) and not pinned and not hold: continue
-			if int(watcher.get("ammo", 1)) <= 0: continue
-			var info := Shot.calculate(self, watcher, mover, false, -15)
-			if not bool(info.los) or not bool(info.range_ok): continue
+			var info: Dictionary = ThreatRoute24.reaction_info(self, watcher, mover, q)
+			if info.is_empty(): continue
 			var ready := preload("res://scripts/ability_chains.gd").consume(self, watcher, "READY") if preload("res://scripts/ability_chains.gd").has_tag(watcher, "READY") else false
 			watcher.overwatch = ready
 			watcher.ow_hit = watcher.get("ow_hit", []) + [int(mover.id)]
@@ -240,7 +295,9 @@ func apply_damage(target: Dictionary, amount: int, source: Dictionary = {}) -> i
 func use_ability(id: int, ability_id: String, target_id: int = -1, target_tile: Vector2i = Vector2i(-1,-1)) -> bool:
 	var before := {}
 	for u in units: before[u.id] = {"hp":u.hp,"status":u.status,"stable":u.get("stable",false),"surrendered":u.get("surrendered",false)}
+	cover_source24 = {"kind":ability_id, "actor":id}
 	var ok := super.use_ability(id,ability_id,target_id,target_tile)
+	cover_source24 = {}
 	if not ok: return false
 	action_serial += 1
 	var actor := unit_by_id(id)
@@ -257,15 +314,16 @@ func use_ability(id: int, ability_id: String, target_id: int = -1, target_tile: 
 	if mercy: mercy_events.append({"unit_id":actor.rid,"action_id":"action_%d" % action_serial,"points":points})
 	return true
 
-func damage_cover(p: Vector2i, damage: int) -> String:
+func damage_cover(p: Vector2i, damage: int, cause: Dictionary = {}) -> String:
+	if cause.is_empty(): cause = cover_source24
 	var barrel: bool = spec.get("prop_overrides",{}).get(p,"") == "barrel" and tile(p) != "r"
-	var after := super.damage_cover(p,damage)
+	var after := super.damage_cover(p,damage,cause)
 	if barrel and after == "r":
 		spec.prop_overrides.erase(p)
 		for u in units:
 			if int(u.hp) > 0 and maxi(absi(int(u.x)-p.x),absi(int(u.y)-p.y)) <= 1: apply_damage(u,3)
 		for y in range(p.y-1,p.y+2):
 			for x in range(p.x-1,p.x+2):
-				if Vector2i(x,y) != p: damage_cover(Vector2i(x,y),3)
+				if Vector2i(x,y) != p: damage_cover(Vector2i(x,y),3,{"kind":"barrel", "actor":int(cause.get("actor", -1))})
 		message("Fuel barrel explodes: 3 damage in a 3×3 area.")
 	return after

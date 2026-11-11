@@ -52,8 +52,8 @@ func show_tile(tile: Vector2i, mission: RefCounted) -> void:
 	shown_tile = tile
 	position = Vector3(tile.x, Shot.elevation(mission, tile) * 0.7 + 0.17, tile.y)
 	var summary: Dictionary = preload("res://scripts/mission_pressure.gd").threat_summary(mission)
-	wave_label.text = "INBOUND"
+	wave_label.text = "ENTRY POINT · INBOUND"
 	for wave in summary.pending_groups:
 		if wave.entry_pos == tile:
-			wave_label.text = "%d INBOUND · %s" % [int(wave.count), ", ".join(wave.types)]
+			wave_label.text = "ENTRY (%d,%d) · %d IN %d TURN%s" % [tile.x, tile.y, int(wave.count), int(wave.turns), "" if int(wave.turns) == 1 else "S"]
 			break
