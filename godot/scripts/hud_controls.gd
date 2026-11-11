@@ -154,8 +154,9 @@ func _shield(parent: Node3D, tile: Vector2i, direction: Vector2i, full: bool) ->
 func _label(text_value: String, size: int = 18) -> Label:
 	var label := Label.new()
 	label.text = text_value
+	label.add_theme_font_override("font", preload("res://scripts/campaign/ui.gd").font("display" if size >= 24 else "body"))
 	label.add_theme_font_size_override("font_size", size)
-	label.add_theme_color_override("font_color", Color("edf3f4"))
+	label.add_theme_color_override("font_color", preload("res://scripts/campaign/ui.gd").TEXT)
 	return label
 
 
@@ -171,10 +172,7 @@ func _button(text_value: String, callback: Callable) -> Button:
 
 
 func _style_panel(panel: PanelContainer) -> void:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.035, 0.075, 0.105, 0.91)
-	style.border_color = Color(0.21, 0.48, 0.58, 0.8)
-	style.set_border_width_all(1)
+	var style: StyleBoxFlat = preload("res://scripts/campaign/ui.gd").style(preload("res://scripts/campaign/ui.gd").SURFACE, preload("res://scripts/campaign/ui.gd").BORDER)
 	style.set_content_margin_all(9)
 	panel.add_theme_stylebox_override("panel", style)
 
@@ -189,11 +187,11 @@ func _build_ui() -> void:
 	bond_lines.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.add_child(bond_lines)
 	g.fx.setup(g.camera, root)
-	var top := PanelContainer.new(); top.anchor_right = 1.0; top.offset_bottom = 64; root.add_child(top); _style_panel(top)
+	var top := PanelContainer.new(); top.anchor_right = 1.0; top.offset_bottom = 48; root.add_child(top); _style_panel(top)
 	var top_row := HBoxContainer.new(); top.add_child(top_row)
 	g.title_label = _label("TEMPLE WATCH", 20); g.title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top_row.add_child(g.title_label)
 	g.objective_label = _label("", 15); g.objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; g.objective_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; top_row.add_child(g.objective_label)
-	var left := PanelContainer.new(); left.offset_top = 75; left.offset_left = 10; left.offset_right = 220; left.offset_bottom = 520; root.add_child(left); _style_panel(left)
+	var left := PanelContainer.new(); left.offset_top = 58; left.offset_left = 10; left.offset_right = 194; left.offset_bottom = 440; root.add_child(left); _style_panel(left)
 	left_panel = left
 	var left_box := VBoxContainer.new(); left.add_child(left_box)
 	left_box.add_child(_label("SQUAD", 17))
@@ -206,18 +204,18 @@ func _build_ui() -> void:
 	var portrait_light := DirectionalLight3D.new(); portrait_light.rotation_degrees = Vector3(-30, -35, 0); portrait_light.light_energy = 2.0; g.portrait_viewport.add_child(portrait_light)
 	var portrait := TextureRect.new(); portrait.texture = g.portrait_viewport.get_texture(); portrait.custom_minimum_size = Vector2(140, 44); portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; left_box.add_child(portrait)
 	g.selected_label = _label("", 14); left_box.add_child(g.selected_label)
-	var right := PanelContainer.new(); right.anchor_left = 1.0; right.anchor_right = 1.0; right.offset_left = -265; right.offset_right = -10; right.offset_top = 75; right.offset_bottom = 530; root.add_child(right); _style_panel(right)
+	var right := PanelContainer.new(); right.anchor_left = 1.0; right.anchor_right = 1.0; right.offset_left = -258; right.offset_right = -10; right.offset_top = 58; right.offset_bottom = 318; root.add_child(right); _style_panel(right)
 	right_panel = right
 	var right_box := VBoxContainer.new(); right.add_child(right_box)
 	right_box.add_child(_label("TARGETING", 17))
 	g.hit_big_label = _label("--%", 31); g.hit_big_label.add_theme_color_override("font_color", Color("e9ca83")); right_box.add_child(g.hit_big_label)
 	g.shot_label = _label("Hover over a target", 14); g.shot_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.shot_label)
-	right_box.add_child(_label("COMBAT LOG", 17))
-	g.log_label = _label("", 14); g.log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; right_box.add_child(g.log_label)
+	var log_title := _label("COMBAT LOG", 17); log_title.visible = false; right_box.add_child(log_title)
+	g.log_label = _label("", 14); g.log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; g.log_label.visible = false; right_box.add_child(g.log_label)
 	var bottom := PanelContainer.new(); bottom.anchor_left = 0.5; bottom.anchor_right = 0.5
 	desktop_bottom = bottom
 	bottom.anchor_top = 1.0; bottom.anchor_bottom = 1.0
-	bottom.offset_left = -380; bottom.offset_right = 380; bottom.offset_top = -164
+	bottom.offset_left = -350; bottom.offset_right = 350; bottom.offset_top = -124
 	root.add_child(bottom); _style_panel(bottom)
 	var bottom_box := VBoxContainer.new(); bottom.add_child(bottom_box)
 	var info_row := HBoxContainer.new(); bottom_box.add_child(info_row)
@@ -267,6 +265,7 @@ func _build_ui() -> void:
 	result_box.add_child(_button("Restart mission", func() -> void: g.get_tree().reload_current_scene()))
 	result_box.add_child(_button("Main menu", func() -> void: g.get_node("/root/CampaignFlow").go("menu")))
 	night = preload("res://scripts/hud_night1.gd").new(); night.g = g; root.add_child(night); night.setup(left_box, right_box)
+	if not Phone.narrow(Phone.window_size()): night.vitals_pips.custom_minimum_size.x = 150
 	if g.has_signal("battle_event") and not g.is_connected("battle_event", _on_battle_event): g.connect("battle_event", _on_battle_event)
 	aim_ui = preload("res://scripts/battle12_aim.gd").new()
 	aim_ui.setup(g, root, Phone.narrow(Phone.window_size()))
@@ -361,6 +360,9 @@ func _refresh() -> void:
 			if str(member.side) == "player" and bool(member.get("wounded", false)): wounded.append(str(member.name))
 		g.result_label.text = ("MISSION COMPLETE" if g.mission.result == "win" else "MISSION FAILED") + "\nWounded: " + (", ".join(wounded) if not wounded.is_empty() else "None")
 	g._refresh_figures(); _refresh_highlights(true); _show_shot(); night.refresh()
+	if phone == null:
+		night.log_heading.visible = false
+		g.log_label.visible = false
 	if phone != null: phone.refresh(true)
 	if bar != null: bar.refresh()
 	if aim_ui != null: aim_ui.refresh()
@@ -368,7 +370,7 @@ func _refresh() -> void:
 	if phone == null:
 		var aiming: bool = aim_ui != null and aim_ui.panel.visible
 		left_panel.visible = not aiming
-		right_panel.visible = not aiming
+		right_panel.visible = not aiming and g.action != "move"
 
 
 func _show_shot() -> void:

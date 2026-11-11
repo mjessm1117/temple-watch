@@ -67,6 +67,7 @@ func setup(game, root: Control, on_phone: bool) -> void:
 	var row := HBoxContainer.new(); row.add_theme_constant_override("separation", 4); body.add_child(row)
 	if phone:
 		var odds_box := VBoxContainer.new(); odds_box.custom_minimum_size.x = 96 if root.size.x < root.size.y else 144; row.add_child(odds_box)
+		odds_box.name = "AimInlineOdds"
 		odds = Label.new(); odds.name = "AimOdds"; odds.add_theme_font_size_override("font_size", 21)
 		odds.add_theme_color_override("font_color", Color("f2d99a")); odds_box.add_child(odds)
 		odds_detail = Label.new(); odds_detail.name = "AimOddsDetail"; odds_detail.add_theme_font_size_override("font_size", 12)
@@ -141,11 +142,12 @@ func refresh() -> void:
 	var selected_index := 0
 	for index in range(options.size()):
 		if int(options[index].id) == g.target_id: selected_index = index
-	for offset in range(mini(options.size(), 2 if phone else 2)):
+	var portrait: bool = phone and g.get_viewport().get_visible_rect().size.y > g.get_viewport().get_visible_rect().size.x
+	for offset in range(mini(options.size(), 1 if portrait else 2)):
 		var enemy: Dictionary = options[(selected_index + offset) % options.size()]
 		var id: int = int(enemy.id)
 		var label := "◉" if phone else str(enemy.name)
-		if g.action in ["shoot", "strike"]:
+		if g.action in ["shoot", "strike"] and not portrait:
 			var info: Dictionary = Shot.calculate(g.mission, actor, enemy, g.action == "strike")
 			label += ("\n%d%% HIT" % int(info.hit))
 		var chip := _button(label, 104 if not phone else 52 if g.get_viewport().get_visible_rect().size.x < 600 else 62, func() -> void: g.target_id = id; g._frame_target(); g._show_shot())

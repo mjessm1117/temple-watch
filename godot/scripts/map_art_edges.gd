@@ -20,6 +20,28 @@ func build(width: int, height: int) -> void:
 		b.end_record()
 	if theme in ["temple","ruins"]: g.arcade(width)
 	if theme in ["dock","city"]: g.industrial(width,height)
+	# Rear landmarks give the sampled shrine, grove and gate different skylines.
+	b.begin_record({"role":"scenery","kind":theme+" landmark"})
+	var centre := float(width-1)*0.5
+	if theme == "plains":
+		for side in [-1,1]:
+			var cairn := Vector3(centre+side*4.2,-0.18,-5.4)
+			for layer in 3:
+				put("boulder","wall",cairn+Vector3.UP*(0.22+layer*0.52),Vector3(1.55-layer*0.25,0.55,1.35-layer*0.17))
+			put("cone","leaves",cairn+Vector3(side*1.0,0.48,0),Vector3(0.45,0.95,0.46))
+	elif theme == "jungle":
+		for side in [-1,1]:
+			var root := Vector3(centre+side*3.1,0,-5.3)
+			put("boulder","bark",root+Vector3.UP*1.0,Vector3(1.6,2.1,1.3))
+			put("rock","leaves",root+Vector3.UP*2.3,Vector3(2.6,1.3,2.3))
+		put("boulder","bark",Vector3(centre,2.0,-5.3),Vector3(5.2,0.78,1.2))
+	elif theme in ["dock","city"]:
+		for side in [-1,1]:
+			var pylon := Vector3(centre+side*3.2,1.8,-5.2)
+			put("bevel","metal",pylon,Vector3(0.95,3.6,0.95))
+			put("box","glow",pylon+Vector3(0,0.7,0.50),Vector3(0.18,0.85,0.03))
+		put("box","dark",Vector3(centre,3.55,-5.2),Vector3(7.3,0.42,1.0))
+	b.end_record()
 	for side in 4:
 		var count := width if side < 2 else height
 		for i in range(1,count,4):

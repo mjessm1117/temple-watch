@@ -10,6 +10,8 @@ var record_first := true
 
 func _init() -> void:
 	var cube := BoxMesh.new(); cube.size = Vector3.ONE; shapes.box = cube; shapes.bevel = _bevel_mesh()
+	var ground := PlaneMesh.new(); ground.size = Vector2.ONE; shapes.terrain = ground
+	shapes.crag = _crag_mesh()
 	var cylinder := CylinderMesh.new(); cylinder.height = 1; cylinder.top_radius = 0.5; cylinder.bottom_radius = 0.5; cylinder.radial_segments = 12; shapes.cylinder = cylinder
 	var cone := CylinderMesh.new(); cone.height = 1; cone.top_radius = 0; cone.bottom_radius = 0.5; cone.radial_segments = 9; shapes.cone = cone
 	var rock := SphereMesh.new(); rock.radius = 0.5; rock.height = 1; rock.radial_segments = 12; rock.rings = 6; shapes.rock = rock
@@ -19,19 +21,20 @@ func _init() -> void:
 	surface.generate_normals(); shapes.ramp = surface.commit()
 	var stone_surface := SurfaceTool.new(); stone_surface.begin(Mesh.PRIMITIVE_TRIANGLES); stone_surface.set_smooth_group(-1)
 	var rings: Array[Vector3] = []
+	var sides := 8
 	for level in 3:
-		for j in 12:
-			var a := TAU*float(j)/12.0
+		for j in sides:
+			var a := TAU*float(j)/float(sides)
 			var radius := (0.38 if level == 0 else 0.5 if level == 1 else 0.31)*(0.85+0.15*float(j%3)/2)
 			var h := -0.5 if level == 0 else -0.08 if level == 1 else 0.22+0.28*float(j%3)/2
 			rings.append(Vector3(cos(a)*radius,h,sin(a)*radius))
 	for level in 2:
-		for j in 12:
-			var k := (j+1)%12
-			for index in [level*12+j,level*12+k,(level+1)*12+k,level*12+j,(level+1)*12+k,(level+1)*12+j]: stone_surface.add_vertex(rings[index])
-	for j in 12:
-		for vertex in [Vector3(0,0.43,0),rings[24+j],rings[24+(j+1)%12]]: stone_surface.add_vertex(vertex)
-		for vertex in [Vector3(0,-0.5,0),rings[(j+1)%12],rings[j]]: stone_surface.add_vertex(vertex)
+		for j in sides:
+			var k := (j+1)%sides
+			for index in [level*sides+j,level*sides+k,(level+1)*sides+k,level*sides+j,(level+1)*sides+k,(level+1)*sides+j]: stone_surface.add_vertex(rings[index])
+	for j in sides:
+		for vertex in [Vector3(0,0.43,0),rings[2*sides+j],rings[2*sides+(j+1)%sides]]: stone_surface.add_vertex(vertex)
+		for vertex in [Vector3(0,-0.5,0),rings[(j+1)%sides],rings[j]]: stone_surface.add_vertex(vertex)
 	stone_surface.generate_normals(); shapes.boulder = stone_surface.commit()
 
 func _bevel_mesh() -> ArrayMesh:
@@ -65,6 +68,23 @@ func _bevel_mesh() -> ArrayMesh:
 				_add_triangle(surface,x,y,z)
 	surface.generate_normals(); return surface.commit()
 
+func _crag_mesh() -> ArrayMesh:
+	var surface := SurfaceTool.new(); surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var xs := [-0.5,-0.26,0.02,0.27,0.5]
+	var tops := [0.43,0.50,0.46,0.49,0.42]
+	var fronts := [0.38,0.50,0.39,0.48,0.42]
+	for i in 4:
+		var a := Vector3(xs[i],-0.5,fronts[i])
+		var b := Vector3(xs[i+1],-0.5,fronts[i+1])
+		var c := Vector3(xs[i+1],tops[i+1],fronts[i+1])
+		var d := Vector3(xs[i],tops[i],fronts[i])
+		_add_quad(surface,a,b,c,d)
+		_add_quad(surface,Vector3(xs[i+1],-0.5,-0.5),Vector3(xs[i],-0.5,-0.5),Vector3(xs[i],tops[i],-0.5),Vector3(xs[i+1],tops[i+1],-0.5))
+		_add_quad(surface,d,c,Vector3(xs[i+1],tops[i+1],-0.5),Vector3(xs[i],tops[i],-0.5))
+	for i in [0,4]:
+		_add_quad(surface,Vector3(xs[i],-0.5,-0.5),Vector3(xs[i],-0.5,fronts[i]),Vector3(xs[i],tops[i],fronts[i]),Vector3(xs[i],tops[i],-0.5))
+	surface.generate_normals(); return surface.commit()
+
 func _add_quad(surface: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3) -> void:
 	_add_triangle(surface,a,b,c); _add_triangle(surface,a,c,d)
 
@@ -80,7 +100,10 @@ func put(shape: String, mat: Material, at: Vector3, size: Vector3, angle := 0.0)
 func add_mesh(mesh: Mesh, mat: Material, transform: Transform3D) -> AABB:
 	var role := str(current.get("role","terrain"))
 	var shadows := role not in ["detail","objective"] and str(current.get("kind","")) not in ["skyline","distant landscape"]
-	var key := "%d:%d:%s:%s" % [mesh.get_instance_id(),mat.get_instance_id() if mat else 0,role,shadows]
+	# The mesh and material already define a compatible static batch. Only the
+	# visibility/shadow policy needs to split it; cover and terrain can share.
+	var visibility := "scenery" if role == "scenery" else "board"
+	var key := "%d:%d:%s:%s" % [mesh.get_instance_id(),mat.get_instance_id() if mat else 0,visibility,shadows]
 	if not buckets.has(key): buckets[key] = {"mesh":mesh,"material":mat,"transforms":[],"role":role,"shadows":shadows}
 	buckets[key].transforms.append(transform)
 	var bounds := transform*mesh.get_aabb()

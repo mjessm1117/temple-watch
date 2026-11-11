@@ -50,14 +50,19 @@ static func build(art: Node3D, m: RefCounted) -> void:
 			match art.theme:
 				"jungle":
 					art.batch.put("cone",art.palette.leaves,at+offset+Vector3.UP*0.07,small,angle)
+					art.batch.put("cone",art.palette.leaves,at+Vector3(-0.18,0.09,-0.15),Vector3(0.09,0.18,0.08),angle+0.7)
+					art.batch.put("boulder",art.palette.bark,at+Vector3(0.04,0.025,-0.03),Vector3(0.22,0.05,0.17),angle)
 				"snow":
 					art.batch.put("rock",art.palette.snow,at+offset+Vector3.UP*0.035,Vector3(0.22,0.07,0.15),angle)
 				"caves":
 					art.batch.put("cone",art.palette.crystal,at+offset+Vector3.UP*0.085,Vector3(0.11,0.17,0.11),angle)
 				"plains":
 					art.batch.put("boulder",art.palette.wall,at+offset+Vector3.UP*0.055,Vector3(0.18,0.11,0.15),angle)
+					for blade in 2:
+						art.batch.put("cone",art.palette.leaves,at+Vector3(-0.20+blade*0.10,0.07,-0.18),Vector3(0.06,0.14,0.06),angle)
 				"dock","city":
 					art.batch.put("box",art.palette.metal,at+offset+Vector3.UP*0.035,Vector3(0.18,0.07,0.13),angle)
+					art.batch.put("box",art.palette.dark,at+Vector3(-0.16,0.015,-0.12),Vector3(0.26,0.03,0.07),angle+0.35)
 				_:
 					art.batch.put("boulder",art.palette.wall,at+offset+Vector3.UP*0.04,Vector3(0.16,0.08,0.13),angle)
 			art.batch.end_record()

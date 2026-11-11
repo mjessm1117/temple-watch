@@ -107,7 +107,8 @@ func run() -> void:
 	await capture("research")
 	home._close_station()
 	await create_timer(0.56).timeout
-	check(home.temple_view.camera.position.distance_to(start) < 0.6 and is_equal_approx(home.temple_view.camera.size, home.temple_view.camera_home_size), "Back restores camera with tween")
+	var framed_home: Vector3 = home.temple_view._framed_position(Vector3(0, 5.8, 0), home.temple_view.camera_home_size)
+	check(home.temple_view.camera.position.distance_to(framed_home) < 0.6 and is_equal_approx(home.temple_view.camera.size, home.temple_view.camera_home_size), "Back restores camera with tween")
 	if portrait: check(home.room_picker.visible, "Back restores portrait room list")
 	if FileAccess.file_exists(flow.save_path): DirAccess.remove_absolute(ProjectSettings.globalize_path(flow.save_path))
 	print("TEMPLE21: %d checks, %d failures at %s" % [checks, failures, size])

@@ -35,10 +35,10 @@ func run() -> void:
 		if not baseline:
 			check(root.size == size, "viewport fits %s" % size)
 			check(game.camera != null and art != null, "battle map exists")
-			check(env.fog_enabled == not low, "Low fog remains disabled")
+			check(env.fog_enabled, "cheap fog remains enabled")
 			check(env.glow_enabled == not low, "Low glow remains disabled")
 			check(env.ssao_enabled == (graphics.effective == "high"), "tier SSAO contract unchanged")
-			check(env.adjustment_enabled == not low, "color grading stays off on Low")
+			check(env.adjustment_enabled, "theme color grading remains enabled")
 			check(game.scene_view.sun.shadow_enabled == not low, "Low shadows remain disabled")
 			check(art.palette.floor.shader == TERRAIN and art.palette.wall.shader == STONE, "terrain shaders exist")
 			var selected = game.views.get(game.selected_id)

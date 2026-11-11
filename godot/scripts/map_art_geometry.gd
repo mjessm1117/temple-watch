@@ -2,10 +2,13 @@ extends RefCounted
 ## Original procedural architecture. No collision, navigation or rules live here.
 const Meshy = preload("res://scripts/meshy_theme_models.gd")
 const Shot = preload("res://scripts/shot.gd")
+const ATLAS_COLOR = preload("res://assets/maps/w23_terrain/w23_albedo.webp")
+const ATLAS_ROUGH = preload("res://assets/maps/w23_terrain/w23_roughness.webp")
 var r
 var b
 var p: Dictionary
 var theme: String
+var mapped_seen: Dictionary = {}
 
 func _init(renderer) -> void:
 	r = renderer; b = r.batch; p = r.palette; theme = r.theme
@@ -53,7 +56,10 @@ func floor_tile(m: RefCounted, tile: Vector2i) -> void:
 					var c := at+direction*(0.475-float(i)*0.05)+Vector3(0,(top-0.24)/2,0)
 					bounds = bounds.merge(put("box",mat,c,Vector3(0.6,top+0.24,0.05),angle))
 			r.floor_bounds[tile] = bounds
-	else: r.floor_bounds[tile] = put("box",mat,center,size)
+	else:
+		# A continuous top surface has no per-cell vertical slab face. The
+		# elevation boundary below supplies the only visible drop.
+		r.floor_bounds[tile] = put("terrain",mat,at+Vector3.UP*level,Vector3.ONE)
 	if m.passable(tile) and posmod(tile.x*37+tile.y*61,19) < 3:
 		at.y = level
 		b.begin_record({"tile":tile,"kind":"surface detail","floor":level,"role":"detail"})
@@ -74,8 +80,9 @@ func floor_tile(m: RefCounted, tile: Vector2i) -> void:
 		if Shot.elevation(m,tile+d) >= Shot.elevation(m,tile) or d in access: continue
 		var dir := Vector3(d.x,0,d.y); var angle := atan2(dir.x,dir.z)
 		var lower := Shot.elevation(m,tile+d)*0.7
-		put("box","ledge",at+dir*0.478+Vector3.UP*(level-0.04),Vector3(0.98,0.08,0.04),angle)
-		put("box","dark",at+dir*0.48+Vector3.UP*(level+lower-0.08)*0.5,Vector3(0.98,level-lower-0.08,0.035),angle)
+		# One low-poly uneven escarpment replaces the bright slab lip.
+		var height := level-lower
+		put("crag","dark",at+dir*0.47+Vector3.UP*(lower+height*0.5),Vector3(0.98,height,0.12),angle)
 
 func cover(m: RefCounted, tile: Vector2i) -> void:
 	var c: String = m.tile(tile)
@@ -92,9 +99,12 @@ func cover(m: RefCounted, tile: Vector2i) -> void:
 	b.begin_record({"tile":tile,"kind":c,"floor":at.y,"role":"cover"})
 	var mesh_angle := Meshy.cover_angle(m,tile,horizontal,vertical)
 	var cover_kind := "full_cover" if c == "#" else "half_cover" if c in ["c","h"] else ""
+	var family := 1+posmod(tile.x*17+tile.y*31+int(m.rng.seed)%17,2)
 	# Explicit barrel/console/rubble art remains intact.
 	var mapped := Meshy.cover_path(r.props,theme,cover_kind) if not m.spec.get("prop_overrides",{}).has(tile) else ""
-	if not mapped.is_empty() and b.pair(mapped,at,0.98,1.9 if c == "#" else 0.8,mesh_angle):
+	if not mapped.is_empty() and not mapped_seen.has(cover_kind) and b.pair(mapped,at,0.98,1.9 if c == "#" else 0.8,mesh_angle):
+		mapped_seen[cover_kind] = true
+	elif cover_kind != "" and cover_family(at,c,family,angle):
 		pass
 	elif c == "#":
 		# The same tall silhouette applies to the boundary and interior: both block LOS.
@@ -147,10 +157,44 @@ func cover(m: RefCounted, tile: Vector2i) -> void:
 			for dx in [-0.33,0.33]: put("box","trim",at+Vector3(dx,0.4,0.445).rotated(Vector3.UP,angle),Vector3(0.07,0.7,0.02),angle)
 	b.end_record()
 
+func cover_family(at: Vector3, c: String, family: int, angle: float) -> bool:
+	var full := c == "#"
+	var hard := theme in ["dock","city"]
+	var natural := theme in ["jungle","plains","snow","caves"]
+	var body := "metal" if hard else "bark" if theme == "jungle" else "wall"
+	if full:
+		if family == 1:
+			put("boulder" if theme == "plains" else "cylinder" if natural else "bevel",body,at+Vector3.UP*0.94,Vector3(0.82,1.84,0.82),angle)
+			put("boulder" if natural else "bevel","dark",at+Vector3.UP*0.10,Vector3(0.94,0.20,0.90),angle)
+			put("boulder" if natural else "bevel","ledge",at+Vector3.UP*1.84,Vector3(0.86,0.16,0.86),angle)
+		else:
+			put("boulder" if natural else "bevel",body,at+Vector3.UP*0.96,Vector3(0.96,1.92,0.90),angle)
+			put("boulder" if natural else "bevel","dark",at+Vector3(0.17,0.34,0.20).rotated(Vector3.UP,angle),Vector3(0.58,0.68,0.48),angle)
+		if theme == "jungle":
+			put("cone","leaves",at+Vector3.UP*1.77,Vector3(0.69,0.25,0.70),angle)
+	else:
+		if family == 1:
+			put("boulder" if natural else "bevel",body,at+Vector3.UP*0.40,Vector3(0.94,0.80,0.60),angle)
+			put("boulder" if natural else "bevel","dark",at+Vector3(0.21,0.10,0.19).rotated(Vector3.UP,angle),Vector3(0.48,0.20,0.35),angle)
+		else:
+			for side in [-1,1]:
+				var local := Vector3(side*0.24,0.39,0).rotated(Vector3.UP,angle)
+				put("cylinder" if natural else "bevel",body,at+local,Vector3(0.45,0.78,0.60),angle)
+			put("bevel","ledge",at+Vector3.UP*0.78,Vector3(0.94,0.04,0.64),angle)
+		if theme == "jungle":
+			put("cone","leaves",at+Vector3(0,0.73,0),Vector3(0.55,0.14,0.50),angle)
+	return true
+
 func backdrop(width: int, height: int) -> void:
 	var seed := float(posmod(hash(r.mission.spec),10000))
 	r.palette.floor.set_shader_parameter("map_seed",seed)
 	r.palette.ground.set_shader_parameter("map_seed",seed)
+	var biome := 0 if theme in ["temple","ruins"] else 1 if theme in ["jungle","plains"] else 2 if theme in ["snow","caves"] else 3
+	for material in r.palette.values():
+		if material is ShaderMaterial:
+			material.set_shader_parameter("atlas_albedo",ATLAS_COLOR)
+			material.set_shader_parameter("atlas_roughness",ATLAS_ROUGH)
+			material.set_shader_parameter("atlas_quadrant",biome)
 	preload("res://scripts/map14_detail.gd").build(r,r.mission)
 	preload("res://scripts/map_art_edges.gd").new(self).build(width,height)
 

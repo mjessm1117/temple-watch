@@ -30,6 +30,35 @@ var focused_room := ""
 var camera_tween: Tween
 var camera_home := Vector3(0, 17.3, 42)
 var camera_home_size := 21.0
+var ui_safe_rect := Rect2()
+
+func set_ui_safe_rect(rect: Rect2) -> void:
+	if ui_safe_rect == rect: return
+	ui_safe_rect = rect
+	if camera == null: return
+	if focused_room != "": focus_room(focused_room)
+	else: restore_camera()
+
+func _clear_area() -> Rect2:
+	var area := Rect2(Vector2.ZERO, size)
+	if ui_safe_rect.size.x <= 0 or ui_safe_rect.size.y <= 0: return area
+	var covered := area.intersection(ui_safe_rect)
+	if not covered.has_area(): return area
+	var strips := [Rect2(Vector2.ZERO, Vector2(size.x, covered.position.y)),
+		Rect2(Vector2(0, covered.end.y), Vector2(size.x, size.y - covered.end.y)),
+		Rect2(Vector2.ZERO, Vector2(covered.position.x, size.y)),
+		Rect2(Vector2(covered.end.x, 0), Vector2(size.x - covered.end.x, size.y))]
+	var best := Rect2()
+	for strip in strips:
+		if strip.get_area() > best.get_area(): best = strip
+	return best if best.has_area() else area
+
+func _framed_position(at: Vector3, framing_size: float) -> Vector3:
+	var area := _clear_area()
+	var center := area.get_center() / size if size.x > 0 and size.y > 0 else Vector2(0.5, 0.5)
+	var aspect := size.x / maxf(size.y, 1.0)
+	var base := Vector3(at.x, camera_home.y + (at.y - 5.8) * 0.45, camera_home.z)
+	return base - camera.global_transform.basis.x * ((center.x - 0.5) * framing_size * aspect) + camera.global_transform.basis.y * ((center.y - 0.5) * framing_size)
 
 func setup(save_state: Dictionary, room_badges: Dictionary = {}) -> void:
 	state = save_state
@@ -57,7 +86,7 @@ func setup(save_state: Dictionary, room_badges: Dictionary = {}) -> void:
 	var rim := DirectionalLight3D.new(); rim.rotation_degrees = Vector3(-15, 155, 0)
 	rim.light_color = Color("d6b68a"); rim.light_energy = 0.6; world.add_child(rim)
 	camera = Camera3D.new(); camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = 21.0 if Phone.narrow(Phone.window_size()) else 31.5; camera_home_size = camera.size
+	camera.size = (76.0 if size.x < size.y else 21.0) if Phone.narrow(Phone.window_size()) else 31.5; camera_home_size = camera.size
 	world.add_child(camera); camera.current = true
 	camera.position = camera_home; camera.look_at(Vector3(0, 5.8, 0))
 	art = Geometry.new(); galaxy = art.galaxy(world, false)
@@ -189,20 +218,26 @@ func focus_room(id: String) -> void:
 	focused_room = id
 	if camera_tween != null: camera_tween.kill()
 	var at: Vector3 = rooms[id].position
-	var target := Vector3(at.x + 4.5, camera_home.y + (at.y - 5.8) * 0.45, camera_home.z)
+	var focus_size := 15.0 if Phone.narrow(Phone.window_size()) else 14.0
+	if Phone.narrow(Phone.window_size()) and size.x > 0 and size.y > 0:
+		var area := _clear_area()
+		focus_size = maxf(maxf(focus_size, 6.0 * size.y / maxf(area.size.x, 1.0)), 3.5 * size.y / maxf(area.size.y, 1.0))
+	var target := _framed_position(at, focus_size)
+	if not Phone.narrow(Phone.window_size()) and ui_safe_rect.size == Vector2.ZERO: target.x += 4.5
 	if Prefs.get_value("motion"):
-		camera.position = target; camera.size = 14.0; return
+		camera.position = target; camera.size = focus_size; return
 	camera_tween = create_tween().set_parallel(true)
 	camera_tween.tween_property(camera, "position", target, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
-	camera_tween.tween_property(camera, "size", 14.0, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	camera_tween.tween_property(camera, "size", focus_size, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 func restore_camera() -> void:
 	focused_room = ""
 	if camera_tween != null: camera_tween.kill()
+	var home := _framed_position(Vector3(0, 5.8, 0), camera_home_size)
 	if Prefs.get_value("motion"):
-		camera.position = camera_home; camera.size = camera_home_size; return
+		camera.position = home; camera.size = camera_home_size; return
 	camera_tween = create_tween().set_parallel(true)
-	camera_tween.tween_property(camera, "position", camera_home, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	camera_tween.tween_property(camera, "position", home, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	camera_tween.tween_property(camera, "size", camera_home_size, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 func _hover(id: String) -> void:
@@ -229,7 +264,7 @@ func _process(delta: float) -> void:
 	galaxy.rotation.y = time * 0.012
 	art.animate(time)
 	if focused_room == "" and (camera_tween == null or not camera_tween.is_running()):
-		camera.position = camera_home + Vector3(sin(time * 0.12) * 0.3, sin(time * 0.16) * 0.12, 0)
+		camera.position = _framed_position(Vector3(0, 5.8, 0), camera_home_size) + Vector3(sin(time * 0.12) * 0.3, sin(time * 0.16) * 0.12, 0)
 	_project_rooms()
 
 func _project_rooms() -> void:

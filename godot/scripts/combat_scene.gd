@@ -131,6 +131,7 @@ func _refresh_figures() -> void:
 			g.figures.add_child(view)
 			var scene: PackedScene = preload("res://scripts/characters/jedi_models.gd").scene_for(u, g.model_cache[model_name])
 			view.setup(u, scene, at)
+			if view.has_method("set_saber_halo"): view.set_saber_halo(true)
 			if str(u.model) == "jedi" and scene != g.model_cache[model_name]:
 				preload("res://scripts/characters/jedi_models.gd").configure_animation(view.animation)
 			g.views[id] = view
@@ -140,6 +141,7 @@ func _refresh_figures() -> void:
 		elif g.views.has(id) and not g.playing_enemy_events and not g.player_attack_pending and g.views[id].position.distance_to(at) > 0.05 and (g.views[id].motion == null or not g.views[id].motion.is_running()):
 			g.views[id].travel([at])
 		if g.views.has(id):
+			if g.views[id].has_method("set_saber_halo"): g.views[id].set_saber_halo(true)
 			g.views[id].set_status(u)
 			g.views[id].set_downed(str(u.get("status", "ok")) == "down")
 			g.views[id].set_selected(id == g.selected_id, str(u.side) == "enemy")
@@ -160,6 +162,18 @@ func _refresh_figures() -> void:
 			var marker: MeshInstance3D = g._box(g.figures, at, Vector3(0.35, 1.0, 0.35), Color("f3d498"))
 			marker.name = "Prisoner"
 		else: g.figures.get_node("Prisoner").position = at
+	_sync_contact_pool()
+
+func _sync_contact_pool() -> void:
+	var pool := g.get_node_or_null("Cine15PropPools/LightfxContactDarkening") as MultiMeshInstance3D
+	if pool == null or pool.multimesh == null: return
+	var index := 0
+	for view in g.views.values():
+		if index >= pool.multimesh.instance_count: break
+		pool.multimesh.set_instance_transform(index, Transform3D(Basis.IDENTITY, view.position + Vector3.UP * 0.035))
+		index += 1
+	for i in range(index, pool.multimesh.instance_count):
+		pool.multimesh.set_instance_transform(i, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * 0.0001), Vector3.ZERO))
 
 func arrange_labels() -> void:
 	var placed: Array[Rect2] = []

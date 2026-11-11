@@ -23,7 +23,10 @@ func bind(original: Node3D, owner_game: Node = null) -> void:
 func changed(_child: Node) -> void: dirty = true
 
 func _process(_delta: float) -> void:
-	if is_instance_valid(game): visible = not game.cinematic
+	if is_instance_valid(game):
+		var aiming: bool = game.action not in ["move", "free", "overwatch", "hunker", "interact"]
+		var moving: bool = game.action == "move" and (game.hovered.x >= 0 or game.preview_tile.x >= 0)
+		visible = not game.cinematic and is_instance_valid(game.mission) and game.mission.phase == "player" and (moving or aiming)
 	if is_instance_valid(game) and is_instance_valid(game.mission):
 		var unit: Dictionary = game.mission.unit_by_id(game.selected_id)
 		if not unit.is_empty():

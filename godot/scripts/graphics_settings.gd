@@ -204,12 +204,12 @@ func apply_globals() -> void:
 func apply_environment(env: Environment) -> void:
 	for property in ["ssao_enabled","ssil_enabled","glow_enabled","volumetric_fog_enabled","adjustment_enabled"]:
 		var baseline = original(env,property)
-		env.set(property,baseline if (effective == "high" or property in ["glow_enabled","adjustment_enabled"] and effective == "medium") else false)
+		env.set(property,baseline if (effective == "high" or property == "adjustment_enabled" or property == "glow_enabled" and effective == "medium") else false)
 	for property in ["ssao_intensity","ssil_intensity","glow_intensity","volumetric_fog_density"]:
 		env.set(property,float(original(env,property))*(0.65 if effective == "medium" else 1.0))
 	for property in ["fog_enabled","fog_height_density"]:
 		var baseline = original(env,property)
-		env.set(property,(baseline if effective != "low" else false) if property == "fog_enabled" else float(baseline)*(1.0 if effective == "high" else 0.0))
+		env.set(property,baseline if property == "fog_enabled" else float(baseline)*(1.0 if effective == "high" else 0.55 if effective == "low" else 0.75))
 
 func apply_node(reference: WeakRef) -> void:
 	var node = reference.get_ref()

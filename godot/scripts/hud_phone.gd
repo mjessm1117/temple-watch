@@ -39,6 +39,7 @@ var odds_title: Label
 var odds_hit: Label
 var odds_modifiers: Label
 var odds_badge: Label
+var alerts: Control
 var last_threat: Dictionary = {}
 const Targeting22 = preload("res://scripts/combat_targeting.gd")
 const Threat22 = preload("res://scripts/decision22_threat.gd")
@@ -62,7 +63,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	var logical_height := float(preload("res://scripts/phone_layout.gd").logical_size(physical).y) if physical.y > 0 else float(g.get_tree().root.size.y)
 	var visual_height := 44.0 * root.size.y / maxf(1.0, logical_height)
 	var top_back := ColorRect.new(); top_back.name = "PhoneTopBackground"
-	top_back.color = Color("101b26ee"); top_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top_back.color = preload("res://scripts/campaign/ui.gd").SURFACE; top_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	preload("res://scripts/hud_phone_layout.gd").place(top_back, Rect2(0, 0, safe_size.x, visual_height))
 	overlay.add_child(top_back)
 	var strip := PanelContainer.new(); strip.name = "PhoneTopStrip"
@@ -192,13 +193,17 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	popup_body.add_theme_constant_override("separation", 8); detail_scroll.add_child(popup_body)
 	odds_plate = PanelContainer.new(); odds_plate.name = "DecisionOdds"; odds_plate.visible = false
 	odds_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var odds_style: StyleBoxFlat = night.panel_style(); odds_style.set_content_margin_all(3)
+	var odds_style: StyleBoxFlat = preload("res://scripts/campaign/ui.gd").style(preload("res://scripts/campaign/ui.gd").SURFACE_RAISED, preload("res://scripts/campaign/ui.gd").LINE); odds_style.set_content_margin_all(3)
 	odds_plate.add_theme_stylebox_override("panel", odds_style); overlay.add_child(odds_plate)
 	var odds_box := VBoxContainer.new(); odds_box.add_theme_constant_override("separation", 0); odds_plate.add_child(odds_box)
 	odds_title = night.label("", 14, Color("dbe7e4")); odds_title.name = "DecisionTarget"; odds_box.add_child(odds_title)
 	odds_hit = night.label("", 24, Color("f2d99a")); odds_hit.name = "DecisionHit"; odds_box.add_child(odds_hit)
 	odds_badge = night.label("", 14, Color("ef6a5d")); odds_badge.name = "DecisionBadge"; odds_box.add_child(odds_badge)
 	odds_modifiers = night.label("", 14, Color("dbe7e4")); odds_modifiers.name = "DecisionModifiers"; odds_modifiers.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; odds_box.add_child(odds_modifiers)
+	if safe_size.y > safe_size.x:
+		alerts = preload("res://scripts/w23_uiart_alerts.gd").new()
+		alerts.name = "PhoneAlertLayer"
+		alerts.setup(g, night, overlay)
 	root_control.resized.connect(_relayout)
 	_relayout.call_deferred()
 
@@ -224,19 +229,28 @@ func _relayout() -> void:
 	var portrait := area.y > area.x
 	threat_chip.custom_minimum_size.x = 72 if portrait else 104
 	threat_chip.text = Threat22.phone_chip(last_threat) if portrait else Threat22.chip(last_threat)
-	layout.place(odds_plate, Rect2(12, 124 if portrait else 50, minf(235.0 if portrait else 340.0, area.x - 82.0), 112 if portrait else 96))
+	layout.place(odds_plate, Rect2(12, 58 if portrait else 50, minf(170.0 if portrait else 340.0, area.x - 82.0), 78 if portrait else 96))
+	odds_title.add_theme_font_size_override("font_size", 12 if portrait else 14)
+	odds_hit.add_theme_font_size_override("font_size", 24)
+	odds_badge.visible = not portrait
+	odds_modifiers.visible = not portrait
+	if is_instance_valid(alerts): alerts.call("set_safe_area", area)
 	if g.hud_controls != null and g.hud_controls.aim_ui != null:
 		var aim = g.hud_controls.aim_ui
 		if portrait:
-			aim.odds.get_parent().custom_minimum_size.x = 96
+			aim.odds.get_parent().visible = false
 			aim.odds_detail.visible = false
 			aim.panel.anchor_left = 0.0; aim.panel.anchor_right = 1.0
 			aim.panel.offset_left = 12; aim.panel.offset_right = -12
-			aim.panel.offset_top = -110; aim.panel.offset_bottom = -12
-			aim.target_row.anchor_left = 0.0; aim.target_row.anchor_right = 1.0
-			aim.target_row.offset_left = 12; aim.target_row.offset_right = -12
-			aim.target_row.offset_top = 58; aim.target_row.offset_bottom = 114
+			aim.panel.offset_top = -72; aim.panel.offset_bottom = -8
+			aim.confirm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			aim.target_row.anchor_left = 1.0; aim.target_row.anchor_right = 1.0
+			aim.target_row.offset_left = -minf(190.0, area.x * 0.49); aim.target_row.offset_right = -12
+			aim.target_row.offset_top = 58; aim.target_row.offset_bottom = 112
+			aim.aim_momentum.visible = false
 		else:
+			aim.odds.get_parent().visible = true
+			aim.aim_momentum.visible = true
 			aim.odds.get_parent().custom_minimum_size.x = 144
 			aim.odds_detail.visible = true
 			aim.panel.anchor_left = 1.0; aim.panel.anchor_right = 1.0
@@ -319,6 +333,9 @@ func _toggle(card: String) -> void:
 
 func _show_menu() -> void:
 	open_card = "menu"; refresh()
+
+func queue_radio(speaker: String, words: String, priority: int = 1) -> void:
+	if is_instance_valid(alerts): alerts.call("queue_radio", speaker, words, priority)
 
 func _cycle_unit(direction: int) -> void:
 	var id: int = preload("res://scripts/input_controls.gd").next_squad(g.mission, g.selected_id, direction)
