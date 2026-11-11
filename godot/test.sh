@@ -110,3 +110,7 @@ run_suite hud24_test --rendering-method gl_compatibility --resolution 390x844 --
 run_suite temple25_test --rendering-method gl_compatibility --resolution 844x390; run_suite temple25_test --rendering-method gl_compatibility --resolution 390x844 -- --portrait; run_suite temple25_test --rendering-method gl_compatibility --resolution 1366x768 -- --desktop
 run_suite roster25_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite menus25_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite opening27_test
+run_suite tactics27_test
+run_suite phone27_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite impact27_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
