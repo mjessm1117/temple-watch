@@ -13,6 +13,9 @@ var hover_view24: MultiMeshInstance3D
 var hover_source24: Node3D
 var hover_dirty24 := true
 var route_markers_current24: Array = []
+var danger_view26: MultiMeshInstance3D
+var danger_tiles26: Dictionary = {}
+var danger_key26 := ""
 
 static func focus_alpha(position: Vector3, selected: Vector2i) -> float:
 	var d := Vector2(position.x-selected.x,position.z-selected.y).length()
@@ -32,6 +35,9 @@ func bind(original: Node3D, owner_game: Node = null) -> void:
 	hover_view24 = MultiMeshInstance3D.new(); hover_view24.name = "RouteBatch24"; add_child(hover_view24)
 	hover_view24.material_override = mat
 	hover_view24.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	danger_view26 = MultiMeshInstance3D.new(); danger_view26.name = "EnemySight26"; get_parent().add_child(danger_view26)
+	danger_view26.material_override = mat
+	danger_view26.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 func changed(_child: Node) -> void: dirty = true
 
@@ -45,6 +51,7 @@ func _process(_delta: float) -> void:
 		if not unit.is_empty():
 			var selected := Vector2i(int(unit.x),int(unit.y))
 			if selected != focus: focus = selected; dirty = true
+	_update_danger26()
 	style_hover()
 	_refresh_hover24()
 	update_route24()
@@ -62,7 +69,7 @@ func _process(_delta: float) -> void:
 		var transform: Transform3D = child.transform*Transform3D(Basis.from_scale(size),Vector3.ZERO)
 		mm.set_instance_transform(index,transform)
 		var tint: Color = child.material_override.albedo_color
-		tint.a = 0.12 if fill else 0.68
+		tint.a = 0.06 if fill else 0.82
 		if focus.x > -900:
 			tint.a *= focus_alpha(child.position,focus)
 		mm.set_instance_color(index,tint); index += 1
@@ -103,7 +110,10 @@ func _refresh_hover24() -> void:
 	mm.mesh = BoxMesh.new(); mm.instance_count = meshes.size() + route_markers_current24.size()
 	for i in range(meshes.size()):
 		var child: MeshInstance3D = meshes[i]
-		var transform: Transform3D = child.transform * Transform3D(Basis.from_scale(child.mesh.size), Vector3.ZERO)
+		var hover_size: Vector3 = child.mesh.size
+		if is_equal_approx(hover_size.x, 0.15) and is_equal_approx(hover_size.y, 0.06):
+			hover_size.x = 0.055; hover_size.y = 0.035
+		var transform: Transform3D = child.transform * Transform3D(Basis.from_scale(hover_size), Vector3.ZERO)
 		mm.set_instance_transform(i, transform)
 		mm.set_instance_color(i, child.material_override.albedo_color)
 	for i in range(route_markers_current24.size()):
@@ -122,7 +132,7 @@ func _hover_changed24(_node: Node) -> void:
 func update_route24() -> void:
 	if not is_instance_valid(game) or game.get("input_controls") == null or not is_instance_valid(game.mission): return
 	if move_controls24 == null and is_instance_valid(game.overlay): _build_controls24()
-	var destination: Vector2i = game.preview_tile if game.action == "move" else Vector2i(-1, -1)
+	var destination: Vector2i = (game.hovered if game.hovered.x >= 0 else game.preview_tile) if game.action == "move" else Vector2i(-1, -1)
 	var selected: int = game.selected_id
 	if move_controls24 != null:
 		move_controls24.visible = game.action == "move" and game.preview_tile.x >= 0 and not game.cinematic
@@ -142,11 +152,11 @@ func update_route24() -> void:
 		cursor = previous[cursor]
 		path.push_front(cursor)
 	var risk: Dictionary = game.mission.route_threat24(path, selected)
-	route_markers_current24 = route_markers24(risk, path)
+	route_markers_current24 = route_markers24(risk, path, danger_tiles26)
 	_refresh_hover24()
 	if game.preview_tile == destination and game.has_method("preview_route24"): game.preview_route24(path)
 
-static func route_markers24(risk: Dictionary, path: Array) -> Array:
+static func route_markers24(risk: Dictionary, path: Array, danger: Dictionary = {}) -> Array:
 	var markers: Array = []
 	for entry in risk.get("overwatch_tiles", []):
 		var tile: Vector2i = entry.get("tile", Vector2i(-1, -1)) if entry is Dictionary else entry
@@ -154,7 +164,43 @@ static func route_markers24(risk: Dictionary, path: Array) -> Array:
 	for entry in risk.get("reveal_tiles", []):
 		var tile: Vector2i = entry.get("tile", Vector2i(-1, -1)) if entry is Dictionary else entry
 		if tile in path: markers.append({"tile": tile, "color": Color("f7d66b"), "height": 0.48})
+	for tile in path:
+		if tile is Vector2i and int(danger.get(tile, 0)) > 0:
+			markers.append({"tile": tile, "color": Color(1.0, 0.48, 0.10, 0.42), "height": 0.12})
 	return markers
+
+static func danger_tiles_for26(m: RefCounted, actor: Dictionary) -> Dictionary:
+	var result := {}
+	if actor.is_empty(): return result
+	var reachable: Dictionary = m.reach_tiles(actor, mini(2, int(actor.get("ap", 0))))
+	for tile in reachable.costs:
+		if not m.in_bounds(tile): continue
+		var seen: int = int(preload("res://scripts/input_controls.gd").sight26(m, actor, tile).seen_by)
+		if seen > 0: result[tile] = seen
+	return result
+
+func _update_danger26() -> void:
+	if not is_instance_valid(game) or not is_instance_valid(game.mission) or danger_view26 == null: return
+	var actor: Dictionary = game.mission.unit_by_id(game.selected_id)
+	var active: bool = game.mission.phase == "player" and game.action == "move" and not actor.is_empty()
+	danger_view26.visible = active
+	if not active: return
+	var key := "%d:%d:%d:%d:%d" % [game.mission.turn, game.selected_id, game.mission.terrain_revision, int(actor.x), int(actor.y)]
+	for enemy in game.mission.living("enemy"):
+		key += ":%d,%d,%d,%d" % [int(enemy.id), int(enemy.x), int(enemy.y), int(bool(enemy.get("awake", false)))]
+	if key == danger_key26: return
+	danger_key26 = key
+	danger_tiles26 = danger_tiles_for26(game.mission, actor)
+	var mm := MultiMesh.new(); mm.transform_format = MultiMesh.TRANSFORM_3D; mm.use_colors = true
+	mm.mesh = BoxMesh.new(); mm.instance_count = danger_tiles26.size()
+	var i := 0
+	for tile in danger_tiles26:
+		var at := Vector3(tile.x, preload("res://scripts/shot.gd").elevation(game.mission, tile) * 0.7 + 0.105, tile.y)
+		mm.set_instance_transform(i, Transform3D(Basis.from_scale(Vector3(0.79, 0.018, 0.79)), at))
+		mm.set_instance_color(i, Color(1.0, 0.19, 0.15, 0.12))
+		i += 1
+	danger_view26.multimesh = mm
+	if route_destination24.x >= 0: route_destination24 = Vector2i(-999, -999)
 
 func _build_controls24() -> void:
 	move_controls24 = preload("res://scripts/w24_command_move_controls.gd").new()
