@@ -140,21 +140,29 @@ func update_route24() -> void:
 	route_destination24 = destination; route_unit24 = selected
 	route_markers_current24.clear()
 	hover_dirty24 = true
-	if destination.x < 0 or not game.mission.has_method("route_threat24"): return
+	if destination.x < 0 or not game.mission.has_method("decision_preview27"): return
 	var actor: Dictionary = game.mission.unit_by_id(selected)
 	if actor.is_empty(): return
-	var decision: Dictionary = preload("res://scripts/input_controls.gd").move_preview(game.mission, actor, destination)
-	if decision.is_empty(): return
-	var previous: Dictionary = decision.get("prev", {})
-	var path: Array = [destination]
-	var cursor := destination
-	while previous.has(cursor):
-		cursor = previous[cursor]
-		path.push_front(cursor)
-	var risk: Dictionary = game.mission.route_threat24(path, selected)
-	route_markers_current24 = route_markers24(risk, path, danger_tiles26)
+	var decision: Dictionary = game.hud_controls.move_tactical27 if game.hud_controls.move_destination == destination else game.mission.decision_preview27(selected, destination)
+	var path: Array = decision.get("path", [])
+	if path.is_empty(): return
+	route_markers_current24 = route_markers27(decision.get("events", []))
 	_refresh_hover24()
 	if game.preview_tile == destination and game.has_method("preview_route24"): game.preview_route24(path)
+
+static func route_markers27(events: Array) -> Array:
+	var markers: Array = []
+	var first_overwatch := -1
+	for i in range(events.size()):
+		if str(events[i].get("kind", "")) == "overwatch": first_overwatch = i; break
+	for i in range(events.size()):
+		var event: Dictionary = events[i]
+		var kind := str(event.get("kind", ""))
+		var color := Color("ff655a") if kind in ["overwatch", "flank"] else Color("f7d66b")
+		markers.append({"tile":event.tile, "color":color, "height":0.18 if i == 0 or i == first_overwatch else 0.48})
+		if i == first_overwatch and event.get("source") is Vector2i:
+			markers.append({"tile":event.source, "color":Color("ff655a"), "height":0.48})
+	return markers
 
 static func route_markers24(risk: Dictionary, path: Array, danger: Dictionary = {}) -> Array:
 	var markers: Array = []
@@ -180,27 +188,7 @@ static func danger_tiles_for26(m: RefCounted, actor: Dictionary) -> Dictionary:
 	return result
 
 func _update_danger26() -> void:
-	if not is_instance_valid(game) or not is_instance_valid(game.mission) or danger_view26 == null: return
-	var actor: Dictionary = game.mission.unit_by_id(game.selected_id)
-	var active: bool = game.mission.phase == "player" and game.action == "move" and not actor.is_empty()
-	danger_view26.visible = active
-	if not active: return
-	var key := "%d:%d:%d:%d:%d" % [game.mission.turn, game.selected_id, game.mission.terrain_revision, int(actor.x), int(actor.y)]
-	for enemy in game.mission.living("enemy"):
-		key += ":%d,%d,%d,%d" % [int(enemy.id), int(enemy.x), int(enemy.y), int(bool(enemy.get("awake", false)))]
-	if key == danger_key26: return
-	danger_key26 = key
-	danger_tiles26 = danger_tiles_for26(game.mission, actor)
-	var mm := MultiMesh.new(); mm.transform_format = MultiMesh.TRANSFORM_3D; mm.use_colors = true
-	mm.mesh = BoxMesh.new(); mm.instance_count = danger_tiles26.size()
-	var i := 0
-	for tile in danger_tiles26:
-		var at := Vector3(tile.x, preload("res://scripts/shot.gd").elevation(game.mission, tile) * 0.7 + 0.105, tile.y)
-		mm.set_instance_transform(i, Transform3D(Basis.from_scale(Vector3(0.79, 0.018, 0.79)), at))
-		mm.set_instance_color(i, Color(1.0, 0.19, 0.15, 0.12))
-		i += 1
-	danger_view26.multimesh = mm
-	if route_destination24.x >= 0: route_destination24 = Vector2i(-999, -999)
+	if danger_view26 != null: danger_view26.visible = false
 
 func _build_controls24() -> void:
 	move_controls24 = preload("res://scripts/w24_command_move_controls.gd").new()

@@ -112,7 +112,10 @@ static func scamper(m: RefCounted, e: Dictionary) -> void:
 
 static func _reason24(m: RefCounted, first: int, actor: Dictionary, reason: String) -> void:
 	for i in range(first, m.action_events.size()):
-		if int(m.action_events[i].get("actor", -1)) == int(actor.id): m.action_events[i].reason24 = reason
+		if int(m.action_events[i].get("actor", -1)) != int(actor.id): continue
+		m.action_events[i].reason24 = reason
+		if m.has_method("intent_explain27"):
+			m.action_events[i].reason27 = m.intent_explain27(m.action_events[i])
 
 static func _shot24(m: RefCounted, e: Dictionary, target: Dictionary, mode: String, info: Dictionary = {}) -> bool:
 	var first: int = m.action_events.size()
@@ -123,7 +126,16 @@ static func _shot24(m: RefCounted, e: Dictionary, target: Dictionary, mode: Stri
 static func _move24(m: RefCounted, e: Dictionary, destination: Vector2i, reason: String) -> bool:
 	var first: int = m.action_events.size()
 	var ok: bool = m.move(int(e.id), destination)
-	if ok: _reason24(m, first, e, reason)
+	if ok:
+		for target in m.living("player"):
+			var info: Dictionary = Shot.calculate(m, e, target)
+			if not bool(info.los) or not bool(info.range_ok) or not bool(info.flanked): continue
+			for i in range(first, m.action_events.size()):
+				if int(m.action_events[i].get("actor", -1)) == int(e.id) and str(m.action_events[i].get("kind", "")) == "move":
+					m.action_events[i].target = int(target.id)
+					m.action_events[i].flanked = true
+			break
+		_reason24(m, first, e, reason)
 	return ok
 
 static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> void:
@@ -185,5 +197,7 @@ static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> void:
 				return
 	if not is_melee(e) and int(e.ap) > 0:
 		e.ap = 0; e.overwatch = true
-		m.action_events.append({"kind": "overwatch", "actor": int(e.id), "at": Shot.pos(e), "reason24":"No clear shot"})
+		var event := {"kind": "overwatch", "actor": int(e.id), "at": Shot.pos(e), "reason24":"No clear shot"}
+		if m.has_method("intent_explain27"): event.reason27 = m.intent_explain27(event)
+		m.action_events.append(event)
 		m.message("%s watches a firing lane." % e.name)
