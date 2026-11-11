@@ -34,6 +34,13 @@ func apply_environment(world: WorldEnvironment, key: DirectionalLight3D, theme_n
 	env.fog_density = float(preset.fog_density)
 	env.fog_height_density = float(preset.height)
 	env.fog_aerial_perspective = 0.28
+	if graphics_low(key):
+		var grade: Dictionary = Presets.low_grade(theme_name)
+		env.ambient_light_color = grade.ambient
+		env.adjustment_contrast = grade.contrast
+		env.adjustment_saturation = grade.saturation
+		env.fog_density = grade.density
+		env.fog_height_density = grade.height
 	world.environment = env
 	key.light_color = Color(preset.sun)
 	key.light_energy = float(preset.sun_power) * 1.13
@@ -52,6 +59,10 @@ func apply_environment(world: WorldEnvironment, key: DirectionalLight3D, theme_n
 		env.adjustment_contrast = 1.20
 	_apply_mood(key, theme_name, preset)
 
+func graphics_low(key: DirectionalLight3D) -> bool:
+	var graphics := key.get_node_or_null("/root/Graphics")
+	return graphics != null and str(graphics.effective) == "low"
+
 func _apply_mood(key: DirectionalLight3D, theme_name: String, preset: Dictionary) -> void:
 	var game := key.get_parent() as Node3D
 	if game == null or game.get("mission") == null: return
@@ -68,20 +79,40 @@ func _apply_mood(key: DirectionalLight3D, theme_name: String, preset: Dictionary
 		pools.add_child(fill)
 	var squad: Array[Dictionary] = game.mission.living("player")
 	var anchor := Vector2(float(squad[0].x), float(squad[0].y)) if not squad.is_empty() else Vector2(float(game.mission.spec.width) * 0.5, float(game.mission.spec.height) * 0.5)
-	for offset in [Vector2(-2.0, -2.0), Vector2(3.0, 1.0)]:
+	var anchor_tile := Vector2i(roundi(anchor.x), roundi(anchor.y))
+	var ambient = preload("res://scripts/w23_lightfx_ambient.gd").new()
+	ambient.configure(theme_name, Vector2(minf(float(game.mission.spec.width), 12.0), minf(float(game.mission.spec.height), 12.0)), low,
+		Vector3(anchor.x, Shot.elevation(game.mission, anchor_tile) * 0.7, anchor.y))
+	pools.add_child(ambient)
+	var contact_pool: MultiMeshInstance3D
+	if low:
+		contact_pool = MultiMeshInstance3D.new(); contact_pool.name = "LightfxContactDarkening"
+		var plane := PlaneMesh.new(); plane.size = Vector2(1.35, 1.35)
+		var mat := StandardMaterial3D.new(); mat.albedo_color = Color("101018", 0.30)
+		mat.albedo_texture = _pool_texture(); mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+		plane.material = mat
+		var instances := MultiMesh.new(); instances.transform_format = MultiMesh.TRANSFORM_3D
+		instances.instance_count = 12; instances.mesh = plane
+		contact_pool.multimesh = instances; contact_pool.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		pools.add_child(contact_pool)
+		for i in 12:
+			contact_pool.multimesh.set_instance_transform(i, Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * 0.0001), Vector3.ZERO))
+		var contact_index := 0
+		for unit in game.mission.units:
+			if contact_index >= 12: break
+			if int(unit.hp) <= 0 or str(unit.side) == "enemy" and not bool(unit.awake) and not bool(unit.get("spotted", false)): continue
+			var tile := Vector2i(int(unit.x), int(unit.y))
+			var at := Vector3(float(tile.x), Shot.elevation(game.mission, tile) * 0.7 + 0.035, float(tile.y))
+			contact_pool.multimesh.set_instance_transform(contact_index, Transform3D(Basis.IDENTITY, at))
+			contact_index += 1
+	var offsets := [Vector2(-2.0, -2.0), Vector2(3.0, 1.0)]
+	for index in offsets.size():
+		var offset: Vector2 = offsets[index]
 		var tile := Vector2i(clampi(roundi(anchor.x + offset.x), 1, int(game.mission.spec.width) - 2), clampi(roundi(anchor.y + offset.y), 1, int(game.mission.spec.height) - 2))
 		var at := Vector3(float(tile.x), Shot.elevation(game.mission, tile) * 0.7 + 0.16, float(tile.y))
-		if low:
-			var disc := MeshInstance3D.new(); disc.name = "Cine15EmissivePool"
-			var mesh := PlaneMesh.new(); mesh.size = Vector2(2.9, 2.9)
-			disc.mesh = mesh; disc.position = at
-			var mat := StandardMaterial3D.new(); mat.albedo_color = Color(tint, 0.82)
-			mat.albedo_texture = _pool_texture()
-			mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-			mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-			mat.emission_enabled = true; mat.emission = tint; mat.emission_energy_multiplier = 1.1
-			disc.material_override = mat; pools.add_child(disc)
-		else:
+		if not low:
 			var lamp := OmniLight3D.new(); lamp.name = "Cine15PropLamp"
 			lamp.position = at + Vector3.UP * 2.1; lamp.light_color = tint
 			lamp.light_energy = 1.05; lamp.omni_range = 4.2; lamp.shadow_enabled = false

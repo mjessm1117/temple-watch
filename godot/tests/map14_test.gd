@@ -65,7 +65,7 @@ func run() -> void:
 				check(view.size == size, "%s: viewport size %s expected %s" % [theme,view.size,size])
 				check(art.theme == theme and art.floor_bounds.size() == int(m.spec.width)*int(m.spec.height), "%s: map complete" % theme)
 				check(art.find_children("*","CollisionObject3D",true,false).is_empty(), "%s: no detail collision" % theme)
-				check(world.environment.fog_enabled == not low and world.environment.glow_enabled == not low, "%s: Low effects" % theme)
+				check(world.environment.fog_enabled and world.environment.glow_enabled == not low, "%s: Low effects" % theme)
 				check(sun.shadow_enabled == not low, "%s: Low shadows" % theme)
 				check(art.get_node_or_null("Map14SurfaceMarks") is MeshInstance3D, "%s: vertex marks" % theme)
 				check(art.palette.floor.get_shader_parameter("map_seed") == float(posmod(hash(m.spec),10000)), "%s: per-map surface seed" % theme)

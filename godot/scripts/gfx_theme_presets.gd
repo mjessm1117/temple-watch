@@ -13,3 +13,18 @@ const PRESETS := {
 
 static func get_preset(theme: String) -> Dictionary:
 	return PRESETS.get(theme,PRESETS.temple)
+
+static func low_grade(theme: String) -> Dictionary:
+	# Compatibility uses inexpensive distance/height fog and a distinct ambient value.
+	var preset := get_preset(theme)
+	return {"fog": Color(preset.fog), "density": minf(float(preset.fog_density) * 0.62, 0.006),
+		"height": minf(float(preset.height) * 0.24, 0.008),
+		"ambient": Color(preset.ambient).darkened(0.12),
+		"contrast": 1.12 if theme in ["temple", "ruins", "city"] else 1.08,
+		"saturation": 0.88 if theme in ["temple", "ruins", "city"] else 0.94}
+
+static func motes(theme: String) -> Dictionary:
+	if theme in ["city", "dock", "temple", "ruins", "caves"]:
+		return {"color": Color("dba76b") if theme != "caves" else Color("92c9e6"), "rise": 0.22}
+	if theme == "snow": return {"color": Color("dceeff"), "rise": -0.10}
+	return {"color": Color("c4d3a0"), "rise": 0.04}

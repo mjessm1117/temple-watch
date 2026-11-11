@@ -26,7 +26,7 @@ func run() -> void:
 		check(env.ssao_enabled == (graphics.effective == "high"),"SSAO "+theme)
 		check(env.glow_enabled == (graphics.effective != "low"),"glow "+theme)
 		check(not env.volumetric_fog_enabled,"height fog path "+theme)
-		check(env.fog_enabled == (graphics.effective != "low"),"fog tier "+theme)
+		check(env.fog_enabled,"cheap fog tier "+theme)
 		check(game.scene_view.sun.shadow_enabled == (graphics.effective != "low"),"shadows "+theme)
 		for unit in game.views.values():
 			var meshes: Array[Node] = unit.model.find_children("*","MeshInstance3D",true,false)
