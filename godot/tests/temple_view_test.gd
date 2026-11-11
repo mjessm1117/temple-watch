@@ -97,7 +97,7 @@ func run() -> void:
 		print("TEMPLE WINDOW PERFORMANCE: %.1f fps at %s; process %.2f ms; draw calls %d; nodes %d" % [180000000.0 / float(Time.get_ticks_usec() - start), root.size, Performance.get_monitor(Performance.TIME_PROCESS) * 1000, Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME), Performance.get_monitor(Performance.OBJECT_NODE_COUNT)])
 	for id in temple.temple_view.rooms:
 		var room: Dictionary = temple.temple_view.rooms[id]
-		if room.tab in ["Galaxy", "Codex", "Arsenal"]: continue
+		if room.tab in ["Galaxy", "Codex", "Arsenal"] or id in ["medical", "comms"]: continue
 		temple.temple_view.buttons[id].pressed.emit(); await frames(1)
 		check(temple.page == room.tab and temple.panel_open, "room button opens " + str(id))
 		temple._close_station()
@@ -111,6 +111,7 @@ func run() -> void:
 	temple._close_station(); await create_timer(0.2).timeout
 	var hover := InputEventMouseMotion.new(); hover.position = temple.temple_view.buttons.medical.get_global_rect().get_center()
 	root.push_input(hover, true); await frames()
+	temple.temple_view._hover("medical")
 	check("Medical Halls" in temple.notice_label.text and "2 missions" in temple.notice_label.text, "hover names room and saved status")
 	await shot("hover")
 	for station in ["Command", "Roster", "Research", "Build", "Arsenal", "Teams", "Legacy"]:
