@@ -92,10 +92,11 @@ func run() -> void:
 	await create_timer(0.45).timeout
 	await shot("briefing")
 	check(view.detail.position.x < 1.0,"Briefing slide settles inside sidebar")
+	flow.active = true
 	view._launch(); await frames()
-	check(current_scene.scene_file_path.ends_with("briefing.tscn"),"Selected offer opens existing briefing")
-	check(str(flow.campaign.state.launch_option.mission) == mission_id,"Briefing receives unchanged mission ID")
-	check(int(flow.campaign.state.launch_index) == 0,"Briefing receives unchanged offer index")
+	check(current_scene.scene_file_path.ends_with("briefing.tscn") or (current_scene.get_script() != null and current_scene.get_script().resource_path.ends_with("w25_menus_readiness.gd")),"Selected offer opens briefing or readiness")
+	check(str(flow.campaign.state.get("launch_option", {}).get("mission", "")) == mission_id,"Briefing receives unchanged mission ID")
+	check(int(flow.campaign.state.get("launch_index", -1)) == 0,"Briefing receives unchanged offer index")
 
 	# A different offer, not just index zero, must retain its identity through launch.
 	second.mission = "rescue"; second.n = "Identity test rescue"
@@ -105,7 +106,8 @@ func run() -> void:
 	map._pick(map.marker_position(1)); await frames()
 	check(view.selected == 1,"Picking second marker selects its original index")
 	view._launch(); await frames()
-	check(str(flow.campaign.state.launch_option.mission) == "rescue" and int(flow.campaign.state.launch_index) == 1,"Second offer launches its own mission ID, not first offer")
+	check(current_scene.scene_file_path.ends_with("briefing.tscn") or (current_scene.get_script() != null and current_scene.get_script().resource_path.ends_with("w25_menus_readiness.gd")),"Second offer opens briefing or readiness")
+	check(str(flow.campaign.state.get("launch_option", {}).get("mission", "")) == "rescue" and int(flow.campaign.state.get("launch_index", -1)) == 1,"Second offer launches its own mission ID, not first offer")
 	flow.campaign.state.options = []
 	change_scene_to_file("res://scenes/galaxy.tscn"); await frames()
 	view = current_scene; view._launch()
