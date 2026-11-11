@@ -1,6 +1,6 @@
 extends Node3D
 signal battle_event(kind: String, actor_id: String, target_id: String, context: Dictionary)
-
+signal input_busy_changed24(busy: bool)
 const Mission = preload("res://scripts/combat_mission.gd")
 const Shot = preload("res://scripts/shot.gd")
 const UnitView = preload("res://scripts/unit_view.gd")
@@ -14,6 +14,7 @@ const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 const Ability = preload("res://scripts/abilities_engine.gd")
 const BattleCamera = preload("res://scripts/battle11_camera.gd")
 const FeelEvents = preload("res://scripts/feelcam22_events.gd")
+const FeelBeats24 = preload("res://scripts/w24_feelcam_beats.gd")
 var animate_headless := false
 var cam = preload("res://scripts/cam_combat.gd").new()
 var scene_view = preload("res://scripts/combat_scene.gd").new()
@@ -76,11 +77,17 @@ var quiet_targets: Dictionary = {}
 var last_reveal_group := -999
 var villain_seen := false
 var villain_retreat_seen := false
-
+var camera_drag_serial24 := 0
+var camera_sensitivity24 := 1.0
+var clutch_turn24 := -1
+var _reported_busy24 := false
 func _ready() -> void:
 	scene_view.g = self
 	cam.g = self
 	add_child(cam)
+	var controls24 := ConfigFile.new()
+	if controls24.load("user://controls24.cfg") == OK:
+		camera_sensitivity24 = clampf(float(controls24.get_value("controls", "cam_sensitivity", 1.0)), 0.5, 2.0)
 	var flow := get_node("/root/CampaignFlow")
 	mission = Mission.adopt(flow.create_battle(7), flow.campaign.state if flow.active and flow.campaign != null else {})
 	if mission.modern:
@@ -118,47 +125,34 @@ func _ready() -> void:
 	else:
 		for arg in OS.get_cmdline_user_args():
 			if arg.begins_with("--capture="): _capture.call_deferred(arg.trim_prefix("--capture="))
-
 func _capture(path: String, frames: int = 2) -> void:
 	for i in range(frames): await get_tree().process_frame
 	var image := get_viewport().get_texture().get_image()
 	var error := image.save_png(path)
 	print("SCREENSHOT: %s (%s)" % [path, "ok" if error == OK else "error %d" % error])
 	get_tree().quit(0 if error == OK else 1)
-
 func _setup_scene() -> void:
 	scene_view._setup_scene()
-
 func _load_models() -> void:
 	scene_view._load_models()
-
 func _mat(color: Color, transparent: bool = false) -> StandardMaterial3D:
 	return scene_view._mat(color, transparent)
-
 func _box(parent: Node3D, at: Vector3, size: Vector3, color: Color) -> MeshInstance3D:
 	return scene_view._box(parent, at, size, color)
-
 func _instance_model(parent: Node3D, key: String, at: Vector3, scale_value: float) -> bool:
 	return scene_view._instance_model(parent, key, at, scale_value)
-
 func _build_terrain() -> void:
 	scene_view._build_terrain()
-
 func _sync_terrain() -> void:
 	scene_view._sync_terrain()
-
 func _clear(node: Node) -> void:
 	scene_view._clear(node)
-
 func _refresh_figures() -> void:
 	scene_view._refresh_figures()
-
 func _refresh_highlights(force: bool = false) -> void:
 	hud_controls._refresh_highlights(force)
-
 func _build_ui() -> void:
 	hud_controls._build_ui()
-
 func _choose_action(mode: String) -> void:
 	if player_attack_pending or playing_enemy_events or mission.phase != "player" or mission.result != "": return
 	if mode != "move" and mission.ability_reason(selected_id, mode) != "":
@@ -185,7 +179,6 @@ func _choose_action(mode: String) -> void:
 		_cycle_target(1)
 	sound.play("click")
 	_refresh()
-
 func _use_ability(id: int = -1, tile: Vector2i = Vector2i(-1, -1)) -> void:
 	if player_attack_pending or playing_enemy_events: return
 	var actor: Dictionary = mission.unit_by_id(selected_id)
@@ -204,6 +197,19 @@ func _use_ability(id: int = -1, tile: Vector2i = Vector2i(-1, -1)) -> void:
 	var before: Dictionary = {}
 	for u in mission.units: before[int(u.id)] = int(u.hp)
 	if mission.use_ability(selected_id, ability_id, id, tile):
+		if str(def.effect) == "leap":
+			var leap_start := from
+			var leap_end := to
+			for leap_event in mission.action_events:
+				if str(leap_event.get("kind", "")) != "leap": continue
+				var s: Variant = leap_event.get("start", leap_event.get("leap_start", Vector2i(roundi(from.x), roundi(from.z))))
+				var e: Variant = leap_event.get("end", leap_event.get("leap_end", tile))
+				if s is Vector2i: leap_start = Vector3(s.x, Shot.elevation(mission, s) * 0.7, s.y)
+				elif s is Vector3: leap_start = s
+				if e is Vector2i: leap_end = Vector3(e.x, Shot.elevation(mission, e) * 0.7, e.y)
+				elif e is Vector3: leap_end = e
+				break
+			await FeelBeats24.leap(self, selected_id, leap_start, leap_end)
 		if str(def.effect) in ["blast", "wave", "collapse"] and sound.has_method("cue"): sound.cue("blast")
 		if views.has(selected_id): views[selected_id].act("reload" if ability_id == "reload" else "cast")
 		fx.ability(ability_id, from + Vector3.UP, to + Vector3.UP)
@@ -230,7 +236,6 @@ func _use_ability(id: int = -1, tile: Vector2i = Vector2i(-1, -1)) -> void:
 	phase_banner.visible = false
 	_after_action()
 	_refresh()
-
 func _select(id: int) -> void:
 	if player_attack_pending or playing_enemy_events: return
 	if selected_id == id and target_id < 0: return
@@ -246,7 +251,6 @@ func _select(id: int) -> void:
 	if mission.identity != null: mission.identity.voice(mission,u,"select")
 	if not u.is_empty(): _glide_to(BattleCamera.phone_focus(Vector3(int(u.x), 0, int(u.y)),yaw,1.55), 0.35, BattleCamera.selected_zoom(mission))
 	_refresh()
-
 func _after_action() -> void:
 	preview_tile = Vector2i(-1, -1)
 	target_id = -1
@@ -257,7 +261,6 @@ func _after_action() -> void:
 	if RescueSettings.battle_value("auto_select") and not current.is_empty():
 		var next_id: int = InputControls.next_squad(mission, selected_id, 1, true)
 		if next_id >= 0 and next_id != selected_id: _select.call_deferred(next_id)
-
 func _cycle_target(direction: int) -> void:
 	var options: Array[Dictionary] = InputControls.valid_targets(mission, mission.unit_by_id(selected_id), action)
 	if options.is_empty():
@@ -272,7 +275,6 @@ func _cycle_target(direction: int) -> void:
 	_frame_target()
 	_refresh_highlights()
 	_show_shot()
-
 func _frame_target() -> void:
 	var actor: Dictionary = mission.unit_by_id(selected_id)
 	var target: Dictionary = mission.unit_by_id(target_id)
@@ -281,7 +283,6 @@ func _frame_target() -> void:
 	midpoint = preload("res://scripts/battle12_aim.gd").phone_frame_point(self, midpoint)
 	var framing_zoom: float = BattleCamera.target_zoom(mission, Vector2(float(actor.x), float(actor.y)).distance_to(Vector2(float(target.x), float(target.y))))
 	_glide_to(midpoint, 0.38, preload("res://scripts/battle12_aim.gd").frame_zoom(self, framing_zoom))
-
 func _cancel_order() -> void:
 	target_id = -1
 	preview_tile = Vector2i(-1, -1)
@@ -289,13 +290,12 @@ func _cancel_order() -> void:
 	end_turn_armed = false
 	warning_label.text = ""
 	_refresh()
-
 func _recenter() -> void:
 	var unit: Dictionary = mission.unit_by_id(selected_id)
 	if unit.is_empty(): return
 	_glide_to(BattleCamera.phone_focus(Vector3(unit.x, 0, unit.y),yaw,1.55), 0.35, BattleCamera.selected_zoom(mission))
-
 func _glide_to(point: Vector3, seconds: float, target_zoom: float = -1.0) -> void:
+	if cam.has_method("cancel_return24"): cam.cancel_return24(false)
 	if Prefs.get_value("motion"):
 		pivot = point
 		if target_zoom > 0.0: zoom = target_zoom
@@ -308,8 +308,24 @@ func _glide_to(point: Vector3, seconds: float, target_zoom: float = -1.0) -> voi
 	if target_zoom > 0.0: camera_tween.tween_property(self, "zoom", target_zoom, seconds).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	camera_tween.tween_callback(_update_camera)
 	set_process(true)
-
+func cancel_camera_glide24() -> void:
+	camera_drag_serial24 += 1
+	if camera_tween != null and camera_tween.is_running(): camera_tween.kill()
+	if cam.has_method("cancel_return24"): cam.cancel_return24(true)
+func is_input_busy24() -> bool:
+	return player_attack_pending or playing_enemy_events or (cinematic and not cam.preview_active)
+func _sync_input_busy24() -> void:
+	var busy := is_input_busy24()
+	if busy == _reported_busy24: return
+	_reported_busy24 = busy
+	input_busy_changed24.emit(busy)
+func preview_route24(path: Array) -> void:
+	if path.size() < 4 or is_input_busy24(): return
+	var last: Variant = path.back()
+	var end := Vector3(last.x, 0.0, last.y) if last is Vector2i or last is Vector2 else Vector3(last.x, 0.0, last.z) if last is Vector3 else pivot
+	_glide_to(pivot.lerp(end, 0.22), 0.22)
 func _process(_delta: float) -> void:
+	_sync_input_busy24()
 	if mission != null:
 		scene_view.arrange_labels()
 		if preload("res://scripts/phone_layout.gd").narrow(get_tree().root.size):
@@ -340,17 +356,12 @@ func _process(_delta: float) -> void:
 		if camera_tween != null and camera_tween.is_running(): camera_tween.kill()
 		var right := Vector3(camera.global_basis.x.x, 0, camera.global_basis.x.z).normalized()
 		var forward := Vector3(-camera.global_basis.z.x, 0, -camera.global_basis.z.z).normalized()
-		pivot += (right * direction.x + forward * direction.y).normalized() * zoom * 0.6 * _delta
+		pivot += (right * direction.x + forward * direction.y).normalized() * zoom * 0.6 * camera_sensitivity24 * _delta
 		_update_camera()
-
 func _action_cam(actor: Node3D, target: Node3D) -> void:
 	if actor != null and target != null: await cam.frame(actor.position, target.position)
-
-
 func _skip_cinematic() -> void:
 	cam.skip()
-
-
 func _shake(power: float) -> void:
 	if Prefs.get_value("motion"): return
 	var original := camera.position
@@ -358,7 +369,6 @@ func _shake(power: float) -> void:
 	for i in range(4):
 		tween.tween_property(camera, "position", original + Vector3(randf_range(-power, power), randf_range(-power, power), 0), 0.035)
 	tween.tween_property(camera, "position", original, 0.08)
-
 func _move_selected(dest: Vector2i) -> void:
 	if player_attack_pending or playing_enemy_events: return
 	var u: Dictionary = mission.unit_by_id(selected_id)
@@ -414,7 +424,6 @@ func _move_selected(dest: Vector2i) -> void:
 	if int(u.get("hp", 0)) > 0: _glide_to(BattleCamera.phone_focus(Vector3(u.x, 0, u.y), yaw, 1.55), 0.35, BattleCamera.selected_zoom(mission))
 	_after_action()
 	_refresh()
-
 func _attack(id: int, mode: String) -> void:
 	if player_attack_pending or playing_enemy_events: return
 	var actor: Dictionary = mission.unit_by_id(selected_id)
@@ -441,20 +450,19 @@ func _attack(id: int, mode: String) -> void:
 		killed_shot = bool(event.get("killed", false))
 		await AttackPresentation.play(self, event)
 	await EnemyPresentation.drain(self)
-	cam.finish()
+	var ready_focus := Vector3.INF
 	if killed_shot:
 		var ready_id: int = InputControls.next_squad(mission, selected_id, 1, true)
 		if ready_id >= 0:
 			var ready: Dictionary = mission.unit_by_id(ready_id)
-			pivot = BattleCamera.phone_focus(Vector3(ready.x, 0, ready.y), yaw, 1.55)
-			_update_camera()
+			ready_focus = BattleCamera.phone_focus(Vector3(ready.x, 0, ready.y), yaw, 1.55)
+	cam.finish(ready_focus)
+	await cam.await_return24()
 	player_attack_pending = false
 	mission.presentation_active = false
 	phase_banner.visible = false
 	_after_action()
 	_refresh()
-
-
 func _request_end_turn() -> void:
 	if player_attack_pending or playing_enemy_events or mission.result != "" or mission.phase != "player": return
 	var ready := 0
@@ -467,7 +475,6 @@ func _request_end_turn() -> void:
 	end_turn_armed = false
 	warning_label.text = ""
 	_end_turn()
-
 func _end_turn() -> void:
 	if playing_enemy_events or player_attack_pending or mission.result != "": return
 	# --- wave10 story ---
@@ -487,7 +494,6 @@ func _end_turn() -> void:
 	await preload("res://scripts/combat_turns.gd").play(self)
 	_face_battle_front()
 	_recenter()
-
 func cue_story(kind: String, world_pos: Vector3) -> void:
 	if kind not in ["focus", "villain", "reveal"] or player_attack_pending: return
 	if playing_enemy_events:
@@ -497,15 +503,12 @@ func cue_story(kind: String, world_pos: Vector3) -> void:
 	cam.skip_requested = false
 	_glide_to(BattleCamera.phone_focus(world_pos, yaw, 1.55), 0.24)
 	await cam.wait(0.36)
-
 func _face_battle_front() -> void:
 	var wanted: float = BattleCamera.battle_heading(mission)
 	var turn: float = wrapf(wanted - yaw, -PI, PI)
 	if absf(turn) >= PI / 4.0 - 0.001:
 		yaw += turn
 		_update_camera()
-
-
 func _demo(kind: String) -> void:
 	demo_mode = true
 	var path := ""
@@ -550,25 +553,21 @@ func _demo(kind: String) -> void:
 	if path != "":
 		await get_tree().create_timer(0.18).timeout
 		_capture(path, 1)
-
 func _refresh() -> void:
 	get_node("/root/CampaignFlow").battle_refresh(self)
 	_sync_terrain()
 	reinforcement_view.show_tile(mission.reinforcement_marker, mission)
 	hud_controls._refresh()
-
 func _show_shot() -> void:
 	hud_controls._show_shot()
-
 func _update_camera() -> void:
 	pitch = clampf(pitch, 0.6, 1.4)
-	zoom = clampf(zoom, 6.0, 65.0)
+	zoom = BattleCamera.clamp_zoom(zoom)
 	if mission != null: pivot = BattleCamera.clamp_pivot(mission, pivot)
 	var direction := Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
 	camera.position = pivot + direction * zoom
 	if mission != null: camera.position = BattleCamera.safe_position(mission, camera.position)
 	camera.look_at(pivot, Vector3.UP)
-
 func _screen_tile(screen: Vector2) -> Vector2i:
 	var origin := camera.project_ray_origin(screen)
 	var dir := camera.project_ray_normal(screen)
@@ -580,20 +579,21 @@ func _screen_tile(screen: Vector2) -> Vector2i:
 		var p := Vector2i(roundi(point.x), roundi(point.z))
 		if mission.in_bounds(p) and abs(Shot.elevation(mission, p) * 0.7 + 0.1 - height) < 0.15: return p
 	return Vector2i(-1, -1)
-
 func _rotate_camera(amount: float) -> void:
 	if camera_tween != null and camera_tween.is_running(): camera_tween.kill()
 	camera_tween = create_tween()
 	camera_tween.tween_property(self, "yaw", yaw + amount, 0.28).set_trans(Tween.TRANS_SINE)
-
 func _skip_activity() -> void:
 	cam.skip()
 	if camera_tween != null and camera_tween.is_running(): camera_tween.kill()
-
-
 func _unhandled_input(event: InputEvent) -> void:
 	if player_attack_pending or playing_enemy_events:
 		if event is InputEventKey and event.pressed and event.keycode in [KEY_SPACE, KEY_ESCAPE, KEY_ENTER]: _skip_activity()
 		elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT: _skip_activity()
+		return
+	if event is InputEventMouseMotion and drag_button == MOUSE_BUTTON_RIGHT:
+		var scaled: InputEventMouseMotion = event.duplicate()
+		scaled.relative *= camera_sensitivity24
+		input_controls.handle_event(scaled)
 		return
 	input_controls.handle_event(event)

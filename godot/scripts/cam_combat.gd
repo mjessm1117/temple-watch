@@ -5,6 +5,7 @@ const BLEND := 0.20
 const REPEAT_BLEND := 0.12
 const PLAYER_SHOT_BLEND := 0.42
 const AIM_BLEND := 0.28
+const RETURN_BLEND24 := 0.28
 const TACTICAL_V_OFFSET := -0.5
 var g
 var skip_requested := false
@@ -16,6 +17,10 @@ var preview_actor := -1
 var preview_target := -1
 var preview_tween: Tween
 var beat_tween: Tween
+var return_tween24: Tween
+var safe_rect24 := Rect2()
+var frame_drag_serial24 := 0
+var return_fov24 := 45.0
 var preview_hidden: Array[Node3D] = []
 var preview_fov := 45.0
 var preview_shoulder: Node3D
@@ -26,6 +31,28 @@ var last_frame_at := -10.0
 
 func _ready() -> void:
 	touch.g = g
+
+func set_battle_safe_rect24(rect: Rect2) -> void:
+	safe_rect24 = rect
+
+func cancel_return24(manual: bool = false) -> void:
+	if return_tween24 != null and return_tween24.is_running():
+		return_tween24.kill()
+		g.cinematic = false
+		g.camera.fov = return_fov24
+		g.camera.v_offset = TACTICAL_V_OFFSET
+		g._update_camera()
+	if manual:
+		if g.action_tween != null and g.action_tween.is_running(): g.action_tween.kill()
+		if beat_tween != null and beat_tween.is_running(): beat_tween.kill()
+		if preview_tween != null and preview_tween.is_running(): preview_tween.kill()
+		g.cinematic = false
+		g.camera.fov = return_fov24
+		g.camera.v_offset = TACTICAL_V_OFFSET
+
+func await_return24() -> void:
+	while return_tween24 != null and return_tween24.is_running() and is_instance_valid(g) and g.is_inside_tree():
+		await g.get_tree().process_frame
 
 func _process(_delta: float) -> void:
 	if g == null or g.camera == null or g.cinematic or preview_active: return
@@ -107,11 +134,12 @@ func preview(actor: Dictionary, target: Dictionary) -> void:
 	if preview_tween != null and preview_tween.is_running(): preview_tween.kill()
 	var origin := Vector3(float(actor.x), Shot.elevation(g.mission, Shot.pos(actor)) * 0.7, float(actor.y))
 	var destination := Vector3(float(target.x), Shot.elevation(g.mission, Shot.pos(target)) * 0.7, float(target.y))
-	var shoulder := aim_shoulder(g.mission, origin, destination, phone, g.get_viewport().get_visible_rect().size)
+	var shoulder := aim_shoulder(g.mission, origin, destination, phone, g.get_viewport().get_visible_rect().size, safe_rect24)
 	var view_direction := destination - shoulder
 	view_direction.y = 0.0
 	var screen_right := view_direction.normalized().cross(Vector3.UP)
 	var look := destination + screen_right * (0.75 if phone else 0.0) + Vector3.UP * 1.25
+	look = safe_look24(shoulder, look, destination + Vector3.UP * 1.25, g.get_viewport().get_visible_rect().size, 58.0 if phone else 52.0, safe_rect24)
 	g.cinematic = true
 	preview_tween = g.create_tween().set_parallel(true)
 	preview_tween.tween_property(g.camera, "position", shoulder, AIM_BLEND).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
@@ -129,7 +157,27 @@ static func aim_screen_point(eye: Vector3, look: Vector3, target: Vector3, viewp
 	var aspect := viewport.x / maxf(1.0, viewport.y)
 	return Vector2(0.5 + delta.dot(right) / (2.0 * depth * scale * aspect), 0.5 - delta.dot(up) / (2.0 * depth * scale))
 
-static func aim_shoulder(m: RefCounted, origin: Vector3, destination: Vector3, phone: bool = false, viewport: Vector2 = Vector2(844, 390)) -> Vector3:
+static func safe_look24(eye: Vector3, look: Vector3, target: Vector3, viewport: Vector2, fov: float, rect: Rect2) -> Vector3:
+	if not rect.has_area(): return look
+	var screen := aim_screen_point(eye, look, target, viewport, fov) * viewport
+	if not rect.has_point(screen): return look
+	var margin := 10.0
+	var candidates := [Vector2(rect.position.x - margin, screen.y), Vector2(rect.end.x + margin, screen.y), Vector2(screen.x, rect.position.y - margin), Vector2(screen.x, rect.end.y + margin)]
+	var best := screen
+	var distance := INF
+	for point in candidates:
+		if point.x < margin or point.y < margin or point.x > viewport.x - margin or point.y > viewport.y - margin: continue
+		if screen.distance_squared_to(point) < distance: best = point; distance = screen.distance_squared_to(point)
+	if distance == INF: return look
+	var forward := (look - eye).normalized()
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	var depth := maxf(0.01, (target - eye).dot(forward))
+	var world_per_pixel := 2.0 * depth * tan(deg_to_rad(fov) * 0.5) / maxf(1.0, viewport.y)
+	var shift: Vector2 = best - screen
+	return look - right * shift.x * world_per_pixel + up * shift.y * world_per_pixel
+
+static func aim_shoulder(m: RefCounted, origin: Vector3, destination: Vector3, phone: bool = false, viewport: Vector2 = Vector2(844, 390), safe_rect: Rect2 = Rect2()) -> Vector3:
 	var forward := destination - origin
 	forward.y = 0.0
 	if forward.length_squared() < 0.01: forward = Vector3.FORWARD
@@ -148,10 +196,14 @@ static func aim_shoulder(m: RefCounted, origin: Vector3, destination: Vector3, p
 					var direction := destination - eye; direction.y = 0.0
 					var screen_right := direction.normalized().cross(Vector3.UP)
 					var look := destination + screen_right * (0.75 if phone else 0.0) + Vector3.UP * 1.25
+					look = safe_look24(eye, look, target, viewport, 58.0 if phone else 52.0, safe_rect)
 					var screen := aim_screen_point(eye, look, target, viewport, 58.0 if phone else 52.0)
 					var source_screen := aim_screen_point(eye, look, origin + Vector3.UP * 1.18, viewport, 58.0 if phone else 52.0)
 					var separation := Vector2((screen.x - source_screen.x) * viewport.x, (screen.y - source_screen.y) * viewport.y).length()
 					var score := -absf(screen.x - 0.53) * 8.0 - absf(screen.y - 0.43) * 8.0
+					if safe_rect.has_area():
+						if safe_rect.has_point(screen * viewport): score -= 40.0
+						if safe_rect.has_point(source_screen * viewport): score -= 40.0
 					if phone and (screen.x < 0.38 or screen.x > 0.70 or screen.y < 0.20 or screen.y > 0.63): score -= 20.0
 					if separation < 40.0: score -= 10.0
 					score += minf(separation, 100.0) * 0.06
@@ -211,6 +263,7 @@ func _clear_preview_visuals() -> void:
 func impact_beat(point: Vector3) -> void:
 	if skip_requested or not g.action_camera: return
 	if beat_tween != null and beat_tween.is_running(): beat_tween.kill()
+	var drag_serial: int = g.camera_drag_serial24
 	var original_fov: float = g.camera.fov
 	beat_tween = g.create_tween()
 	beat_tween.tween_property(g.camera, "fov", maxf(42.0, original_fov - 5.0), 0.06)
@@ -218,11 +271,12 @@ func impact_beat(point: Vector3) -> void:
 	beat_tween.tween_property(g.camera, "fov", original_fov, 0.06)
 	await wait(0.18)
 	if beat_tween != null and beat_tween.is_running(): beat_tween.kill()
-	g.camera.fov = original_fov
+	if drag_serial == g.camera_drag_serial24: g.camera.fov = original_fov
 
 func frame(from: Vector3, to: Vector3, style: String = "shoot") -> void:
+	if return_tween24 != null and return_tween24.is_running(): return_tween24.kill()
 	_clear_preview_visuals()
-	if preview_active: g.camera.fov = preview_fov
+	if preview_active: g.camera.fov = preview_fov; return_fov24 = preview_fov
 	if not g.action_camera or skip_requested: return
 	g.camera.v_offset = 0.0
 	if preview_tween != null and preview_tween.is_running(): preview_tween.kill()
@@ -232,7 +286,9 @@ func frame(from: Vector3, to: Vector3, style: String = "shoot") -> void:
 	if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
 	if g.action_tween != null and g.action_tween.is_running(): g.action_tween.kill()
 	if not g.cinematic: return_pivot = g.pivot
+	if not g.cinematic: return_fov24 = g.camera.fov
 	g.cinematic = true
+	frame_drag_serial24 = g.camera_drag_serial24
 	trace.append("camera_start")
 	var direction := to - from; direction.y = 0
 	if direction.length_squared() < 0.01: direction = Vector3.FORWARD
@@ -246,6 +302,11 @@ func frame(from: Vector3, to: Vector3, style: String = "shoot") -> void:
 	if style in ["push", "pull", "force", "reveal"]:
 		shoulder = from.lerp(to, 0.4) + side * maxf(4.0, from.distance_to(to) * 0.8) + Vector3.UP * 3.4
 		look = from.lerp(to, 0.5) + Vector3.UP
+	if safe_rect24.has_area() and style in ["shoot", "strike"]:
+		var viewport: Vector2 = g.get_viewport().get_visible_rect().size
+		shoulder = aim_shoulder(g.mission, from, to, viewport.x < viewport.y, viewport, safe_rect24)
+		look = to + Vector3.UP * 1.25
+		look = safe_look24(shoulder, look, to + Vector3.UP * 1.25, viewport, 58.0 if viewport.x < viewport.y else 52.0, safe_rect24)
 	shoulder = preload("res://scripts/battle11_camera.gd").safe_position(g.mission, shoulder)
 	var initial_look: Vector3 = g.camera.position - g.camera.global_basis.z * 8.0
 	g.action_tween = g.create_tween().set_parallel(true).set_speed_scale(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if g.playing_enemy_events else 1.0))
@@ -254,7 +315,7 @@ func frame(from: Vector3, to: Vector3, style: String = "shoot") -> void:
 	g.action_tween.tween_property(g.camera, "position", shoulder, duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	g.action_tween.tween_method(func(value: Vector3): g.camera.look_at(value, Vector3.UP), initial_look, look, duration)
 	await wait(duration)
-	if not skip_requested:
+	if not skip_requested and frame_drag_serial24 == g.camera_drag_serial24:
 		g.camera.position = shoulder; g.camera.look_at(look, Vector3.UP)
 	trace.append("camera_ready")
 
@@ -264,11 +325,34 @@ func skip() -> void:
 	if beat_tween != null and beat_tween.is_running(): beat_tween.kill()
 	finish()
 
-func finish() -> void:
+func finish(target_pivot: Vector3 = Vector3.INF) -> void:
 	if preview_active: end_preview(); return
 	if beat_tween != null and beat_tween.is_running(): beat_tween.kill()
 	if g.action_tween != null and g.action_tween.is_running(): g.action_tween.kill()
-	if g.cinematic: g.pivot = return_pivot
-	g.cinematic = false
-	g.camera.v_offset = TACTICAL_V_OFFSET
+	if frame_drag_serial24 != g.camera_drag_serial24:
+		g.cinematic = false
+		return
+	if not g.cinematic: return
+	if return_tween24 != null and return_tween24.is_running(): return_tween24.kill()
+	var start: Transform3D = g.camera.transform
+	var start_fov: float = g.camera.fov
+	var start_offset: float = g.camera.v_offset
+	g.pivot = target_pivot if target_pivot.is_finite() else return_pivot
 	g._update_camera()
+	var goal: Transform3D = g.camera.transform
+	var goal_fov: float = return_fov24
+	g.camera.transform = start
+	g.camera.fov = start_fov
+	g.camera.v_offset = start_offset
+	var duration := 0.0 if skip_requested else RETURN_BLEND24
+	if duration <= 0.0:
+		g.camera.transform = goal; g.camera.fov = goal_fov; g.camera.v_offset = TACTICAL_V_OFFSET; g.cinematic = false
+		return
+	return_tween24 = g.create_tween().set_parallel(true)
+	return_tween24.tween_property(g.camera, "transform", goal, duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	return_tween24.tween_property(g.camera, "fov", goal_fov, duration)
+	return_tween24.tween_property(g.camera, "v_offset", TACTICAL_V_OFFSET, duration)
+	return_tween24.chain().tween_callback(func() -> void:
+		g.cinematic = false
+		g._update_camera()
+		trace.append("camera_return24"))
