@@ -77,7 +77,7 @@ func _build() -> void:
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 	var wash := ColorRect.new()
-	wash.color = Color(0.02,0.05,0.06,0.4 if mode == "codex" else 0.78)
+	wash.color = Color(0.02,0.05,0.06,0.36 if mode == "codex" else 0.66)
 	wash.mouse_filter = MOUSE_FILTER_IGNORE
 	wash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(wash)
@@ -103,7 +103,7 @@ func _build() -> void:
 func _header(title: String, detail: String) -> void:
 	var head := HBoxContainer.new()
 	body.add_child(head)
-	head.add_child(UI.icon("holocron",32))
+	head.add_child(UI.icon("holocron", UI.ICON_LARGE, UI.GOLD))
 	var mark := UI.label(title,18 if Phone.narrow(Phone.window_size()) else 24,UI.ACCENT)
 	mark.size_flags_horizontal = SIZE_EXPAND_FILL
 	head.add_child(mark)
@@ -150,8 +150,14 @@ func _build_story() -> void:
 			visual.add_child(UI.label(str(engine.mission(scene_data.get("id","")).get("where",scene_data.get("eyebrow","TARGET PROJECTION"))).to_upper(),14,UI.ACCENT))
 			big_speaker_portrait = _portrait(visual,speaker,1.0,Vector2(290,180))
 		visual.add_child(UI.label("TEMPLE RECORD\nJEDI ARCHIVE · SQUAD 06" if kind == "scene11" else "SECURE TRANSMISSION\nJEDI ARCHIVE · CHANNEL 06",12,UI.MUTED))
-	var frame := UI.panel(Color(0.04,0.075,0.085,0.96))
+	var frame := UI.panel(Color("152b35dd") if phone else UI.SURFACE_RAISED)
+	var frame_style: StyleBoxFlat = UI.style(Color("152b35dd") if phone else UI.SURFACE_RAISED, UI.LINE)
+	frame_style.set_content_margin_all(14)
+	frame.add_theme_stylebox_override("panel", frame_style)
 	frame.size_flags_horizontal = SIZE_EXPAND_FILL
+	if phone:
+		frame.size_flags_vertical = SIZE_SHRINK_BEGIN
+		frame.custom_minimum_size.y = minf(500.0, get_viewport_rect().size.y * 0.62)
 	row.add_child(frame)
 	var content := UI.column(8 if phone else 12)
 	content.size_flags_horizontal = SIZE_EXPAND_FILL
@@ -169,7 +175,7 @@ func _build_story() -> void:
 	speaking.add_theme_constant_override("separation",12)
 	content.add_child(speaking)
 	if phone:
-		speaker_portrait = Portraits14.picture(speaker,Vector2(44,54))
+		speaker_portrait = Portraits14.picture(speaker,Vector2(60,70))
 		speaking.add_child(speaker_portrait)
 	speaker_plate = UI.label("SPEAKER  " + speaker.to_upper(),14,UI.ACCENT)
 	speaker_plate.size_flags_horizontal = SIZE_EXPAND_FILL
@@ -183,7 +189,7 @@ func _build_story() -> void:
 	fast.custom_minimum_size = Vector2(72,44)
 	speaking.add_child(fast)
 	content.add_child(UI.label(str(scene_data.get("eyebrow","TEMPLE")).to_upper(),14,UI.GOLD))
-	content.add_child(UI.label(scene_data.get("title","The Temple"),23 if phone else 32,UI.ACCENT))
+	content.add_child(UI.label(scene_data.get("title","The Temple"),23 if phone else 32,UI.GOLD))
 	dialogue_lines = PackedStringArray()
 	for source_line in str(scene_data.get("text","")).split("\n",false):
 		for passage in Paging.pages(source_line): dialogue_lines.append(passage)
@@ -240,7 +246,7 @@ func _build_story() -> void:
 	foot.add_child(vision)
 
 func _portrait(parent: Node, caption: String, facing: float, dimensions: Vector2) -> TextureRect:
-	var frame := UI.panel()
+	var frame := UI.panel(UI.SURFACE_RAISED)
 	frame.size_flags_horizontal = SIZE_EXPAND_FILL
 	parent.add_child(frame)
 	var column := UI.column(6)
@@ -403,7 +409,7 @@ func _build_codex() -> void:
 		button.toggle_mode = true
 		button.button_pressed = category == codex_category
 		tabs.add_child(button)
-	var panel := UI.panel(Color(0.04,0.075,0.085,0.88))
+	var panel := UI.panel(UI.SURFACE_RAISED)
 	panel.size_flags_vertical = SIZE_EXPAND_FILL
 	body.add_child(panel)
 	var scroll := preload("res://scripts/touch_scroll.gd").new()

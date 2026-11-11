@@ -84,7 +84,7 @@ func _ready() -> void:
 	for r in c.state.roster: _portrait(r)
 	_make_audio()
 	resized.connect(_layout)
-	_refresh(); _layout()
+	_refresh(); _layout(); _layout.call_deferred()
 	if from_temple and focus_index >= 0: inspect(focus_index)
 
 func _build_stage() -> void:
@@ -103,9 +103,15 @@ func _build_header() -> void:
 	if not compact: title.add_child(UI.label("Choose up to %d. Equip for the mission. Bring everyone home." % capacity, 13, S.MUTED))
 	var info := S.column(5); row.add_child(info)
 	resources = UI.label("", 14, S.GOLD); resources.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; info.add_child(resources)
+	if compact:
+		resources.reparent(title)
+		resources.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		row.remove_child(info)
+		info.free()
+		header.add_theme_stylebox_override("panel", S.box(S.PANEL, S.EDGE, 4))
 	var option: Dictionary = flow.session().state.get("launch_option", {})
 	var mission := str(option.get("n", option.get("mission", "Detention Line"))).to_upper().replace("_", " ")
-	if not from_temple: info.add_child(UI.label("OPERATION  /  " + mission, 14 if compact else 16, S.CYAN))
+	if not from_temple and not compact: info.add_child(UI.label("OPERATION  /  " + mission, 16, S.CYAN))
 	var mission_id := str(option.get("mission", "rescue"))
 	var hint := "Select a soldier to inspect gear or swap with the roster."
 	if preload("res://scripts/campaign/battle_bridge.gd").map_path(mission_id).ends_with("rescue.json") and mission_id != "rescue":
@@ -147,19 +153,19 @@ func _layout() -> void:
 		skill_confirm.position = Vector2(safe.x + 9, safe.y + 60); skill_confirm.size = Vector2(110, 44)
 		footer_bg.position = Vector2(0, size.y - safe.w - 70); footer_bg.size = Vector2(size.x, 70)
 		header.position = Vector2(safe.x + 6, safe.y + 5)
-		header.size = Vector2(size.x - safe.x - safe.z - 12, 56)
+		header.size = Vector2(size.x - safe.x - safe.z - 12, 64)
 		_footer_rect(12 + safe.x, -66 - safe.w, -12 - safe.w)
 		if focus_index >= 0:
 			stage_container.custom_minimum_size.y = 0
 			if size.x < 500:
 				stage_container.position = Vector2(0, safe.y)
-				stage_container.size = Vector2(size.x, 220)
+				stage_container.size = Vector2(size.x, 184)
 				stage.camera.keep_aspect = Camera3D.KEEP_HEIGHT
-				stage.camera.fov = 34.0
+				stage.camera.fov = 30.0
 				card_scroll.visible = false
 				card_scroll.process_mode = Node.PROCESS_MODE_DISABLED
-				drawer.position = Vector2(safe.x + 12, safe.y + 228)
-				drawer.size = Vector2(size.x - safe.x - safe.z - 24, size.y - safe.y - safe.w - 310)
+				drawer.position = Vector2(safe.x + 12, safe.y + 192)
+				drawer.size = Vector2(size.x - safe.x - safe.z - 24, size.y - safe.y - safe.w - 274)
 			else:
 				stage_container.position = Vector2(0, safe.y + 4)
 				stage_container.size = Vector2(168, size.y - safe.y - safe.w - 120)
@@ -260,8 +266,12 @@ func _refresh() -> void:
 	stage.show_squad(roster); stage.focus_slot(focus_index)
 	UI.ensure_phone_type(stage)
 	counter.text = "%d / %d IN SQUAD" % [selected.size(), capacity] if from_temple else "%d / %d READY FOR DEPLOYMENT" % [selected.size(), capacity]
+	if Phone.narrow(Phone.window_size()):
+		counter.text = "%d/%d SQUAD" % [selected.size(), capacity] if from_temple else "%d/%d READY" % [selected.size(), capacity]
+		counter.autowrap_mode = TextServer.AUTOWRAP_OFF
 	deploy.disabled = not preload("res://scripts/campaign/strat_deployment.gd").validate(c, selected, c.state.get("launch_option",{}))
 	resources.text = "%d Cr   /   %d Intel   /   %d Kyber" % [c.state.res.credits, c.state.res.intel, c.state.res.kyber]
+	if Phone.narrow(Phone.window_size()): resources.text = "Cr %d  ·  Intel %d  ·  Ky %d" % [c.state.res.credits, c.state.res.intel, c.state.res.kyber]
 	if focus_index >= selected.size(): focus_index = -1
 	if focus_index >= 0: _build_drawer()
 	_layout()
