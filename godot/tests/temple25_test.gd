@@ -77,13 +77,21 @@ func run() -> void:
 	await capture("after-archives-%dx%d" % [size.x, size.y])
 	home._close_station(); await create_timer(0.2).timeout
 	stage.buttons["medical"].pressed.emit()
-	check(home.page == "Roster" and home.selected_room == "medical", "medical fallback opens roster")
+	var medical_screen: Control = current_scene
+	check(medical_screen != null and medical_screen.get("temple_focus") == "medical" and medical_screen.get("temple_soldier_id") == home.selected_id, "medical opens focused squad screen")
 	check("1 wounded" in W25UI.medical_status(c) and "3 days" in W25UI.medical_status(c), "medical count and accurate return ETA")
 	await create_timer(0.8).timeout
 	await capture("after-medical-%dx%d" % [size.x, size.y])
 	check(home.room_story_attempted.has("medical"), "room story attempted once")
+	current_scene = null
+	if medical_screen != null: medical_screen.queue_free()
+	await process_frame
 	stage.buttons["medical"].pressed.emit()
 	check(home.room_story_attempted.size() == 2, "repeat room tap does not repeat story")
+	medical_screen = current_scene
+	current_scene = null
+	if medical_screen != null: medical_screen.queue_free()
+	await process_frame
 	home._close_station(); await create_timer(0.2).timeout
 	stage.buttons["u0"].pressed.emit()
 	check(home.selected_room == "u0" and home.build_slot == "u0" and stage.highlighted_room == "u0", "sealed bay selected and highlighted")

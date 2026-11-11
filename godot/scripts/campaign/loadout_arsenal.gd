@@ -219,7 +219,7 @@ func _slot(key: String, title: String, value: String, mark: int, icon: String) -
 		var full_width := ThemeDB.fallback_font.get_string_size(display_value, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
 		item_label.text = display_value if full_width <= item_label.size.x else display_value.get_slice(" ", 0)
 	b.resized.connect(fit_item)
-	fit_item.call_deferred()
+	fit_item.call()
 
 	b.add_child(item_label)
 	var tier := UI.label("Mk " + _mark(mark), 14, _tier_color(mark))
