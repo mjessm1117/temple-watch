@@ -4,6 +4,9 @@ const Progression = preload("res://scripts/campaign/progression.gd")
 const Classes = preload("res://scripts/class_registry.gd")
 const Base = preload("res://scripts/campaign/strat_base.gd")
 
+static func patient_actions25(c, soldier_id: String) -> Array:
+	return load("res://scripts/w25_roster_people.gd").patient_actions(c, soldier_id)
+
 static func ensure(s: Dictionary) -> void:
 	if not s.has("strategy"): s.strategy = {}
 	var defaults := {"squad_upgrades":0, "team_deployed":[], "projects":[], "project":{}, "training":{}, "edict":[], "edict_month":0, "votes":{}, "support":[], "support_used":{}, "loyalty":60}

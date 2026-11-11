@@ -10,8 +10,10 @@ const JediModels = preload("res://scripts/characters/jedi_models.gd")
 const StoryPortraits = preload("res://scripts/story14_portraits.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
+const People25 = preload("res://scripts/w25_roster_people.gd")
 var from_temple := false
 var temple_soldier_id := ""
+var temple_focus := ""
 var capacity := 5
 var flow: Node
 var selected: Array = []
@@ -44,15 +46,35 @@ var compact_layout := false
 var armory_skills := false
 var armory_slot := ""
 
-static func open_from_temple(tree: SceneTree, soldier_id := "") -> Control:
+static func open_from_temple(tree: SceneTree, focus: String = "", soldier_id: String = "") -> Control:
 	var screen: Control = load("res://scenes/squad.tscn").instantiate()
 	screen.from_temple = true
-	screen.temple_soldier_id = soldier_id
+	screen.temple_focus = focus if focus in ["medical", "loadout"] else "loadout"
+	screen.temple_soldier_id = soldier_id if soldier_id != "" else "" if focus in ["medical", "loadout"] else focus
 	var previous := tree.current_scene
 	tree.root.add_child(screen)
 	tree.current_scene = screen
 	if previous != null and previous != screen: previous.queue_free()
 	return screen
+
+func patient_actions25(soldier_id: String) -> Array:
+	return People25.patient_actions(flow.session(), soldier_id)
+
+func loadout_delta25(soldier_id: String, item_id: Variant) -> Array:
+	return People25.delta(flow.session(), soldier_id, item_id)
+
+func apply_patient_action25(soldier_id: String, action: String) -> bool:
+	if not People25.apply_patient(flow.session(), soldier_id, action): return false
+	flow.save()
+	if focus_index >= 0: _build_drawer()
+	return true
+
+func best_ready_fill25() -> void:
+	selected = People25.best_ready(flow.session(), capacity)
+	focus_index = -1
+	drawer.hide()
+	_persist_selection()
+	_refresh()
 
 func _ready() -> void:
 	flow = get_node("/root/CampaignFlow")
@@ -72,6 +94,14 @@ func _ready() -> void:
 		focus_index = selected.find(temple_soldier_id)
 		c.state.armory_selected_id = temple_soldier_id
 		flow.save()
+	if from_temple and temple_focus == "medical":
+		for r in c.state.roster:
+			if int(r.get("wound", 0)) > 0:
+				if not selected.has(r.id):
+					if selected.is_empty(): selected.append(r.id)
+					else: selected[0] = r.id
+				focus_index = selected.find(r.id)
+				break
 	var bg := ColorRect.new(); bg.color = S.BG; bg.set_anchors_and_offsets_preset(PRESET_FULL_RECT); add_child(bg)
 	_build_stage(); _build_header(); _build_footer()
 	swap_button = S.button("SWAP", _tab.bind("roster")); add_child(swap_button); wire_button(swap_button)
@@ -85,7 +115,9 @@ func _ready() -> void:
 	_make_audio()
 	resized.connect(_layout)
 	_refresh(); _layout(); _layout.call_deferred()
-	if from_temple and focus_index >= 0: inspect(focus_index)
+	if from_temple and focus_index >= 0:
+		inspect(focus_index)
+		if temple_focus == "medical": _tab("medical")
 
 func _build_stage() -> void:
 	stage_container = SubViewportContainer.new(); stage_container.stretch = true
@@ -100,9 +132,10 @@ func _build_header() -> void:
 	var title := S.column(3); title.size_flags_horizontal = SIZE_EXPAND_FILL; row.add_child(title)
 	if not compact: title.add_child(UI.label("JEDI TEMPLE  /  HANGAR 07  /  %s" % ("ARMORY" if from_temple else "DEPLOYMENT"), 14, S.CYAN))
 	title.add_child(UI.label("TEMPLE ARMORY" if from_temple else "SQUAD LOADOUT", 20 if compact else 32))
-	if not compact: title.add_child(UI.label("Choose up to %d. Equip for the mission. Bring everyone home." % capacity, 13, S.MUTED))
+	if not compact: title.add_child(UI.label("Choose up to %d. Equip for the mission. Bring everyone home." % capacity, 14, S.MUTED))
 	var info := S.column(5); row.add_child(info)
 	resources = UI.label("", 14, S.GOLD); resources.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; info.add_child(resources)
+	if not compact: resources.custom_minimum_size.x = 300
 	if compact:
 		resources.reparent(title)
 		resources.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -116,7 +149,7 @@ func _build_header() -> void:
 	var hint := "Select a soldier to inspect gear or swap with the roster."
 	if preload("res://scripts/campaign/battle_bridge.gd").map_path(mission_id).ends_with("rescue.json") and mission_id != "rescue":
 		hint = "Battlefield: Detention Line · free Mira and reach evacuation."
-	if not compact: info.add_child(UI.label(hint, 12, S.MUTED))
+	if not compact: info.add_child(UI.label(hint, 14, S.MUTED))
 
 func _build_footer() -> void:
 	footer_bg = ColorRect.new(); footer_bg.color = S.BG; footer_bg.mouse_filter = MOUSE_FILTER_IGNORE; footer_bg.z_index = 10; add_child(footer_bg)
@@ -126,7 +159,7 @@ func _build_footer() -> void:
 		else: flow.back_from_squad()); footer.add_child(back); wire_button(back)
 	var text := S.column(2); text.size_flags_horizontal = SIZE_EXPAND_FILL; footer.add_child(text)
 	counter = UI.label("", 17, S.CYAN); text.add_child(counter)
-	notice = UI.label("Tap a soldier to inspect" if Phone.touch_device() else "Click a soldier to inspect  ·  Esc returns to the lineup", 12, S.MUTED); text.add_child(notice)
+	notice = UI.label("Tap a soldier to inspect" if Phone.touch_device() else "Click a soldier to inspect  ·  Esc returns to the lineup", 14, S.MUTED); text.add_child(notice)
 	if Phone.narrow(Phone.window_size()): notice.hide()
 	deploy = S.button("DEPLOY >" if Phone.touch_device() else "DEPLOY →", _deploy); deploy.custom_minimum_size = Vector2(210, 48)
 	if Phone.narrow(Phone.window_size()): deploy.custom_minimum_size = Vector2(100, 56)
@@ -159,22 +192,23 @@ func _layout() -> void:
 			stage_container.custom_minimum_size.y = 0
 			if size.x < 500:
 				stage_container.position = Vector2(0, safe.y)
-				stage_container.size = Vector2(size.x, 184)
+				stage_container.size = Vector2(size.x, maxf(184.0, size.y * 0.45) if from_temple else 184.0)
 				stage.camera.keep_aspect = Camera3D.KEEP_HEIGHT
 				stage.camera.fov = 30.0
 				card_scroll.visible = false
 				card_scroll.process_mode = Node.PROCESS_MODE_DISABLED
-				drawer.position = Vector2(safe.x + 12, safe.y + 192)
-				drawer.size = Vector2(size.x - safe.x - safe.z - 24, size.y - safe.y - safe.w - 274)
+				drawer.position = Vector2(safe.x + 12, safe.y + stage_container.size.y + 8)
+				drawer.size = Vector2(size.x - safe.x - safe.z - 24, size.y - safe.y - safe.w - stage_container.size.y - 90)
 			else:
 				stage_container.position = Vector2(0, safe.y + 4)
-				stage_container.size = Vector2(168, size.y - safe.y - safe.w - 120)
+				stage_container.size = Vector2(249.0 if Phone.window_size().x <= 900 else 168.0, size.y - safe.y - safe.w - 120.0)
+				stage.camera.v_offset = -0.5 if Phone.window_size().x <= 900 else 0.0
 				card_scroll.visible = true
 				card_scroll.process_mode = Node.PROCESS_MODE_INHERIT
 				card_scroll.position = Vector2(safe.x + 6, size.y - safe.w - 117)
 				card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, 86)
-				drawer.position = Vector2(174, safe.y + 4)
-				drawer.size = Vector2(size.x - safe.z - 180, size.y - safe.y - safe.w - 78)
+				drawer.position = Vector2(stage_container.size.x + 6, safe.y + 4)
+				drawer.size = Vector2(size.x - safe.z - stage_container.size.x - 12, size.y - safe.y - safe.w - 74)
 		else:
 			stage_container.position = Vector2(0, 64)
 			stage_container.custom_minimum_size.y = 0
@@ -309,20 +343,16 @@ func _build_drawer() -> void:
 	var r: Dictionary = flow.session().soldier(str(selected[focus_index]))
 	var compact := Phone.narrow(Phone.window_size())
 	if not compact:
-		var top := HBoxContainer.new(); drawer_content.add_child(top)
-		var title := UI.label(str(r.n), 22); title.size_flags_horizontal = SIZE_EXPAND_FILL; top.add_child(title)
-		top.add_child(UI.label("%d Cr · %d Ky" % [flow.session().state.res.credits, flow.session().state.res.kyber], 11, S.GOLD))
-		var close := S.button("×", close_inspector); close.custom_minimum_size = Vector2(44, 44)
-		close.tooltip_text = "Return to lineup" if Phone.touch_device() else "Return to lineup (Esc)"; top.add_child(close); wire_button(close)
+		drawer_content.add_child(UI.label(str(r.n), 22))
 	var stats := Gear.battle_stats(flow.session(), str(r.id))
 	var tabs := HBoxContainer.new(); tabs.add_theme_constant_override("separation", 8 if compact else 4); drawer_content.add_child(tabs)
-	for tab in ["arsenal", "skills"]:
-		var label := "ROSTER" if tab == "roster" else "SKILLS" if tab == "skills" else "GEAR"
-		var b := S.button(label, _tab_armory_skills if tab == "skills" else _tab.bind(tab)); b.size_flags_horizontal = SIZE_EXPAND_FILL
+	for tab in (["arsenal", "roster", "medical", "skills"] if from_temple else ["arsenal", "skills"]):
+		var label: String = ({"arsenal":"GEAR", "roster":"TEAM", "medical":"CARE", "skills":"SKILL"} if compact else {"arsenal":"GEAR", "roster":"SQUAD", "medical":"MEDICAL", "skills":"SKILLS"})[tab]
+		var b := S.button(label, _tab_armory_skills if tab == "skills" else _tab.bind(tab)); b.size_flags_horizontal = SIZE_SHRINK_BEGIN
 		b.custom_minimum_size.y = 44
 		b.modulate = S.CYAN if (tab == "skills" and armory_skills) or (drawer_tab == tab and not armory_skills) else Color.WHITE
 		tabs.add_child(b); wire_button(b)
-	if compact:
+	if not compact or size.x >= 500:
 		var close := S.button("×", close_inspector); close.custom_minimum_size = Vector2(44, 44)
 		tabs.add_child(close); wire_button(close)
 	var scroll := preload("res://scripts/touch_scroll.gd").new(); scroll.size_flags_vertical = SIZE_EXPAND_FILL
@@ -330,10 +360,26 @@ func _build_drawer() -> void:
 	if drawer_tab == "arsenal":
 		arsenal = Arsenal.new(); arsenal.size_flags_horizontal = SIZE_EXPAND_FILL; scroll.add_child(arsenal); arsenal.setup(self, str(r.id))
 		if armory_skills: arsenal._show_skills()
+	elif drawer_tab == "medical":
+		var list := S.column(8); list.size_flags_horizontal = SIZE_EXPAND_FILL; scroll.add_child(list)
+		list.add_child(UI.label("PATIENTS  /  RECOVERY", 14, S.CYAN))
+		for entry in People25.groups(flow.session()).Wounded:
+			var line := S.panel(); list.add_child(line)
+			var body := S.column(5); line.add_child(body)
+			body.add_child(UI.label("%s · return in about %d days" % [entry.name, entry.eta], 14, S.GOLD))
+			for action in patient_actions25(entry.id):
+				var button_text := "%s · %d days" % [action.label, int(action.days)] if bool(action.enabled) else "%s unavailable" % action.label
+				var button := S.button(button_text, apply_patient_action25.bind(entry.id, action.id), bool(action.enabled))
+				button.custom_minimum_size.y = 44; body.add_child(button); wire_button(button)
+				var effect := UI.label(str(action.effect), 14, S.MUTED)
+				effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; body.add_child(effect)
 	else:
 		var list := S.column(8); list.size_flags_horizontal = SIZE_EXPAND_FILL; scroll.add_child(list)
-		list.add_child(UI.label("ROSTER  /  %d SOLDIERS" % flow.session().state.roster.size(), 12, S.CYAN))
-		for soldier in flow.session().state.roster: _roster_row(list, soldier)
+		var fill := S.button("BEST READY SQUAD", best_ready_fill25); fill.custom_minimum_size.y = 44; list.add_child(fill); wire_button(fill)
+		for group_name in ["Ready", "Tired", "Wounded"]:
+			var entries: Array = People25.groups(flow.session())[group_name]
+			list.add_child(UI.label("%s  /  %d" % [group_name.to_upper(), entries.size()], 14, S.CYAN))
+			for entry in entries: _roster_row(list, flow.session().soldier(entry.id))
 	UI.ensure_phone_type(drawer)
 
 func _confirm_skill() -> void:
@@ -365,8 +411,9 @@ func _roster_row(parent: VBoxContainer, r: Dictionary) -> void:
 		b.text = Details.visible_name(str(r.n), maxf(12.0, b.size.x - 50.0 - ThemeDB.fallback_font.get_string_size(suffix, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x)) + suffix
 	b.resized.connect(update_name)
 	update_name.call_deferred()
-	col.add_child(UI.label("%s · R%d · %s" % [r.cls, int(r.rank), Details.nickname(r)], 11, S.MUTED))
-	var status := UI.label(Details.status(flow.session(), r), 11, S.GREEN if fit else S.RED)
+	col.add_child(UI.label("%s · R%d · %s" % [r.cls, int(r.rank), Details.nickname(r)], 14, S.MUTED))
+	var status_text := "WOUNDED · return ~%d days" % People25.eta(flow.session(), r) if int(r.get("wound", 0)) > 0 else Details.status(flow.session(), r) + (" · fully ready ~%d days" % People25.eta(flow.session(), r) if People25.eta(flow.session(), r) > 0 else "")
+	var status := UI.label(status_text, 14, S.GREEN if fit else S.RED)
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; col.add_child(status)
 
 func _portrait_texture(r: Dictionary) -> Texture2D:
