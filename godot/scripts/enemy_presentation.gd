@@ -2,6 +2,7 @@ extends RefCounted
 const Shot = preload("res://scripts/shot.gd")
 const Events = preload("res://scripts/feelcam22_events.gd")
 const Pressure = preload("res://scripts/mission_pressure.gd")
+const FeelBeats24 = preload("res://scripts/w24_feelcam_beats.gd")
 
 static func _point(m: RefCounted, tile: Vector2i, height: float = 0.0) -> Vector3:
 	return Vector3(tile.x, Shot.elevation(m, tile) * 0.7 + height, tile.y)
@@ -42,8 +43,15 @@ static func play(game: Node3D, events: Array[Dictionary], _sequence: int) -> voi
 	await flush_quiet(game)
 
 static func show_event(game: Node3D, event: Dictionary) -> void:
-	var actor: Node3D = game.views.get(int(event.actor))
+	var actor: Node3D = game.views.get(int(event.get("actor", -1)))
 	var kind := str(event.kind)
+	if game.playing_enemy_events and kind in ["intent", "attack", "push", "move", "overwatch", "reload", "objective_attack", "vip_attack"]:
+		var reason := str(event.get("intent_reason24", event.get("intent_reason", "")))
+		if reason == "" and game.mission.has_method("intent_reason24"): reason = str(game.mission.call("intent_reason24", event))
+		if reason != "": game.phase_banner.text = reason
+		game.phase_banner.visible = true
+		if reason != "" and actor != null and game.fx != null and game.fx.has_method("float_text"):
+			game.fx.float_text(actor.position + Vector3.UP * 2.2, game.phase_banner.text, Color("ffe39b"))
 	if kind == "intent":
 		var a: Dictionary = game.mission.unit_by_id(int(event.actor))
 		var t: Dictionary = game.mission.unit_by_id(int(event.target))
@@ -137,6 +145,9 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 				game.fx.float_text(actor.position + Vector3.UP * 1.7, kind.to_upper(), Color("f2ba47"))
 				if kind == "reload": actor.act("reload")
 			await game.cam.wait(0.2)
+		"cover_break":
+			FeelBeats24.clutch(game, event, _point(game.mission, event.get("at", Vector2i.ZERO)))
+			FeelBeats24.cue(game, "cover_break", _point(game.mission, event.get("at", Vector2i.ZERO)))
 	if kind != "move": game.cam.finish()
 	decorate(game)
 
@@ -182,6 +193,7 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 			game.villain_retreat_seen = true
 			Events.emit(game, "villain_retreat", event, to)
 	elif mode != "push": Events.emit(game, "miss", event, to)
+	FeelBeats24.impact(game, event, from, to, victim)
 	var word := "DEFLECT" if "deflected" in outcome else "MISS" if damage == 0 and mode != "push" else "CRIT %d" % damage if outcome == "crits" else "GRAZE %d" % damage if outcome == "grazes" else "-%d" % damage if damage > 0 else "PUSH"
 	game.fx.float_text(to + Vector3.UP * 0.6, word, Color("ffca70") if outcome == "crits" else Color("a8eaff") if outcome == "grazes" else Color.WHITE, outcome == "crits")
 	if int(event.get("armor_lost", 0)) > 0: game.fx.float_text(to + Vector3.UP * 0.15, "SHRED -%d" % int(event.armor_lost), Color("f0c68b"))
@@ -191,9 +203,11 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 		if bool(event.killed):
 			var target: Dictionary = game.mission.unit_by_id(int(event.target))
 			if str(target.side) == "player": victim.set_downed(true)
-			else: victim.fall(); game.views.erase(int(event.target))
+			else:
+				if victim.has_method("fall24"): victim.call("fall24", posmod(int(event.actor) + int(event.target), 3), to - from)
+				else: victim.fall()
+				game.views.erase(int(event.target))
 	if damage > 0: game.sound.play("hit")
-	if not game.cam.skip_requested and (outcome == "crits" or bool(event.killed)): game.fx.hit_stop()
 	if not game.cam.skip_requested and (outcome == "crits" or bool(event.killed)) and not bool(event.get("killcam_played", false)):
 		await game.cam.impact_beat(to)
 	if victim != null and not bool(event.killed): victim.set_status(game.mission.unit_by_id(int(event.target)))
