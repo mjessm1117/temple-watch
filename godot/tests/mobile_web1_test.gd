@@ -55,7 +55,7 @@ func run() -> void:
 		game.cam.touch.handle(first); game.cam.touch.handle(second)
 		var twist := InputEventScreenDrag.new(); twist.index = 1; twist.position = Vector2(327,254)
 		game.cam.touch.handle(twist)
-		check(is_equal_approx(game.yaw,before_yaw+PI*0.5), "actual two finger twist snaps without free spin")
+		check(game.yaw > before_yaw + 0.1 and game.yaw <= before_yaw + 0.25, "actual two finger twist rotates continuously within event bound")
 		check(hud.unit_card.custom_minimum_size.y >= 38 and hud.target_card.custom_minimum_size.y >= 38, "compact cards have touch targets")
 		var night = game.hud_controls.night
 		for field in ["FOCUS", "MEDPACS", "AMMO", "MOMENTUM"]:
