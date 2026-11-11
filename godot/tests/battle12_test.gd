@@ -33,15 +33,18 @@ func run() -> void:
 	var yellow: Dictionary = m.reach_tiles(actor, 2)
 	check(int(actor.mob) > 0 and blue.costs.size() > 1, "mobile selected unit has blue reach")
 	check(yellow.costs.size() > blue.costs.size(), "mobile selected unit has dash reach")
-	var blue_fill := 0
-	var yellow_fill := 0
+	var blue_edges := 0
+	var yellow_edges := 0
+	var filled_tiles := 0
 	for node in game.range_highlights.get_children():
 		if not node is MeshInstance3D or node.material_override == null: continue
 		var color: Color = node.material_override.albedo_color
-		if color.is_equal_approx(HudControls.move_fill(1)): blue_fill += 1
-		if color.is_equal_approx(HudControls.move_fill(2)): yellow_fill += 1
-	check(blue_fill == blue.costs.size() - 1, "blue ring is drawn for one action")
-	check(yellow_fill == yellow.costs.size() - blue.costs.size(), "yellow dash ring is drawn for two actions")
+		if node.mesh is BoxMesh and node.mesh.size.x > 0.7 and node.mesh.size.z > 0.7: filled_tiles += 1
+		if color.is_equal_approx(HudControls.move_color(1)): blue_edges += 1
+		if color.is_equal_approx(HudControls.move_color(2)): yellow_edges += 1
+	check(blue_edges > 0, "blue one-action perimeter is drawn")
+	check(yellow_edges > 0, "yellow dash perimeter is drawn")
+	check(filled_tiles == 0, "move range leaves terrain unfilled")
 	for ally in m.living("player"):
 		if "shoot" in ally.get("kit", []): actor = ally; game.selected_id = int(ally.id); break
 	for enemy in m.living("enemy"):

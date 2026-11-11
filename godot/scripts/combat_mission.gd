@@ -2,6 +2,7 @@ extends "res://scripts/mission.gd"
 ## Combat extension stays separate from the missions lane's objective implementation.
 const Round = preload("res://scripts/combat_round.gd")
 const ThreatRoute24 = preload("res://scripts/w24_threat_route.gd")
+const DecisionPreview27 = preload("res://scripts/w27b_decision_preview.gd")
 const Concealment = preload("res://scripts/combat_concealment.gd")
 const Bonds = preload("res://scripts/combat_bonds.gd")
 var combat_initialized := false
@@ -64,6 +65,24 @@ func route_threat24(path: Array, actor_id: int) -> Dictionary:
 		if str(enemy.side) == "enemy" and not bool(enemy.awake): continue
 		if bool(Shot.calculate(self, enemy, probe, false).flanked): flanked_end = true; break
 	return {"overwatch_tiles":overwatch_tiles, "reveal_tiles":reveal_tiles, "flanked_end":flanked_end, "danger_index":overwatch_tiles.size() * 2 + reveal_tiles.size() + (1 if flanked_end else 0)}
+
+func decision_preview27(actor_id: int, tile: Vector2i) -> Dictionary:
+	return DecisionPreview27.build(self, actor_id, tile)
+
+func intent_explain27(event: Dictionary) -> String:
+	if str(event.get("reason27", "")) != "": return str(event.reason27)
+	var actor: Dictionary = unit_by_id(int(event.get("actor", -1)))
+	var target: Dictionary = unit_by_id(int(event.get("target", -1)))
+	var name: String = str(target.get("name", "the squad"))
+	if bool(event.get("reaction", false)): return "Overwatch on %s" % name
+	if bool(event.get("flanked", false)) or bool(event.get("info", {}).get("flanked", false)): return "Flanking %s" % name
+	match str(event.get("kind", "")):
+		"overwatch": return "Overwatch on gate" if str(spec.get("id", "")).contains("relay") else "Overwatch on lane"
+		"move": return "Taking cover" if str(event.get("reason24", "")) == "Low health" else "Advancing on squad"
+		"attack", "intent": return "Firing at %s" % name
+		"push": return "Dislodging %s" % name
+		"reload": return "Reloading"
+	return str(event.get("reason24", ""))
 
 func intent_reason24(event: Dictionary) -> String:
 	if event.has("reason24"): return str(event.reason24)

@@ -20,6 +20,7 @@ var desktop_threat_chip: Label
 var aim_ui
 var combo_overlay: Control
 var move_decision: Dictionary = {}
+var move_tactical27: Dictionary = {}
 var move_destination := Vector2i(-1, -1)
 var preview_card26: PanelContainer
 var preview_text26: Label
@@ -44,8 +45,7 @@ func _range_edge(parent: Node3D, p: Vector2i, ap_cost: int, blue: Dictionary, al
 		var next: Vector2i = p + entry[0]
 		if all.costs.has(next) and (blue.costs.has(next) == (ap_cost == 1)): continue
 		var size := Vector3(0.10, 0.05, 0.86) if entry[0].x != 0 else Vector3(0.86, 0.05, 0.10)
-		var visible_to_enemy := int(InputControls.sight26(g.mission, g.mission.unit_by_id(g.selected_id), p).seen_by) > 0
-		g._box(parent, at + entry[1], size, Color("ffd16a") if visible_to_enemy else Color("65ddf5"))
+		g._box(parent, at + entry[1], size, move_color(ap_cost))
 
 func _route_end(parent: Node3D, p: Vector2i, color: Color, previous: Vector2i) -> void:
 	var at := Vector3(p.x, Shot.elevation(g.mission, p) * 0.7 + 0.23, p.y)
@@ -70,7 +70,7 @@ func _border(parent: Node3D, p: Vector2i, color: Color, height: float = 0.12) ->
 func _refresh_highlights(force: bool = false) -> void:
 	if preview_card26 != null: preview_card26.visible = false
 	g._clear(g.hover_highlights)
-	move_decision = {}; move_destination = Vector2i(-1, -1)
+	move_decision = {}; move_tactical27 = {}; move_destination = Vector2i(-1, -1)
 	targeting.g = g
 	if force: targeting.detection()
 	if force: g._clear(g.range_highlights)
@@ -88,12 +88,6 @@ func _refresh_highlights(force: bool = false) -> void:
 		for p in yellow.costs:
 			if p == Shot.pos(u): continue
 			var ap_cost := 1 if blue.costs.has(p) else 2
-			var color := move_fill(ap_cost)
-			color.a = MOVE_RANGE_FILL_ALPHA26
-			var tile: MeshInstance3D = g._box(g.range_highlights, Vector3(p.x, Shot.elevation(g.mission, p) * 0.7 + 0.10, p.y), Vector3(0.79, 0.025, 0.79), color)
-			var fill_material: StandardMaterial3D = g._mat(move_fill(ap_cost), true)
-			fill_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-			tile.material_override = fill_material
 			_range_edge(g.range_highlights, p, ap_cost, blue, yellow)
 	elif force and g.action not in ["move", "free", "overwatch", "hunker"] and g.mission.abilities.has(g.action):
 		var target_kind := str(g.mission.abilities[g.action].target)
@@ -110,20 +104,23 @@ func _refresh_highlights(force: bool = false) -> void:
 			var preview: Dictionary = InputControls.move_preview(g.mission, u, shown)
 			if not preview.is_empty():
 				move_decision = preview; move_destination = shown
-				var cursor := shown
+				var decision: Dictionary = g.mission.decision_preview27(int(u.id), shown) if g.mission.has_method("decision_preview27") else {}
+				move_tactical27 = decision
+				var path: Array = decision.get("path", [])
 				var route_color := Color("65ddf5")
 				_route_end(g.hover_highlights, shown, route_color, preview.prev.get(shown, Shot.pos(u)))
-				while preview.prev.has(cursor):
+				var next: Vector2i = Shot.pos(u)
+				for cursor in path:
 					var here := Vector3(cursor.x, Shot.elevation(g.mission, cursor) * 0.7 + 0.20, cursor.y)
-					var next: Vector2i = preview.prev[cursor]
 					var next_at := Vector3(next.x, Shot.elevation(g.mission, next) * 0.7 + 0.20, next.y)
 					var line: MeshInstance3D = g._box(g.hover_highlights, (here + next_at) * 0.5, Vector3(0.15, 0.06, here.distance_to(next_at) * 0.98), route_color)
 					line.look_at(next_at, Vector3.UP)
-					cursor = next
+					next = cursor
 				var cost_label := "1 action · 1 action remains" if int(preview.ap) == 1 and int(u.ap) == 2 else "1 action" if int(preview.ap) == 1 else "DASH: ends turn"
-				var risk := "  ·  FLANKED: %s" % ", ".join(preview.flanks) if not preview.flanks.is_empty() else "  ·  SEEN: %s" % ", ".join(preview.seen_by) if not preview.seen_by.is_empty() else "  ·  NO KNOWN LOS"
+				var first: Dictionary = decision.get("events", [])[0] if not decision.get("events", []).is_empty() else {}
+				var risk := "  ·  %s AT %s" % [str(first.get("kind", "clear")).to_upper(), str(first.get("tile", ""))] if not first.is_empty() else "  ·  CLEAR ROUTE"
 				g.path_label.text = "%s  ·  %d tiles%s" % [cost_label, int(preview.tiles), risk]
-				g.path_label.add_theme_color_override("font_color", Color("ff746b") if not preview.flanks.is_empty() else Color("ffd16a") if not preview.seen_by.is_empty() else Color("91d6fa"))
+				g.path_label.add_theme_color_override("font_color", Color("ff746b") if str(first.get("kind", "")) == "overwatch" else Color("ffd16a") if not first.is_empty() else Color("91d6fa"))
 			else: g.path_label.text = ""
 		else: g.path_label.text = ""
 		var shields := "  •  COVER "
@@ -148,7 +145,7 @@ func _update_preview_card26(tile: Vector2i, actor: Dictionary) -> void:
 		var style := StyleBoxFlat.new()
 		style.bg_color = Color(0.035, 0.09, 0.14, 0.90)
 		style.border_color = Color("65ddf5")
-		style.set_border_width_all(1)
+		style.set_border_width_all(0)
 		style.set_content_margin_all(6)
 		preview_card26.add_theme_stylebox_override("panel", style)
 		preview_text26 = _label("", 13)
@@ -158,17 +155,26 @@ func _update_preview_card26(tile: Vector2i, actor: Dictionary) -> void:
 	var allowed: bool = g.action in ["move", "shoot", "strike", "push"] and g.mission.phase == "player" and g.mission.result == "" and not g.cinematic
 	preview_card26.visible = allowed and not actor.is_empty() and tile.x >= 0 and g.mission.in_bounds(tile)
 	if not preview_card26.visible: return
-	var data := preview26(tile, int(actor.id))
+	var tactical: Dictionary = move_tactical27 if g.action == "move" and tile == move_destination else {}
+	var data: Dictionary = {}
 	var shields: Array[String] = []
-	for entry in [["N", Vector2i.UP], ["E", Vector2i.RIGHT], ["S", Vector2i.DOWN], ["W", Vector2i.LEFT]]:
-		var cover := Shot.cover(g.mission, tile, tile + entry[1] * 2)
-		if cover > 0: shields.append("%s %s" % [entry[0], "FULL" if cover == 40 else "HALF"])
-	preview_text26.text = "%d%% HIT  ·  SEEN BY %d\n%s" % [int(data.hit_pct_vs_nearest), int(data.seen_by), "  ".join(shields) if not shields.is_empty() else "NO COVER"]
+	if tactical.is_empty():
+		data = preview26(tile, int(actor.id))
+		for entry in [["N", Vector2i.UP], ["E", Vector2i.RIGHT], ["S", Vector2i.DOWN], ["W", Vector2i.LEFT]]:
+			var cover := Shot.cover(g.mission, tile, tile + entry[1] * 2)
+			if cover > 0: shields.append("%s %s" % [entry[0], "FULL" if cover == 40 else "HALF"])
+	if tactical.is_empty() or tactical.get("path", []).is_empty():
+		preview_text26.text = "%d%% HIT  ·  SEEN BY %d\n%s" % [int(data.hit_pct_vs_nearest), int(data.seen_by), "  ".join(shields) if not shields.is_empty() else "NO COVER"]
+	else:
+		var first: Dictionary = tactical.events[0] if not tactical.events.is_empty() else {}
+		var event_line := "%s AT %s" % [str(first.get("kind", "clear")).to_upper(), str(first.get("tile", "destination"))] if not first.is_empty() else "CLEAR ROUTE"
+		if str(first.get("kind", "")) == "overwatch": event_line += " FROM %s" % str(first.get("source_name", first.get("source", "")))
+		preview_text26.text = "%s COVER  ·  HEIGHT %+d  ·  FLANK %+d\nSHOT %+d%%  ·  %s" % [("NO" if str(tactical.cover) == "none" else str(tactical.cover).to_upper()), int(tactical.height), int(tactical.flank), int(tactical.odds_delta), event_line]
 	var area: Vector2 = g.overlay.size
 	var portrait := area.y > area.x
 	preview_card26.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	preview_card26.position = Vector2(12, 190) if portrait else Vector2(maxf(8.0, area.x - 226.0), 50)
-	preview_card26.size = Vector2(210, 48)
+	preview_card26.position = Vector2(12, 190) if portrait else Vector2(maxf(8.0, area.x - 306.0), 50)
+	preview_card26.size = Vector2(300, 48)
 
 func _shield(parent: Node3D, tile: Vector2i, direction: Vector2i, full: bool) -> void:
 	var phone_scale := 1.65 if phone != null else 1.0
