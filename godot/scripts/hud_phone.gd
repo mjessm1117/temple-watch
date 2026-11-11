@@ -133,7 +133,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	unit_portrait = left.find_children("*", "TextureRect", true, false)[0] as TextureRect
 	unit_portrait.name = "UnitPortrait"; unit_portrait.reparent(plate_row)
 	unit_portrait.texture = load("res://assets/story/portraits14/satele.png")
-	unit_portrait.custom_minimum_size = Vector2(44, 44)
+	unit_portrait.custom_minimum_size = Vector2(52, 52)
 	unit_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	unit_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	unit_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
