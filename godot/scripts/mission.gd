@@ -176,10 +176,34 @@ func unit_by_id(id: int) -> Dictionary:
 	return {}
 
 func living(side: String) -> Array[Dictionary]:
+	_sync_opening_campaign26()
 	var out: Array[Dictionary] = []
 	for u in units:
 		if str(u.side) == side and int(u.hp) > 0: out.append(u)
 	return out
+
+func _sync_opening_campaign26() -> void:
+	if not _is_opening_defense26() or str(pressure_state.opening_contact26.status) != "inactive": return
+	if bool(pressure_state.opening_contact26.get("staged", false)): return
+	var campaign_squad := false
+	for u in units:
+		if str(u.get("side", "")) == "player" and u.has("rid"):
+			campaign_squad = true
+			break
+	if not campaign_squad: return
+	pressure_state.opening_contact26.staged = true
+	for enemy in units:
+		if str(enemy.get("side", "")) == "enemy" and int(enemy.get("group", -1)) == int(spec.opening_contact26.group):
+			enemy.awake = false
+			enemy.spotted = false
+			enemy.detected = false
+	for wave in pressure_state.pending:
+		if str(wave.get("reason", "")) == "Gate assault 1" and int(wave.turn) == 2:
+			wave.turn = 3
+			for i in log_lines.size():
+				if log_lines[i].begins_with("INBOUND: Gate assault 1 — "):
+					log_lines[i] = log_lines[i].replace(" on turn 2.", " on turn 3.")
+			break
 
 func message(value: String) -> void:
 	log_lines.append(value)
@@ -622,6 +646,7 @@ func _activate_opening_contact26(trigger: String) -> void:
 
 func opening_contact26() -> Dictionary:
 	if not _is_opening_defense26(): return {}
+	_sync_opening_campaign26()
 	return {"pod":"east", "status":str(pressure_state.opening_contact26.status), "activation_trigger":str(pressure_state.opening_contact26.activation_trigger)}
 
 func next_wave26() -> Dictionary:
