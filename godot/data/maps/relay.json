@@ -2,6 +2,8 @@
   "id": "relay",
   "name": "Temple Outer Gate",
   "family": "defend",
+  "first_mission": true,
+  "opening_contact26": {"pod": "east", "group": 1, "status": "inactive"},
   "theme": "temple",
   "plot": {
     "width": 26,
@@ -151,7 +153,7 @@
     "blurb": "Hold the Temple approach until the guard seals the breach.",
     "zone_prop": "res://assets/maps/door_temple.glb",
     "hold_turns": 6,
-    "zone_radius": 2,
+    "zone_radius": 3,
     "hold_hp": 42
   },
   "squad": [

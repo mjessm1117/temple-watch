@@ -58,6 +58,7 @@ func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") ->
 	abilities = preload("res://scripts/class_registry.gd").ability_catalog()
 	preload("res://scripts/class_registry.gd").apply_to_units(catalog)
 	if modern: Pressure.setup(self)
+	if _is_opening_defense26(): pressure_state.opening_contact26 = {"status":"inactive", "activation_trigger":"none"}
 	for row in spec.rows: board.append(str(row))
 	for y in range(board.size()):
 		for x in range(board[y].length()):
@@ -259,6 +260,7 @@ func move(id: int, dest: Vector2i) -> bool:
 	if modern: Telemetry.travel(self,u,dest,reach.prev)
 	u.x = dest.x
 	u.y = dest.y
+	if str(u.side) == "player" and turn == 1 and _opening_sight26(dest): _activate_opening_contact26("sight")
 	if phase == "enemy": action_events.append({"kind": "move", "actor": id, "from": old, "to": dest})
 	message("%s moves %d tiles (%d AP)." % [u.name, cost, ap_cost])
 	if str(u.side) == "player":
@@ -318,6 +320,7 @@ func shot(id: int, target_id: int, mode: String = "shoot") -> bool:
 	return true
 
 func _apply_attack(a: Dictionary, t: Dictionary, info: Dictionary, mode: String) -> void:
+	if str(a.side) == "player" and mode != "strike": _activate_opening_contact26("shot")
 	if modern and str(a.side) == "player": break_concealment("Attack")
 	var before_hp := int(t.hp)
 	var roll := rng.randf_range(0.0, 100.0)
@@ -397,6 +400,7 @@ func _wake_groups() -> void:
 	var groups: Dictionary = {}
 	for u in living("enemy"):
 		if int(u.group) < 0 or bool(u.awake): continue
+		if _is_opening_defense26() and int(u.group) == int(spec.opening_contact26.group) and str(pressure_state.opening_contact26.status) == "inactive": continue
 		if modern and Enemy11.hidden(self,u): continue
 		if not groups.has(int(u.group)): groups[int(u.group)] = []
 		groups[int(u.group)].append(u)
@@ -513,6 +517,7 @@ func finish_enemy_turn() -> void:
 		if int(e.get("marked_until", 0)) <= turn: e.erase("marked_aim"); e.erase("marked")
 		if int(e.get("suppressed_until", 0)) <= turn: e.erase("suppressed_by"); e.erase("suppressed")
 	if modern:
+		if turn == 2: _activate_opening_contact26("turn_2")
 		Objectives.player_start(self)
 		if result != "": return
 		Pressure.player_start(self); Hack.player_start(self); Telemetry.sample(self); _wake_groups()
@@ -590,6 +595,37 @@ func break_concealment(reason: String) -> void:
 
 func queue_reinforcement(kinds: Array, delay: int = 1, reason: String = "Reinforcements") -> void:
 	if modern: Pressure.queue(self,kinds,delay,reason)
+
+func _is_opening_defense26() -> bool:
+	return modern and str(spec.get("family", "")) == "defend" and bool(spec.get("first_mission", false)) and spec.has("opening_contact26")
+
+func _opening_sight26(at: Vector2i) -> bool:
+	if not _is_opening_defense26() or str(pressure_state.opening_contact26.status) != "inactive": return false
+	for enemy in living("enemy"):
+		if int(enemy.group) != int(spec.opening_contact26.group): continue
+		if Shot.distance(Shot.pos(enemy), at) <= 8.0 and Shot.los(self, Shot.pos(enemy), at): return true
+	return false
+
+func _activate_opening_contact26(trigger: String) -> void:
+	if not _is_opening_defense26() or str(pressure_state.opening_contact26.status) != "inactive": return
+	pressure_state.opening_contact26 = {"status":"active", "activation_trigger":trigger}
+	var marker := Vector2i(-1, -1)
+	var actor_id := -1
+	for enemy in living("enemy"):
+		if int(enemy.group) != int(spec.opening_contact26.group): continue
+		enemy.awake = true; enemy.spotted = true; enemy.detected = true
+		if marker.x < 0: marker = Shot.pos(enemy); actor_id = int(enemy.id)
+	if marker.x >= 0:
+		reinforcement_marker = marker
+		action_events.append({"kind":"activation", "actor":actor_id, "at":marker})
+	message("ENEMY REINFORCEMENT APPROACHING — east pod activated.")
+
+func opening_contact26() -> Dictionary:
+	if not _is_opening_defense26(): return {}
+	return {"pod":"east", "status":str(pressure_state.opening_contact26.status), "activation_trigger":str(pressure_state.opening_contact26.activation_trigger)}
+
+func next_wave26() -> Dictionary:
+	return Pressure.next_wave26(self) if modern else {}
 
 func hack(unit: Dictionary, at: Vector2i, mode: String = "safe") -> Dictionary:
 	return Hack.use(self,unit,at,mode) if modern else {"ok":false,"reason":"Use the existing Hack ability"}

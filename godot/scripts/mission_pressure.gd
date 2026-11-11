@@ -64,6 +64,14 @@ static func next_reinforcement24(m: RefCounted) -> Dictionary:
 		if int(wave.turns) < int(next.turns): next = wave
 	return {"count":int(next.count), "turns":int(next.turns), "entry_tile":next.entry_pos}
 
+static func next_wave26(m: RefCounted) -> Dictionary:
+	var pending: Array = m.pressure_state.get("pending", [])
+	if pending.is_empty(): return {}
+	var next: Dictionary = pending[0]
+	for wave in pending:
+		if int(wave.turn) < int(next.turn): next = wave
+	return {"turn":int(next.turn), "count":next.kinds.size(), "entry_tile":Maps.point(next.at)}
+
 static func reveal_info(m: RefCounted, group: Array) -> Dictionary:
 	var kinds: Array = []
 	var number := -1
@@ -116,7 +124,10 @@ static func queue(m: RefCounted, kinds: Array, delay: int = 1, reason: String = 
 	m.pressure_state.serial += 1
 	m.pressure_state.pending.append({"serial":m.pressure_state.serial,"spawned":0,"at":[entry[0],entry[1]],"name":entry[2],"kinds":kinds.duplicate(),"turn":m.turn+maxi(1,delay),"announced":m.turn,"reason":reason})
 	m.reinforcement_announced = true; m.reinforcement_marker = Maps.point(entry)
-	m.message("INBOUND: %s — %s at (%d,%d), %d hostiles: %s in %d turn(s)." % [reason,entry[2],int(entry[0]),int(entry[1]),kinds.size(),", ".join(_types(m,kinds)),maxi(1,delay)])
+	if bool(m.spec.get("first_mission", false)) and str(m.spec.get("family", "")) == "defend":
+		m.message("INBOUND: %s — %s at (%d,%d), %d hostiles: %s on turn %d." % [reason,entry[2],int(entry[0]),int(entry[1]),kinds.size(),", ".join(_types(m,kinds)),m.turn+maxi(1,delay)])
+	else:
+		m.message("INBOUND: %s — %s at (%d,%d), %d hostiles: %s in %d turn(s)." % [reason,entry[2],int(entry[0]),int(entry[1]),kinds.size(),", ".join(_types(m,kinds)),maxi(1,delay)])
 
 static func player_start(m: RefCounted) -> void:
 	var later: Array = []
@@ -143,7 +154,8 @@ static func player_start(m: RefCounted) -> void:
 		if wave > 1: kinds.append("acolyte")
 		if wave > 2: kinds.append("agent")
 		if m.spec.has("wave_roster") and wave < m.spec.wave_roster.size(): kinds = m.spec.wave_roster[wave].duplicate()
-		queue(m,kinds,1,"Defense wave %d" % (wave+1)); m.pressure_state.waves += 1
+		var delay := 2 if bool(m.spec.get("first_mission", false)) and wave == 1 else 1
+		queue(m,kinds,delay,"Defense wave %d" % (wave+1)); m.pressure_state.waves += 1
 	elif m.spec.family not in ["defend","holocron_recovery","evacuation","sith_lord_duel"] and m.turn == 4: queue(m,["trooper","trooper"],1,"Patrol support")
 
 static func brood(m: RefCounted) -> void:
