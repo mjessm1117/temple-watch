@@ -10,8 +10,7 @@ static func place(control: Control, box: Rect2) -> void:
 
 static func boxes(size: Vector2) -> Dictionary:
 	var width := size.x
-	var tree := Engine.get_main_loop() as SceneTree
-	var physical := tree.root.content_scale_size if tree != null else DisplayServer.window_get_size()
+	var physical := preload("res://scripts/phone_layout.gd").window_size()
 	var scale := width / float(physical.x) if physical.x > 0 else 1.0
 	var short := width / scale < 750.0
 	var portrait := size.y > size.x
@@ -32,6 +31,6 @@ static func boxes(size: Vector2) -> Dictionary:
 		"plate": Rect2(15 * scale, size.y - height - scale, plate_width, height),
 		"tray": Rect2(tray_left, size.y - height - scale, tray_right - tray_left, height),
 		"camera": Rect2(width - 56, 60, 48, 144),
-		"portrait": Rect2(8 * scale, 48, 60, 60),
+		"portrait": Rect2(8 * scale, 52, 60, 60),
 		"map": Rect2(0, 44, width, size.y - 44),
 	}

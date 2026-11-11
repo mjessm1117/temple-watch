@@ -144,29 +144,38 @@ func model(path: String, at: Vector3, width: float, height: float, angle := 0.0,
 
 func flush(parent: Node3D) -> void:
 	# LOD holders require MultiMeshInstance3D for their range bounds contract.
-	if parent.name.begins_with("MeshyLOD"):
+	# Godot renames duplicate MeshyLOD siblings, so also recognize their parent.
+	var holder_parent := parent.get_parent()
+	var map_script: Script = holder_parent.get_script() if holder_parent != null else null
+	var lod_holder := parent.name.begins_with("MeshyLOD") or (map_script != null and map_script.resource_path.ends_with("/map_presentation.gd"))
+	if lod_holder:
 		for bucket in buckets.values(): _flush_multimesh(parent, bucket)
 		buckets.clear()
 		return
-	# Static procedural shapes sharing a material render as one surface. Imported
-	# unoverridden meshes retain their own surface materials and instancing.
+	# Resolve imported surface materials before grouping. GLB nodes normally have
+	# no material override, so grouping by the override alone left every submesh
+	# as a separate draw even when several surfaces use the same atlas material.
 	var merged: Dictionary = {}
 	for bucket in buckets.values():
-		if bucket.material == null:
-			_flush_multimesh(parent, bucket)
-			continue
-		var key := "%d:%s:%s" % [bucket.material.get_instance_id(), bucket.role == "scenery", bucket.shadows]
-		if not merged.has(key): merged[key] = {"material":bucket.material,"role":bucket.role,"shadows":bucket.shadows,"buckets":[]}
-		merged[key].buckets.append(bucket)
+		for surface_index in bucket.mesh.get_surface_count():
+			var material: Material = bucket.material if bucket.material != null else bucket.mesh.surface_get_material(surface_index)
+			var key := "%d:%s:%s" % [material.get_instance_id() if material != null else 0, bucket.role == "scenery", bucket.shadows]
+			if not merged.has(key): merged[key] = {"material":material,"role":bucket.role,"shadows":bucket.shadows,"parts":[]}
+			merged[key].parts.append({"bucket":bucket,"surface":surface_index})
 	for group in merged.values():
-		if group.buckets.size() == 1:
-			_flush_multimesh(parent, group.buckets[0])
+		if group.parts.size() == 1:
+			var part: Dictionary = group.parts[0]
+			var source: Dictionary = part.bucket
+			if source.mesh.get_surface_count() == 1:
+				_flush_multimesh(parent, source)
+				continue
+		if group.parts.is_empty():
 			continue
 		var surface := SurfaceTool.new()
-		for bucket in group.buckets:
+		for part in group.parts:
+			var bucket: Dictionary = part.bucket
 			for transform in bucket.transforms:
-				for index in bucket.mesh.get_surface_count():
-					surface.append_from(bucket.mesh, index, transform)
+				surface.append_from(bucket.mesh, int(part.surface), transform)
 		var instance := MeshInstance3D.new()
 		instance.mesh = surface.commit()
 		instance.material_override = group.material
