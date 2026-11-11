@@ -27,6 +27,7 @@ run_suite graphics_boot_test -- --expect=high
 for suite in run campaign_test campaign11_test gear_research_test story_port_test story_bonds_test story_night1_test story11_test villain11_battle_test loop_test sith_test strategy_test combat7_test hud_night1_test battle11_test missions_test missions11_test temple_view_test home_ui_test loadout_test galaxy_view_test screens_test integration_test map_art_test terrain_test; do
   run_suite "$suite"
 done
+run_suite terrain23_test
 run_suite battle12_test
 run_suite threat22_test
 run_suite mobile_web1_test
