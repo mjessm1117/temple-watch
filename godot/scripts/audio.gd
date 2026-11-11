@@ -23,7 +23,7 @@ func _ready() -> void:
 		_voices.append(voice)
 		_voice_levels.append(0.0)
 	player = _voices[0]
-	for kind in ["shot", "saber", "push", "hit", "death", "click", "turn", "step", "whiz", "clash", "ignite", "crit", "kill", "blast", "saber_clash", "alert", "villain", "radio", "objective_hit", "victory", "defeat"]:
+	for kind in ["shot", "saber", "push", "hit", "death", "click", "turn", "step", "whiz", "clash", "ignite", "crit", "kill", "blast", "saber_clash", "alert", "villain", "radio", "objective_hit", "victory", "defeat", "rapid_fire", "suppress", "force_push", "force_pull", "force_heal", "barrier", "saber_throw", "grenade"]:
 		sounds[kind] = _synthesize(kind)
 	_ambience = AudioStreamPlayer.new()
 	_ambience.stream = _synthesize("ambience")
@@ -119,6 +119,7 @@ func _synthesize(kind: String) -> AudioStreamWAV:
 		"hum": seconds = 0.5
 		"ambience": seconds = 3.0
 		"step": seconds = 0.085
+		"rapid_fire", "suppress", "force_push", "force_pull", "force_heal", "barrier", "saber_throw", "grenade": seconds = 0.34
 	var count := int(rate * seconds)
 	var data := PackedByteArray()
 	data.resize(count * 2)
@@ -133,6 +134,14 @@ func _synthesize(kind: String) -> AudioStreamWAV:
 		var envelope := pow(1.0 - phase, 1.8) * minf(1.0, t * 120.0)
 		var wave := 0.0
 		match kind:
+			"rapid_fire": wave = sin(TAU * (950.0 - 350.0 * fmod(phase * 3.0, 1.0)) * t) * 0.45 * (1.0 if fmod(phase * 3.0, 1.0) < 0.6 else 0.15) + noise * 0.12
+			"suppress": wave = sin(TAU * (620.0 - 220.0 * phase) * t) * 0.3 + filtered * 0.26 + sin(TAU * 16.0 * t) * 0.15
+			"force_push": wave = sin(TAU * (65.0 + 440.0 * phase) * t) * 0.55 + filtered * 0.34
+			"force_pull": wave = sin(TAU * (550.0 - 470.0 * phase) * t) * 0.48 + filtered * 0.24
+			"force_heal": wave = sin(TAU * (310.0 + 75.0 * phase) * t) * 0.35 + sin(TAU * 465.0 * t) * 0.2
+			"barrier": wave = sin(TAU * (125.0 + 25.0 * sin(phase * PI)) * t) * 0.4 + sin(TAU * 250.0 * t) * 0.2
+			"saber_throw": wave = sin(TAU * (180.0 + 600.0 * phase) * t) * 0.32 + filtered * 0.3
+			"grenade": wave = sin(TAU * (70.0 - 45.0 * phase) * t) * 0.6 + noise * 0.22
 			"shot": wave = sin(TAU * (1100.0 * t - 560.0 * t * t)) * 0.46 + noise * 0.2
 			"saber": wave = sin(TAU * (145.0 * t + 30.0 * t * t)) * 0.4 + sin(TAU * 370.0 * t) * 0.18 + filtered * 0.42
 			"push": wave = sin(TAU * (72.0 * t + 360.0 * t * t)) * 0.42 + filtered * 0.75

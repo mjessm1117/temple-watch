@@ -32,6 +32,7 @@ var downed := false
 var enemy_side := false
 var aim_ready := false
 var footfalls := 0
+var route_beats27: Array[String] = []
 static var _corpses: Array[Node3D] = []
 static var _active_feet24: Array[AudioStreamPlayer] = []
 const CORPSE_CAP := 6
@@ -347,17 +348,26 @@ func travel24(path: Array, dash: bool, segments: Array = []) -> void:
 		if step_index < segments.size():
 			var segment: Variant = segments[step_index]
 			kind = str(segment.get("kind", segment.get("type", "walk"))) if segment is Dictionary else str(segment)
-		var duration := maxf(0.08, flat.length() / travel_speed24(dash))
+		var duration := maxf(0.08, flat.length() / travel_speed24(dash) * (1.16 if dash and step_index == 0 else 0.78 if dash and step_index > 0 else 1.0))
 		motion.tween_callback(func() -> void: face(point))
+		if kind in ["vault", "climb", "door"]: motion.tween_callback(func() -> void: route_beats27.append(kind + "_contact"))
 		motion.tween_callback(func() -> void:
 			if model != null: model.rotation.z = -0.16 if dash else 0.0)
 		if kind in ["vault", "climb", "door"]:
-			var rise := 0.55 if kind == "vault" else 0.38 if kind == "climb" else 0.16
+			var rise := 0.72 if kind == "vault" else 0.48 if kind == "climb" else 0.08
 			var middle := previous.lerp(point, 0.5) + Vector3.UP * rise
-			motion.tween_property(self, "position", middle, duration * 0.5).set_trans(Tween.TRANS_SINE)
+			if kind == "door": motion.tween_interval(0.06)
+			motion.tween_callback(func() -> void:
+				if model != null:
+					model.rotation.x = -0.20 if kind == "vault" else 0.18 if kind == "climb" else 0.0
+					model.rotation.y = 0.24 if kind == "door" else 0.0)
+			motion.tween_property(self, "position", middle, duration * 0.48).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 			motion.parallel().tween_callback(_footstep).set_delay(duration * 0.18)
-			motion.tween_property(self, "position", point, duration * 0.5).set_trans(Tween.TRANS_SINE)
-			motion.parallel().tween_callback(_footstep).set_delay(duration * 0.35)
+			motion.tween_property(self, "position", point, duration * 0.52).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+			motion.tween_callback(func() -> void: route_beats27.append(kind + "_land"))
+			motion.tween_callback(_footstep)
+			motion.tween_callback(func() -> void:
+				if model != null: model.rotation = Vector3.ZERO)
 		else:
 			motion.tween_property(self, "position", point, duration).set_trans(Tween.TRANS_LINEAR)
 			motion.parallel().tween_callback(_footstep).set_delay(duration * 0.22)
@@ -378,7 +388,8 @@ static func choose_fall24(dir: Vector3) -> int:
 func fall24(variant: int, dir: Vector3) -> void:
 	if not alive: return
 	if variant < -1 or variant > 2: return
-	if variant < 0: variant = choose_fall24(dir)
+	if variant < 0: variant = (choose_fall24(dir) + unit_id) % 3
+	route_beats27.append("fall_%d" % variant)
 	alive = false
 	set_saber_active(false)
 	if ring != null: ring.hide()
