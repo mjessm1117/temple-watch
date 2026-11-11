@@ -9,12 +9,33 @@ var b
 var p: Dictionary
 var theme: String
 var mapped_seen: Dictionary = {}
+var cover_materials26: Dictionary = {}
 
 func _init(renderer) -> void:
 	r = renderer; b = r.batch; p = r.palette; theme = r.theme
 
 func put(shape: String, mat: String, at: Vector3, size: Vector3, angle := 0.0) -> AABB:
-	return b.put("bevel" if shape == "box" and (b.current.get("role", "") == "cover") else shape,p[mat],at,size,angle)
+	var cover_kind := str(b.current.get("kind", "")) if b.current.get("role", "") == "cover" else ""
+	var material: Material = cover_material26(mat, cover_kind)
+	return b.put("bevel" if shape == "box" and (b.current.get("role", "") == "cover") else shape,material,at,size,angle)
+
+static func cover_tint26(full: bool) -> Color:
+	return Color(0.76, 0.83, 0.91) if full else Color(1.07, 0.98, 0.88)
+
+func cover_material26(name: String, cover_kind: String) -> Material:
+	if cover_kind not in ["#", "c", "h"]: return p[name]
+	var full := cover_kind == "#"
+	var key := name + ("_full26" if full else "_half26")
+	if cover_materials26.has(key): return cover_materials26[key]
+	var material: Material = p[name].duplicate()
+	var tint := cover_tint26(full)
+	if material is StandardMaterial3D:
+		material.albedo_color *= tint
+	elif material is ShaderMaterial:
+		var color: Color = material.get_shader_parameter("stone_color")
+		material.set_shader_parameter("stone_color", color * tint)
+	cover_materials26[key] = material
+	return material
 
 func floor_tile(m: RefCounted, tile: Vector2i) -> void:
 	var level := Shot.elevation(m,tile)*0.7

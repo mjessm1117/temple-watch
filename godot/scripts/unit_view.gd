@@ -3,6 +3,9 @@ extends Node3D
 const Audio = preload("res://scripts/audio.gd")
 const W17_ROOT := "res://assets/units/w17/"
 const W17_KINDS := ["sniper", "heavy", "tech", "droid", "officer"]
+const ALLY_COLOR26 := Color("00d4ff")
+const ENEMY_COLOR26 := Color("ff3030")
+static var _side_badges26: Dictionary = {}
 var unit_id: int
 var model: Node3D
 var animation: AnimationPlayer
@@ -112,6 +115,24 @@ static func battle_model_scene(u: Dictionary, fallback: PackedScene) -> PackedSc
 static func w17_kind(u: Dictionary) -> String:
 	var cls := str(u.get("class_name", "")).to_lower()
 	return cls if cls in W17_KINDS else str(u.get("kind", "")).to_lower()
+
+static func side_color26(side: String) -> Color:
+	return ENEMY_COLOR26 if side == "enemy" else ALLY_COLOR26
+
+static func _side_texture26(side: String) -> Texture2D:
+	if _side_badges26.has(side): return _side_badges26[side]
+	var color := side_color26(side)
+	var image := Image.create(120, 50, false, Image.FORMAT_RGBA8)
+	for y in image.get_height():
+		for x in image.get_width():
+			if x >= 49 and y >= 20 and y < 39:
+				var edge := x < 51 or x >= 118 or y < 22 or y >= 37
+				image.set_pixel(x, y, Color(color.r, color.g, color.b, 0.88 if edge else 0.48))
+			elif absi(x - 22) + absi(y - 22) <= 21:
+				image.set_pixel(x, y, color)
+	var texture := ImageTexture.create_from_image(image)
+	_side_badges26[side] = texture
+	return texture
 
 func _set_lod_range(node: Node, begin: float, end: float, skip: Node = null) -> void:
 	if node == skip: return
@@ -364,6 +385,7 @@ func fall24(variant: int, dir: Vector3) -> void:
 	var selection_ring := get_node_or_null("GfxSelectionRing")
 	if selection_ring != null: selection_ring.hide()
 	if status_label != null: status_label.hide()
+	if side_badge26 != null: side_badge26.hide()
 	if watch_eye != null: watch_eye.hide()
 	_corpses.append(self)
 	while _corpses.size() > CORPSE_CAP:
@@ -427,6 +449,7 @@ func _footstep() -> void:
 	_dust()
 
 var status_label: Label3D
+var side_badge26: Sprite3D
 var watch_eye: Sprite3D
 static var watch_eye_texture: Texture2D
 
@@ -444,6 +467,13 @@ static func eye_texture() -> Texture2D:
 	return watch_eye_texture
 
 func set_status(u: Dictionary) -> void:
+	var side := "enemy" if str(u.side) == "enemy" else "ally"
+	if side_badge26 == null:
+		side_badge26 = Sprite3D.new(); side_badge26.name = "SideBadge26"
+		side_badge26.billboard = BaseMaterial3D.BILLBOARD_ENABLED; side_badge26.no_depth_test = true
+		side_badge26.pixel_size = 0.012; side_badge26.position = Vector3(-0.15, 2.48, 0)
+		side_badge26.render_priority = -1; add_child(side_badge26)
+	side_badge26.texture = _side_texture26(side)
 	if watch_eye == null:
 		watch_eye = Sprite3D.new(); watch_eye.texture = eye_texture(); watch_eye.pixel_size = 0.025
 		watch_eye.billboard = BaseMaterial3D.BILLBOARD_ENABLED; watch_eye.no_depth_test = true
@@ -451,14 +481,14 @@ func set_status(u: Dictionary) -> void:
 	watch_eye.visible = bool(u.get("overwatch",false))
 	if status_label == null:
 		status_label = Label3D.new(); status_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-		status_label.position.y = 2.0; status_label.font_size = 15; status_label.pixel_size = 0.0012; status_label.fixed_size = true
-		status_label.outline_size = 4; add_child(status_label)
+		status_label.position.y = 2.40; status_label.font_size = 18; status_label.pixel_size = 0.003; status_label.fixed_size = true
+		status_label.outline_size = 4; status_label.no_depth_test = true; status_label.render_priority = 1; add_child(status_label)
 	var badges: Array[String] = []
 	for pair in [["concealed", "HIDDEN"], ["overwatch", "WATCH"], ["hunkered", "HUNKER"], ["stunned", "STUN"], ["disarmed", "DISARM"], ["rooted", "BOUND"], ["suppressed", "PINNED"], ["marked", "MARKED"], ["tricked", "TRICKED"]]:
 		if bool(u.get(pair[0], false)): badges.append(pair[1])
 	status_label.text = "%s\nHP %d/%d  %s" % [u.name,u.hp,u.max_hp," · ".join(badges)]
 	if preload("res://scripts/campaign/strat_preferences.gd").get_value("numbers"): status_label.text += "  AP %d · ARM %d" % [u.ap,u.get("armor",0)]
-	status_label.modulate = (Color("f9bf60") if str(u.side) == "enemy" else Color("73d8ff")) if preload("res://scripts/campaign/strat_preferences.gd").get_value("cb") else (Color("ffb09e") if str(u.side) == "enemy" else Color("b8edff"))
+	status_label.modulate = Color.WHITE
 
 func _paced_tween() -> Tween:
 	return create_tween().set_speed_scale(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if enemy_side else 1.0))

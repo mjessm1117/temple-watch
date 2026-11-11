@@ -173,7 +173,8 @@ static func decorate(game: Node3D) -> void:
 		_tint(view.model,overlay)
 
 static func _tint(node: Node, overlay: Material) -> void:
-	if node is MeshInstance3D: node.material_overlay = overlay
+	# Keep the side rim and chest band on meshes already decorated for readability.
+	if node is MeshInstance3D and not node.has_meta("gfx_rim"): node.material_overlay = overlay
 	for child in node.get_children(): _tint(child,overlay)
 
 static func impact(game: Node3D, event: Dictionary) -> void:
