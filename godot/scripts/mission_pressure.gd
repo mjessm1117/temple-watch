@@ -72,6 +72,27 @@ static func next_wave26(m: RefCounted) -> Dictionary:
 		if int(wave.turn) < int(next.turn): next = wave
 	return {"turn":int(next.turn), "count":next.kinds.size(), "entry_tile":Maps.point(next.at)}
 
+static func wave_entry27(m: RefCounted) -> Dictionary:
+	var pending: Array = m.pressure_state.get("pending", [])
+	if pending.is_empty(): return {}
+	var next: Dictionary = pending[0]
+	for wave in pending:
+		if int(wave.turn) < int(next.turn): next = wave
+	var tile: Vector2i = Maps.point(next.at)
+	var side := "north" if tile.y <= 3 else "west" if tile.x <= 3 else "east" if tile.x >= int(m.spec.width)-3 else str(next.name)
+	var landings: Array[Vector2i] = []
+	for _kind in next.kinds:
+		for radius in range(1, 5):
+			var found := false
+			for y in range(tile.y-radius, tile.y+radius+1):
+				for x in range(tile.x-radius, tile.x+radius+1):
+					var p := Vector2i(x,y)
+					if m.passable(p) and not m.occupied(p) and p not in landings:
+						landings.append(p); found = true; break
+				if found: break
+			if found: break
+	return {"turns_left":maxi(0,int(next.turn)-m.turn), "count":next.kinds.size(), "entry_tiles":landings, "side":side}
+
 static func reveal_info(m: RefCounted, group: Array) -> Dictionary:
 	var kinds: Array = []
 	var number := -1

@@ -3,6 +3,7 @@ class_name RescueMission
 const Maps = preload("res://scripts/map_catalog.gd")
 const Objectives = preload("res://scripts/mission_objectives.gd")
 const Pressure = preload("res://scripts/mission_pressure.gd")
+const Opening27 = preload("res://scripts/w27a_opening.gd")
 const Hack = preload("res://scripts/mission_hack.gd")
 const Telemetry = preload("res://scripts/mission_metrics.gd")
 const Families11 = preload("res://scripts/mission11_families.gd")
@@ -53,7 +54,10 @@ func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") ->
 		for key in tuning:
 			if key == "objective": spec.objective.merge(tuning.objective,true)
 			else: spec[key] = tuning[key]
+		if str(spec.get("id", "")) == "rescue": spec.turn_limit = 11
+		if str(spec.get("id", "")) == "envoy": spec.turn_limit = 16
 		if int(spec.objective.get("hold_turns",0)) > 0: spec.objective.hp = maxi(int(spec.objective.hp),int(spec.objective.get("hold_hp",0)))
+		if str(spec.get("id", "")) == "relay" and Settings.difficulty == "normal": spec.objective.hp = 32
 	catalog = _json("res://data/units.json")
 	abilities = preload("res://scripts/class_registry.gd").ability_catalog()
 	preload("res://scripts/class_registry.gd").apply_to_units(catalog)
@@ -651,6 +655,12 @@ func opening_contact26() -> Dictionary:
 
 func next_wave26() -> Dictionary:
 	return Pressure.next_wave26(self) if modern else {}
+
+func wave_entry27(_m: RefCounted = null) -> Dictionary:
+	return Pressure.wave_entry27(self) if modern else {}
+
+func opening_choices27(_m: RefCounted = null) -> Dictionary:
+	return Opening27.choices(self)
 
 func hack(unit: Dictionary, at: Vector2i, mode: String = "safe") -> Dictionary:
 	return Hack.use(self,unit,at,mode) if modern else {"ok":false,"reason":"Use the existing Hack ability"}

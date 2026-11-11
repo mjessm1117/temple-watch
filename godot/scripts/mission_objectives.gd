@@ -19,7 +19,7 @@ static func setup(m: RefCounted) -> void:
 	if f == "defend" and int(m.spec.objective.get("hold_turns",0)) > 0:
 		for enemy in m.living("enemy"):
 			enemy.awake = true; enemy.spotted = true; enemy.detected = true
-		m.queue_reinforcement(m.spec.wave_roster[0],1,"Gate assault 1")
+		m.queue_reinforcement(m.spec.wave_roster[0],2 if bool(m.spec.get("first_mission", false)) else 1,"Gate assault 1")
 		m.pressure_state.waves = 1
 	m.message("%s — %s" % [m.spec.name,status(m).label])
 
@@ -134,12 +134,14 @@ static func enemy_end(m: RefCounted) -> void:
 			var radius := float(m.spec.objective.get("zone_radius",2))
 			var allies: int = m.living("player").filter(func(u): return Shot.distance(Shot.pos(u),at) <= radius).size()
 			var hostiles: int = m.living("enemy").filter(func(u): return Shot.distance(Shot.pos(u),at) <= radius).size()
-			var opening_grace: bool = bool(m.spec.get("first_mission", false)) and m.living("player").any(func(u): return u.has("rid"))
-			m.objective_state.overrun = int(m.objective_state.overrun) + 1 if hostiles >= 2 and (hostiles > allies if opening_grace else hostiles >= allies) else 0
-			var loss_grace := 3 if opening_grace and allies > 0 else 2
+			var opening_grace: bool = bool(m.spec.get("first_mission", false))
+			var contested := hostiles >= 2 and (hostiles > allies if opening_grace else hostiles >= allies)
+			m.objective_state.overrun = int(m.objective_state.overrun) + 1 if contested else 0
+			var loss_grace := 3 if opening_grace else 2
 			if int(m.objective_state.overrun) >= loss_grace or (not opening_grace and hostiles >= 2 and hostiles > allies): fail(m,"The gate zone is overrun.")
 			else:
-				m.objective_state.held += 1
+				if not contested: m.objective_state.held += 1
+				else: m.message("Gate contested: clear the zone next turn to recover the line.")
 				if int(m.objective_state.held) >= int(m.spec.objective.hold_turns):
 					m.result = "win"; m.message("%s held." % str(m.spec.objective.name))
 		elif int(m.pressure_state.get("waves",0)) >= int(m.spec.objective.waves) and m.pressure_state.pending.is_empty() and m.living("enemy").is_empty(): primary_done(m)
