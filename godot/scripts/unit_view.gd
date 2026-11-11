@@ -7,6 +7,7 @@ var unit_id: int
 var model: Node3D
 var animation: AnimationPlayer
 var lod_animation: AnimationPlayer
+var lod2_animation: AnimationPlayer
 var base_clip := "idle"
 var motion: Tween
 var turn_motion: Tween
@@ -16,7 +17,11 @@ var ring: MeshInstance3D
 var foot: AudioStreamPlayer
 var hum: AudioStreamPlayer
 var saber_blade: MeshInstance3D
+var saber_halo: MeshInstance3D
 var saber_active := false
+var saber_halo_enabled := true
+static var _saber_mesh: ArrayMesh
+static var _saber_shader: Shader
 var _step_stream: AudioStreamWAV
 var _action_serial := 0
 var _cover_level := 0
@@ -44,7 +49,15 @@ func setup(u: Dictionary, scene: PackedScene, at: Vector3) -> void:
 			var low := low_scene.instantiate() as Node3D
 			model.add_child(low)
 			_set_lod_range(model, 0.0, 26.0, low)
-			_set_lod_range(low, 26.0, 0.0)
+			var far_scene := load(W17_ROOT + kind + "_lod2.glb") as PackedScene
+			if far_scene != null:
+				_set_lod_range(low, 26.0, 42.0)
+				var far := far_scene.instantiate() as Node3D
+				low.add_child(far)
+				_set_lod_range(far, 42.0, 0.0)
+				lod2_animation = _find_animation(far)
+			else:
+				_set_lod_range(low, 26.0, 0.0)
 			lod_animation = _find_animation(low)
 	ring = MeshInstance3D.new()
 	var disc := CylinderMesh.new(); disc.top_radius = 0.48; disc.bottom_radius = 0.48; disc.height = 0.035
@@ -80,6 +93,11 @@ func set_saber_active(value: bool) -> void:
 	if hum != null:
 		if saber_active and not hum.playing: hum.play()
 		elif not saber_active: hum.stop()
+
+func set_saber_halo(enabled: bool) -> void:
+	saber_halo_enabled = enabled
+	if saber_blade != null:
+		(saber_blade.material_override as ShaderMaterial).set_shader_parameter("halo_alpha", 0.23 if enabled else 0.0)
 
 static func battle_model_path(u: Dictionary) -> String:
 	var kind := w17_kind(u)
@@ -125,8 +143,8 @@ func _attach_saber(u: Dictionary) -> void:
 	hand.bone_name = "hand_r"
 	skeleton.add_child(hand)
 	var grip := Node3D.new()
-	# Imported armature carries a 0.01 scale; restore world-sized equipment.
-	grip.scale = Vector3.ONE * 80.0
+	# BoneAttachment3D is already in model units; keep the blade beside the hand.
+	grip.scale = Vector3.ONE
 	grip.rotation.x = PI
 	grip.position.y = 0.07
 	hand.add_child(grip)
@@ -137,25 +155,62 @@ func _attach_saber(u: Dictionary) -> void:
 	var steel := StandardMaterial3D.new(); steel.albedo_color = Color("a8b7bc")
 	hilt.material_override = steel
 	var blade := MeshInstance3D.new()
-	var blade_mesh := CapsuleMesh.new()
-	blade_mesh.radius = 0.038; blade_mesh.height = 1.06; blade_mesh.radial_segments = 8; blade_mesh.rings = 4
-	blade.mesh = blade_mesh; blade.position.y = 0.62
+	blade.mesh = _blade_mesh(); blade.position.y = 0.62
 	var color := Color(str(u.get("col", "#79d3e2")))
-	var glow := StandardMaterial3D.new()
-	glow.albedo_color = color; glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	glow.emission_enabled = true; glow.emission = color; glow.emission_energy_multiplier = 2.6
+	var glow := ShaderMaterial.new()
+	glow.shader = _blade_shader()
+	glow.set_shader_parameter("blade_color", color)
 	blade.material_override = glow; grip.add_child(blade)
 	saber_blade = blade
+	saber_halo = blade
+	set_saber_halo(saber_halo_enabled)
+
+static func _blade_mesh() -> ArrayMesh:
+	if _saber_mesh != null: return _saber_mesh
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for spec in [[0.038, 1.06, 8, 4, 1.0], [0.105, 1.08, 6, 1, 0.2]]:
+		var capsule := CapsuleMesh.new()
+		capsule.radius = spec[0]; capsule.height = spec[1]
+		capsule.radial_segments = spec[2]; capsule.rings = spec[3]
+		var faces := capsule.get_faces()
+		for i in range(0, faces.size(), 3):
+			var normal := (faces[i + 1] - faces[i]).cross(faces[i + 2] - faces[i]).normalized()
+			for j in 3:
+				surface.set_normal(normal)
+				surface.set_color(Color(1.0, 1.0, 1.0, spec[4]))
+				surface.add_vertex(faces[i + j])
+	_saber_mesh = surface.commit()
+	return _saber_mesh
+
+static func _blade_shader() -> Shader:
+	if _saber_shader != null: return _saber_shader
+	_saber_shader = Shader.new()
+	_saber_shader.code = """shader_type spatial;
+render_mode unshaded, blend_add, depth_draw_never, cull_disabled;
+uniform vec4 blade_color : source_color = vec4(0.48, 0.83, 0.89, 1.0);
+uniform float halo_alpha = 0.23;
+void fragment() {
+	float shell = step(COLOR.a, 0.5);
+	ALBEDO = blade_color.rgb;
+	EMISSION = blade_color.rgb * mix(2.4, 1.2, shell);
+	ALPHA = mix(1.0, halo_alpha, shell);
+}"""
+	return _saber_shader
 
 func play(clip: String) -> void:
 	if animation == null: return
 	animation.speed_scale = float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if enemy_side else 1.0)
 	if lod_animation != null: lod_animation.speed_scale = animation.speed_scale
+	if lod2_animation != null: lod2_animation.speed_scale = animation.speed_scale
 	var name := clip if animation.has_animation(clip) else base_clip if animation.has_animation(base_clip) else "idle"
+	var blend := 0.12 if name == "run" else 0.18 if animation.current_animation == "run" else 0.08 if name == "shoot" else 0.1
 	if animation.has_animation(name) and animation.current_animation != name:
-		animation.play(name, 0.14 if clip == "run" else 0.1)
+		animation.play(name, blend)
 	if lod_animation != null and lod_animation.has_animation(name) and lod_animation.current_animation != name:
-		lod_animation.play(name, 0.14 if clip == "run" else 0.1)
+		lod_animation.play(name, blend)
+	if lod2_animation != null and lod2_animation.has_animation(name) and lod2_animation.current_animation != name:
+		lod2_animation.play(name, blend)
 
 func set_selected(value: bool, enemy: bool) -> void:
 	if ring == null: return
@@ -251,7 +306,7 @@ func travel(route: Array) -> void:
 		var flat: Vector3 = point - previous
 		if flat.length_squared() < 0.001: continue
 		motion.tween_callback(func() -> void: face(point))
-		motion.tween_property(self, "position", point, maxf(0.08, flat.length() / 4.0)).set_trans(Tween.TRANS_SINE)
+		motion.tween_property(self, "position", point, maxf(0.08, flat.length() / 4.0)).set_trans(Tween.TRANS_LINEAR)
 		motion.parallel().tween_callback(_footstep).set_delay(0.07)
 		previous = point
 	motion.tween_callback(func() -> void: if alive: play(base_clip))
@@ -280,7 +335,6 @@ func fall() -> void:
 	tween.chain().tween_interval(CORPSE_LIFETIME)
 	tween.chain().tween_callback(queue_free)
 	var game := get_parent().get_parent() if get_parent() != null else null
-	if game != null and game.get("sound") != null and game.sound.has_method("cue"): game.sound.cue("kill")
 	if game != null and game.get("fx") is Node3D and get_parent() == game.get("figures"):
 		reparent(game.fx, true)
 
