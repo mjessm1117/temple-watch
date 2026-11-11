@@ -17,6 +17,7 @@ var phone := false
 var sight: Control
 var lighting: Node
 var cine_toggle: Button
+var swipe24: Node
 
 static func phone_frame_point(game, midpoint: Vector3) -> Vector3:
 	var size: Vector2i = preload("res://scripts/phone_layout.gd").window_size()
@@ -107,6 +108,9 @@ func setup(game, root: Control, on_phone: bool) -> void:
 		cancel = _button("CANCEL", 76, g._cancel_order); cancel.name = "AimCancel"; row.add_child(cancel)
 	panel.hide()
 	if target_row != null: target_row.hide()
+	swipe24 = preload("res://scripts/w24_command_aim_swipe.gd").new()
+	swipe24.game = g; swipe24.panel = panel; swipe24.target_row = target_row
+	root.add_child(swipe24)
 
 func _button(value: String, width: float, action: Callable) -> Button:
 	var b := Button.new(); b.text = value; b.focus_mode = Control.FOCUS_NONE
