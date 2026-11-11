@@ -213,6 +213,7 @@ func move(id: int, dest: Vector2i) -> bool:
 		for i in range(event_start, action_events.size()):
 			if action_events[i].kind == "move" and int(action_events[i].actor) == id:
 				action_events[i].path = route
+				action_events[i].dash24 = bool(u.dashing)
 		if str(u.side) == "enemy" and squad_concealed:
 			for p in living("player"): Concealment.detect_path(self, p)
 	u.erase("combat_route"); u.erase("dashing")

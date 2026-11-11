@@ -20,11 +20,14 @@ static func drain(game: Node3D) -> void:
 		var view: Node3D = game.views.get(int(id))
 		if view == null or int(u.get("hp",0)) <= 0: continue
 		if not game.cam.skip_requested:
-			view.travel(game.presentation_routes[id])
+			var meta24: Dictionary = game.presentation_route_meta24.get(id, {})
+			if view.has_method("travel24"): view.travel24(game.presentation_routes[id], bool(meta24.get("dash", false)), meta24.get("segments", []))
+			else: view.travel(game.presentation_routes[id])
 			while view.motion != null and view.motion.is_running() and not game.cam.skip_requested: await game.get_tree().process_frame
 		if view.motion != null and view.motion.is_running(): view.motion.kill()
 		view.position = _point(game.mission, Shot.pos(u))
 	game.presentation_routes.clear()
+	game.presentation_route_meta24.clear()
 
 static func flush_quiet(game: Node3D) -> void:
 	for view in game.quiet_motions:
@@ -131,9 +134,15 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 					if past: remainder.append(_point(game.mission,p))
 					else: points.append(_point(game.mission,p))
 					if p == stop: past = true
-				if not remainder.is_empty(): game.presentation_routes[int(event.actor)] = remainder
+				if not remainder.is_empty():
+					game.presentation_routes[int(event.actor)] = remainder
+					var remaining_segments24: Array = preload("res://scripts/w24_threat_route.gd").segments(game.mission, event.get("path", [event.to]), event.from).slice(points.size()) if game.mission.has_method("route_segments24") else []
+					game.presentation_route_meta24[int(event.actor)] = {"dash":bool(event.get("dash24", false)), "segments":remaining_segments24}
 				if not game.cam.skip_requested:
-					actor.travel(points)
+					var route24: Array = event.get("path", [event.to])
+					var segments24: Array = preload("res://scripts/w24_threat_route.gd").segments(game.mission, route24, event.from) if game.mission.has_method("route_segments24") else []
+					if actor.has_method("travel24"): actor.travel24(points, bool(event.get("dash24", false)), segments24.slice(0, points.size()))
+					else: actor.travel(points)
 					if not game.quiet_motions.has(actor): game.quiet_motions.append(actor)
 					game.quiet_targets[int(event.actor)] = _point(game.mission, stop)
 				else: actor.position = _point(game.mission, stop)
@@ -204,7 +213,7 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 			var target: Dictionary = game.mission.unit_by_id(int(event.target))
 			if str(target.side) == "player": victim.set_downed(true)
 			else:
-				if victim.has_method("fall24"): victim.call("fall24", posmod(int(event.actor) + int(event.target), 3), to - from)
+				if victim.has_method("fall24"): victim.call("fall24", -1, to - from)
 				else: victim.fall()
 				game.views.erase(int(event.target))
 	if damage > 0: game.sound.play("hit")

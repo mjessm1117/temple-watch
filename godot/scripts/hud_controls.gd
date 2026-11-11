@@ -272,6 +272,8 @@ func _build_ui() -> void:
 	if Phone.narrow(Phone.window_size()):
 		phone = preload("res://scripts/hud_phone.gd").new()
 		phone.setup(g, night, root, top, left, right, bottom, row)
+		# Phone HUD uses a static portrait, so the hidden 3D portrait need not render.
+		g.portrait_viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
 	else:
 		bar = preload("res://scripts/battle13_bar.gd").new()
 		bar.setup(g, root, row, g.action_buttons)

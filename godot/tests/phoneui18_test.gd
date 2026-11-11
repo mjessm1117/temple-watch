@@ -131,7 +131,7 @@ func battle(value: Vector2i) -> void:
 		var before: Vector3 = game.pivot
 		await swipe(control.get_global_rect().get_center())
 		if control == phone.ability_buttons[0]:
-			check(game.pivot.distance_to(before) > 0.03, "%s ability drag still pans in HUD lane" % value)
+			check(game.pivot.distance_to(before) < 0.03, "%s ability drag leaves board still" % value)
 		else:
 			check(game.pivot.distance_to(before) < 0.03, "%s drag from %s leaves board still" % [value, control.name])
 	var selected_before: int = game.selected_id

@@ -22,6 +22,20 @@ static func bindings24() -> Dictionary:
 		if not parsed.is_empty(): result[action] = parsed
 	return result
 
+func get_bindings24() -> Dictionary:
+	return bindings24()
+
+func set_binding24(action_name: String, key: Variant) -> bool:
+	if not DEFAULT_BINDINGS.has(action_name): return false
+	var code := OS.find_keycode_from_string(str(key)) if not key is int else int(key)
+	if code <= 0: return false
+	var cfg := ConfigFile.new()
+	cfg.load("user://controls24.cfg")
+	var overrides: Dictionary = cfg.get_value("controls", "keymap", {})
+	overrides[action_name] = [str(key)]
+	cfg.set_value("controls", "keymap", overrides)
+	return cfg.save("user://controls24.cfg") == OK
+
 static func confirm_move24(touch: bool) -> bool:
 	var cfg := ConfigFile.new()
 	if cfg.load("user://controls24.cfg") != OK: return touch

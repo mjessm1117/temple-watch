@@ -22,6 +22,9 @@ var cam_sensitivity := 1.0
 var invert_rotate := false
 var invert_pan := false
 
+func gesture_owns_touch24() -> bool:
+	return not fingers.is_empty()
+
 static func is_tap(distance: float) -> bool:
 	return distance <= THRESHOLD
 

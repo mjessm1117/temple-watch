@@ -6,6 +6,7 @@ var config := ConfigFile.new()
 var keymap: Dictionary = {}
 var remap_action := ""
 var key_buttons: Dictionary = {}
+var binding_source: Object
 
 func _ready() -> void:
 	add_theme_constant_override("separation", 6)
@@ -31,15 +32,17 @@ func _ready() -> void:
 	_toggle("Confirm move", "confirm_move", preload("res://scripts/phone_layout.gd").touch_device())
 	var keys := Label.new(); keys.text = "KEY BINDINGS"; keys.add_theme_font_size_override("font_size", 16); add_child(keys)
 	var bindings: Dictionary = {}
-	if source != null and source.has_method("bindings24"):
-		bindings = source.call("bindings24")
+	if source != null and (source.has_method("get_bindings24") or source.has_method("bindings24")):
+		binding_source = source
+		bindings = source.call("get_bindings24" if source.has_method("get_bindings24") else "bindings24")
 	else:
 		for path in ["res://scripts/input_controls.gd", "res://scripts/combat_targeting.gd"]:
 			var script: Script = load(path)
 			if script == null: continue
 			var candidate: Object = script.new()
-			if candidate.has_method("bindings24"):
-				bindings = candidate.call("bindings24")
+			if candidate.has_method("get_bindings24") or candidate.has_method("bindings24"):
+				binding_source = candidate
+				bindings = candidate.call("get_bindings24" if candidate.has_method("get_bindings24") else "bindings24")
 				break
 	if bindings.is_empty():
 		var fallback := {"Move": "1", "Shoot": "2", "Strike": "3", "Push": "4", "Overwatch": "6", "Hunker": "7", "Confirm": "Enter", "Cancel": "Esc", "Next unit": "Tab", "Rotate": "Q / E", "Pan": "W / A / S / D"}
@@ -84,6 +87,8 @@ func _input(event: InputEvent) -> void:
 	var key := OS.get_keycode_string(event.keycode)
 	if key == "": return
 	keymap[action] = [key]
+	if binding_source != null and binding_source.has_method("set_binding24"):
+		binding_source.call("set_binding24", action, key)
 	_save("keymap", keymap)
 	key_buttons[action].text = key
 	get_viewport().set_input_as_handled()

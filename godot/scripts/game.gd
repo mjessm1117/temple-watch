@@ -67,6 +67,7 @@ var end_turn_armed := false
 var warning_label: Label
 var enemy_frame_sequence := 0
 var presentation_routes: Dictionary = {}
+var presentation_route_meta24: Dictionary = {}
 var playing_enemy_events := false
 var player_attack_pending := false
 var terrain_seen_revision := 0
@@ -227,8 +228,11 @@ func _use_ability(id: int = -1, tile: Vector2i = Vector2i(-1, -1)) -> void:
 						var hit_event := {"actor":selected_id, "target":int(u.id), "damage":-change}
 						FeelEvents.emit(self, "hit", hit_event, at)
 						FeelEvents.cue(self, "hit")
+						FeelBeats24.cue(self, "hit", at)
 						if str(u.side) == "player": FeelEvents.emit(self, "hurt", hit_event, at)
-						if int(u.hp) <= 0: FeelEvents.emit(self, "kill", hit_event, at); FeelEvents.cue(self, "kill")
+						if int(u.hp) <= 0:
+							FeelEvents.emit(self, "kill", hit_event, at); FeelEvents.cue(self, "kill")
+							FeelBeats24.cue(self, "kill", at)
 		await EnemyPresentation.drain(self)
 	cam.finish()
 	player_attack_pending = false
@@ -376,13 +380,19 @@ func _move_selected(dest: Vector2i) -> void:
 	var reach: Dictionary = mission.paths(u, int(u.mob) * 2)
 	if not reach.costs.has(dest): return
 	var points: Array[Vector3] = []
+	var route_tiles: Array[Vector2i] = []
 	var cursor := dest
 	while reach.prev.has(cursor):
 		points.push_front(Vector3(cursor.x, Shot.elevation(mission, cursor) * 0.7, cursor.y))
+		route_tiles.push_front(cursor)
 		cursor = reach.prev[cursor]
+	var dash24 := int(reach.costs[dest]) > int(u.mob)
+	var segments24: Array = mission.route_segments24(route_tiles, selected_id) if mission.has_method("route_segments24") else []
 	if DisplayServer.get_name() == "headless" and not animate_headless:
 		if mission.move(selected_id, dest):
-			if views.has(selected_id): views[selected_id].travel(points)
+			if views.has(selected_id):
+				if views[selected_id].has_method("travel24"): views[selected_id].travel24(points, dash24, segments24)
+				else: views[selected_id].travel(points)
 			_glide_to(BattleCamera.phone_focus(Vector3(dest.x, 0, dest.y), yaw, 1.55), 0.35, BattleCamera.selected_zoom(mission))
 			mission.action_events.clear(); _after_action(); _refresh()
 		return
@@ -402,7 +412,8 @@ func _move_selected(dest: Vector2i) -> void:
 			if Vector2i(roundi(point.x), roundi(point.z)) == stop: break
 		if views.has(selected_id):
 			var view: Node3D = views[selected_id]
-			view.travel(visible_route)
+			if view.has_method("travel24"): view.travel24(visible_route, dash24, segments24.slice(0, visible_route.size()))
+			else: view.travel(visible_route)
 			while view.motion != null and view.motion.is_running() and not cam.skip_requested: await get_tree().process_frame
 		await EnemyPresentation.drain(self)
 		if int(u.hp) > 0 and views.has(selected_id) and stop != dest:
@@ -413,7 +424,8 @@ func _move_selected(dest: Vector2i) -> void:
 				if past: rest.append(point)
 				if Vector2i(roundi(point.x), roundi(point.z)) == stop: past = true
 			if not cam.skip_requested:
-				view.travel(rest)
+				if view.has_method("travel24"): view.travel24(rest, dash24, segments24.slice(visible_route.size()))
+				else: view.travel(rest)
 				while view.motion != null and view.motion.is_running() and not cam.skip_requested: await get_tree().process_frame
 			view.position = Vector3(u.x, Shot.elevation(mission, Shot.pos(u))*0.7, u.y)
 	mission.defer_resolution = false

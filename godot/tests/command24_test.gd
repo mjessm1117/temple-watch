@@ -119,7 +119,7 @@ func run() -> void:
 	var controls: Control = game.overlay.find_child("MoveConfirm24", true, false)
 	if controls != null: check(controls is BaseButton and controls.custom_minimum_size.y >= 44 and controls.size.x >= 196, "move controls are touch-owned with two 44 px areas")
 	if controls != null:
-		check(game.cam.touch._button_at(game.overlay, controls.get_global_rect().get_center()) == controls, "touch gesture owner recognizes move controls")
+		check(game.cam.touch._control_at(game.get_viewport(), controls.get_global_rect().get_center()) == controls, "touch gesture owner recognizes move controls")
 		var move_game := MoveGame.new(); root.add_child(move_game); controls.game = move_game
 		var tap := InputEventScreenTouch.new(); tap.index = 0; tap.pressed = true; tap.position = Vector2(20, 20)
 		controls._gui_input(tap)

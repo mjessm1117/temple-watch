@@ -335,11 +335,9 @@ func _show_ability(button: Button) -> void:
 func _ability_input(event: InputEvent, button: Button) -> void:
 	if event is InputEventScreenTouch and event.pressed or event is InputEventMouseButton and event.pressed: _show_ability(button)
 	if event is InputEventScreenDrag:
-		if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
-		var right: Vector3 = g.camera.global_basis.x
-		var forward: Vector3 = -g.camera.global_basis.z; forward.y = 0.0; forward = forward.normalized()
-		g.pivot += (-right * event.relative.x + forward * event.relative.y) * g.zoom * 0.0015
-		g._update_camera()
+		# An ability drag belongs to the HUD; only touches begun on the map pan it.
+		if g.cam.touch.has_method("gesture_owns_touch24") and g.cam.touch.gesture_owns_touch24(): return
+		return
 
 func _plate_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:

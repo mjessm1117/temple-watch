@@ -166,7 +166,7 @@ func battle(size: Vector2i) -> void:
 				check(not hud.feedback.busy.visible, "K11 busy cue clears")
 				var controls := preload("res://scripts/w24_hud_controls_settings.gd").new(); view.add_child(controls); await frames()
 				check(controls.find_child("CameraSensitivity", true, false) != null, "K12 sensitivity control")
-				check(controls.get_child_count() > 10, "K12 read-only bindings list without bindings24")
+				check(controls.key_buttons.has("overwatch"), "K12 merged command bindings are editable")
 				(controls.find_child("CameraSensitivity", true, false) as HSlider).value = 1.3
 				var cfg := ConfigFile.new(); cfg.load("user://controls24.cfg")
 				check(is_equal_approx(float(cfg.get_value("controls", "cam_sensitivity", 0)), 1.3), "K12 controls24.cfg saved")

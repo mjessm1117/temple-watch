@@ -18,7 +18,8 @@ static func impact(game: Node3D, event: Dictionary, from: Vector3, to: Vector3, 
 	var damage := int(event.get("damage", 0))
 	var direction := to - from
 	if damage > 0:
-		cue(game, "hit", to, 1.2 if str(event.get("outcome", "")) == "crits" else 1.0)
+		# Bolt, saber, and Force already emit the ordinary contact cue in fx.gd.
+		if str(event.get("outcome", "")) == "crits": cue(game, "crit", to, 1.2)
 		if game.fx != null and game.fx.has_method("hit_stop") and not game.cam.skip_requested: game.fx.hit_stop(0.055)
 		nudge(victim, direction)
 		if bool(event.get("killed", false)): cue(game, "kill", to, 1.0)

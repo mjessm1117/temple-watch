@@ -100,7 +100,7 @@ func run() -> void:
 	Beats24.impact(game, hit, from, to, victim)
 	for i in range(4): await process_frame
 	proof24("hit-impulse")
-	check(probe.cues == ["hit"] and probe.stops == [0.055], "B3 normal hit cues and 55 ms hit-stop")
+	check(probe.cues.is_empty() and probe.stops == [0.055], "B3 normal hit leaves cue to fx and keeps 55 ms hit-stop")
 	var miss := hit.duplicate(); miss.damage = 0; miss.outcome = "misses"
 	var dodge_origin: Vector3 = victim.model.position
 	Beats24.impact(game, miss, from, to, victim)
@@ -109,7 +109,7 @@ func run() -> void:
 	proof24("miss-dodge")
 	var kill := hit.duplicate(); kill.killed = true
 	Beats24.impact(game, kill, from, to, victim)
-	check(probe.cues.slice(-2) == ["hit", "kill"], "B9 kill adds emphasis cue")
+	check(probe.cues.back() == "kill" and probe.cues.count("kill") == 1, "B9 kill adds one emphasis cue")
 	ally.hp = 1
 	var clutch := {"kind":"attack", "actor":int(enemy.id), "target":int(ally.id), "mode":"shoot", "damage":1}
 	Beats24.clutch(game, clutch, from)
