@@ -28,8 +28,8 @@ func _ready() -> void:
 	_watch(self)
 	set_process(true)
 	if OS.has_feature("web") and get_tree().root.get_node_or_null("W29bWebProbe") == null:
-		if bool(JavaScriptBridge.eval("location.search.includes('w29b_probe=1')")):
-			var probe := preload("res://scripts/w29b_web_probe.gd").new()
+		if bool(JavaScriptBridge.eval("location.search.includes('w29b_probe=1')")) and ResourceLoader.exists("res://scripts/w29b_web_probe.gd"):
+			var probe: Node = load("res://scripts/w29b_web_probe.gd").new()
 			probe.name = "W29bWebProbe"
 			get_tree().root.call_deferred("add_child", probe)
 

@@ -7,6 +7,60 @@ const Settings = preload("res://scripts/settings.gd")
 const Villain11Battle = preload("res://scripts/villain11_battle.gd")
 const SaveSlots = preload("res://scripts/campaign/save_slots.gd")
 const Beats22 = preload("res://scripts/story/story14_beats.gd")
+
+class SettingsTouchShield extends Control:
+	var owner_scroll: ScrollContainer
+	var start := Vector2.ZERO
+	var candidate: BaseButton
+	var pressed := false
+	var dragged := false
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_STOP
+		set_process(true)
+
+	func _process(_delta: float) -> void:
+		if not is_instance_valid(owner_scroll):
+			queue_free()
+			return
+		var rect := owner_scroll.get_global_rect()
+		position = rect.position
+		size = rect.size
+
+	func _gui_input(event: InputEvent) -> void:
+		if not is_instance_valid(owner_scroll): return
+		if event is InputEventScreenTouch:
+			if event.pressed:
+				pressed = true
+				dragged = false
+				start = event.position
+				candidate = _button_at(start)
+			else:
+				owner_scroll.call("_gui_input", event)
+				if pressed and not dragged and is_instance_valid(candidate):
+					if candidate is OptionButton:
+						candidate.get_popup().popup()
+					else:
+						candidate.pressed.emit()
+				pressed = false
+				candidate = null
+				accept_event()
+				return
+			owner_scroll.call("_gui_input", event)
+			accept_event()
+		elif event is InputEventScreenDrag and pressed:
+			if (event.position - start).length() >= 10.0: dragged = true
+			owner_scroll.call("_gui_input", event)
+			accept_event()
+
+	func _button_at(point: Vector2) -> BaseButton:
+		var found: BaseButton
+		for node in owner_scroll.find_children("*", "BaseButton", true, false):
+			var button := node as BaseButton
+			if button.is_visible_in_tree() and not button.disabled and (button.get_global_rect().has_point(point) or button.get_global_rect().has_point(get_global_transform() * point)):
+				found = button
+		return found
+
 var campaign: RefCounted
 var story: RefCounted
 var active := false
@@ -117,7 +171,7 @@ func open_settings() -> void:
 	settings.add_theme_constant_override("separation", 8)
 	var controls_section := settings.find_child("ControlsSection", true, false) as BoxContainer
 	if controls_section != null: controls_section.add_theme_constant_override("separation", 8)
-	var touch_shield := preload("res://scripts/w29b_touch_shield.gd").new()
+	var touch_shield := SettingsTouchShield.new()
 	touch_shield.name = "SettingsTouchShield"
 	touch_shield.owner_scroll = scroll
 	layer.add_child(touch_shield)
