@@ -1,6 +1,6 @@
 extends RefCounted
 ## Battle HUD coordinates are phone CSS points after Window.content_scale_factor.
-const ACTION_MIN_SIZE := Vector2(56, 56)
+const ACTION_MIN_SIZE := Vector2(67, 56)
 
 static func place(control: Control, box: Rect2) -> void:
 	control.anchor_left = 0.0; control.anchor_right = 0.0
@@ -15,7 +15,7 @@ static func boxes(size: Vector2) -> Dictionary:
 	if portrait:
 		var plate_y := h - 226.0
 		return {
-			"header": Rect2(0, 0, w, 76),
+			"header": Rect2(0, 0, w, 72),
 			"plate": Rect2(8, plate_y, w - 16, 68),
 			"tray": Rect2(8, h - 150, w - 16, 68),
 			"end": Rect2(w - 136, h - 74, 128, 66),

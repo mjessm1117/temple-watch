@@ -202,13 +202,14 @@ func refresh_markers(m: RefCounted) -> void:
 	var markers = Batch.new(); markers.models = batch.models; markers.lod_distance = batch.lod_distance
 	# Records are replaced when escort/civilian positions change.
 	batch.records = batch.records.filter(func(record): return record.role != "objective")
-	for point in m.spec.evac:
-		var tile := Maps.point(point); var at := Vector3(tile.x,Shot.elevation(m,tile)*0.7,tile.y)
-		markers.begin_record({"tile":tile,"floor":at.y,"kind":"evac","role":"objective"})
-		# One small beacon at a zone corner leaves the walkable tile and unit centre clear.
-		if point == m.spec.evac[0]:
-			markers.pair(Meshy.objective_path(props,Meshy.action(props,"evac")),at+Vector3(0.33,0,0.33),0.25,0.44)
-		ring(markers,at,palette.evac); markers.end_record()
+	if str(m.objective_state.get("phase", "primary")) == "evac" or not m.modern:
+		for point in m.spec.evac:
+			var tile := Maps.point(point); var at := Vector3(tile.x,Shot.elevation(m,tile)*0.7,tile.y)
+			markers.begin_record({"tile":tile,"floor":at.y,"kind":"evac","role":"objective"})
+			# One small beacon at a zone corner leaves the walkable tile and unit centre clear.
+			if point == m.spec.evac[0]:
+				markers.pair(Meshy.objective_path(props,Meshy.action(props,"evac")),at+Vector3(0.33,0,0.33),0.25,0.44)
+			ring(markers,at,palette.evac); markers.end_record()
 	if bool(m.prisoner.get("active",true)) and m.in_bounds(Shot.pos(m.prisoner)) and m.result != "win":
 		var tile := Shot.pos(m.prisoner); var at := Vector3(tile.x,Shot.elevation(m,tile)*0.7,tile.y)
 		markers.begin_record({"tile":tile,"floor":at.y,"kind":"prisoner","role":"objective"})

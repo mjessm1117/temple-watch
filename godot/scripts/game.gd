@@ -84,7 +84,6 @@ var clutch_turn24 := -1
 var _reported_busy24 := false
 func impact_budget27() -> Dictionary:
 	return fx.impact_budget27() if fx != null and fx.has_method("impact_budget27") else {"draws_per_beat": 4, "particles_max": 12}
-
 func _ready() -> void:
 	scene_view.g = self
 	cam.g = self
@@ -120,6 +119,7 @@ func _ready() -> void:
 	pivot = BattleCamera.phone_focus(pivot,yaw,1.55)
 	_update_camera()
 	_refresh()
+	if hud_controls.phone != null: cam.frame_selected_safe29.call_deferred()
 	if sound.has_method("set_music_state"): sound.set_music_state("calm")
 	battle_event.emit("player_turn_start", "", "", {"world_pos":pivot, "turn":mission.turn})
 	var demo := ""
@@ -154,7 +154,7 @@ func _clear(node: Node) -> void:
 func _refresh_figures() -> void:
 	scene_view._refresh_figures()
 func _refresh_highlights(force: bool = false) -> void:
-	hud_controls._refresh_highlights(force)
+	hud_controls._refresh_highlights(force); preload("res://scripts/w29a_move_controls.gd").place(self)
 func _build_ui() -> void:
 	hud_controls._build_ui()
 func _choose_action(mode: String) -> void:
