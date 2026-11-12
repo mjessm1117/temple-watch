@@ -3,6 +3,7 @@ extends RefCounted
 const THRESHOLD := 18.0 # Viewport positions are logical pixels on high-density phones.
 const UNIT_PICK_RADIUS27 := 36.0
 const CameraRules = preload("res://scripts/battle11_camera.gd")
+const MoveInput28 = preload("res://scripts/w28e_move_input.gd")
 var g
 var fingers: Dictionary = {}
 var start := Vector2.ZERO
@@ -65,6 +66,12 @@ func _pan(delta: Vector2) -> void:
 	g.pivot += (-right * delta.x + forward * delta.y) * g.zoom * 0.0015 * cam_sensitivity * direction
 	g._update_camera()
 
+func _modal_open28() -> bool:
+	var hud: Variant = g.get("hud_controls")
+	if hud == null: return false
+	if hud.phone != null and hud.phone.popup != null and hud.phone.popup.visible: return true
+	return hud.night != null and hud.night.pause_back != null and hud.night.pause_back.visible
+
 func handle(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		if event.pressed:
@@ -75,7 +82,7 @@ func handle(event: InputEvent) -> void:
 				gesture = ""
 				pressed_control = _control_at(g.get_viewport(), event.position)
 				start_on_scroll = _in_scroll(pressed_control)
-				board_start = pressed_control == null and g._screen_tile(event.position).x >= 0
+				board_start = pressed_control == null and MoveInput28.unit_at(g, event.position).is_empty()
 				# The board input owner must not see the emulated press.
 				g.set_process_unhandled_input(false)
 			elif fingers.size() == 2:
@@ -101,7 +108,9 @@ func handle(event: InputEvent) -> void:
 					g.set_process_unhandled_input.call_deferred(true)
 					pinching = false
 					return
-				if tap and not (pressed_control is BaseButton) and g.get_viewport().gui_get_hovered_control() == null and g._screen_tile(event.position).x >= 0:
+				if tap and not _modal_open28() and not (pressed_control is BaseButton) and not start_on_scroll and MoveInput28.tap(g, event.position):
+					pass
+				elif tap and not _modal_open28() and not (pressed_control is BaseButton) and g.get_viewport().gui_get_hovered_control() == null and g._screen_tile(event.position).x >= 0:
 					# In Move mode, a tap on an empty board tile is a destination even
 					# when the larger ally pick halo reaches into that tile.
 					if (g.action == "move" and _empty_board(event.position)) or not _pick_unit27(event.position):

@@ -115,7 +115,7 @@ func run() -> void:
 		print("CAMGEST24 LATENCY ", entry[0], "=", latency_ms, "ms")
 		if entry[0] == "unit": await capture("drag-frame1")
 		touch(t,0,point + Vector2(36,0),false)
-		check(game.pivot.distance_to(before) > 0.05, "%s finger drag pans board" % entry[0])
+		check(game.pivot.distance_to(before) < 0.05 if entry[0] == "unit" else game.pivot.distance_to(before) > 0.05, "%s finger drag respects starting point" % entry[0])
 		var released: Vector3 = game.pivot
 		for i in 20: await process_frame
 		var drift: float = game.pivot.distance_to(released)
@@ -132,9 +132,17 @@ func run() -> void:
 		drag(t,0,point + Vector2(40,0),point)
 		touch(t,0,point + Vector2(40,0),false)
 		check(game.pivot.distance_to(before) < 0.001, name + " start blocks pan through release")
-	# A fresh select glide must yield to the manual drag at 18 logical pixels.
+	# A fresh select glide must yield to a drag that starts on empty board.
 	game._glide_to(game.pivot + Vector3(3,0,0), 0.6)
-	var start: Vector2 = game.camera.unproject_position(Vector3(float(unit.x), 0.8, float(unit.y)))
+	var start := Vector2.ZERO
+	for y in range(230, 630, 40):
+		for x in range(60, 350, 40):
+			var candidate := Vector2(x, y)
+			if t._control_at(game.overlay, candidate) == null and preload("res://scripts/w28e_move_input.gd").unit_at(game, candidate).is_empty() and game._screen_tile(candidate).x >= 0:
+				start = candidate
+				break
+		if start != Vector2.ZERO: break
+	check(start != Vector2.ZERO, "visible empty board point found for glide drag")
 	touch(t,0,start,true)
 	drag(t,0,start + Vector2(36,0),start)
 	touch(t,0,start + Vector2(36,0),false)

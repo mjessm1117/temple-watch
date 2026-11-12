@@ -195,8 +195,9 @@ func exercise(size: Vector2i) -> void:
 	var at: Vector2 = game.camera.unproject_position(Vector3(tile.x, 1.0, tile.y))
 	var ap_before: int = int(unit.ap)
 	old_pivot = game.pivot
+	var drag_starts_on_unit: bool = not preload("res://scripts/w28e_move_input.gd").unit_at(game, at + Vector2(75, 0)).is_empty()
 	await swipe(at + Vector2(75, 0), Vector2(-70, 30))
-	check(game.pivot.distance_to(old_pivot) > 0.03, tag + " board drag pans")
+	check(game.pivot.distance_to(old_pivot) < 0.03 if drag_starts_on_unit else game.pivot.distance_to(old_pivot) > 0.03, tag + " board drag respects starting unit")
 	check(int(unit.ap) == ap_before and game.preview_tile.x < 0, tag + " board drag never moves or selects a tile")
 	# Place visible enemies at distinct ranges to check nearest-first aiming.
 	var actor: Dictionary = {}
