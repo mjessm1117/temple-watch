@@ -105,7 +105,7 @@
           "tag": "READY"
         }
       ],
-      "description": "Give an ally an action and prepare its overwatch."
+      "description": "Use after SHIELDED; grant ATTUNED to allies."
     },
     "officer_command_mark": {
       "name": "Command Mark",
@@ -148,7 +148,7 @@
           "status": "suppressed"
         }
       ],
-      "description": "Mark an enemy for allied accuracy and disrupt its aim."
+      "description": "Exploit PINNED prey; apply MARKED for allies."
     },
     "officer_rally_line": {
       "name": "Rally Line",
@@ -189,7 +189,7 @@
           "amount": 2
         }
       ],
-      "description": "Rally allies with aim and battlefield first aid."
+      "description": "Spend ATTUNED; gain INSPIRED for your next move."
     },
     "officer_coordinated_fire": {
       "name": "Coordinated Fire",
@@ -232,7 +232,7 @@
           "tag": "MARKED"
         }
       ],
-      "description": "Call another ally to shoot the marked target."
+      "description": "Exploit MARKED prey; apply STAGGERED for allies."
     },
     "officer_fallback_order": {
       "name": "Fallback Order",
@@ -273,7 +273,7 @@
           "amount": 3
         }
       ],
-      "description": "Order an ally to withdraw with a fresh action and shield."
+      "description": "Use after ATTUNED; grant ATTUNED to allies."
     },
     "officer_ready_signal": {
       "name": "Ready Signal",
@@ -314,7 +314,7 @@
           "amount": 1
         }
       ],
-      "description": "Signal every ally to gain an action."
+      "description": "Spend READY; gain READY for your next move."
     },
     "officer_tactical_feint": {
       "name": "Tactical Feint",
@@ -357,7 +357,7 @@
           "tag": "EXPOSED"
         }
       ],
-      "description": "Feint into a suppression that exposes the enemy."
+      "description": "Exploit EXPOSED prey; apply PINNED for allies."
     },
     "officer_focus_fire": {
       "name": "Focus Fire",
@@ -405,7 +405,7 @@
           "tag": "MARKED"
         }
       ],
-      "description": "Concentrate allied fire on one marked foe."
+      "description": "Exploit EXPOSED prey; apply BURNING for allies."
     },
     "officer_hold_fast": {
       "name": "Hold Fast",
@@ -447,7 +447,7 @@
           "amount": 2
         }
       ],
-      "description": "Hold a defensive formation and shield the squad."
+      "description": "Spend READY; gain ATTUNED for your next move."
     },
     "officer_battle_plan": {
       "name": "Battle Plan",
@@ -494,7 +494,7 @@
           "tag": "INSPIRED"
         }
       ],
-      "description": "Give an ally initiative and keep your own command action."
+      "description": "Use after INSPIRED; grant INSPIRED to allies."
     },
     "officer_counter_order": {
       "name": "Counter Order",
@@ -537,7 +537,7 @@
           "status": "stunned"
         }
       ],
-      "description": "Order a countershot and stun the foe."
+      "description": "Exploit EXPOSED prey; apply IONIZED for allies."
     },
     "officer_full_assault": {
       "name": "Full Assault",
@@ -585,7 +585,7 @@
           "tag": "READY"
         }
       ],
-      "description": "Once per mission: order a squad-wide attack with ready follow-ups.",
+      "description": "Spend INSPIRED; gain READY for your next move.",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "officer"
@@ -634,7 +634,7 @@
           "amount": 2
         }
       ],
-      "description": "Once per mission: double an ally command and guard the squad.",
+      "description": "Use after INSPIRED; grant ATTUNED to allies.",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "officer"

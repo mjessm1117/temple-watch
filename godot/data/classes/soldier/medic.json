@@ -79,7 +79,7 @@
           "amount": 1
         }
       ],
-      "description": "Spray and cleanse the squad while restoring health."
+      "description": "After BURNING, apply INSPIRED/SHIELDED/READY."
     },
     "heal": {
       "name": "Medkit",
@@ -101,7 +101,7 @@
           {"tag": "INSPIRED", "target": "target"}
         ]
       },
-      "description": "Treat a wounded ally and cleanse burning for extra recovery."
+      "description": "Use after BURNING; grant INSPIRED to allies."
     },
     "reviveStim": {
       "name": "Revive Stim",
@@ -122,7 +122,7 @@
           {"tag": "SHIELDED", "target": "target", "amount": 2}
         ]
       },
-      "description": "Revive an ally behind a temporary shield."
+      "description": "Use after PINNED; grant SHIELDED to allies."
     },
     "medic_toxin_dart": {
       "name": "Toxin Dart",
@@ -160,7 +160,7 @@
           "amount": 1
         }
       ],
-      "description": "Toxin dart poisons its target for damage each turn."
+      "description": "After MARKED, apply STAGGERED/EXPOSED/IONIZED."
     },
     "smoke": {
       "name": "Smoke",
@@ -183,7 +183,7 @@
           {"tag": "SHIELDED", "target": "all_allies", "amount": 1}
         ]
       },
-      "description": "Fill the area with smoke and shield allies while clearing burns."
+      "description": "Spend BURNING; gain SHIELDED for your next move."
     },
     "hack": {
       "name": "Hack",
@@ -202,7 +202,7 @@
           {"tag": "INSPIRED", "target": "self"}
         ]
       },
-      "description": "Open a console while preparing the medic for the next push."
+      "description": "Use after READY; grant INSPIRED to allies."
     },
     "protocol": {
       "name": "Combat Protocol",
@@ -225,7 +225,7 @@
           {"tag": "IONIZED", "target": "target"}
         ]
       },
-      "description": "Strike a droid, consuming stagger before ionizing it."
+      "description": "Use after STAGGERED; grant IONIZED to allies."
     },
     "shieldDrone": {
       "name": "Shield Drone",
@@ -246,7 +246,7 @@
           {"tag": "INSPIRED", "target": "target"}
         ]
       },
-      "description": "Shield a patient and clear burning for a small heal."
+      "description": "Use after BURNING; grant INSPIRED to allies."
     },
     "scan": {
       "name": "Scan Clue",
@@ -265,7 +265,7 @@
           {"tag": "READY", "target": "self"}
         ]
       },
-      "description": "Find a clue and prepare a guarded follow-up."
+      "description": "Use after INSPIRED; grant READY to allies."
     },
     "shoot": {
       "name": "Shoot",
@@ -276,7 +276,29 @@
       "range": "weapon",
       "cost": 1,
       "ends_turn": true
-    },
+,
+               "chain": {
+                 "consume": [
+                   {
+                     "tag": "STAGGERED",
+                     "target": "target",
+                     "bonus": [
+                       {
+                         "type": "damage",
+                         "target": "target",
+                         "amount": 2
+                       }
+                     ]
+                   }
+                 ],
+                 "apply": [
+                   {
+                     "tag": "MARKED",
+                     "target": "target"
+                   }
+                 ]
+               },
+               "description": "Exploit STAGGERED prey; apply MARKED for allies."    },
     "overwatch": {
       "name": "Overwatch",
       "ap": 1,
@@ -284,7 +306,29 @@
       "effect": "overwatch",
       "cost": 1,
       "ends_turn": true
-    },
+,
+                   "chain": {
+                     "consume": [
+                       {
+                         "tag": "READY",
+                         "target": "self",
+                         "bonus": [
+                           {
+                             "type": "shield",
+                             "target": "self",
+                             "amount": 1
+                           }
+                         ]
+                       }
+                     ],
+                     "apply": [
+                       {
+                         "tag": "SHIELDED",
+                         "target": "self"
+                       }
+                     ]
+                   },
+                   "description": "Spend READY; gain SHIELDED while watching."    },
     "medBeacon": {
       "name": "Med Beacon",
       "ap": 1,
@@ -298,7 +342,7 @@
       "rank": 7,
       "capstone": true,
       "once_per_mission": true,
-      "description": "Once per mission: heal and shield the squad, cleanse burning, and inspire them.",
+      "description": "Spend BURNING; gain INSPIRED for your next move.",
       "capstone_template": "medic",
       "effects": [
         {
@@ -339,7 +383,7 @@
       "rank": 7,
       "capstone": true,
       "once_per_mission": true,
-      "description": "Once per mission: disable a droid, stagger it, and shield the squad.",
+      "description": "Use after IONIZED; grant STAGGERED to allies.",
       "capstone_template": "medic",
       "charges": "soldier_capstone",
       "effects": [
@@ -384,7 +428,7 @@
           {"tag": "STAGGERED", "target": "target"}
         ]
       },
-      "description": "Hit a marked foe and stagger it to protect patients."
+      "description": "Exploit MARKED prey; apply STAGGERED for allies."
     },
     "medic_guard_watch": {
       "name": "Guard Watch",
@@ -414,7 +458,7 @@
           "amount": 1
         }
       ],
-      "description": "Keep watch behind a field shield."
+      "description": "Spend SHIELDED; gain READY for your next move."
     }
   },
   "base_stats": {

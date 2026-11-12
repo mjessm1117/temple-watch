@@ -103,7 +103,7 @@
       "chance": 85,
       "pierce": true,
       "ignore_cover": true,
-      "description": "Fire beyond sight through one enemy; a lifted target takes bonus damage."
+      "description": "Exploit LIFTED prey; apply MARKED for allies."
     },
     "sniper_spotter_round": {
       "name": "Spotter Round",
@@ -138,7 +138,7 @@
           "amount": 1
         }
       ],
-      "description": "Mark a target and call one ally into a squadsight follow-up shot.",
+      "description": "Exploit EXPOSED prey; apply MARKED for allies.",
       "damage": [
         1,
         1
@@ -181,7 +181,7 @@
         ]
       },
       "shots": 2,
-      "description": "Two quick shots without ending the turn."
+      "description": "Exploit EXPOSED prey; apply STAGGERED for allies."
     },
     "sniper_dead_eye": {
       "name": "Dead Eye",
@@ -219,7 +219,7 @@
       },
       "ignore_cover": true,
       "crit_mod": 35,
-      "description": "A precision shot ignores cover and raises critical chance."
+      "description": "Exploit EXPOSED prey; apply IONIZED for allies."
     },
     "sniper_cover_splitter": {
       "name": "Cover Splitter",
@@ -265,7 +265,7 @@
           "amount": 1
         }
       ],
-      "description": "Fire two cover-splitting shots and brace behind the rifle."
+      "description": "Exploit LIFTED prey; apply EXPOSED for allies."
     },
     "sniper_eagle_perch": {
       "name": "Eagle Perch",
@@ -305,7 +305,7 @@
           "amount": 3
         }
       ],
-      "description": "Hold an overwatch lane from a fortified perch."
+      "description": "Spend ATTUNED; gain READY for your next move."
     },
     "sniper_crossfire": {
       "name": "Crossfire",
@@ -348,7 +348,7 @@
           "amount": 2
         }
       ],
-      "description": "Call another shooter into the target and add a grazing hit."
+      "description": "Exploit LIFTED prey; apply BURNING for allies."
     },
     "sniper_gravity_sight": {
       "name": "Gravity Sight",
@@ -394,7 +394,7 @@
           "status": "stunned"
         }
       ],
-      "description": "Track a target through terrain and suppress its reaction."
+      "description": "Shoot through cover; stun and mark. LIFTED→MARKED"
     },
     "sniper_ricochet": {
       "name": "Ricochet",
@@ -424,7 +424,7 @@
         ]
       },
       "shots": 1,
-      "description": "Shot ricochets to exactly one nearby second enemy.",
+      "description": "Bounce to a second foe; stagger. LIFTED→STAGGERED",
       "bounce": 1
     },
     "sniper_execution_order": {
@@ -470,7 +470,7 @@
           "amount": 3
         }
       ],
-      "description": "Execute a wounded mark with a cover-piercing critical shot."
+      "description": "Finish wounded targets; add crit. LIFTED→IONIZED"
     },
     "sniper_duel_trigger": {
       "name": "Duel Trigger",
@@ -503,6 +503,10 @@
           {
             "tag": "EXPOSED",
             "target": "target"
+          },
+          {
+            "tag": "SHIELDED",
+            "target": "self"
           }
         ]
       },
@@ -518,7 +522,7 @@
           "amount": 2
         }
       ],
-      "description": "Trade a shot and recover an action behind a guard."
+      "description": "Shoot MARKED; apply EXPOSED to foe, SHIELDED to self."
     },
     "sniper_one_shot": {
       "name": "One Shot",
@@ -565,7 +569,7 @@
           "amount": 5
         }
       ],
-      "description": "Once per mission: a killing line through cover and armor.",
+      "description": "Exploit MARKED prey; apply PINNED for allies.",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "sniper"
@@ -613,7 +617,7 @@
           "amount": 2
         }
       ],
-      "description": "Once per mission: four shots and suppressive damage to every foe.",
+      "description": "Exploit MARKED prey; apply BURNING for allies.",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "sniper"
