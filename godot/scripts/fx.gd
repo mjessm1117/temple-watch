@@ -9,6 +9,7 @@ var float_anchors: Array[Dictionary] = []
 var _hit_stop_serial := 0
 var _time_scale_before := 1.0
 var _billboards: MultiMeshInstance3D
+var _ability_preview: Dictionary = {}
 const BLAST_CORE_SECONDS := 0.19
 const BLAST_SHELL_SECONDS := 0.48
 const CAMERA_IMPULSE_MAX := 0.16
@@ -406,20 +407,32 @@ func heal(at: Vector3, amount: int) -> void:
 	burst(at, color, 14)
 	float_text(at + Vector3.UP * 0.7, "+%d HP" % amount if amount > 0 else "PROTECTED", color, true)
 
-func ring(at: Vector3, color: Color, radius: float = 1.0) -> void:
+func ring(at: Vector3, color: Color, radius: float = 1.0, duration: float = 0.5) -> void:
 	var node := MeshInstance3D.new()
 	var mesh := TorusMesh.new(); mesh.inner_radius = 0.88; mesh.outer_radius = 1.0
 	node.mesh = mesh; node.material_override = _material(color); node.position = at
 	node.scale = Vector3.ONE * 0.12; add_child(node)
 	var tween := _paced_tween().set_parallel(true)
-	tween.tween_property(node, "scale", Vector3(radius, 0.15, radius), 0.5)
-	tween.tween_property(node, "transparency", 1.0, 0.5)
+	tween.tween_property(node, "scale", Vector3(radius, 0.15, radius), duration)
+	tween.tween_property(node, "transparency", 1.0, duration)
 	tween.chain().tween_callback(node.queue_free)
 
 func ability(id: String, from: Vector3, to: Vector3) -> void:
-	var signature: Dictionary = Signature27.profile(id)
+	var def: Dictionary = {}
+	var preview: Dictionary = {}
+	if get_parent() != null and get_parent().has_method("_use_ability"):
+		var game = get_parent()
+		def = game.mission.abilities.get(id, {})
+		if int(_ability_preview.get("actor_id", -1)) == int(game.selected_id):
+			preview["actor"] = _ability_preview.get("actor", {})
+		if int(_ability_preview.get("target_id", -1)) == int(game.target_id):
+			preview["target"] = _ability_preview.get("target", {})
+	var signature: Dictionary = Signature27.profile(id, def, preview.get("target", {}), preview.get("actor", {}))
 	if not signature.is_empty():
-		_ability_signature27(id, from, to, signature)
+		if signature.has("color"):
+			_ability_class_tell(to, signature)
+		else:
+			_ability_signature27(id, from, to, signature)
 		return
 	# The web's blue telekinesis / gold mind / green life / violet stasis vocabulary.
 	if id == "pull": shockwave(to, from)
@@ -443,6 +456,33 @@ func ability(id: String, from: Vector3, to: Vector3) -> void:
 		ring(from - Vector3.UP * 0.8, Color("79d3e2"), 2.2); ring(to - Vector3.UP * 0.8, Color("79d3e2"), 1.0)
 	elif id in ["rapidFire", "deadeye", "chainShot", "snipe", "fanFire", "coverFire", "suppress", "backup"]: bolt(from, to, false, false)
 	else: ring(to, Color("79d3e2"), 0.7)
+
+func _ability_class_tell(to: Vector3, signature: Dictionary) -> void:
+	var color: Color = signature.color
+	var radius: float = float(signature.radius)
+	if str(signature.shape) == "narrow_arc":
+		var mesh := ImmediateMesh.new()
+		var span := PI * float(signature.get("arc_width", 0.45))
+		mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
+		for i in 13:
+			var angle := -span * 0.5 + float(i) * span / 12.0
+			for r in [radius - 0.025, radius + 0.025]:
+				mesh.surface_add_vertex(Vector3(cos(angle) * r, 0.0, sin(angle) * r))
+		mesh.surface_end()
+		var arc := MeshInstance3D.new(); arc.mesh = mesh
+		var arc_material := _material(color)
+		arc_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		arc_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+		arc.material_override = arc_material
+		arc.position = to - Vector3.UP * 0.75; add_child(arc)
+		var fade := _paced_tween(); fade.tween_property(arc, "transparency", 1.0, 0.45); fade.tween_callback(arc.queue_free)
+		return
+	var at := to - Vector3.UP * 0.75
+	if signature.has("pulse"):
+		ring(at, color, radius, 0.3)
+		get_tree().create_timer(0.15).timeout.connect(func() -> void:
+			if is_inside_tree(): ring(at, color, radius * 1.15, 0.3))
+	else: ring(at, color, radius)
 
 func _ability_signature27(id: String, from: Vector3, to: Vector3, signature: Dictionary) -> void:
 	_cue(str(signature.sound))
@@ -518,6 +558,12 @@ func _delayed_layer27(delay: float, at: Vector3, size: float, color: Color, life
 			if is_inside_tree(): _layer(at, size, color, life, drift))
 
 func _process(delta: float) -> void:
+	if get_parent() != null and get_parent().has_method("_use_ability"):
+		var game = get_parent()
+		if game.mission != null and not game.player_attack_pending:
+			var target: Dictionary = game.mission.unit_by_id(game.target_id)
+			var actor: Dictionary = game.mission.unit_by_id(game.selected_id)
+			_ability_preview = {"actor_id":game.selected_id, "target_id":game.target_id, "target":{"combo_tags":target.get("combo_tags", {}).duplicate()}, "actor":{"combo_tags":actor.get("combo_tags", {}).duplicate()}}
 	var current_turn := _battle_turn()
 	var current_ms := Time.get_ticks_msec()
 	for i in range(_scorches.size()-1,-1,-1):
