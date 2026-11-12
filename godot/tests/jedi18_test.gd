@@ -177,9 +177,8 @@ func run() -> void:
 	var foe: Dictionary = grand.living("enemy")[0]
 	Chains.resolve(grand, leader, {}, Vector2i.ZERO, Classes.class_data("guardian").abilities.guardian_grand_aegis)
 	check(int(leader.shield) >= 14 and Chains.has_tag(foe, "TAUNTED"), "Aegis shields the squad and taunts enemies")
-	var before_ap := int(leader.ap)
 	Chains.resolve(grand, leader, {}, Vector2i.ZERO, Classes.class_data("knight").abilities.knight_grand_convergence)
-	check(int(leader.ap) == before_ap + 1 and Chains.has_tag(leader, "INSPIRED"), "Convergence grants squad actions and inspiration")
+	check(int(leader.ap) == 2 and Chains.has_tag(leader, "INSPIRED"), "Convergence grants inspiration with AP capped at 2")
 	foe.hp = 20
 	Chains.resolve(grand, leader, {}, Vector2i(int(foe.x), int(foe.y)), Classes.class_data("sage").abilities.sage_grand_maelstrom)
 	check(int(foe.hp) <= 12 and Chains.has_tag(foe, "LIFTED") and bool(foe.get("rooted", false)), "Maelstrom damages and lifts foes in its area")

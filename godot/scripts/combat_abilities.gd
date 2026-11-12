@@ -2,6 +2,13 @@ extends RefCounted
 const Shot = preload("res://scripts/shot.gd")
 const Bonds = preload("res://scripts/combat_bonds.gd")
 const EFFECTS = ["relay_attack","reload", "breach", "blast", "stabilize", "shadow", "hold_line", "mass_heal", "wave", "handoff", "backup", "surge", "momentum_rally", "taunt", "bond_aid", "bond_strike"]
+static var _b30_used_this_turn: Dictionary = {}
+
+static func valid_target(id: String, actor: Dictionary, target: Dictionary) -> bool:
+	return id != "officer_battle_plan" or int(actor.get("id", -1)) != int(target.get("id", -1))
+
+static func _b30_key(m: RefCounted, u: Dictionary, id: String) -> String:
+	return "%d:%d:%s" % [m.get_instance_id(), int(u.get("id", -1)), id]
 
 static func reason(m: RefCounted, u: Dictionary, id: String, def: Dictionary) -> String:
 	if id in ["shoot", "overwatch", "holdLine"] or int(def.get("ammo_cost", 0)) > 0:
@@ -10,6 +17,10 @@ static func reason(m: RefCounted, u: Dictionary, id: String, def: Dictionary) ->
 	if id == "reload" and (not u.has("ammo") or int(u.ammo) >= int(u.clip)): return "Ammo full"
 	if str(def.get("effect")) == "interact" and interactables(m, u).is_empty(): return "Move adjacent to an objective"
 	if bool(def.get("once_turn", false)) and int(u.get(id + "_turn", 0)) == m.turn: return "Used this turn"
+	if id == "officer_battle_plan":
+		var key := _b30_key(m, u, id)
+		if int(_b30_used_this_turn.get(key, -1)) == int(m.turn): return "Used this turn"
+		_b30_used_this_turn.erase(key) # A new turn expires the previous use.
 	if bool(def.get("squad_once", false)) and m.get("squad_uses") != null and int(m.squad_uses.get(id, 0)) == m.turn: return "Squad used this turn"
 	if int(def.get("momentum", 0)) > 0 and (m.get("momentum") == null or m.momentum < int(def.momentum)): return "Need %d Momentum" % int(def.momentum)
 	if id == "bondAid":
@@ -35,6 +46,7 @@ static func interact(m: RefCounted, u: Dictionary, tile: Vector2i) -> bool:
 
 static func effect(m: RefCounted, u: Dictionary, t: Dictionary, tile: Vector2i, id: String, def: Dictionary) -> void:
 	u[id + "_turn"] = m.turn
+	if id == "officer_battle_plan": _b30_used_this_turn[_b30_key(m, u, id)] = int(m.turn)
 	if m.get("squad_uses") != null and bool(def.get("squad_once", false)): m.squad_uses[id] = m.turn
 	if int(def.get("momentum", 0)) > 0: m.momentum -= int(def.momentum)
 	match str(def.effect):

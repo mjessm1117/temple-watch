@@ -31,20 +31,25 @@ static func apply_tag(unit: Dictionary, tag: String, source: int = -1, amount: i
 	if tag == "INSPIRED": unit.erase("panicked")
 	return true
 
-static func resolve(m: RefCounted, actor: Dictionary, target: Dictionary, tile: Vector2i, def: Dictionary) -> void:
+static func resolve(m: RefCounted, actor: Dictionary, target: Dictionary, tile: Vector2i, def: Dictionary, attack_hit: bool = true) -> void:
 	var chain: Dictionary = def.get("chain", {})
+	var missed_attack := str(def.get("effect", "")) == "attack" and not attack_hit
 	var target_before: Dictionary = tags(target).duplicate() if not target.is_empty() else {}
 	for entry in chain.get("consume", []):
 		var tag := str(entry.get("tag", "")) if entry is Dictionary else str(entry)
 		for recipient in _recipients(m, actor, target, tile, entry.get("target", "target") if entry is Dictionary else "target"):
 			if recipient == target and not target_before.has(tag): continue
 			if consume(m, recipient, tag, bool(entry.get("preserve", false)) if entry is Dictionary else false):
-				for bonus in entry.get("bonus", []) if entry is Dictionary else []: _effect(m, actor, recipient, tile, bonus)
+				for bonus in entry.get("bonus", []) if entry is Dictionary else []:
+					if missed_attack and str(bonus.get("type", "")) == "action": continue
+					_effect(m, actor, recipient, tile, bonus)
 	for entry in chain.get("apply", []):
 		var tag := str(entry.get("tag", "")) if entry is Dictionary else str(entry)
 		for recipient in _recipients(m, actor, target, tile, entry.get("target", "target") if entry is Dictionary else "target"):
 			apply_tag(recipient, tag, int(actor.get("id", -1)), int(entry.get("amount", 0)) if entry is Dictionary else 0)
-	for effect in def.get("effects", []): _effect(m, actor, target, tile, effect)
+	for effect in def.get("effects", []):
+		if missed_attack and str(effect.get("type", "")) in ["damage", "action"]: continue
+		_effect(m, actor, target, tile, effect)
 
 static func _recipients(m: RefCounted, actor: Dictionary, target: Dictionary, tile: Vector2i, scope: String) -> Array:
 	if scope == "self": return [actor]
@@ -69,7 +74,7 @@ static func _effect_one(m: RefCounted, actor: Dictionary, recipient: Dictionary,
 		"heal": recipient.hp = mini(int(recipient.get("max_hp", 0)), int(recipient.get("hp", 0)) + int(effect.get("amount", 0)))
 		"shield": recipient.shield = int(recipient.get("shield", 0)) + int(effect.get("amount", 0))
 		"focus": recipient.focus_left = mini(int(recipient.get("focus", 0)), int(recipient.get("focus_left", 0)) + int(effect.get("amount", 0)))
-		"action": recipient.ap = int(recipient.get("ap", 0)) + int(effect.get("amount", 0))
+		"action": recipient.ap = mini(2, int(recipient.get("ap", 0)) + int(effect.get("amount", 0)))
 		"status": recipient[str(effect.get("status", ""))] = true
 		_: preload("res://scripts/effects_jedi.gd").apply(m, actor, recipient, effect)
 
