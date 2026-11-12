@@ -7,6 +7,7 @@ const path = require('node:path');
 const repo = path.resolve(__dirname, '../..');
 const logs = process.argv.find(x => x.startsWith('--output-dir='))?.slice(13) || '/home/jess/projects/tw-logs/w28/phone-hud';
 const baseline = process.argv.includes('--baseline');
+const screenshotOnly = process.argv.includes('--screenshot-only');
 const noBuild = process.argv.includes('--no-build');
 const only = process.argv.find(x => x.startsWith('--case='))?.slice(7);
 const port = Number(process.argv.find(x => x.startsWith('--port='))?.slice(7) || process.env.W28D_PORT || 18648);
@@ -105,7 +106,7 @@ async function runCase(page, item, errors) {
   await wait(item.safe || current.width !== item.width || current.height !== item.height ? 2000 : 500);
   const shot = path.join(logs, `${baseline ? 'before' : 'after'}-${item.name}.png`);
   await page.screenshot({path: shot, scale: 'css', timeout: 120000});
-  if (baseline) return {name: item.name, shot, errors};
+  if (baseline || screenshotOnly) return {name: item.name, shot, errors};
   let data = await state(page);
   if (!data) throw Error(`${item.name}: no Godot HUD data`);
   const measuredControls = data.controls.length;
@@ -143,6 +144,9 @@ async function runCase(page, item, errors) {
   data = await state(page);
   console.log(`SELECT ${item.name} ${selected}->${data.selected}`);
   if (data.selected === selected) failures.push('select unit did not respond');
+  // Selection updates before the newly selected unit's controls finish settling.
+  await wait(500);
+  data = await state(page);
   console.log(`CHECK ${item.name}: move`);
   const moveTouches = data.moveTouches;
   await tap(page, control(data, 'move'));
@@ -201,7 +205,7 @@ async function runCase(page, item, errors) {
       results.push(result);
       console.error(JSON.stringify(result));
     } finally {
-      fs.writeFileSync(path.join(logs, `${baseline ? 'before' : 'after'}-measurements.json`), JSON.stringify(results, null, 2));
+      fs.writeFileSync(path.join(logs, `${baseline ? 'before' : screenshotOnly ? 'screenshots' : 'after'}-measurements.json`), JSON.stringify(results, null, 2));
       await closeBrowser(browser);
     }
   }

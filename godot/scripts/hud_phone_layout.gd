@@ -27,7 +27,7 @@ static func boxes(size: Vector2) -> Dictionary:
 	var tray_left := card_width + 24.0
 	var end_x := w - end_width - 8.0
 	return {
-		"header": Rect2(0, 0, w, 48),
+		"header": Rect2(0, 0, w, 52),
 		"plate": Rect2(8, h - 68, card_width, 68),
 		"tray": Rect2(tray_left, h - 64, maxf(120, end_x - tray_left - 8), 64),
 		"end": Rect2(end_x, h - 68, end_width, 68),
