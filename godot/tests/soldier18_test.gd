@@ -69,7 +69,8 @@ func run() -> void:
 		var abilities: Dictionary = row.get("abilities", {})
 		total += abilities.size()
 		check(row.get("schema") == 1 and row.get("implemented") == true, class_id + " valid implementation")
-		check(abilities.size() == 13, class_id + " has 13 abilities")
+		var expected_ability_count: int = int({"trooper":16, "scout":18, "medic":15}.get(class_id, 13))
+		check(abilities.size() == expected_ability_count, class_id + " keeps legacy kit alongside 13 ranked choices")
 		check(row.get("kit", []).has(row.get("signature", "")) or (shipped.has(class_id) and row.tree.trunk["1"].has(row.signature)), class_id + " exposes its signature")
 		var applies: Dictionary = {}
 		var consumes: Dictionary = {}
@@ -107,8 +108,8 @@ func run() -> void:
 				check(preserved, class_id + " keeps shipped values for " + id)
 		for branch in row.tree.specs.values():
 			for id in branch["7"]: check(bool(abilities[id].get("capstone", false)), class_id + " rank 7 capstone " + id)
-	check(total == 104, "104 soldier abilities")
-	check(signatures.size() == 78, "zero duplicate signatures among 78 new abilities")
+	check(total == 114, "114 soldier definitions including retained legacy kit")
+	check(signatures.size() == 88, "zero duplicate signatures among 88 new abilities")
 	check(capstone_count == 16 and capstone_templates.size() == 8, "sixteen capstones have eight path templates")
 	var all_capstones := {}
 	var all_capstone_signatures := {}

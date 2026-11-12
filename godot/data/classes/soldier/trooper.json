@@ -5,65 +5,34 @@
   "side": "soldier",
   "role": "Armor and explosives",
   "signature": "trooper_thermal_detonator",
-  "branches": [
-    "Assault",
-    "Grenadier"
-  ],
+  "branches": ["Assault", "Grenadier"],
   "implemented": true,
   "unit_kind": "soldier",
-  "kit": [
-    "shoot",
-    "overwatch",
-    "hunker",
-    "suppress",
-    "rapidFire",
-    "rally"
-  ],
+  "kit": ["shoot", "overwatch", "hunker", "suppress", "rapidFire", "rally"],
   "passives": [],
   "bonus_kit": [],
   "bonus_passives": [],
   "tree": {
     "trunk": {
-      "1": [
-        "trooper_thermal_detonator"
-      ],
-      "2": [
-        "suppress",
-        "rapidFire"
-      ]
+      "1": ["trooper_thermal_detonator"],
+      "2": ["suppress", "rapidFire"]
     },
     "specs": {
       "assault": {
         "n": "Assault",
         "sig": "trooper_breach_charge",
-        "4": [
-          "rally"
-        ],
-        "5": [
-          "trooper_firebreak"
-        ],
-        "6": [
-          "overwatch"
-        ],
-        "7": [
-          "trooper_assault_storm"
-        ]
+        "4": ["rally"],
+        "5": ["trooper_firebreak"],
+        "6": ["trooper_armor_watch"],
+        "7": ["trooper_assault_storm"]
       },
       "grenadier": {
         "n": "Grenadier",
-        "sig": "hunker",
-        "4": [
-          "trooper_armor_piercer"
-        ],
-        "5": [
-          "shoot"
-        ],
-        "6": [
-          "trooper_counter_barrage"
-        ],
-        "7": [
-          "trooper_grenadier_finale"
-        ]
+        "sig": "trooper_fragment_guard",
+        "4": ["trooper_armor_piercer"],
+        "5": ["trooper_cover_buster"],
+        "6": ["trooper_counter_barrage"],
+        "7": ["trooper_grenadier_finale"]
       }
     }
   },
@@ -77,31 +46,15 @@
       "effect": "blast",
       "range": 6,
       "ends_turn": true,
-      "damage": [
-        4,
-        5
-      ],
+      "damage": [4, 5],
       "cover_damage": 5,
       "cooldown": 2,
       "chain": {
         "consume": [
-          {
-            "tag": "MARKED",
-            "target": "area_enemies",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 1
-              }
-            ]
-          }
+          {"tag": "MARKED", "target": "area_enemies", "bonus": [{"type": "damage", "target": "target", "amount": 1}]}
         ],
         "apply": [
-          {
-            "tag": "EXPOSED",
-            "target": "area_enemies"
-          }
+          {"tag": "EXPOSED", "target": "area_enemies"}
         ]
       },
       "effects": [
@@ -126,7 +79,16 @@
       "ammo_cost": 1,
       "cost": 1,
       "ends_turn": true,
-      "rank": 2
+      "rank": 2,
+      "chain": {
+        "consume": [
+          {"tag": "MARKED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "PINNED", "target": "target"}
+        ]
+      },
+      "description": "Suppress a marked foe, then pin it for a squad follow-up."
     },
     "rapidFire": {
       "name": "Rapid Fire",
@@ -141,7 +103,16 @@
       "ammo_cost": 2,
       "cost": 1,
       "ends_turn": true,
-      "rank": 2
+      "rank": 2,
+      "chain": {
+        "consume": [
+          {"tag": "PINNED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "STAGGERED", "target": "target"}
+        ]
+      },
+      "description": "Two shots exploit a pinned foe and stagger survivors."
     },
     "trooper_breach_charge": {
       "name": "Breach Charge",
@@ -152,31 +123,15 @@
       "effect": "blast",
       "range": 7,
       "ends_turn": true,
-      "damage": [
-        2,
-        3
-      ],
+      "damage": [2, 3],
       "cover_damage": 3,
       "cooldown": 1,
       "chain": {
         "consume": [
-          {
-            "tag": "MARKED",
-            "target": "area_enemies",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 1
-              }
-            ]
-          }
+          {"tag": "MARKED", "target": "area_enemies", "bonus": [{"type": "damage", "target": "target", "amount": 1}]}
         ],
         "apply": [
-          {
-            "tag": "PINNED",
-            "target": "area_enemies"
-          }
+          {"tag": "PINNED", "target": "area_enemies"}
         ]
       },
       "clear_overwatch": true,
@@ -208,7 +163,16 @@
       "clear_status": true,
       "cost": 1,
       "ends_turn": false,
-      "rank": 4
+      "rank": 4,
+      "chain": {
+        "consume": [
+          {"tag": "BURNING", "target": "all_allies", "bonus": [{"type": "heal", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "INSPIRED", "target": "all_allies"}
+        ]
+      },
+      "description": "Clear nearby disruptions and inspire the squad; burning allies recover."
     },
     "trooper_armor_piercer": {
       "name": "Armor Piercer",
@@ -224,23 +188,10 @@
       "ammo_cost": 1,
       "chain": {
         "consume": [
-          {
-            "tag": "STAGGERED",
-            "target": "target",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 1
-              }
-            ]
-          }
+          {"tag": "STAGGERED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 1}]}
         ],
         "apply": [
-          {
-            "tag": "EXPOSED",
-            "target": "target"
-          }
+          {"tag": "EXPOSED", "target": "target"}
         ]
       },
       "ignore_cover": true,
@@ -256,31 +207,15 @@
       "effect": "blast",
       "range": 7,
       "ends_turn": true,
-      "damage": [
-        3,
-        4
-      ],
+      "damage": [3, 4],
       "cover_damage": 5,
       "cooldown": 1,
       "chain": {
         "consume": [
-          {
-            "tag": "STAGGERED",
-            "target": "area_enemies",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 1
-              }
-            ]
-          }
+          {"tag": "STAGGERED", "target": "area_enemies", "bonus": [{"type": "damage", "target": "target", "amount": 1}]}
         ],
         "apply": [
-          {
-            "tag": "BURNING",
-            "target": "area_enemies"
-          }
+          {"tag": "BURNING", "target": "area_enemies"}
         ]
       },
       "effects": [
@@ -330,23 +265,10 @@
       "ammo_cost": 1,
       "chain": {
         "consume": [
-          {
-            "tag": "STAGGERED",
-            "target": "target",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 1
-              }
-            ]
-          }
+          {"tag": "STAGGERED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 1}]}
         ],
         "apply": [
-          {
-            "tag": "STAGGERED",
-            "target": "target"
-          }
+          {"tag": "PINNED", "target": "target"}
         ]
       },
       "shots": 2,
@@ -369,30 +291,14 @@
       "range": 7,
       "ends_turn": true,
       "capstone": true,
-      "damage": [
-        6,
-        8
-      ],
+      "damage": [6, 8],
       "cover_damage": 7,
       "chain": {
         "consume": [
-          {
-            "tag": "STAGGERED",
-            "target": "area_enemies",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 1
-              }
-            ]
-          }
+          {"tag": "STAGGERED", "target": "area_enemies", "bonus": [{"type": "damage", "target": "target", "amount": 1}]}
         ],
         "apply": [
-          {
-            "tag": "IONIZED",
-            "target": "area_enemies"
-          }
+          {"tag": "IONIZED", "target": "area_enemies"}
         ]
       },
       "effects": [
@@ -423,30 +329,14 @@
       "range": 7,
       "ends_turn": true,
       "capstone": true,
-      "damage": [
-        7,
-        9
-      ],
+      "damage": [7, 9],
       "cover_damage": 8,
       "chain": {
         "consume": [
-          {
-            "tag": "IONIZED",
-            "target": "area_enemies",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 1
-              }
-            ]
-          }
+          {"tag": "IONIZED", "target": "area_enemies", "bonus": [{"type": "damage", "target": "target", "amount": 1}]}
         ],
         "apply": [
-          {
-            "tag": "EXPOSED",
-            "target": "area_enemies"
-          }
+          {"tag": "EXPOSED", "target": "area_enemies"}
         ]
       },
       "friendly_fire": true,
@@ -468,6 +358,80 @@
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "trooper"
+    },
+    "trooper_fragment_guard": {
+      "name": "Fragment Guard",
+      "ap": 1,
+      "target": "self",
+      "effect": "hunker",
+      "defense": 35,
+      "cost": 1,
+      "ends_turn": false,
+      "rank": 3,
+      "chain": {
+        "consume": [
+          {"tag": "INSPIRED", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 1}]}
+        ],
+        "apply": [
+          {"tag": "SHIELDED", "target": "self", "amount": 2}
+        ]
+      },
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 2
+        }
+      ],
+      "description": "Brace behind blast armor and build a shield for the next attack."
+    },
+    "trooper_armor_watch": {
+      "name": "Armor Watch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true,
+      "rank": 6,
+      "chain": {
+        "consume": [
+          {"tag": "SHIELDED", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "READY", "target": "self"}
+        ]
+      },
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 1
+        }
+      ],
+      "description": "Overwatch behind armor, converting a shield into more protection."
+    },
+    "trooper_cover_buster": {
+      "name": "Cover Buster",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true,
+      "rank": 5,
+      "damage_mod": 1,
+      "ignore_cover": true,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {"tag": "PINNED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "EXPOSED", "target": "target"}
+        ]
+      },
+      "description": "Fire through cover and expose a pinned target."
     }
   },
   "base_stats": {
@@ -475,10 +439,7 @@
     "armor": 1,
     "aim": 70,
     "mob": 5,
-    "dmg": [
-      3,
-      6
-    ],
+    "dmg": [3, 6],
     "range": 8,
     "init": 10,
     "will": 55,
@@ -488,10 +449,7 @@
     "hp": 8,
     "aim": 70,
     "mob": 5,
-    "damage": [
-      3,
-      6
-    ],
+    "damage": [3, 6],
     "range": 8,
     "focus": 0,
     "armor": 1,
