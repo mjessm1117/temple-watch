@@ -51,6 +51,7 @@ static func targets(m: RefCounted, u: Dictionary, id: String) -> Array[Dictionar
 	if kind.begins_with("ally"):
 		for t in m.units:
 			if str(t.get("side", "")) != "player": continue
+			if not Combat.valid_target(id, u, t): continue
 			if Shot.distance(Shot.pos(u), Shot.pos(t)) > radius: continue
 			if kind == "ally_down" and str(t.get("status", "ok")) != "down": continue
 			if kind == "ally_injured" and str(t.get("status", "ok")) != "down" and int(t.hp) >= int(t.max_hp): continue
@@ -144,11 +145,12 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 		u.cooldowns = cds
 	if int(def.get("ammo_cost", 0)) > 0 and u.has("ammo"): u.ammo = int(u.ammo) - int(def.ammo_cost)
 	var effect := str(def.get("effect", ""))
+	var attack_hit := true
 	u.active_ability = id
 	if effect in Combat.EFFECTS: Combat.effect(m, u, t, tile, id, def)
 	match effect:
 		"heal": _heal(m, u, t, def)
-		"attack": _attack(m, u, t, def, id)
+		"attack": attack_hit = _attack(m, u, t, def, id)
 		"status": _status(m, u, t, def)
 		"buff": _buff(m, u, t, def)
 		"area_buff":
@@ -191,7 +193,8 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 		"hunker": u.hunkered = true
 		"displace": _displace(m, u, t, def)
 		_: pass
-	if def.has("chain") or def.has("effects"): Chains.resolve(m, u, t, tile, def)
+	if def.has("chain") or def.has("effects"): Chains.resolve(m, u, t, tile, def, attack_hit)
+	if bool(def.get("ends_turn", false)): u.ap = 0
 	if m.has_method("setup_combat") and (effect in ["attack", "area_attack", "status", "displace", "blast", "wave", "breach", "collapse", "backup", "bond_strike"]):
 		var ghost_triggered := not ghost_used and bool(u.get("ghost_used", false))
 		u.concealed = was_concealed
@@ -200,7 +203,6 @@ static func use(m: RefCounted, actor_id: int, id: String, target_id: int = -1, t
 	if int(def.get("darkness", 0)) > 0: u.darkness = int(u.get("darkness", 0)) + int(def.darkness)
 	m.message("%s uses %s." % [u.name, def.name])
 	m.ability_uses[id] = int(m.ability_uses.get(id, 0)) + 1
-	if bool(def.get("ends_turn", false)): u.ap = 0
 	u.erase("active_ability")
 	m._check_lose()
 	return true
@@ -213,7 +215,7 @@ static func _heal(m: RefCounted, u: Dictionary, t: Dictionary, def: Dictionary) 
 	else: t.hp = mini(int(t.max_hp), int(t.hp) + int(def.get("heal", 0)))
 	m.action_events.append({"kind": "heal", "actor": int(u.id), "target": int(t.id), "amount": int(t.hp) - before, "revived": before == 0})
 
-static func _attack(m: RefCounted, u: Dictionary, t: Dictionary, def: Dictionary, id: String) -> void:
+static func _attack(m: RefCounted, u: Dictionary, t: Dictionary, def: Dictionary, id: String) -> bool:
 	var melee := bool(def.get("melee", false))
 	var probe: Dictionary = u.duplicate()
 	if def.has("range") and str(def.range) != "weapon": probe.range = def.range
@@ -221,12 +223,14 @@ static func _attack(m: RefCounted, u: Dictionary, t: Dictionary, def: Dictionary
 	var chance := int(def.get("chance", info.hit))
 	if bool(def.get("ignore_cover", false)) and not def.has("chance"): chance = mini(100, chance + int(info.cover))
 	var was_alive := int(t.hp) > 0
+	var hit := false
 	var damage_range: Array = def.get("damage", u.damage) if typeof(def.get("damage")) == TYPE_ARRAY else u.damage
 	for i in range(int(def.get("shots", 1))):
 		if int(t.hp) <= 0: break
 		if m.rng.randi_range(1, 100) > chance:
 			if bool(def.get("follow_hit", false)): break
 			continue
+		hit = true
 		var damage: int = m.rng.randi_range(int(damage_range[0]), int(damage_range[1])) + int(def.get("damage_mod", 0))
 		if int(def.get("crit_mod", 0)) > 0 and m.rng.randi_range(1, 100) <= int(info.crit) + int(def.crit_mod): damage += 2
 		var dealt: int = m.apply_damage(t, maxi(1, damage - int(t.get("armor", 0))), u)
@@ -242,6 +246,7 @@ static func _attack(m: RefCounted, u: Dictionary, t: Dictionary, def: Dictionary
 	if melee: u.leap_aim = 0
 	if was_alive and int(t.hp) <= 0 and "ghost" in u.get("passives", []) and not bool(u.get("ghost_used", false)):
 		u.concealed = true; u.ghost_used = true
+	return hit
 
 static func _status(m: RefCounted, u: Dictionary, t: Dictionary, def: Dictionary) -> void:
 	if m.rng.randi_range(1, 100) > int(def.get("chance", 100)): return
