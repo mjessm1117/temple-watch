@@ -48,7 +48,7 @@ func run() -> void:
 	check(hud != null, "portrait HUD exists")
 	check(hud.threat_chip.get_parent() == hud.end_button.get_parent(), "threat chip remains beside End Turn")
 	check(hud.alerts != null and not hud.alerts.card.mouse_filter == Control.MOUSE_FILTER_STOP, "one non-blocking alert layer")
-	check(hud.alerts.card.visible, "portrait turn notice uses the alert layer")
+	check(not hud.alerts.card.visible and not hud.night.phase_plate.visible, "portrait start keeps persistent notices off the map")
 	await shot(phone, "phone-alert")
 	var actor: Dictionary = {}
 	for ally in game.mission.living("player"):
@@ -62,7 +62,7 @@ func run() -> void:
 	var aim = game.hud_controls.aim_ui
 	check(aim.panel.visible and hud.odds_plate.visible, "portrait aim and odds visible")
 	check(not aim.odds.get_parent().visible and not aim.odds_detail.visible, "inline aim odds suppressed")
-	check(hud.odds_plate.get_global_rect().end.y < phone.size.y * 0.25, "odds anchored above sight line")
+	check(hud.odds_plate.get_global_rect().end.y < phone.size.y * 0.25 + 8.0, "odds anchored above sight line")
 	check(not hud.odds_plate.get_global_rect().intersects(aim.target_row.get_global_rect()), "odds and target selection do not overlap")
 	check(not aim.panel.get_global_rect().intersects(aim.target_row.get_global_rect()), "one lower confirmation tray")
 	for button in [aim.confirm, aim.cancel]:

@@ -5,11 +5,11 @@ const {spawn, execFileSync} = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const repo = path.resolve(__dirname, '../..');
-const logs = '/home/jess/projects/tw-logs/w28/phone-hud';
+const logs = process.argv.find(x => x.startsWith('--output-dir='))?.slice(13) || '/home/jess/projects/tw-logs/w28/phone-hud';
 const baseline = process.argv.includes('--baseline');
 const noBuild = process.argv.includes('--no-build');
 const only = process.argv.find(x => x.startsWith('--case='))?.slice(7);
-const port = Number(process.env.W28D_PORT || 18648);
+const port = Number(process.argv.find(x => x.startsWith('--port='))?.slice(7) || process.env.W28D_PORT || 18648);
 fs.mkdirSync(logs, {recursive: true});
 if (!baseline && !noBuild) execFileSync(path.join(repo, 'tools/web/export_web.sh'),
   {cwd: repo, stdio: 'inherit', timeout: 600000, env: {...process.env, TMPDIR: logs}});

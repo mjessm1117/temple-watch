@@ -74,7 +74,9 @@ func layout_check(view: Vector2i) -> void:
 	check(menu_rect.end.x * scale <= view.x and chip_rect.size.y <= 52, "D threat chip keeps header within phone at %s: chip %s menu %s scale %.2f" % [view, chip_rect, menu_rect, scale])
 	# Headless uses the 390px logical canvas at scale 1; a rendered phone scales this 12px font above 14px.
 	var min_chip_font := 12.0 if DisplayServer.get_name() == "headless" else 14.0
-	check(layout_phone.threat_chip.get_line_count() == 1 and layout_phone.threat_chip.get_theme_font_size("font_size") * scale >= min_chip_font, "D threat chip is one readable line at %s" % view)
+	var icon_nodes: Array[Node] = layout_phone.threat_chip.find_children("*", "Label", true, false)
+	var threat_icon: Label = icon_nodes[0] as Label if not icon_nodes.is_empty() else null
+	check(threat_icon != null and threat_icon.text == "!" and threat_icon.get_theme_font_size("font_size") * scale >= min_chip_font, "D threat icon is readable at %s" % view)
 	layout_phone.last_threat = {}; layout_phone.threat_chip.visible = false; layout_phone._relayout()
 	var shooter: Dictionary = {}
 	for unit in layout_game.mission.living("player"):

@@ -112,6 +112,10 @@ func _ground_at28(screen: Vector2) -> Vector3:
 	var direction: Vector3 = g.camera.project_ray_normal(screen)
 	return origin + direction * (-origin.y / direction.y) if absf(direction.y) > 0.001 else g.pivot
 
+func frame_selected_safe29() -> void:
+	if g != null and is_instance_valid(g) and g.camera != null:
+		preload("res://scripts/w29a_phone_frame.gd").frame(g, _map_rect28())
+
 func frame_selected_move28() -> void:
 	if g == null or not is_instance_valid(g) or g.camera == null or g.cinematic: return
 	var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
@@ -143,6 +147,7 @@ func frame_selected_move28() -> void:
 	var actual: Vector2 = bounds.get_center()
 	g.pivot += _ground_at28(actual) - _ground_at28(desired)
 	g._update_camera()
+	preload("res://scripts/w29a_phone_frame.gd").frame(g, _map_rect28())
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
