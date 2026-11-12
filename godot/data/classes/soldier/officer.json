@@ -585,7 +585,7 @@
           "tag": "READY"
         }
       ],
-      "description": "Spend INSPIRED; gain READY for your next move.",
+      "description": "Spend INSPIRED; gain READY for your next move. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "officer"
@@ -634,7 +634,7 @@
           "amount": 2
         }
       ],
-      "description": "Use after INSPIRED; grant ATTUNED to allies.",
+      "description": "Use after INSPIRED; grant ATTUNED to allies. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "officer"

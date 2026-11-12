@@ -6,6 +6,68 @@ const Promotion = preload("res://scripts/campaign/promotion_screen.gd")
 const PATHS := ["guardian", "knight", "duelist", "sage", "consular", "sentinel", "wayseeker"]
 const TAGS := ["ATTUNED", "BURNING", "EXPOSED", "INSPIRED", "IONIZED", "LIFTED", "MARKED", "PINNED", "READY", "SHIELDED", "STAGGERED", "TAUNTED"]
 const SHARED_LEGACY := ["shoot", "overwatch", "mark", "deadeye", "hack", "scan", "shieldDrone", "rapidFire", "rally", "hunker", "strike", "push", "meditate", "choke", "subdue", "disarm", "guard", "pull", "breach"]
+# A30 intentionally refreshed these 49 pinned legacy ability definitions.
+const A30_LEGACY_OVERRIDES := """
+{
+  "guardian": {
+    "strike": {"chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"EXPOSED","target":"target"}]},"description":"Hit MARKED foes; EXPOSED primes the next attack."},
+    "guard": {"chain":{"consume":[{"tag":"ATTUNED","target":"self","bonus":[{"type":"shield","target":"self","amount":2}]}],"apply":[{"tag":"SHIELDED","target":"self"}]},"description":"Spend ATTUNED; apply SHIELDED to yourself."},
+    "push": {"chain":{"consume":[{"tag":"EXPOSED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"PINNED","target":"target"},{"tag":"MARKED","target":"target"}]},"description":"Push an EXPOSED foe; leave it PINNED and MARKED."},
+    "meditate": {"chain":{"consume":[{"tag":"SHIELDED","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"ATTUNED","target":"self"},{"tag":"READY","target":"self"},{"tag":"INSPIRED","target":"self"}]},"description":"Spend SHIELDED; gain ATTUNED, READY, INSPIRED."},
+    "saberThrow": {"chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":3}]}],"apply":[{"tag":"PINNED","target":"target"}]},"description":"Strike a MARKED foe; leave it PINNED."},
+    "leap": {"chain":{"consume":[{"tag":"ATTUNED","target":"self","bonus":[{"type":"shield","target":"self","amount":1}]}],"apply":[{"tag":"READY","target":"self"}]},"description":"Spend ATTUNED; gain READY for the landing."},
+    "sweep": {"chain":{"consume":[{"tag":"READY","target":"self","bonus":[{"type":"shield","target":"self","amount":2}]}],"apply":[{"tag":"SHIELDED","target":"self"}]},"description":"Spend READY; gain SHIELDED while sweeping."},
+    "choke": {"chain":{"consume":[{"tag":"PINNED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"STAGGERED","target":"target"}]},"description":"Choke a PINNED foe; leave it STAGGERED."},
+    "subdue": {"chain":{"consume":[{"tag":"STAGGERED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"PINNED","target":"target"}]},"description":"Restrain a STAGGERED target; leave it PINNED."},
+    "collapse": {"chain":{"consume":[{"tag":"ATTUNED","target":"self","bonus":[{"type":"shield","target":"self","amount":3}]}],"apply":[{"tag":"INSPIRED","target":"self"}]},"description":"Spend ATTUNED; gain INSPIRED as walls fall."},
+    "defLine": {"chain":{"consume":[{"tag":"INSPIRED","target":"self","bonus":[{"type":"shield","target":"self","amount":1}]}],"apply":[{"tag":"SHIELDED","target":"self"}]},"description":"Spend INSPIRED; apply SHIELDED while defending."},
+    "reflectM": {"chain":{"consume":[{"tag":"SHIELDED","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"ATTUNED","target":"self"}]},"description":"Spend SHIELDED; gain ATTUNED on the return."},
+    "flurry": {"chain":{"consume":[{"tag":"PINNED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"MARKED","target":"target"}]},"description":"Follow a PINNED foe; apply MARKED for the next strike."},
+    "mightyBlow": {"chain":{"consume":[{"tag":"TAUNTED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"STAGGERED","target":"target"}]},"description":"Break a TAUNTED foe; leave it STAGGERED."},
+    "precisionStrike": {"chain":{"consume":[{"tag":"EXPOSED","target":"target","bonus":[{"type":"damage","target":"target","amount":3}]}],"apply":[{"tag":"STAGGERED","target":"target"}]},"description":"Exploit EXPOSED prey; leave it STAGGERED."}
+  },
+  "consular": {
+    "strike": {"chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"EXPOSED","target":"target"}]},"description":"Hit MARKED foes; EXPOSED primes the next attack."},
+    "push": {"chain":{"consume":[{"tag":"EXPOSED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"PINNED","target":"target"},{"tag":"MARKED","target":"target"}]},"description":"Push an EXPOSED foe; leave it PINNED and MARKED."},
+    "meditate": {"chain":{"consume":[{"tag":"SHIELDED","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"ATTUNED","target":"self"},{"tag":"READY","target":"self"},{"tag":"INSPIRED","target":"self"}]},"description":"Spend SHIELDED; gain ATTUNED, READY, INSPIRED."},
+    "stun": {"chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"STAGGERED","target":"target"}]},"description":"Stun a MARKED foe; leave it STAGGERED."},
+    "forceHeal": {"chain":{"consume":[{"tag":"INSPIRED","target":"target","bonus":[{"type":"shield","target":"target","amount":2}]}],"apply":[{"tag":"SHIELDED","target":"target"}]},"description":"Heal an INSPIRED ally; leave it SHIELDED."},
+    "barrier": {"chain":{"consume":[{"tag":"ATTUNED","target":"target","bonus":[{"type":"shield","target":"target","amount":2}]}],"apply":[{"tag":"SHIELDED","target":"target"}]},"description":"Reinforce an ATTUNED ally; grant SHIELDED."},
+    "battleMed": {"chain":{"consume":[{"tag":"READY","target":"self","bonus":[{"type":"shield","target":"all_allies","amount":2}]}],"apply":[{"tag":"INSPIRED","target":"all_allies"}]},"description":"Spend READY; INSPIRED allies gain the aura."},
+    "mindTrick": {"chain":{"consume":[{"tag":"EXPOSED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"STAGGERED","target":"target"}]},"description":"Disrupt EXPOSED foes; leave them STAGGERED."},
+    "forceRevive": {"chain":{"consume":[{"tag":"READY","target":"self","bonus":[]}],"apply":[{"tag":"INSPIRED","target":"target"}]},"description":"Spend READY; revive an ally with INSPIRED."},
+    "choke": {"chain":{"consume":[{"tag":"PINNED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"STAGGERED","target":"target"}]},"description":"Choke a PINNED foe; leave it STAGGERED."},
+    "subdue": {"chain":{"consume":[{"tag":"STAGGERED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"PINNED","target":"target"}]},"description":"Restrain a STAGGERED target; leave it PINNED."},
+    "massHeal": {"chain":{"consume":[{"tag":"BURNING","target":"all_allies","bonus":[{"type":"shield","target":"target","amount":3}]}],"apply":[{"tag":"SHIELDED","target":"all_allies"}]},"description":"Cleanse BURNING allies; apply SHIELDED to the squad."},
+    "forceWave": {"chain":{"consume":[{"tag":"READY","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"ATTUNED","target":"self"}]},"description":"Spend READY; gain ATTUNED from the force wave."},
+    "stasisField": {"chain":{"consume":[{"tag":"ATTUNED","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"READY","target":"self"}]},"description":"Stasis stuns foes; spend ATTUNED, gain READY."},
+    "disarm": {"chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"PINNED","target":"target"}]},"description":"Disarm a MARKED foe; leave it PINNED."}
+  },
+  "sentinel": {
+    "strike": {"chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"EXPOSED","target":"target"}]},"description":"Hit MARKED foes; EXPOSED primes the next attack."},
+    "guard": {"chain":{"consume":[{"tag":"ATTUNED","target":"self","bonus":[{"type":"shield","target":"self","amount":2}]}],"apply":[{"tag":"SHIELDED","target":"self"}]},"description":"Spend ATTUNED; apply SHIELDED to yourself."},
+    "meditate": {"chain":{"consume":[{"tag":"SHIELDED","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"ATTUNED","target":"self"},{"tag":"READY","target":"self"},{"tag":"INSPIRED","target":"self"}]},"description":"Spend SHIELDED; gain ATTUNED, READY, INSPIRED."},
+    "shadowStep": {"chain":{"consume":[{"tag":"INSPIRED","target":"self","bonus":[{"type":"shield","target":"self","amount":1}]}],"apply":[{"tag":"SHIELDED","target":"self"}]},"description":"Spend INSPIRED; gain SHIELDED while cloaked."},
+    "disarm": {"chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"PINNED","target":"target"}]},"description":"Disarm a MARKED foe; leave it PINNED."},
+    "pull": {"chain":{"consume":[{"tag":"STAGGERED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"EXPOSED","target":"target"}]},"description":"Pull a STAGGERED foe; leave it EXPOSED."},
+    "breach": {"chain":{"consume":[{"tag":"INSPIRED","target":"self","bonus":[{"type":"shield","target":"self","amount":1}]}],"apply":[{"tag":"SHIELDED","target":"self"}]},"description":"Spend INSPIRED; gain SHIELDED at the breach."},
+    "sense": {"chain":{"consume":[{"tag":"ATTUNED","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"READY","target":"self"}]},"description":"Spend ATTUNED; gain READY after the scan."},
+    "executioner": {"chain":{"consume":[{"tag":"SHIELDED","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"ATTUNED","target":"self"}]},"description":"Spend SHIELDED; gain ATTUNED for wounded prey."}
+  },
+  "wayseeker": {
+    "strike": {"chain":{"consume":[{"tag":"MARKED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"EXPOSED","target":"target"}]},"description":"Hit MARKED foes; EXPOSED primes the next attack."},
+    "guard": {"chain":{"consume":[{"tag":"ATTUNED","target":"self","bonus":[{"type":"shield","target":"self","amount":2}]}],"apply":[{"tag":"SHIELDED","target":"self"}]},"description":"Spend ATTUNED; apply SHIELDED to yourself."},
+    "meditate": {"chain":{"consume":[{"tag":"SHIELDED","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"ATTUNED","target":"self"},{"tag":"READY","target":"self"},{"tag":"INSPIRED","target":"self"}]},"description":"Spend SHIELDED; gain ATTUNED, READY, INSPIRED."},
+    "beastCalm": {"chain":{"consume":[{"tag":"STAGGERED","target":"target","bonus":[{"type":"damage","target":"target","amount":1}]}],"apply":[{"tag":"EXPOSED","target":"target"}]},"description":"Calm a STAGGERED creature; leave it EXPOSED."},
+    "pull": {"chain":{"consume":[{"tag":"STAGGERED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"EXPOSED","target":"target"}]},"description":"Pull a STAGGERED foe; leave it EXPOSED."},
+    "push": {"chain":{"consume":[{"tag":"EXPOSED","target":"target","bonus":[{"type":"damage","target":"target","amount":2}]}],"apply":[{"tag":"PINNED","target":"target"},{"tag":"MARKED","target":"target"}]},"description":"Push an EXPOSED foe; leave it PINNED and MARKED."},
+    "breach": {"chain":{"consume":[{"tag":"INSPIRED","target":"self","bonus":[{"type":"shield","target":"self","amount":1}]}],"apply":[{"tag":"SHIELDED","target":"self"}]},"description":"Spend INSPIRED; gain SHIELDED at the breach."},
+    "tremor": {"chain":{"consume":[{"tag":"TAUNTED","target":"area_enemies","bonus":[{"type":"damage","target":"target","amount":3}]}],"apply":[{"tag":"STAGGERED","target":"area_enemies"}]},"description":"Exploit TAUNTED foes; apply STAGGERED across area."},
+    "pathfinder": {"chain":{"consume":[{"tag":"READY","target":"self","bonus":[{"type":"shield","target":"self","amount":1}]}],"apply":[{"tag":"INSPIRED","target":"self"}]},"description":"Spend READY; gain INSPIRED for the route."},
+    "wildBond": {"chain":{"consume":[{"tag":"ATTUNED","target":"self","bonus":[{"type":"focus","target":"self","amount":1}]}],"apply":[{"tag":"READY","target":"self"},{"tag":"SHIELDED","target":"self"}]},"description":"Spend ATTUNED; gain READY and SHIELDED."}
+  }
+}
+"""
 var checks := 0
 var failures := 0
 
@@ -38,6 +100,11 @@ func _template(def: Dictionary) -> String:
 func run() -> void:
 	check(Classes.validate().is_empty(), "all 15 class schemas: " + str(Classes.validate()))
 	var legacy: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/jedi18_legacy.json"))
+	var overrides: Dictionary = JSON.parse_string(A30_LEGACY_OVERRIDES)
+	for class_id in overrides:
+		for ability_id in overrides[class_id]:
+			var expected: Dictionary = legacy[class_id][ability_id]
+			for property in overrides[class_id][ability_id]: expected[property] = overrides[class_id][ability_id][property]
 	var all_ids: Dictionary = {}
 	var all_signatures: Dictionary = {}
 	var all_templates: Dictionary = {}

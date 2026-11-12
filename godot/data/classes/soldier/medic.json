@@ -342,7 +342,7 @@
       "rank": 7,
       "capstone": true,
       "once_per_mission": true,
-      "description": "Spend BURNING; gain INSPIRED for your next move.",
+      "description": "Spend BURNING; gain INSPIRED for your next move. · Once per mission",
       "capstone_template": "medic",
       "effects": [
         {
@@ -383,7 +383,7 @@
       "rank": 7,
       "capstone": true,
       "once_per_mission": true,
-      "description": "Use after IONIZED; grant STAGGERED to allies.",
+      "description": "Use after IONIZED; grant STAGGERED to allies. · Once per mission",
       "capstone_template": "medic",
       "charges": "soldier_capstone",
       "effects": [

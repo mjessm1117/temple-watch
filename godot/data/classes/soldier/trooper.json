@@ -397,7 +397,7 @@
           "tag": "EXPOSED"
         }
       ],
-      "description": "Exploit STAGGERED foes; apply IONIZED across the area.",
+      "description": "Exploit STAGGERED foes; apply IONIZED across the area. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "trooper"
@@ -437,7 +437,7 @@
           "status": "rooted"
         }
       ],
-      "description": "Exploit IONIZED foes; apply EXPOSED across the area.",
+      "description": "Exploit IONIZED foes; apply EXPOSED across the area. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "trooper"

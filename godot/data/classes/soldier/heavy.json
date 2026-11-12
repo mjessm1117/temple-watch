@@ -594,7 +594,7 @@
           "status": "stunned"
         }
       ],
-      "description": "Exploit EXPOSED foes; apply EXPOSED across the area.",
+      "description": "Exploit EXPOSED foes; apply EXPOSED across the area. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "heavy"
@@ -647,7 +647,7 @@
           "amount": 2
         }
       ],
-      "description": "Spend SHIELDED; gain SHIELDED for your next move.",
+      "description": "Spend SHIELDED; gain SHIELDED for your next move. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "heavy"

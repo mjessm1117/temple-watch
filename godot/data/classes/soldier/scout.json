@@ -389,7 +389,7 @@
           "tag": "PINNED"
         }
       ],
-      "description": "Exploit STAGGERED foes; apply MARKED across the area.",
+      "description": "Exploit STAGGERED foes; apply MARKED across the area. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "scout"
@@ -426,7 +426,7 @@
           "amount": 4
         }
       ],
-      "description": "Exploit STAGGERED prey; apply PINNED for allies.",
+      "description": "Exploit STAGGERED prey; apply PINNED for allies. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "scout"

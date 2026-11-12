@@ -569,7 +569,7 @@
           "amount": 5
         }
       ],
-      "description": "Exploit MARKED prey; apply PINNED for allies.",
+      "description": "Exploit MARKED prey; apply PINNED for allies. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "sniper"
@@ -617,7 +617,7 @@
           "amount": 2
         }
       ],
-      "description": "Exploit MARKED prey; apply BURNING for allies.",
+      "description": "Exploit MARKED prey; apply BURNING for allies. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "sniper"

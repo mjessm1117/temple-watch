@@ -610,7 +610,7 @@
           "tag": "IONIZED"
         }
       ],
-      "description": "Exploit MARKED foes; apply STAGGERED across the area.",
+      "description": "Exploit MARKED foes; apply STAGGERED across the area. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "tech"
@@ -661,7 +661,7 @@
           "amount": 1
         }
       ],
-      "description": "Spend ATTUNED; gain SHIELDED for your next move.",
+      "description": "Spend ATTUNED; gain SHIELDED for your next move. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "tech"
