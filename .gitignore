@@ -11,3 +11,7 @@ art/meshy1c/
 art/meshy1d/
 build/
 docs/godot/meshy6/retry-scratch/
+
+# Godot 4 import policy: .uid files are committed (stable cross-machine refs)
+# .import files are already tracked; do not add new ones — regenerated per-machine
+# addons/godot_ai/ is intentionally untracked pending integration decision
