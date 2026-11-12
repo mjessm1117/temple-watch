@@ -14,6 +14,7 @@ var hack_state: Dictionary = {}
 var metrics: Dictionary = {}
 var modern := false
 const Shot = preload("res://scripts/shot.gd")
+const Cover29 = preload("res://scripts/w29c_cover.gd")
 const AI = preload("res://scripts/ai.gd")
 const Settings = preload("res://scripts/settings.gd")
 const Ability = preload("res://scripts/abilities_engine.gd")
@@ -44,7 +45,7 @@ var clues := 0
 var saved_by: Dictionary = {}
 func _init(seed_value: int = 1, data_path: String = "res://data/rescue.json") -> void:
 	rng.seed = seed_value
-	spec = Maps.load_map(data_path)
+	spec = Maps.load_map(data_path, seed_value)
 	assert(not spec.is_empty(), "Mission map missing: " + data_path)
 	modern = spec.has("family")
 	difficulty = Settings.selected()
@@ -144,27 +145,12 @@ func _destructible(p: Vector2i) -> bool:
 	if not in_bounds(p) or p.x == 0 or p.y == 0 or p.x == int(spec.width) - 1 or p.y == int(spec.height) - 1: return false
 	return tile(p) in ["#", "c", "h", "k"]
 func damage_cover(p: Vector2i, damage: int, cause: Dictionary = {}) -> String:
-	if not _destructible(p) or damage <= 0: return tile(p)
-	var before := tile(p)
-	if not cover_hp.has(p): cover_hp[p] = 8 if tile(p) == "#" else 4
-	var remaining: int = int(cover_hp[p]) - damage
-	if remaining <= 0:
-		set_tile(p, "r")
-		message("Cover collapses into rubble.")
-	elif tile(p) == "#" and remaining <= 4:
-		set_tile(p, "c")
-		cover_hp[p] = remaining
-		message("Full cover cracks into half cover.")
-	else: cover_hp[p] = remaining
-	if tile(p) != before:
-		terrain_revision += 1
-		action_events.append({"kind":"cover_break", "at":p, "from_tile":before, "to_tile":tile(p), "cause":cause.get("kind", "environment"), "actor":int(cause.get("actor", -1))})
-	return tile(p)
+	return Cover29.damage(self, p, damage, cause)
 func explode(center: Vector2i, damage: int, radius: int = 1, cause: Dictionary = {}) -> void:
 	for y in range(center.y - radius, center.y + radius + 1):
 		for x in range(center.x - radius, center.x + radius + 1):
 			var p := Vector2i(x, y)
-			if center.distance_to(p) <= float(radius): damage_cover(p, damage, cause)
+			if center.distance_to(p) <= float(radius): damage_cover(p, maxi(8, damage), cause)
 
 func passable(p: Vector2i) -> bool:
 	return in_bounds(p) and tile(p) not in ["#", "c", "h", "k"] and (not modern or tile(p) != "w")
@@ -375,9 +361,7 @@ func _apply_attack(a: Dictionary, t: Dictionary, info: Dictionary, mode: String)
 		damage = max(1, damage - armor)
 		apply_damage(t, damage, a)
 		if armor > 0: t.armor = armor - 1
-		if str(a.get("class_name", "")) == "Heavy" and mode == "shoot":
-			var direction := Vector2i(signi(int(a.x) - int(t.x)), signi(int(a.y) - int(t.y)))
-			for q in [Shot.pos(t) + Vector2i(direction.x, 0), Shot.pos(t) + Vector2i(0, direction.y)]: damage_cover(q, 3, {"kind":"heavy_shot", "actor":int(a.id)})
+	Cover29.shot_chip(self, a, t, mode, outcome)
 	message("%s %s %s%s" % [a.name, outcome, t.name, " for %d." % damage if damage > 0 else "."])
 	if phase == "enemy": action_events.append({"kind": "attack", "actor": int(a.id), "target": int(t.id), "from": Shot.pos(a), "to": Shot.pos(t), "mode": mode, "enemy": str(a.side) == "enemy", "outcome": outcome, "damage": before_hp - int(t.hp), "killed": int(t.hp) <= 0})
 	if int(t.hp) <= 0 and str(t.side) == "player": t.wounded = true
@@ -469,7 +453,7 @@ func _enemy_reaction_fire(mover: Dictionary) -> void:
 	for e in living("enemy"):
 		if not bool(e.awake) or not bool(e.overwatch): continue
 		var info: Dictionary = Shot.calculate(self, e, mover, false, -15)
-		if bool(info.los) and bool(info.range_ok):
+		if bool(info.los) and bool(info.range_ok) and (not modern or int(info.cover) < 40):
 			e.overwatch = false
 			if modern: message("OVERWATCH: %s fires." % e.name)
 			_apply_attack(e, mover, info, "shoot")
