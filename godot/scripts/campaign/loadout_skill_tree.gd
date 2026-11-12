@@ -6,10 +6,12 @@ const Classes = preload("res://scripts/class_registry.gd")
 var host: Control
 var soldier_id := ""
 var selected_key := ""
+var selected_rank := 0
 var cards: Dictionary = {}
 var columns: Dictionary = {}
 var confirm: Button
 var comparison: Label
+var rows: Dictionary = {}
 
 func setup(owner_screen: Control, id: String) -> void:
 	host = owner_screen; soldier_id = id; name = "SkillTree"
@@ -17,98 +19,144 @@ func setup(owner_screen: Control, id: String) -> void:
 	build()
 
 func build() -> void:
-	S.clear(self); cards.clear(); columns.clear()
+	S.clear(self); cards.clear(); columns.clear(); rows.clear(); selected_key = ""; selected_rank = 0
 	var r: Dictionary = host.flow.session().soldier(soldier_id)
 	var locked := bool(host.flow.session().state.get("skill_picks_locked", false))
-	add_child(UI.label("%s  /  SKILL TREE  ·  %s" % [str(r.cls).to_upper(), "LOCKED" if locked else "FREE UNTIL DEPLOY"], 15, S.GOLD))
-	comparison = UI.label("Tap a node to compare · tap again to equip.", 11, S.CYAN)
-	comparison.clip_text = true; add_child(comparison)
-	var ranks := HBoxContainer.new(); ranks.name = "RankColumns"
-	ranks.add_theme_constant_override("separation", 7); add_child(ranks)
-	var available := maxf(450.0, host.size.x - 215.0)
-	var col_width := clampf((available - 14.0) / 3.0, 145.0, 238.0)
-	for rank in range(1, 4):
-		var column := S.column(3); column.name = "Rank%d" % rank
-		column.custom_minimum_size.x = col_width; ranks.add_child(column); columns[rank] = column
-		var rank_label := UI.label("R%d  /  %s" % [rank, "SPECIALIZATION" if rank == 3 else "FOUNDATION" if rank == 1 else "TACTICS"], 10, S.CYAN)
-		column.add_child(rank_label)
-		var pair := HBoxContainer.new(); pair.name = "Pair%d" % rank
-		pair.add_theme_constant_override("separation", 4); column.add_child(pair)
-		var options: Array = Progression.tree_options(r, rank)
-		for key in options:
-			var other := str(options[0] if str(options[0]) != str(key) else options[1]) if options.size() > 1 else ""
-			var card := _card(r, rank, str(key), other, (col_width - 4) * 0.5, locked)
-			pair.add_child(card); cards[str(key)] = card
-	var later := S.column(3); later.name = "LaterRanks"; later.custom_minimum_size.x = col_width
-	ranks.add_child(later)
-	later.add_child(UI.label("R4+  /  FUTURE RANKS", 10, S.MUTED))
-	var future := S.panel(); future.custom_minimum_size.y = 138
-	future.add_theme_stylebox_override("panel", S.box(Color("142025"), Color("344047"), 5)); later.add_child(future)
-	var future_label := UI.label("◇  LOCKED\nEarn ranks in battle to reveal the next branches.", 11, S.MUTED)
-	future_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; future.add_child(future_label)
+	add_child(UI.label("%s  /  SKILL TREE  ·  %s" % [str(r.cls).to_upper(), "PROMOTION PICKS" if locked else "FREE UNTIL DEPLOY"], 15, S.GOLD))
+	comparison = UI.label("Tap an open ability to compare · tap again to equip.", 11, S.CYAN)
+	comparison.clip_text = true; comparison.autowrap_mode = TextServer.AUTOWRAP_OFF; add_child(comparison)
+	var side_name := "jedi" if Progression.is_jedi(r) else "soldier"
+	var class_row: Dictionary = Classes.class_data(str(r.get("cls", "")))
+	var specs: Dictionary = class_row.get("tree", {}).get("specs", {})
+	var catalog := Classes.ability_catalog()
+	var phone := host.size.x < 900
+	var ranks: BoxContainer = S.column(7) if phone else HBoxContainer.new()
+	ranks.name = "RankColumns"; add_child(ranks)
+	var col_width := clampf((maxf(450.0, host.size.x - 215.0) - 14.0) / 3.0, 145.0, 238.0)
+	for rank in range(1, Classes.ranks(side_name).size() + 1):
+		var column := S.column(4); column.name = "Rank%d" % rank
+		if phone: ranks.add_child(column)
+		elif rank > 3: add_child(column)
+		else:
+			column.custom_minimum_size.x = col_width; ranks.add_child(column)
+		columns[rank] = column; rows[rank] = column
+		var tier := str(Classes.rank_data(side_name, rank).get("tier", "Rank %d" % rank))
+		var picked_id := str(r.get("picks", [])[rank - 1]) if r.get("picks", []).size() >= rank else ""
+		var picked_name := str(catalog.get(picked_id, {}).get("name", picked_id)) if picked_id != "" else "None"
+		var heading := UI.label("R%d  /  %s  ·  Pick: %s" % [rank, tier.to_upper(), picked_name], 11, S.CYAN)
+		heading.name = "Tier"; heading.clip_text = true; heading.autowrap_mode = TextServer.AUTOWRAP_OFF; column.add_child(heading)
+		var entries := _rank_entries(r, rank, specs)
+		var pair: BoxContainer = HBoxContainer.new() if not phone and rank <= 3 else S.column(4)
+		pair.name = "Pair%d" % rank; column.add_child(pair)
+		for entry in entries:
+			var key := str(entry.id)
+			var width := (col_width - 4) * 0.5 if not phone and rank <= 3 else 0.0
+			var card := _card(r, rank, key, str(entry.branch), width, locked, catalog)
+			pair.add_child(card)
+			if not cards.has(key): cards[key] = card
+			cards["%d:%s" % [rank, key]] = card
 	confirm = host.skill_confirm
 	confirm.disabled = true
 
-func _card(r: Dictionary, rank: int, key: String, other: String, width: float, locked: bool) -> Button:
-	var ability: Dictionary = Classes.ability_catalog().get(key, {})
-	var other_ability: Dictionary = Classes.ability_catalog().get(other, {})
-	var picked: bool = key in r.get("picks", [])
-	var available: bool = rank <= Progression.skill_rank(r) and rank <= r.get("picks", []).size() + 1 and not locked
+func _rank_entries(r: Dictionary, rank: int, specs: Dictionary) -> Array:
+	var result := []
+	if rank <= 2:
+		for id in Progression.tree_options(r, rank): result.append({"id":id, "branch":"Foundation" if rank == 1 else "Tactics"})
+		return result
+	if rank == 3:
+		for branch in specs:
+			var id := str(specs[branch].get("sig", ""))
+			if id in Progression.tree_options(r, rank): result.append({"id":id, "branch":str(specs[branch].get("n", branch))})
+		return result
+	for branch in specs:
+		var sample := r.duplicate(); sample.spec = branch
+		for id in Progression.tree_options(sample, rank):
+			if not result.any(func(entry): return str(entry.id) == str(id)):
+				result.append({"id":id, "branch":str(specs[branch].get("n", branch))})
+	return result
+
+func _card(r: Dictionary, rank: int, key: String, branch: String, width: float, locked: bool, catalog: Dictionary) -> Button:
+	var ability: Dictionary = catalog.get(key, {})
+	var picked: bool = r.get("picks", []).size() >= rank and str(r.get("picks", [])[rank - 1]) == key
+	var options: Array = Progression.tree_options(r, rank)
+	var available: bool = (not locked or rank > 3) and Progression.set_choice(r.duplicate(true), rank, key, not locked)
+	var reason := ""
+	if rank > Progression.skill_rank(r): reason = "Reach " + str(Classes.rank_data("jedi" if Progression.is_jedi(r) else "soldier", rank).get("tier", "rank %d" % rank))
+	elif key not in options: reason = "Choose %s at rank 3" % branch
+	elif rank > r.get("picks", []).size() + 1: reason = "Choose earlier rank"
+	elif locked and rank <= 3 and not picked: reason = "Picks locked after deploy"
+	elif locked and rank <= r.get("picks", []).size() and not picked: reason = "Already chosen"
 	var card := S.button("", _preview.bind(rank, key), available)
-	card.name = "Skill_" + key; card.custom_minimum_size = Vector2(width, 136)
+	card.name = "Skill_" + key; card.custom_minimum_size = Vector2(maxf(width, 44.0), 136 if width > 0 else 108)
+	card.size_flags_horizontal = SIZE_EXPAND_FILL
 	UI.style_button(card)
 	card.add_theme_stylebox_override("normal", S.box(Color("22434b") if picked else Color("172b32"), S.GOLD if picked else S.EDGE, 4))
 	card.add_theme_stylebox_override("disabled", S.box(Color("142025"), Color("344047"), 4))
-	card.tooltip_text = str(ability.get("description", ""))
-	var info := S.column(0); info.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	info.offset_left = 4; info.offset_right = -4; info.offset_top = 2; info.offset_bottom = -2
+	card.tooltip_text = str(ability.get("description", "")); card.mouse_filter = Control.MOUSE_FILTER_PASS
+	var info := S.column(0)
 	info.mouse_filter = Control.MOUSE_FILTER_IGNORE; card.add_child(info)
-	var top := HBoxContainer.new(); info.add_child(top)
+	info.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	info.offset_left = 4; info.offset_right = -4; info.offset_top = 2; info.offset_bottom = -2
+	var top := HBoxContainer.new(); top.mouse_filter = Control.MOUSE_FILTER_IGNORE; info.add_child(top)
 	var icon := TextureRect.new(); icon.name = "SkillIcon"
 	icon.texture = S.icon(_icon(ability)); icon.custom_minimum_size = Vector2(18, 18)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top.add_child(icon)
-	var state := UI.label("✓" if picked else "○", 12, S.GOLD if picked else S.MUTED)
+	var state := UI.label("PICKED" if picked else reason if reason != "" else "OPEN", 10, S.GOLD if picked else S.MUTED if reason != "" else S.GREEN)
+	state.name = "LockReason"
+	state.clip_text = true; state.autowrap_mode = TextServer.AUTOWRAP_OFF
 	state.size_flags_horizontal = SIZE_EXPAND_FILL; state.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; top.add_child(state)
-	var name_label := UI.label(str(ability.get("name", key)).to_upper(), 10, S.TEXT)
-	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	name_label.custom_minimum_size.y = 20; info.add_child(name_label)
-	var number := UI.label(_main_number(ability), 19, S.GOLD if picked else S.CYAN)
-	number.name = "Number"; info.add_child(number)
-	var effect := UI.label(_effect_line(ability), 8, S.TEXT)
-	effect.clip_text = true; info.add_child(effect)
-	var compare := UI.label("VS " + _main_number(other_ability) + " " + _short_metric(other_ability) if other != "" else "FOUNDATION", 8, S.MUTED)
-	compare.name = "Compare"; compare.clip_text = true; info.add_child(compare)
-	var chain := UI.label(_chain_line(ability, r, rank), 8, S.GREEN)
-	chain.name = "Chain"; chain.clip_text = true; info.add_child(chain)
+	var name_label := UI.label(str(ability.get("name", key)).to_upper() + "  ·  " + branch, 10, S.TEXT)
+	name_label.name = "AbilityName"; name_label.clip_text = true; name_label.autowrap_mode = TextServer.AUTOWRAP_OFF; info.add_child(name_label)
+	var description := UI.label(str(ability.get("description", _effect_line(ability))), 9, S.TEXT)
+	description.name = "Description"; description.clip_text = true; description.autowrap_mode = TextServer.AUTOWRAP_OFF; info.add_child(description)
+	var chain: Control = HBoxContainer.new() if width <= 0 else UI.label("", 8, S.GREEN)
+	chain.name = "Chain"; chain.mouse_filter = Control.MOUSE_FILTER_IGNORE; info.add_child(chain)
+	var chain_data: Dictionary = ability.get("chain", {}) if ability.get("chain", {}) is Dictionary else {}
+	var chip_names := []
+	for kind in ["apply", "consume"]:
+		var tags: Variant = chain_data.get(kind, [])
+		if not tags is Array: continue
+		for tag in tags:
+			if not tag is Dictionary or str(tag.get("tag", "")) == "": continue
+			chip_names.append(("+" if kind == "apply" else "↳") + str(tag.tag))
+			if width > 0: continue
+			var chip := UI.label(("+" if kind == "apply" else "↳") + str(tag.tag), 8, S.GREEN if kind == "apply" else S.CYAN)
+			chip.autowrap_mode = TextServer.AUTOWRAP_OFF
+			chip.add_theme_stylebox_override("normal", S.box(Color("1b3438"), S.EDGE, 2))
+			chip.mouse_filter = Control.MOUSE_FILTER_IGNORE; chain.add_child(chip)
+	if chain is Label:
+		chain.text = " ".join(chip_names)
+		chain.clip_text = true; chain.autowrap_mode = TextServer.AUTOWRAP_OFF
 	return card
 
 func _preview(rank: int, key: String) -> void:
 	var r: Dictionary = host.flow.session().soldier(soldier_id)
-	if bool(host.flow.session().state.get("skill_picks_locked", false)): return
-	if rank > r.get("picks", []).size() + 1: return
-	if selected_key == key:
+	var locked := bool(host.flow.session().state.get("skill_picks_locked", false))
+	if locked and rank <= 3: return
+	if not Progression.set_choice(r.duplicate(true), rank, key, not locked): return
+	if selected_key == key and selected_rank == rank:
 		_confirm(); return
-	selected_key = key
+	selected_key = key; selected_rank = rank
 	var catalog := Classes.ability_catalog()
 	var current: Dictionary = catalog.get(key, {})
 	var options: Array = Progression.tree_options(r, rank)
 	var other := str(options[0] if str(options[0]) != key else options[1]) if options.size() > 1 else ""
 	var rival: Dictionary = catalog.get(other, {})
-	comparison.text = "%s  %s %s   VS   %s  %s %s" % [str(current.get("name", key)), _main_number(current), _metric(current), str(rival.get("name", other)), _main_number(rival), _metric(rival)]
+	comparison.text = "%s  %s %s   VS   %s  %s %s" % [str(current.get("name", key)), _main_number(current), _metric(current), str(rival.get("name", other)), _main_number(rival), _metric(rival)] if other != "" else "%s  ·  %s" % [str(current.get("name", key)), str(current.get("description", _effect_line(current)))]
 	confirm.disabled = false
+	var selected_card: Control = rows[rank].get_node("Pair%d/Skill_%s" % [rank, key])
 	for id in cards:
-		cards[id].modulate = S.GOLD if id == selected_key else Color.WHITE
+		cards[id].modulate = S.GOLD if cards[id] == selected_card else Color.WHITE
 
 func _confirm() -> void:
 	if selected_key == "": return
 	var r: Dictionary = host.flow.session().soldier(soldier_id)
-	var chosen_rank := 0
-	for rank in range(1, 4):
-		if selected_key in Progression.tree_options(r, rank): chosen_rank = rank; break
+	var chosen_rank := selected_rank
 	if chosen_rank == 0: return
 	if not Progression.set_choice(r, chosen_rank, selected_key, not bool(host.flow.session().state.get("skill_picks_locked", false))): return
-	selected_key = ""; host.flow.save(); host._refresh(); host.arsenal._show_skills()
+	selected_key = ""; selected_rank = 0; host.flow.save(); host._refresh(); host.arsenal._show_skills()
 
 static func _icon(ability: Dictionary) -> String:
 	match str(ability.get("effect", "")):
@@ -139,9 +187,6 @@ static func _metric(ability: Dictionary) -> String:
 			return {"defense":"defense", "chance":"hit", "distance":"tiles", "amount":"actions", "damage_mod":"damage", "cooldown":"turn cooldown"}.get(field, field)
 	return str(ability.get("effect", "effect")).replace("_", " ")
 
-static func _short_metric(ability: Dictionary) -> String:
-	return {"defense":"DEF", "damage":"DMG", "chance":"HIT", "aim":"AIM", "heal":"HEAL", "shots":"SHOTS", "damage_mod":"DMG"}.get(_metric(ability), _metric(ability).to_upper().left(4))
-
 static func _effect_line(ability: Dictionary) -> String:
 	var kind := str(ability.get("effect", "skill"))
 	match kind:
@@ -157,14 +202,3 @@ static func _effect_line(ability: Dictionary) -> String:
 		"shadow", "leap": return "reposition"
 		"focus": return "restore Focus"
 	return kind.replace("_", " ")
-
-static func _chain_line(ability: Dictionary, r: Dictionary, rank: int) -> String:
-	var chain: Dictionary = ability.get("chain", {})
-	var applied: Array = chain.get("apply", [])
-	if not applied.is_empty(): return "→ " + str(applied[0].get("tag", "COMBO"))
-	if rank < 3:
-		var next := Progression.tree_options(r, rank + 1)
-		if not next.is_empty():
-			var next_name := str(Classes.ability_catalog().get(str(next[0]), {}).get("name", "R%d" % (rank + 1)))
-			return "→ " + str(next_name.split(" ")[-1]).to_upper()
-	return "LINK → squad follow-up"
