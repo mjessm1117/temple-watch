@@ -28,6 +28,8 @@ var preview_source_model: Node3D
 var close_pitch := deg_to_rad(53.0)
 var overhead := false
 var last_frame_at := -10.0
+var framed_move_actor28 := -1
+var framed_move_position28 := Vector2i(-1, -1)
 
 func _ready() -> void:
 	touch.g = g
@@ -56,6 +58,13 @@ func await_return24() -> void:
 
 func _process(_delta: float) -> void:
 	if g == null or g.camera == null or g.cinematic or preview_active: return
+	if preload("res://scripts/phone_layout.gd").narrow(Vector2i(g.get_viewport().get_visible_rect().size)):
+		var actor: Dictionary = g.mission.unit_by_id(g.selected_id) if g.mission != null else {}
+		if not actor.is_empty() and g.action == "move":
+			var location := Vector2i(int(actor.x), int(actor.y))
+			if framed_move_actor28 != g.selected_id or framed_move_position28 != location:
+				framed_move_actor28 = g.selected_id; framed_move_position28 = location
+				frame_selected_move28.call_deferred()
 	if g.playing_enemy_events and not skip_requested and g.quiet_motions.is_empty():
 		for enemy in g.mission.living("enemy"):
 			var view = g.views.get(int(enemy.id))
@@ -79,6 +88,61 @@ func _process(_delta: float) -> void:
 	if absf(g.pitch - pitch) > 0.002:
 		g.pitch = pitch
 		g._update_camera()
+
+func move_preview_state28() -> Dictionary:
+	var tile: Vector2i = g.preview_tile if g != null else Vector2i(-1, -1)
+	var cost := 0
+	if g != null and tile.x >= 0 and g.action == "move":
+		var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
+		cost = int(preload("res://scripts/input_controls.gd").move_preview(g.mission, actor, tile).get("ap", 0))
+	return {"tile": tile, "cost": cost, "confirmed": false}
+
+func _map_rect28() -> Rect2:
+	var size: Vector2 = g.get_viewport().get_visible_rect().size
+	if g.has_method("hud_safe_rect28"):
+		var supplied: Variant = g.call("hud_safe_rect28")
+		if supplied is Rect2 and supplied.has_area(): return supplied
+	if g.get("hud_controls") != null and g.hud_controls.phone != null and g.hud_controls.phone.has_method("hud_safe_rect28"):
+		var supplied: Variant = g.hud_controls.phone.call("hud_safe_rect28")
+		if supplied is Rect2 and supplied.has_area(): return supplied
+	return Rect2(Vector2(0, size.y * 0.12), Vector2(size.x, size.y * 0.63))
+
+func _ground_at28(screen: Vector2) -> Vector3:
+	var origin: Vector3 = g.camera.project_ray_origin(screen)
+	var direction: Vector3 = g.camera.project_ray_normal(screen)
+	return origin + direction * (-origin.y / direction.y) if absf(direction.y) > 0.001 else g.pivot
+
+func frame_selected_move28() -> void:
+	if g == null or not is_instance_valid(g) or g.camera == null or g.cinematic: return
+	var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
+	if actor.is_empty(): return
+	if g.camera_tween != null and g.camera_tween.is_running(): g.camera_tween.kill()
+	# Keep the soldier legible even when the entire dash reach cannot fit the HUD gap.
+	var legible_zoom: float = preload("res://scripts/battle11_camera.gd").selected_zoom(g.mission)
+	g.zoom = minf(g.zoom, legible_zoom)
+	g._update_camera()
+	var reach: Dictionary = g.mission.reach_tiles(actor, mini(2, int(actor.get("ap", 0))))
+	var bounds := Rect2()
+	var first := true
+	for tile in reach.get("costs", {}):
+		var point: Vector2 = g.camera.unproject_position(Vector3(tile.x, preload("res://scripts/shot.gd").elevation(g.mission, tile) * 0.7 + 0.3, tile.y))
+		if first: bounds = Rect2(point, Vector2.ZERO); first = false
+		else: bounds = bounds.expand(point)
+	if first: return
+	var safe := _map_rect28().grow(-18.0)
+	var factor: float = maxf(bounds.size.x / maxf(1.0, safe.size.x), bounds.size.y / maxf(1.0, safe.size.y))
+	if factor > 1.0:
+		g.zoom = minf(legible_zoom, preload("res://scripts/battle11_camera.gd").clamp_zoom(g.zoom * minf(factor * 1.12, 2.2)))
+		g._update_camera()
+		bounds = Rect2(); first = true
+		for tile in reach.get("costs", {}):
+			var point: Vector2 = g.camera.unproject_position(Vector3(tile.x, preload("res://scripts/shot.gd").elevation(g.mission, tile) * 0.7 + 0.3, tile.y))
+			if first: bounds = Rect2(point, Vector2.ZERO); first = false
+			else: bounds = bounds.expand(point)
+	var desired: Vector2 = safe.get_center()
+	var actual: Vector2 = bounds.get_center()
+	g.pivot += _ground_at28(actual) - _ground_at28(desired)
+	g._update_camera()
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:

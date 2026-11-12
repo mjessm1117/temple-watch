@@ -48,7 +48,7 @@ func run() -> void:
 	var grid := Grid.new(); root.add_child(grid); grid.bind(source,fixture)
 	var border := art.box(Vector3(1,0.12,1),Vector3(0.08,0.05,0.86),art.material(Color("399ef2")),source)
 	await process_frame; await process_frame
-	check(not grid.visible,"idle overview has no grid")
+	check(grid.visible and grid.reach_edges28 > 0,"selected Move reach remains visible without hover")
 	fixture.hovered = Vector2i(1,1); grid._process(0)
 	check(grid.visible and grid.view.multimesh.visible_instance_count == 1,"Move squares remain lit")
 	fixture.action = "free"; grid._process(0)
