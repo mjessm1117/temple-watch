@@ -46,7 +46,7 @@ func _build(option: Dictionary) -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = SIZE_EXPAND_FILL
 	col.add_child(scroll)
-	var body := UI.column(5)
+	var body := UI.column(8)
 	body.size_flags_horizontal = SIZE_EXPAND_FILL
 	scroll.add_child(body)
 	body.add_child(UI.label(str(flow.screen.get("title", option.get("n", "Mission briefing"))), 18, UI.ACCENT))

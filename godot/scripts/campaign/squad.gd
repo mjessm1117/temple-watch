@@ -108,9 +108,11 @@ func _ready() -> void:
 	skill_confirm = S.button("CONFIRM", _confirm_skill); skill_confirm.name = "SkillConfirm"; add_child(skill_confirm); wire_button(skill_confirm)
 	card_row = HBoxContainer.new(); card_row.add_theme_constant_override("separation", 6)
 	card_scroll = preload("res://scripts/touch_scroll.gd").new(); card_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	card_scroll.z_index = 1
 	add_child(card_scroll); card_scroll.add_child(card_row)
 	card_scroll.resized.connect(_sync_roster_visibility)
 	drawer = ColorRect.new(); drawer.color = S.PANEL; drawer.clip_contents = true; add_child(drawer); drawer.hide()
+	move_child(card_scroll, -1)
 	for r in c.state.roster: _portrait(r)
 	_make_audio()
 	resized.connect(_layout)
@@ -257,6 +259,7 @@ func _sync_roster_visibility() -> void:
 	var compact_strip := card_scroll.size.x <= 350.0
 	card_scroll.visible = true
 	card_scroll.modulate.a = 0.0 if phone_focus and not compact_strip else 1.0
+	move_child(card_scroll, 0 if phone_focus and not compact_strip else -1)
 	for card in cards.values():
 		var button: Button = card.get_child(0).get_child(0)
 		button.disabled = phone_focus and not compact_strip
@@ -318,8 +321,9 @@ func _draw_cards() -> void:
 	for i in selected.size():
 		var r: Dictionary = c.soldier(str(selected[i]))
 		var card := Details.card(c, r, inspect.bind(i), _portrait_texture(r)); card_row.add_child(card); cards[str(r.id)] = card
-		if Phone.narrow(Phone.window_size()) and size.x > 700.0:
-			card.custom_minimum_size.x = minf(166.0,(size.x-26.0-8.0*6.0)/7.0)
+		if Phone.narrow(Phone.window_size()):
+			# Three readable cards fit a portrait strip; the rest remain swipeable.
+			card.custom_minimum_size.x = 138.0 if size.x < 500.0 else 150.0
 		if focus_index == i: card.add_theme_stylebox_override("panel", S.box(Color("213a42"), S.CYAN, 8))
 		var button: Button = card.get_child(0).get_child(0); wire_button(button)
 		button.mouse_entered.connect(func(): stage.highlight(i))
@@ -486,8 +490,13 @@ func _make_audio() -> void:
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(footer):
-		var desired := -78.0 if Phone.narrow(Phone.window_size()) else -80.0
-		if absf(footer.offset_top - desired) > 1.0: _footer_rect(12 if desired == -78.0 else 24, desired, -12)
+		var compact := Phone.narrow(Phone.window_size())
+		var safe := Phone.safe_margins(size) if compact else Vector4.ZERO
+		var margin := 12.0 + maxf(0.0, safe.x) if compact else 24.0
+		var top := -66.0 - maxf(0.0, safe.w) if compact else -80.0
+		var bottom := -12.0 - maxf(0.0, safe.w) if compact else -12.0
+		if absf(footer.offset_top - top) > 1.0 or absf(footer.offset_left - margin) > 1.0:
+			_footer_rect(margin, top, bottom)
 	if not is_instance_valid(stage_container) or focus_index >= 0: return
 	var mouse := get_local_mouse_position()
 	var index := -1

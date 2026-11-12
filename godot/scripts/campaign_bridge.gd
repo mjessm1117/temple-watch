@@ -114,6 +114,13 @@ func open_settings() -> void:
 	settings.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(settings)
 	layer.add_child(panel)
+	settings.add_theme_constant_override("separation", 8)
+	var controls_section := settings.find_child("ControlsSection", true, false) as BoxContainer
+	if controls_section != null: controls_section.add_theme_constant_override("separation", 8)
+	var touch_shield := preload("res://scripts/w29b_touch_shield.gd").new()
+	touch_shield.name = "SettingsTouchShield"
+	touch_shield.owner_scroll = scroll
+	layer.add_child(touch_shield)
 	settings_layer = layer
 	settings_panel = panel
 	scroll.set_deferred("scroll_vertical", w25_settings_scroll)
@@ -179,7 +186,21 @@ func go(scene: String) -> void:
 	var back := tree.create_tween()
 	back.tween_property(veil, "modulate:a", 0.0, fade_duration)
 	await back.finished
+	if scene == "temple": _w29b_temple_targets(tree.current_scene)
 	layer.queue_free()
+
+func _w29b_temple_targets(view: Node) -> void:
+	if view == null: return
+	var safe := preload("res://scripts/phone_layout.gd").safe_margins(get_viewport().get_visible_rect().size)
+	if safe.x > 8.0:
+		for badge in view.find_children("EdgeBadge*", "Control", true, false):
+			badge.hide()
+	var first_tab := view.find_child("Tab_Galaxy", true, false)
+	if first_tab != null and first_tab.get_parent() is GridContainer:
+		first_tab.get_parent().add_theme_constant_override("v_separation", 8)
+	var rail := view.find_child("TaskRailCard", true, false) as Control
+	if rail != null and get_viewport().get_visible_rect().size.x < 500.0:
+		rail.position.y += 6.0
 
 func prepare_briefing(index: int) -> void:
 	_prepare_briefing25(index)
