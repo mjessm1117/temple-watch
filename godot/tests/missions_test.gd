@@ -73,7 +73,7 @@ func adjacent(m: RefCounted, u: Dictionary, p: Vector2i) -> void:
 func extract(m: RefCounted) -> void:
 	var squad: Array = m.living("player")
 	for i in squad.size(): squad[i].x = m.spec.evac[i][0]; squad[i].y = m.spec.evac[i][1]
-	if m.spec.family in ["rescue","vip_extract"]: m.prisoner.x = m.spec.evac[0][0]; m.prisoner.y = m.spec.evac[0][1]
+	if m.spec.family in ["rescue","vip_extract"] or bool(m.spec.get("envoy_extract",false)): m.prisoner.x = m.spec.evac[0][0]; m.prisoner.y = m.spec.evac[0][1]
 	m._check_win()
 
 func _rules() -> void:
@@ -98,9 +98,7 @@ func _rules() -> void:
 			var p: Vector2i = m.interactables()[0]; adjacent(m,u,p); m.interact(u,p)
 		m._check_win()
 		check(m.result == "" and m.objective_state.phase == "evac",id+" primary leads to evacuation, not instant win")
-		if id == "envoy" and not m.interactables().is_empty():
-			var bonus_tile: Vector2i = m.interactables()[0]; adjacent(m,u,bonus_tile); m.interact(u,bonus_tile)
-			check(m.objective_state.done.size() == 3,"optional third terminal remains available during evac")
+		if id == "envoy": check(m.interactables().is_empty() and bool(m.prisoner.freed),"envoy intercept advances to escort without another terminal")
 		extract(m); check(m.result == "win",id+" family can finish")
 		check(int(m.metrics.objective_turn) > 0 and int(m.metrics.evac_turn) > 0,id+" objective and evac telemetry")
 	var recon = mission("sabotage")
@@ -131,7 +129,8 @@ func _rules() -> void:
 	defense.damage_objective(99); check(defense.result == "loss","defense relay loss fails")
 	defense = mission("relay")
 	check(defense.pressure_state.pending.size() == 1 and defense.living("enemy").all(func(e): return bool(e.awake) and bool(e.spotted)),"gate announces the first wave and shows all attackers")
-	for turn in [2,4]: defense.turn = turn; Pressure.player_start(defense)
+	for turn in [2,4]:
+		defense.turn = turn; defense.objective_state.held = turn-1; Pressure.player_start(defense)
 	check(defense.pressure_state.waves == 3,"three defense waves queued")
 	check(defense.living("enemy").filter(func(e): return int(e.group) >= 1000).all(func(e): return bool(e.awake) and bool(e.spotted)),"gate waves arrive awake and visible")
 	var sizes: Array = defense.pressure_state.pending.map(func(w): return w.kinds.size())

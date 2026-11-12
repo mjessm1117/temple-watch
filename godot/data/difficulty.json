@@ -63,6 +63,13 @@
     ],
     "player_hp": 2,
     "enemy_damage": 0,
+    "modern": {
+      "enemy_aim": 20,
+      "enemy_hp": 4,
+      "active_cap": 7,
+      "player_hp": 0,
+      "enemy_damage": 1
+    },
     "combat_enemy_aim": -10
   },
   "legend": {

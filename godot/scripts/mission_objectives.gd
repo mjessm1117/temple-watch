@@ -5,8 +5,12 @@ const Families11 = preload("res://scripts/mission11_families.gd")
 
 static func setup(m: RefCounted) -> void:
 	var f := str(m.spec.family)
+	if str(m.difficulty.name) == "Normal" and int(m.spec.get("normal_turn_limit",0)) > 0: m.spec.turn_limit = int(m.spec.normal_turn_limit)
+	var relay_hp := int(m.spec.objective.hp)
+	if bool(m.spec.get("first_mission",false)):
+		relay_hp = int(m.spec.objective.get("hard_hold_hp" if str(m.difficulty.name) == "Hard" else "normal_hold_hp",relay_hp))
 	m.objective_state = {"phase":"primary","done":{},"held":0,"step":0,"clock_start":1 if m.spec.clock_trigger == "start" else 0,
-		"relay_hp":int(m.spec.objective.hp),"overrun":0,"saved":0,"lost":0,"civilians":[],"runner_id":-1,"evac_start":0}
+		"relay_hp":relay_hp,"overrun":0,"saved":0,"lost":0,"civilians":[],"runner_id":-1,"evac_start":0}
 	if f == "retaliation":
 		for at in m.spec.objective.civilians: m.objective_state.civilians.append({"at":at,"state":"waiting"})
 	if not bool(m.prisoner.get("active", false)): m.prisoner.x = -99; m.prisoner.y = -99
@@ -27,7 +31,7 @@ static func targets(m: RefCounted) -> Array[Vector2i]:
 	var out: Array[Vector2i] = []
 	if m.result != "": return out
 	if Families11.applies(m): return Families11.targets(m)
-	if m.objective_state.phase != "primary" and m.spec.family not in ["hack_terminal","sabotage"]: return out
+	if m.objective_state.phase != "primary" and (m.spec.family not in ["hack_terminal","sabotage"] or bool(m.spec.get("envoy_extract",false))): return out
 	match str(m.spec.family):
 		"rescue", "vip_extract":
 			if not bool(m.prisoner.freed): out.append(Shot.pos(m.prisoner))
@@ -55,7 +59,9 @@ static func interact(m: RefCounted, u: Dictionary, p: Vector2i) -> Dictionary:
 			primary_done(m)
 		"hack_terminal", "sabotage":
 			m.objective_state.done[p] = true
-			m.message("%s: %d/%d" % ["Terminal copied" if f == "hack_terminal" else "Charge planted",m.objective_state.done.size(),int(m.spec.objective.required)])
+			if bool(m.spec.get("envoy_extract",false)):
+				m.prisoner.freed = true; m.prisoner.escort_id = u.id
+			m.message("%s: %d/%d" % ["Transmission intercepted" if bool(m.spec.get("envoy_extract",false)) else "Terminal copied" if f == "hack_terminal" else "Charge planted",m.objective_state.done.size(),int(m.spec.objective.required)])
 			if m.objective_state.done.size() >= int(m.spec.objective.required): primary_done(m)
 		"destroy_relay": damage_relay(m,6)
 		"retaliation":
@@ -82,7 +88,7 @@ static func primary_done(m: RefCounted) -> void:
 		return
 	m.objective_state.phase = "evac"; m.objective_state.evac_start = m.turn
 	m.metrics.objective_turn = m.turn
-	m.message("Main objective complete. Reach the blue evacuation zone.")
+	m.message("Escort the envoy to the blue evacuation zone." if bool(m.spec.get("envoy_extract",false)) else "Main objective complete. Reach the blue evacuation zone.")
 	m.queue_reinforcement(["trooper","heavy"],1,"Evac pursuit")
 
 static func fail(m: RefCounted, why: String) -> void:
@@ -100,7 +106,7 @@ static func check(m: RefCounted) -> void:
 	var f := str(m.spec.family)
 	if bool(m.objective_state.get("objective_ready",false)) or f == "pursuit": primary_done(m)
 	if f == "operation": check_step(m)
-	elif f in ["rescue","vip_extract"]:
+	elif f in ["rescue","vip_extract"] or bool(m.spec.get("envoy_extract",false)):
 		if int(m.prisoner.get("hp",8)) <= 0: fail(m,"The evacuee is lost."); return
 		if bool(m.prisoner.freed) and m.objective_state.phase == "primary": primary_done(m)
 	elif f == "ambush":
@@ -111,7 +117,7 @@ static func check(m: RefCounted) -> void:
 	var squad: Array = m.living("player")
 	if squad.is_empty(): return
 	var done := squad.all(func(u): return at_evac(m,Shot.pos(u)))
-	if f in ["rescue","vip_extract"]:
+	if f in ["rescue","vip_extract"] or bool(m.spec.get("envoy_extract",false)):
 		done = at_evac(m,Shot.pos(m.prisoner)) and squad.any(func(u): return Shot.distance(Shot.pos(u),Shot.pos(m.prisoner)) <= 3.0)
 	if done:
 		m.result = "win"; m.metrics.evac_turn = m.turn; m.message("Objective secured. Squad extracted.")
@@ -120,7 +126,7 @@ static func enemy_end(m: RefCounted) -> void:
 	if m.result != "": return
 	if Families11.applies(m): Families11.enemy_end(m); return
 	var f := str(m.spec.family)
-	if f in ["rescue","vip_extract"] and bool(m.prisoner.freed):
+	if (f in ["rescue","vip_extract"] or bool(m.spec.get("envoy_extract",false))) and bool(m.prisoner.freed):
 		var vip := Shot.pos(m.prisoner)
 		for e in m.living("enemy"):
 			if not bool(e.awake) or bool(e.get("stunned",false)) or Shot.distance(Shot.pos(e),vip) > 4.0 or not Shot.los(m,Shot.pos(e),vip): continue
@@ -165,8 +171,9 @@ static func enemy_end(m: RefCounted) -> void:
 	check(m)
 
 static func player_start(m: RefCounted) -> void:
-	var start := int(m.objective_state.clock_start)
-	var limit := int(m.spec.turn_limit)
+	var extraction_clock: bool = str(m.objective_state.phase) == "evac" and int(m.spec.get("evac_turn_limit",0)) > 0
+	var start := int(m.objective_state.evac_start) if extraction_clock else int(m.objective_state.clock_start)
+	var limit := int(m.spec.evac_turn_limit) if extraction_clock else int(m.spec.turn_limit)
 	if limit > 0 and start > 0 and m.turn-start >= limit:
 		fail(m,"%s window closed." % str(m.spec.family).replace("_"," "))
 	if Families11.applies(m): Families11.player_start(m)
@@ -224,19 +231,22 @@ static func runner_turn(m: RefCounted, u: Dictionary) -> bool:
 
 static func status(m: RefCounted) -> Dictionary:
 	var s: Dictionary = m.objective_state
-	var label := "Extract the squad" if s.phase == "evac" else str(m.spec.family).replace("_"," ").capitalize()
+	var label := ("Escort the envoy to evac" if bool(m.spec.get("envoy_extract",false)) else "Extract the squad") if s.phase == "evac" else str(m.spec.family).replace("_"," ").capitalize()
 	if Families11.applies(m): label = Families11.status(m)
 	if s.phase == "primary":
 		match str(m.spec.family):
 			"rescue": label = "Free the prisoner, then escort to evac"
 			"vip_extract": label = "Escort the VIP to the far evac"
-			"hack_terminal", "sabotage": label += " %d/%d" % [s.done.size(),int(m.spec.objective.required)]
+			"hack_terminal", "sabotage": label = ("Intercept the envoy's transmission" if bool(m.spec.get("envoy_extract",false)) else label) + " %d/%d" % [s.done.size(),int(m.spec.objective.required)]
 			"destroy_relay": label += " · Relay %d HP" % int(s.relay_hp)
 			"defend": label = "HOLD %d/%d · %s %d HP" % [int(s.held),int(m.spec.objective.hold_turns),str(m.spec.objective.name),int(s.relay_hp)] if int(m.spec.objective.get("hold_turns",0)) > 0 else label + " · Relay %d HP" % int(s.relay_hp)
 			"retaliation": label = "Save civilians %d/%d · %d lost" % [int(s.saved),int(m.spec.objective.save),int(s.lost)]
 			"operation": label = str(current_step(m).get("name","Extract"))
 	if m.spec.has("rival_required") and s.phase == "primary": label += " · Defeat the rival"
-	return {"label":label,"phase":s.phase,"clock_trigger":m.spec.clock_trigger,"turns_left":maxi(0,int(m.spec.turn_limit)-(m.turn-int(s.clock_start))) if int(s.clock_start)>0 and int(m.spec.turn_limit)>0 else -1,"held":s.held}
+	var extraction_clock: bool = s.phase == "evac" and int(m.spec.get("evac_turn_limit",0)) > 0
+	var clock_start := int(s.evac_start) if extraction_clock else int(s.clock_start)
+	var limit := int(m.spec.evac_turn_limit) if extraction_clock else int(m.spec.turn_limit)
+	return {"label":label,"phase":s.phase,"clock_trigger":m.spec.clock_trigger,"turns_left":maxi(0,limit-(m.turn-clock_start)) if clock_start>0 and limit>0 else -1,"held":s.held}
 
 static func defense_turn(m: RefCounted, u: Dictionary) -> bool:
 	if m.spec.family != "defend" or m.objective_state.phase != "primary": return false

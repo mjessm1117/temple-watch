@@ -106,7 +106,9 @@ static func reveal_info(m: RefCounted, group: Array) -> Dictionary:
 	return {"title":title, "count":count, "types":types, "threat_line":"%d hostiles: %s" % [count, ", ".join(types)]}
 
 static func setup(m: RefCounted) -> void:
-	m.pressure_state = {"pending":[],"last_entry":-1,"waves":0,"brood_turn":0,"chain_turn":0,"chain_count":0,"calm_turn":0,"serial":0}
+	var modern_tuning: Dictionary = m.difficulty.get("modern",{})
+	for key in modern_tuning: m.difficulty[key] = modern_tuning[key]
+	m.pressure_state = {"pending":[],"last_entry":-1,"waves":0,"patrol_queued":false,"brood_turn":0,"chain_turn":0,"chain_count":0,"calm_turn":0,"serial":0}
 	# Introduce one new threat at a time across the late war and later era.
 	var variants := {"dock":[2,0,"assassin11"],"r_muster":[1,0,"shield_droid11"],"r_bomb":[2,0,"alchemist11"],"r_nexus":[0,0,"beast11"],"h_roots":[1,0,"beast11"]}
 	if variants.has(str(m.spec.id)):
@@ -168,16 +170,38 @@ static func player_start(m: RefCounted) -> void:
 		if landed > 0: m.reinforcement_dropped = true; m.message("%d hostiles arrive from %s." % [landed,wave.name])
 	m.pressure_state.pending = later
 	m.reinforcement_marker = Maps.point(later[0].at) if not later.is_empty() else Vector2i(-1,-1)
-	if m.spec.family == "defend" and m.objective_state.phase == "primary" and m.turn % 2 == 0 and int(m.pressure_state.waves) < int(m.spec.objective.waves):
+	var wave_number := int(m.pressure_state.waves)
+	var held := int(m.objective_state.get("held",0))
+	var contested_sight := false
+	if bool(m.spec.get("first_mission",false)) and wave_number >= 2 and m.turn >= 4:
+		for enemy in m.living("enemy"):
+			if not bool(enemy.get("awake",false)) or not bool(enemy.get("spotted",false)): continue
+			for player in m.living("player"):
+				if Shot.distance(Shot.pos(player),Shot.pos(enemy)) <= 12.0 and Shot.los(m,Shot.pos(player),Shot.pos(enemy)):
+					contested_sight = true; break
+			if contested_sight: break
+	var defense_ready := held >= maxi(1,wave_number * 2 - 1) or contested_sight
+	if m.spec.family == "defend" and m.objective_state.phase == "primary" and wave_number < int(m.spec.objective.waves) and defense_ready:
 		var wave := int(m.pressure_state.waves)
 		var kinds: Array = ["trooper","trooper"]
 		if wave > 0: kinds.append("heavy")
 		if wave > 1: kinds.append("acolyte")
 		if wave > 2: kinds.append("agent")
 		if m.spec.has("wave_roster") and wave < m.spec.wave_roster.size(): kinds = m.spec.wave_roster[wave].duplicate()
-		var delay := 2 if bool(m.spec.get("first_mission", false)) and wave == 1 else 1
-		queue(m,kinds,delay,"Defense wave %d" % (wave+1)); m.pressure_state.waves += 1
-	elif m.spec.family not in ["defend","holocron_recovery","evacuation","sith_lord_duel"] and m.turn == 4: queue(m,["trooper","trooper"],1,"Patrol support")
+		var delay := 2 if bool(m.spec.get("first_mission",false)) and wave == 1 else 1
+		queue(m,kinds,delay,"Defense wave %d — gate held %d turns" % [wave+1,held]); m.pressure_state.waves += 1
+	elif m.spec.family not in ["defend","holocron_recovery","evacuation","sith_lord_duel"] and not bool(m.pressure_state.patrol_queued) and m.turn >= 3:
+		var objective_progress: bool = m.objective_state.get("done",{}).size() > 0 or bool(m.prisoner.get("freed",false))
+		var sight := false
+		for enemy in m.living("enemy"):
+			if not bool(enemy.get("awake",false)) and not bool(enemy.get("spotted",false)): continue
+			for player in m.living("player"):
+				if Shot.distance(Shot.pos(player),Shot.pos(enemy)) <= 12.0 and Shot.los(m,Shot.pos(player),Shot.pos(enemy)):
+					sight = true; break
+			if sight: break
+		if objective_progress or sight:
+			queue(m,["trooper","trooper"],2,"Patrol alerted by %s" % ("objective breach" if objective_progress else "squad sighting"))
+			m.pressure_state.patrol_queued = true
 
 static func brood(m: RefCounted) -> void:
 	if not bool(m.spec.get("swarm",false)) or m.turn % 2 != 0 or int(m.pressure_state.brood_turn) == m.turn: return

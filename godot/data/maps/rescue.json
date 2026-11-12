@@ -132,6 +132,7 @@
     ]
   },
   "turn_limit": 12,
+  "normal_turn_limit": 10,
   "clock_trigger": "start",
   "concealed": false,
   "objective": {
@@ -255,7 +256,7 @@
     "x": 17,
     "y": 4,
     "active": true,
-    "hp": 8
+    "hp": 7
   },
   "evac": [
     [
