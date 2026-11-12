@@ -593,7 +593,7 @@
           "amount": 3
         }
       ],
-      "description": "Spend SHIELDED; gain SHIELDED for your next move. · Once per mission",
+      "description": "Spend SHIELDED; shield allies. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "droid"
@@ -648,7 +648,7 @@
           "tag": "BURNING"
         }
       ],
-      "description": "Exploit PINNED foes; apply EXPOSED across the area. · Once per mission",
+      "description": "Spend PINNED; mark area EXPOSED. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "droid"
