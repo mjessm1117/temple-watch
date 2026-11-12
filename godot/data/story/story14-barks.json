@@ -2,57 +2,91 @@
   "heroes": {
     "Kira Venn": {
       "contact": ["Enemy contact. I have the near gate.", "They see us. Watch the passage behind them.", "Their line is awake. Keep the route open."],
-      "ally_down": ["One of ours is down. I have the near gate.", "Get to our wounded. Watch the passage behind them.", "We are bringing them home. Keep the route open."],
+      "ally_down": ["One of ours is down. I have the near gate.", "Get to our wounded. Watch the passage behind them.", "We are bringing them home. Keep the route open.", "One of ours fell. I am bringing them back."],
       "objective_done": ["The objective is ours. I have the near gate.", "The work is done here. Watch the passage behind them.", "Now find the way out. Keep the route open."],
       "villain": ["The commander is here. I have the near gate.", "That is the one we came for. Watch the passage behind them.", "Keep your eyes on the leader. Keep the route open."],
       "last_enemy": ["One hostile left. I have the near gate.", "Their line is broken. Watch the passage behind them.", "Find the last one. Keep the route open."],
-      "kill": ["Tor, that lane is clear. Keep the evac route open."],
+      "kill": ["Tor, that lane is clear. Keep the evac route open.", "That lane is clear. Tor, watch the evac."],
       "hurt": ["Tor, I am hit. Keep the others moving."],
       "flank": ["I see the gap. Tor, cover our retreat."],
       "crit": ["That struck deeper than I meant. Stay sharp."],
       "miss": ["The Force offered a warning, not a guarantee."],
-      "reveal": ["Tor, that signal matches the gate. Someone planned this."]
+      "reveal": ["Tor, that signal matches the gate. Someone planned this."],
+      "opening_contact": ["Gate contact. Tor, watch the eastern breach."],
+      "first_wound": ["Tor, I took a hit. Keep the gate clear."],
+      "flanked": ["They are behind us. Rhal, turn the line."],
+      "recovery": ["Bren has me standing. Back to the gate."],
+      "promotion": ["A new rank means another watch. I am ready."]
     },
     "Tor Saalen": {
       "contact": ["Enemy contact. I can feel them ahead.", "They see us. Stay where I can reach you.", "Their line is awake. We move together."],
-      "ally_down": ["One of ours is down. I can feel them ahead.", "Get to our wounded. Stay where I can reach you.", "We are bringing them home. We move together."],
+      "ally_down": ["One of ours is down. I can feel them ahead.", "Get to our wounded. Stay where I can reach you.", "We are bringing them home. We move together.", "I am coming. Keep a path to them open."],
       "objective_done": ["The objective is ours. I can feel them ahead.", "The work is done here. Stay where I can reach you.", "Now find the way out. We move together."],
       "villain": ["The commander is here. I can feel them ahead.", "That is the one we came for. Stay where I can reach you.", "Keep your eyes on the leader. We move together."],
       "last_enemy": ["One hostile left. I can feel them ahead.", "Their line is broken. Stay where I can reach you.", "Find the last one. We move together."],
-      "kill": ["Kira, the threat has stopped. Check the wounded."],
+      "kill": ["Kira, the threat has stopped. Check the wounded.", "The threat has stopped. Check their wounded."],
       "hurt": ["Kira, stay on the objective. I can still stand."],
       "flank": ["Kira, their blind side is open. Take care with it."],
       "crit": ["That should end the fight quickly. I hope it does."],
       "miss": ["Too hurried. Kira, I will try again."],
-      "reveal": ["Kira, I sense fear ahead. Ours or theirs, I cannot tell."]
+      "reveal": ["Kira, I sense fear ahead. Ours or theirs, I cannot tell."],
+      "opening_contact": ["I feel them at the gate. Stay within reach."],
+      "first_wound": ["It hurts. The others need me steady."],
+      "flanked": ["Their blind side is open. Do not leave ours exposed."],
+      "recovery": ["The pain is quieter. I can reach them now."],
+      "promotion": ["Then let me use this trust to protect them."]
     },
     "Sgt. Rhal Dax": {
       "contact": ["Enemy contact. Mark the angles.", "They see us. Hold your line.", "Their line is awake. Check the second exit."],
-      "ally_down": ["One of ours is down. Mark the angles.", "Get to our wounded. Hold your line.", "We are bringing them home. Check the second exit."],
+      "ally_down": ["One of ours is down. Mark the angles.", "Get to our wounded. Hold your line.", "We are bringing them home. Check the second exit.", "Trooper down. Cover the recovery lane."],
       "objective_done": ["The objective is ours. Mark the angles.", "The work is done here. Hold your line.", "Now find the way out. Check the second exit."],
       "villain": ["The commander is here. Mark the angles.", "That is the one we came for. Hold your line.", "Keep your eyes on the leader. Check the second exit."],
-      "last_enemy": ["One hostile left. Mark the angles.", "Their line is broken. Hold your line.", "Find the last one. Check the second exit."]
+      "last_enemy": ["One hostile left. Mark the angles.", "Their line is broken. Hold your line.", "Find the last one. Check the second exit."],
+      "opening_contact": ["Front contact. Mark the two exits."],
+      "first_wound": ["Hit. Mark my angle; hold the line."],
+      "flanked": ["Rear contact. Shift two steps, now."],
+      "recovery": ["Bandaged. I still have this post."],
+      "promotion": ["Understood. I will set the next watch."],
+      "kill": ["Target down. Check the second exit."]
     },
     "Ilsa Myr": {
       "contact": ["Enemy contact. I have their position.", "They see us. I am marking the way out.", "Their line is awake. Count who is still moving."],
-      "ally_down": ["One of ours is down. I have their position.", "Get to our wounded. I am marking the way out.", "We are bringing them home. Count who is still moving."],
+      "ally_down": ["One of ours is down. I have their position.", "Get to our wounded. I am marking the way out.", "We are bringing them home. Count who is still moving.", "I hear them breathing. Bren, this way."],
       "objective_done": ["The objective is ours. I have their position.", "The work is done here. I am marking the way out.", "Now find the way out. Count who is still moving."],
       "villain": ["The commander is here. I have their position.", "That is the one we came for. I am marking the way out.", "Keep your eyes on the leader. Count who is still moving."],
-      "last_enemy": ["One hostile left. I have their position.", "Their line is broken. I am marking the way out.", "Find the last one. Count who is still moving."]
+      "last_enemy": ["One hostile left. I have their position.", "Their line is broken. I am marking the way out.", "Find the last one. Count who is still moving."],
+      "opening_contact": ["Gate signal confirmed. I have their positions."],
+      "first_wound": ["Hit. The signal is still clean."],
+      "flanked": ["I have their rear position. Marking it now."],
+      "recovery": ["Bren patched me. I kept the recording."],
+      "promotion": ["More authority means fewer lost signals."],
+      "kill": ["Target stopped. The channel stays open."]
     },
     "Doc Bren": {
       "contact": ["Enemy contact. I am with the wounded.", "They see us. Leave me a path through.", "Their line is awake. I have one more kit."],
-      "ally_down": ["One of ours is down. I am with the wounded.", "Get to our wounded. Leave me a path through.", "We are bringing them home. I have one more kit."],
+      "ally_down": ["One of ours is down. I am with the wounded.", "Get to our wounded. Leave me a path through.", "We are bringing them home. I have one more kit.", "I am here. Keep them breathing."],
       "objective_done": ["The objective is ours. I am with the wounded.", "The work is done here. Leave me a path through.", "Now find the way out. I have one more kit."],
       "villain": ["The commander is here. I am with the wounded.", "That is the one we came for. Leave me a path through.", "Keep your eyes on the leader. I have one more kit."],
-      "last_enemy": ["One hostile left. I am with the wounded.", "Their line is broken. Leave me a path through.", "Find the last one. I have one more kit."]
+      "last_enemy": ["One hostile left. I am with the wounded.", "Their line is broken. Leave me a path through.", "Find the last one. I have one more kit."],
+      "opening_contact": ["Contact. Leave a path to the wounded."],
+      "first_wound": ["My turn for a bandage. Make it quick."],
+      "flanked": ["They found the ward. Grak, behind me."],
+      "recovery": ["Kit worked. I have one more."],
+      "promotion": ["Give me the supplies before the title."],
+      "kill": ["Threat down. I am checking for survivors."]
     },
     "Grak Ordo": {
       "contact": ["Enemy contact. I have the flank.", "They see us. No one crosses this line.", "Their line is awake. I can carry them out."],
-      "ally_down": ["One of ours is down. I have the flank.", "Get to our wounded. No one crosses this line.", "We are bringing them home. I can carry them out."],
+      "ally_down": ["One of ours is down. I have the flank.", "Get to our wounded. No one crosses this line.", "We are bringing them home. I can carry them out.", "I can carry them. Clear the way."],
       "objective_done": ["The objective is ours. I have the flank.", "The work is done here. No one crosses this line.", "Now find the way out. I can carry them out."],
       "villain": ["The commander is here. I have the flank.", "That is the one we came for. No one crosses this line.", "Keep your eyes on the leader. I can carry them out."],
-      "last_enemy": ["One hostile left. I have the flank.", "Their line is broken. No one crosses this line.", "Find the last one. I can carry them out."]
+      "last_enemy": ["One hostile left. I have the flank.", "Their line is broken. No one crosses this line.", "Find the last one. I can carry them out."],
+      "opening_contact": ["Here they come. Nobody crosses this line."],
+      "first_wound": ["Armor cracked. I am still the wall."],
+      "flanked": ["Behind us? Then they meet me first."],
+      "recovery": ["Good patch, Bren. Back on the flank."],
+      "promotion": ["Fine. I will carry the extra weight."],
+      "kill": ["Lane clear. Move the wounded through."]
     },
     "Satele Shan": {
       "contact": ["Enemy contact. I feel the field turn.", "They see us. Keep your focus here.", "Their line is awake. There is still a path."],

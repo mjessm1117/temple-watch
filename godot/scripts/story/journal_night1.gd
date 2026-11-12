@@ -25,6 +25,8 @@ static func entries(s: Dictionary, callbacks: Array, arcs: Array) -> Dictionary:
 		else:
 			var wait := maxi(0, 6 - done)
 			hint = "Return to the Temple for their decision now." if wait == 0 or int(s.get("era", 1)) >= 2 else "After %d more mission%s or at era 2: return to the Temple." % [wait, "" if wait == 1 else "s"]
+			if not preload("res://scripts/story/arc_night1.gd")._field_resolution_ready(s, str(row.id)):
+				hint = "Kira must clear a path in battle first." if row.id == "arc_0" else "Tor must get a squadmate back on their feet first."
 		active.append("%s — %s: %s" % [row.name, row.title, hint])
 	var record := {"era":int(s.get("era", 1)),"choices":choices,"arcs":active,"fallen":s.get("memorials", []).duplicate()}
 	record.transcript = s.get("story_transcript", []).duplicate(true)

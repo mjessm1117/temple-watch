@@ -44,7 +44,17 @@ static func _queue(s: Dictionary, key: String, beat: String, substitutions: Dict
 static func on_rank(s: Dictionary, unit: Dictionary, previous: int, current: int) -> void:
 	var side := "j" if preload("res://scripts/campaign/progression.gd").is_jedi(unit) else "s"
 	var beat := side + str(current)
-	if BEATS.has(beat): _queue(s, str(unit.id) + ":" + beat, beat, {"unit":str(unit.n)})
+	if BEATS.has(beat):
+		var key := str(unit.id) + ":" + beat
+		var was_seen: bool = s.get("rank_story_seen", {}).has(key)
+		_queue(s, key, beat, {"unit":str(unit.n)})
+		if not was_seen:
+			var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/story/story14-barks.json"))
+			var lines: Array = data.get("heroes", {}).get(str(unit.n), {}).get("promotion", []) if data is Dictionary else []
+			if not lines.is_empty():
+				var quote := "%s: %s" % [str(unit.n), str(lines[0])]
+				s.rank_story_queue[-1].text += "\n" + quote
+				s.rank_story_journal[-1] += " " + quote
 	if side == "j" and previous < 3 and current == 3 and str(unit.get("mentor_id", "")) != "":
 		for master in s.roster:
 			if str(master.get("id", "")) == str(unit.mentor_id):

@@ -33,6 +33,7 @@ static func next_talk(s: Dictionary, rows: Array) -> Dictionary:
 			s.pending = scene
 			return scene
 		if step == 2 and (int(s.story.get("done", 0)) >= 6 or int(s.get("era", 1)) >= 2):
+			if not _field_resolution_ready(s, str(row.id)): continue
 			return _resolution(s, row)
 	return {}
 
@@ -41,8 +42,16 @@ static func next_era_resolution(s: Dictionary, rows: Array) -> Dictionary:
 	if int(s.get("era", 1)) != 1: return {}
 	for row in rows:
 		if int(s.personal_arcs.get(row.id, 0)) != 2: continue
+		if not _field_resolution_ready(s, str(row.id)): continue
 		if person(s, str(row.name)).get("status", "") == "active": return _resolution(s, row)
 	return {}
+
+static func _field_resolution_ready(s: Dictionary, id: String) -> bool:
+	var events: Dictionary = s.get("w29e_events", {})
+	if not events.get("battle_seen", false): return true
+	if id == "arc_0": return bool(events.get("kira_gate", false))
+	if id == "arc_1": return bool(events.get("tor_action", false))
+	return true
 
 static func _resolution(s: Dictionary, row: Dictionary) -> Dictionary:
 	var choices: Array = []
