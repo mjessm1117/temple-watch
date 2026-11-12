@@ -23,6 +23,8 @@ var bark_number := 0
 var pending: Array[String] = []
 var next_bark_at := 0
 var event_mode := false
+var unit_snapshots: Dictionary = {}
+var triggered_named := 0
 
 func _init(g: Node) -> void:
 	game = weakref(g)
@@ -33,6 +35,38 @@ func _init(g: Node) -> void:
 	var records: Dictionary = story_data.get("records",{}) if story_data is Dictionary else {}
 	legacy_barks = records.get("BARKS",{})
 	hero_barks = records.get("HERO_BARKS",{})
+	if g.has_signal("battle_event"): g.connect("battle_event", _battle_event)
+
+func _battle_event(kind: String, actor_id: String, target_id: String, _context: Dictionary) -> void:
+	var g: Node = game.get_ref()
+	if g == null or g.mission == null: return
+	var event: String = {"reveal":"opening_contact", "flank":"flanked", "hurt":"first_wound", "kill":"kill", "heal":"recovery", "revive":"recovery", "promotion":"promotion", "ally_down":"ally_down"}.get(kind, "")
+	if event.is_empty(): return
+	if kind == "reveal":
+		if not seen.has("opening_contact"):
+			seen.opening_contact = true
+			for ally in g.mission.living("player"):
+				if lines.has(str(ally.get("name", ""))): pending.append("opening_contact|" + str(ally.get("name", ""))); break
+		return
+	var id := target_id if kind in ["hurt", "heal", "revive", "ally_down", "flank"] else actor_id
+	for unit in g.mission.units:
+		if str(unit.get("side", "")) != "player" or id not in [str(unit.get("id", "")), str(unit.get("rid", ""))]: continue
+		if kind == "hurt":
+			if seen.has("wound:" + id): return
+			seen["wound:" + id] = true
+		pending.append("%s|%s" % [event, str(unit.get("name", ""))])
+		return
+	if kind == "kill":
+		for unit in g.mission.units:
+			if str(unit.get("side", "")) == "player" and target_id in [str(unit.get("id", "")), str(unit.get("rid", ""))]:
+				for ally in g.mission.living("player"):
+					if int(ally.get("hp", 0)) > 0 and lines.has(str(ally.get("name", ""))): pending.append("ally_down|" + str(ally.get("name", ""))); break
+				return
+	if kind == "flank":
+		for unit in g.mission.units:
+			if str(unit.get("side", "")) == "player" and actor_id in [str(unit.get("id", "")), str(unit.get("rid", ""))]:
+				pending.append("flanked|" + str(unit.get("name", "")))
+				return
 
 func sample() -> void:
 	var g: Node = game.get_ref()
@@ -44,8 +78,18 @@ func sample() -> void:
 	var now := Time.get_ticks_msec()
 	if now - last_sample < 100: return
 	last_sample = now
-	if g.mission == null or g.demo_mode or event_mode: return
+	if g.mission == null or g.demo_mode: return
 	var players: Array = g.mission.units.filter(func(u): return str(u.get("side","")) == "player")
+	if event_mode:
+		for ally in players:
+			var id := str(ally.get("id", ""))
+			var hp := int(ally.get("hp", 0))
+			if unit_snapshots.has(id) and hp > int(unit_snapshots[id].hp) and lines.has(str(ally.get("name", ""))): pending.append("recovery|" + str(ally.get("name", "")))
+			unit_snapshots[id] = {"hp":hp}
+		if now >= next_bark_at and not pending.is_empty():
+			_show(g, pending.pop_front(), players)
+			next_bark_at = now + 4000
+		return
 	var enemies: Array = g.mission.living("enemy")
 	var triggers: Array[String] = []
 	var visible := false
@@ -55,12 +99,24 @@ func sample() -> void:
 		if (bool(foe.get("boss",false)) or bool(foe.get("duel_boss",false)) or bool(foe.get("villain11",false)) or str(foe.get("kind","")) in ["sith_lord","marchion_ro","lourna_dee"]) and (bool(foe.get("awake",false)) or bool(foe.get("spotted",false))): boss_visible = true
 	if visible and not contact:
 		contact = true
-		triggers.append("contact")
+		triggers.append("opening_contact")
 	if boss_visible and not villain:
 		villain = true
 		triggers.append("villain")
 	for ally in players:
 		var id := str(ally.get("id",""))
+		var name := str(ally.get("name", ""))
+		var hp := int(ally.get("hp", 0))
+		var kills := int(ally.get("kills", 0))
+		var rank := int(ally.get("rank", 1))
+		if unit_snapshots.has(id):
+			var before: Dictionary = unit_snapshots[id]
+			if hp < int(before.hp) and hp > 0 and not seen.has("wound:" + id):
+				seen["wound:" + id] = true; triggers.append("first_wound|" + name)
+			if hp > int(before.hp): triggers.append("recovery|" + name)
+			if kills > int(before.kills): triggers.append("kill|" + name)
+			if rank > int(before.rank): triggers.append("promotion|" + name)
+		unit_snapshots[id] = {"hp":hp,"kills":kills,"rank":rank}
 		if str(ally.get("status","")) == "down" or int(ally.get("hp",1)) <= 0:
 			if not seen.has(id):
 				seen[id] = true
@@ -78,7 +134,7 @@ func sample() -> void:
 func fallback(kind: String, actor_id: String, target_id: String) -> Dictionary:
 	var g: Node = game.get_ref()
 	if g == null or g.mission == null: return {}
-	var key: String = {"reveal":"contact", "reinforce":"contact", "flank":"contact", "hit":"contact", "miss":"contact", "crit":"last_enemy", "hurt":"ally_down", "kill":"last_enemy", "objective_hit":"objective_done", "villain_reveal":"villain"}.get(kind,kind)
+	var key: String = {"reveal":"opening_contact", "reinforce":"contact", "flank":"flanked", "hit":"contact", "miss":"contact", "crit":"last_enemy", "hurt":"first_wound", "heal":"recovery", "revive":"recovery", "kill":"kill", "objective_hit":"objective_done", "villain_reveal":"villain"}.get(kind,kind)
 	for id in [actor_id,target_id]:
 		for unit in g.mission.units:
 			if (str(unit.get("id","")) != id and str(unit.get("rid","")) != id) or str(unit.get("side","")) != "player": continue
@@ -104,12 +160,14 @@ func _show(g: Node, event: String, players: Array) -> void:
 		var name := str(ally.get("name",""))
 		if lines.has(name) and int(ally.get("hp",0)) > 0: heroes.append(name)
 	if heroes.is_empty(): return
-	var name: String = heroes[bark_number % heroes.size()]
+	var parts := event.split("|", false, 1)
+	event = parts[0]
+	var name: String = parts[1] if parts.size() > 1 and heroes.has(parts[1]) else heroes[bark_number % heroes.size()]
 	var options: Array = lines[name].get(event,[])
-	if options.size() < 3: return
+	if options.is_empty(): return
 	var sentence: String = options[bark_number % options.size()]
 	var portrait_key := name
-	var kind: String = {"contact":"reveal", "ally_down":"hurt", "villain":"villain_reveal"}.get(event, "")
+	var kind: String = {"contact":"reveal", "villain":"villain_reveal"}.get(event, "")
 	if not kind.is_empty():
 		var actor_id := ""
 		var target_id := ""
@@ -125,6 +183,7 @@ func _show(g: Node, event: String, players: Array) -> void:
 		if not bark.is_empty():
 			name = str(bark.get("speaker", name)); portrait_key = str(bark.get("portrait_key", name)); sentence = str(bark.get("text", sentence))
 	bark_number += 1
+	triggered_named += 1
 	show_radio(name,portrait_key,sentence,1)
 
 func show_radio(speaker: String, portrait_key: String, text: String, priority: int) -> void:

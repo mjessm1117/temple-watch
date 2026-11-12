@@ -10,6 +10,7 @@ const Journal = preload("res://scripts/story/journal_night1.gd")
 const Villain11 = preload("res://scripts/story/villain11_arc.gd")
 const Scenes11 = preload("res://scripts/story/scenes11_squad.gd")
 const Beats14 = preload("res://scripts/story/story14_beats.gd")
+const Early29 = preload("res://scripts/story/w29e_early_story.gd")
 var state: Dictionary
 var data: Dictionary = {}
 var story20: Dictionary = {}
@@ -71,6 +72,7 @@ func ensure_state(s: Dictionary) -> void:
 	Arcs.ensure(s)
 	Villain11.ensure(s)
 	Scenes11.ensure(s)
+	Early29.ensure(s)
 	if not s.has("roster"):
 		s.roster = []
 		for key in table("CAST"):
@@ -98,6 +100,7 @@ func start_briefing(mission_id: String) -> Dictionary:
 		choices.append({"id":"brief:%d" % (i+1),"label":a.get("l",""),"text":a.get("d",""),"fx":a.get("fx",{}),"cost":a.get("cost",{})})
 	var scene := {"kind":"briefing","id":mission_id,"title":m.get("n",mission_id),"eyebrow":m.get("where","Mission briefing"),"text":_brief_text(mission_id,m),"goal":m.get("goal",""),"choices":choices}
 	Arcs.briefing(state,scene,table("N1_ARCS"))
+	Early29.briefing(state,scene,table("W11_SCENES"))
 	Callbacks.apply(state,scene,table("N1_CALLBACKS"))
 	Villain11.briefing(state,scene)
 	state.last_villain_briefing = scene.duplicate(true) if scene.get("villain_present",false) else {}
@@ -161,6 +164,7 @@ func start_debrief(result: Dictionary) -> Dictionary:
 	Callbacks.apply(state,scene,table("N1_CALLBACKS"))
 	Villain11.debrief(state,scene)
 	scene.text = Beats14.debrief(state,result,m) + "\n\n" + str(scene.text)
+	Early29.debrief(state,scene,result,table("W11_SCENES"))
 	state.pending = scene
 	return scene
 
@@ -411,6 +415,7 @@ func journal(s: Dictionary) -> Dictionary:
 	var record: Dictionary = Journal.entries(s,table("N1_CALLBACKS"),table("N1_ARCS"))
 	Villain11.journal(s,record,table("W11_VILLAIN"))
 	Scenes11.journal(s,record,table("W11_SCENES"))
+	Early29.journal(s,record)
 	return record
 
 func next_villain_beat(s: Dictionary) -> Dictionary:
