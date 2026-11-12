@@ -64,7 +64,10 @@ func run() -> void:
 	check(change.any(func(x): return x.name == "armor" and x.value > 0), "picker shows a real green armor stat gain")
 	check(jedi.gear == before_gear, "preview leaves equipment untouched")
 	check(jedi.has("evo") == had_evo, "preview leaves promotion state untouched")
+	var preview_rank := int(jedi.rank)
+	jedi.rank = 3
 	var form_change: Array = Preview.changes(flow.campaign, str(jedi.id), "form", "", "soresu")
+	jedi.rank = preview_rank
 	check(form_change.any(func(x): return x.value < 0 or int(x.get("high", 0)) < 0), "form picker shows red tradeoff")
 	screen.arsenal._select_slot("armor")
 	check(screen.arsenal.offers.any(func(o): return o.slot == "armor" and o.card.visible), "slot tap opens only armor cards")

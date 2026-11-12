@@ -80,10 +80,16 @@ static func buy_utility(campaign, id: String, key: String) -> bool:
 
 static func set_form(campaign, id: String, key: String) -> bool:
 	var r: Dictionary = campaign.soldier(id)
-	var form: Dictionary = Data.get_table("gear", "FORMS").get(key, {})
-	if r.is_empty() or not Progression.is_jedi(r) or form.is_empty() or not campaign.researched(str(form.get("res", ""))): return false
+	if form_lock_reason(campaign, r, key) != "": return false
 	r.gear.form = key
 	return true
+
+static func form_lock_reason(campaign, r: Dictionary, key: String) -> String:
+	var form: Dictionary = Data.get_table("gear", "FORMS").get(key, {})
+	if r.is_empty() or not Progression.is_jedi(r) or form.is_empty(): return "Unavailable form"
+	if key != "shiiCho" and int(r.get("rank", 1)) < 3: return "Knight rank 3 required"
+	if not campaign.researched(str(form.get("res", ""))): return "Research required"
+	return ""
 
 static func slots(r: Dictionary, kind: String) -> int:
 	if kind == "w": return 0 if Progression.is_jedi(r) else int(Data.get_table("gear", "WEAPONS")[int(r.gear.w)].slots)
@@ -156,7 +162,9 @@ static func battle_stats(campaign, id: String) -> Dictionary:
 	var armor_lv := clampi(int(g.mk.get("armor:" + str(g.armor), 1)), 1, 3)
 	if armor.has("mk"): Progression._add_mod(stats, armor.mk[armor_lv - 1])
 	Progression._add_mod(stats, Data.get_table("gear", "UTIL").get(str(g.get("util", "none")), {}).get("mod", {}))
-	if Progression.is_jedi(r): Progression._add_mod(stats, Data.get_table("gear", "FORMS").get(str(g.get("form", "shiiCho")), {}).get("mod", {}))
+	if Progression.is_jedi(r):
+		var form_key := str(g.get("form", "shiiCho")) if int(r.get("rank", 1)) >= 3 else "shiiCho"
+		Progression._add_mod(stats, Data.get_table("gear", "FORMS").get(form_key, {}).get("mod", {}))
 	for kind in MOD_KEY:
 		for key in g.get(MOD_KEY[kind], []):
 			var item: Dictionary = Data.get_table("gear", POOL_KEY[kind]).get(str(key), {})

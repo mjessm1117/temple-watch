@@ -302,17 +302,15 @@
     "2": {
       "hp": 1,
       "aim": 5,
-      "will": 3,
-      "jedi": {
-        "maxF": 1
-      }
+      "will": 3
     },
     "3": {
       "hp": 1,
       "aim": 5,
       "will": 3,
       "jedi": {
-        "deflect": 10
+        "deflect": 10,
+        "maxF": 1
       },
       "troop": {
         "kits": 1,
