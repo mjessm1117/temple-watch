@@ -119,3 +119,8 @@ run_suite soldier_chains28_test
 run_suite class_tree28_test --rendering-method gl_compatibility --resolution 956x440
 run_suite phonehud28_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite phonemove28_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite story29_test
+run_suite balance29_test
+run_suite battle29_test
+run_suite phone29_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite scroll29_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low

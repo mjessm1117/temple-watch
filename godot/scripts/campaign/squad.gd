@@ -323,7 +323,7 @@ func _draw_cards() -> void:
 		var card := Details.card(c, r, inspect.bind(i), _portrait_texture(r)); card_row.add_child(card); cards[str(r.id)] = card
 		if Phone.narrow(Phone.window_size()):
 			# Three readable cards fit a portrait strip; the rest remain swipeable.
-			card.custom_minimum_size.x = 138.0 if size.x < 500.0 else 150.0
+			card.custom_minimum_size.x = minf(150.0,(size.x-26.0-8.0*6.0)/7.0)
 		if focus_index == i: card.add_theme_stylebox_override("panel", S.box(Color("213a42"), S.CYAN, 8))
 		var button: Button = card.get_child(0).get_child(0); wire_button(button)
 		button.mouse_entered.connect(func(): stage.highlight(i))
