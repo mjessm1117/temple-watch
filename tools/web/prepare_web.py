@@ -61,8 +61,12 @@ def main() -> None:
     excluded_imports = {name + ".import" for name in excluded}
     def ignore(directory: str, names: list[str]) -> set[str]:
         folder = Path(directory).relative_to(SOURCE)
-        return {name for name in names if name == ".godot" or (folder == Path('.') and name == 'tests') or (folder / name).as_posix() in excluded | excluded_imports}
+        return {name for name in names if name == ".godot" or (folder == Path('.') and name in ('tests', 'addons')) or (folder / name).as_posix() in excluded | excluded_imports}
     shutil.copytree(SOURCE, dest, ignore=ignore)
+    # Editor plugins are not used at runtime. Keeping them in this disposable
+    # copy makes Godot 4.7 export an empty project.binary in some builds.
+    project = dest / "project.godot"
+    project.write_text(re.sub(r"\[editor_plugins\]\n(?:[^\[]*\n)?", "", project.read_text()))
     # The real project and its import files are never edited. If an image is
     # added as a direct runtime asset in future, the check above stops export.
     print(f"Web copy: omitted {len(mesh_cuts)} unused Meshy GLBs, {len(raster_cuts)} duplicate rasters")

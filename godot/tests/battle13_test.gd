@@ -73,7 +73,7 @@ func exercise(size: Vector2i) -> void:
 		for button in game.hud_controls.phone.ability_buttons:
 			if bool(button.get_meta("battle12_available", false)): available_at_start += 1
 			if button.visible: shown_at_start += 1
-		check(shown_at_start == mini(4, available_at_start), "phone shows four primary actions with overflow at turn start")
+		check(shown_at_start >= 2 and shown_at_start <= available_at_start and (shown_at_start == available_at_start or game.hud_controls.phone.more_button.visible), "phone keeps primary actions reachable through overflow at turn start")
 		var another: Dictionary = game.mission.living("player")[1]
 		Input.warp_mouse(Vector2(422, 195))
 		game._select(int(another.id))

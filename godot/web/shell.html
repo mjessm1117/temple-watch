@@ -11,8 +11,8 @@
       overflow: hidden; overscroll-behavior: none; }
     body { position: fixed; inset: 0; height: 100dvh; color: #f6e8c4;
       font-family: Georgia, "Times New Roman", serif; touch-action: none; }
-    #canvas { display: block; position: fixed; top: 0; left: 0;
-      width: 100vw; height: var(--visible-height, 100dvh);
+    #canvas { display: block; position: fixed; top: var(--visible-top, 0px); left: var(--visible-left, 0px);
+      width: var(--visible-width, 100vw); height: var(--visible-height, 100dvh);
       outline: none; touch-action: none; }
     #safe-area-probe { position: fixed; visibility: hidden; pointer-events: none;
       padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
@@ -51,12 +51,18 @@
     // Render behind the notch; the game positions controls inside the measured safe area.
     GODOT_CONFIG.canvasResizePolicy = 0;
     const canvas = document.getElementById('canvas');
+    window.tw_hud_rects = () => window.tw_hud_data || null;
     function fitVisibleViewport() {
-      const height = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      const visible = window.visualViewport;
+      const height = visible ? visible.height : window.innerHeight;
+      document.documentElement.style.setProperty('--visible-width', `${visible ? visible.width : window.innerWidth}px`);
       document.documentElement.style.setProperty('--visible-height', `${height}px`);
+      document.documentElement.style.setProperty('--visible-left', `${visible ? visible.offsetLeft : 0}px`);
+      document.documentElement.style.setProperty('--visible-top', `${visible ? visible.offsetTop : 0}px`);
       const safe = getComputedStyle(document.getElementById('safe-area-probe'));
       window.templeSafeArea = Object.fromEntries(['top', 'right', 'bottom', 'left']
-        .map(side => [side, parseFloat(safe.getPropertyValue(`padding-${side}`)) || 0]));
+        .map(side => [side, Math.max(parseFloat(safe.getPropertyValue(`padding-${side}`)) || 0,
+          Number(window.templeTestSafeArea?.[side] || 0))]));
       window.scrollTo(0, 0);
       const rect = canvas.getBoundingClientRect();
       const ratio = window.devicePixelRatio || 1;
@@ -64,6 +70,7 @@
       const pixels = Math.max(1, Math.floor(rect.height * ratio));
       if (canvas.width !== width || canvas.height !== pixels) { canvas.width = width; canvas.height = pixels; }
     }
+    window.tw_refresh_viewport = fitVisibleViewport;
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', fitVisibleViewport);
       window.visualViewport.addEventListener('scroll', fitVisibleViewport);

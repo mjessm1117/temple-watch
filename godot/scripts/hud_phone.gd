@@ -18,6 +18,7 @@ var action_art: Control
 var ability_buttons: Array[Button] = []
 var end_confirm := false
 var end_button: Button
+var menu_button: Button
 var end_pulse: Tween
 var detail_scroll
 var last_unit_id := -1
@@ -85,7 +86,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	var strip := PanelContainer.new(); strip.name = "PhoneTopStrip"
 	preload("res://scripts/hud_phone_layout.gd").place(strip, layout.header)
 	var strip_style: StyleBoxFlat = night.panel_style(); strip_style.set_content_margin_all(0)
-	strip_style.content_margin_left = 230; strip_style.content_margin_right = 12
+	strip_style.content_margin_left = 8; strip_style.content_margin_right = 8
 	strip_style.bg_color = Color.TRANSPARENT; strip_style.border_color = Color.TRANSPARENT
 	strip.add_theme_stylebox_override("panel", strip_style); overlay.add_child(strip)
 	var heading := HBoxContainer.new(); top_heading = heading
@@ -118,17 +119,23 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	end_button = _button("END TURN", _end_turn); end_button.name = "PhoneEndTurn"
 	end_button.custom_minimum_size = Vector2(88, 44); overlay.add_child(end_button)
 	heading.add_theme_constant_override("separation", 8)
-	var menu := _button("MENU" if preload("res://scripts/phone_layout.gd").touch_device() else "☰", _show_menu); menu.name = "PhoneMenu"
+	var menu := _button("MENU" if preload("res://scripts/phone_layout.gd").touch_device() else "☰", _show_menu); menu.name = "PhoneMenu"; menu_button = menu
 	menu.custom_minimum_size = Vector2(44, 44); heading.add_child(menu)
-	for button in [end_button, menu]:
+	for button in [menu]:
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	var end_style: StyleBoxFlat = night.panel_style()
+	end_style.border_color = Color("e9ca83")
+	end_style.set_border_width_all(2)
+	end_button.add_theme_stylebox_override("normal", end_style)
+	end_button.add_theme_stylebox_override("hover", end_style)
+	end_button.add_theme_stylebox_override("pressed", end_style)
 	unit_plate = PanelContainer.new(); unit_plate.name = "UnitPlate"
 	preload("res://scripts/hud_phone_layout.gd").place(unit_plate, layout.plate)
 	var plate_style: StyleBoxFlat = night.panel_style(); plate_style.set_content_margin_all(0)
 	unit_plate.add_theme_stylebox_override("panel", plate_style); overlay.add_child(unit_plate)
 	var plate_row := HBoxContainer.new(); unit_plate_row = plate_row
-	plate_row.add_theme_constant_override("separation", 2); unit_plate.add_child(plate_row)
+	plate_row.add_theme_constant_override("separation", 8); unit_plate.add_child(plate_row)
 	portrait_frame = PanelContainer.new(); portrait_frame.name = "PhonePortraitTopLeft"
 	var portrait_style: StyleBoxFlat = night.panel_style(); portrait_style.set_content_margin_all(0)
 	portrait_frame.add_theme_stylebox_override("panel", portrait_style)
@@ -164,18 +171,20 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 		var arrow := _button("<" if direction < 0 else ">", _cycle_unit.bind(direction))
 		arrow.name = "UnitPrevious" if direction < 0 else "UnitNext"
 		arrow.custom_minimum_size = Vector2(44, 44); plate_row.add_child(arrow)
+		if direction < 0: arrow.hide()
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			arrow.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	camera_rail = VBoxContainer.new(); camera_rail.name = "CameraRail"
-	camera_rail.add_theme_constant_override("separation", 0)
+	camera_rail.add_theme_constant_override("separation", 8)
 	preload("res://scripts/hud_phone_layout.gd").place(camera_rail, Rect2(layout.camera.position - Vector2(4, 0), layout.camera.size)); overlay.add_child(camera_rail)
 	for entry in [["L", -1], ["C", 0], ["R", 1]]:
 		var button := _button(str(entry[0]), func() -> void:
 			if int(entry[1]) == 0: g._recenter()
 			else: g._rotate_camera(float(entry[1]) * PI / 2.0))
 		button.name = "CameraCenter" if int(entry[1]) == 0 else "CameraRotateLeft" if int(entry[1]) < 0 else "CameraRotateRight"
+		button.tooltip_text = "Center on selected unit" if int(entry[1]) == 0 else "Rotate camera left" if int(entry[1]) < 0 else "Rotate camera right"
 		button.text = ""
-		button.custom_minimum_size = Vector2(48, 48); camera_rail.add_child(button)
+		button.custom_minimum_size = Vector2(44, 44); camera_rail.add_child(button)
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	camera_art = preload("res://scripts/hud_phone_camera_art.gd").new()
@@ -213,7 +222,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 44; tray_box.add_child(scroll)
 	tray_box.move_child(momentum_plate, tray_box.get_child_count() - 1)
 	scroll.get_h_scroll_bar().modulate.a = 0.0
-	var track := HBoxContainer.new(); track.add_theme_constant_override("separation", 3); scroll.add_child(track)
+	var track := HBoxContainer.new(); track.add_theme_constant_override("separation", 8); scroll.add_child(track)
 	for node in abilities.get_children():
 		var button: Button = node
 		button.reparent(track); button.custom_minimum_size = preload("res://scripts/hud_phone_layout.gd").ACTION_MIN_SIZE
@@ -288,40 +297,39 @@ func _relayout() -> void:
 	var area := root_control.size - Vector2(safe.x + safe.z, safe.y + safe.w)
 	var boxes: Dictionary = preload("res://scripts/hud_phone_layout.gd").boxes(area)
 	var layout = preload("res://scripts/hud_phone_layout.gd")
-	var logical_height := maxf(1.0, preload("res://scripts/phone_layout.gd").logical_size(preload("res://scripts/phone_layout.gd").window_size()).y)
-	layout.place(overlay.find_child("PhoneTopBackground", false, false), Rect2(0, 0, area.x, 44.0 * root_control.size.y / logical_height))
+	layout.place(overlay.find_child("PhoneTopBackground", false, false), boxes.header)
 	layout.place(overlay.find_child("PhoneTopStrip", false, false), boxes.header)
-	layout.place(threat_chip, Rect2(12, 0, 106, 44))
-	layout.place(end_button, Rect2(126, 0, 88, 44))
-	layout.place(unit_plate, boxes.plate)
-	layout.place(ability_tray, Rect2(boxes.tray.position, boxes.tray.size - Vector2(8, 0)))
-	layout.place(action_art, Rect2(boxes.tray.position, boxes.tray.size - Vector2(8, 0)))
-	var objective_x := maxf(8.0, area.x - 220.0)
-	layout.place(objective_summary, Rect2(objective_x, boxes.tray.position.y - 22.0, minf(212.0, area.x - 16.0), 20.0))
-	layout.place(action_name, Rect2(boxes.tray.position.x, boxes.tray.position.y - 22.0, maxf(70.0, objective_x - boxes.tray.position.x - 8.0), 20.0))
-	layout.place(camera_rail, Rect2(boxes.camera.position - Vector2(4, 0), boxes.camera.size))
-	layout.place(camera_art, Rect2(boxes.camera.position - Vector2(4, 0), boxes.camera.size))
 	var portrait := area.y > area.x
-	if portrait:
-		if unit_portrait.get_parent() != unit_plate_row:
-			unit_portrait.reparent(unit_plate_row)
-			unit_plate_row.move_child(unit_portrait, 0)
-		portrait_frame.hide()
-	else:
-		if unit_portrait.get_parent() != portrait_frame: unit_portrait.reparent(portrait_frame)
-		portrait_frame.show()
-		layout.place(portrait_frame, boxes.portrait)
-	layout.place(group_reveal, Rect2(8, (boxes.plate.end.y if portrait else boxes.portrait.end.y) + 3, minf(240.0, area.x - 70.0), 32))
+	layout.place(threat_chip, Rect2(8, 0, area.x - 80 if portrait else minf(224, area.x * 0.35), 52))
+	layout.place(end_button, boxes.end)
+	layout.place(unit_plate, boxes.plate)
+	layout.place(ability_tray, boxes.tray)
+	layout.place(action_art, boxes.tray)
+	_update_actions.call_deferred(false)
+	layout.place(objective_summary, Rect2(8 if portrait else minf(236, area.x * 0.36), 52 if portrait else 0, area.x - 88 if portrait else maxf(56, area.x - minf(236, area.x * 0.36) - 74), 22 if portrait else 52))
+	layout.place(action_name, Rect2(8 if portrait else boxes.tray.position.x, (boxes.plate.position.y if portrait else boxes.tray.position.y) - 24, area.x - 16 if portrait else boxes.tray.size.x, 20))
+	action_name.hide()
+	layout.place(camera_rail, boxes.camera)
+	layout.place(camera_art, boxes.camera)
+	if unit_portrait.get_parent() != unit_plate_row:
+		unit_portrait.reparent(unit_plate_row)
+		unit_plate_row.move_child(unit_portrait, 0)
+	portrait_frame.hide()
+	layout.place(group_reveal, Rect2(8, 78 if portrait else 54, minf(240.0, area.x - 70.0), 32))
 	if portrait and g.objective_label.get_parent() != overlay:
 		g.objective_label.reparent(overlay)
 	elif not portrait and g.objective_label.get_parent() != top_heading:
 		g.objective_label.reparent(top_heading)
 		top_heading.move_child(g.objective_label, 0)
-	top_heading.alignment = BoxContainer.ALIGNMENT_END if portrait else BoxContainer.ALIGNMENT_BEGIN
-	g.objective_label.custom_minimum_size.y = 24 if portrait else 44
-	if portrait: layout.place(g.objective_label, Rect2(8, 44, minf(200.0, area.x - 16.0), 24))
-	threat_chip.custom_minimum_size.x = 106
-	threat_chip.text = Threat22.zone_text(last_threat)
+	top_heading.alignment = BoxContainer.ALIGNMENT_END
+	g.objective_label.hide()
+	threat_chip.custom_minimum_size.x = 0
+	threat_chip.text = preload("res://scripts/w28d_phone_labels.gd").threat(last_threat)
+	menu_button.custom_minimum_size = Vector2(64, 52)
+	menu_button.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	end_button.add_theme_font_size_override("font_size", 15)
+	ability_scroll.custom_minimum_size.y = 56
+	unit_portrait.custom_minimum_size = Vector2(52, 52)
 	layout.place(odds_plate, Rect2(12, 72 if portrait else 50, minf(150.0 if portrait else 340.0, area.x - 82.0), 126 if portrait else 96))
 	layout.place(enemy_card, Rect2(12, 150 if portrait else 50, minf(250.0 if portrait else 350.0, area.x - 76.0), 76))
 	odds_title.add_theme_font_size_override("font_size", 12 if portrait else 14)
@@ -338,6 +346,7 @@ func _relayout() -> void:
 		odds_scroll.show()
 		feedback.details_button.hide()
 	_place_reinforcement()
+	preload("res://scripts/w28d_phone_bridge.gd").publish.call_deferred(self)
 	if is_instance_valid(alerts):
 		alerts.call("set_safe_area", area)
 		alerts.card.position.y = boxes.plate.end.y + 38
@@ -347,12 +356,12 @@ func _relayout() -> void:
 			aim.odds.get_parent().visible = false
 			aim.odds_detail.visible = false
 			aim.panel.anchor_left = 0.0; aim.panel.anchor_right = 1.0
-			aim.panel.offset_left = 12; aim.panel.offset_right = -12
-			aim.panel.offset_top = -72; aim.panel.offset_bottom = -8
+			aim.panel.offset_left = 12 + safe.x; aim.panel.offset_right = -12 - safe.z
+			aim.panel.offset_top = -72 - safe.w; aim.panel.offset_bottom = -8 - safe.w
 			aim.confirm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			aim.target_row.anchor_left = 1.0; aim.target_row.anchor_right = 1.0
-			aim.target_row.offset_left = -minf(190.0, area.x * 0.49); aim.target_row.offset_right = -12
-			aim.target_row.offset_top = 58; aim.target_row.offset_bottom = 112
+			aim.target_row.offset_left = -minf(190.0, area.x * 0.49) - safe.z; aim.target_row.offset_right = -12 - safe.z
+			aim.target_row.offset_top = 64 + safe.y; aim.target_row.offset_bottom = 118 + safe.y
 			aim.aim_momentum.visible = false
 		else:
 			aim.odds.get_parent().visible = true
@@ -361,13 +370,13 @@ func _relayout() -> void:
 			aim.odds_detail.visible = true
 			aim.panel.anchor_left = 1.0; aim.panel.anchor_right = 1.0
 			aim.panel.anchor_top = 1.0; aim.panel.anchor_bottom = 1.0
-			aim.panel.offset_left = -minf(356.0, area.x - 262.0)
-			aim.panel.offset_right = -12
-			aim.panel.offset_top = -62; aim.panel.offset_bottom = -4
+			aim.panel.offset_left = -minf(356.0, area.x - 262.0) - safe.z
+			aim.panel.offset_right = -12 - safe.z
+			aim.panel.offset_top = -62 - safe.w; aim.panel.offset_bottom = -4 - safe.w
 			aim.target_row.anchor_left = 1.0; aim.target_row.anchor_right = 1.0
-			aim.target_row.offset_left = -minf(340.0, area.x * 0.48)
-			aim.target_row.offset_right = -12
-			aim.target_row.offset_top = 48; aim.target_row.offset_bottom = 102
+			aim.target_row.offset_left = -minf(340.0, area.x * 0.48) - safe.z
+			aim.target_row.offset_right = -12 - safe.z
+			aim.target_row.offset_top = 64 + safe.y; aim.target_row.offset_bottom = 118 + safe.y
 
 func _button(title: String, action: Callable) -> Button:
 	var button := Button.new(); button.text = title; button.focus_mode = Control.FOCUS_NONE
@@ -376,28 +385,18 @@ func _button(title: String, action: Callable) -> Button:
 	button.custom_minimum_size = Vector2(44, 56 if title in ["END TURN", "MOVE", "FIRE", "OVERWATCH", "CANCEL"] else 44); button.pressed.connect(action)
 	return button
 
+func hud_safe_rect28() -> Rect2:
+	if not is_instance_valid(overlay): return Rect2()
+	var box: Rect2 = preload("res://scripts/hud_phone_layout.gd").boxes(overlay.size).map
+	return Rect2(overlay.global_position + box.position, box.size)
+
+func hud_scale28() -> float:
+	return root_control.get_window().content_scale_factor if is_instance_valid(root_control) else 1.0
+
 func _place_reinforcement() -> void:
 	if feedback.reinforcement == null: return
-	var pending: Array = last_threat.get("pending_groups", [])
-	var wave: Dictionary = {}
-	var pressure_script: Script = load("res://scripts/mission_pressure.gd")
-	if pressure_script != null and pressure_script.has_method("wave_entry27"):
-		wave = pressure_script.call("wave_entry27", g.mission)
-	elif g.mission.has_method("wave_entry27"):
-		wave = g.mission.call("wave_entry27", g.mission)
-	if wave.is_empty() and not pending.is_empty(): wave = pending[0]
-	if wave.is_empty():
-		feedback.reinforcement.hide()
-		return
-	var entries: Array = wave.get("entry_tiles", [])
-	var tile: Vector2i = entries[0] if not entries.is_empty() else wave.get("entry_pos", Vector2i(-1, -1))
-	var arrow: String = preload("res://scripts/reinforcement_marker.gd").edge_arrow(tile, g.mission)
-	feedback.reinforcement.text = "%s %d in %dT" % [arrow, int(wave.get("count", 0)), int(wave.get("turns_left", wave.get("turns", 0)))]
-	var point: Vector2 = g.camera.unproject_position(Vector3(tile.x, 1.9, tile.y)) - overlay.global_position
-	var x := clampf(point.x - 52.0, 8.0, maxf(8.0, overlay.size.x - 112.0))
-	var y := clampf(point.y - 22.0, 195.0 if overlay.size.y > overlay.size.x else 48.0, overlay.size.y - 145.0)
-	preload("res://scripts/hud_phone_layout.gd").place(feedback.reinforcement, Rect2(x, y, 104, 44))
-	feedback.reinforcement.visible = tile.x >= 0 and not odds_plate.visible and open_card == "" and g.mission.phase == "player"
+	# The same alert lives in the top strip; a floating map label blocks taps.
+	feedback.reinforcement.hide()
 
 func _refresh_odds() -> void:
 	if odds_plate == null: return
@@ -456,6 +455,7 @@ static func compact_names(names: Array) -> String:
 	return ", ".join(labels)
 
 func _show_ability(button: Button) -> void:
+	button.set_meta("w28d_touch_count", int(button.get_meta("w28d_touch_count", 0)) + 1)
 	action_name.text = button.tooltip_text
 	feedback.show_ability(button)
 
@@ -553,9 +553,11 @@ func _end_turn() -> void:
 		if int(member.get("ap", 0)) > 0: ap_remains = true; break
 	if ap_remains and not end_confirm:
 		end_confirm = true
+		end_button.text = "CONFIRM"
 		action_name.text = "End the squad turn? Tap END TURN again."
 		return
 	end_confirm = false
+	end_button.text = "END TURN"
 	g._request_end_turn()
 	if g.end_turn_armed: g._request_end_turn()
 
@@ -578,7 +580,7 @@ func refresh(from_game: bool = false) -> void:
 				forecast["next_wave26"] = {"count":int(next_wave.get("count", 0)), "turns":maxi(0, int(next_wave.get("turn", g.mission.turn)) - int(g.mission.turn))}
 		last_threat = forecast
 		g.objective_label.text = Threat22.sight_text(forecast)
-		threat_chip.text = Threat22.zone_text(forecast)
+		threat_chip.text = preload("res://scripts/w28d_phone_labels.gd").threat(forecast)
 		threat_chip.tooltip_text = str(forecast)
 		threat_chip.visible = threat_chip.text != ""
 		var objective: Dictionary = g.mission.objective_status()
@@ -603,10 +605,10 @@ func refresh(from_game: bool = false) -> void:
 	var pips: int = clampi(int(g.mission.chain_momentum), 0, 3)
 	var used_this_turn: bool = int(g.mission.chain_strike_used_turn) == int(g.mission.turn)
 	momentum_row.visible = false
-	momentum_plate.visible = true
+	momentum_plate.visible = false
 	momentum_pips.text = "MOM " + char(0x25CF).repeat(pips) + char(0x25CB).repeat(3 - pips)
 	momentum_display.text = "MOM %d/3" % pips
-	momentum_strike.visible = true
+	momentum_strike.visible = pips >= 3
 	momentum_strike.disabled = pips < 3 or used_this_turn or g.mission.phase != "player"
 	if pips != last_chain_momentum:
 		last_chain_momentum = pips
@@ -630,9 +632,9 @@ func refresh(from_game: bool = false) -> void:
 	elif g.path_label.text != "": action_name.text = g.path_label.text.get_slice("  •  COVER",0)
 	elif g.action == "move": action_name.text = "Blue: 1 action  ·  Amber: DASH ends turn"
 	else: action_name.text = "Choose an action · tap the map to preview"
+	end_button.text = "CONFIRM" if end_confirm else "END TURN"
 
 	_update_actions(from_game)
-	action_art.queue_redraw()
 	if g.warning_label.text == "" and not end_confirm and g.path_label.text == "":
 		var selected_ability: Dictionary = g.mission.abilities.get(g.action, {})
 		if not selected_ability.is_empty():
@@ -646,13 +648,10 @@ func refresh(from_game: bool = false) -> void:
 		portrait_path = wanted; unit_portrait.texture = load(wanted)
 	var hp: int = int(unit.get("hp", 0))
 	var display_name := str(unit.get("name", "UNIT"))
-	if display_name.length() >= 10 and display_name.contains(" "):
-		var split_at := display_name.find(" ")
-		display_name = display_name.substr(0, split_at) + "\n" + display_name.substr(split_at + 1)
 	# Legacy readers inspect the hidden button text; the visible readout uses ASCII.
 	var legacy_ap := char(0x25CF) + char(0x25CB) if int(unit.get("ap", 0)) == 1 else ""
 	unit_card.text = "%s\nHP%d/%d AP%s %s" % [str(unit.get("name", "UNIT")), hp, int(unit.get("max_hp", 0)), g.hud_controls.ap_pips(unit), legacy_ap]
-	unit_card_readout.text = "%s\nHP%d/%d AP%s" % [display_name, hp, int(unit.get("max_hp", 0)), g.hud_controls.ap_pips(unit)]
+	unit_card_readout.text = "%s\nHP%d/%d AP%d" % [display_name, hp, int(unit.get("max_hp", 0)), int(unit.get("ap", 0))]
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	target_card.text = "%s  %s  v" % [str(target.get("name", "TARGET")), g.hit_big_label.text]
 	popup.visible = open_card != ""
@@ -710,8 +709,8 @@ func refresh(from_game: bool = false) -> void:
 func _update_actions(from_game: bool) -> void:
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var available: int = int(unit.get("ap", 0))
-	var action_width: float = ability_scroll.size.x if ability_scroll.size.x > 0.0 else ability_tray.size.x - 86.0
-	var primary_limit := clampi(int(floor((action_width + 3.0) / 47.0)) - 2, 2, 4)
+	var action_width: float = ability_tray.size.x - (82.0 if momentum_plate.visible else 0.0) - (68.0 if momentum_strike.visible else 0.0) - 4.0
+	var primary_limit := clampi(int(floor((action_width + 8.0) / 64.0)) - 1, 1, 4)
 	last_unit_id = g.selected_id; last_unit_ap = available
 	if from_game:
 		for button in ability_buttons: button.set_meta("battle12_available", button.visible)
@@ -737,6 +736,7 @@ func _update_actions(from_game: bool) -> void:
 	for button in ability_buttons:
 		if bool(button.get_meta("battle12_available", false)) and not button.visible: overflow += 1
 	more_button.visible = overflow > 0
+	action_art.queue_redraw()
 
 func _unit_details(unit: Dictionary) -> String:
 	var lines: Array[String] = [str(unit.get("name", "UNIT")), str(unit.get("class_name", "Jedi"))]

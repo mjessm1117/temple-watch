@@ -19,6 +19,7 @@ python3 "$repo_dir/tools/web/force_texture_reimport.py" "$work_dir/godot"
     fi
     echo "Godot exited non-zero (crash on shutdown) but index.pck exists — treating export as success" >&2
 }
+python3 "$repo_dir/tools/web/w28d_verify_pack.py" "$export_dir/index.pck"
 python3 "$repo_dir/tools/web/version_service_worker.py" "$export_dir"
 if grep -E 'SCRIPT ERROR|Parse Error|ERROR:' "$work_dir/import.log" "$work_dir/reimport.log" "$work_dir/final-import.log" "$work_dir/export.log"; then
   echo "Web import/export reported errors. Logs: $work_dir" >&2

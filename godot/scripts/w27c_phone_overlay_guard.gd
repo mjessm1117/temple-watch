@@ -1,15 +1,28 @@
 extends Node
 ## Runs after the phone alert layer so its older notices cannot cover aim or enemy actions.
 var hud
+var w28d_safe := Vector4(-1, -1, -1, -1)
+var w28d_elapsed := 0.0
 
 func _process(_delta: float) -> void:
 	if hud == null or not is_instance_valid(hud.overlay): return
 	var g = hud.g
 	if g == null or g.mission == null: return
+	var current: Vector4 = preload("res://scripts/phone_layout.gd").safe_margins(hud.root_control.size)
+	if current != w28d_safe:
+		w28d_safe = current
+		hud._relayout()
+	w28d_elapsed += _delta
+	if w28d_elapsed >= 0.25:
+		w28d_elapsed = 0.0
+		preload("res://scripts/w28d_phone_bridge.gd").publish(hud)
+	preload("res://scripts/w28d_world_markers.gd").update(g, hud)
 	if g.hud_controls != null and g.hud_controls.preview_card26 != null:
 		g.hud_controls.preview_card26.hide()
 	var enemy_active: bool = g.mission.phase == "enemy" or g.playing_enemy_events
 	var aiming: bool = hud.odds_plate.visible and g.action in ["shoot", "strike"]
+	var aim_panel = g.hud_controls.aim_ui.panel if g.hud_controls != null and g.hud_controls.aim_ui != null else null
+	hud.end_button.visible = not (aim_panel != null and aim_panel.visible)
 	if is_instance_valid(hud.alerts):
 		if enemy_active or aiming:
 			hud.alerts.set_process(false)

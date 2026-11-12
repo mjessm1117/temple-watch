@@ -1,6 +1,6 @@
 extends RefCounted
-## Phone battle geometry. Controls stay over the full-size map viewport.
-const ACTION_MIN_SIZE := Vector2(44, 44)
+## Battle HUD coordinates are phone CSS points after Window.content_scale_factor.
+const ACTION_MIN_SIZE := Vector2(56, 56)
 
 static func place(control: Control, box: Rect2) -> void:
 	control.anchor_left = 0.0; control.anchor_right = 0.0
@@ -9,28 +9,28 @@ static func place(control: Control, box: Rect2) -> void:
 	control.offset_right = box.end.x; control.offset_bottom = box.end.y
 
 static func boxes(size: Vector2) -> Dictionary:
-	var width := size.x
-	var physical := preload("res://scripts/phone_layout.gd").window_size()
-	var scale := width / float(physical.x) if physical.x > 0 else 1.0
-	var short := width / scale < 750.0
-	var portrait := size.y > size.x
+	var w := size.x
+	var h := size.y
+	var portrait := h > w
 	if portrait:
+		var plate_y := h - 226.0
 		return {
-			"header": Rect2(0, 0, width, 44),
-			"plate": Rect2(8, 74, minf(width - 72, 224), 70),
-			"tray": Rect2(8, size.y - 88, width - 16, 84),
-			"camera": Rect2(width - 56, 290, 48, 144),
-			"map": Rect2(0, 44, width, size.y - 44),
+			"header": Rect2(0, 0, w, 76),
+			"plate": Rect2(8, plate_y, w - 16, 68),
+			"tray": Rect2(8, h - 150, w - 16, 68),
+			"end": Rect2(w - 136, h - 74, 128, 66),
+			"camera": Rect2(w - 52, 100, 44, 156),
+			"map": Rect2(8, 100, w - 68, maxf(0, plate_y - 108)),
 		}
-	var plate_width := maxf(190.0 if short else 216.0, (230.0 if short else 260.0) * scale)
-	var height := (70.0 if short else 76.0) * scale
-	var tray_left := maxf(plate_width + maxf(14.0, 11.0 * scale) + 3.0 * scale, width - 505.0 * scale)
-	var tray_right := width - 4.0 * scale
+	var card_width := 180.0 if w < 620.0 else clampf(w * 0.24, 220, 246)
+	var end_width := 108.0 if w < 620.0 else 124.0
+	var tray_left := card_width + 24.0
+	var end_x := w - end_width - 8.0
 	return {
-		"header": Rect2(0, 0, width, 44),
-		"plate": Rect2(15 * scale, size.y - height - scale, plate_width, height),
-		"tray": Rect2(tray_left, size.y - height - scale, tray_right - tray_left, height),
-		"camera": Rect2(width - 56, 60, 48, 144),
-		"portrait": Rect2(8 * scale, 52, 60, 60),
-		"map": Rect2(0, 44, width, size.y - 44),
+		"header": Rect2(0, 0, w, 52),
+		"plate": Rect2(8, h - 68, card_width, 68),
+		"tray": Rect2(tray_left, h - 64, maxf(120, end_x - tray_left - 8), 64),
+		"end": Rect2(end_x, h - 68, end_width, 68),
+		"camera": Rect2(w - 52, 62, 44, 156),
+		"map": Rect2(8, 76, w - 68, maxf(0, h - 160)),
 	}

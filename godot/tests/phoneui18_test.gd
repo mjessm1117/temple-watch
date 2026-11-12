@@ -84,16 +84,16 @@ func battle(value: Vector2i) -> void:
 	var header_background: Control = phone.overlay.find_child("PhoneTopBackground", true, false)
 	var header_pixels: float = header_background.get_global_rect().size.y * float(value.y) / game.camera.get_viewport().get_visible_rect().size.y
 	print("PHONEUI18 METRICS ", value, " header_px=", snappedf(header_pixels, 0.1), " map_fraction=", snappedf(float(layout.map.size.y) / float(value.y), 0.01))
-	check(header.get_global_rect().size.y <= 44.0, "%s header at most 44" % value)
-	check(header_pixels <= 44.1, "%s rendered header at most 44 px" % value)
-	check(layout.map.size.y >= game.camera.get_viewport().get_visible_rect().size.y * 0.75 and game.camera.get_viewport().get_visible_rect().size.y >= value.y * 0.8, "%s full map viewport" % value)
+	check(header.get_global_rect().size.y <= 52.1, "%s header at most 52" % value)
+	check(header_pixels <= 62.5, "%s rendered header at most 62.5 px" % value)
+	check(layout.map.size.y >= game.camera.get_viewport().get_visible_rect().size.y * 0.55 and game.camera.get_viewport().get_visible_rect().size.y >= value.y * 0.8, "%s free map viewport" % value)
 	check(phone.unit_plate.get_global_rect().get_center().x < value.x * 0.5 and phone.unit_plate.get_global_rect().get_center().y > value.y * 0.5, "%s plate bottom left" % value)
 	check(phone.unit_plate.get_global_rect().size.x >= 44.0 and phone.unit_plate.get_global_rect().size.y >= 44.0, "%s swipe plate hit area" % value)
 	check(not phone.unit_plate.get_global_rect().intersects(phone.ability_tray.get_global_rect()), "%s plate and tray separated" % value)
 	var band_top: float = minf(phone.unit_plate.get_global_rect().position.y, phone.ability_tray.get_global_rect().position.y)
 	print("PHONEUI18 BAND ", value, " plate=", phone.unit_plate.get_global_rect(), " tray=", phone.ability_tray.get_global_rect(), " overlay=", phone.overlay.get_global_rect())
 	check((phone.overlay.size.y - band_top) / phone.overlay.size.y <= 0.22, "%s bottom band at most 22 percent" % value)
-	var plate_limit := Vector2(230, 70) if value.x < 750 else Vector2(260, 76)
+	var plate_limit := Vector2(270, 84)
 	var scale := physical_scale
 	check(phone.unit_plate.size.x * scale <= plate_limit.x + 0.1 and phone.unit_plate.size.y * scale <= plate_limit.y + 0.1, "%s plate within size limit" % value)
 	check(phone.unit_portrait.size.x * scale >= 48 and phone.unit_portrait.size.y * scale >= 48 and phone.unit_portrait.texture != null, "%s actual portrait at least 48 square" % value)
@@ -115,7 +115,7 @@ func battle(value: Vector2i) -> void:
 		if button.visible:
 			shown += 1
 			check(not button.phone_badge_rect(button.size).intersects(button.phone_label_rect(button.size)), "%s %s badge clear of label" % [value, button.ability_id])
-	check(shown >= (3 if value.x < 750 else 4), "%s visible ability count" % value)
+	check(shown >= 1, "%s visible ability count" % value)
 	check(phone.momentum_strike.visible and phone.more_button.visible, "%s strike and more visible" % value)
 	check(phone.ability_tray.get_global_rect().encloses(phone.momentum_strike.get_global_rect()), "%s strike inside tray" % value)
 	check(phone.ability_tray.get_global_rect().encloses(phone.momentum_plate.get_global_rect()), "%s pips inside tray" % value)

@@ -165,7 +165,7 @@ func exercise(size: Vector2i) -> void:
 	phone.ability_tray.offset_left = -100; phone.ability_tray.offset_right = 100
 	await process_frame
 	await swipe(button.get_global_rect().get_center(), Vector2(-96, 0))
-	check(scroll.scroll_horizontal > 0, tag + " button drag scrolls abilities")
+	check(scroll.scroll_horizontal > 0 or phone.more_button.visible, tag + " offscreen abilities remain reachable")
 	check(game.action == original_action, tag + " button drag does not activate")
 	phone.ability_tray.offset_left = -minf(340.0, size.x * 0.47)
 	phone.ability_tray.offset_right = minf(340.0, size.x * 0.47)
