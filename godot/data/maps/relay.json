@@ -153,6 +153,8 @@
     "blurb": "Hold the Temple approach until the guard seals the breach.",
     "zone_prop": "res://assets/maps/door_temple.glb",
     "hold_turns": 6,
+    "normal_hold_hp": 30,
+    "hard_hold_hp": 26,
     "zone_radius": 3,
     "hold_hp": 42
   },

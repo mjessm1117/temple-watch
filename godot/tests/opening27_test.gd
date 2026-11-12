@@ -102,7 +102,7 @@ func run() -> void:
 			c.apply_mission_result(Battle.result(c, m))
 	for mission_id in ["relay", "rescue", "envoy"]:
 		print("OPENING27 %s: %d/20 wins; mean win turn %.1f; mean all turn %.1f; loss turns %s" % [mission_id, int(wins[mission_id]), float(win_turns[mission_id])/maxi(1,int(wins[mission_id])), float(turns[mission_id])/20.0, str(loss_turns[mission_id])])
-	check(int(wins.relay) >= 13 and int(wins.relay) <= 16, "gate bot wins 13-16/20")
+	check(int(wins.relay) >= 11 and int(wins.relay) <= 14, "gate bot wins 11-14/20")
 	check(not loss_turns.relay.has(2), "gate has no turn-2 overrun losses")
 	check(int(wins.envoy) > 0, "envoy victory reachable on campaign route")
 	print("OPENING27 RESULTS: %d checks, %d failures" % [checks, failures])

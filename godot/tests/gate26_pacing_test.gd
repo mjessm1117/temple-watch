@@ -96,7 +96,7 @@ func _campaign_bot_regression() -> void:
 			if m.result != "": break
 			CampaignBot.turn(m)
 		if m.result == "win": wins += 1
-	check(wins >= 13 and wins <= 16, "Normal gate campaign bot wins 13–16/20 (got %d/20)" % wins)
+	check(wins >= 11 and wins <= 14, "Normal gate campaign bot wins 11–14/20 (got %d/20)" % wins)
 	print("GATE26 CAMPAIGN BOT: %d/20 wins" % wins)
 
 func _legacy_rescue_guard() -> void:

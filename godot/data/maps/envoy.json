@@ -2,6 +2,7 @@
   "id": "envoy",
   "name": "The Envoy's Trail",
   "family": "hack_terminal",
+  "envoy_extract": true,
   "theme": "city",
   "plot": {
     "width": 26,
@@ -108,10 +109,11 @@
     ]
   },
   "turn_limit": 9,
+  "evac_turn_limit": 7,
   "clock_trigger": "start",
   "concealed": true,
   "objective": {
-    "required": 2,
+    "required": 1,
     "points": [
       [
         13,
@@ -227,36 +229,36 @@
     ]
   ],
   "prisoner": {
-    "name": "Republic evacuee",
+    "name": "Imperial envoy",
     "x": 13,
     "y": 4,
-    "active": false,
+    "active": true,
     "hp": 8
   },
   "evac": [
     [
       10,
-      27
+      24
     ],
     [
       11,
-      27
+      24
     ],
     [
       12,
-      27
+      24
     ],
     [
       13,
-      27
+      24
     ],
     [
       14,
-      27
+      24
     ],
     [
       15,
-      27
+      24
     ]
   ],
   "entries": [

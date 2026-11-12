@@ -108,6 +108,7 @@
     ]
   },
   "turn_limit": 9,
+  "evac_turn_limit": 5,
   "clock_trigger": "start",
   "concealed": true,
   "objective": {
