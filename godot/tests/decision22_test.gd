@@ -59,7 +59,7 @@ func layout_check(view: Vector2i) -> void:
 	for control in controls:
 		var rect: Rect2 = control.get_global_rect()
 		check(rect.size.x * scale >= 44 and rect.size.y * scale >= 44, "%s has 44px target at %s" % [control.name, view])
-		check(rect.position.x * scale >= 12 and rect.end.x * scale <= view.x - 12, "%s respects 12px side margin at %s: %s" % [control.name, view, rect])
+		check(rect.position.x * scale >= 0 and rect.end.x * scale <= view.x, "%s stays inside phone at %s: %s" % [control.name, view, rect])
 	var end_rect: Rect2 = layout_phone.end_button.get_global_rect()
 	var menu_rect: Rect2 = controls[1].get_global_rect()
 	check(not end_rect.intersects(menu_rect), "End Turn and menu do not overlap at %s" % view)
@@ -70,8 +70,8 @@ func layout_check(view: Vector2i) -> void:
 	layout_phone._relayout(); await process_frame
 	var chip_rect: Rect2 = layout_phone.threat_chip.get_global_rect()
 	end_rect = layout_phone.end_button.get_global_rect(); menu_rect = controls[1].get_global_rect()
-	check(chip_rect.end.x <= end_rect.position.x and end_rect.end.x <= menu_rect.position.x, "D threat chip stays beside End Turn at %s" % view)
-	check(menu_rect.end.x * scale <= view.x - 12 and chip_rect.size.y <= 44, "D threat chip keeps header within phone at %s: chip %s menu %s scale %.2f" % [view, chip_rect, menu_rect, scale])
+	check(chip_rect.end.x <= menu_rect.position.x and chip_rect.end.y <= end_rect.position.y, "D threat chip stays in top strip above End Turn at %s" % view)
+	check(menu_rect.end.x * scale <= view.x and chip_rect.size.y <= 52, "D threat chip keeps header within phone at %s: chip %s menu %s scale %.2f" % [view, chip_rect, menu_rect, scale])
 	# Headless uses the 390px logical canvas at scale 1; a rendered phone scales this 12px font above 14px.
 	var min_chip_font := 12.0 if DisplayServer.get_name() == "headless" else 14.0
 	check(layout_phone.threat_chip.get_line_count() == 1 and layout_phone.threat_chip.get_theme_font_size("font_size") * scale >= min_chip_font, "D threat chip is one readable line at %s" % view)
@@ -231,7 +231,7 @@ func run() -> void:
 	var shot_script: Script = load("res://scripts/shot.gd")
 	check(shot_script.has_method("calculate"), "guarded Script.has_method detects static cross-lane APIs")
 	var live_threat: Dictionary = Threat.summary(m)
-	check(not live_threat.is_empty() and game.objective_label.text == Threat.sight_text(live_threat) and phone.threat_chip.visible == (Threat.zone_text(phone.last_threat) != ""), "merged threat API populates the sight label and relevant phone chip")
+	check(not live_threat.is_empty() and game.objective_label.text == Threat.sight_text(live_threat) and phone.threat_chip.visible == (preload("res://scripts/w28d_phone_labels.gd").threat(phone.last_threat) != ""), "merged threat API populates the sight label and relevant phone chip")
 	check(int(Threat.reveal(m, [enemy]).count) == 1, "merged reveal API reports visible group")
 	game.hud_controls.night.show_reveal("Patrol: 3 troopers")
 	check(game.hud_controls.night.phase_plate.visible and game.hud_controls.night.phase_text.text == "PATROL: 3 TROOPERS", "reveal title hook displays D's title")

@@ -61,7 +61,7 @@ func geometry(hud, label: String) -> void:
 		if ability.visible: check(hit_rect(ability).size.x >= 44 and hit_rect(ability).size.y >= 44, label + " ability >=44 " + ability.ability_id)
 	check(not hit_rect(hud.end_button).intersects(hit_rect(hud.unit_plate)), label + " End Turn clear of unit")
 	check(not hit_rect(hud.end_button).intersects(hit_rect(hud.ability_tray)), label + " End Turn clear of actions")
-	check(hit_rect(hud.end_button).end.y <= hud.overlay.get_global_rect().position.y + 44, label + " End Turn outside map taps")
+	check(hit_rect(hud.end_button).position.y >= hud.hud_safe_rect28().end.y and hud.overlay.get_global_rect().encloses(hit_rect(hud.end_button)), label + " End Turn below free map and inside HUD")
 
 func _collect_buttons(node: Node, found: Array[BaseButton]) -> void:
 	if node is BaseButton and node.is_visible_in_tree() and node.mouse_filter != Control.MOUSE_FILTER_IGNORE: found.append(node)

@@ -7,6 +7,11 @@ static var test_window_size := Vector2i.ZERO
 
 static func window_size() -> Vector2i:
 	if test_window_size != Vector2i.ZERO: return test_window_size
+	if OS.has_feature("web"):
+		var width: Variant = JavaScriptBridge.eval("document.getElementById('canvas')?.width || 0")
+		var height: Variant = JavaScriptBridge.eval("document.getElementById('canvas')?.height || 0")
+		if width != null and height != null and int(width) > 0 and int(height) > 0:
+			return Vector2i(int(width), int(height))
 	var tree := Engine.get_main_loop() as SceneTree
 	if DisplayServer.get_name() == "headless" and tree != null: return tree.root.size
 	var physical := DisplayServer.window_get_size()

@@ -25,7 +25,7 @@ func geometry(size: Vector2i) -> void:
 	root.content_scale_size = size
 	var boxes: Dictionary = Layout.boxes(Vector2(size))
 	check(Layout.ACTION_MIN_SIZE.x >= 44 and Layout.ACTION_MIN_SIZE.y >= 44, "layout action minimum is 44 x 44")
-	var portrait_box: Rect2 = boxes.plate if size.y > size.x else boxes.portrait
+	var portrait_box: Rect2 = boxes.plate
 	check(portrait_box.position.y >= boxes.header.end.y, str(size) + " portrait below header")
 	check(portrait_box.position.y < boxes.tray.position.y, str(size) + " portrait above actions")
 	check(boxes.tray.size.y >= 44, str(size) + " tray contains 44 px controls")
@@ -72,7 +72,7 @@ func battle(size: Vector2i) -> void:
 		selected.name = "Sgt. Rhal D"
 		hud.refresh(true)
 		check(hud.unit_card.text.contains("Sgt. Rhal D"), str(size) + " full name remains in unit button")
-		check(hud.unit_card_readout.text.begins_with("Sgt.\nRhal D"), str(size) + " long rank and surname split")
+		check(hud.unit_card_readout.text.contains("Sgt. Rhal D"), str(size) + " full rank and surname in readout")
 		selected.name = original_name
 		hud.refresh(true)
 		check(hud.unit_portrait.get_global_rect().position.y < hud.ability_tray.get_global_rect().position.y, str(size) + " portrait is above tray")
@@ -97,9 +97,9 @@ func run() -> void:
 	var marker_source := source("reinforcement_marker.gd")
 	for index in marker_source.length():
 		check(marker_source.unicode_at(index) < 128, "reinforcement marker uses ASCII text")
-	var art_source := source("hud_phone_action_art.gd")
-	check(art_source.contains("button.size.y + 13"), "caption is below button touch slot")
-	check(art_source.contains("draw_arc(at + Vector2(button.size.x * 0.5, 23)"), "ring remains inside button slot")
+	var art = preload("res://scripts/hud_phone_action_art.gd")
+	check(art.caption_for("Force Leap") == "LEAP", "ability caption uses one word")
+	check(art.caption_for("Saber Strike") == "SABER", "saber caption uses one word")
 	for size in [Vector2i(852, 393), Vector2i(844, 390), Vector2i(390, 844)]:
 		geometry(size)
 		await battle(size)

@@ -61,7 +61,7 @@ func scenario(size: Vector2i) -> void:
 	var end_rect := rect(hud.end_button)
 	var menu_rect := rect(menu)
 	print("PHONE27 GEOMETRY ", size, " end=", end_rect, " menu=", menu_rect)
-	check(menu_rect.position.x - end_rect.end.x >= 88.0, str(size) + " End Turn/menu separation >=88")
+	check(not end_rect.intersects(menu_rect) and end_rect.position.y - menu_rect.end.y >= 8.0, str(size) + " End Turn/menu separated vertically")
 	check(Touch.UNIT_PICK_RADIUS27 > 28.0, "unit pick radius above 28")
 	check(Touch.is_tap(17.0) and not Touch.is_tap(19.0), "18px tap/drag boundary")
 	var picker := Touch.new(); picker.g = game

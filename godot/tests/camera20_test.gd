@@ -69,7 +69,7 @@ func run() -> void:
 		if phone != null:
 			var background: Control = phone.overlay.find_child("PhoneTopBackground", false, false)
 			var header_px: float = background.get_global_rect().size.y * float(size.y) / game.camera.get_viewport().get_visible_rect().size.y
-			check(absf(header_px - 44.0) < 0.2, "%s header is 44 logical px" % size)
+			check(absf(header_px - 62.4) < 0.2, "%s header is 62.4 logical px" % size)
 			var buttons: Array[BaseButton] = []
 			_buttons(phone.overlay, buttons)
 			var measured := 0
