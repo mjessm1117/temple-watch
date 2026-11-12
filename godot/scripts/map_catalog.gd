@@ -1,6 +1,7 @@
 extends RefCounted
 ## Authored plots + parcels. Every campaign id is explicit; missing ids never borrow rescue.
 const Validator = preload("res://scripts/map_validator.gd")
+const Layout29 = preload("res://scripts/w29c_layout.gd")
 
 static func read(path: String) -> Dictionary:
 	if not FileAccess.file_exists(path): return {}
@@ -27,17 +28,19 @@ static func select_layout(id: String, seed_value: int, variant: int = -1) -> Str
 	if pool.is_empty(): return ""
 	return pool[posmod(seed_value if variant < 0 else variant,pool.size())]
 
-static func load_map(path: String) -> Dictionary:
+static func load_map(path: String, seed_value: int = 1, retry_count: int = 0) -> Dictionary:
 	var data := read(path)
 	if not data.has("plot"): return data
+	var parcels := read("res://data/maps/parcels.json")
+	if bool(data.get("procedural",false)): data = Layout29.transform(data,seed_value+retry_count*1009,parcels)
 	var plot: Dictionary = data.plot
 	data.width = int(plot.width); data.height = int(plot.height)
 	data.prop_overrides = {}
 	var rows: Array[String] = []
 	for y in range(data.height): rows.append("#".repeat(data.width) if y in [0, data.height-1] else "#" + ".".repeat(data.width-2) + "#")
-	var parcels := read("res://data/maps/parcels.json")
 	for placement in plot.placements:
 		var chunk: Array = parcels[placement.parcel].duplicate()
+		if bool(placement.get("mirror",false)): chunk = Layout29.mirror(chunk)
 		for rotation in int(placement.get("rotate", 0)):
 			var rotated: Array = []
 			for x in str(chunk[0]).length():
@@ -96,7 +99,12 @@ static func load_map(path: String) -> Dictionary:
 		for y in [6,data.height-6]: put(rows,Vector2i(x,y),"c")
 	for at in data.evac: put(rows, point(at), "E")
 	preload("res://scripts/map_art_elevation.gd").apply(rows, data.get("elevation", []))
+	if bool(data.get("procedural",false)): Layout29.ensure_start_cover(rows,data)
 	data.rows = rows
+	if bool(data.get("procedural",false)):
+		data.layout29.validation = Layout29.validate(data)
+		if not bool(data.layout29.validation.ok) and retry_count < 8: return load_map(path,seed_value,retry_count+1)
+		assert(bool(data.layout29.validation.ok),"Procedural map has no valid route: %s" % path)
 	return data
 
 static func point(at: Array) -> Vector2i:

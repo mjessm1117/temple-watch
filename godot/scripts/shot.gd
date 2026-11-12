@@ -92,6 +92,7 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 	if m.get("identity") != null: modifier += m.identity.aim(m,attacker)
 	var a := pos(attacker)
 	var t := pos(target)
+	var height_delta: int = elevation(m, a) - elevation(m, t)
 	var lines: Array = [["Base aim", int(attacker.aim) + int(attacker.get("buff_aim", 0)) + int(attacker.get("debuff_aim", 0)) + int(target.get("marked_aim", 0))]]
 	if chains.has_tag(target, "MARKED"): lines.append(["Marked", 20])
 	if chains.has_tag(attacker, "INSPIRED"): lines.append(["Inspired", 15])
@@ -120,7 +121,8 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 		var d := distance(a, t)
 		var r := float(attacker.range)
 		lines.append(["Range", -roundi((d - r * 0.6) * 3) if d > r * 0.6 else 0])
-	lines.append(["High ground", 20 if elevation(m, a) > elevation(m, t) else 0])
+	if height_delta > 0: lines.append(["High ground aim", 20])
+	elif height_delta <= -2 and bool(m.modern): lines.append(["Target high ground defense", -20])
 	var defense := int(target.get("defense", 0))
 	if bool(target.get("hunkered", false)): defense += 30
 	defense += int(target.get("buff_defense", 0))
@@ -144,7 +146,7 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 	if not sight and str(attacker.get("side", "")) == "player" and str(target.get("side", "")) == "enemy":
 		for ally in m.units:
 			if int(ally.get("hp", 0)) > 0 and "spotter" in ally.get("passives", []) and distance(pos(ally), t) <= 11.0 and los(m, pos(ally), t): sight = true; break
-	return {"lines": lines, "hit": hit, "crit": crit, "graze": 0 if melee else min(GRAZE, 100 - hit), "cover": cv, "flanked": flanked, "los": sight, "range_ok": melee or distance(a, t) <= float(attacker.range)}
+	return {"lines": lines, "hit": hit, "crit": crit, "graze": 0 if melee else min(GRAZE, 100 - hit), "cover": cv, "flanked": flanked, "height_delta":height_delta, "cover_after_shot":{} if melee else preload("res://scripts/w29c_cover.gd").preview(m,attacker,t), "los": sight, "range_ok": melee or distance(a, t) <= float(attacker.range)}
 
 static func trace(m: RefCounted, a: Vector2i, b: Vector2i) -> Dictionary:
 	if _direct(m, a, b, false): return {"clear":true, "origin":a, "end":b, "blocker":Vector2i(-1,-1)}

@@ -2,6 +2,7 @@ extends RefCounted
 class_name RescueAI
 
 const Shot = preload("res://scripts/shot.gd")
+const Plan29 = preload("res://scripts/w29c_ai_plan.gd")
 
 static func is_melee(e: Dictionary) -> bool:
 	return float(e.range) < 2.0
@@ -171,6 +172,18 @@ static func act(m: RefCounted, e: Dictionary, fired: Dictionary) -> void:
 					_reason24(m, first, e, "Target in cover")
 					e.pushed = true
 					return
+	var setup29: Dictionary = Plan29.setup(m,e)
+	if not setup29.is_empty():
+		if setup29.role == "overwatch":
+			e.ap = 0; e.overwatch = true; e.setup29_done = true
+			var event := {"kind":"overwatch", "actor":int(e.id), "at":Shot.pos(e), "target":int(setup29.target), "reason24":"Covering flank setup"}
+			if m.has_method("intent_explain27"): event.reason27 = m.intent_explain27(event)
+			m.action_events.append(event)
+			m.message("%s holds the lane on Overwatch." % e.name)
+			return
+		if _move24(m,e,setup29.destination,"Flank setup"):
+			e.setup29_done = true
+			return
 	var target := choose_target(m, e, fired)
 	if not target.is_empty() and not bool(e.get("disarmed", false)):
 		var mode := "strike" if is_melee(e) else "shoot"
