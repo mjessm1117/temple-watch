@@ -32,9 +32,12 @@ static func create(campaign, seed_value: int) -> RefCounted:
 		var u: Dictionary = m.units.pop_back()
 		u.rid = r.id; u.name = r.n; u.class_name = r.cls; u.rank = r.rank
 		if Progression.is_jedi(r):
-			var tier: Dictionary = Classes.rank_data("jedi", int(r.rank))
-			u.master_aura = int(tier.get("aura", 0))
-			u.master_action_available = bool(tier.get("third_action_once", false)) or int(r.rank) > 5
+			u.master_aura = 0
+			u.master_action_available = false
+			for level in range(1, int(r.rank) + 1):
+				var tier: Dictionary = Classes.rank_data("jedi", level)
+				u.master_aura = maxi(int(u.master_aura), int(tier.get("aura", 0)))
+				u.master_action_available = bool(u.master_action_available) or bool(tier.get("third_action_once", false))
 		u.dark = r.get("dark", 0)
 		var stats: Dictionary = preload("res://scripts/campaign/gear.gd").battle_stats(campaign, str(r.id))
 		for key in ["hp", "aim", "mob", "range", "will", "crit", "deflect", "dodge", "armor"]:

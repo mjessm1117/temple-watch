@@ -105,7 +105,9 @@ func setup(owner_screen: Control, id: String) -> void:
 		section("SABER FORM")
 		for key in Data.get_table("gear", "FORMS"):
 			var item: Dictionary = Data.get_table("gear", "FORMS")[key]
-			offer("form", "", key, str(item.n), "Equipped" if r.gear.get("form", "shiiCho") == key else lock_reason(c, item, 0), 0, 0, str(item.get("desc", "")))
+			var form_reason := Gear.form_lock_reason(c, r, key)
+			var reason := form_reason if form_reason == "Knight rank 3 required" else lock_reason(c, item, 0)
+			offer("form", "", key, str(item.n), "Equipped" if r.gear.get("form", "shiiCho") == key else reason, 0, 0, str(item.get("desc", "")))
 	for kind in (["s", "a"] if jedi else ["w", "a"]):
 		var installed: Array = r.gear.get(Gear.MOD_KEY[kind], [])
 		var slots := Gear.slots(r, kind)

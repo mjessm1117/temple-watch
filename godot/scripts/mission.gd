@@ -361,7 +361,7 @@ func _apply_attack(a: Dictionary, t: Dictionary, info: Dictionary, mode: String)
 	elif mode == "shoot" and roll < int(info.hit) + Shot.GRAZE:
 		damage = ceili(float(rng.randi_range(int(a.damage[0]), int(a.damage[1]))) / 2.0)
 		outcome = "grazes"
-	if damage > 0 and str(a.side) == "enemy" and str(t.side) == "player" and str(t.get("class_name", "")) in ["Guardian", "Consular"]:
+	if damage > 0 and str(a.side) == "enemy" and str(t.side) == "player" and (str(t.get("class_name", "")) in ["Guardian", "Consular"] or bool(t.get("guard", false))):
 		var deflect_chance := int(t.get("guard_deflect", 0)) if bool(t.get("guard", false)) else int(t.get("deflect", 0))
 		if rng.randi_range(1, 100) <= deflect_chance:
 			damage = 0; outcome = "is deflected by"
