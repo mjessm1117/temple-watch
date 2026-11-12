@@ -113,7 +113,7 @@ func run() -> void:
 				scores.append(snappedf(power, 0.1))
 				if scores.size() > 1: check(scores[-1] >= scores[-2], class_id + " non-decreasing at rank " + str(rank))
 			rows[class_id] = scores
-	check(count == 176 and signatures.size() == 176, "176 unique class-prefixed abilities")
+	check(count == 186 and signatures.size() == 186, "186 unique class-prefixed abilities")
 	check(scored == 202, "all 202 ranked promotion definitions scored")
 	for rank in bands:
 		var values: Array[float] = []

@@ -5,70 +5,34 @@
   "side": "soldier",
   "role": "Sneak and damage",
   "signature": "scout_concealment",
-  "branches": [
-    "Infiltrator",
-    "Saboteur"
-  ],
+  "branches": ["Infiltrator", "Saboteur"],
   "implemented": true,
   "unit_kind": "scout",
-  "kit": [
-    "shoot",
-    "overwatch",
-    "mark",
-    "runGun",
-    "deadeye"
-  ],
-  "passives": [
-    "spotter",
-    "ghost"
-  ],
-  "bonus_kit": [
-    "snipe",
-    "hunker"
-  ],
+  "kit": ["shoot", "overwatch", "mark", "runGun", "deadeye"],
+  "passives": ["spotter", "ghost"],
+  "bonus_kit": ["snipe", "hunker"],
   "bonus_passives": [],
   "tree": {
     "trunk": {
-      "1": [
-        "scout_concealment"
-      ],
-      "2": [
-        "mark",
-        "runGun"
-      ]
+      "1": ["scout_concealment"],
+      "2": ["mark", "runGun"]
     },
     "specs": {
       "infiltrator": {
         "n": "Infiltrator",
         "sig": "scout_vanish",
-        "4": [
-          "spotter"
-        ],
-        "5": [
-          "snipe"
-        ],
-        "6": [
-          "shoot"
-        ],
-        "7": [
-          "scout_saboteur_trap"
-        ]
+        "4": ["scout_spotter_signal"],
+        "5": ["snipe"],
+        "6": ["scout_flanking_shot"],
+        "7": ["scout_saboteur_trap"]
       },
       "saboteur": {
         "n": "Saboteur",
         "sig": "deadeye",
-        "4": [
-          "ghost"
-        ],
-        "5": [
-          "hunker"
-        ],
-        "6": [
-          "overwatch"
-        ],
-        "7": [
-          "scout_ambush"
-        ]
+        "4": ["scout_ghost_step"],
+        "5": ["scout_shadow_cover"],
+        "6": ["scout_hidden_watch"],
+        "7": ["scout_ambush"]
       }
     }
   },
@@ -85,24 +49,10 @@
       "cooldown": 0,
       "chain": {
         "consume": [
-          {
-            "tag": "SHIELDED",
-            "target": "self",
-            "bonus": [
-              {
-                "type": "shield",
-                "target": "target",
-                "amount": 3
-              }
-            ]
-          }
+          {"tag": "SHIELDED", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 3}]}
         ],
         "apply": [
-          {
-            "tag": "READY",
-            "target": "self",
-            "amount": 3
-          }
+          {"tag": "READY", "target": "self", "amount": 3}
         ]
       },
       "amount": 0,
@@ -131,7 +81,16 @@
       "ally_aim": 15,
       "cost": 1,
       "ends_turn": true,
-      "rank": 2
+      "rank": 2,
+      "chain": {
+        "consume": [
+          {"tag": "EXPOSED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 1}]}
+        ],
+        "apply": [
+          {"tag": "MARKED", "target": "target"}
+        ]
+      },
+      "description": "Mark an exposed target for the next squad shot."
     },
     "runGun": {
       "name": "Run & Gun",
@@ -142,7 +101,16 @@
       "cooldown": 1,
       "cost": 0,
       "ends_turn": false,
-      "rank": 2
+      "rank": 2,
+      "chain": {
+        "consume": [
+          {"tag": "INSPIRED", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 1}]}
+        ],
+        "apply": [
+          {"tag": "READY", "target": "self"}
+        ]
+      },
+      "description": "Gain a move and set up a ready follow-up."
     },
     "scout_vanish": {
       "name": "Vanish",
@@ -156,24 +124,10 @@
       "cooldown": 2,
       "chain": {
         "consume": [
-          {
-            "tag": "INSPIRED",
-            "target": "self",
-            "bonus": [
-              {
-                "type": "shield",
-                "target": "target",
-                "amount": 3
-              }
-            ]
-          }
+          {"tag": "INSPIRED", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 3}]}
         ],
         "apply": [
-          {
-            "tag": "ATTUNED",
-            "target": "self",
-            "amount": 3
-          }
+          {"tag": "ATTUNED", "target": "self", "amount": 3}
         ]
       },
       "amount": 0,
@@ -204,7 +158,16 @@
       "ammo_cost": 1,
       "cost": 1,
       "ends_turn": true,
-      "rank": 3
+      "rank": 3,
+      "chain": {
+        "consume": [
+          {"tag": "MARKED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "EXPOSED", "target": "target"}
+        ]
+      },
+      "description": "Risk a precise shot to open a target for another soldier."
     },
     "spotter": {
       "name": "Spotter",
@@ -213,8 +176,7 @@
       "range": 11,
       "cost": 0,
       "ap": 0,
-      "ends_turn": false,
-      "rank": 4
+      "ends_turn": false
     },
     "ghost": {
       "name": "Ghost",
@@ -223,8 +185,7 @@
       "charges": 1,
       "cost": 0,
       "ap": 0,
-      "ends_turn": false,
-      "rank": 4
+      "ends_turn": false
     },
     "snipe": {
       "name": "Snipe",
@@ -238,7 +199,16 @@
       "ammo_cost": 1,
       "cost": 1,
       "ends_turn": true,
-      "rank": 5
+      "rank": 5,
+      "chain": {
+        "consume": [
+          {"tag": "EXPOSED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "MARKED", "target": "target"}
+        ]
+      },
+      "description": "Snipe exposed prey and leave a mark for an ally."
     },
     "hunker": {
       "name": "Hunker Down",
@@ -277,30 +247,14 @@
       "range": 7,
       "ends_turn": true,
       "capstone": true,
-      "damage": [
-        4,
-        5
-      ],
+      "damage": [4, 5],
       "cover_damage": 7,
       "chain": {
         "consume": [
-          {
-            "tag": "STAGGERED",
-            "target": "area_enemies",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 2
-              }
-            ]
-          }
+          {"tag": "STAGGERED", "target": "area_enemies", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
         ],
         "apply": [
-          {
-            "tag": "MARKED",
-            "target": "area_enemies"
-          }
+          {"tag": "MARKED", "target": "area_enemies"}
         ]
       },
       "effects": [
@@ -336,45 +290,12 @@
       "ammo_cost": 1,
       "chain": {
         "consume": [
-          {
-            "tag": "STAGGERED",
-            "target": "target",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 2
-              }
-            ]
-          },
-          {
-            "tag": "EXPOSED",
-            "target": "target",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 2
-              }
-            ]
-          },
-          {
-            "tag": "MARKED",
-            "target": "target",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 1
-              }
-            ]
-          }
+          {"tag": "STAGGERED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]},
+          {"tag": "EXPOSED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]},
+          {"tag": "MARKED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 1}]}
         ],
         "apply": [
-          {
-            "tag": "EXPOSED",
-            "target": "target"
-          }
+          {"tag": "PINNED", "target": "target"}
         ]
       },
       "capstone": true,
@@ -391,16 +312,144 @@
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "scout"
+    },
+    "scout_spotter_signal": {
+      "name": "Spotter Signal",
+      "passive": false,
+      "effect": "status",
+      "range": 11,
+      "cost": 1,
+      "ap": 1,
+      "ends_turn": false,
+      "rank": 4,
+      "target": "enemy",
+      "status": "marked",
+      "ally_aim": 10,
+      "chain": {
+        "consume": [
+          {"tag": "PINNED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "EXPOSED", "target": "target"}
+        ]
+      },
+      "description": "Call out a pinned target and expose it for the squad."
+    },
+    "scout_flanking_shot": {
+      "name": "Flanking Shot",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true,
+      "rank": 6,
+      "damage_mod": 1,
+      "crit_mod": 10,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {"tag": "MARKED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "STAGGERED", "target": "target"}
+        ]
+      },
+      "description": "Cash in a mark and stagger the target."
+    },
+    "scout_ghost_step": {
+      "name": "Ghost Step",
+      "passive": false,
+      "effect": "ap",
+      "charges": 1,
+      "cost": 1,
+      "ap": 1,
+      "ends_turn": false,
+      "rank": 4,
+      "target": "self",
+      "amount": 0,
+      "cooldown": 2,
+      "chain": {
+        "consume": [
+          {"tag": "SHIELDED", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "READY", "target": "self"}
+        ]
+      },
+      "effects": [
+        {
+          "type": "status",
+          "target": "self",
+          "status": "concealed"
+        }
+      ],
+      "description": "Reconceal and prepare a hidden follow-up."
+    },
+    "scout_shadow_cover": {
+      "name": "Shadow Cover",
+      "ap": 1,
+      "target": "self",
+      "effect": "hunker",
+      "defense": 25,
+      "cost": 1,
+      "ends_turn": false,
+      "rank": 5,
+      "chain": {
+        "consume": [
+          {"tag": "READY", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 1}]}
+        ],
+        "apply": [
+          {"tag": "SHIELDED", "target": "self", "amount": 1}
+        ]
+      },
+      "effects": [
+        {
+          "type": "status",
+          "target": "self",
+          "status": "concealed"
+        }
+      ],
+      "description": "Dig in and disappear behind cover."
+    },
+    "scout_hidden_watch": {
+      "name": "Hidden Watch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true,
+      "rank": 6,
+      "chain": {
+        "consume": [
+          {"tag": "SHIELDED", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 3}]}
+        ],
+        "apply": [
+          {"tag": "READY", "target": "self"}
+        ]
+      },
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 3
+        },
+        {
+          "type": "status",
+          "target": "self",
+          "amount": 1,
+          "status": "concealed"
+        }
+      ],
+      "description": "Watch from concealment with a reinforced decoy."
     }
   },
   "base_stats": {
     "hp": 6,
     "aim": 80,
     "mob": 6,
-    "dmg": [
-      4,
-      7
-    ],
+    "dmg": [4, 7],
     "range": 11,
     "crit": 15,
     "init": 15,
@@ -411,10 +460,7 @@
     "hp": 6,
     "aim": 80,
     "mob": 6,
-    "damage": [
-      4,
-      7
-    ],
+    "damage": [4, 7],
     "range": 11,
     "focus": 0,
     "armor": 0,

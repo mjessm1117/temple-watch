@@ -5,10 +5,7 @@
   "side": "soldier",
   "role": "Healer",
   "signature": "medic_bacta_spray",
-  "branches": [
-    "Field Surgeon",
-    "Combat Medic"
-  ],
+  "branches": ["Field Surgeon", "Combat Medic"],
   "implemented": true,
   "unit_kind": "medic",
   "kit": [
@@ -24,52 +21,29 @@
     "scan"
   ],
   "passives": [],
-  "bonus_kit": [
-    "medBeacon"
-  ],
+  "bonus_kit": ["medBeacon"],
   "bonus_passives": [],
   "tree": {
     "trunk": {
-      "1": [
-        "medic_bacta_spray"
-      ],
-      "2": [
-        "heal",
-        "reviveStim"
-      ]
+      "1": ["medic_bacta_spray"],
+      "2": ["heal", "reviveStim"]
     },
     "specs": {
       "field_surgeon": {
         "n": "Field Surgeon",
         "sig": "medic_toxin_dart",
-        "4": [
-          "hack"
-        ],
-        "5": [
-          "shieldDrone"
-        ],
-        "6": [
-          "shoot"
-        ],
-        "7": [
-          "medBeacon"
-        ]
+        "4": ["hack"],
+        "5": ["shieldDrone"],
+        "6": ["medic_covering_round"],
+        "7": ["medBeacon"]
       },
       "combat_medic": {
         "n": "Combat Medic",
         "sig": "smoke",
-        "4": [
-          "protocol"
-        ],
-        "5": [
-          "scan"
-        ],
-        "6": [
-          "overwatch"
-        ],
-        "7": [
-          "hackDroid"
-        ]
+        "4": ["protocol"],
+        "5": ["scan"],
+        "6": ["medic_guard_watch"],
+        "7": ["hackDroid"]
       }
     }
   },
@@ -88,56 +62,14 @@
       "cooldown": 2,
       "chain": {
         "consume": [
-          {
-            "tag": "BURNING",
-            "target": "all_allies",
-            "bonus": [
-              {
-                "type": "heal",
-                "target": "target",
-                "amount": 1
-              }
-            ]
-          },
-          {
-            "tag": "STAGGERED",
-            "target": "all_allies",
-            "bonus": [
-              {
-                "type": "heal",
-                "target": "target",
-                "amount": 2
-              }
-            ]
-          },
-          {
-            "tag": "PINNED",
-            "target": "all_allies",
-            "bonus": [
-              {
-                "type": "heal",
-                "target": "target",
-                "amount": 3
-              }
-            ]
-          }
+          {"tag": "BURNING", "target": "all_allies", "bonus": [{"type": "heal", "target": "target", "amount": 1}]},
+          {"tag": "STAGGERED", "target": "all_allies", "bonus": [{"type": "heal", "target": "target", "amount": 2}]},
+          {"tag": "PINNED", "target": "all_allies", "bonus": [{"type": "heal", "target": "target", "amount": 3}]}
         ],
         "apply": [
-          {
-            "tag": "INSPIRED",
-            "target": "all_allies",
-            "amount": 2
-          },
-          {
-            "tag": "SHIELDED",
-            "target": "all_allies",
-            "amount": 2
-          },
-          {
-            "tag": "READY",
-            "target": "all_allies",
-            "amount": 2
-          }
+          {"tag": "INSPIRED", "target": "all_allies", "amount": 2},
+          {"tag": "SHIELDED", "target": "all_allies", "amount": 2},
+          {"tag": "READY", "target": "all_allies", "amount": 2}
         ]
       },
       "effects": [
@@ -160,7 +92,16 @@
       "charges": "medpacs",
       "cost": 1,
       "ends_turn": false,
-      "rank": 2
+      "rank": 2,
+      "chain": {
+        "consume": [
+          {"tag": "BURNING", "target": "target", "bonus": [{"type": "heal", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "INSPIRED", "target": "target"}
+        ]
+      },
+      "description": "Treat a wounded ally and cleanse burning for extra recovery."
     },
     "reviveStim": {
       "name": "Revive Stim",
@@ -172,7 +113,16 @@
       "charges": "medpacs",
       "cost": 1,
       "ends_turn": false,
-      "rank": 2
+      "rank": 2,
+      "chain": {
+        "consume": [
+          {"tag": "PINNED", "target": "target", "bonus": [{"type": "heal", "target": "target", "amount": 1}]}
+        ],
+        "apply": [
+          {"tag": "SHIELDED", "target": "target", "amount": 2}
+        ]
+      },
+      "description": "Revive an ally behind a temporary shield."
     },
     "medic_toxin_dart": {
       "name": "Toxin Dart",
@@ -187,53 +137,14 @@
       "chance": 75,
       "chain": {
         "consume": [
-          {
-            "tag": "MARKED",
-            "target": "target",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 1
-              }
-            ]
-          },
-          {
-            "tag": "PINNED",
-            "target": "target",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 2
-              }
-            ]
-          },
-          {
-            "tag": "BURNING",
-            "target": "target",
-            "bonus": [
-              {
-                "type": "damage",
-                "target": "target",
-                "amount": 3
-              }
-            ]
-          }
+          {"tag": "MARKED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 1}]},
+          {"tag": "PINNED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]},
+          {"tag": "BURNING", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 3}]}
         ],
         "apply": [
-          {
-            "tag": "STAGGERED",
-            "target": "target"
-          },
-          {
-            "tag": "EXPOSED",
-            "target": "target"
-          },
-          {
-            "tag": "IONIZED",
-            "target": "target"
-          }
+          {"tag": "STAGGERED", "target": "target"},
+          {"tag": "EXPOSED", "target": "target"},
+          {"tag": "IONIZED", "target": "target"}
         ]
       },
       "effects": [
@@ -263,7 +174,16 @@
       "charges": "smoke",
       "cost": 1,
       "ends_turn": true,
-      "rank": 3
+      "rank": 3,
+      "chain": {
+        "consume": [
+          {"tag": "BURNING", "target": "all_allies", "bonus": [{"type": "heal", "target": "target", "amount": 1}]}
+        ],
+        "apply": [
+          {"tag": "SHIELDED", "target": "all_allies", "amount": 1}
+        ]
+      },
+      "description": "Fill the area with smoke and shield allies while clearing burns."
     },
     "hack": {
       "name": "Hack",
@@ -273,7 +193,16 @@
       "effect": "hack",
       "cost": 1,
       "ends_turn": true,
-      "rank": 4
+      "rank": 4,
+      "chain": {
+        "consume": [
+          {"tag": "READY", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "INSPIRED", "target": "self"}
+        ]
+      },
+      "description": "Open a console while preparing the medic for the next push."
     },
     "protocol": {
       "name": "Combat Protocol",
@@ -281,16 +210,22 @@
       "range": 8,
       "target": "enemy_droid",
       "effect": "attack",
-      "damage": [
-        3,
-        3
-      ],
+      "damage": [3, 3],
       "chance": 100,
       "no_los": true,
       "ignore_cover": true,
       "cost": 1,
       "ends_turn": true,
-      "rank": 4
+      "rank": 4,
+      "chain": {
+        "consume": [
+          {"tag": "STAGGERED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "IONIZED", "target": "target"}
+        ]
+      },
+      "description": "Strike a droid, consuming stagger before ionizing it."
     },
     "shieldDrone": {
       "name": "Shield Drone",
@@ -302,7 +237,16 @@
       "charges": "shield_drone",
       "cost": 1,
       "ends_turn": false,
-      "rank": 5
+      "rank": 5,
+      "chain": {
+        "consume": [
+          {"tag": "BURNING", "target": "target", "bonus": [{"type": "heal", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "INSPIRED", "target": "target"}
+        ]
+      },
+      "description": "Shield a patient and clear burning for a small heal."
     },
     "scan": {
       "name": "Scan Clue",
@@ -312,7 +256,16 @@
       "effect": "scan",
       "cost": 1,
       "ends_turn": false,
-      "rank": 5
+      "rank": 5,
+      "chain": {
+        "consume": [
+          {"tag": "INSPIRED", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 1}]}
+        ],
+        "apply": [
+          {"tag": "READY", "target": "self"}
+        ]
+      },
+      "description": "Find a clue and prepare a guarded follow-up."
     },
     "shoot": {
       "name": "Shoot",
@@ -345,7 +298,7 @@
       "rank": 7,
       "capstone": true,
       "once_per_mission": true,
-      "description": "Once per mission: restore the whole squad, shield them, and keep the medic moving.",
+      "description": "Once per mission: heal and shield the squad, cleanse burning, and inspire them.",
       "capstone_template": "medic",
       "effects": [
         {
@@ -363,7 +316,15 @@
           "target": "self",
           "amount": 1
         }
-      ]
+      ],
+      "chain": {
+        "consume": [
+          {"tag": "BURNING", "target": "all_allies", "bonus": [{"type": "heal", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "INSPIRED", "target": "all_allies"}
+        ]
+      }
     },
     "hackDroid": {
       "name": "Hack Droid",
@@ -378,7 +339,7 @@
       "rank": 7,
       "capstone": true,
       "once_per_mission": true,
-      "description": "Once per mission: stun a target Droid, ionize every enemy, and shield the squad.",
+      "description": "Once per mission: disable a droid, stagger it, and shield the squad.",
       "capstone_template": "medic",
       "charges": "soldier_capstone",
       "effects": [
@@ -393,17 +354,74 @@
           "target": "all_allies",
           "amount": 2
         }
-      ]
+      ],
+      "chain": {
+        "consume": [
+          {"tag": "IONIZED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "STAGGERED", "target": "target"}
+        ]
+      }
+    },
+    "medic_covering_round": {
+      "name": "Covering Round",
+      "ap": 1,
+      "target": "enemy",
+      "effect": "attack",
+      "weapon": true,
+      "range": "weapon",
+      "cost": 1,
+      "ends_turn": true,
+      "rank": 6,
+      "damage_mod": 1,
+      "ammo_cost": 1,
+      "chain": {
+        "consume": [
+          {"tag": "MARKED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "STAGGERED", "target": "target"}
+        ]
+      },
+      "description": "Hit a marked foe and stagger it to protect patients."
+    },
+    "medic_guard_watch": {
+      "name": "Guard Watch",
+      "ap": 1,
+      "target": "self",
+      "effect": "overwatch",
+      "cost": 1,
+      "ends_turn": true,
+      "rank": 6,
+      "chain": {
+        "consume": [
+          {"tag": "SHIELDED", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 2}]}
+        ],
+        "apply": [
+          {"tag": "READY", "target": "self"}
+        ]
+      },
+      "effects": [
+        {
+          "type": "shield",
+          "target": "self",
+          "amount": 2
+        },
+        {
+          "type": "heal",
+          "target": "all_allies",
+          "amount": 1
+        }
+      ],
+      "description": "Keep watch behind a field shield."
     }
   },
   "base_stats": {
     "hp": 7,
     "aim": 65,
     "mob": 5,
-    "dmg": [
-      2,
-      4
-    ],
+    "dmg": [2, 4],
     "range": 6,
     "kits": 2,
     "init": 9,
@@ -414,10 +432,7 @@
     "hp": 7,
     "aim": 65,
     "mob": 5,
-    "damage": [
-      2,
-      4
-    ],
+    "damage": [2, 4],
     "range": 6,
     "focus": 0,
     "armor": 0,
