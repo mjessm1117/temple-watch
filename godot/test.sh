@@ -114,3 +114,8 @@ run_suite opening27_test
 run_suite tactics27_test
 run_suite phone27_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite impact27_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite jedi_tiers28_test
+run_suite soldier_chains28_test
+run_suite class_tree28_test --rendering-method gl_compatibility --resolution 956x440
+run_suite phonehud28_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite phonemove28_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
