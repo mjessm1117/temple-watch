@@ -9,7 +9,9 @@ var galaxy_button: Button
 func setup(rooms: Dictionary, state: Dictionary) -> void:
 	name = "PhoneRoomGrid"
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	offset_left = 8; offset_right = -8; offset_top = 84; offset_bottom = -110
+	var safe := preload("res://scripts/phone_layout.gd").safe_margins(get_viewport_rect().size)
+	offset_left = 8 + safe.x; offset_right = -8 - safe.z
+	offset_top = 84 + safe.y; offset_bottom = -110 - safe.w
 	var column := UI.column(4); add_child(column)
 	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	galaxy_button = UI.button(("GALAXY MAP  ·  %d missions and threats  >" if preload("res://scripts/phone_layout.gd").touch_device() else "GALAXY MAP  ·  %d missions and threats  →") % state.options.size(), func(): galaxy_selected.emit())
@@ -20,7 +22,8 @@ func setup(rooms: Dictionary, state: Dictionary) -> void:
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	column.add_child(scroll)
-	var grid := GridContainer.new(); grid.name = "RoomGrid"; grid.columns = 4
+	var grid := GridContainer.new(); grid.name = "RoomGrid"
+	grid.columns = 2 if get_viewport_rect().size.x < 500.0 else 4
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	grid.add_theme_constant_override("h_separation", 8)
 	grid.add_theme_constant_override("v_separation", 8)

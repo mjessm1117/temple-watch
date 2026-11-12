@@ -84,12 +84,14 @@ func _build() -> void:
 	outer.offset_left = safe.x + (12 if compact else 22); outer.offset_top = safe.y + (12 if compact else 16)
 	outer.offset_right = -safe.z - (12 if compact else 22); outer.offset_bottom = -safe.w - (12 if compact else 12); add_child(outer)
 	var head: BoxContainer = VBoxContainer.new() if portrait else HBoxContainer.new()
-	head.add_theme_constant_override("separation", 6 if portrait else 8 if compact else 4); outer.add_child(head)
+	head.add_theme_constant_override("separation", 8 if compact else 4); outer.add_child(head)
 	var title := UI.column(0); title.size_flags_horizontal = Control.SIZE_EXPAND_FILL; head.add_child(title)
 	if not compact: title.add_child(UI.label("J E D I   T E M P L E   /   W A R   R O O M",12,Color("79d3e2")))
 	title.add_child(UI.label("Galaxy command",20 if compact else 30,Color("dbe7e4")))
 	var actions: BoxContainer = HBoxContainer.new() if portrait else head
-	if portrait: head.add_child(actions)
+	if portrait:
+		actions.add_theme_constant_override("separation", 8)
+		head.add_child(actions)
 	back_button = UI.button("← MAP" if portrait else "GALAXY" if Phone.touch_device() else "←  GALAXY", _overview); back_button.name = "GalaxyOverview"; back_button.visible = false; actions.add_child(back_button)
 	var intelligence := UI.button("INTEL" if portrait else "INTEL WORKBENCH",open_intel_view25); intelligence.name = "Intelligence"
 	if compact: intelligence.custom_minimum_size.y = 44
@@ -103,6 +105,7 @@ func _build() -> void:
 	deadline_rail = UI.label("", 14, UI.GOLD); deadline_rail.name = "ThreatCountdown25"; outer.add_child(deadline_rail)
 	contact_action = UI.button("",_contact_primary25)
 	contact_action.name = "ContactChoice25"; contact_action.custom_minimum_size.y = 44
+	contact_action.clip_text = true
 	contact_action.add_theme_font_size_override("font_size",14)
 	if compact and not portrait:
 		contact_action.custom_minimum_size.x = 185
@@ -136,10 +139,15 @@ func _build() -> void:
 	else:
 		right.custom_minimum_size.x = 330; body.add_child(right)
 	var column := UI.column(8 if compact else 7); column.custom_minimum_size.x = 0 if compact else 304; right.add_child(column)
+	var top_actions: HBoxContainer
 	if compact:
+		top_actions = HBoxContainer.new()
+		top_actions.add_theme_constant_override("separation", 8)
+		column.add_child(top_actions)
 		var close := UI.button("← BACK TO MAP" if portrait else "CLOSE", _overview)
 		close.name = "CloseSite"; close.custom_minimum_size.y = 44
-		column.add_child(close)
+		close.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		top_actions.add_child(close)
 		region_strip = HBoxContainer.new(); region_strip.name = "SelectedRegionStrip25"
 		region_strip.size_flags_horizontal = Control.SIZE_EXPAND_FILL; column.add_child(region_strip)
 	tabs = HBoxContainer.new()
@@ -182,6 +190,9 @@ func _build() -> void:
 	launch_button = UI.button("READY  >" if compact else "READY FOR MISSION  →",_launch)
 	if compact: launch_button.custom_minimum_size.y = 44
 	column.add_child(launch_button)
+	if compact:
+		launch_button.reparent(top_actions)
+		launch_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	message = UI.label("Tap a world or signal to inspect it." if Phone.touch_device() else "Select a world or a signal.  ↑ ↓ offers  ·  Enter briefing  ·  Esc back  ·  T Temple",12,Color("8aa2a5")); outer.add_child(message)
 	if compact: message.hide(); status.hide()
 	if compact: _phone_text_floor(self)
@@ -210,7 +221,11 @@ func _show_details() -> void:
 	if detail_panel != null and Phone.narrow(Phone.window_size()): detail_panel.visible = detail_open
 	if transition and transition.is_running(): transition.kill()
 	detail.position.x = 0; detail.modulate.a = 1
-	UI.clear(detail); scroll.scroll_vertical = 0
+	# A polling rebuild during a finger gesture must retain the current list.
+	var held_scroll := scroll.scroll_vertical
+	UI.clear(detail)
+	if not scroll.touch_dragging: scroll.scroll_vertical = 0
+	else: scroll.set_deferred("scroll_vertical", held_scroll)
 	_refresh_strategy25()
 	if get_viewport_rect().size.y > get_viewport_rect().size.x and page == "Briefing" and not campaign.state.options.is_empty():
 		_build_selected_card()
