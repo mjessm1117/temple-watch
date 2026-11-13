@@ -1,6 +1,7 @@
 extends Node3D
 
 const Audio = preload("res://scripts/audio.gd")
+const Trail31 = preload("res://scripts/w31c_trail.gd")
 const W17_ROOT := "res://assets/units/w17/"
 const W17_KINDS := ["sniper", "heavy", "tech", "droid", "officer"]
 const ALLY_COLOR26 := Color("00d4ff")
@@ -349,6 +350,9 @@ func travel24(path: Array, dash: bool, segments: Array = []) -> void:
 			var segment: Variant = segments[step_index]
 			kind = str(segment.get("kind", segment.get("type", "walk"))) if segment is Dictionary else str(segment)
 		var duration := maxf(0.08, flat.length() / travel_speed24(dash) * (1.16 if dash and step_index == 0 else 0.78 if dash and step_index > 0 else 1.0))
+		if not enemy_side and step_index % 3 == 0:
+			motion.tween_callback(func() -> void:
+				if model != null and is_inside_tree(): Trail31.spawn_trail_ghost(get_tree(), global_position, model))
 		motion.tween_callback(func() -> void: face(point))
 		if kind in ["vault", "climb", "door"]: motion.tween_callback(func() -> void: route_beats27.append(kind + "_contact"))
 		motion.tween_callback(func() -> void:
@@ -363,13 +367,13 @@ func travel24(path: Array, dash: bool, segments: Array = []) -> void:
 					model.rotation.y = 0.24 if kind == "door" else 0.0)
 			motion.tween_property(self, "position", middle, duration * 0.48).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 			motion.parallel().tween_callback(_footstep).set_delay(duration * 0.18)
-			motion.tween_property(self, "position", point, duration * 0.52).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+			motion.tween_property(self, "position", point, duration * 0.52).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT if step_index == path.size() - 1 else Tween.EASE_IN)
 			motion.tween_callback(func() -> void: route_beats27.append(kind + "_land"))
 			motion.tween_callback(_footstep)
 			motion.tween_callback(func() -> void:
 				if model != null: model.rotation = Vector3.ZERO)
 		else:
-			motion.tween_property(self, "position", point, duration).set_trans(Tween.TRANS_LINEAR)
+			motion.tween_property(self, "position", point, duration).set_trans(Tween.TRANS_CUBIC if step_index == path.size() - 1 else Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT if step_index == path.size() - 1 else Tween.EASE_IN_OUT)
 			motion.parallel().tween_callback(_footstep).set_delay(duration * 0.22)
 			if duration >= 0.17: motion.parallel().tween_callback(_footstep).set_delay(duration * 0.76)
 		previous = point

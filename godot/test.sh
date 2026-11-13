@@ -128,3 +128,8 @@ run_suite a30_test
 run_suite b30_test
 run_suite c30_test
 run_suite d30_test
+run_suite decisions31_test
+run_suite phoneaim31_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite impact31_test
+run_suite render31_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite e31_test --rendering-method gl_compatibility --resolution 844x390

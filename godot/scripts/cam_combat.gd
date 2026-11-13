@@ -178,7 +178,8 @@ func preview(actor: Dictionary, target: Dictionary) -> void:
 	var actor_view = g.views.get(actor_id)
 	if actor_view != null: actor_view.set_aim_ready(true, Vector3(float(target.x), 0.0, float(target.y)))
 	var phone: bool = g.hud_controls != null and g.hud_controls.phone != null
-	if phone and actor_view != null:
+	var portrait: bool = phone and g.get_viewport().get_visible_rect().size.y > g.get_viewport().get_visible_rect().size.x
+	if phone and not portrait and actor_view != null:
 		preview_source_model = actor_view.model
 		preview_shoulder = preview_source_model.duplicate()
 		preview_shoulder.name = "AimShoulder"
@@ -209,6 +210,11 @@ func preview(actor: Dictionary, target: Dictionary) -> void:
 	var screen_right := view_direction.normalized().cross(Vector3.UP)
 	var look := destination + screen_right * (0.75 if phone else 0.0) + Vector3.UP * 1.25
 	look = safe_look24(shoulder, look, destination + Vector3.UP * 1.25, g.get_viewport().get_visible_rect().size, 58.0 if phone else 52.0, safe_rect24)
+	var viewport: Vector2 = g.get_viewport().get_visible_rect().size
+	if portrait:
+		var framing: Dictionary = portrait_frame31(shoulder, origin, destination, viewport)
+		shoulder = framing.eye; look = framing.look
+		g.hud_controls.phone.odds_hit.add_theme_font_size_override("font_size", 17)
 	g.cinematic = true
 	preview_tween = g.create_tween().set_parallel(true)
 	preview_tween.tween_property(g.camera, "position", shoulder, AIM_BLEND).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
@@ -225,6 +231,23 @@ static func aim_screen_point(eye: Vector3, look: Vector3, target: Vector3, viewp
 	var scale := tan(deg_to_rad(fov) * 0.5)
 	var aspect := viewport.x / maxf(1.0, viewport.y)
 	return Vector2(0.5 + delta.dot(right) / (2.0 * depth * scale * aspect), 0.5 - delta.dot(up) / (2.0 * depth * scale))
+
+static func portrait_frame31(eye: Vector3, actor: Vector3, target: Vector3, viewport: Vector2) -> Dictionary:
+	var safe: Rect2 = preload("res://scripts/hud_phone_layout.gd").boxes(viewport).map.grow(-14.0)
+	var midpoint: Vector3 = actor.lerp(target, 0.5) + Vector3.UP * 0.95
+	for factor in [1.0, 1.3, 1.7, 2.2, 3.0, 4.0, 5.5, 7.5, 10.0]:
+		var candidate: Vector3 = midpoint + (eye - midpoint) * factor
+		var bounds := Rect2()
+		var first := true
+		for anchor in [actor, target]:
+			for x in [-0.38, 0.38]:
+				for z in [-0.38, 0.38]:
+					for y in [0.0, 1.9]:
+						var point: Vector2 = aim_screen_point(candidate, midpoint, anchor + Vector3(x, y, z), viewport) * viewport
+						if first: bounds = Rect2(point, Vector2.ZERO); first = false
+						else: bounds = bounds.expand(point)
+		if safe.encloses(bounds): return {"eye": candidate, "look": midpoint, "actor_box": bounds}
+	return {"eye": midpoint + (eye - midpoint) * 10.0, "look": midpoint, "actor_box": Rect2()}
 
 static func safe_look24(eye: Vector3, look: Vector3, target: Vector3, viewport: Vector2, fov: float, rect: Rect2) -> Vector3:
 	if not rect.has_area(): return look

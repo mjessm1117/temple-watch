@@ -3,6 +3,10 @@ const Shot = preload("res://scripts/shot.gd")
 const Events = preload("res://scripts/feelcam22_events.gd")
 const Pressure = preload("res://scripts/mission_pressure.gd")
 const FeelBeats24 = preload("res://scripts/w24_feelcam_beats.gd")
+const Impact31 = preload("res://scripts/w31c_impact.gd")
+const Trail31 = preload("res://scripts/w31c_trail.gd")
+const W31ECard = preload("res://scripts/w31e_enemy_card.gd")
+const kill_hold_ms := 300
 
 static func _point(m: RefCounted, tile: Vector2i, height: float = 0.0) -> Vector3:
 	return Vector3(tile.x, Shot.elevation(m, tile) * 0.7 + height, tile.y)
@@ -28,6 +32,7 @@ static func drain(game: Node3D) -> void:
 		view.position = _point(game.mission, Shot.pos(u))
 	game.presentation_routes.clear()
 	game.presentation_route_meta24.clear()
+	Trail31.clear_trail_ghosts(game.get_tree())
 
 static func flush_quiet(game: Node3D) -> void:
 	for view in game.quiet_motions:
@@ -48,13 +53,18 @@ static func play(game: Node3D, events: Array[Dictionary], _sequence: int) -> voi
 static func show_event(game: Node3D, event: Dictionary) -> void:
 	var actor: Node3D = game.views.get(int(event.get("actor", -1)))
 	var kind := str(event.kind)
+	if game.cam.skip_requested: W31ECard.clear(game, true)
 	if game.playing_enemy_events and kind in ["intent", "attack", "push", "move", "overwatch", "reload", "objective_attack", "vip_attack"]:
-		var reason := str(event.get("intent_reason24", event.get("intent_reason", "")))
+		var actor_id := int(event.get("actor", -1))
+		var reason := str(event.get("reason27", event.get("intent_reason24", event.get("intent_reason", ""))))
+		if reason == "" and game.mission.has_method("intent_explain27"): reason = str(game.mission.call("intent_explain27", event))
 		if reason == "" and game.mission.has_method("intent_reason24"): reason = str(game.mission.call("intent_reason24", event))
-		if reason != "": game.phase_banner.text = reason
-		game.phase_banner.visible = true
-		if reason != "" and actor != null and game.fx != null and game.fx.has_method("float_text"):
-			game.fx.float_text(actor.position + Vector3.UP * 2.2, game.phase_banner.text, Color("ffe39b"))
+		if reason != "": game.phase_banner.text = reason; game.phase_banner.visible = true
+		var card: PanelContainer = W31ECard.current(game)
+		if not game.cam.skip_requested and (card == null or int(card.get_meta("actor_id", -1)) != actor_id):
+			var unit: Dictionary = game.mission.unit_by_id(actor_id)
+			if int(unit.get("hp", 0)) > 0:
+				W31ECard.show_actor(game, unit, reason)
 	if kind == "intent":
 		var a: Dictionary = game.mission.unit_by_id(int(event.actor))
 		var t: Dictionary = game.mission.unit_by_id(int(event.target))
@@ -87,6 +97,7 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 			var source: Dictionary = game.mission.unit_by_id(int(event.actor))
 			game.phase_banner.text = "%s HIT  •  %d HP  •  %s" % ["GATE" if kind == "objective_attack" else "VIP", hp, str(source.get("name", "ENEMY"))]
 			game.phase_banner.visible = true
+			W31ECard.result(game, int(event.actor), "HIT")
 			Events.emit(game, "objective_hit", event, to, {"source_pos":from})
 			Events.cue(game, "objective_hit")
 			await game.cam.wait(0.25)
@@ -158,6 +169,7 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 			FeelBeats24.clutch(game, event, _point(game.mission, event.get("at", Vector2i.ZERO)))
 			FeelBeats24.cue(game, "cover_break", _point(game.mission, event.get("at", Vector2i.ZERO)))
 	if kind != "move": game.cam.finish()
+	if game.cam.skip_requested: W31ECard.clear(game, true)
 	decorate(game)
 
 static func decorate(game: Node3D) -> void:
@@ -191,6 +203,10 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 	var damage := int(event.damage)
 	var outcome := str(event.get("outcome", ""))
 	if damage > 0:
+		if not game.playing_enemy_events and not game.cam.skip_requested:
+			Impact31.apply_hit_shake(game.camera, 2.0, 50)
+			var contact_node := Node3D.new(); contact_node.name = "W31CContactAnchor"; game.fx.add_child(contact_node); contact_node.position = to
+			Impact31.enlarge_contact_flash(contact_node, game.fx.contact_scale27(to) if game.fx.has_method("contact_scale27") else 2.0)
 		Events.emit(game, "hit", event, to)
 		Events.cue(game, "hit")
 		Events.music(game, "contact")
@@ -205,6 +221,7 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 	elif mode != "push": Events.emit(game, "miss", event, to)
 	FeelBeats24.impact(game, event, from, to, victim)
 	var word := "DEFLECT" if "deflected" in outcome else "MISS" if damage == 0 and mode != "push" else "KILL -%d" % damage if bool(event.get("killed", false)) else "CRIT %d" % damage if outcome == "crits" else "GRAZE %d" % damage if outcome == "grazes" else "-%d" % damage if damage > 0 else "PUSH"
+	if game.playing_enemy_events: W31ECard.result(game, int(event.actor), "KILL" if bool(event.get("killed", false)) else "HIT" if damage > 0 else "MISS" if mode != "push" else "PUSH")
 	game.fx.float_text(to + Vector3.UP * 0.6, word, Color("ffca70") if outcome == "crits" or bool(event.get("killed", false)) else Color("a8eaff") if outcome == "grazes" else Color.WHITE, outcome == "crits" or bool(event.get("killed", false)))
 	if int(event.get("armor_lost", 0)) > 0: game.fx.float_text(to + Vector3.UP * 0.15, "SHRED -%d" % int(event.armor_lost), Color("f0c68b"))
 	if victim != null:
@@ -217,6 +234,7 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 				if victim.has_method("fall24"): victim.call("fall24", -1, to - from)
 				else: victim.fall()
 				game.views.erase(int(event.target))
+	if bool(event.get("killed", false)) and not game.cam.skip_requested: await game.cam.wait(float(kill_hold_ms) / 1000.0)
 	if damage > 0: game.sound.play("hit")
 	if not game.cam.skip_requested and (outcome == "crits" or bool(event.killed)) and not bool(event.get("killcam_played", false)):
 		await game.cam.impact_beat(to)
@@ -224,4 +242,4 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 	if actor != null: actor.set_status(game.mission.unit_by_id(int(event.actor)))
 	game.cam.trace.append("impact_%d" % int(event.actor))
 	game._sync_terrain()
-	await game.cam.wait(0.06 if bool(event.killed) or game.playing_enemy_events else 0.10)
+	if not bool(event.get("killed", false)) and not game.playing_enemy_events: await game.cam.wait(0.10)

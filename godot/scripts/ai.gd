@@ -116,12 +116,16 @@ static func _reason24(m: RefCounted, first: int, actor: Dictionary, reason: Stri
 		if int(m.action_events[i].get("actor", -1)) != int(actor.id): continue
 		m.action_events[i].reason24 = reason
 		if m.has_method("intent_explain27"):
-			m.action_events[i].reason27 = m.intent_explain27(m.action_events[i])
+			if reason == "Flank setup": m.action_events[i].reason27 = "Flanking the gate line" if str(m.spec.get("id", "")) == "relay" else "Flanking the squad"
+			elif reason == "Holding cover": m.action_events[i].reason27 = "Holding cover and firing"
+			else: m.action_events[i].reason27 = m.intent_explain27(m.action_events[i])
 
 static func _shot24(m: RefCounted, e: Dictionary, target: Dictionary, mode: String, info: Dictionary = {}) -> bool:
 	var first: int = m.action_events.size()
 	var ok: bool = m.shot(int(e.id), int(target.id), mode)
-	if ok: _reason24(m, first, e, "Flanking" if bool(info.get("flanked", false)) else "Threat in sight")
+	if ok:
+		var reason := "Flanking" if bool(info.get("flanked", false)) else "Holding cover" if Shot.cover(m, Shot.pos(e), Shot.pos(target)) > 0 else "Threat in sight"
+		_reason24(m, first, e, reason)
 	return ok
 
 static func _move24(m: RefCounted, e: Dictionary, destination: Vector2i, reason: String) -> bool:

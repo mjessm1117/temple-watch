@@ -72,6 +72,12 @@ static func next_wave26(m: RefCounted) -> Dictionary:
 		if int(wave.turn) < int(next.turn): next = wave
 	return {"turn":int(next.turn), "count":next.kinds.size(), "entry_tile":Maps.point(next.at)}
 
+static func entry_marker31(m: RefCounted) -> Vector2i:
+	var next: Dictionary = {}
+	for wave in m.pressure_state.get("pending", []):
+		if next.is_empty() or int(wave.turn) < int(next.turn): next = wave
+	return Maps.point(next.at) if not next.is_empty() else Vector2i(-1, -1)
+
 static func wave_entry27(m: RefCounted) -> Dictionary:
 	var pending: Array = m.pressure_state.get("pending", [])
 	if pending.is_empty(): return {}
@@ -146,7 +152,7 @@ static func queue(m: RefCounted, kinds: Array, delay: int = 1, reason: String = 
 	m.pressure_state.last_entry = i
 	m.pressure_state.serial += 1
 	m.pressure_state.pending.append({"serial":m.pressure_state.serial,"spawned":0,"at":[entry[0],entry[1]],"name":entry[2],"kinds":kinds.duplicate(),"turn":m.turn+maxi(1,delay),"announced":m.turn,"reason":reason})
-	m.reinforcement_announced = true; m.reinforcement_marker = Maps.point(entry)
+	m.reinforcement_announced = true; m.reinforcement_marker = entry_marker31(m)
 	if bool(m.spec.get("first_mission", false)) and str(m.spec.get("family", "")) == "defend":
 		m.message("INBOUND: %s — %s at (%d,%d), %d hostiles: %s on turn %d." % [reason,entry[2],int(entry[0]),int(entry[1]),kinds.size(),", ".join(_types(m,kinds)),m.turn+maxi(1,delay)])
 	else:
@@ -169,7 +175,7 @@ static func player_start(m: RefCounted) -> void:
 			m.message("Blocked landing: remaining hostiles inbound next turn.")
 		if landed > 0: m.reinforcement_dropped = true; m.message("%d hostiles arrive from %s." % [landed,wave.name])
 	m.pressure_state.pending = later
-	m.reinforcement_marker = Maps.point(later[0].at) if not later.is_empty() else Vector2i(-1,-1)
+	m.reinforcement_marker = entry_marker31(m)
 	var wave_number := int(m.pressure_state.waves)
 	var held := int(m.objective_state.get("held",0))
 	var contested_sight := false

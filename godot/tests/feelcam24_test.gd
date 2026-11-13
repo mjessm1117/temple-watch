@@ -129,7 +129,7 @@ func run() -> void:
 		arc_height = maxf(arc_height, game.views[int(ally.id)].position.y - start.y)
 		if not arc_captured and arc_height > 0.6: proof24("leap-arc"); arc_captured = true
 	var landing_deadline := Time.get_ticks_msec() + 800
-	while game.views[int(ally.id)].position.distance_to(landing) > 0.01 and Time.get_ticks_msec() < landing_deadline: await process_frame
+	while (game.views[int(ally.id)].position.distance_to(landing) > 0.01 or probe.cues.back() != "leap_land") and Time.get_ticks_msec() < landing_deadline: await process_frame
 	proof24("leap-land")
 	check(arc_height > 0.5 and game.views[int(ally.id)].position.distance_to(landing) < 0.01 and probe.cues.back() == "leap_land", "B8 leap start, arc, land and cue")
 	game.fx = old_fx; probe.queue_free()
