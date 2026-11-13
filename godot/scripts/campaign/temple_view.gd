@@ -82,7 +82,7 @@ func setup(save_state: Dictionary, room_badges: Dictionary = {}) -> void:
 	env.environment.background_mode = Environment.BG_COLOR
 	env.environment.background_color = Color("060e14")
 	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.environment.ambient_light_color = Color("a6bfc9"); env.environment.ambient_light_energy = 0.45
+	env.environment.ambient_light_color = Color("a6bfc9"); env.environment.ambient_light_energy = 0.32
 	env.environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.environment.glow_enabled = true; env.environment.glow_intensity = 0.6
 	world.add_child(env)
@@ -292,6 +292,7 @@ func restore_camera() -> void:
 
 func _set_highlight(id: String) -> void:
 	if highlighted_room == id: return
+	if stage25 != null: stage25.focus(id, cell_nodes, rooms)
 	last_highlight_usec = Time.get_ticks_usec()
 	for room_id in [highlighted_room, id]:
 		if room_id == "" or not buttons.has(room_id): continue

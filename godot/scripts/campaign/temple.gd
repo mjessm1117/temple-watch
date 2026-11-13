@@ -17,6 +17,7 @@ const Prefs = preload("res://scripts/campaign/strat_preferences.gd")
 const Squad = preload("res://scripts/campaign/squad.gd")
 const Roster25 = preload("res://scripts/campaign/strat_roster.gd")
 const W25UI = preload("res://scripts/w25_temple_ui.gd")
+const RoomStory25 = preload("res://scripts/w25_menus_room_story.gd")
 var build_slot := "b0"
 var field_team: Array = []
 var edict_draft: Array = []
@@ -315,6 +316,7 @@ func _refresh_shell() -> void:
 	if panel_open and selected_room != "" and temple_view.rooms.has(selected_room): temple_view.focus_room(selected_room)
 
 func _change_page(name: String, room_id: String = "") -> void:
+	if room_picker != null: room_picker.hide()
 	selected_room = room_id
 	if name == "Galaxy": _open_galaxy(); return
 	if name == "Arsenal": Squad.open_from_temple(get_tree(), selected_id); return
@@ -336,6 +338,10 @@ func _show_page() -> void:
 		training_room.changed.connect(func(): get_node("/root/CampaignFlow").save())
 		return
 	if page != "Research": page_content.add_child(UI.label(page.to_upper(), 30, UI.ACCENT))
+	if selected_room != "" and temple_view.rooms.has(selected_room):
+		var flavour := UI.label(RoomStory25.flavour(selected_room), 14, UI.MUTED)
+		flavour.name = "RoomFlavour"
+		page_content.add_child(flavour)
 	if page != "Research" and selected_room != "" and temple_view.rooms.has(selected_room):
 		var room: Dictionary = temple_view.rooms[selected_room]
 		var context := _card(str(room.name), str(room.status))
