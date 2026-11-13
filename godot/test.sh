@@ -5,6 +5,11 @@ test_log=$(mktemp)
 test_data=$(mktemp -d)
 export XDG_DATA_HOME="$test_data"
 trap 'rm -f "$test_log"; rm -rf "$test_data"' EXIT
+"${GODOT_BIN:-/home/jess/projects/.tools/godot/godot}" --headless --import --path . 2>&1 | tee "$test_log"
+if grep -Eq 'SCRIPT ERROR|Parse Error|ERROR:' "$test_log"; then
+  echo "Godot reported a failure during import." >&2
+  exit 1
+fi
 run_suite() {
   local suite="$1"
   shift
@@ -95,6 +100,8 @@ run_suite art20_test --rendering-method gl_compatibility --resolution 844x390
 run_suite temple21_test --rendering-method gl_compatibility --resolution 844x390; run_suite temple21_test --rendering-method gl_compatibility --resolution 390x844 -- --portrait; run_suite temple21_test --rendering-method gl_compatibility --resolution 1366x768 -- --desktop
 run_suite galaxy21_test --rendering-method gl_compatibility -- --graphics=low
 run_suite galaxy25_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite galaxy32_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite economy32_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite menus21_test --rendering-method gl_compatibility --resolution 844x390
 run_suite impact22_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
 run_suite lightfx23_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
@@ -124,6 +131,7 @@ run_suite balance29_test
 run_suite battle29_test
 run_suite phone29_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite scroll29_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
+run_suite menu32_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite a30_test
 run_suite b30_test
 run_suite c30_test
@@ -133,3 +141,5 @@ run_suite phoneaim31_test --rendering-method gl_compatibility --resolution 390x8
 run_suite impact31_test
 run_suite render31_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite e31_test --rendering-method gl_compatibility --resolution 844x390
+run_suite temple32_test --rendering-method gl_compatibility --resolution 390x844 -- --portrait
+run_suite people32_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low

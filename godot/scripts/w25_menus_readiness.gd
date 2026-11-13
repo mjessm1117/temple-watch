@@ -84,6 +84,8 @@ func _build(option: Dictionary) -> void:
 	deploy_button.name = "ReadyDeploy"
 	deploy_button.disabled = not choice_made or squad.is_empty()
 	confirm_box.add_child(deploy_button)
+	# The phone route uses one confirm card after the briefing choice.
+	if Phone.window_size().x < 420 and Phone.mobile_device() and choice_made: _confirm()
 
 func _choose(id: String) -> void:
 	if choice_made: return
@@ -96,6 +98,7 @@ func _choose(id: String) -> void:
 	message.text = "Decision recorded. Ready to deploy."
 	deploy_button.disabled = squad.is_empty()
 	flow.save()
+	if Phone.window_size().x < 420 and Phone.mobile_device(): _confirm()
 
 func _confirm() -> void:
 	if not choice_made: return

@@ -9,6 +9,7 @@ const Phone = preload("res://scripts/phone_layout.gd")
 const JediModels = preload("res://scripts/characters/jedi_models.gd")
 const StoryPortraits = preload("res://scripts/story14_portraits.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
+const Roster = preload("res://scripts/campaign/strat_roster.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const People25 = preload("res://scripts/w25_roster_people.gd")
 var from_temple := false
@@ -214,11 +215,11 @@ func _layout() -> void:
 		else:
 			stage_container.position = Vector2(0, 64)
 			stage_container.custom_minimum_size.y = 0
-			stage_container.size = Vector2(size.x, maxf(110, size.y - safe.y - safe.w - 228))
+			stage_container.size = Vector2(size.x, maxf(110, size.y - safe.y - safe.w - (280 if size.x < 500 else 228)))
 			card_scroll.visible = true
 			card_scroll.process_mode = Node.PROCESS_MODE_INHERIT
-			card_scroll.position = Vector2(safe.x + 6, size.y - safe.w - 164)
-			card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, 86)
+			card_scroll.position = Vector2(safe.x + 6, size.y - safe.w - (216 if size.x < 500 else 164))
+			card_scroll.size = Vector2(size.x - safe.x - safe.z - 12, 138 if size.x < 500 else 86)
 		stage_container.custom_minimum_size.y = stage_container.size.y
 		card_row.reset_size()
 		_sync_roster_visibility()
@@ -321,13 +322,29 @@ func _draw_cards() -> void:
 	for i in selected.size():
 		var r: Dictionary = c.soldier(str(selected[i]))
 		var card := Details.card(c, r, inspect.bind(i), _portrait_texture(r)); card_row.add_child(card); cards[str(r.id)] = card
-		if Phone.narrow(Phone.window_size()):
-			# Three readable cards fit a portrait strip; the rest remain swipeable.
-			card.custom_minimum_size.x = minf(150.0,(size.x-26.0-8.0*6.0)/7.0)
+		if Phone.narrow(Phone.window_size()) and size.x < 500:
+			decorate_roster_card(card, r)
 		if focus_index == i: card.add_theme_stylebox_override("panel", S.box(Color("213a42"), S.CYAN, 8))
 		var button: Button = card.get_child(0).get_child(0); wire_button(button)
 		button.mouse_entered.connect(func(): stage.highlight(i))
 		button.mouse_exited.connect(func(): stage.highlight(-1))
+
+static func decorate_roster_card(card: PanelContainer, r: Dictionary) -> void:
+	card.custom_minimum_size = Vector2(160, 138)
+	var content: VBoxContainer = card.get_child(0)
+	var class_label: Label = content.get_child(1)
+	class_label.name = "ClassName"
+	class_label.text = str(r.get("cls", ""))
+	class_label.clip_text = false
+	class_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	class_label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+	var tier := UI.label("R%d · %s" % [int(r.get("rank", 1)), Roster.rank_tier_label(r)], 14, S.GOLD)
+	tier.name = "RankTier"; tier.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_child(tier)
+	var tag := Roster.chain_tag_label(r)
+	var chain := UI.label("CHAIN · %s" % (tag if tag != "" else "—"), 14, S.CYAN)
+	chain.name = "ChainTag"; chain.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_child(chain)
 
 func inspect(index: int) -> void:
 	if index < 0 or index >= selected.size(): return
@@ -415,7 +432,10 @@ func _roster_row(parent: VBoxContainer, r: Dictionary) -> void:
 		b.text = Details.visible_name(str(r.n), maxf(12.0, b.size.x - 50.0 - ThemeDB.fallback_font.get_string_size(suffix, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x)) + suffix
 	b.resized.connect(update_name)
 	update_name.call_deferred()
-	col.add_child(UI.label("%s · R%d · %s" % [r.cls, int(r.rank), Details.nickname(r)], 14, S.MUTED))
+	var identity := UI.label("%s · R%d · %s" % [r.cls, int(r.rank), Roster.rank_tier_label(r)], 14, S.MUTED)
+	identity.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; col.add_child(identity)
+	var tag := Roster.chain_tag_label(r)
+	if tag != "": col.add_child(UI.label("CHAIN · " + tag, 14, S.CYAN))
 	var status_text := "WOUNDED · return ~%d days" % People25.eta(flow.session(), r) if int(r.get("wound", 0)) > 0 else Details.status(flow.session(), r) + (" · fully ready ~%d days" % People25.eta(flow.session(), r) if People25.eta(flow.session(), r) > 0 else "")
 	var status := UI.label(status_text, 14, S.GREEN if fit else S.RED)
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; col.add_child(status)

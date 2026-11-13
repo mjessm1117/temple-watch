@@ -3,11 +3,21 @@ extends RefCounted
 const Data = preload("res://scripts/campaign/data.gd")
 var workers: Array[Dictionary] = []
 var walkers: Array[Dictionary] = []
+var focus_light: OmniLight3D
 
 func setup(art: RefCounted, cells: Dictionary, rooms: Dictionary, state: Dictionary, _jedi: Array[Node3D]) -> void:
+	focus_light = OmniLight3D.new()
+	focus_light.name = "SelectedWorkerLight"
+	focus_light.light_color = Color("ffe4b4")
+	focus_light.light_energy = 1.8
+	focus_light.omni_range = 3.2
+	focus_light.visible = false
+	cells.values()[0].get_parent().add_child(focus_light)
 	for room_id in rooms:
 		var info: Dictionary = rooms[room_id]
-		if not info.built or (int(info.staff) <= 0 and room_id != "archives"): continue
+		if not info.built:
+			# A repair crew keeps even a sealed threshold from looking abandoned.
+			art.person(cells[room_id], Vector3(-0.5, 0.13, 1.05), Color("c6aa75"), false)
 		var figure: Node3D
 		for entry in art.people:
 			if entry.node.get_parent() == cells[room_id] and not entry.walk:
@@ -18,6 +28,16 @@ func setup(art: RefCounted, cells: Dictionary, rooms: Dictionary, state: Diction
 		figure.scale = Vector3.ONE * 1.55
 		figure.position = Vector3(-0.5, 0.13, 1.05)
 		figure.rotation.z = -0.12
+		var backdrop := MeshInstance3D.new()
+		backdrop.name = "WorkerVignette"
+		var plane := QuadMesh.new(); plane.size = Vector2(1.9, 1.75)
+		backdrop.mesh = plane
+		backdrop.position = Vector3(-0.5, 1.05, -1.20)
+		var shade := ShaderMaterial.new()
+		shade.shader = Shader.new()
+		shade.shader.code = "shader_type spatial; render_mode unshaded, blend_mix, depth_draw_never, cull_disabled; void fragment() { float r = length((UV - vec2(0.5)) * vec2(1.0, 1.1)); ALBEDO = vec3(0.006, 0.018, 0.025); ALPHA = (1.0 - smoothstep(0.12, 0.50, r)) * 0.72; }"
+		backdrop.material_override = shade
+		cells[room_id].add_child(backdrop)
 		var project := MeshInstance3D.new(); project.name = "WorkerProject"; project.mesh = _project_mesh(_progress(str(room_id), state))
 		project.position = Vector3(0.24, 0.95, 1.16)
 		var mat := StandardMaterial3D.new(); mat.albedo_color = Color("72e4df")
@@ -41,6 +61,12 @@ func setup(art: RefCounted, cells: Dictionary, rooms: Dictionary, state: Diction
 		var figure: Node3D = entry.node
 		figure.reparent(cells[origin_room].get_parent())
 		walkers.append({"figure":figure, "from":origin, "to":destination, "phase":float(walkers.size()) * 1.7})
+
+func focus(room_id: String, cells: Dictionary, rooms: Dictionary) -> void:
+	if focus_light == null: return
+	focus_light.visible = room_id != "" and rooms.has(room_id)
+	if focus_light.visible:
+		focus_light.position = cells[room_id].position + Vector3(-0.6, 1.45, 2.0)
 
 func _progress(room_id: String, state: Dictionary) -> float:
 	if room_id == "archives" and str(state.research.cur) != "":

@@ -43,6 +43,9 @@ var scan_feedback := ""
 var scan_events: Array = []
 var deadline_rail: Label
 var region_strip: HBoxContainer
+var ready_shortcut32: Button
+var detail_scroll_key32 := ""
+var test_safe_insets32 := Vector4.ZERO
 
 func _ready() -> void:
 	campaign = get_node("/root/CampaignFlow").session()
@@ -77,8 +80,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _build() -> void:
 	var compact := Phone.narrow(Phone.window_size())
-	var portrait := compact and get_viewport_rect().size.x < get_viewport_rect().size.y
-	var safe := Phone.safe_margins(get_viewport_rect().size)
+	var physical := Phone.window_size()
+	var portrait := compact and (get_viewport_rect().size.x < get_viewport_rect().size.y or physical.x < physical.y)
+	var safe := test_safe_insets32 if test_safe_insets32 != Vector4.ZERO else Phone.safe_margins(get_viewport_rect().size)
 	var bg := ColorRect.new(); bg.color = Color("0a1113"); bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); add_child(bg)
 	var outer := UI.column(6); outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	outer.offset_left = safe.x + (12 if compact else 22); outer.offset_top = safe.y + (12 if compact else 16)
@@ -111,6 +115,11 @@ func _build() -> void:
 		contact_action.custom_minimum_size.x = 185
 		actions.add_child(contact_action)
 	else: outer.add_child(contact_action)
+	if portrait and physical.x < 420:
+		ready_shortcut32 = UI.button("READY SIGNAL", _launch)
+		ready_shortcut32.name = "SignalReadyShortcut32"
+		ready_shortcut32.custom_minimum_size.y = 44
+		outer.add_child(ready_shortcut32)
 	var body := HBoxContainer.new(); body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation",12); outer.add_child(body)
 	var left := UI.column(8); left.size_flags_horizontal = Control.SIZE_EXPAND_FILL; body.add_child(left)
@@ -221,13 +230,17 @@ func _show_details() -> void:
 	if detail_panel != null and Phone.narrow(Phone.window_size()): detail_panel.visible = detail_open
 	if transition and transition.is_running(): transition.kill()
 	detail.position.x = 0; detail.modulate.a = 1
-	# A polling rebuild during a finger gesture must retain the current list.
+	# Rebuilding the same detail keeps its position, including between gestures.
+	var next_scroll_key := "%s|%s|%s|%s|%s" % [page, str(campaign.state.options[selected].mission) if not campaign.state.options.is_empty() else "", region, planet, scan_site]
 	var held_scroll := scroll.scroll_vertical
 	UI.clear(detail)
-	if not scroll.touch_dragging: scroll.scroll_vertical = 0
-	else: scroll.set_deferred("scroll_vertical", held_scroll)
+	if next_scroll_key != detail_scroll_key32:
+		detail_scroll_key32 = next_scroll_key
+		scroll.scroll_vertical = 0
+	else:
+		scroll.set_deferred("scroll_vertical", held_scroll)
 	_refresh_strategy25()
-	if get_viewport_rect().size.y > get_viewport_rect().size.x and page == "Briefing" and not campaign.state.options.is_empty():
+	if (get_viewport_rect().size.y > get_viewport_rect().size.x or Phone.window_size().y > Phone.window_size().x) and page == "Briefing" and not campaign.state.options.is_empty():
 		_build_selected_card()
 	_sync_ui_safe_rect.call_deferred()
 	if excerpt != null:
@@ -248,13 +261,16 @@ func _show_details() -> void:
 	if not campaign.state.options.is_empty():
 		var offer_region := campaign.region_for_mission(str(campaign.state.options[selected].mission))
 		launch_button.disabled = launch_button.disabled or (offer_region != "" and not Strategy25.contacted(campaign.state, offer_region) and not campaign.state.options[selected].get("story", false))
+	if ready_shortcut32 != null:
+		ready_shortcut32.disabled = launch_button.disabled
+		ready_shortcut32.text = "READY · %s" % str(campaign.state.options[selected].get("n", "SIGNAL")) if not campaign.state.options.is_empty() else "NO SIGNAL READY"
 	if campaign.state.get("twin",{}).get("stage", "") == "b":
 		detail.add_child(UI.label("FRONT B · fresh squad · up to 4, at most 2 Jedi",16,UI.GOLD))
 		detail.add_child(UI.button("Auto resolve (%d%%)" % preload("res://scripts/mission_fronts.gd").auto_odds(campaign.state,campaign.default_squad()),_front_auto))
 		detail.add_child(UI.button("Stand down Front B",_front_stand_down))
 	for b in tabs.get_children(): b.modulate = Color("79d3e2") if b.text == page else Color.WHITE
 	map_view.selected = selected
-	back_button.visible = not map_view.focused.is_empty() and not (Phone.narrow(Phone.window_size()) and get_viewport_rect().size.x < get_viewport_rect().size.y)
+	back_button.visible = not map_view.focused.is_empty() and not (Phone.narrow(Phone.window_size()) and (get_viewport_rect().size.x < get_viewport_rect().size.y or Phone.window_size().x < Phone.window_size().y))
 	match page:
 		"Event": _scan_event_panel25()
 		"Scan": _scan_panel25()
@@ -304,7 +320,7 @@ func _slide(open_panel: bool = false) -> void:
 	transition = create_tween().set_parallel(true)
 	transition.tween_property(detail,"modulate:a",1.0,0.32)
 	transition.tween_property(detail,"position:x",home,0.38).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	if open_panel and Phone.narrow(Phone.window_size()) and detail_panel != null and get_viewport_rect().size.x >= get_viewport_rect().size.y:
+	if open_panel and Phone.narrow(Phone.window_size()) and detail_panel != null and get_viewport_rect().size.x >= get_viewport_rect().size.y and Phone.window_size().x >= Phone.window_size().y:
 		detail_panel.offset_left = detail_left + detail_panel.size.x
 		detail_panel.offset_right = detail_right + detail_panel.size.x
 		transition.tween_property(detail_panel, "offset_left", detail_left, 0.32).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
@@ -318,7 +334,7 @@ func _select(index: int) -> void:
 	selected = clampi(index,0,campaign.state.options.size()-1); page = "Briefing"
 	campaign.state.w25_selected_mission_id = str(campaign.state.options[selected].mission)
 	get_node("/root/CampaignFlow").save()
-	if get_viewport_rect().size.x < get_viewport_rect().size.y: phone_more = true
+	if get_viewport_rect().size.x < get_viewport_rect().size.y or Phone.window_size().x < Phone.window_size().y: phone_more = true
 	var m: Dictionary = campaign.story.mission(str(campaign.state.options[selected].mission))
 	planet = Intel.planet_for(m); region = str(Data.get_table("galaxy","PLANETS")[planet].reg)
 	map_view.focus_offer(selected); detail_open = true; _show_details(); _slide(true)
@@ -362,11 +378,17 @@ func _refresh_strategy25() -> void:
 	var s: Dictionary = campaign.state
 	var project: Dictionary = campaign.sith.project_status()
 	deadline_rail.text = "DAY %d · SITH ESCALATION IN %d DAYS · %d/%d CONTACTS · +%d Cr/MO" % [int(s.elapsed_days), maxi(0, int(project.next_escalation) - int(s.elapsed_days)), s.w25_contacts.size(), Strategy25.contact_capacity(s), Strategy25.monthly_income(s)]
-	var phone_landscape := Phone.narrow(Phone.window_size()) and get_viewport_rect().size.x > get_viewport_rect().size.y
+	var safe := test_safe_insets32 if test_safe_insets32 != Vector4.ZERO else Phone.safe_margins(get_viewport_rect().size)
+	var narrow_safe_width := get_viewport_rect().size.x - safe.x - safe.z - 24 < 320
+	if narrow_safe_width and Phone.window_size().x < 420:
+		deadline_rail.text = "DAY %d · SITH %dD · %d/%d CONTACTS" % [int(s.elapsed_days), maxi(0, int(project.next_escalation) - int(s.elapsed_days)), s.w25_contacts.size(), Strategy25.contact_capacity(s)]
+	var phone_landscape := Phone.narrow(Phone.window_size()) and get_viewport_rect().size.x > get_viewport_rect().size.y and Phone.window_size().x > Phone.window_size().y
 	deadline_rail.visible = not phone_landscape
 	var next_region := _next_contact25()
 	var cost := Strategy25.contact_cost(next_region)
 	contact_action.text = "CONTACT %s · %d Intel + %d Cr · %d/%d SLOTS" % [Intel.region_name(next_region).to_upper(),int(cost.intel),int(cost.credits),s.w25_contacts.size(),Strategy25.contact_capacity(s)] if next_region != "" else "CONTACT NETWORK FULL · %d/%d SLOTS" % [s.w25_contacts.size(),Strategy25.contact_capacity(s)]
+	if narrow_safe_width and Phone.window_size().x < 420:
+		contact_action.text = "CONTACT %s · %dI + %dCr" % [Intel.region_name(next_region).to_upper(),int(cost.intel),int(cost.credits)] if next_region != "" else "CONTACTS FULL · %d/%d" % [s.w25_contacts.size(),Strategy25.contact_capacity(s)]
 	if phone_landscape:
 		contact_action.text = "%s %dI/%dCr · SITH %dD" % [Intel.region_name(next_region).to_upper(),int(cost.intel),int(cost.credits),maxi(0,int(project.next_escalation)-int(s.elapsed_days))] if next_region != "" else "CONTACTS FULL · SITH %dD" % maxi(0,int(project.next_escalation)-int(s.elapsed_days))
 	contact_action.disabled = next_region == "" or not campaign.can_afford(cost)
@@ -385,7 +407,7 @@ func _refresh_strategy25() -> void:
 			strip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			strip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			region_strip.add_child(strip)
-		region_strip.visible = page == "Briefing" and get_viewport_rect().size.x < get_viewport_rect().size.y
+		region_strip.visible = page == "Briefing" and (get_viewport_rect().size.x < get_viewport_rect().size.y or Phone.window_size().x < Phone.window_size().y)
 
 func _contact25(key: String) -> void:
 	if Strategy25.make_contact(campaign,key):

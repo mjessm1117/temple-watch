@@ -7,12 +7,15 @@ const SPRING := 38.0
 static var last_handled_drag := -1
 var touch_origin := Vector2.ZERO
 var last_touch := Vector2.ZERO
+var touch_travel := Vector2.ZERO
 var touch_dragging := false
 var finger_down := false
 var velocity := Vector2.ZERO
 var edge := Vector2.ZERO
 var edge_velocity := Vector2.ZERO
 var last_drag_time := 0
+var last_drag_frame := -1
+var last_drag_relative := Vector2.ZERO
 var touch_events := 0
 var drag_events := 0
 var last_event_id := -1
@@ -139,6 +142,7 @@ func _gui_input(event: InputEvent) -> void:
 			finger_down = true
 			touch_origin = event.position
 			last_touch = event.position
+			touch_travel = Vector2.ZERO
 			touch_dragging = false
 			velocity = Vector2.ZERO
 			edge_velocity = Vector2.ZERO
@@ -150,17 +154,24 @@ func _gui_input(event: InputEvent) -> void:
 				touch_dragging = false
 				propagate_notification(NOTIFICATION_SCROLL_END)
 	elif event is InputEventScreenDrag and finger_down:
-		drag_events += 1
-		if (last_touch - event.position).length_squared() < 0.01: return
+		var relative: Vector2 = event.relative
+		var has_relative := relative.length_squared() > 0.01
+		var frame := Engine.get_process_frames()
+		if not has_relative and (last_touch - event.position).length_squared() < 0.01: return
 		# GUI input bubbles through nested containers. The inner owner handles it
 		# once and passes only its unused distance to the parent.
 		if last_handled_drag == event.get_instance_id(): return
+		if has_relative and frame == last_drag_frame and relative == last_drag_relative: return
 		last_handled_drag = event.get_instance_id()
-		if not touch_dragging and is_drag((event.position - touch_origin).length()):
+		last_drag_frame = frame
+		last_drag_relative = relative
+		drag_events += 1
+		if has_relative: touch_travel += relative
+		if not touch_dragging and is_drag(touch_travel.length() if has_relative else (event.position - touch_origin).length()):
 			touch_dragging = true
 			propagate_notification(NOTIFICATION_SCROLL_BEGIN)
 		if touch_dragging:
-			var movement: Vector2 = last_touch - event.position
+			var movement: Vector2 = -relative if has_relative else last_touch - event.position
 			var now := Time.get_ticks_msec()
 			var dt := clampf(float(now - last_drag_time) / 1000.0, 0.008, 0.05) if last_drag_time > 0 else 0.016
 			velocity = velocity.lerp(movement / dt, 0.65)
@@ -183,7 +194,7 @@ func _process(delta: float) -> void:
 			edge_velocity[axis] = next.y
 	var content := _content()
 	if content != null and edge.length_squared() > 0.01:
-		content.position = Vector2(-scroll_horizontal, -scroll_vertical) + edge
+		content.position = Vector2(-scroll_horizontal, -scroll_vertical)
 	last_scroll = Vector2(scroll_horizontal, scroll_vertical)
 
 func _content() -> Control:
