@@ -94,16 +94,16 @@ func setup(c: RefCounted, id: String) -> void:
     transition.add_child(_rank_mark(side_name, before, 46))
     var from_label := UI.label(str(Classes.rank_data(side_name, before).get("title", "")), 14, UI.MUTED)
     from_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    from_label.clip_text = true
-    from_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+    from_label.clip_text = view_size.x >= 420.0
+    from_label.autowrap_mode = TextServer.AUTOWRAP_OFF if from_label.clip_text else TextServer.AUTOWRAP_WORD_SMART
     transition.add_child(from_label)
     transition.add_child(UI.label("›", 22, UI.GOLD))
     new_badge = _rank_mark(side_name, level, 46)
     transition.add_child(new_badge)
     var to_label := UI.label(str(Classes.rank_data(side_name, level).get("title", "")), 15, UI.GOLD)
     to_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    to_label.clip_text = true
-    to_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+    to_label.clip_text = view_size.x >= 420.0
+    to_label.autowrap_mode = TextServer.AUTOWRAP_OFF if to_label.clip_text else TextServer.AUTOWRAP_WORD_SMART
     transition.add_child(to_label)
     var gains := UI.label(_gain_text(r), 14, UI.ACCENT)
     gains.name = "StatGains"
@@ -249,8 +249,8 @@ func _ability_card(id: String, active: bool, earned: bool = false, show_metric: 
         stack.offset_bottom = -6
     var title := UI.label("◆  " + _ability_name(id, false), 14, UI.GOLD if active or earned else UI.MUTED)
     title.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    title.autowrap_mode = TextServer.AUTOWRAP_OFF
-    title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+    title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if active and not compact else TextServer.AUTOWRAP_OFF
+    title.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING if active and not compact else TextServer.OVERRUN_TRIM_ELLIPSIS
     title.custom_minimum_size.y = 20
     stack.add_child(title)
     if active and show_metric:
@@ -273,10 +273,20 @@ func _ability_card(id: String, active: bool, earned: bool = false, show_metric: 
     if chain_text != "" and not compact:
         var chains := UI.label(chain_text, 14, UI.ACCENT if active or earned else UI.MUTED)
         chains.mouse_filter = Control.MOUSE_FILTER_IGNORE
-        chains.autowrap_mode = TextServer.AUTOWRAP_OFF
-        chains.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+        chains.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if active and not compact else TextServer.AUTOWRAP_OFF
+        chains.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING if active and not compact else TextServer.OVERRUN_TRIM_ELLIPSIS
         chains.custom_minimum_size.y = 16
         stack.add_child(chains)
+    if active and not compact and card_width > 0.0:
+        var text_width := maxf(44.0, card_width - 24.0)
+        var needed := 12.0
+        for label in stack.get_children():
+            if label is Label:
+                var font: Font = label.get_theme_font("font")
+                var font_size: int = label.get_theme_font_size("font_size")
+                label.custom_minimum_size.y = maxf(label.custom_minimum_size.y, font.get_multiline_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, text_width, font_size).y)
+                needed += label.custom_minimum_size.y
+        card.custom_minimum_size.y = maxf(44.0, needed)
     if active: cards[id] = card
     return card
 
@@ -353,11 +363,11 @@ func _refresh() -> void:
             var portrait_visible := usable_width >= 760.0
             if portrait_visible: usable_width -= 240.0
             usable_width -= 16.0 # frame/scroll spacing
-            grid.columns = 2 if usable_width >= 600.0 or portrait_visible and usable_width >= 480.0 or view_size.y > view_size.x and usable_width >= 280.0 else 1
+            grid.columns = 2 if usable_width >= 600.0 or portrait_visible and usable_width >= 480.0 or view_size.y > view_size.x and usable_width >= 420.0 else 1
             grid.add_theme_constant_override("h_separation", 4)
             grid.add_theme_constant_override("v_separation", 4)
             row.add_child(grid)
-            var card_width := minf(220.0, (usable_width - 4.0) / 2.0) if grid.columns == 2 else 0.0
+            var card_width := minf(220.0, (usable_width - 4.0) / 2.0) if grid.columns == 2 else (usable_width if view_size.y >= 420.0 else 0.0)
             var compact := view_size.y < 420.0
             for option in options: grid.add_child(_ability_card(str(option), true, false, grid.columns == 2, card_width, compact))
         elif level <= picks.size():

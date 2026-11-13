@@ -3,6 +3,7 @@ const S = preload("res://scripts/campaign/loadout_style.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const Progression = preload("res://scripts/campaign/progression.gd")
 const Classes = preload("res://scripts/class_registry.gd")
+const Roster = preload("res://scripts/campaign/strat_roster.gd")
 var host: Control
 var soldier_id := ""
 var selected_key := ""
@@ -41,11 +42,13 @@ func build() -> void:
 		else:
 			column.custom_minimum_size.x = col_width; ranks.add_child(column)
 		columns[rank] = column; rows[rank] = column
-		var tier := str(Classes.rank_data(side_name, rank).get("tier", "Rank %d" % rank))
+		var tier := Roster.rank_tier_label({"cls":r.cls, "rank":rank})
+		var rank_title := str(Classes.rank_data(side_name, rank).get("tier", ""))
+		var tier_text := tier.to_upper() if tier == rank_title else "%s / %s" % [tier.to_upper(), rank_title.to_upper()]
 		var picked_id := str(r.get("picks", [])[rank - 1]) if r.get("picks", []).size() >= rank else ""
 		var picked_name := str(catalog.get(picked_id, {}).get("name", picked_id)) if picked_id != "" else "None"
-		var heading := UI.label("R%d  /  %s  ·  Pick: %s" % [rank, tier.to_upper(), picked_name], 11, S.CYAN)
-		heading.name = "Tier"; heading.clip_text = true; heading.autowrap_mode = TextServer.AUTOWRAP_OFF; column.add_child(heading)
+		var heading := UI.label("R%d  /  %s  ·  Pick: %s" % [rank, tier_text, picked_name], 11, S.CYAN)
+		heading.name = "Tier"; heading.clip_text = false; heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; column.add_child(heading)
 		var entries := _rank_entries(r, rank, specs)
 		var pair: BoxContainer = HBoxContainer.new() if not phone and rank <= 3 else S.column(4)
 		pair.name = "Pair%d" % rank; column.add_child(pair)
@@ -128,7 +131,8 @@ func _card(r: Dictionary, rank: int, key: String, branch: String, width: float, 
 			if not tag is Dictionary or str(tag.get("tag", "")) == "": continue
 			chip_names.append(("+" if kind == "apply" else "↳") + str(tag.tag))
 	chain.text = "  ".join(chip_names)
-	chain.clip_text = true; chain.autowrap_mode = TextServer.AUTOWRAP_OFF
+	chain.clip_text = false; chain.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	chain.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	return card
 
 func _preview(rank: int, key: String) -> void:
