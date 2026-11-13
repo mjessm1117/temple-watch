@@ -15,7 +15,9 @@ static func act(view, action: Callable) -> void:
 	else: view.notice_label.text = "Unavailable: check resources, room power, staff and readiness."
 
 static func button(view, box: Control, text: String, action: Callable, enabled: bool = true) -> void:
-	box.add_child(UI.button(text, act.bind(view, action), enabled))
+	var control := UI.button(text, act.bind(view, action), enabled)
+	control.custom_minimum_size.y = 44
+	box.add_child(control)
 
 static func build(view) -> void:
 	if view.room_picker != null: view.room_picker.hide()
@@ -65,8 +67,9 @@ static func build(view) -> void:
 				selected_wing = chosen
 				var preview: Dictionary = c.build_preview25(str(slot.id), chosen)
 				var bonus: Array = preview.get("adjacency_bonus", [])
-				var details := "%d Cr · Power %d → %d / %d · %s · finishes M%d D%d" % [int(preview.get("cost", 0)), int(preview.get("power_used", 0)), int(preview.get("power_after", 0)), int(preview.get("power_cap", 0)), ", ".join(bonus) if not bonus.is_empty() else "No adjacency bonus", int(preview.get("finish_month", 0)), int(preview.get("finish_day", 0))]
+				var details := "%d Cr · %d days · Power %d → %d / %d · month end %+d Cr" % [int(preview.get("cost", 0)), int(preview.get("days", 0)), int(preview.get("power_used", 0)), int(preview.get("power_after", 0)), int(preview.get("power_cap", 0)), int(preview.get("month_credit_delta", 0))]
 				box = view._card("BUILD PREVIEW · " + str(Data.get_table("core", "WINGS")[chosen].n), details)
+				box.add_child(UI.label("Unlocks: %s · %s" % [str(preview.get("unlocks", "")), ", ".join(bonus) if not bonus.is_empty() else "No adjacency bonus"], 14, UI.ACCENT))
 				box.add_child(UI.label(str(preview.get("reason", "")), 14, UI.GOLD))
 				button(view, box, "Confirm · %d Cr" % int(preview.get("cost", 0)), c.confirm_build25.bind(str(slot.id), chosen), bool(preview.get("valid", false)))
 		elif slot.tier == "u":
@@ -91,7 +94,15 @@ static func build(view) -> void:
 		for line in c.state.facility.log.get(wing, []).slice(0, 2): box.add_child(UI.label(str(line), 12, UI.MUTED))
 	box = view._card("TEMPLE STAFF", "Archivists speed research; artisans speed building and projects; healers improve recovery. One staff slot per room level, up to two.")
 	for worker in c.state.facility.workers: box.add_child(UI.label("%s · %s · %s" % [worker.n, worker.role, worker.wing if worker.wing != "" else "available"], 14))
-	for role in ["archivist", "artisan", "healer"]: button(view, box, "Hire %s · 75 Cr + 1 recruit" % role, Base.hire_staff.bind(c, role))
+	for role in ["archivist", "artisan", "healer"]:
+		button(view, box, "Review %s hire" % role, func():
+			view.set_meta("w32c_staff_role", role); view._show_page(); return true)
+	var hire_role := str(view.get_meta("w32c_staff_role", ""))
+	if hire_role in ["archivist", "artisan", "healer"]:
+		var unlock: String = {"archivist":"faster research when assigned", "artisan":"faster construction and Forge projects", "healer":"faster recovery when assigned"}[hire_role]
+		var hire_card: VBoxContainer = view._card("CONFIRM STAFF · " + hire_role.capitalize(), "75 Cr + 1 recruit · available now · Power +0 · month end +0 Cr")
+		hire_card.add_child(UI.label("Unlocks: " + unlock, 14, UI.ACCENT))
+		button(view, hire_card, "Confirm hire", Base.hire_staff.bind(c, hire_role), c.can_afford({"credits":75, "recruits":1}))
 	box = view._card("SPIRES", "Available from month 4 or era 2. Construction takes 14 days.")
 	for id in Data.get_table("temple", "SPIRES"):
 		var sp: Dictionary = Data.get_table("temple", "SPIRES")[id]

@@ -5,10 +5,20 @@ const Base = preload("res://scripts/campaign/strat_base.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const Theme13 = preload("res://scripts/armory13_theme.gd")
 
+static func action_button(label: String, action: Callable, enabled: bool = true) -> Button:
+	var control := UI.button(label, action, enabled)
+	control.custom_minimum_size.y = 44
+	return control
+
 static func _queue(view, id: String) -> void:
 	if Queue.enqueue(view.campaign, id):
+		view.set_meta("w32c_research_id", "")
 		view.get_node("/root/CampaignFlow").save()
 		view._refresh_shell()
+
+static func _review(view, id: String) -> void:
+	view.set_meta("w32c_research_id", id)
+	view._show_page()
 
 static func _dismiss(view) -> void:
 	view.campaign.state.research.last = ""
@@ -61,17 +71,26 @@ static func render(view) -> void:
 				break
 		if first != "": break
 	if first != "":
-		var study := UI.button("Study %s" % str(data[first].n), _queue.bind(view, first))
+		var study := action_button("Review %s" % str(data[first].n), _review.bind(view, first))
 		study.name = "FirstStudyButton"; study.custom_minimum_size.y = 44
 		top.add_child(study)
 	else: top.add_child(UI.label("No study available. Check the requirements below.", 14, UI.MUTED))
 	for id in c.state.research.queue:
-		top.add_child(UI.button("Remove queued: " + str(data[id].n), _remove.bind(view, str(id))))
+		top.add_child(action_button("Remove queued: " + str(data[id].n), _remove.bind(view, str(id))))
 	view.page_content.move_child(top.get_parent(), position); position += 1
+	var selected := str(view.get_meta("w32c_research_id", ""))
+	if data.has(selected) and Queue.can_queue(c, selected):
+		var study_data: Dictionary = data[selected]
+		var cost := "%d Cr" % int(study_data.cost.get("credits", 0))
+		if int(study_data.cost.get("intel", 0)) > 0: cost += " + %d Intel" % int(study_data.cost.intel)
+		var confirm_card: VBoxContainer = view._card("CONFIRM RESEARCH · " + str(study_data.n), "%s when study starts · %d work days · Power +0 · month end +0 Cr" % [cost, int(study_data.days)])
+		confirm_card.add_child(UI.label("Unlocks: " + str(study_data.desc), 14, UI.ACCENT))
+		confirm_card.add_child(action_button("Confirm study", _queue.bind(view, selected), c.can_afford(study_data.cost)))
+		view.page_content.move_child(confirm_card.get_parent(), position); position += 1
 	if last != "" and data.has(last):
 		var unlock: Dictionary = data[last]
 		var toast: VBoxContainer = view._card("UNLOCKED  ·  " + str(unlock.n), str(unlock.desc))
-		toast.add_child(UI.button("Dismiss", _dismiss.bind(view)))
+		toast.add_child(action_button("Dismiss", _dismiss.bind(view)))
 		view.page_content.move_child(toast.get_parent(), position); position += 1
 	for branch in Data.get_table("research", "RES_TREE"):
 		var card: VBoxContainer = view._card(str(branch.n).to_upper())
@@ -91,6 +110,5 @@ static func render(view) -> void:
 			label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(label)
 			var can := Queue.can_queue(c, str(id))
-			row.add_child(UI.button("Queue", _queue.bind(view, str(id)), can))
+			row.add_child(action_button("Review", _review.bind(view, str(id)), can))
 	Theme13.apply_tree(view.page_content)
-	(view.page_content.get_parent() as ScrollContainer).scroll_vertical = 0
