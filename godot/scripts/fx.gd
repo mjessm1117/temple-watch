@@ -431,6 +431,9 @@ func ability(id: String, from: Vector3, to: Vector3) -> void:
 	if not signature.is_empty():
 		if signature.has("color"):
 			_ability_class_tell(to, signature)
+			if str(signature.get("category", "")) == "chain":
+				get_tree().create_timer(0.18).timeout.connect(func() -> void:
+					if is_inside_tree(): Signature27.chain_result_pulse(self, to))
 		else:
 			_ability_signature27(id, from, to, signature)
 		return
