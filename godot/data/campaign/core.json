@@ -74,7 +74,7 @@
       "lockEra": 3,
       "desc": "Wandering Jedi who reshape the battlefield. Unlocks in the High Republic era."
     },
-    "Soldier": {
+    "Trooper": {
       "hp": 8,
       "armor": 1,
       "aim": 70,
@@ -130,53 +130,6 @@
       "init": 7,
       "will": 60,
       "desc": "Heavy weapons. Grenades, rockets and armor-shredding fire."
-    },
-    "Defender": {
-      "jedi": 1,
-      "hp": 8,
-      "armor": 1,
-      "aim": 70,
-      "mob": 4,
-      "dmg": [
-        3,
-        5
-      ],
-      "range": 1.5,
-      "deflect": 35,
-      "guardDef": 85,
-      "maxF": 4,
-      "init": 10,
-      "will": 80,
-      "desc": "Tank Jedi. Soresu defense: soaks hits, counters, shelters allies."
-    },
-    "Shieldbearer": {
-      "hp": 11,
-      "armor": 3,
-      "aim": 65,
-      "mob": 4,
-      "dmg": [
-        3,
-        5
-      ],
-      "range": 6,
-      "init": 8,
-      "will": 70,
-      "desc": "Tank trooper. Heavy plate and a riot shield: holds the line, covers allies."
-    },
-    "Gunslinger": {
-      "hp": 10,
-      "aim": 85,
-      "mob": 6,
-      "dmg": [
-        3,
-        6
-      ],
-      "range": 6,
-      "crit": 15,
-      "armor": 1,
-      "init": 14,
-      "will": 55,
-      "desc": "Pistol fighter. Cheap 1-AP shots, Fan the Hammer, hit-and-run."
     },
     "Sniper": {
       "hp": 7,
@@ -244,9 +197,6 @@
     ],
     "Heavy": [
       "grenade"
-    ],
-    "Shieldbearer": [
-      "hunker"
     ],
     "Sniper": [
       "mark",
@@ -602,7 +552,7 @@
     },
     {
       "n": "Sgt. Rhal Dax",
-      "cls": "Soldier"
+      "cls": "Trooper"
     },
     {
       "n": "Ilsa Myr",

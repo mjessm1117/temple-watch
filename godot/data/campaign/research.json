@@ -320,7 +320,7 @@
         }
       }
     },
-    "Soldier": {
+    "Trooper": {
       "trunk": {"1": ["suppress", "hunker", "soBreach"], "2": ["rapidFire", "flakVest", "soAdrenaline"]},
       "specs": {
         "sergeant": {
@@ -417,81 +417,6 @@
           "ic": "sp_bulwark",
           "desc": "Walking cover. Soaks fire and holds ground.",
           "sig": "holdLine"
-        }
-      }
-    },
-    "Defender": {
-      "trunk": {"1": ["defLine", "saberThrow", "gChallenge"], "2": ["leap", "gStalwart", "tkGuardPost"]},
-      "specs": {
-        "bastion": {
-          "4": ["gIron", "gpBastion", "tkFortress"],
-          "5": ["collapse", "gAegis", "gpBeacon"],
-          "6": ["forceWave", "gpUndying", "tkShieldWall"],
-          "7": ["gUnbreakable", "gpLiving", "tkColossus"],
-          "n": "Bastion",
-          "ic": "sp_protector",
-          "desc": "Unmovable. Soaks fire and shelters allies.",
-          "sig": "barrier"
-        },
-        "soresu": {
-          "4": ["tkParry", "gBulwark", "chFade"],
-          "5": ["gwCounter", "sbBlur", "tkRedirect"],
-          "6": ["precisionStrike", "tkWall", "gLastStand"],
-          "7": ["tkSoresu", "sUntouchable", "gwRampage"],
-          "n": "Soresu",
-          "ic": "sp_weaponMaster",
-          "desc": "Perfect defense. Deflects, dodges, counters.",
-          "sig": "reflectM"
-        }
-      }
-    },
-    "Shieldbearer": {
-      "trunk": {"1": ["hunker", "suppress", "hCoverMe"], "2": ["flakVest", "mHardy", "tkGuardPost"]},
-      "specs": {
-        "phalanx": {
-          "4": ["juggernaut", "hbWall", "tkShieldWall"],
-          "5": ["hBulwark", "hbIron", "rally"],
-          "6": ["smoke", "hTitan", "tkFortress"],
-          "7": ["hbAnchor", "soSgtHero", "tkBastion"],
-          "n": "Phalanx",
-          "ic": "sp_bulwark",
-          "desc": "Shield line. Everyone behind you lives.",
-          "sig": "holdLine"
-        },
-        "breacher": {
-          "4": ["soVanPlate", "svBrawl", "soBreach"],
-          "5": ["svFury", "veteran", "hBrute"],
-          "6": ["runGun", "soVanCharge", "svRush"],
-          "7": ["soLegend", "svRampage", "hWarlord"],
-          "n": "Breacher",
-          "ic": "sp_vanguard",
-          "desc": "Shield-first assault. Kicks the door and keeps going.",
-          "sig": "chainShot"
-        }
-      }
-    },
-    "Gunslinger": {
-      "trunk": {"1": ["gsQuickDraw", "mark", "scFlanker"], "2": ["gsHitRun", "runGun", "scEvasive"]},
-      "specs": {
-        "duelist": {
-          "4": ["gsTrick", "siKnife", "killshot"],
-          "5": ["ssExposed", "svFury", "veteran"],
-          "6": ["svRush", "smoke", "soBreach"],
-          "7": ["svRampage", "gsDeadShot", "ssStreak"],
-          "n": "Duelist",
-          "ic": "sp_sniper",
-          "desc": "Close, fast, deadly. Three shots a turn.",
-          "sig": "chainShot"
-        },
-        "outlaw": {
-          "4": ["siVanish", "fieldcraft", "scSurvivor"],
-          "5": ["ssBigGame", "hCoverMe", "gsReflex"],
-          "6": ["gsSpeed", "sSwift", "scInfKnife"],
-          "7": ["scInfPhantom", "scInfStrike", "scLegend"],
-          "n": "Outlaw",
-          "ic": "sp_infiltrator",
-          "desc": "Slippery. Hits and is gone.",
-          "sig": "ghost"
         }
       }
     }

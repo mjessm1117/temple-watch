@@ -107,12 +107,17 @@ func _migrate() -> void:
 	if not state.has("team_assignments"): state.team_assignments = {}
 	if not state.has("elapsed_days"): state.elapsed_days = (int(state.month) - 1) * 30 + int(state.day) - 1
 	for r in state.roster:
+		var current_class: String = {"Soldier":"Trooper", "Defender":"Guardian", "Shieldbearer":"Heavy", "Gunslinger":"Scout"}.get(str(r.get("cls", "")), str(r.get("cls", "")))
+		r.cls = current_class
 		var defaults := {"rank":2, "xp":30, "pick":0, "dark":0, "wound":0, "status":"active", "kills":0, "missions":0, "bonus":{}}
 		for key in defaults:
 			if not r.has(key): r[key] = defaults[key]
 		for key in ["picks", "scars"]:
 			if not r.has(key): r[key] = []
 		if not r.has("classes"): r.classes = [Classes.class_id(str(r.get("cls", "")))]
+		else:
+			for index in r.classes.size():
+				r.classes[index] = Classes.class_id(str({"defender":"guardian", "shieldbearer":"heavy", "gunslinger":"scout"}.get(str(r.classes[index]), r.classes[index])))
 		for key in ["cross_picks", "trained_padawans", "legacies"]:
 			if not r.has(key): r[key] = []
 		if not r.has("tier"): r.tier = str(Classes.rank_data("jedi" if Progression.is_jedi(r) else "soldier", int(r.rank)).get("tier", r.get("title", "")))
