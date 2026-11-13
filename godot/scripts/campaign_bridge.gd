@@ -7,18 +7,15 @@ const Settings = preload("res://scripts/settings.gd")
 const Villain11Battle = preload("res://scripts/villain11_battle.gd")
 const SaveSlots = preload("res://scripts/campaign/save_slots.gd")
 const Beats22 = preload("res://scripts/story/story14_beats.gd")
-
 class SettingsTouchShield extends Control:
 	var owner_scroll: ScrollContainer
 	var start := Vector2.ZERO
 	var candidate: BaseButton
 	var pressed := false
 	var dragged := false
-
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		set_process(true)
-
 	func _process(_delta: float) -> void:
 		if not is_instance_valid(owner_scroll):
 			queue_free()
@@ -26,7 +23,6 @@ class SettingsTouchShield extends Control:
 		var rect := owner_scroll.get_global_rect()
 		position = rect.position
 		size = rect.size
-
 	func _gui_input(event: InputEvent) -> void:
 		if not is_instance_valid(owner_scroll): return
 		if event is InputEventScreenTouch:
@@ -52,7 +48,6 @@ class SettingsTouchShield extends Control:
 			if (event.position - start).length() >= 10.0: dragged = true
 			owner_scroll.call("_gui_input", event)
 			accept_event()
-
 	func _button_at(point: Vector2) -> BaseButton:
 		var found: BaseButton
 		for node in owner_scroll.find_children("*", "BaseButton", true, false):
@@ -60,7 +55,6 @@ class SettingsTouchShield extends Control:
 			if button.is_visible_in_tree() and not button.disabled and (button.get_global_rect().has_point(point) or button.get_global_rect().has_point(get_global_transform() * point)):
 				found = button
 		return found
-
 var campaign: RefCounted
 var story: RefCounted
 var active := false
@@ -82,7 +76,12 @@ var last_bark_at := -4000
 var actor_bark_turn: Dictionary = {}
 var turn_prompt: PanelContainer
 var queued_radio: Dictionary = {}
-
+var suppress_story_once := false
+func _unhandled_input(event: InputEvent) -> void:
+	if not is_instance_valid(settings_panel): return
+	if event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
+		open_settings()
 func session() -> RefCounted:
 	if campaign == null:
 		campaign = Campaign.new()
@@ -90,20 +89,16 @@ func session() -> RefCounted:
 		_ensure_w25_state()
 		story = Story.new(campaign.state)
 	return campaign
-
 func _ensure_w25_state() -> void:
 	if campaign == null: return
 	if not campaign.state.has("w25_room_seen"): campaign.state.w25_room_seen = {}
 	if not campaign.state.has("w25_room_journal"): campaign.state.w25_room_journal = []
-
 func save() -> bool:
 	return campaign.save(save_path)
-
 func save_slot(slot: int) -> bool:
 	var ok := SaveSlots.write(session(), slot)
 	if ok: w25_current_slot = slot
 	return ok
-
 func load_slot(slot: int) -> bool:
 	var next := Campaign.new()
 	if not SaveSlots.read(next, slot): return false
@@ -114,7 +109,6 @@ func load_slot(slot: int) -> bool:
 	w25_current_slot = slot
 	_resume_loaded()
 	return true
-
 func open_settings() -> void:
 	var scene := get_tree().current_scene
 	if scene == null: return
@@ -178,11 +172,9 @@ func open_settings() -> void:
 	settings_layer = layer
 	settings_panel = panel
 	scroll.set_deferred("scroll_vertical", w25_settings_scroll)
-
 func open_saves(origin: String = "menu") -> void:
 	launch_origin = origin
 	go("save_load")
-
 func new_campaign(difficulty: String) -> void:
 	campaign = Campaign.new(difficulty)
 	_ensure_w25_state()
@@ -191,14 +183,12 @@ func new_campaign(difficulty: String) -> void:
 	campaign.state.flow_stage = "opening"
 	save()
 	go("opening")
-
 func opening_finished() -> void:
 	if not active or campaign == null or campaign.state.get("flow_stage", "") != "opening": return
 	for i in campaign.state.options.size():
 		if campaign.state.options[i].get("story", false) and str(campaign.state.options[i].get("mission", "")) == "relay":
 			prepare_briefing(i)
 			return
-
 func continue_campaign() -> void:
 	campaign = Campaign.new()
 	if not campaign.load_save(save_path): return
@@ -207,7 +197,6 @@ func continue_campaign() -> void:
 	active = true
 	w25_current_slot = 0
 	_resume_loaded()
-
 func _resume_loaded() -> void:
 	var stage: String = campaign.state.get("flow_stage", "temple")
 	if stage == "opening": go("opening")
@@ -217,12 +206,10 @@ func _resume_loaded() -> void:
 		go("briefing" if stage == "briefing" else "dialogue")
 	elif stage in ["squad", "battle"]: go("squad")
 	else: go("temple")
-
 func direct_rescue(difficulty: String) -> void:
 	active = false
 	Settings.difficulty = difficulty
 	go("rescue")
-
 func go(scene: String) -> void:
 	var tree := get_tree()
 	var layer := CanvasLayer.new()
@@ -242,7 +229,6 @@ func go(scene: String) -> void:
 	await back.finished
 	if scene == "temple": _w29b_temple_targets(tree.current_scene)
 	layer.queue_free()
-
 func _w29b_temple_targets(view: Node) -> void:
 	if view == null: return
 	var safe := preload("res://scripts/phone_layout.gd").safe_margins(get_viewport().get_visible_rect().size)
@@ -255,11 +241,9 @@ func _w29b_temple_targets(view: Node) -> void:
 	var rail := view.find_child("TaskRailCard", true, false) as Control
 	if rail != null and get_viewport().get_visible_rect().size.x < 500.0:
 		rail.position.y += 6.0
-
 func prepare_briefing(index: int) -> void:
 	_prepare_briefing25(index)
 	go("briefing")
-
 func _prepare_briefing25(index: int) -> void:
 	launch_origin = get_tree().current_scene.name.to_snake_case() if get_tree().current_scene != null else "galaxy"
 	if launch_origin not in ["galaxy", "temple"]: launch_origin = "galaxy"
@@ -280,7 +264,6 @@ func _prepare_briefing25(index: int) -> void:
 	if option.has("sith_offer_id"): screen.goal = str(option.n) + " · " + str(option.get("risk",screen.goal))
 	screen_return = "squad"
 	save()
-
 func launch_ready25(mission_id: String) -> void:
 	if not active or campaign == null or not campaign.state.get("pending_mission", {}).is_empty(): return
 	var galaxy := get_tree().current_scene
@@ -300,14 +283,12 @@ func launch_ready25(mission_id: String) -> void:
 			_prepare_briefing25(i)
 			_show_ready25()
 			return
-
 func _show_ready25() -> void:
 	var ready := preload("res://scripts/w25_menus_readiness.gd").new()
 	var previous := get_tree().current_scene
 	get_tree().root.add_child(ready)
 	get_tree().current_scene = ready
 	if previous != null: previous.queue_free()
-
 func back_from_ready25() -> void:
 	campaign.state.flow_stage = "temple"
 	campaign.state.erase("pending")
@@ -317,7 +298,6 @@ func back_from_ready25() -> void:
 	var galaxy := get_tree().current_scene
 	if galaxy != null and galaxy.has_method("_select") and w25_launch_index >= 0:
 		galaxy.call("_select", w25_launch_index)
-
 func open_room_story25(room_id: String) -> bool:
 	if not active or campaign == null or get_tree().current_scene == null: return false
 	var helper := preload("res://scripts/w25_menus_room_story.gd")
@@ -332,25 +312,25 @@ func open_room_story25(room_id: String) -> bool:
 	get_tree().current_scene.add_child(card)
 	card.present(self, beat)
 	return true
-
 func back_from_briefing() -> void:
 	campaign.state.flow_stage = "temple"
 	campaign.state.erase("pending")
 	screen = {}
 	save()
 	go(launch_origin)
-
 func back_from_squad() -> void:
 	campaign.state.flow_stage = "briefing"
 	save()
 	go("briefing")
-
 func open_codex() -> void:
-	screen = {}; screen_return = "temple"
+	var current := get_tree().current_scene
+	screen = {}; screen_return = "galaxy" if current != null and current.scene_file_path.ends_with("galaxy.tscn") else "temple"
 	go("codex")
-
 func temple_story() -> void:
 	if not active: return
+	if suppress_story_once:
+		suppress_story_once = false
+		return
 	var s: Dictionary = campaign.state
 	screen = s.get("pending", {})
 	if screen.get("kind", "") not in ["talk", "event", "vote", "villain11", "scene11", "grief"]: screen = preload("res://scripts/story/rank19_beats.gd").next(s)
@@ -365,7 +345,6 @@ func temple_story() -> void:
 	screen_return = "temple"
 	save()
 	go("dialogue")
-
 func story_finished() -> void:
 	campaign._migrate()
 	save()
@@ -382,8 +361,7 @@ func story_finished() -> void:
 		_:
 			campaign.state.flow_stage = "temple"
 			campaign.state.erase("pending")
-			save(); go("temple")
-
+			save(); go(screen_return if screen_return in ["temple", "galaxy"] else "temple")
 func launch_squad(ids: Array) -> bool:
 	if campaign.sith.project_status().defeated: return false
 	var option: Dictionary = campaign.state.pending_mission
@@ -398,14 +376,12 @@ func launch_squad(ids: Array) -> bool:
 	save()
 	go("rescue")
 	return true
-
 func create_battle(seed_value: int) -> RefCounted:
 	if not active or campaign == null or campaign.state.get("flow_stage", "") != "battle":
 		return preload("res://scripts/mission.gd").new(seed_value)
 	var battle: RefCounted = Battle.create(campaign, seed_value)
 	if battle != null: Villain11Battle.setup(battle, campaign.state.pending_mission)
 	return battle
-
 func battle_refresh(game: Node) -> void:
 	if not active or campaign == null or campaign.state.get("flow_stage", "") != "battle" or transitioning: return
 	if battle_game != game:
@@ -424,7 +400,6 @@ func battle_refresh(game: Node) -> void:
 	if game.mission.result != "" and not game.playing_enemy_events and not game.player_attack_pending:
 		transitioning = true
 		debrief.call_deferred(game.mission)
-
 func battle_beat(game: Node) -> void:
 	if not active or transitioning or game.mission.result != "": return
 	if is_instance_valid(turn_prompt): return
@@ -447,7 +422,6 @@ func battle_beat(game: Node) -> void:
 	turn_prompt.present(game,screen,_choose_battle_beat)
 	_record_story(speaker,game.mission.turn,str(screen.get("text","")))
 	save()
-
 func _choose_battle_beat(id: String) -> void:
 	var choice: Dictionary = story.apply_choice(campaign.state,id)
 	if not choice.get("ok",false): return
@@ -462,7 +436,6 @@ func _choose_battle_beat(id: String) -> void:
 	queued_radio.clear()
 	battle_game._refresh()
 	save()
-
 func _battle_event(kind: String, actor_id: String, target_id: String, context: Dictionary) -> void:
 	if battle_game == null or campaign == null or transitioning: return
 	var turn := int(context.get("turn",battle_game.mission.turn))
@@ -493,7 +466,6 @@ func _battle_event(kind: String, actor_id: String, target_id: String, context: D
 	last_bark_at = now
 	actor_bark_turn[actor_id] = turn
 	if comms != null: comms.bark_number += 1
-
 func _show_radio(speaker: String, portrait_key: String, line: String, priority: int, turn: int) -> void:
 	if battle_game == null or not battle_game.has_meta("story_comms"): return
 	var comms = battle_game.get_meta("story_comms")
@@ -504,7 +476,6 @@ func _show_radio(speaker: String, portrait_key: String, line: String, priority: 
 		return
 	comms.show_radio(speaker,portrait_key,line,priority)
 	_record_story(speaker,turn,line)
-
 func _record_story(speaker: String, turn: int, line: String) -> void:
 	if campaign == null or line.strip_edges().is_empty(): return
 	var transcript: Array = campaign.state.get("story_transcript",[])
@@ -512,7 +483,6 @@ func _record_story(speaker: String, turn: int, line: String) -> void:
 	while transcript.size() > 40: transcript.pop_front()
 	campaign.state.story_transcript = transcript
 	save()
-
 func debrief(mission: RefCounted) -> void:
 	transitioning = false
 	if campaign.state.get("flow_stage", "") != "battle": return
@@ -537,12 +507,10 @@ func debrief(mission: RefCounted) -> void:
 	screen_return = "result"
 	save()
 	go("dialogue")
-
 static func debrief_input(result: Dictionary, mission: RefCounted) -> Dictionary:
 	return {"mission_id":result.mission_id,"won":result.win,"units":result.units,"mission_result":result,
 		"squad":result.units.filter(func(u): return u.status != "dead").map(func(u): return u.id),
 		"saved_by":mission.saved_by,"clues":mission.clues}
-
 func finish_result() -> void:
 	if campaign.state.get("flow_stage", "") != "debrief": return
 	var result: Dictionary = campaign.state.battle_result
@@ -552,7 +520,6 @@ func finish_result() -> void:
 	campaign.state.flow_stage = "temple"
 	save()
 	go("temple")
-
 func advance_era() -> void:
 	var prior_era := int(campaign.state.era)
 	if prior_era == 1 and (campaign.state.flags.get("boss_or_won", false) or campaign.state.flags.get("temple_scarred", false)):
@@ -573,7 +540,6 @@ func advance_era() -> void:
 		screen_return = "temple"
 		campaign.state.flow_stage = "interlude"
 		save(); go("dialogue")
-
 func open_intel_view25() -> void:
 	var current := get_tree().current_scene
 	if current != null and current.has_method("open_intel_view25"):
@@ -585,7 +551,6 @@ func open_intel_view25() -> void:
 	current = get_tree().current_scene
 	if current != null and current.has_method("open_intel_view25"):
 		current.call("open_intel_view25")
-
 func open_intelligence(page: String = "operations") -> void:
 	if int(campaign.state.era) == 1 and int(campaign.state.story.get("done", 0)) == 0: return
 	var current := get_tree().current_scene
@@ -607,7 +572,6 @@ func open_intelligence(page: String = "operations") -> void:
 			if campaign.state.options[i].get("sith_offer_id", "") == offer.id:
 				intelligence.queue_free(); prepare_briefing(i); return)
 	get_tree().current_scene.add_child(intelligence)
-
 func show_sith_events() -> bool:
 	if get_tree().current_scene == null: return false
 	if int(campaign.state.era) == 1 and int(campaign.state.story.get("done", 0)) == 0: return false

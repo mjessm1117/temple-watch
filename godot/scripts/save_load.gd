@@ -7,6 +7,12 @@ var pending_action := ""
 var message: Label
 var list: VBoxContainer
 var confirm_host: VBoxContainer
+var leaving := false
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
+		_back()
 
 func _ready() -> void:
 	_build()
@@ -30,7 +36,9 @@ func _build() -> void:
 	var title := UI.label("SAVE / LOAD", 23, UI.ACCENT)
 	title.size_flags_horizontal = SIZE_EXPAND_FILL
 	head.add_child(title)
-	head.add_child(UI.button("BACK", _back))
+	var back := UI.button("BACK", _back)
+	back.name = "SaveBack"
+	head.add_child(back)
 	message = UI.label("Choose a save.", 14, UI.GOLD)
 	content.add_child(message)
 	confirm_host = UI.column(4)
@@ -106,4 +114,9 @@ func _cancel() -> void:
 	_refresh()
 
 func _back() -> void:
+	if pending_slot >= 0:
+		_cancel()
+		return
+	if leaving: return
+	leaving = true
 	get_node("/root/CampaignFlow").go(get_node("/root/CampaignFlow").launch_origin)
