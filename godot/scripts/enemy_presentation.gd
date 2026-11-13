@@ -5,6 +5,7 @@ const Pressure = preload("res://scripts/mission_pressure.gd")
 const FeelBeats24 = preload("res://scripts/w24_feelcam_beats.gd")
 const Impact31 = preload("res://scripts/w31c_impact.gd")
 const Trail31 = preload("res://scripts/w31c_trail.gd")
+const W31ECard = preload("res://scripts/w31e_enemy_card.gd")
 const kill_hold_ms := 300
 
 static func _point(m: RefCounted, tile: Vector2i, height: float = 0.0) -> Vector3:
@@ -52,13 +53,18 @@ static func play(game: Node3D, events: Array[Dictionary], _sequence: int) -> voi
 static func show_event(game: Node3D, event: Dictionary) -> void:
 	var actor: Node3D = game.views.get(int(event.get("actor", -1)))
 	var kind := str(event.kind)
+	if game.cam.skip_requested: W31ECard.clear(game, true)
 	if game.playing_enemy_events and kind in ["intent", "attack", "push", "move", "overwatch", "reload", "objective_attack", "vip_attack"]:
-		var reason := str(event.get("intent_reason24", event.get("intent_reason", "")))
+		var actor_id := int(event.get("actor", -1))
+		var reason := str(event.get("reason27", event.get("intent_reason24", event.get("intent_reason", ""))))
+		if reason == "" and game.mission.has_method("intent_explain27"): reason = str(game.mission.call("intent_explain27", event))
 		if reason == "" and game.mission.has_method("intent_reason24"): reason = str(game.mission.call("intent_reason24", event))
-		if reason != "": game.phase_banner.text = reason
-		game.phase_banner.visible = true
-		if reason != "" and actor != null and game.fx != null and game.fx.has_method("float_text"):
-			game.fx.float_text(actor.position + Vector3.UP * 2.2, game.phase_banner.text, Color("ffe39b"))
+		if reason != "": game.phase_banner.text = reason; game.phase_banner.visible = true
+		var card: PanelContainer = W31ECard.current(game)
+		if not game.cam.skip_requested and (card == null or int(card.get_meta("actor_id", -1)) != actor_id):
+			var unit: Dictionary = game.mission.unit_by_id(actor_id)
+			if int(unit.get("hp", 0)) > 0:
+				W31ECard.show_actor(game, unit, reason)
 	if kind == "intent":
 		var a: Dictionary = game.mission.unit_by_id(int(event.actor))
 		var t: Dictionary = game.mission.unit_by_id(int(event.target))
@@ -91,6 +97,7 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 			var source: Dictionary = game.mission.unit_by_id(int(event.actor))
 			game.phase_banner.text = "%s HIT  •  %d HP  •  %s" % ["GATE" if kind == "objective_attack" else "VIP", hp, str(source.get("name", "ENEMY"))]
 			game.phase_banner.visible = true
+			W31ECard.result(game, int(event.actor), "HIT")
 			Events.emit(game, "objective_hit", event, to, {"source_pos":from})
 			Events.cue(game, "objective_hit")
 			await game.cam.wait(0.25)
@@ -162,6 +169,7 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 			FeelBeats24.clutch(game, event, _point(game.mission, event.get("at", Vector2i.ZERO)))
 			FeelBeats24.cue(game, "cover_break", _point(game.mission, event.get("at", Vector2i.ZERO)))
 	if kind != "move": game.cam.finish()
+	if game.cam.skip_requested: W31ECard.clear(game, true)
 	decorate(game)
 
 static func decorate(game: Node3D) -> void:
@@ -213,6 +221,7 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 	elif mode != "push": Events.emit(game, "miss", event, to)
 	FeelBeats24.impact(game, event, from, to, victim)
 	var word := "DEFLECT" if "deflected" in outcome else "MISS" if damage == 0 and mode != "push" else "KILL -%d" % damage if bool(event.get("killed", false)) else "CRIT %d" % damage if outcome == "crits" else "GRAZE %d" % damage if outcome == "grazes" else "-%d" % damage if damage > 0 else "PUSH"
+	if game.playing_enemy_events: W31ECard.result(game, int(event.actor), "KILL" if bool(event.get("killed", false)) else "HIT" if damage > 0 else "MISS" if mode != "push" else "PUSH")
 	game.fx.float_text(to + Vector3.UP * 0.6, word, Color("ffca70") if outcome == "crits" or bool(event.get("killed", false)) else Color("a8eaff") if outcome == "grazes" else Color.WHITE, outcome == "crits" or bool(event.get("killed", false)))
 	if int(event.get("armor_lost", 0)) > 0: game.fx.float_text(to + Vector3.UP * 0.15, "SHRED -%d" % int(event.armor_lost), Color("f0c68b"))
 	if victim != null:

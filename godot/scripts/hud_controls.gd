@@ -6,6 +6,8 @@ const Ability = preload("res://scripts/abilities_engine.gd")
 const Phone = preload("res://scripts/phone_layout.gd")
 const Rules12 = preload("res://scripts/rules12_actions.gd")
 const Threat22 = preload("res://scripts/decision22_threat.gd")
+const ChainSignature = preload("res://scripts/w27d_ability_signature.gd")
+const W31ECard = preload("res://scripts/w31e_enemy_card.gd")
 var g
 var techniques: HFlowContainer
 var techniques_open := false
@@ -17,6 +19,11 @@ var left_panel: PanelContainer
 var right_panel: PanelContainer
 var desktop_bottom: PanelContainer
 var desktop_threat_chip: Label
+var cue_row31: HBoxContainer
+var cue_overwatch31: Label
+var cue_flank31: Label
+var cue_reinforcement31: Label
+var chain_hint_turn31 := -1
 var aim_ui
 var combo_overlay: Control
 var move_decision: Dictionary = {}
@@ -306,6 +313,26 @@ func _build_ui() -> void:
 	command_row.add_child(_button("RESTART", func() -> void: g.get_tree().reload_current_scene()))
 	g.phase_banner = _label("ENEMY ACTIVITY", 30); g.phase_banner.visible = false; g.phase_banner.anchor_left = 0.5; g.phase_banner.anchor_right = 0.5; g.phase_banner.anchor_top = 0.18; g.phase_banner.offset_left = -370; g.phase_banner.offset_right = 370; g.phase_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; g.phase_banner.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; root.add_child(g.phase_banner)
 	g.phase_banner.modulate.a = 0.0
+	cue_row31 = HBoxContainer.new(); cue_row31.name = "W31EPersistentCues"
+	cue_row31.anchor_left = 0.5; cue_row31.anchor_right = 0.5
+	cue_row31.offset_left = -60; cue_row31.offset_right = 60
+	cue_row31.offset_top = 49; cue_row31.offset_bottom = 75
+	cue_row31.alignment = BoxContainer.ALIGNMENT_CENTER
+	cue_row31.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(cue_row31)
+	for cue in [["OverwatchCue", "⌖", "f2ba47"], ["FlankCue", "◇", "ff8e72"], ["ReinforcementCue", "⇣", "9bd5ff"]]:
+		var icon := _label(str(cue[1]), 20)
+		icon.name = str(cue[0]); icon.custom_minimum_size = Vector2(32, 25)
+		icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		icon.add_theme_color_override("font_color", Color(str(cue[2])))
+		icon.mouse_filter = Control.MOUSE_FILTER_STOP
+		icon.visible = false
+		cue_row31.add_child(icon)
+		match str(cue[0]):
+			"OverwatchCue": cue_overwatch31 = icon
+			"FlankCue": cue_flank31 = icon
+			"ReinforcementCue": cue_reinforcement31 = icon
+	cue_row31.visible = false
 	g.result_panel = PanelContainer.new(); g.result_panel.visible = false; g.result_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER); g.result_panel.offset_left = -220; g.result_panel.offset_right = 220; g.result_panel.offset_top = -100; g.result_panel.offset_bottom = 100; root.add_child(g.result_panel)
 	var result_box := VBoxContainer.new(); g.result_panel.add_child(result_box)
 	g.result_label = _label("", 28); result_box.add_child(g.result_label)
@@ -341,6 +368,8 @@ func _on_battle_event(kind: String, _actor_id: String, _target_id: String, conte
 
 
 func _refresh() -> void:
+	if g.mission.phase == "player" and not g.playing_enemy_events: W31ECard.clear(g)
+	_refresh_cues31()
 	var u: Dictionary = g.mission.unit_by_id(g.selected_id)
 	if phone == null and desktop_threat_chip != null:
 		var forecast: Dictionary = Threat22.summary(g.mission)
@@ -414,6 +443,7 @@ func _refresh() -> void:
 		g.log_label.visible = false
 	if phone != null: phone.refresh(true)
 	if bar != null: bar.refresh()
+	_pulse_chain_hint31(u)
 	if aim_ui != null: aim_ui.refresh()
 	_sync_aim_confirm31()
 	if phone != null: night.chips.visible = false
@@ -421,6 +451,88 @@ func _refresh() -> void:
 		var aiming: bool = aim_ui != null and aim_ui.panel.visible
 		left_panel.visible = not aiming
 		right_panel.visible = not aiming and g.action != "move"
+
+func _refresh_cues31() -> void:
+	if cue_row31 == null: return
+	var player_turn: bool = g.mission.phase == "player" and not g.playing_enemy_events and g.mission.result == ""
+	var overwatch_count := 0
+	var flank_count := 0
+	if player_turn:
+		var enemies: Array[Dictionary] = g.mission.living("enemy")
+		for enemy in enemies:
+			if bool(enemy.get("overwatch", false)): overwatch_count += 1
+		for player in g.mission.living("player"):
+			for enemy in enemies:
+				if not bool(enemy.get("awake", false)) or bool(enemy.get("stunned", false)) or float(enemy.get("range", 0)) < 2.0: continue
+				var info: Dictionary = Shot.calculate(g.mission, enemy, player, false)
+				if bool(info.flanked) and bool(info.los) and bool(info.range_ok):
+					flank_count += 1
+					break
+	cue_overwatch31.visible = player_turn and overwatch_count > 0
+	cue_overwatch31.tooltip_text = "%d enemies on Overwatch" % overwatch_count
+	cue_flank31.visible = player_turn and flank_count > 0
+	cue_flank31.tooltip_text = "%d Jedi flanked" % flank_count
+	var incoming: bool = player_turn and (not g.mission.pressure_state.get("pending", []).is_empty() or g.mission.reinforcement_marker.x >= 0 and not bool(g.mission.reinforcement_dropped))
+	cue_reinforcement31.visible = incoming
+	cue_reinforcement31.tooltip_text = "Reinforcements incoming"
+	cue_row31.visible = cue_overwatch31.visible or cue_flank31.visible or cue_reinforcement31.visible
+
+func _pulse_chain_hint31(actor: Dictionary) -> void:
+	if chain_hint_turn31 == g.mission.turn or g.mission.phase != "player" or g.playing_enemy_events or actor.is_empty(): return
+	for mode in g.action_buttons:
+		var source: Button = g.action_buttons[mode]
+		if g.mission.ability_reason(int(actor.id), str(mode)) != "": continue
+		var def: Dictionary = g.mission.abilities.get(mode, {})
+		if def.get("chain", {}).get("consume", []).is_empty(): continue
+		var targets: Array[Dictionary] = InputControls.valid_targets(g.mission, actor, str(mode))
+		if str(def.get("target", "")) == "self": targets.append(actor)
+		for target in targets:
+			if not ChainSignature.chain_ready(def, target, actor): continue
+			var button: Button = source
+			var exposed := false
+			if bar != null and bar.copies.has(mode):
+				button = bar.copies[mode]
+				if not button.visible:
+					var displaced: Button = null
+					for candidate in bar.copies.values():
+						if candidate.visible: displaced = candidate
+					if displaced != null: displaced.visible = false
+					button.call("configure", mode, source.display_name, "", source.cost, source.cooldown, "", g.action == mode)
+					button.call("set_chain", def, target)
+					button.visible = true
+					exposed = true
+			elif phone != null and not source.visible:
+				var displaced: Button = null
+				for candidate in phone.ability_buttons:
+					if candidate.visible: displaced = candidate
+				if displaced != null: displaced.visible = false
+				source.visible = true
+				phone.action_art.queue_redraw()
+				exposed = true
+			if not button.is_visible_in_tree(): continue
+			chain_hint_turn31 = g.mission.turn
+			button.set_meta("w31e_hint_pulse", chain_hint_turn31)
+			var ring := Panel.new()
+			ring.name = "W31EChainHintPulse"
+			ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			ring.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			var style := StyleBoxFlat.new()
+			style.bg_color = Color.TRANSPARENT
+			style.border_color = Color("fff2ac")
+			style.set_border_width_all(3)
+			ring.add_theme_stylebox_override("panel", style)
+			button.add_child(ring)
+			ring.pivot_offset = button.size * 0.5
+			ring.modulate.a = 0.0
+			var pulse := ring.create_tween()
+			pulse.tween_property(ring, "modulate:a", 1.0, 0.12)
+			pulse.parallel().tween_property(ring, "scale", Vector2(1.07, 1.07), 0.12)
+			pulse.tween_property(ring, "modulate:a", 0.0, 0.25)
+			pulse.tween_callback(func() -> void:
+				ring.queue_free()
+				if exposed and bar != null: bar.refresh()
+				elif exposed and phone != null: phone._update_actions(false))
+			return
 
 
 func _show_shot() -> void:
