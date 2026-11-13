@@ -7,6 +7,14 @@ var flow: Node
 var beat: Dictionary
 var pair_ids: Array = []
 
+static func flavour(room_id: String) -> String:
+	var rows: Variant = JSON.parse_string(FileAccess.get_file_as_string(DATA))
+	if not rows is Array: return ""
+	for row in rows:
+		if str(row.get("id", "")) == "ambient_flavours":
+			return str(row.get("flavours", {}).get(room_id, ""))
+	return ""
+
 static func due(campaign: RefCounted, room_id: String) -> Dictionary:
 	var room := room_id.to_lower().strip_edges()
 	room = {"u2":"memorial", "sp0":"archives", "sp2":"council", "medical_halls":"medical", "kyber_forge":"forge", "comms_hub":"comms", "memorial_vault":"memorial", "council_chamber":"council"}.get(room, room)

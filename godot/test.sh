@@ -133,3 +133,4 @@ run_suite phoneaim31_test --rendering-method gl_compatibility --resolution 390x8
 run_suite impact31_test
 run_suite render31_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite e31_test --rendering-method gl_compatibility --resolution 844x390
+run_suite temple32_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
