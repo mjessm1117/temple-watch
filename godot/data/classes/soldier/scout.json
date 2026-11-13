@@ -69,7 +69,7 @@
           "amount": 1
         }
       ],
-      "description": "Conceal and set a defensive decoy."
+      "description": "Spend SHIELDED; gain READY for your next move."
     },
     "mark": {
       "name": "Mark",
@@ -90,7 +90,7 @@
           {"tag": "MARKED", "target": "target"}
         ]
       },
-      "description": "Mark an exposed target for the next squad shot."
+      "description": "Exploit EXPOSED prey; apply MARKED for allies."
     },
     "runGun": {
       "name": "Run & Gun",
@@ -110,7 +110,7 @@
           {"tag": "READY", "target": "self"}
         ]
       },
-      "description": "Gain a move and set up a ready follow-up."
+      "description": "Spend INSPIRED; gain READY for your next move."
     },
     "scout_vanish": {
       "name": "Vanish",
@@ -144,7 +144,7 @@
           "amount": 1
         }
       ],
-      "description": "Vanish and immediately reposition."
+      "description": "Spend INSPIRED; gain ATTUNED for your next move."
     },
     "deadeye": {
       "name": "Deadeye",
@@ -167,7 +167,7 @@
           {"tag": "EXPOSED", "target": "target"}
         ]
       },
-      "description": "Risk a precise shot to open a target for another soldier."
+      "description": "Exploit MARKED prey; apply EXPOSED for allies."
     },
     "spotter": {
       "name": "Spotter",
@@ -177,7 +177,33 @@
       "cost": 0,
       "ap": 0,
       "ends_turn": false
-    },
+,
+                 "chain": {
+                   "consume": [
+                     {
+                       "tag": "INSPIRED",
+                       "target": "self",
+                       "bonus": [
+                         {
+                           "type": "shield",
+                           "target": "self",
+                           "amount": 1
+                         }
+                       ]
+                     }
+                   ],
+                   "apply": [
+                     {
+                       "tag": "SHIELDED",
+                       "target": "self"
+                     },
+                     {
+                       "tag": "READY",
+                       "target": "self"
+                     }
+                   ]
+                 },
+                 "description": "Use INSPIRED; gain SHIELDED and READY to aim."    },
     "ghost": {
       "name": "Ghost",
       "passive": true,
@@ -186,7 +212,33 @@
       "cost": 0,
       "ap": 0,
       "ends_turn": false
-    },
+,
+               "chain": {
+                 "consume": [
+                   {
+                     "tag": "READY",
+                     "target": "self",
+                     "bonus": [
+                       {
+                         "type": "shield",
+                         "target": "self",
+                         "amount": 1
+                       }
+                     ]
+                   }
+                 ],
+                 "apply": [
+                   {
+                     "tag": "INSPIRED",
+                     "target": "self"
+                   },
+                   {
+                     "tag": "SHIELDED",
+                     "target": "self"
+                   }
+                 ]
+               },
+               "description": "Spend READY; gain INSPIRED and SHIELDED while concealed."    },
     "snipe": {
       "name": "Snipe",
       "ap": 1,
@@ -208,7 +260,7 @@
           {"tag": "MARKED", "target": "target"}
         ]
       },
-      "description": "Snipe exposed prey and leave a mark for an ally."
+      "description": "Exploit EXPOSED prey; apply MARKED for allies."
     },
     "hunker": {
       "name": "Hunker Down",
@@ -218,7 +270,29 @@
       "defense": 30,
       "cost": 1,
       "ends_turn": false
-    },
+,
+                "chain": {
+                  "consume": [
+                    {
+                      "tag": "INSPIRED",
+                      "target": "self",
+                      "bonus": [
+                        {
+                          "type": "shield",
+                          "target": "self",
+                          "amount": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "apply": [
+                    {
+                      "tag": "SHIELDED",
+                      "target": "self"
+                    }
+                  ]
+                },
+                "description": "Spend INSPIRED; gain SHIELDED in cover."    },
     "shoot": {
       "name": "Shoot",
       "ap": 1,
@@ -228,7 +302,29 @@
       "range": "weapon",
       "cost": 1,
       "ends_turn": true
-    },
+,
+               "chain": {
+                 "consume": [
+                   {
+                     "tag": "STAGGERED",
+                     "target": "target",
+                     "bonus": [
+                       {
+                         "type": "damage",
+                         "target": "target",
+                         "amount": 2
+                       }
+                     ]
+                   }
+                 ],
+                 "apply": [
+                   {
+                     "tag": "MARKED",
+                     "target": "target"
+                   }
+                 ]
+               },
+               "description": "Exploit STAGGERED prey; apply MARKED for allies."    },
     "overwatch": {
       "name": "Overwatch",
       "ap": 1,
@@ -236,7 +332,29 @@
       "effect": "overwatch",
       "cost": 1,
       "ends_turn": true
-    },
+,
+                   "chain": {
+                     "consume": [
+                       {
+                         "tag": "READY",
+                         "target": "self",
+                         "bonus": [
+                           {
+                             "type": "shield",
+                             "target": "self",
+                             "amount": 1
+                           }
+                         ]
+                       }
+                     ],
+                     "apply": [
+                       {
+                         "tag": "SHIELDED",
+                         "target": "self"
+                       }
+                     ]
+                   },
+                   "description": "Spend READY; gain SHIELDED while watching."    },
     "scout_saboteur_trap": {
       "name": "Saboteur Trap",
       "ap": 1,
@@ -271,7 +389,7 @@
           "tag": "PINNED"
         }
       ],
-      "description": "Once per mission: trap an area, root survivors and pin them.",
+      "description": "Spend STAGGERED; MARK foes. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "scout"
@@ -308,7 +426,7 @@
           "amount": 4
         }
       ],
-      "description": "Once per mission: strike through cover and cash in three primed tags.",
+      "description": "Spend STAGGERED; leave target PINNED. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "scout"
@@ -333,7 +451,7 @@
           {"tag": "EXPOSED", "target": "target"}
         ]
       },
-      "description": "Call out a pinned target and expose it for the squad."
+      "description": "Exploit PINNED prey; apply EXPOSED for allies."
     },
     "scout_flanking_shot": {
       "name": "Flanking Shot",
@@ -350,13 +468,30 @@
       "ammo_cost": 1,
       "chain": {
         "consume": [
-          {"tag": "MARKED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
+          {
+            "tag": "MARKED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
         ],
         "apply": [
-          {"tag": "STAGGERED", "target": "target"}
+          {
+            "tag": "STAGGERED",
+            "target": "target"
+          },
+          {
+            "tag": "EXPOSED",
+            "target": "target"
+          }
         ]
       },
-      "description": "Cash in a mark and stagger the target."
+      "description": "Exploit MARKED prey; apply STAGGERED and EXPOSED for allies."
     },
     "scout_ghost_step": {
       "name": "Ghost Step",
@@ -372,10 +507,27 @@
       "cooldown": 2,
       "chain": {
         "consume": [
-          {"tag": "SHIELDED", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 2}]}
+          {
+            "tag": "SHIELDED",
+            "target": "self",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
         ],
         "apply": [
-          {"tag": "READY", "target": "self"}
+          {
+            "tag": "READY",
+            "target": "self"
+          },
+          {
+            "tag": "ATTUNED",
+            "target": "self"
+          }
         ]
       },
       "effects": [
@@ -385,7 +537,7 @@
           "status": "concealed"
         }
       ],
-      "description": "Reconceal and prepare a hidden follow-up."
+      "description": "Spend SHIELDED; gain READY and ATTUNED for your next move."
     },
     "scout_shadow_cover": {
       "name": "Shadow Cover",
@@ -411,7 +563,7 @@
           "status": "concealed"
         }
       ],
-      "description": "Dig in and disappear behind cover."
+      "description": "Spend READY; gain SHIELDED for your next move."
     },
     "scout_hidden_watch": {
       "name": "Hidden Watch",
@@ -442,7 +594,7 @@
           "status": "concealed"
         }
       ],
-      "description": "Watch from concealment with a reinforced decoy."
+      "description": "Spend SHIELDED; gain READY for your next move."
     }
   },
   "base_stats": {

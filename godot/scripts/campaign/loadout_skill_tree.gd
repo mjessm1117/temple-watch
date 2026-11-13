@@ -24,7 +24,8 @@ func build() -> void:
 	var locked := bool(host.flow.session().state.get("skill_picks_locked", false))
 	add_child(UI.label("%s  /  SKILL TREE  ·  %s" % [str(r.cls).to_upper(), "PROMOTION PICKS" if locked else "FREE UNTIL DEPLOY"], 15, S.GOLD))
 	comparison = UI.label("Tap an open ability to compare · tap again to equip.", 11, S.CYAN)
-	comparison.clip_text = true; comparison.autowrap_mode = TextServer.AUTOWRAP_OFF; add_child(comparison)
+	comparison.custom_minimum_size.y = 44
+	comparison.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; add_child(comparison)
 	var side_name := "jedi" if Progression.is_jedi(r) else "soldier"
 	var class_row: Dictionary = Classes.class_data(str(r.get("cls", "")))
 	var specs: Dictionary = class_row.get("tree", {}).get("specs", {})
@@ -87,7 +88,7 @@ func _card(r: Dictionary, rank: int, key: String, branch: String, width: float, 
 	elif locked and rank <= 3 and not picked: reason = "Picks locked after deploy"
 	elif locked and rank <= r.get("picks", []).size() and not picked: reason = "Already chosen"
 	var card := S.button("", _preview.bind(rank, key), available)
-	card.name = "Skill_" + key; card.custom_minimum_size = Vector2(maxf(width, 44.0), 136 if width > 0 else 108)
+	card.name = "Skill_" + key; card.custom_minimum_size = Vector2(maxf(width, 44.0), 136 if width > 0 else 144)
 	card.size_flags_horizontal = SIZE_EXPAND_FILL
 	UI.style_button(card)
 	card.add_theme_stylebox_override("normal", S.box(Color("22434b") if picked else Color("172b32"), S.GOLD if picked else S.EDGE, 4))
@@ -110,8 +111,13 @@ func _card(r: Dictionary, rank: int, key: String, branch: String, width: float, 
 	var name_label := UI.label(str(ability.get("name", key)).to_upper() + "  ·  " + branch, 10, S.TEXT)
 	name_label.name = "AbilityName"; name_label.clip_text = true; name_label.autowrap_mode = TextServer.AUTOWRAP_OFF; info.add_child(name_label)
 	var description := UI.label(str(ability.get("description", _effect_line(ability))), 9, S.TEXT)
-	description.name = "Description"; description.clip_text = true; description.autowrap_mode = TextServer.AUTOWRAP_OFF; info.add_child(description)
-	var chain: Control = HBoxContainer.new() if width <= 0 else UI.label("", 8, S.GREEN)
+	description.name = "Description"
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description.max_lines_visible = 3
+	description.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	description.custom_minimum_size.y = 46 if width <= 0 else 34
+	info.add_child(description)
+	var chain: Label = UI.label("", 8, S.GREEN)
 	chain.name = "Chain"; chain.mouse_filter = Control.MOUSE_FILTER_IGNORE; info.add_child(chain)
 	var chain_data: Dictionary = ability.get("chain", {}) if ability.get("chain", {}) is Dictionary else {}
 	var chip_names := []
@@ -121,14 +127,8 @@ func _card(r: Dictionary, rank: int, key: String, branch: String, width: float, 
 		for tag in tags:
 			if not tag is Dictionary or str(tag.get("tag", "")) == "": continue
 			chip_names.append(("+" if kind == "apply" else "↳") + str(tag.tag))
-			if width > 0: continue
-			var chip := UI.label(("+" if kind == "apply" else "↳") + str(tag.tag), 8, S.GREEN if kind == "apply" else S.CYAN)
-			chip.autowrap_mode = TextServer.AUTOWRAP_OFF
-			chip.add_theme_stylebox_override("normal", S.box(Color("1b3438"), S.EDGE, 2))
-			chip.mouse_filter = Control.MOUSE_FILTER_IGNORE; chain.add_child(chip)
-	if chain is Label:
-		chain.text = " ".join(chip_names)
-		chain.clip_text = true; chain.autowrap_mode = TextServer.AUTOWRAP_OFF
+	chain.text = "  ".join(chip_names)
+	chain.clip_text = true; chain.autowrap_mode = TextServer.AUTOWRAP_OFF
 	return card
 
 func _preview(rank: int, key: String) -> void:

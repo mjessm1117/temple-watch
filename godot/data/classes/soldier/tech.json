@@ -109,7 +109,7 @@
           "tag": "MARKED"
         }
       ],
-      "description": "Remote probe marks contacts even beyond line of sight."
+      "description": "Exploit EXPOSED prey; apply IONIZED for allies."
     },
     "tech_emp_burst": {
       "name": "EMP Burst",
@@ -157,7 +157,7 @@
           "tag": "IONIZED"
         }
       ],
-      "description": "EMP blast drains shields and stuns droids."
+      "description": "Exploit LIFTED foes; apply IONIZED across the area."
     },
     "tech_remote_shield": {
       "name": "Remote Shield",
@@ -198,7 +198,7 @@
           "amount": 2
         }
       ],
-      "description": "Project a shield to an ally and retain a small reserve."
+      "description": "Use after READY; grant SHIELDED to allies."
     },
     "tech_slicer_ping": {
       "name": "Slicer Ping",
@@ -246,7 +246,7 @@
           "amount": 1
         }
       ],
-      "description": "Ping and ionize enemy signals while recovering the slicer action."
+      "description": "Exploit LIFTED prey; apply BURNING for allies."
     },
     "tech_turret_pin": {
       "name": "Turret Pin",
@@ -292,7 +292,7 @@
           "status": "rooted"
         }
       ],
-      "description": "A turret double-taps and pins its target."
+      "description": "Exploit LIFTED prey; apply PINNED for allies."
     },
     "tech_override": {
       "name": "Override",
@@ -333,7 +333,7 @@
           "amount": 1
         }
       ],
-      "description": "Override a droid into the player squad for the rest of the battle.",
+      "description": "Use after IONIZED; grant STAGGERED to allies.",
       "damage": [
         1,
         1
@@ -384,7 +384,7 @@
           "amount": 2
         }
       ],
-      "description": "Repair a wounded ally and reinforce its plating."
+      "description": "Use after INSPIRED; grant ATTUNED to allies."
     },
     "tech_ion_spike": {
       "name": "Ion Spike",
@@ -429,7 +429,7 @@
           "tag": "IONIZED"
         }
       ],
-      "description": "A cover-proof ion shot that empties shields."
+      "description": "Exploit MARKED prey; apply EXPOSED for allies."
     },
     "tech_barrier_grid": {
       "name": "Barrier Grid",
@@ -473,7 +473,7 @@
           "tag": "SHIELDED"
         }
       ],
-      "description": "Project a defensive grid over the whole squad."
+      "description": "Spend SHIELDED; gain SHIELDED for your next move."
     },
     "tech_signal_jam": {
       "name": "Signal Jam",
@@ -516,7 +516,7 @@
           "status": "disarmed"
         }
       ],
-      "description": "Jam enemy weapons and suppress the marked contact."
+      "description": "Exploit MARKED prey; apply BURNING for allies."
     },
     "tech_drone_relay": {
       "name": "Drone Relay",
@@ -562,7 +562,7 @@
           "amount": 3
         }
       ],
-      "description": "Relay a fresh action and shield to one ally."
+      "description": "Use after SHIELDED; grant ATTUNED to allies."
     },
     "tech_total_shutdown": {
       "name": "Total Shutdown",
@@ -610,7 +610,7 @@
           "tag": "IONIZED"
         }
       ],
-      "description": "Once per mission: global ion surge with a droid-ending EMP blast.",
+      "description": "Spend MARKED; STAGGER foes. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "tech"
@@ -661,7 +661,7 @@
           "amount": 1
         }
       ],
-      "description": "Once per mission: repair and coordinate the whole squad.",
+      "description": "Spend ATTUNED; shield allies. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "tech"

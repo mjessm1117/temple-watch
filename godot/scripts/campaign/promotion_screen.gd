@@ -13,6 +13,7 @@ var unit_id := ""
 var scroll: ScrollContainer
 var content: VBoxContainer
 var confirm: Button
+var done_button: Button
 var chosen := ""
 var cards: Dictionary = {}
 var rank_rows: Dictionary = {}
@@ -32,7 +33,8 @@ func setup(c: RefCounted, id: String) -> void:
     add_child(shade)
     var margin := MarginContainer.new()
     margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    var safe := Phone.safe_margins(get_viewport_rect().size) if Phone.narrow(Phone.window_size()) else Vector4.ZERO
+    var view_size := get_viewport_rect().size
+    var safe := Phone.safe_margins(view_size)
     margin.add_theme_constant_override("margin_left", 12 + int(safe.x))
     margin.add_theme_constant_override("margin_right", 12 + int(safe.z))
     margin.add_theme_constant_override("margin_top", 12 + int(safe.y))
@@ -43,18 +45,18 @@ func setup(c: RefCounted, id: String) -> void:
     margin.add_child(frame)
     var portrait_panel := UI.panel(Color("11242c"))
     portrait_panel.name = "RankupPortrait"
-    var logical_width := Phone.logical_size(Phone.window_size()).x
-    portrait_panel.custom_minimum_size.x = 152 if Phone.narrow(Phone.window_size()) and logical_width <= 700 else 185 if Phone.narrow(Phone.window_size()) else 300
+    var available_width := view_size.x - safe.x - safe.z - 24.0
+    portrait_panel.custom_minimum_size.x = 185 if Phone.narrow(Phone.window_size()) else 300
     portrait_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
     frame.add_child(portrait_panel)
-    if get_viewport_rect().size.x < 500: portrait_panel.hide()
+    if available_width < 760.0: portrait_panel.hide()
     var portrait_column := VBoxContainer.new()
     portrait_column.add_theme_constant_override("separation", 2)
     portrait_panel.add_child(portrait_column)
     var r: Dictionary = campaign.soldier(unit_id)
     var eyebrow := UI.label("FIELD RECORD  /  PROMOTION", 14, UI.ACCENT)
     portrait_column.add_child(eyebrow)
-    var portrait_height: float = minf(270.0, get_viewport_rect().size.y - 130.0)
+    var portrait_height: float = minf(270.0, get_viewport_rect().size.y - 165.0)
     var portrait_width: float = minf(246.0, portrait_panel.custom_minimum_size.x - 28.0)
     var image := Portraits.picture(str(r.get("n", "")), Vector2(portrait_width, portrait_height))
     image.name = "UnitPortrait"
@@ -75,10 +77,13 @@ func setup(c: RefCounted, id: String) -> void:
     right.add_child(header)
     var heading := UI.label("RANK UP  /  %s" % Classes.class_data(str(r.cls)).get("name", r.cls), 18, UI.GOLD)
     heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    heading.clip_text = true
+    heading.autowrap_mode = TextServer.AUTOWRAP_OFF
     header.add_child(heading)
-    var back := UI.button("DONE", _close)
-    back.custom_minimum_size = Vector2(72, 44)
-    header.add_child(back)
+    done_button = UI.button("DONE", _close)
+    done_button.name = "RankupDone"
+    done_button.custom_minimum_size = Vector2(72, 44)
+    header.add_child(done_button)
     var transition := HBoxContainer.new()
     transition.name = "RankTransition"
     transition.add_theme_constant_override("separation", 5)
@@ -89,12 +94,16 @@ func setup(c: RefCounted, id: String) -> void:
     transition.add_child(_rank_mark(side_name, before, 46))
     var from_label := UI.label(str(Classes.rank_data(side_name, before).get("title", "")), 14, UI.MUTED)
     from_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    from_label.clip_text = true
+    from_label.autowrap_mode = TextServer.AUTOWRAP_OFF
     transition.add_child(from_label)
     transition.add_child(UI.label("›", 22, UI.GOLD))
     new_badge = _rank_mark(side_name, level, 46)
     transition.add_child(new_badge)
     var to_label := UI.label(str(Classes.rank_data(side_name, level).get("title", "")), 15, UI.GOLD)
     to_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    to_label.clip_text = true
+    to_label.autowrap_mode = TextServer.AUTOWRAP_OFF
     transition.add_child(to_label)
     var gains := UI.label(_gain_text(r), 14, UI.ACCENT)
     gains.name = "StatGains"
@@ -211,11 +220,12 @@ func _effect_text(definition: Dictionary) -> String:
     if definition.has("reaction"): pieces.append("reaction fire")
     return "  ·  ".join(pieces)
 
-func _ability_card(id: String, active: bool, earned: bool = false, show_metric: bool = true) -> Control:
+func _ability_card(id: String, active: bool, earned: bool = false, show_metric: bool = true, card_width: float = 0.0, compact: bool = false) -> Control:
     var definition := _ability_data(id)
     var card: Control = Button.new() if active else PanelContainer.new()
     card.name = "Card_" + id
-    card.custom_minimum_size.y = 112 if active else 50
+    var narrow_card := card_width > 0.0 and card_width < 170.0
+    card.custom_minimum_size = Vector2(card_width, 88 if active and compact and show_metric else 80 if active and compact else 132 if active and narrow_card else 112 if active else 50)
     card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     var fill := Color("1d333b") if earned else Color("182b34") if active else Color("142127")
     var border := UI.GOLD if earned else UI.ACCENT if active else UI.BORDER
@@ -249,15 +259,18 @@ func _ability_card(id: String, active: bool, earned: bool = false, show_metric: 
         metric.mouse_filter = Control.MOUSE_FILTER_IGNORE
         metric.autowrap_mode = TextServer.AUTOWRAP_OFF
         stack.add_child(metric)
-    var effect := UI.label(_effect_text(definition), 14, UI.TEXT if active or earned else UI.MUTED)
+    var effect_text := _effect_text(definition)
+    if compact and effect_text.length() > 40: effect_text = effect_text.substr(0, 39).strip_edges() + "…"
+    elif narrow_card and effect_text.length() > 45: effect_text = effect_text.substr(0, 44).strip_edges() + "…"
+    var effect := UI.label(effect_text, 14, UI.TEXT if active or earned else UI.MUTED)
     effect.name = "Effect_" + id
     effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
     effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if active else TextServer.AUTOWRAP_OFF
     effect.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING if active else TextServer.OVERRUN_TRIM_ELLIPSIS
-    effect.custom_minimum_size.y = 38 if active else 18
+    effect.custom_minimum_size.y = 24 if compact else 52 if active and narrow_card else 38 if active else 18
     stack.add_child(effect)
     var chain_text := _chain_text(definition)
-    if chain_text != "":
+    if chain_text != "" and not compact:
         var chains := UI.label(chain_text, 14, UI.ACCENT if active or earned else UI.MUTED)
         chains.mouse_filter = Control.MOUSE_FILTER_IGNORE
         chains.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -286,6 +299,22 @@ func _select(id: String) -> void:
             card.add_theme_stylebox_override(state, UI.style(Color("28414c") if key == id else Color("182b34"), color))
     confirm.disabled = false
     confirm.text = "CONFIRM  ·  " + _ability_name(id, false)
+
+func preview_choice(rank: int, branch_index: int) -> void:
+    var r: Dictionary = campaign.soldier(unit_id)
+    if int(r.get("pick", 0)) != rank: return
+    var options := Progression.tree_options(r, rank)
+    if branch_index < 0 or branch_index >= options.size(): return
+    _select(str(options[branch_index]))
+
+func cancel_preview() -> void:
+    chosen = ""
+    confirm.disabled = true
+    confirm.text = "SELECT AN ABILITY"
+    for key in cards:
+        var card: Button = cards[key]
+        for state in ["normal", "hover", "pressed", "focus"]:
+            card.add_theme_stylebox_override(state, UI.style(Color("182b34"), UI.ACCENT))
 
 func _confirm() -> void:
     if chosen == "": return
@@ -318,11 +347,19 @@ func _refresh() -> void:
             var options := Progression.tree_options(r, level)
             var grid := GridContainer.new()
             grid.name = "ChoiceGrid"
-            grid.columns = 1 if Phone.narrow(Phone.window_size()) and Phone.logical_size(Phone.window_size()).x < 800 else 2
+            var view_size := get_viewport_rect().size
+            var safe := Phone.safe_margins(view_size)
+            var usable_width := view_size.x - safe.x - safe.z - 24.0
+            var portrait_visible := usable_width >= 760.0
+            if portrait_visible: usable_width -= 240.0
+            usable_width -= 16.0 # frame/scroll spacing
+            grid.columns = 2 if usable_width >= 600.0 or portrait_visible and usable_width >= 480.0 or view_size.y > view_size.x and usable_width >= 280.0 else 1
             grid.add_theme_constant_override("h_separation", 4)
             grid.add_theme_constant_override("v_separation", 4)
             row.add_child(grid)
-            for option in options: grid.add_child(_ability_card(str(option), true, false, grid.columns == 2))
+            var card_width := minf(220.0, (usable_width - 4.0) / 2.0) if grid.columns == 2 else 0.0
+            var compact := view_size.y < 420.0
+            for option in options: grid.add_child(_ability_card(str(option), true, false, grid.columns == 2, card_width, compact))
         elif level <= picks.size():
             row.add_child(_ability_card(str(picks[level - 1]), false, true))
         elif level > rank:

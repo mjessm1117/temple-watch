@@ -103,7 +103,7 @@
       },
       "droid_damage": 10,
       "clear_overwatch": true,
-      "description": "Rocket doubles into ionized armor and strips reactions."
+      "description": "Exploit IONIZED foes; apply EXPOSED across the area."
     },
     "heavy_breaching_shell": {
       "name": "Breaching Shell",
@@ -149,7 +149,7 @@
           "amount": 2
         }
       ],
-      "description": "Blast cover, interrupt overwatch, and brace the gunner."
+      "description": "Exploit IONIZED foes; apply BURNING across the area."
     },
     "heavy_shield_wall": {
       "name": "Shield Wall",
@@ -191,7 +191,7 @@
           "amount": 1
         }
       ],
-      "description": "Shield nearby allies while holding your ground."
+      "description": "Spend ATTUNED; gain SHIELDED for your next move."
     },
     "heavy_shrapnel_net": {
       "name": "Shrapnel Net",
@@ -237,7 +237,7 @@
           "status": "rooted"
         }
       ],
-      "description": "Pin enemies in a shrapnel field so they cannot move."
+      "description": "Exploit IONIZED foes; apply PINNED across the area."
     },
     "heavy_juggernaut_push": {
       "name": "Juggernaut Push",
@@ -273,7 +273,7 @@
       },
       "distance": 3,
       "collision_damage": 4,
-      "description": "Drive one enemy three tiles back and crush it against cover."
+      "description": "Exploit IONIZED prey; apply IONIZED for allies."
     },
     "heavy_demolition_line": {
       "name": "Demolition Line",
@@ -319,7 +319,7 @@
           "amount": 2
         }
       ],
-      "description": "Lay an explosive line with secondary fragmentation."
+      "description": "Exploit PINNED foes; apply EXPOSED across the area."
     },
     "heavy_armor_lock": {
       "name": "Armor Lock",
@@ -360,7 +360,7 @@
           "amount": 4
         }
       ],
-      "description": "Lock armor, hunker down and gain a shield."
+      "description": "Spend READY; gain ATTUNED for your next move."
     },
     "heavy_ion_buster": {
       "name": "Ion Buster",
@@ -408,7 +408,7 @@
           "tag": "IONIZED"
         }
       ],
-      "description": "Ion shell drains shields, stuns Droids, and interrupts overwatch.",
+      "description": "Exploit PINNED foes; apply BURNING across the area.",
       "clear_overwatch": true
     },
     "heavy_fortress_fire": {
@@ -453,7 +453,7 @@
           "amount": 3
         }
       ],
-      "description": "Double fire from a reinforced position."
+      "description": "Exploit PINNED prey; apply MARKED for allies."
     },
     "heavy_siege_breaker": {
       "name": "Siege Breaker",
@@ -501,7 +501,7 @@
           "status": "stunned"
         }
       ],
-      "description": "Collapse a siege line and stun enemies inside it."
+      "description": "Exploit PINNED foes; apply STAGGERED across the area."
     },
     "heavy_body_block": {
       "name": "Body Block",
@@ -547,7 +547,7 @@
           "amount": 4
         }
       ],
-      "description": "Take the threat onto yourself and shield the ally you guard."
+      "description": "Use after INSPIRED; grant ATTUNED to allies."
     },
     "heavy_armageddon": {
       "name": "Armageddon",
@@ -594,7 +594,7 @@
           "status": "stunned"
         }
       ],
-      "description": "Once per mission: a devastating blast that risks allies and ruins cover.",
+      "description": "Spend EXPOSED; blast the area. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "heavy"
@@ -647,7 +647,7 @@
           "amount": 2
         }
       ],
-      "description": "Once per mission: fortify and heal the whole squad behind a shield wall.",
+      "description": "Spend SHIELDED; shield allies. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "heavy"

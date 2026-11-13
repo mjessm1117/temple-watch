@@ -65,7 +65,7 @@
           "tag": "BURNING"
         }
       ],
-      "description": "Detonate cover and set the area on fire."
+      "description": "Exploit MARKED foes; apply EXPOSED across the area."
     },
     "suppress": {
       "name": "Suppress",
@@ -88,7 +88,7 @@
           {"tag": "PINNED", "target": "target"}
         ]
       },
-      "description": "Suppress a marked foe, then pin it for a squad follow-up."
+      "description": "Exploit MARKED prey; apply PINNED for allies."
     },
     "rapidFire": {
       "name": "Rapid Fire",
@@ -112,7 +112,7 @@
           {"tag": "STAGGERED", "target": "target"}
         ]
       },
-      "description": "Two shots exploit a pinned foe and stagger survivors."
+      "description": "Exploit PINNED prey; apply STAGGERED for allies."
     },
     "trooper_breach_charge": {
       "name": "Breach Charge",
@@ -143,7 +143,7 @@
           "status": "rooted"
         }
       ],
-      "description": "Breach cover and root enemies in the debris."
+      "description": "Exploit MARKED foes; apply PINNED across the area."
     },
     "hunker": {
       "name": "Hunker Down",
@@ -153,7 +153,29 @@
       "defense": 30,
       "cost": 1,
       "ends_turn": false
-    },
+,
+                "chain": {
+                  "consume": [
+                    {
+                      "tag": "INSPIRED",
+                      "target": "self",
+                      "bonus": [
+                        {
+                          "type": "shield",
+                          "target": "self",
+                          "amount": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "apply": [
+                    {
+                      "tag": "SHIELDED",
+                      "target": "self"
+                    }
+                  ]
+                },
+                "description": "Spend INSPIRED; gain SHIELDED in cover."    },
     "rally": {
       "name": "Rally",
       "ap": 1,
@@ -166,13 +188,30 @@
       "rank": 4,
       "chain": {
         "consume": [
-          {"tag": "BURNING", "target": "all_allies", "bonus": [{"type": "heal", "target": "target", "amount": 2}]}
+          {
+            "tag": "BURNING",
+            "target": "all_allies",
+            "bonus": [
+              {
+                "type": "heal",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
         ],
         "apply": [
-          {"tag": "INSPIRED", "target": "all_allies"}
+          {
+            "tag": "INSPIRED",
+            "target": "all_allies"
+          },
+          {
+            "tag": "ATTUNED",
+            "target": "all_allies"
+          }
         ]
       },
-      "description": "Clear nearby disruptions and inspire the squad; burning allies recover."
+      "description": "Spend BURNING; gain INSPIRED and ATTUNED for your next move."
     },
     "trooper_armor_piercer": {
       "name": "Armor Piercer",
@@ -196,7 +235,7 @@
       },
       "ignore_cover": true,
       "pierce": true,
-      "description": "Pierce cover and continue through a second target."
+      "description": "Exploit STAGGERED prey; apply EXPOSED for allies."
     },
     "trooper_firebreak": {
       "name": "Firebreak",
@@ -231,7 +270,7 @@
           "amount": 2
         }
       ],
-      "description": "Burn an area while the trooper braces behind armor."
+      "description": "Exploit STAGGERED foes; apply BURNING across the area."
     },
     "shoot": {
       "name": "Shoot",
@@ -242,7 +281,29 @@
       "range": "weapon",
       "cost": 1,
       "ends_turn": true
-    },
+,
+               "chain": {
+                 "consume": [
+                   {
+                     "tag": "STAGGERED",
+                     "target": "target",
+                     "bonus": [
+                       {
+                         "type": "damage",
+                         "target": "target",
+                         "amount": 2
+                       }
+                     ]
+                   }
+                 ],
+                 "apply": [
+                   {
+                     "tag": "MARKED",
+                     "target": "target"
+                   }
+                 ]
+               },
+               "description": "Exploit STAGGERED prey; apply MARKED for allies."    },
     "overwatch": {
       "name": "Overwatch",
       "ap": 1,
@@ -250,7 +311,29 @@
       "effect": "overwatch",
       "cost": 1,
       "ends_turn": true
-    },
+,
+                   "chain": {
+                     "consume": [
+                       {
+                         "tag": "READY",
+                         "target": "self",
+                         "bonus": [
+                           {
+                             "type": "shield",
+                             "target": "self",
+                             "amount": 1
+                           }
+                         ]
+                       }
+                     ],
+                     "apply": [
+                       {
+                         "tag": "SHIELDED",
+                         "target": "self"
+                       }
+                     ]
+                   },
+                   "description": "Spend READY; gain SHIELDED while watching."    },
     "trooper_counter_barrage": {
       "name": "Counter Barrage",
       "ap": 1,
@@ -279,7 +362,7 @@
           "amount": 2
         }
       ],
-      "description": "Fire two counter rounds and a fragmentation hit."
+      "description": "Exploit STAGGERED prey; apply PINNED for allies."
     },
     "trooper_assault_storm": {
       "name": "Assault Storm",
@@ -314,7 +397,7 @@
           "tag": "EXPOSED"
         }
       ],
-      "description": "Once per mission: breach an area and release the assault squad.",
+      "description": "Spend STAGGERED; IONIZE foes. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "trooper"
@@ -354,7 +437,7 @@
           "status": "rooted"
         }
       ],
-      "description": "Once per mission: risky inferno that roots surviving enemies.",
+      "description": "Spend IONIZED; EXPOSE foes. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "trooper"
@@ -383,7 +466,7 @@
           "amount": 2
         }
       ],
-      "description": "Brace behind blast armor and build a shield for the next attack."
+      "description": "Spend INSPIRED; gain SHIELDED for your next move."
     },
     "trooper_armor_watch": {
       "name": "Armor Watch",
@@ -395,10 +478,27 @@
       "rank": 6,
       "chain": {
         "consume": [
-          {"tag": "SHIELDED", "target": "self", "bonus": [{"type": "shield", "target": "target", "amount": 2}]}
+          {
+            "tag": "SHIELDED",
+            "target": "self",
+            "bonus": [
+              {
+                "type": "shield",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
         ],
         "apply": [
-          {"tag": "READY", "target": "self"}
+          {
+            "tag": "READY",
+            "target": "self"
+          },
+          {
+            "tag": "INSPIRED",
+            "target": "self"
+          }
         ]
       },
       "effects": [
@@ -408,7 +508,7 @@
           "amount": 1
         }
       ],
-      "description": "Overwatch behind armor, converting a shield into more protection."
+      "description": "Spend SHIELDED; gain READY and INSPIRED for your next move."
     },
     "trooper_cover_buster": {
       "name": "Cover Buster",
@@ -425,13 +525,30 @@
       "ammo_cost": 1,
       "chain": {
         "consume": [
-          {"tag": "PINNED", "target": "target", "bonus": [{"type": "damage", "target": "target", "amount": 2}]}
+          {
+            "tag": "PINNED",
+            "target": "target",
+            "bonus": [
+              {
+                "type": "damage",
+                "target": "target",
+                "amount": 2
+              }
+            ]
+          }
         ],
         "apply": [
-          {"tag": "EXPOSED", "target": "target"}
+          {
+            "tag": "EXPOSED",
+            "target": "target"
+          },
+          {
+            "tag": "STAGGERED",
+            "target": "target"
+          }
         ]
       },
-      "description": "Fire through cover and expose a pinned target."
+      "description": "Exploit PINNED prey; apply EXPOSED and STAGGERED for allies."
     }
   },
   "base_stats": {

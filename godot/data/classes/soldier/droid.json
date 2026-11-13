@@ -115,7 +115,7 @@
         ]
       },
       "amount": 0,
-      "description": "Rebuild a wrecked chassis in place."
+      "description": "Spend ATTUNED; gain READY for your next move."
     },
     "droid_repeater_module": {
       "name": "Repeater Module",
@@ -152,7 +152,7 @@
       },
       "shots": 3,
       "aim_mod": -15,
-      "description": "Repeater module lays three suppressive shots."
+      "description": "Exploit STAGGERED prey; apply PINNED for allies."
     },
     "droid_shield_module": {
       "name": "Shield Module",
@@ -193,7 +193,7 @@
           "amount": 1
         }
       ],
-      "description": "Shield module reinforces its target and nearby squad."
+      "description": "Use after READY; grant SHIELDED to allies."
     },
     "droid_sensor_module": {
       "name": "Sensor Module",
@@ -236,7 +236,7 @@
           "tag": "MARKED"
         }
       ],
-      "description": "Sensor module marks every visible enemy."
+      "description": "Exploit STAGGERED prey; apply MARKED for allies."
     },
     "droid_jetpack_module": {
       "name": "Jetpack Module",
@@ -276,7 +276,7 @@
           "amount": 2
         }
       ],
-      "description": "Jetpack leap gains a landing shield."
+      "description": "Spend PINNED; gain EXPOSED for your next move."
     },
     "droid_flamer_module": {
       "name": "Flamer Module",
@@ -327,7 +327,7 @@
           "status": "panicked"
         }
       ],
-      "description": "Flamer blankets an area in lasting fire and panics survivors."
+      "description": "Exploit IONIZED foes; apply BURNING across the area."
     },
     "droid_med_module": {
       "name": "Med Module",
@@ -373,7 +373,7 @@
           }
         ]
       },
-      "description": "Med module treats its target and self-repairs."
+      "description": "Use after INSPIRED; grant INSPIRED to allies."
     },
     "droid_targeting_protocol": {
       "name": "Targeting Protocol",
@@ -417,7 +417,7 @@
           "tag": "MARKED"
         }
       ],
-      "description": "Targeting computer ignores cover and primes follow-up shots."
+      "description": "Exploit MARKED prey; apply PINNED for allies."
     },
     "droid_servo_lock": {
       "name": "Servo Lock",
@@ -458,7 +458,7 @@
           "amount": 2
         }
       ],
-      "description": "Servo lock immobilizes a target and tears its joints."
+      "description": "Exploit IONIZED prey; apply BURNING for allies."
     },
     "droid_reactive_plate": {
       "name": "Reactive Plate",
@@ -500,7 +500,7 @@
           "tag": "SHIELDED"
         }
       ],
-      "description": "Reactive plate hunkers and charges a shield."
+      "description": "Spend INSPIRED; gain ATTUNED for your next move."
     },
     "droid_ion_relay": {
       "name": "Ion Relay",
@@ -545,7 +545,7 @@
           "tag": "IONIZED"
         }
       ],
-      "description": "Ion relay pierces a line and ionizes hostiles."
+      "description": "Exploit IONIZED prey; apply STAGGERED for allies."
     },
     "droid_omni_frame": {
       "name": "Omni Frame",
@@ -593,7 +593,7 @@
           "amount": 3
         }
       ],
-      "description": "Once per mission: omni-frame gives each ally an action and reinforced plating.",
+      "description": "Spend SHIELDED; shield allies. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "droid"
@@ -648,7 +648,7 @@
           "tag": "BURNING"
         }
       ],
-      "description": "Once per mission: sacrifice chassis integrity to ignite a huge blast.",
+      "description": "Spend PINNED; mark area EXPOSED. · Once per mission",
       "charges": "soldier_capstone",
       "once_per_mission": true,
       "capstone_template": "droid"

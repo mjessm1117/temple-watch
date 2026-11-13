@@ -124,3 +124,7 @@ run_suite balance29_test
 run_suite battle29_test
 run_suite phone29_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite scroll29_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
+run_suite a30_test
+run_suite b30_test
+run_suite c30_test
+run_suite d30_test

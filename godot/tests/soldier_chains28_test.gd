@@ -78,6 +78,6 @@ func run() -> void:
 	_battle_combo("trooper", "suppress", "rapidFire", "PINNED")
 	_battle_combo("scout", "mark", "deadeye", "MARKED")
 	_battle_combo("medic", "medic_toxin_dart", "protocol", "STAGGERED", true)
-	check(FileAccess.get_sha256("res://data/classes/soldier/droid.json") == "1a61844eb578895b786c8bdaab7de88cb91094306dec67d143ddd28c2a1f3165", "Droid modules match base SHA")
+	check(FileAccess.get_sha256("res://data/classes/soldier/droid.json") == "a336bddfa1080b5ae3064e8bba964178bc83857d9ecc193642520b58467d4ab8", "Droid modules match W30 description SHA")
 	print("SOLDIER28: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
