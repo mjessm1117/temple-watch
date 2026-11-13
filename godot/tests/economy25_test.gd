@@ -40,11 +40,11 @@ func run() -> void:
 	check(forecast_line.text.ends_with("Cr at month end"), "compact forecast line")
 	forecast_line.free()
 	var priority = Campaign.new()
-	check(priority.strategic_snapshot25().top_priority.room_id == "works", "unbuilt urgent room priority")
+	check(priority.strategic_snapshot25().top_priority.room_id == "war", "Sith deadline outranks unbuilt room")
 	priority.state.wings.archives = 1
-	check(priority.strategic_snapshot25().top_priority.room_id == "archives", "idle lab outranks room")
+	check(priority.strategic_snapshot25().top_priority.room_id == "war", "Sith deadline outranks idle lab")
 	priority.state.research.cur = "ataru"; priority.state.wings.forge = 1
-	check(priority.strategic_snapshot25().top_priority.room_id == "forge", "idle forge priority")
+	check(priority.strategic_snapshot25().top_priority.room_id == "war", "Sith deadline outranks idle forge")
 	priority.state.wings.armory = 1
 	check(priority.strategic_snapshot25().top_priority.room_id == "works", "power over cap outranks threat")
 	c.month_advanced.connect(func(month: int, _snapshot: Dictionary):

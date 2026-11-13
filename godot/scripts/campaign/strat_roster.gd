@@ -56,7 +56,7 @@ static func refresh_recruits(s: Dictionary) -> void:
 	var names: Array = Data.get_table("core", "RECRUIT_NAMES")
 	for i in 3:
 		var jedi := i == 0 and int(s.month) % 2 == 1
-		var cls: String = ["Guardian", "Consular", "Sentinel"][(int(s.month) + i) % 3] if jedi else ["Soldier", "Scout", "Medic", "Heavy", "Sniper", "Tech", "Droid", "Officer"][(int(s.month) + i) % 8]
+		var cls: String = ["Guardian", "Consular", "Sentinel"][(int(s.month) + i) % 3] if jedi else ["Trooper", "Scout", "Medic", "Heavy", "Sniper", "Tech", "Droid", "Officer"][(int(s.month) + i) % 8]
 		s.cands.append({"id":"candidate-%d-%d" % [s.month, i], "n":names[(int(s.month) * 3 + i) % names.size()], "cls":cls, "jedi":jedi})
 
 static func capacity(s: Dictionary) -> int:
