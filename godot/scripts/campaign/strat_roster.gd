@@ -28,6 +28,29 @@ static func fatigue_status(r: Dictionary) -> String:
 	var value := int(r.get("fatigue", 0))
 	return "EXHAUSTED" if value >= 67 else "TIRED" if value >= 34 else "READY"
 
+static func rank_tier_label(r: Dictionary) -> String:
+	var explicit := str(r.get("rank_tier", ""))
+	if explicit != "": return explicit
+	var side_name := Classes.side(str(r.get("cls", "")))
+	var rank := int(r.get("rank", 1))
+	if side_name == "jedi": return str(Classes.rank_data(side_name, rank).get("tier", "Padawan"))
+	return ["Recruit", "Specialist", "Expert", "Expert", "Elite", "Elite", "Legend"][clampi(rank - 1, 0, 6)]
+
+static func chain_tag_label(r: Dictionary) -> String:
+	var explicit := str(r.get("combo_tag", ""))
+	if explicit != "": return explicit
+	var abilities: Dictionary = Classes.class_data(str(r.get("cls", ""))).get("abilities", {})
+	var candidates: Array = r.get("picks", []).duplicate()
+	var signature := str(Classes.class_data(str(r.get("cls", ""))).get("signature", ""))
+	if signature != "": candidates.append(signature)
+	for id in candidates:
+		var chain: Dictionary = abilities.get(str(id), {}).get("chain", {})
+		for action in ["consume", "apply"]:
+			for entry in chain.get(action, []):
+				var tag := str(entry.get("tag", ""))
+				if tag != "": return tag
+	return ""
+
 static func refresh_recruits(s: Dictionary) -> void:
 	s.cands = []
 	var names: Array = Data.get_table("core", "RECRUIT_NAMES")
