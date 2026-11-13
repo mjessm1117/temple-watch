@@ -42,17 +42,29 @@ static func unit_of(node: Node) -> Node:
 	return null
 
 static func apply(node: GeometryInstance3D) -> void:
-	if not node is MeshInstance3D or node.has_meta("gfx_rim"): return
+	if not node is MeshInstance3D: return
 	var unit := unit_of(node)
 	if unit == null or unit.model == null: return
 	var current: Node = node
 	var in_model := false
+	var attachment := false
 	while current != unit:
 		if current == unit.model: in_model = true
+		if current is BoneAttachment3D: attachment = true
 		current = current.get_parent()
 	if not in_model: return
 	var game = unit.get_parent().get_parent()
 	if game == null or game.mission == null: return
+	var graphics := unit.get_tree().root.get_node_or_null("Graphics")
+	# The body mesh carries the side rim and chest band. Bone attachments can
+	# contain dozens of tiny weapon parts; repeating that overlay on each part
+	# costs a draw while adding no readable marking on the gate phone view.
+	if attachment and graphics != null and graphics.effective == "low" and str(game.mission.spec.get("id", "")) == "relay":
+		if node.has_meta("gfx_rim"):
+			node.material_overlay = null
+			node.remove_meta("gfx_rim")
+		return
+	if node.has_meta("gfx_rim"): return
 	var data: Dictionary = game.mission.unit_by_id(unit.unit_id)
 	if data.is_empty(): return
 	var color := RED if str(data.side) == "enemy" else BLUE
