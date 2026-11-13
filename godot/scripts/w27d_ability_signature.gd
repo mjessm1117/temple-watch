@@ -66,5 +66,29 @@ static func profile(id: String, def: Dictionary = {}, target: Dictionary = {}, a
 		"ranged": return {"shape":"narrow_arc", "color":Color(1.0, 1.0, 1.0, 0.7), "radius":0.8, "arc_width":0.45, "category":kind}
 	return {}
 
+static func chain_result_pulse(fx_node: Node3D, at: Vector3) -> MeshInstance3D:
+	if fx_node == null or not is_instance_valid(fx_node): return null
+	var pulse := MeshInstance3D.new()
+	pulse.name = "W31CChainResultPulse"
+	var mesh := TorusMesh.new()
+	mesh.inner_radius = 0.45
+	mesh.outer_radius = 0.54
+	pulse.mesh = mesh
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = Color(1.0, 1.0, 0.92, 0.95)
+	material.emission_enabled = true
+	material.emission = material.albedo_color
+	material.emission_energy_multiplier = 2.4
+	pulse.material_override = material
+	pulse.position = at - Vector3.UP * 0.75
+	fx_node.add_child(pulse)
+	var tween := fx_node.create_tween().set_parallel(true)
+	tween.tween_property(pulse, "scale", Vector3.ONE * 2.4, 0.25).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(pulse, "transparency", 1.0, 0.25)
+	tween.chain().tween_callback(pulse.queue_free)
+	return pulse
+
 static func budget() -> Dictionary:
 	return {"draws_per_beat": 4, "particles_max": 12}
