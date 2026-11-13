@@ -33,6 +33,28 @@ var speaker_plate: Label
 var speaker_portrait: TextureRect
 var big_speaker_portrait: TextureRect
 var big_speaker_caption: Label
+var backing := false
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("ui_cancel"): return
+	var flow := get_node_or_null("/root/CampaignFlow")
+	if flow != null and is_instance_valid(flow.settings_panel): return
+	get_viewport().set_input_as_handled()
+	_back()
+
+func _back() -> void:
+	if backing: return
+	backing = true
+	var flow := get_node_or_null("/root/CampaignFlow")
+	if mode == "briefing" and flow != null and flow.active:
+		flow.back_from_briefing()
+	elif mode == "codex":
+		_finish()
+	elif mode == "dialogue" and flow != null and flow.active:
+		if flow.screen_return != "result": flow.suppress_story_once = true
+		flow.go("result" if flow.screen_return == "result" else "temple")
+	else:
+		backing = false
 
 func set_campaign_state(value: Dictionary) -> void:
 	demo_mode = false
@@ -171,8 +193,12 @@ func _build_story() -> void:
 	var campaign_flow := get_node_or_null("/root/CampaignFlow")
 	var live_briefing: bool = mode == "briefing" and campaign_flow != null and campaign_flow.active and campaign_flow.campaign != null
 	if live_briefing:
-		var back := UI.button("← BACK TO MISSION", campaign_flow.back_from_briefing)
+		var back := UI.button("← BACK TO MISSION", _back)
 		back.name = "BriefingBack"
+		content.add_child(back)
+	elif mode == "dialogue" and campaign_flow != null and campaign_flow.active:
+		var back := UI.button("← BACK", _back)
+		back.name = "StoryBack"
 		content.add_child(back)
 	var speaking := HBoxContainer.new()
 	speaking.add_theme_constant_override("separation",12)
@@ -403,6 +429,8 @@ func _finish() -> void:
 	completed.emit()
 
 func _build_codex() -> void:
+	var flow := get_node_or_null("/root/CampaignFlow")
+	var back_text := "← Return to Mission" if flow != null and flow.screen_return == "galaxy" else "← Return to Temple"
 	var found := 0
 	for category in campaign_state.codex.values(): found += category.size()
 	_header("TEMPLE ARCHIVE", "%d ENTRIES FOUND  /  %s BBY" % [found,str(campaign_state.story.bby)])
@@ -434,7 +462,7 @@ func _build_codex() -> void:
 	scroll.add_child(list)
 	if codex_category == "journal":
 		_build_journal(list)
-		body.add_child(UI.button("← Return to Temple",_finish))
+		body.add_child(UI.button(back_text,_finish))
 		return
 	list.add_child(UI.label(codex_category.to_upper() + "  /  ARCHIVE RECORDS",14,UI.GOLD))
 	var entries: Array = engine.codex_entries(campaign_state,codex_category,false)
@@ -455,7 +483,7 @@ func _build_codex() -> void:
 		content.add_child(UI.label(str(entry.name).replace("_"," ").capitalize() if unlocked else "Sealed holocron",23,UI.ACCENT if unlocked else UI.MUTED))
 		content.add_child(UI.label(entry.lore if unlocked else "UNDISCOVERED · Encounter this record’s subject to unlock its history.",16,UI.TEXT if unlocked else UI.MUTED))
 	body.add_child(UI.label("New records unlock as missions, people and places become known to your Order.",14 if Phone.narrow(Phone.window_size()) else 13,UI.MUTED))
-	body.add_child(UI.button("← Return to Temple",_finish))
+	body.add_child(UI.button(back_text,_finish))
 
 func _build_journal(list: VBoxContainer) -> void:
 	var record: Dictionary = engine.journal(campaign_state)
