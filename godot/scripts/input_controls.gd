@@ -85,7 +85,23 @@ static func move_preview(m: RefCounted, unit: Dictionary, dest: Vector2i) -> Dic
 		if bool(shot_info.los) and bool(shot_info.range_ok):
 			seen_by.append(str(enemy.name))
 			if bool(shot_info.flanked): flanks.append(str(enemy.name))
-	return {"ap": ap_cost, "tiles": cost, "prev": route.prev, "shields": shields, "flanks": flanks, "seen_by": seen_by}
+	var danger: Dictionary = first_danger31(m, unit, dest, route.prev)
+	return {"ap": ap_cost, "tiles": cost, "prev": route.prev, "shields": shields, "flanks": flanks, "seen_by": seen_by, "first_danger_tile": danger.tile, "danger_sightlines": danger.sightlines}
+
+static func first_danger31(m: RefCounted, actor: Dictionary, dest: Vector2i, prev: Dictionary) -> Dictionary:
+	var path: Array[Vector2i] = []
+	var cursor := dest
+	while cursor != Shot.pos(actor) and prev.has(cursor):
+		path.push_front(cursor)
+		cursor = prev[cursor]
+	if cursor != Shot.pos(actor): return {"tile": Vector2i(-1, -1), "sightlines": 0}
+	var risk: Dictionary = m.route_threat24(path, int(actor.id)) if m.has_method("route_threat24") else {}
+	for step in path:
+		var sightlines: int = int(sight26(m, actor, step).seen_by)
+		for entry in risk.get("overwatch_tiles", []):
+			if entry.tile == step: sightlines = maxi(sightlines, entry.get("watchers", []).size())
+		if sightlines > 0: return {"tile": step, "sightlines": sightlines}
+	return {"tile": Vector2i(-1, -1), "sightlines": 0}
 
 static func sight26(m: RefCounted, actor: Dictionary, tile: Vector2i) -> Dictionary:
 	var seen_by := 0
@@ -104,7 +120,7 @@ static func sight26(m: RefCounted, actor: Dictionary, tile: Vector2i) -> Diction
 	return {"seen_by": seen_by, "flanked": flanked, "cover_pct": cover_pct}
 
 static func preview26(m: RefCounted, tile: Vector2i, actor_id: int) -> Dictionary:
-	var result := {"cover_pct": 0, "flanked": false, "seen_by": 0, "hit_pct_vs_nearest": 0, "route_safe": false}
+	var result := {"cover_pct": 0, "flanked": false, "seen_by": 0, "hit_pct_vs_nearest": 0, "route_safe": false, "first_danger_tile": Vector2i(-1, -1)}
 	if m == null or not m.in_bounds(tile): return result
 	var actor: Dictionary = m.unit_by_id(actor_id)
 	if actor.is_empty(): return result
@@ -125,11 +141,8 @@ static func preview26(m: RefCounted, tile: Vector2i, actor_id: int) -> Dictionar
 		if bool(odds.los) and bool(odds.range_ok): result.hit_pct_vs_nearest = int(odds.hit)
 	var move: Dictionary = move_preview(m, actor, tile)
 	if not move.is_empty():
-		result.route_safe = true
-		var cursor := tile
-		while move.prev.has(cursor):
-			if int(sight26(m, actor, cursor).seen_by) > 0: result.route_safe = false; break
-			cursor = move.prev[cursor]
+		result.first_danger_tile = move.first_danger_tile
+		result.route_safe = move.first_danger_tile.x < 0
 	return result
 
 static func valid_targets(m: RefCounted, unit: Dictionary, mode: String) -> Array[Dictionary]:

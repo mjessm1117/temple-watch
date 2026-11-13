@@ -22,6 +22,6 @@ static func apply(game: Node, label: Label3D) -> int:
 			child.visible = false
 			hidden += 1
 	var tile: Vector2i = Maps.point(spec.evac[0])
-	label.position = Vector3(tile.x, Shot.elevation(game.mission, tile) * 0.7 + 1.0, tile.y)
+	label.position = Vector3(tile.x, Shot.elevation(game.mission, tile) * 0.7 + 2.6, tile.y)
 	label.visible = true
 	return hidden
