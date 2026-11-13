@@ -628,7 +628,6 @@ func _activate_opening_contact26(trigger: String) -> void:
 		enemy.awake = true; enemy.spotted = true; enemy.detected = true
 		if marker.x < 0: marker = Shot.pos(enemy); actor_id = int(enemy.id)
 	if marker.x >= 0:
-		reinforcement_marker = marker
 		action_events.append({"kind":"activation", "actor":actor_id, "at":marker})
 	message("ENEMY REINFORCEMENT APPROACHING — east pod activated.")
 
