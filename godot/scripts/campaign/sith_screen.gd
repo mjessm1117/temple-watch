@@ -18,6 +18,7 @@ var message := "Choose where to push back. The remaining operations will proceed
 var selected_id := ""
 var portrait := false
 var compact := false
+var test_safe_insets32 := Vector4.ZERO
 
 func bind_state(campaign_state: Dictionary) -> void:
 	layer = Layer.new(campaign_state)
@@ -58,11 +59,21 @@ func show_page(value: String) -> void:
 		var close_guard := Node.new(); close_guard.name = "PhoneClose"; add_child(close_guard)
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for edge in ["left", "right"]: margin.add_theme_constant_override("margin_" + edge, 12 if compact else 34)
-	for edge in ["top", "bottom"]: margin.add_theme_constant_override("margin_" + edge, 12 if compact else 22)
+	var safe := test_safe_insets32 if test_safe_insets32 != Vector4.ZERO else Phone.safe_margins(view_size)
+	margin.add_theme_constant_override("margin_left", int(safe.x) + (12 if compact else 34))
+	margin.add_theme_constant_override("margin_top", int(safe.y) + (12 if compact else 22))
+	margin.add_theme_constant_override("margin_right", int(safe.z) + (12 if compact else 34))
+	margin.add_theme_constant_override("margin_bottom", int(safe.w) + (12 if compact else 22))
+	# The graphics adapter may apply its legacy margins later in this frame.
+	margin.call_deferred("add_theme_constant_override", "margin_left", int(safe.x) + (12 if compact else 34))
+	margin.call_deferred("add_theme_constant_override", "margin_top", int(safe.y) + (12 if compact else 22))
+	margin.call_deferred("add_theme_constant_override", "margin_right", int(safe.z) + (12 if compact else 34))
+	margin.call_deferred("add_theme_constant_override", "margin_bottom", int(safe.w) + (12 if compact else 22))
 	add_child(margin)
 	body = UI.column(8 if compact else 14)
 	margin.add_child(body)
+	if compact:
+		var layout_guard := Node.new(); layout_guard.name = "PhoneTabScroll"; body.add_child(layout_guard)
 	_header()
 	_project()
 	var tabs: Container = HFlowContainer.new() if portrait else HBoxContainer.new()
@@ -89,8 +100,7 @@ func show_page(value: String) -> void:
 	else: _operations()
 	status_line = UI.label(message, 14, UI.MUTED)
 	body.add_child(status_line)
-	if compact:
-		var layout_guard := Node.new(); layout_guard.name = "PhoneTabScroll"; body.add_child(layout_guard)
+	if compact: body.move_child(body.get_node("PhoneTabScroll"), body.get_child_count() - 1)
 	if Phone.narrow(Phone.window_size()): _phone_text_floor(self)
 
 func _phone_text_floor(node: Node) -> void:
@@ -102,6 +112,7 @@ func _phone_text_floor(node: Node) -> void:
 
 func _header() -> void:
 	var row: BoxContainer = VBoxContainer.new() if portrait else HBoxContainer.new()
+	row.custom_minimum_size.y = 44
 	body.add_child(row)
 	var title := UI.column(2)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -114,7 +125,9 @@ func _header() -> void:
 	dates.add_child(UI.label(("M%02d  D%02d" if compact and not portrait else "MONTH %02d  /  DAY %02d") % [int(layer.s.month), int(layer.s.day) % 30 + 1], 18, GOLD))
 	dates.add_child(UI.label("%d Intel available" % int(layer.state.get("res", {}).get("intel", 0)), 14, UI.MUTED))
 	var close := UI.button("CLOSE", _close)
+	close.name = "WarClose32"
 	close.custom_minimum_size.y = 44
+	close.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(close)
 
 func _close() -> void:
@@ -136,6 +149,7 @@ func _project() -> void:
 	if layer.s.defeated: deadline = "THE ORDER HAS FALLEN"
 	if compact and not portrait and not layer.s.defeated: deadline = "ESCALATES %s" % date_label(int(layer.s.next_escalation))
 	var date := UI.label(deadline, 15, GOLD)
+	date.name = "WarDeadline32"
 	date.autowrap_mode = TextServer.AUTOWRAP_OFF
 	row.add_child(date)
 	var segments := HBoxContainer.new()
