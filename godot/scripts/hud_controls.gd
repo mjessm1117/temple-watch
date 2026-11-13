@@ -116,11 +116,12 @@ func _refresh_highlights(force: bool = false) -> void:
 					var line: MeshInstance3D = g._box(g.hover_highlights, (here + next_at) * 0.5, Vector3(0.15, 0.06, here.distance_to(next_at) * 0.98), route_color)
 					line.look_at(next_at, Vector3.UP)
 					next = cursor
+				if preview.first_danger_tile.x >= 0: _border(g.hover_highlights, preview.first_danger_tile, Color("ff655a"), 0.24)
 				var cost_label := "1 action · 1 action remains" if int(preview.ap) == 1 and int(u.ap) == 2 else "1 action" if int(preview.ap) == 1 else "DASH: ends turn"
 				var first: Dictionary = decision.get("events", [])[0] if not decision.get("events", []).is_empty() else {}
-				var risk := "  ·  %s AT %s" % [str(first.get("kind", "clear")).to_upper(), str(first.get("tile", ""))] if not first.is_empty() else "  ·  CLEAR ROUTE"
+				var risk := "  ·  DANGER AT %s" % str(preview.first_danger_tile) if preview.first_danger_tile.x >= 0 else "  ·  %s AT %s" % [str(first.get("kind", "clear")).to_upper(), str(first.get("tile", ""))] if not first.is_empty() else "  ·  CLEAR ROUTE"
 				g.path_label.text = "%s  ·  %d tiles%s" % [cost_label, int(preview.tiles), risk]
-				g.path_label.add_theme_color_override("font_color", Color("ff746b") if str(first.get("kind", "")) == "overwatch" else Color("ffd16a") if not first.is_empty() else Color("91d6fa"))
+				g.path_label.add_theme_color_override("font_color", Color("ff746b") if preview.first_danger_tile.x >= 0 else Color("ffd16a") if not first.is_empty() else Color("91d6fa"))
 			else: g.path_label.text = ""
 		else: g.path_label.text = ""
 		var shields := "  •  COVER "
@@ -414,6 +415,7 @@ func _refresh() -> void:
 	if phone != null: phone.refresh(true)
 	if bar != null: bar.refresh()
 	if aim_ui != null: aim_ui.refresh()
+	_sync_aim_confirm31()
 	if phone != null: night.chips.visible = false
 	if phone == null:
 		var aiming: bool = aim_ui != null and aim_ui.panel.visible
@@ -427,6 +429,7 @@ func _show_shot() -> void:
 	if night != null: night.refresh_target.call_deferred()
 	if phone != null: phone.refresh.call_deferred()
 	if aim_ui != null: aim_ui.refresh.call_deferred()
+	_sync_aim_confirm31.call_deferred()
 	var actor: Dictionary = g.mission.unit_by_id(g.selected_id)
 	if g.action not in ["shoot", "strike", "push", "move"]:
 		var def: Dictionary = g.mission.abilities.get(g.action, {})
@@ -470,3 +473,7 @@ func _show_shot() -> void:
 	g.shot_label.text = "%s  HP %d%s\nCRIT %d%%  ·  GRAZE %d%%\nDMG %d–%d  ·  ARMOR %d\nCRIT %d–%d  ·  GRAZE %d–%d\nSHRED %d on hit\n%s\n%s" % [target.name, int(target.hp), "  ·  FLANKED" if bool(info.flanked) else "", int(info.crit), int(info.graze), damage.normal[0], damage.normal[1], damage.armor, damage.critical[0], damage.critical[1], damage.graze[0], damage.graze[1], damage.shred, breakdown, "LOS CLEAR" if bool(info.los) else "LOS BLOCKED — red trace"]
 	if actor.has("ammo"): g.shot_label.text += "\nAMMO %d/%d · 2 AP" % [int(actor.ammo), int(actor.clip)]
 	targeting.trace(actor, target)
+
+func _sync_aim_confirm31() -> void:
+	if phone != null and aim_ui != null and aim_ui.panel.visible and g.get_viewport().get_visible_rect().size.y > g.get_viewport().get_visible_rect().size.x and g.action in ["shoot", "strike"]:
+		aim_ui.confirm.text = "CONFIRM %s" % ("FIRE" if g.action == "shoot" else "STRIKE")

@@ -217,6 +217,10 @@ func update_route24() -> void:
 	ap_label28.modulate = Color("69d9ff") if int(decision.get("ap", 1)) == 1 else Color("ffd05a")
 	ap_label28.position = Vector3(destination.x, preload("res://scripts/shot.gd").elevation(game.mission, destination) * 0.7 + 0.9, destination.y)
 	route_markers_current24 = route_markers27(decision.get("events", []))
+	if game.mission.phase == "player" and not game.playing_enemy_events:
+		var move: Dictionary = preload("res://scripts/input_controls.gd").move_preview(game.mission, actor, destination)
+		var danger: Vector2i = move.get("first_danger_tile", Vector2i(-1, -1))
+		if danger.x >= 0: route_markers_current24.append({"tile": danger, "color": Color("ff655a"), "height": 0.18})
 	_refresh_hover24()
 	# Keep the preview tile under the finger for the confirming tap on phones.
 	if game.preview_tile == destination and not preload("res://scripts/phone_layout.gd").narrow(Vector2i(game.get_viewport().get_visible_rect().size)) and game.has_method("preview_route24"):

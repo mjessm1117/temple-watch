@@ -285,9 +285,10 @@ func _refresh_odds() -> void:
 		odds_hit.add_theme_color_override("font_color", Color("60b9ff") if int(move_preview.ap) == 1 else Color("ffd16a"))
 		var tactical: Dictionary = g.hud_controls.move_tactical27
 		var cue: Dictionary = preload("res://scripts/w29a_move_cue.gd").at(g.mission, actor, g.hud_controls.move_destination, tactical)
-		odds_badge.text = str(cue.label)
-		odds_badge.add_theme_color_override("font_color", Color("ef6a5d") if cue.flanked or cue.exposed else Color("e0bd78"))
-		odds_modifiers.text = str(cue.detail)
+		var danger: Vector2i = move_preview.get("first_danger_tile", Vector2i(-1, -1))
+		odds_badge.text = "DANGER · %d enemy sightline%s" % [int(move_preview.get("danger_sightlines", 0)), "" if int(move_preview.get("danger_sightlines", 0)) == 1 else "s"] if danger.x >= 0 else str(cue.label)
+		odds_badge.add_theme_color_override("font_color", Color("ef6a5d") if danger.x >= 0 or cue.flanked or cue.exposed else Color("e0bd78"))
+		odds_modifiers.text = "FIRST DANGER TILE %d,%d  ·  %s" % [danger.x, danger.y, str(cue.detail)] if danger.x >= 0 else str(cue.detail)
 		feedback.refresh_odds()
 		odds_scroll.show(); feedback.details_button.hide()
 		return
@@ -297,7 +298,7 @@ func _refresh_odds() -> void:
 	var data: Dictionary = Targeting22.shot_breakdown(g.mission, actor, target, g.action == "strike", int(actor.get("leap_aim", 0)) if g.action == "strike" else 0)
 	var decision: Dictionary = Targeting22.decision_summary(data, str(target.name), g.action == "strike")
 	odds_title.text = str(decision.target).to_upper()
-	odds_hit.text = "%d%% HIT" % int(decision.hit)
+	odds_hit.text = "%d%% HIT  ·  %d%% CRIT" % [int(decision.hit), int(data.get("crit", 0))]
 	odds_hit.add_theme_color_override("font_color", Color("f2d99a"))
 	odds_badge.text = "◆ " + str(decision.badge)
 	odds_badge.add_theme_color_override("font_color", Color("ef6a5d") if str(decision.badge) == "FLANKED" else Color("e0bd78"))
