@@ -51,7 +51,18 @@ static func _blocker(m: RefCounted, a: Vector2i, b: Vector2i, peek: bool) -> Vec
 static func _direct(m: RefCounted, a: Vector2i, b: Vector2i, peek: bool) -> bool:
 	return _blocker(m, a, b, peek).x < 0
 
+static func _ledge_blind(m: RefCounted, a: Vector2i, b: Vector2i) -> bool:
+	# A high unit can look down from the rim, but not from two or more tiles back
+	# at a low unit standing on the first tile below that rim.
+	if elevation(m, a) <= elevation(m, b): return false
+	var points := line(a, b)
+	for i in range(1, points.size()):
+		if elevation(m, points[i]) < elevation(m, points[i - 1]):
+			return i >= 2 and maxi(absi(points[i].x - b.x), absi(points[i].y - b.y)) <= 1
+	return false
+
 static func los(m: RefCounted, a: Vector2i, b: Vector2i) -> bool:
+	if _ledge_blind(m, a, b): return false
 	if _direct(m, a, b, false): return true
 	var beside_wall := false
 	for d in DIRS:
@@ -122,7 +133,7 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 		var r := float(attacker.range)
 		lines.append(["Range", -roundi((d - r * 0.6) * 3) if d > r * 0.6 else 0])
 	if height_delta > 0: lines.append(["High ground aim", 20])
-	elif height_delta <= -2 and bool(m.modern): lines.append(["Target high ground defense", -20])
+	elif height_delta < 0 and bool(m.modern): lines.append(["Target high ground defense", -20 if height_delta <= -2 else -10])
 	var defense := int(target.get("defense", 0))
 	if bool(target.get("hunkered", false)): defense += 30
 	defense += int(target.get("buff_defense", 0))
@@ -149,6 +160,7 @@ static func calculate(m: RefCounted, attacker: Dictionary, target: Dictionary, m
 	return {"lines": lines, "hit": hit, "crit": crit, "graze": 0 if melee else min(GRAZE, 100 - hit), "cover": cv, "flanked": flanked, "height_delta":height_delta, "cover_after_shot":{} if melee else preload("res://scripts/w29c_cover.gd").preview(m,attacker,t), "los": sight, "range_ok": melee or distance(a, t) <= float(attacker.range)}
 
 static func trace(m: RefCounted, a: Vector2i, b: Vector2i) -> Dictionary:
+	if _ledge_blind(m, a, b): return {"clear":false, "origin":a, "end":b, "blocker":b}
 	if _direct(m, a, b, false): return {"clear":true, "origin":a, "end":b, "blocker":Vector2i(-1,-1)}
 	var beside_wall := false
 	for d in DIRS:

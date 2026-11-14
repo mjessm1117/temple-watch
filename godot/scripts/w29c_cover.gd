@@ -16,7 +16,7 @@ static func preview(m: RefCounted, attacker: Dictionary, target: Vector2i) -> Di
 	var before: int = int(m.cover_hp.get(p, 8 if m.tile(p) == "#" else 4))
 	var heavy := str(attacker.get("class_name","")) == "Heavy"
 	var active := bool(m.modern)
-	var hit_chip := 3 if heavy and (active or not bool(m.modern)) else 1 if active else 0
+	var hit_chip := 8 if heavy and active else 3 if heavy else 1 if active else 0
 	var miss_chip := 3 if heavy and active else 1 if active else 0
 	return {"at":p, "tile":m.tile(p), "hp":before, "on_hit":_after(m.tile(p), before, hit_chip), "on_miss":_after(m.tile(p), before, miss_chip)}
 
@@ -35,11 +35,11 @@ static func shot_chip(m: RefCounted, a: Dictionary, t: Dictionary, mode: String,
 		return
 	var p := facing_tile(m, Vector2i(int(a.x),int(a.y)), Vector2i(int(t.x),int(t.y)))
 	if p.x < 0: return
-	var chip := 3 if str(a.get("class_name", "")) == "Heavy" else 1
+	var chip := 8 if str(a.get("class_name", "")) == "Heavy" and outcome in ["hits", "crits"] else 3 if str(a.get("class_name", "")) == "Heavy" else 1
 	m.damage_cover(p, chip, {"kind":"shot_miss" if outcome == "misses" else "sustained_fire", "actor":int(a.id)})
 
 static func damage(m: RefCounted, p: Vector2i, amount: int, cause: Dictionary) -> String:
-	if bool(m.modern) and str(cause.get("kind","")) in ["grenade","ionNade","explosion","barrel"]: amount = maxi(8,amount)
+	if bool(m.modern) and str(cause.get("kind","")) in ["grenade","ionNade","barrage","moStrike","tremor","collapse","explosion","barrel"]: amount = maxi(8,amount)
 	if not m._destructible(p) or amount <= 0: return m.tile(p)
 	var before: String = m.tile(p)
 	var old_hp: int = int(m.cover_hp.get(p, 8 if before == "#" else 4))
