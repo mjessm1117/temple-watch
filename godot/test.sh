@@ -143,3 +143,7 @@ run_suite render31_test --rendering-method gl_compatibility --resolution 390x844
 run_suite e31_test --rendering-method gl_compatibility --resolution 844x390
 run_suite temple32_test --rendering-method gl_compatibility --resolution 390x844 -- --portrait
 run_suite people32_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite maplayout33_test
+run_suite terrain33_test
+run_suite mapart33_test
+run_suite readability33_test

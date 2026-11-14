@@ -223,7 +223,9 @@ func _set_cover33(node: MultiMeshInstance3D, positions: Array) -> void:
 	node.multimesh = mm
 
 func _update_silhouette33() -> void:
-	if silhouette33 == null or not is_instance_valid(game) or not is_instance_valid(game.mission) or not is_instance_valid(game.camera): return
+	if silhouette33 == null or not is_instance_valid(game) or not is_instance_valid(game.mission): return
+	var active_camera: Camera3D = game.get("camera")
+	if not is_instance_valid(active_camera): return
 	var actor: Dictionary = game.mission.unit_by_id(game.selected_id)
 	if actor.is_empty(): silhouette33.visible = false; return
 	var tile := Vector2i(int(actor.x), int(actor.y))
@@ -231,7 +233,7 @@ func _update_silhouette33() -> void:
 	silhouette33.position = at + Vector3.UP * 1.35
 	var art: Node = game.terrain.get_child(0) if game.terrain.get_child_count() > 0 else null
 	var records: Array = art.batch.records if art != null and art.get("batch") != null else []
-	silhouette33.visible = visible and Read33.occluded(game.mission, game.camera.global_position, at, records)
+	silhouette33.visible = visible and Read33.occluded(game.mission, active_camera.global_position, at, records)
 
 func _hover_changed24(_node: Node) -> void:
 	hover_dirty24 = true

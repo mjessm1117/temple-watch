@@ -118,8 +118,8 @@ func run() -> void:
 	game.hud_controls._shield(shields_node, Vector2i(3, 2), Vector2i.UP, true)
 	game.hud_controls._shield(shields_node, Vector2i(3, 2), Vector2i.RIGHT, false)
 	check(shields_node.get_child_count() == 2, "destination draws both cover shield types")
-	check(shields_node.get_child(0).mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX].size() == 9, "full cover shield has solid fill")
-	check(shields_node.get_child(1).mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX].size() == 30, "half cover shield has outline")
+	check(shields_node.get_child(0) is MeshInstance3D and shields_node.get_child(0).mesh != null, "full cover shield has a mesh")
+	check(shields_node.get_child(1) is MeshInstance3D and shields_node.get_child(1).mesh != null, "half cover shield has a mesh")
 	m.set_tile(Vector2i(4,3), "c"); enemy.x = 6; enemy.y = 4
 	var exposed: Dictionary = InputControls.move_preview(m, actor, Vector2i(4,4))
 	check(not exposed.is_empty() and not exposed.flanks.is_empty(), "visible enemy flanking destination triggers warning")

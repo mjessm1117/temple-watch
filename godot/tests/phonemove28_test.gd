@@ -61,7 +61,7 @@ func run_case(size: Vector2i) -> void:
 	check(grid != null, "%s grid exists" % size)
 	if grid != null:
 		check(grid.reach_edges28 > 0 and grid.reach_view28.visible and grid.reach_view28.multimesh.instance_count > 0, "%s selected reach visible" % size)
-		check(grid.evac_batches_hidden28 > 0 and grid.evac_label28.visible, "%s evac ring ladder replaced" % size)
+		check(grid.evac_batches_hidden28 == 0 and not grid.evac_label28.visible, "%s EVAC marker hidden outside evac phase" % size)
 	var choices := candidates(game, actor)
 	check(choices.size() >= 2, "%s has two visible move tiles" % size)
 	if choices.size() >= 2:
