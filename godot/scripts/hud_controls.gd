@@ -8,6 +8,7 @@ const Rules12 = preload("res://scripts/rules12_actions.gd")
 const Threat22 = preload("res://scripts/decision22_threat.gd")
 const ChainSignature = preload("res://scripts/w27d_ability_signature.gd")
 const W31ECard = preload("res://scripts/w31e_enemy_card.gd")
+const Read33 = preload("res://scripts/w33d_readability.gd")
 var g
 var techniques: HFlowContainer
 var techniques_open := false
@@ -178,6 +179,12 @@ func _update_preview_card26(tile: Vector2i, actor: Dictionary) -> void:
 		var event_line := "%s AT %s" % [str(first.get("kind", "clear")).to_upper(), str(first.get("tile", "destination"))] if not first.is_empty() else "CLEAR ROUTE"
 		if str(first.get("kind", "")) == "overwatch": event_line += " FROM %s" % str(first.get("source_name", first.get("source", "")))
 		preview_text26.text = "%s COVER  ·  HEIGHT %+d  ·  FLANK %+d\nSHOT %+d%%  ·  %s" % [("NO" if str(tactical.cover) == "none" else str(tactical.cover).to_upper()), int(tactical.height), int(tactical.flank), int(tactical.odds_delta), event_line]
+	if g.action == "move":
+		var fallback: Dictionary = Read33.fallback_threat(g.mission, actor, tile)
+		var threat: Dictionary = Read33.tile_threat(g.mission, tile, fallback)
+		var warning: String = Read33.warning_text(threat)
+		if warning != "": preview_text26.text += "\n" + warning
+		if Shot.elevation(g.mission, tile) == 2: preview_text26.text = "▲  " + preview_text26.text
 	var area: Vector2 = g.overlay.size
 	var portrait := area.y > area.x
 	preview_card26.set_anchors_preset(Control.PRESET_TOP_LEFT)
@@ -185,24 +192,10 @@ func _update_preview_card26(tile: Vector2i, actor: Dictionary) -> void:
 	preview_card26.size = Vector2(300, 48)
 
 func _shield(parent: Node3D, tile: Vector2i, direction: Vector2i, full: bool) -> void:
-	var phone_scale := 1.65 if phone != null else 1.0
-	var center := Vector3(tile.x + direction.x * 0.36, Shot.elevation(g.mission, tile) * 0.7 + 1.65, tile.y + direction.y * 0.36)
-	var points := [Vector2(-0.19, -0.16), Vector2(0.19, -0.16), Vector2(0.15, 0.09), Vector2(0, 0.21), Vector2(-0.15, 0.09)]
-	for i in range(points.size()): points[i] *= phone_scale
-	var mesh := ImmediateMesh.new()
-	var material := StandardMaterial3D.new(); material.albedo_color = Color("ffe6a2") if full else Color("9fe3ff")
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES, material)
-	if full:
-		for i in range(1, 4):
-			for j in [0, i, i + 1]: mesh.surface_add_vertex(center + Vector3(points[j].x, 0, points[j].y))
-	else:
-		for i in range(5):
-			var a: Vector2 = points[i]; var b: Vector2 = points[(i + 1) % 5]
-			var side := (b - a).normalized().orthogonal() * 0.018
-			for v in [a + side, b + side, b - side, a + side, b - side, a - side]: mesh.surface_add_vertex(center + Vector3(v.x, 0, v.y))
-	mesh.surface_end()
-	var icon := MeshInstance3D.new(); icon.mesh = mesh; parent.add_child(icon)
+	var icon := MeshInstance3D.new()
+	icon.mesh = Read33.shield_mesh(full); icon.material_override = Read33.shield_material()
+	icon.position = Vector3(tile.x + direction.x * 0.30, Shot.elevation(g.mission, tile) * 0.7 + 0.86, tile.y + direction.y * 0.30)
+	parent.add_child(icon)
 
 
 func _label(text_value: String, size: int = 18) -> Label:

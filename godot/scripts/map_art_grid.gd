@@ -1,4 +1,6 @@
 extends Node3D
+const Read33 = preload("res://scripts/w33d_readability.gd")
+const Shot33 = preload("res://scripts/shot.gd")
 ## Render the HUD's rule-owned range borders as one visible instanced grid.
 ## Source nodes remain intact for the HUD's existing refresh/clear contract.
 var source: Node3D
@@ -22,6 +24,10 @@ var reach_edges28 := 0
 var ap_label28: Label3D
 var evac_label28: Label3D
 var evac_batches_hidden28 := 0
+var cover_full33: MultiMeshInstance3D
+var cover_half33: MultiMeshInstance3D
+var silhouette33: MeshInstance3D
+var silhouette_tick33 := 0.0
 
 static func focus_alpha(position: Vector3, selected: Vector2i) -> float:
 	var d := Vector2(position.x-selected.x,position.z-selected.y).length()
@@ -38,6 +44,11 @@ func bind(original: Node3D, owner_game: Node = null) -> void:
 	reach_view28 = MultiMeshInstance3D.new(); reach_view28.name = "MoveReach28"; add_child(reach_view28)
 	reach_view28.material_override = mat
 	reach_view28.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	cover_full33 = _cover_view33("FullCover33", true)
+	cover_half33 = _cover_view33("HalfCover33", false)
+	silhouette33 = MeshInstance3D.new(); silhouette33.name = "OccludedUnit33"; add_child(silhouette33)
+	silhouette33.mesh = Read33.silhouette_mesh(); silhouette33.material_override = Read33.shield_material()
+	silhouette33.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; silhouette33.visible = false
 	if is_instance_valid(game) and game.get("input_controls") != null:
 		var busy_input := preload("res://scripts/w24_command_busy_input.gd").new()
 		busy_input.game = game; game.add_child(busy_input)
@@ -60,6 +71,14 @@ func bind(original: Node3D, owner_game: Node = null) -> void:
 
 func changed(_child: Node) -> void: dirty = true
 
+func _cover_view33(label: String, full: bool) -> MultiMeshInstance3D:
+	var node := MultiMeshInstance3D.new(); node.name = label; add_child(node)
+	node.material_override = Read33.shield_material()
+	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var mm := MultiMesh.new(); mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = Read33.shield_mesh(full, 0.52); mm.instance_count = 0; node.multimesh = mm
+	return node
+
 func _process(_delta: float) -> void:
 	if is_instance_valid(game):
 		var aiming: bool = game.action not in ["move", "free", "overwatch", "hunker", "interact"]
@@ -78,6 +97,8 @@ func _process(_delta: float) -> void:
 					var ring: MeshInstance3D = ally_view.get("ring")
 					if ring != null: ring.visible = int(ally.id) == game.selected_id
 	_update_danger26()
+	silhouette_tick33 += _delta
+	if silhouette_tick33 >= 0.12: silhouette_tick33 = 0.0; _update_silhouette33()
 	if evac_label28 != null: evac_batches_hidden28 = preload("res://scripts/w28e_evac_marker.gd").apply(game, evac_label28)
 	_update_reach28()
 	style_hover()
@@ -165,12 +186,16 @@ func _update_reach28() -> void:
 	var actor: Dictionary = game.mission.unit_by_id(game.selected_id)
 	var active: bool = game.action == "move" and game.mission.phase == "player" and game.mission.result == "" and not actor.is_empty() and int(actor.get("ap", 0)) > 0
 	reach_view28.visible = active
+	cover_full33.visible = active; cover_half33.visible = active
 	if not active: return
 	var key := "%d:%d:%d:%d:%d" % [game.selected_id, int(actor.x), int(actor.y), int(actor.ap), int(game.mission.terrain_revision)]
 	if key == reach_key28: return
 	reach_key28 = key
 	var one: Dictionary = game.mission.reach_tiles(actor, 1)
 	var all: Dictionary = game.mission.reach_tiles(actor, mini(2, int(actor.ap)))
+	var marks: Dictionary = Read33.cover_marks(game.mission, all.costs)
+	_set_cover33(cover_full33, marks.full)
+	_set_cover33(cover_half33, marks.half)
 	var edges: Array = []
 	for tile in all.costs:
 		if tile == Vector2i(int(actor.x), int(actor.y)): continue
@@ -190,6 +215,23 @@ func _update_reach28() -> void:
 		mm.set_instance_color(i, Color("57d6ff") if edge.blue else Color("ffd05a"))
 	reach_edges28 = edges.size()
 	reach_view28.multimesh = mm
+
+func _set_cover33(node: MultiMeshInstance3D, positions: Array) -> void:
+	var mm := MultiMesh.new(); mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = node.multimesh.mesh; mm.instance_count = positions.size()
+	for i in positions.size(): mm.set_instance_transform(i, Transform3D(Basis.IDENTITY, positions[i]))
+	node.multimesh = mm
+
+func _update_silhouette33() -> void:
+	if silhouette33 == null or not is_instance_valid(game) or not is_instance_valid(game.mission) or not is_instance_valid(game.camera): return
+	var actor: Dictionary = game.mission.unit_by_id(game.selected_id)
+	if actor.is_empty(): silhouette33.visible = false; return
+	var tile := Vector2i(int(actor.x), int(actor.y))
+	var at := Vector3(tile.x, Shot33.elevation(game.mission, tile) * 0.7, tile.y)
+	silhouette33.position = at + Vector3.UP * 1.35
+	var art: Node = game.terrain.get_child(0) if game.terrain.get_child_count() > 0 else null
+	var records: Array = art.batch.records if art != null and art.get("batch") != null else []
+	silhouette33.visible = visible and Read33.occluded(game.mission, game.camera.global_position, at, records)
 
 func _hover_changed24(_node: Node) -> void:
 	hover_dirty24 = true

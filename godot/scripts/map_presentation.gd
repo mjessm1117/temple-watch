@@ -105,7 +105,12 @@ func build(m: RefCounted, _models: Dictionary = {}) -> void:
 	for y in int(m.spec.height):
 		for x in int(m.spec.width):
 			geo.floor_tile(m,Vector2i(x,y)); geo.cover(m,Vector2i(x,y))
+	var lip33: Material = palette.trim
+	for lip in tier2_lips33(m): batch.put("box",lip33,lip.at,lip.size)
 	geo.backdrop(int(m.spec.width),int(m.spec.height))
+	if preload("res://scripts/phone_layout.gd").touch_device():
+		for key in batch.buckets.keys():
+			if str(batch.buckets[key].role) == "detail": batch.buckets.erase(key)
 	batch.flush(self)
 	var rim := DirectionalLight3D.new(); rim.light_color = color(int(t.rim[0])); rim.light_energy = float(t.rim[1])*0.4
 	rim.rotation_degrees = Vector3(-30,135,0)
@@ -119,6 +124,17 @@ func build(m: RefCounted, _models: Dictionary = {}) -> void:
 	if is_instance_valid(game):
 		var detection := preload("res://scripts/meshy_theme_markers.gd").new()
 		detection.game = game; add_child(detection)
+
+static func tier2_lips33(m: RefCounted) -> Array:
+	var lips := []
+	for y in int(m.spec.height):
+		for x in int(m.spec.width):
+			var tile := Vector2i(x,y)
+			if Shot.elevation(m,tile) != 2: continue
+			for d in Shot.DIRS:
+				if Shot.elevation(m,tile+d) >= 2: continue
+				lips.append({"at":Vector3(x+d.x*0.45,1.42,y+d.y*0.45),"size":Vector3(0.10,0.09,0.90) if d.x != 0 else Vector3(0.90,0.09,0.10)})
+	return lips
 
 func clear_children(parent: Node) -> void:
 	for child in parent.get_children(): parent.remove_child(child); child.queue_free()
@@ -345,4 +361,5 @@ func weather(settings: Dictionary, width: int, height: int) -> void:
 	mesh.material = mat
 	if compatibility: node.mesh = mesh
 	else: node.draw_pass_1 = mesh
+	if preload("res://scripts/phone_layout.gd").touch_device(): node.visible = false
 	add_child(node)
