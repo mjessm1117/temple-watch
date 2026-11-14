@@ -146,15 +146,15 @@ func _destructible(p: Vector2i) -> bool:
 	return tile(p) in ["#", "c", "h", "k"]
 func damage_cover(p: Vector2i, damage: int, cause: Dictionary = {}) -> String:
 	return Cover29.damage(self, p, damage, cause)
+func w33b_tile_tactics(tile_pos: Vector2i) -> Dictionary:
+	return preload("res://scripts/w33b_tile_tactics.gd").read(self, tile_pos)
 func explode(center: Vector2i, damage: int, radius: int = 1, cause: Dictionary = {}) -> void:
 	for y in range(center.y - radius, center.y + radius + 1):
 		for x in range(center.x - radius, center.x + radius + 1):
 			var p := Vector2i(x, y)
 			if center.distance_to(p) <= float(radius): damage_cover(p, maxi(8, damage), cause)
-
 func passable(p: Vector2i) -> bool:
 	return in_bounds(p) and tile(p) not in ["#", "c", "h", "k"] and (not modern or tile(p) != "w")
-
 func occupied(p: Vector2i, except_id: int = -1) -> bool:
 	for u in units:
 		if (int(u.hp) > 0 or str(u.get("status", "")) == "down") and int(u.id) != except_id and Shot.pos(u) == p: return true
