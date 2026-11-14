@@ -4,6 +4,11 @@ var g
 var b
 var theme: String
 
+# Lane D's tactical grid owns route visibility. These restrained swatches are
+# available to its selection/preview pass without tying art to combat state.
+static func route_tint(blue: bool) -> Color:
+	return Color("6d9da3") if blue else Color("b7a474")
+
 func _init(geometry) -> void:
 	g = geometry; b = g.b; theme = g.theme
 
@@ -63,7 +68,7 @@ func build(width: int, height: int) -> void:
 							put("box","trim",at+Vector3(dx,h*0.5,0.35).rotated(Vector3.UP,angle),Vector3(0.16,h,0.18),angle)
 					else:
 						put("box","dark",at+Vector3.DOWN*0.9,Vector3(2.6,1.8,1.4),angle)
-						put("box","glow",at+Vector3.UP*0.03,Vector3(1.2,0.05,0.12),angle)
+						put("box","trim",at+Vector3.UP*0.03,Vector3(1.2,0.05,0.12),angle)
 				"city":
 					if side != 1:
 						put("box","wall",at+Vector3.UP*h*0.6,Vector3(2.8,h*1.2,2.0),angle)

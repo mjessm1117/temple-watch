@@ -120,12 +120,42 @@ func collect(node: Node3D, parent: Transform3D, out: Array) -> void:
 	for child in node.get_children():
 		if child is Node3D: collect(child,transform,out)
 
+func _collapse_untextured(parts: Array) -> Array:
+	var surfaces := 0
+	var reference: StandardMaterial3D = null
+	for part in parts:
+		for i in part.mesh.get_surface_count():
+			surfaces += 1
+			var mat: Material = part.material if part.material else part.mesh.surface_get_material(i)
+			if not mat is StandardMaterial3D or mat.albedo_texture or mat.emission_enabled or mat.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED:
+				return parts
+			if reference == null: reference = mat
+			elif absf(mat.metallic-reference.metallic) > 0.001 or absf(mat.roughness-reference.roughness) > 0.001: return parts
+	if surfaces < 2 or reference == null: return parts
+	var tool := SurfaceTool.new(); tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for part in parts:
+		for i in part.mesh.get_surface_count():
+			var mat: StandardMaterial3D = part.material if part.material else part.mesh.surface_get_material(i)
+			var arrays: Array = part.mesh.surface_get_arrays(i)
+			var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+			var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+			var indexes: Variant = arrays[Mesh.ARRAY_INDEX]
+			var sequence: Array = Array(indexes) if indexes != null and indexes.size() > 0 else range(vertices.size())
+			for index in sequence:
+				tool.set_color(mat.albedo_color)
+				if normals.size() > int(index): tool.set_normal((part.transform.basis*normals[int(index)]).normalized())
+				tool.add_vertex(part.transform*vertices[int(index)])
+	var merged_material: StandardMaterial3D = reference.duplicate()
+	merged_material.albedo_color = Color.WHITE
+	merged_material.vertex_color_use_as_albedo = true
+	return [{"mesh":tool.commit(),"material":merged_material,"transform":Transform3D.IDENTITY}]
+
 func model(path: String, at: Vector3, width: float, height: float, angle := 0.0, uniform := false) -> AABB:
 	if not models.has(path):
 		if not ResourceLoader.exists(path): return AABB()
 		var instance: Node3D = load(path).instantiate()
 		var parts: Array = []; collect(instance,Transform3D.IDENTITY,parts)
-		models[path] = parts; instance.free()
+		models[path] = _collapse_untextured(parts); instance.free()
 	var parts: Array = models[path]
 	var rotate := Transform3D(Basis(Vector3.UP,angle),Vector3.ZERO)
 	var bounds := AABB(); var first := true

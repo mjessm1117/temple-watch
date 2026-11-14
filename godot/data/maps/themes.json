@@ -51,6 +51,11 @@
       "base": "#53616a",
       "secondary": "#394952",
       "biome": 1
+    },
+    "w33c_mood": {
+      "practical": "#ffbd72",
+      "energy": 1.55,
+      "edge_shade": 0.28
     }
   },
   "city": {
@@ -104,6 +109,11 @@
       "base": "#656478",
       "secondary": "#424756",
       "biome": 0
+    },
+    "w33c_mood": {
+      "practical": "#ffab7a",
+      "energy": 1.45,
+      "edge_shade": 0.28
     }
   },
   "jungle": {
@@ -158,6 +168,11 @@
       "base": "#635442",
       "secondary": "#46503a",
       "biome": 2
+    },
+    "w33c_mood": {
+      "practical": "#ffd18a",
+      "energy": 1.25,
+      "edge_shade": 0.28
     }
   },
   "snow": {
@@ -212,6 +227,11 @@
       "base": "#a4b6c3",
       "secondary": "#70899c",
       "biome": 3
+    },
+    "w33c_mood": {
+      "practical": "#ffc894",
+      "energy": 1.35,
+      "edge_shade": 0.28
     }
   },
   "temple": {
@@ -266,6 +286,11 @@
       "base": "#82715b",
       "secondary": "#675c48",
       "biome": 0
+    },
+    "w33c_mood": {
+      "practical": "#ffb66f",
+      "energy": 1.6,
+      "edge_shade": 0.28
     }
   },
   "ruins": {
@@ -319,6 +344,11 @@
       "base": "#9d815e",
       "secondary": "#675e47",
       "biome": 4
+    },
+    "w33c_mood": {
+      "practical": "#ffad76",
+      "energy": 1.5,
+      "edge_shade": 0.28
     }
   },
   "plains": {
@@ -373,6 +403,11 @@
       "base": "#777650",
       "secondary": "#596443",
       "biome": 2
+    },
+    "w33c_mood": {
+      "practical": "#ffcf8b",
+      "energy": 1.2,
+      "edge_shade": 0.28
     }
   },
   "caves": {
@@ -427,6 +462,11 @@
       "base": "#535d63",
       "secondary": "#3a424e",
       "biome": 5
+    },
+    "w33c_mood": {
+      "practical": "#ff9f65",
+      "energy": 1.65,
+      "edge_shade": 0.28
     }
   }
 }

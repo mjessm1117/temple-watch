@@ -190,7 +190,7 @@ func cover_family(at: Vector3, c: String, family: int, angle: float) -> bool:
 		if family == 1:
 			put("boulder" if theme == "plains" else "cylinder" if natural else "bevel",body,at+Vector3.UP*0.94,Vector3(0.82,1.84,0.82),angle)
 			put("boulder" if natural else "bevel","dark",at+Vector3.UP*0.10,Vector3(0.94,0.20,0.90),angle)
-			put("boulder" if natural else "bevel","ledge",at+Vector3.UP*1.84,Vector3(0.86,0.16,0.86),angle)
+			put("boulder" if natural else "bevel","wall" if theme == "plains" else "ledge",at+Vector3.UP*1.84,Vector3(0.86,0.16,0.86),angle)
 		else:
 			put("boulder" if natural else "bevel",body,at+Vector3.UP*0.96,Vector3(0.96,1.92,0.90),angle)
 			put("boulder" if natural else "bevel","dark",at+Vector3(0.17,0.34,0.20).rotated(Vector3.UP,angle),Vector3(0.58,0.68,0.48),angle)
@@ -204,9 +204,10 @@ func cover_family(at: Vector3, c: String, family: int, angle: float) -> bool:
 			for side in [-1,1]:
 				var local := Vector3(side*0.24,0.39,0).rotated(Vector3.UP,angle)
 				put("cylinder" if natural else "bevel",body,at+local,Vector3(0.45,0.78,0.60),angle)
-			put("bevel","ledge",at+Vector3.UP*0.78,Vector3(0.94,0.04,0.64),angle)
+			put("bevel","wall" if theme == "plains" else "ledge",at+Vector3.UP*0.78,Vector3(0.94,0.04,0.64),angle)
 		if theme == "jungle":
 			put("cone","leaves",at+Vector3(0,0.73,0),Vector3(0.55,0.14,0.50),angle)
+	preload("res://scripts/w33c_theme_dressing.gd").cover(self,at,c,angle,family)
 	return true
 
 func backdrop(width: int, height: int) -> void:
@@ -221,6 +222,7 @@ func backdrop(width: int, height: int) -> void:
 			material.set_shader_parameter("atlas_quadrant",biome)
 	preload("res://scripts/map14_detail.gd").build(r,r.mission)
 	preload("res://scripts/map_art_edges.gd").new(self).build(width,height)
+	preload("res://scripts/w33c_theme_dressing.gd").new().build(self,r.mission,width,height)
 
 func rock(at: Vector3, size: Vector3) -> void:
 	put("boulder","wall",at+Vector3.UP*size.y*0.5,size,at.x*0.3)
@@ -235,25 +237,45 @@ func tree(at: Vector3, height: float, broad: bool) -> void:
 func crystal(at: Vector3, height: float) -> void:
 	for j in 3:
 		put("cone","crystal",at+Vector3((j-1)*0.19,height*(0.5-j*0.08),0),Vector3(0.22,height*(1-j*0.16),0.25))
-	r.light(at+Vector3.UP*height,Color("88b6ff"),0.65,2.5)
+
+func stone_guard(at: Vector3, width: float, height: float) -> void:
+	put("box","ledge",at+Vector3.UP*0.08,Vector3(width,0.16,width*0.72))
+	put("bevel","wall",at+Vector3.UP*height*0.42,Vector3(width*0.48,height*0.67,width*0.38))
+	put("rock","wall",at+Vector3.UP*height*0.84,Vector3(width*0.40,height*0.23,width*0.36))
+	for side in [-1,1]:
+		put("cylinder","wall",at+Vector3(side*width*0.32,height*0.45,0),Vector3(width*0.16,height*0.42,width*0.16))
+		put("box","dark",at+Vector3(side*width*0.2,height*0.10,0),Vector3(width*0.17,height*0.2,width*0.25))
 
 func arcade(width: int) -> void:
 	b.begin_record({"role":"scenery","kind":"arcade"})
 	for x in range(0,width,4):
 		var at := Vector3(x,-0.25,-4)
-		r.prop("pillar",at,1.6,3.6)
+		if theme == "ruins":
+			put("crag","wall",Vector3(x,1.3,-4),Vector3(0.8,2.6,0.8))
+			if x%8 == 0:
+				put("box","ledge",Vector3(x+1.0,3.0,-4),Vector3(2.0,0.17,0.85))
+				put("boulder","dark",Vector3(x+1.4,0.3,-3.8),Vector3(1.4,0.6,1.0))
+			continue
+		put("cylinder","wall",at+Vector3.UP*1.8,Vector3(1.2,3.6,1.2))
+		put("box","ledge",at+Vector3.UP*3.65,Vector3(1.6,0.18,1.6))
 		if x+4 >= width: continue
 		for j in 11:
 			var a := PI*float(j)/10.0
 			put("box","wall",Vector3(x+2+cos(a)*1.75,3.15+sin(a)*1.25,-4),Vector3(0.47,0.4,0.8))
 		put("box","ledge",Vector3(x+2,4.55,-4),Vector3(4.0,0.16,1.0))
 		if theme == "temple":
-			put("box","banner",Vector3(x+2,3.3,-3.65),Vector3(0.65,1.9,0.03))
-			put("box","trim",Vector3(x+2,3.45,-3.62),Vector3(0.045,1.1,0.025))
+			put("box","ledge",Vector3(x+2,3.3,-3.65),Vector3(0.65,1.9,0.03))
+			put("box","ledge",Vector3(x+2,3.45,-3.62),Vector3(0.045,1.1,0.025))
 	var mid := float(width-1)*0.5
+	if theme == "ruins":
+		for side in [-1,1]:
+			put("crag","wall",Vector3(mid+side*3.5,2.2,-8),Vector3(2.1,4.4,1.6))
+			put("boulder","dark",Vector3(mid+side*2.2,0.45,-7.6),Vector3(2.1,0.9,1.5))
+		b.end_record()
+		return
 	for side in [-1,1]:
 		var at := Vector3(mid+side*5,-0.25,-8)
-		r.prop("statue",at,2.1,5.8)
+		stone_guard(at,2.1,5.8)
 		put("box","wall",Vector3(mid+side*3.6,3.2,-10),Vector3(1.8,6.9,1.9))
 		put("cone","wall",Vector3(mid+side*3.6,7.4,-10),Vector3(1.7,2.1,1.7))
 	put("box","ledge",Vector3(mid,6.5,-10),Vector3(9.2,0.6,2.2))
@@ -261,14 +283,19 @@ func arcade(width: int) -> void:
 
 func industrial(width: int, height: int) -> void:
 	b.begin_record({"role":"scenery","kind":"skyline"})
-	for i in range(-12,width+18,4):
+	for i in range(-12,width+18,6 if theme == "dock" else 4):
 		var h := 6.0+posmod(i*13,9)
 		var at := Vector3(i,-0.25,-12-posmod(i,3)*2)
-		put("box","dark",at+Vector3.UP*h*0.5,Vector3(3,h,3))
-		put("box","metal",at+Vector3.UP*(h+0.1),Vector3(3.3,0.2,3.3))
-		for row in int(h):
-			for col in 3:
-				if (row+col+i)%3: put("box","window",at+Vector3((col-1)*0.75,row+0.4,1.51),Vector3(0.3,0.10,0.02))
+		if theme == "dock":
+			put("bevel","metal",at+Vector3.UP*h*0.36,Vector3(4.6,h*0.72,2.6))
+			put("box","dark",at+Vector3.UP*(h*0.73),Vector3(4.9,0.16,2.8))
+			for x in [-1.7,0.0,1.7]: put("box","trim",at+Vector3(x,h*0.35,1.32),Vector3(0.08,h*0.67,0.04))
+		else:
+			put("box","dark",at+Vector3.UP*h*0.5,Vector3(3,h,3))
+			put("box","metal",at+Vector3.UP*(h+0.1),Vector3(3.3,0.2,3.3))
+			for row in int(h):
+				for col in 3:
+					if (row+col+i)%3: put("box","window",at+Vector3((col-1)*0.75,row+0.4,1.51),Vector3(0.3,0.10,0.02))
 	if theme == "dock":
 		r.prop("shuttle",Vector3(width*0.5,-0.25,-6),7.5,3.2)
 		for x in [1,width-2]:
