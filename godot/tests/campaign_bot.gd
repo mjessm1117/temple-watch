@@ -106,24 +106,28 @@ func run() -> void:
 	var failures := 0
 	for family in FAMILIES:
 		if "--family" in OS.get_cmdline_user_args() and family != OS.get_cmdline_user_args()[-1]: continue
-		var wins := 0; var losses := {}; var turns := 0
+		var wins := 0; var losses := {}; var turns := 0; var timeouts := 0
 		for seed_value in range(1,count+1):
 			var c = Campaign.new("normal")
 			c.state.options = [{"mission":FAMILIES[family],"map_variant":0,"adv":false}]
 			c.select_mission(0)
 			var m = Battle.create(c,seed_value)
-			for step in 60:
+			var cap := maxi(18, int(m.spec.get("turn_limit", 0)) + 8)
+			if str(m.spec.family) == "defend" and int(m.spec.objective.get("hold_turns", 0)) == 0:
+				cap = maxi(24, int(m.spec.objective.get("waves", 0)) * 5 + 8)
+			for step in cap:
 				if m.result != "": break
 				turn(m)
 			if "--trace" in OS.get_cmdline_user_args(): print("TRACE ",family," seed ",seed_value," ",m.turn," ",m.result," objective ",m.objective_status()," players ",m.living("player").map(func(u): return [u.name,u.hp,u.x,u.y])," enemies ",m.living("enemy").map(func(u): return [u.name,u.hp,u.x,u.y,u.awake])," vip ",m.prisoner)
 			turns += m.turn
 			if m.result == "win": wins += 1
+			elif m.result == "":
+				timeouts += 1; failures += 1
 			else:
-				var why: String = m.log_lines[-1] if m.result != "" else "turn safety limit"
+				var why: String = m.log_lines[-1]
 				losses[why] = int(losses.get(why,0))+1
-				if m.result == "": failures += 1
-			c.apply_mission_result(Battle.result(c,m))
+			if m.result != "": c.apply_mission_result(Battle.result(c,m))
 		if count >= 20 and (wins*100/count < 30 or wins*100/count > 80):
 			failures += 1; push_error("Campaign family outside 30–80% band: " + str(family))
-		print("CAMPAIGN BOT %s: %d/%d wins (%d%%), mean turns %.1f; losses %s" % [family,wins,count,100*wins/count,float(turns)/count,JSON.stringify(losses)])
+		print("CAMPAIGN BOT %s: %d/%d wins (%d%%), %d timeouts, mean turns %.1f; losses %s" % [family,wins,count,100*wins/count,timeouts,float(turns)/count,JSON.stringify(losses)])
 	quit(1 if failures else 0)

@@ -1,5 +1,6 @@
 {
   "id": "r_prisoners",
+  "procedural": true,
   "name": "The Prison Hulk",
   "family": "rescue",
   "theme": "plains",

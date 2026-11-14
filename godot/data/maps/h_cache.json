@@ -1,5 +1,6 @@
 {
   "id": "h_cache",
+  "procedural": true,
   "name": "Path Engine Cache",
   "family": "sabotage",
   "theme": "dock",

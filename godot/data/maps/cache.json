@@ -1,5 +1,6 @@
 {
   "id": "cache",
+  "procedural": true,
   "name": "Listening Post Besh",
   "family": "hack_terminal",
   "theme": "ruins",

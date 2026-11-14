@@ -1,5 +1,6 @@
 {
   "id": "escort",
+  "procedural": true,
   "name": "The Senator's Walk",
   "family": "vip_extract",
   "theme": "city",

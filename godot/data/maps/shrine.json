@@ -108,6 +108,8 @@
     ]
   },
   "turn_limit": 0,
+  "normal_turn_limit": 7,
+  "evac_turn_limit": 4,
   "clock_trigger": "start",
   "concealed": false,
   "objective": {
@@ -119,7 +121,8 @@
       ]
     ],
     "hp": 18,
-    "waves": 4,
+    "waves": 0,
+    "name": "Dantooine shrine",
     "civilians": [
       [
         4,

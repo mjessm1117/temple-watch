@@ -132,6 +132,8 @@
     ]
   },
   "turn_limit": 10,
+  "normal_turn_limit": 10,
+  "evac_turn_limit": 5,
   "clock_trigger": "concealment",
   "concealed": true,
   "objective": {

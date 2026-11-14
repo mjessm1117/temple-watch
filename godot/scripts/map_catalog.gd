@@ -2,6 +2,7 @@ extends RefCounted
 ## Authored plots + parcels. Every campaign id is explicit; missing ids never borrow rescue.
 const Validator = preload("res://scripts/map_validator.gd")
 const Layout29 = preload("res://scripts/w29c_layout.gd")
+const Cover33 = preload("res://scripts/w33a_cover_layout.gd")
 
 static func read(path: String) -> Dictionary:
 	if not FileAccess.file_exists(path): return {}
@@ -66,9 +67,10 @@ static func load_map(path: String, seed_value: int = 1, retry_count: int = 0) ->
 	for y in plot.crossings:
 		for x in range(1, data.width-1):
 			for dy in [-1, 0, 1]: clear_floor(rows,Vector2i(x,int(y)+dy))
-	# Plot sockets guarantee high/low flanks and cover in all four quarters.
-	for x in [7, data.width-8]:
-		for y in [7, data.height-8]:
+	# Authored pockets move with the site; both side approaches retain height.
+	var socket_shift := posmod(str(data.get("id", "")).hash(), 3) - 1 if str(data.get("id", "")) in Cover33.COVER_IDS else 0
+	for x in [7 + socket_shift, data.width-8 - socket_shift]:
+		for y in [7 - socket_shift, data.height-8 + socket_shift]:
 			put(rows,Vector2i(x,y),"#")
 			put(rows,Vector2i(x,y+2),"c")
 	for x in [2,data.width-3]:
@@ -97,6 +99,7 @@ static func load_map(path: String, seed_value: int = 1, retry_count: int = 0) ->
 					if q.x > 0 and q.y > 0 and q.x < data.width-1 and q.y < data.height-1: put(rows,q,".")
 	for x in [2,data.width-3]:
 		for y in [6,data.height-6]: put(rows,Vector2i(x,y),"c")
+	Cover33.apply(rows, data, seed_value)
 	for at in data.evac: put(rows, point(at), "E")
 	preload("res://scripts/map_art_elevation.gd").apply(rows, data.get("elevation", []))
 	if bool(data.get("procedural",false)): Layout29.ensure_start_cover(rows,data)

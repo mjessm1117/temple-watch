@@ -132,7 +132,7 @@
     ]
   },
   "turn_limit": 12,
-  "normal_turn_limit": 10,
+  "normal_turn_limit": 8,
   "clock_trigger": "start",
   "concealed": false,
   "objective": {
