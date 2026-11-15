@@ -2,6 +2,7 @@ extends Node3D
 
 const Audio = preload("res://scripts/audio.gd")
 const Trail31 = preload("res://scripts/w31c_trail.gd")
+const Facing34 = preload("res://scripts/w34b_facing.gd")
 const W17_ROOT := "res://assets/units/w17/"
 const W17_KINDS := ["sniper", "heavy", "tech", "droid", "officer"]
 const ALLY_COLOR26 := Color("00d4ff")
@@ -15,6 +16,10 @@ var lod2_animation: AnimationPlayer
 var base_clip := "idle"
 var motion: Tween
 var turn_motion: Tween
+var last_known_w34b: Array[Vector2i] = []
+var last_idle_target_w34b := Vector2i(-1, -1)
+var last_idle_origin_w34b := Vector2i(-1, -1)
+var idle_lock_until_w34b := 0
 var pose_motion: Tween
 var alive := true
 var ring: MeshInstance3D
@@ -88,6 +93,7 @@ func setup(u: Dictionary, scene: PackedScene, at: Vector3) -> void:
 		set_saber_active(true)
 
 func _process(_delta: float) -> void:
+	Facing34.update(self)
 	if hum == null: return
 	var game := get_parent().get_parent() if get_parent() != null else null
 	var sound: Node = game.get("sound") if game != null else null
@@ -278,6 +284,7 @@ func stagger_to(point: Vector3) -> void:
 
 func act(clip: String) -> void:
 	if not alive or downed: return
+	idle_lock_until_w34b = Time.get_ticks_msec() + 550
 	_action_serial += 1
 	var serial := _action_serial
 	if pose_motion != null and pose_motion.is_running(): pose_motion.kill()
@@ -307,13 +314,8 @@ func flinch24() -> void:
 	pose_motion.tween_property(model, "rotation:z", 0.0, 0.18).set_trans(Tween.TRANS_BACK)
 
 func face(point: Vector3) -> void:
-	var direction := point - global_position
-	direction.y = 0
-	if direction.length_squared() < 0.01: return
-	var goal := atan2(direction.x, direction.z)
-	if turn_motion != null and turn_motion.is_running(): turn_motion.kill()
-	turn_motion = _paced_tween()
-	turn_motion.tween_property(self, "rotation:y", rotation.y + wrapf(goal - rotation.y, -PI, PI), 0.12).set_trans(Tween.TRANS_SINE)
+	last_idle_target_w34b = Vector2i(-1, -1)
+	Facing34.turn_model(self, point, 0.12)
 
 func set_aim_ready(value: bool, point: Vector3) -> void:
 	if model == null or not alive or downed: return
@@ -371,7 +373,7 @@ func travel24(path: Array, dash: bool, segments: Array = []) -> void:
 			motion.tween_callback(func() -> void: route_beats27.append(kind + "_land"))
 			motion.tween_callback(_footstep)
 			motion.tween_callback(func() -> void:
-				if model != null: model.rotation = Vector3.ZERO)
+					if model != null: model.rotation.x = 0.0; model.rotation.y -= 0.24 if kind == "door" else 0.0; model.rotation.z = 0.0)
 		else:
 			motion.tween_property(self, "position", point, duration).set_trans(Tween.TRANS_CUBIC if step_index == path.size() - 1 else Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT if step_index == path.size() - 1 else Tween.EASE_IN_OUT)
 			motion.parallel().tween_callback(_footstep).set_delay(duration * 0.22)

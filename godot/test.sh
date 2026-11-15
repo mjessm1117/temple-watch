@@ -148,3 +148,4 @@ run_suite maplayout33_test
 run_suite terrain33_test
 run_suite mapart33_test
 run_suite readability33_test
+run_suite w34b_facing_test --rendering-method gl_compatibility --resolution 844x390
