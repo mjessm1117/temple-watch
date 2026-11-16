@@ -179,7 +179,7 @@ static func relayout(h) -> void:
 		if child.gui_input.is_connected(ability_scroll._gui_input):
 			child.gui_input.disconnect(ability_scroll._gui_input)
 	unit_portrait.custom_minimum_size = Vector2(52, 52)
-	layout.place(odds_plate, Rect2(column.end.x + 8, 126 if portrait else 50, minf(150.0 if portrait else 340.0, area.x - column.end.x - 68.0), 126 if portrait else 96))
+	layout.place(odds_plate, Rect2(column.end.x + 8, 72 if portrait else 50, minf(150.0 if portrait else 340.0, area.x - column.end.x - 68.0), 126 if portrait else 96))
 	layout.place(enemy_card, Rect2(column.end.x + 8, 150 if portrait else 50, minf(250.0 if portrait else 350.0, area.x - column.end.x - 68.0), 76))
 	h.popup.anchor_left = 0.0; h.popup.anchor_right = 0.0
 	h.popup.offset_left = column.end.x + 8; h.popup.offset_right = area.x - 8
