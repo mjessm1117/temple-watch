@@ -130,7 +130,7 @@ func handle(event: InputEvent) -> void:
 			var next_distance := _distance()
 			var next_angle := _angle()
 			var next_center := _center()
-			if gesture == "" and pressed_control == null and _control_at(g.get_viewport(), fingers.values()[0]) == null and _control_at(g.get_viewport(), fingers.values()[1]) == null:
+			if gesture == "" and not (pressed_control is BaseButton) and not (_control_at(g.get_viewport(), fingers.values()[0]) is BaseButton) and not (_control_at(g.get_viewport(), fingers.values()[1]) is BaseButton):
 				var spread := absf(next_distance - pair_start_distance)
 				var rotation := absf(wrapf(next_angle - pair_start_angle, -PI, PI))
 				var travel := next_center.distance_to(pair_start_center)
