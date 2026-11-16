@@ -41,8 +41,9 @@ func check_phone_tactical(game, unit: Dictionary, context: String) -> void:
 	var phone = game.hud_controls.phone
 	var bounds := unit_bounds(game, unit)
 	var header_bottom: float = phone.overlay.get_child(0).get_global_rect().end.y
-	var tray_top: float = phone.overlay.find_child("AbilityTray", true, false).get_global_rect().position.y
-	check(bounds.position.y >= header_bottom + 8.0 and bounds.end.y <= tray_top - 8.0, context + " selected unit clears phone HUD: %s header=%.1f tray=%.1f" % [bounds,header_bottom,tray_top])
+	var tray: Rect2 = phone.ability_tray.get_global_rect()
+	var plate_top: float = phone.unit_plate.get_global_rect().position.y
+	check(bounds.position.y >= header_bottom + 8.0 and bounds.end.y <= plate_top - 8.0 and not bounds.intersects(tray), context + " selected unit clears phone HUD: %s header=%.1f column=%s" % [bounds,header_bottom,tray])
 	check(bounds.position.x >= 8.0 and bounds.end.x <= 836.0, context + " selected unit stays on screen")
 	var at: Vector3 = game.views[int(unit.id)].global_position
 	var tile_width: float = game.camera.unproject_position(at + Vector3(0.5, 0, 0)).distance_to(game.camera.unproject_position(at + Vector3(-0.5, 0, 0)))
@@ -73,7 +74,7 @@ func exercise(size: Vector2i) -> void:
 		for button in game.hud_controls.phone.ability_buttons:
 			if bool(button.get_meta("battle12_available", false)): available_at_start += 1
 			if button.visible: shown_at_start += 1
-		check(shown_at_start >= 2 and shown_at_start <= available_at_start and (shown_at_start == available_at_start or game.hud_controls.phone.more_button.visible), "phone keeps primary actions reachable through overflow at turn start")
+		check(shown_at_start >= 1 and shown_at_start <= available_at_start and game.hud_controls.phone.more_button.visible, "phone keeps Move and overflow reachable at turn start")
 		var another: Dictionary = game.mission.living("player")[1]
 		Input.warp_mouse(Vector2(422, 195))
 		game._select(int(another.id))

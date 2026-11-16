@@ -130,6 +130,7 @@ run_suite story29_test
 run_suite balance29_test
 run_suite battle29_test
 run_suite phone29_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
+run_suite w34a_actionbar_test --rendering-method gl_compatibility --resolution 956x440 -- --graphics=low
 run_suite scroll29_test --rendering-method gl_compatibility --resolution 844x390 -- --graphics=low
 run_suite menu32_test --rendering-method gl_compatibility --resolution 390x844 -- --graphics=low
 run_suite a30_test

@@ -69,14 +69,12 @@ func run() -> void:
 	touch(center, true); touch(center, false); await process_frame
 	check(screen.focus_index == 1, "roster short tap inspects")
 	screen.queue_free(); await process_frame
-	# Battle abilities use the same scroll owner as armory and roster.
+	# Battle actions are fixed; armory and roster retain gesture scrolling.
 	var battle = load("res://scenes/rescue.tscn").instantiate()
 	root.add_child(battle); await process_frame
 	var abilities: ScrollContainer = battle.hud_controls.phone.overlay.find_child("Abilities", true, false)
 	var action_button: Button = battle.hud_controls.phone.ability_buttons[0]
-	check(abilities.scroll_deadzone == 10 and action_button.mouse_filter == Control.MOUSE_FILTER_PASS, "battle ability passes touch to 10 px scroll")
-	battle.hud_controls.phone.ability_tray.offset_left = -100
-	battle.hud_controls.phone.ability_tray.offset_right = 100
+	check(abilities.mouse_filter == Control.MOUSE_FILTER_IGNORE and not action_button.gui_input.is_connected(abilities._gui_input), "battle column does not capture touch for scrolling")
 	await process_frame
 	center = action_button.get_global_rect().get_center()
 	var action_before: String = battle.action
@@ -85,7 +83,7 @@ func run() -> void:
 		var next := center + Vector2(-12 * (step + 1), 0)
 		drag(last, next); last = next; await process_frame
 	touch(last, false); await process_frame
-	check(abilities.scroll_horizontal > 0, "battle ability button drag scrolls")
+	check(abilities.scroll_horizontal == 0 and battle.hud_controls.phone.more_button.visible, "battle overflow stays in More")
 	check(battle.action == action_before, "battle ability button drag does not activate")
 	battle.queue_free(); await process_frame
 	print("SCROLL16 TEST RESULTS: %d checks, %d failures" % [checks, failures])

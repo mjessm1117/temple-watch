@@ -109,13 +109,14 @@ func scenario(size: Vector2i) -> void:
 		check(not game.hud_controls.aim_ui.odds.get_parent().visible, "portrait inline odds hidden")
 		check(hud.odds_scroll.visible, "portrait reasons visible")
 		check(hud.odds_plate.get_global_rect().end.y < view.size.y * 0.43, "odds card stays above units")
-		var phone_scale := float(size.x) / Phone.logical_size(size).x
-		check(hud.odds_plate.get_global_rect().end.x * phone_scale < game.hud_controls.aim_ui.target_row.get_global_rect().position.x, "scaled portrait odds clears target selector")
+		check(not hud.odds_plate.get_global_rect().intersects(game.hud_controls.aim_ui.target_row.get_global_rect()), "portrait odds clears target selector")
+		check(not hud.odds_plate.get_global_rect().intersects(hud.ability_tray.get_global_rect()), "portrait odds clears action column")
 	await capture(view, "after-%dx%d-low-aim" % [size.x, size.y])
 	game.action = "free"; game.target_id = -1; game.mission.phase = "enemy"
 	game.phase_banner.text = "Sith Trooper advances to cover"
 	game.phase_banner.show()
 	game._refresh(); await frames(2)
+	check(not hud.enemy_card.get_global_rect().intersects(hud.ability_tray.get_global_rect()), str(size) + " enemy event clears action column")
 	hud._update_group_reveal()
 	check(hud.enemy_card.visible, str(size) + " enemy card visible")
 	check(not game.phase_banner.visible and not hud.alerts.card.visible if hud.alerts != null else not game.phase_banner.visible, str(size) + " only one enemy overlay")

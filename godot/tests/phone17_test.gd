@@ -158,18 +158,14 @@ func exercise(size: Vector2i) -> void:
 	await swipe(card_at, Vector2(-100, 0))
 	check(phone.open_card == old_card, "%s unit card drag does not activate card=%s" % [tag, phone.open_card])
 	check(game.pivot.distance_to(old_pivot) < 0.03, "%s unit card drag leaves board still from=%s to=%s" % [tag, old_pivot, game.pivot])
-	# Battle ability buttons sit inside a horizontal scroll area.
+	# The fixed battle column keeps overflow in More without gesture capture.
 	var scroll: ScrollContainer = phone.overlay.find_child("Abilities", true, false)
 	var button: Button = phone.ability_buttons[0]
 	var original_action: String = game.action
-	phone.ability_tray.offset_left = -100; phone.ability_tray.offset_right = 100
 	await process_frame
 	await swipe(button.get_global_rect().get_center(), Vector2(-96, 0))
-	check(scroll.scroll_horizontal > 0 or phone.more_button.visible, tag + " offscreen abilities remain reachable")
+	check(scroll.scroll_horizontal == 0 and phone.more_button.visible, tag + " overflow uses More without scrolling")
 	check(game.action == original_action, tag + " button drag does not activate")
-	phone.ability_tray.offset_left = -minf(340.0, size.x * 0.47)
-	phone.ability_tray.offset_right = minf(340.0, size.x * 0.47)
-	scroll.scroll_horizontal = 0
 	phone._toggle("unit")
 	await process_frame
 	var popup_scroll: ScrollContainer = phone.detail_scroll

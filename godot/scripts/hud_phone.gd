@@ -246,6 +246,8 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 		alerts.setup(g, night, overlay)
 	var guard := preload("res://scripts/w27c_phone_overlay_guard.gd").new()
 	guard.name = "PhoneOverlayGuard27"; guard.hud = self; overlay.add_child(guard)
+	var recovery := preload("res://scripts/w34a_action_recovery.gd").new()
+	recovery.name = "PhoneActionRecovery34"; recovery.hud = self; overlay.add_child(recovery)
 	var move_controls = preload("res://scripts/w29a_move_controls.gd").new(); move_controls.g = g; overlay.add_child(move_controls)
 	root_control.resized.connect(_relayout)
 	_relayout.call_deferred()

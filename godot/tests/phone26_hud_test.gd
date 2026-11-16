@@ -27,9 +27,10 @@ func geometry(size: Vector2i) -> void:
 	check(Layout.ACTION_MIN_SIZE.x >= 44 and Layout.ACTION_MIN_SIZE.y >= 44, "layout action minimum is 44 x 44")
 	var portrait_box: Rect2 = boxes.plate
 	check(portrait_box.position.y >= boxes.header.end.y, str(size) + " portrait below header")
-	check(portrait_box.position.y < boxes.tray.position.y, str(size) + " portrait above actions")
-	check(boxes.tray.size.y >= 44, str(size) + " tray contains 44 px controls")
-	check(boxes.tray.size.x >= 48, str(size) + " action tray width")
+	var column: Rect2 = preload("res://scripts/w34a_action_column.gd").box(Vector2(size), portrait_box)
+	check(column.end.y <= portrait_box.position.y, str(size) + " actions above portrait")
+	check(column.size.y >= 4 * 44, str(size) + " column contains four controls")
+	check(column.size.x >= 124, str(size) + " action column width")
 
 func battle(size: Vector2i) -> void:
 	print("PHONE26 scene ", size)
@@ -75,7 +76,7 @@ func battle(size: Vector2i) -> void:
 		check(hud.unit_card_readout.text.contains("Sgt. Rhal D"), str(size) + " full rank and surname in readout")
 		selected.name = original_name
 		hud.refresh(true)
-		check(hud.unit_portrait.get_global_rect().position.y < hud.ability_tray.get_global_rect().position.y, str(size) + " portrait is above tray")
+		check(hud.ability_tray.get_global_rect().end.y < hud.unit_portrait.get_global_rect().position.y, str(size) + " actions above portrait")
 		check(not hud.ability_tray.is_ancestor_of(hud.action_art), str(size) + " caption canvas is outside button VBox")
 		for button in hud.ability_buttons:
 			if button.visible:

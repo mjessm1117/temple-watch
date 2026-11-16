@@ -113,7 +113,7 @@ func battle(size: Vector2i) -> void:
 			geometry(hud, str(size))
 			if size.x < size.y: await capture(view, "after-390x844-start")
 			if size.x < size.y:
-				check(hud.ability_tray.get_global_rect().position.y > hud.unit_plate.get_global_rect().end.y, "portrait unit and actions in separate rows")
+				check(hud.ability_tray.get_global_rect().end.y < hud.unit_plate.get_global_rect().position.y, "portrait action column above unit")
 				var target: Dictionary = game.mission.living("enemy")[0]
 				var actor: Dictionary = {}
 				for ally in game.mission.living("player"):

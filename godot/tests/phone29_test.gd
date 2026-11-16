@@ -99,8 +99,10 @@ func run() -> void:
 	var tile := Vector2i(int(actor.x), int(actor.y)) + Vector2i(1, 0)
 	var cue: Dictionary = Cue.at(rescue, actor, tile)
 	check(str(cue.get("label", "")) != "" and str(cue.get("detail", "")) != "", "destination shield cue")
-	var inset_tray: Rect2 = preload("res://scripts/hud_phone_layout.gd").boxes(Vector2(390 - 59, 844 - 34)).tray
-	check(inset_tray.size.x >= 4.0 * 67.0 + 3.0 * 8.0, "portrait inset fits three actions and MORE")
+	var inset_area := Vector2(390 - 59, 844 - 34)
+	var inset_plate: Rect2 = preload("res://scripts/hud_phone_layout.gd").boxes(inset_area).plate
+	var inset_column: Rect2 = preload("res://scripts/w34a_action_column.gd").box(inset_area, inset_plate)
+	check(inset_column.size.y >= 4.0 * 44.0 + 3.0 * 2.0, "portrait inset fits three actions and MORE")
 	Phone.test_touch = -1; Phone.test_mobile = -1; Phone.test_scale = 0
 	print("PHONE29 TEST RESULTS: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)

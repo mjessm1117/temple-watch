@@ -47,22 +47,23 @@ static func setup_action_bar(h, layout: Dictionary, abilities: HFlowContainer) -
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.custom_minimum_size.y = 44; tray_box.add_child(scroll)
 	tray_box.move_child(momentum_plate, tray_box.get_child_count() - 1)
 	scroll.get_h_scroll_bar().modulate.a = 0.0
-	var track := HBoxContainer.new(); track.add_theme_constant_override("separation", 8); scroll.add_child(track)
+	var track := GridContainer.new(); track.name = "ActionColumn"; track.columns = 1
+	track.add_theme_constant_override("h_separation", 0); track.add_theme_constant_override("v_separation", 0); scroll.add_child(track)
 	for node in abilities.get_children():
 		var button: Button = node
-		button.reparent(track); button.custom_minimum_size = preload("res://scripts/hud_phone_layout.gd").ACTION_MIN_SIZE
+		button.reparent(track); button.custom_minimum_size = Vector2(124, 44)
 		button.flat = true
 		ability_buttons.append(button)
-		button.set_meta("graphics_custom_minimum_size", preload("res://scripts/hud_phone_layout.gd").ACTION_MIN_SIZE)
+		button.set_meta("graphics_custom_minimum_size", Vector2(124, 44))
 		button.set_meta("shared_phone_art", true)
 		button.set("compact", true); button.set("phone_icon", true)
 		button.button_down.connect(h._show_ability.bind(button))
 		button.pressed.connect(h._show_ability.bind(button))
 		button.gui_input.connect(h._ability_input.bind(button))
 	momentum_strike = h._button("STRIKE", h._claim_strike)
-	momentum_strike.name = "MomentumStrike"; momentum_strike.custom_minimum_size = preload("res://scripts/hud_phone_layout.gd").ACTION_MIN_SIZE
+	momentum_strike.name = "MomentumStrike"; momentum_strike.custom_minimum_size = Vector2(124, 44)
 	momentum_strike.add_theme_font_size_override("font_size", 11); track.add_child(momentum_strike)
-	more_button = h._button("MORE", h._toggle.bind("more")); more_button.custom_minimum_size = preload("res://scripts/hud_phone_layout.gd").ACTION_MIN_SIZE; track.add_child(more_button)
+	more_button = h._button("MORE", h._toggle.bind("more")); more_button.custom_minimum_size = Vector2(124, 44); track.add_child(more_button)
 	for button in [momentum_strike, more_button]:
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			var round_style := StyleBoxFlat.new()
@@ -70,7 +71,7 @@ static func setup_action_bar(h, layout: Dictionary, abilities: HFlowContainer) -
 			round_style.border_color = Color("a8f3bb") if button == momentum_strike and state != "disabled" else Color("be9d5b")
 			round_style.set_border_width_all(1); round_style.set_corner_radius_all(18)
 			button.add_theme_stylebox_override(state, round_style)
-	action_art = preload("res://scripts/hud_phone_action_art.gd").new()
+	action_art = preload("res://scripts/w34a_action_art.gd").new()
 	action_art.name = "PhoneActionArt"; action_art.buttons = ability_buttons
 	preload("res://scripts/hud_phone_layout.gd").place(action_art, Rect2(layout.tray.position, layout.tray.size - Vector2(8, 0)))
 	overlay.add_child(action_art)
@@ -126,17 +127,22 @@ static func relayout(h) -> void:
 	var area := root_control.size - Vector2(safe.x + safe.z, safe.y + safe.w)
 	var boxes: Dictionary = preload("res://scripts/hud_phone_layout.gd").boxes(area)
 	var layout = preload("res://scripts/hud_phone_layout.gd")
+	if area.x > area.y:
+		var plate_box: Rect2 = boxes.plate
+		var plate_height := 52.0 if area.y < 300.0 else 56.0
+		boxes.plate = Rect2(plate_box.position.x, area.y - plate_height, plate_box.size.x, plate_height)
 	layout.place(overlay.find_child("PhoneTopBackground", false, false), boxes.header)
 	layout.place(overlay.find_child("PhoneTopStrip", false, false), boxes.header)
 	var portrait := area.y > area.x
 	layout.place(threat_chip, Rect2(8, 2, 44, 44))
 	layout.place(end_button, boxes.end)
 	layout.place(unit_plate, boxes.plate)
-	layout.place(ability_tray, boxes.tray)
-	layout.place(action_art, boxes.tray)
+	var column: Rect2 = preload("res://scripts/w34a_action_column.gd").box(area, boxes.plate)
+	layout.place(ability_tray, column)
+	layout.place(action_art, column)
 	h._update_actions.call_deferred(false)
 	layout.place(objective_summary, Rect2(60, 2, area.x - 164, 44))
-	layout.place(action_name, Rect2(8 if portrait else boxes.tray.position.x, (boxes.plate.position.y if portrait else boxes.tray.position.y) - 24, area.x - 16 if portrait else boxes.tray.size.x, 20))
+	layout.place(action_name, Rect2(column.end.x + 8, column.position.y, area.x - column.end.x - 16, 20))
 	action_name.hide()
 	layout.place(camera_rail, boxes.camera)
 	layout.place(camera_art, boxes.camera)
@@ -157,10 +163,22 @@ static func relayout(h) -> void:
 	menu_button.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	end_button.add_theme_font_size_override("font_size", 15)
 	if end_confirm: end_button.set_pressed_no_signal(true)
-	ability_scroll.custom_minimum_size.y = 56
+	ability_scroll.custom_minimum_size = Vector2(124, 44)
+	ability_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	ability_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	# The fixed column has no scrolling. Keep the legacy container for layout,
+	# but remove its touch capture path during viewport and gesture changes.
+	ability_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ability_scroll.set_process_input(false)
+	ability_scroll.set_process(false)
+	for child in ability_scroll.find_children("*", "Control", true, false):
+		if child.gui_input.is_connected(ability_scroll._gui_input):
+			child.gui_input.disconnect(ability_scroll._gui_input)
 	unit_portrait.custom_minimum_size = Vector2(52, 52)
-	layout.place(odds_plate, Rect2(12, 72 if portrait else 50, minf(150.0 if portrait else 340.0, area.x - 82.0), 126 if portrait else 96))
-	layout.place(enemy_card, Rect2(12, 150 if portrait else 50, minf(250.0 if portrait else 350.0, area.x - 76.0), 76))
+	layout.place(odds_plate, Rect2(column.end.x + 8, 126 if portrait else 50, minf(150.0 if portrait else 340.0, area.x - column.end.x - 68.0), 126 if portrait else 96))
+	layout.place(enemy_card, Rect2(column.end.x + 8, 150 if portrait else 50, minf(250.0 if portrait else 350.0, area.x - column.end.x - 68.0), 76))
+	h.popup.anchor_left = 0.0; h.popup.anchor_right = 0.0
+	h.popup.offset_left = column.end.x + 8; h.popup.offset_right = area.x - 8
 	odds_title.add_theme_font_size_override("font_size", 12 if portrait else 14)
 	odds_hit.add_theme_font_size_override("font_size", 24)
 	odds_badge.visible = true
@@ -212,40 +230,29 @@ static func update_actions(h, from_game: bool) -> void:
 	var g = h.g
 	var ability_buttons: Array[Button] = h.ability_buttons
 	var ability_tray: PanelContainer = h.ability_tray
-	var momentum_plate: Control = h.momentum_plate
 	var momentum_strike: Button = h.momentum_strike
-	var overlay: Control = h.overlay
 	var more_button: Button = h.more_button
 	var action_art: Control = h.action_art
+	var ability_scroll: ScrollContainer = h.ability_scroll
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var available: int = int(unit.get("ap", 0))
-	var action_width: float = ability_tray.size.x - (82.0 if momentum_plate.visible else 0.0) - (68.0 if momentum_strike.visible else 0.0) - 4.0
-	var primary_limit := clampi(int(floor((action_width + 8.0) / 75.0)) - 1, 1, 4)
+	for button in ability_buttons:
+		var charges: String = str(g.mission.abilities.get(button.ability_id, {}).get("charges", ""))
+		button.set_meta("w34a_charges", int(unit.get(charges, 0)) if charges != "" else -1)
 	h.last_unit_id = g.selected_id; h.last_unit_ap = available
 	if from_game:
 		for button in ability_buttons: button.set_meta("battle12_available", button.visible)
-	var primary: Array[String] = []
-	for mode in ["move", "shoot", "strike", "overwatch", "push", "reload", "hunker", "medpac"]:
-		if primary.size() >= primary_limit: break
-		for button in ability_buttons:
-			if button.ability_id == mode and bool(button.get_meta("battle12_available", false)):
-				primary.append(mode); break
-	if overlay.size.y > overlay.size.x and "overwatch" not in primary:
-		for button in ability_buttons:
-			if button.ability_id == "overwatch" and bool(button.get_meta("battle12_available", false)):
-				if primary.size() >= primary_limit: primary.pop_back()
-				primary.append("overwatch")
-				break
-	for button in ability_buttons:
-		if primary.size() >= primary_limit: break
-		if bool(button.get_meta("battle12_available", false)) and button.ability_id not in primary:
-			primary.append(button.ability_id)
+	var primary: Array[String] = ["move", "shoot", "overwatch"]
 	for button in ability_buttons:
 		button.visible = bool(button.get_meta("battle12_available", false)) and button.ability_id in primary
-	var overflow := 0
-	for button in ability_buttons:
-		if bool(button.get_meta("battle12_available", false)) and not button.visible: overflow += 1
-	more_button.visible = overflow > 0
+	more_button.visible = true
+	var track: GridContainer = ability_scroll.get_node("ActionColumn")
+	var order := ["move", "shoot", "overwatch"]
+	for index in order.size():
+		for button in ability_buttons:
+			if button.ability_id == order[index] and button.get_parent() == track: track.move_child(button, index)
+	track.move_child(more_button, track.get_child_count() - 1)
+	momentum_strike.visible = int(g.mission.chain_momentum) >= 3 and ability_tray.size.y >= 228.0
 	action_art.queue_redraw()
 
 static func more_group(button: Button, abilities: Dictionary, unit: Dictionary, target: Dictionary) -> int:
@@ -276,6 +283,10 @@ static func build_more_list(h) -> void:
 	reason_label.hide(); popup_body.add_child(reason_label)
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
+	if int(g.mission.chain_momentum) >= 3 and not h.momentum_strike.visible:
+		var strike: Button = h._button("MOMENTUM STRIKE", func() -> void: h._claim_strike(); h._close())
+		strike.disabled = h.momentum_strike.disabled
+		popup_body.add_child(strike)
 	var candidates: Array[Button] = []
 	for button in h.ability_buttons:
 		if button.visible or not bool(button.get_meta("battle12_available", false)) or button.ability_id == "": continue
