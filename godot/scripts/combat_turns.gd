@@ -3,14 +3,17 @@ const AI = preload("res://scripts/ai.gd")
 const Round = preload("res://scripts/combat_round.gd")
 const Presentation = preload("res://scripts/enemy_presentation.gd")
 const Events = preload("res://scripts/feelcam22_events.gd")
+const EnemyTiming = preload("res://scripts/w34c_enemy_timing.gd")
 
 static func play(game: Node3D) -> void:
 	game.playing_enemy_events = true
 	game.mission.presentation_active = true
 	game.cam.skip_requested = false
+	game.cam.fast_forward_w34c = false
+	if game.has_meta("w34c_drama_started_ms"): game.remove_meta("w34c_drama_started_ms")
 	var prior_handoff: Variant = game.phase_banner.get_meta("handoff_tween") if game.phase_banner.has_meta("handoff_tween") else null
 	if prior_handoff is Tween and prior_handoff.is_running(): prior_handoff.kill()
-	game.phase_banner.text = "ENEMY ACTIVITY  •  SPACE TO SKIP"
+	game.phase_banner.text = "ENEMY ACTIVITY  •  TAP TO SPEED UP"
 	game.phase_banner.modulate.a = 1.0
 	game.phase_banner.visible = true
 	game.sound.play("turn")
@@ -28,7 +31,7 @@ static func play(game: Node3D) -> void:
 			Events.emit(game, "villain_reveal", {"actor":enemy.id}, at)
 			Events.cue(game, "villain")
 			Events.music(game, "contact")
-			await game.cam.wait(0.12)
+			await game.cam.hold_drama_w34c()
 			game.cam.finish()
 			break
 	var fired: Dictionary = {}
@@ -39,8 +42,7 @@ static func play(game: Node3D) -> void:
 		group_center += Vector3(near_enemy.x, 0, near_enemy.y)
 		group_count += 1
 		if group_count == 4: break
-	if group_count > 0 and not game.cam.skip_requested:
-		game._glide_to(group_center / float(group_count), 0.16)
+	if group_count > 0 and EnemyTiming.on_screen(game, group_center / float(group_count)):
 		game.cam.trace.append("group_frame_%d" % group_count)
 	for enemy in game.mission.living("enemy"):
 		if game.mission.result != "": break
@@ -48,7 +50,9 @@ static func play(game: Node3D) -> void:
 		game.mission.enemy_actor(enemy, fired)
 		await Presentation.drain(game)
 		# Important events finish before the next decision; quiet travel may overlap.
-	await Presentation.flush_quiet(game)
+	Presentation.release_quiet_w34c(game)
+	if game.has_meta("w34c_drama_started_ms"):
+		await game.cam.hold_drama_until_w34c(int(game.get_meta("w34c_drama_started_ms")))
 	game.mission.defer_resolution = false
 	Round.finish(game.mission)
 	await Presentation.drain(game)

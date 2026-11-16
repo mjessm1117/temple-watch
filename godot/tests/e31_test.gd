@@ -133,7 +133,7 @@ func _bench(game: Node3D) -> void:
 	await Presentation.play(game, events, 0)
 	var elapsed := Time.get_ticks_msec() - started
 	print("E31 FEELCAM22 BENCH: %d ms" % elapsed)
-	check(elapsed <= 602, "FEELCAM22 four moves and one attack stays within 602ms")
+	check(elapsed >= 200 and elapsed <= 1250, "four moves and one attack show the result without exceeding 1250ms")
 	Card.clear(game, true)
 	game.playing_enemy_events = false
 

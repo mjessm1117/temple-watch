@@ -6,6 +6,7 @@ const FeelBeats24 = preload("res://scripts/w24_feelcam_beats.gd")
 const Impact31 = preload("res://scripts/w31c_impact.gd")
 const Trail31 = preload("res://scripts/w31c_trail.gd")
 const W31ECard = preload("res://scripts/w31e_enemy_card.gd")
+const EnemyTiming = preload("res://scripts/w34c_enemy_timing.gd")
 const kill_hold_ms := 300
 
 static func _point(m: RefCounted, tile: Vector2i, height: float = 0.0) -> Vector3:
@@ -27,7 +28,8 @@ static func drain(game: Node3D) -> void:
 			var meta24: Dictionary = game.presentation_route_meta24.get(id, {})
 			if view.has_method("travel24"): view.travel24(game.presentation_routes[id], bool(meta24.get("dash", false)), meta24.get("segments", []))
 			else: view.travel(game.presentation_routes[id])
-			while view.motion != null and view.motion.is_running() and not game.cam.skip_requested: await game.get_tree().process_frame
+			if game.playing_enemy_events and view.motion != null: view.motion.set_speed_scale(EnemyTiming.move_speed_scale())
+			while view.motion != null and view.motion.is_running() and not game.cam.skip_requested and not game.cam.fast_forward_w34c: await game.get_tree().process_frame
 		if view.motion != null and view.motion.is_running(): view.motion.kill()
 		view.position = _point(game.mission, Shot.pos(u))
 	game.presentation_routes.clear()
@@ -37,10 +39,23 @@ static func drain(game: Node3D) -> void:
 static func flush_quiet(game: Node3D) -> void:
 	for view in game.quiet_motions:
 		if not is_instance_valid(view): continue
-		while view.motion != null and view.motion.is_running() and not game.cam.skip_requested:
+		while view.motion != null and view.motion.is_running() and not game.cam.skip_requested and not game.cam.fast_forward_w34c:
 			await game.get_tree().process_frame
 		if view.motion != null and view.motion.is_running(): view.motion.kill()
 		if game.quiet_targets.has(view.unit_id): view.position = game.quiet_targets[view.unit_id]
+	game.quiet_motions.clear()
+	game.quiet_targets.clear()
+
+static func release_quiet_w34c(game: Node3D) -> void:
+	# The mission has committed these destinations. Let their visual tails finish
+	# under the player handoff instead of holding the phase open.
+	for view in game.quiet_motions:
+		if not is_instance_valid(view): continue
+		var destination: Vector3 = game.quiet_targets.get(view.unit_id, view.position)
+		if view.motion != null and view.motion.is_running():
+			view.motion.finished.connect(func() -> void:
+				if is_instance_valid(view): view.position = destination)
+		else: view.position = destination
 	game.quiet_motions.clear()
 	game.quiet_targets.clear()
 
@@ -54,13 +69,27 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 	var actor: Node3D = game.views.get(int(event.get("actor", -1)))
 	var kind := str(event.kind)
 	if game.cam.skip_requested: W31ECard.clear(game, true)
-	if game.playing_enemy_events and kind in ["intent", "attack", "push", "move", "overwatch", "reload", "objective_attack", "vip_attack"]:
+	var quiet_offscreen := false
+	if game.playing_enemy_events and kind in ["move", "reload"] and actor != null:
+		quiet_offscreen = not EnemyTiming.on_screen(game, actor.position)
+		if kind == "move":
+			var path_points: Array[Vector3] = []
+			for tile in event.get("path", [event.to]): path_points.append(_point(game.mission, tile))
+			quiet_offscreen = not EnemyTiming.visible_move(game, _point(game.mission, event.from), path_points)
+	if quiet_offscreen:
+		var quiet_reason := str(event.get("reason27", event.get("intent_reason24", event.get("intent_reason", ""))))
+		if quiet_reason != "": game.phase_banner.text = quiet_reason; game.phase_banner.visible = true
+	if game.playing_enemy_events and not quiet_offscreen and kind in ["intent", "attack", "push", "overwatch", "reload", "objective_attack", "vip_attack"]:
 		var actor_id := int(event.get("actor", -1))
 		var reason := str(event.get("reason27", event.get("intent_reason24", event.get("intent_reason", ""))))
 		if reason == "" and game.mission.has_method("intent_explain27"): reason = str(game.mission.call("intent_explain27", event))
 		if reason == "" and game.mission.has_method("intent_reason24"): reason = str(game.mission.call("intent_reason24", event))
 		if reason != "": game.phase_banner.text = reason; game.phase_banner.visible = true
 		var card: PanelContainer = W31ECard.current(game)
+		if card != null and int(card.get_meta("actor_id", -1)) != actor_id and game.has_meta("w34c_drama_started_ms"):
+			await game.cam.hold_drama_until_w34c(int(game.get_meta("w34c_drama_started_ms")))
+		if kind in ["intent", "attack", "push", "objective_attack", "vip_attack"]:
+			game.set_meta("w34c_drama_started_ms", Time.get_ticks_msec())
 		if not game.cam.skip_requested and (card == null or int(card.get_meta("actor_id", -1)) != actor_id):
 			var unit: Dictionary = game.mission.unit_by_id(actor_id)
 			if int(unit.get("hp", 0)) > 0:
@@ -100,12 +129,12 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 			W31ECard.result(game, int(event.actor), "HIT")
 			Events.emit(game, "objective_hit", event, to, {"source_pos":from})
 			Events.cue(game, "objective_hit")
-			await game.cam.wait(0.25)
+			await game.cam.hold_drama_w34c()
 		"reinforcement":
 			game._refresh_figures()
 			game.fx.float_text(_point(game.mission,event.at,1.8),"REINFORCEMENTS",Color("ffad8d"))
 			Events.emit(game, "reinforce", event, _point(game.mission,event.at))
-			await game.cam.wait(0.3)
+			await game.cam.hold_drama_w34c()
 		"activation":
 			game._refresh_figures()
 			actor = game.views.get(int(event.actor))
@@ -129,7 +158,7 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 				Events.emit(game, "reveal", event, center, {"group":group_id, "count":members.size(), "title":game.phase_banner.text})
 				Events.cue(game, "alert")
 				Events.music(game, "contact")
-				await game.cam.wait(0.12)
+				await game.cam.hold_drama_w34c()
 		"move":
 			if actor == null:
 				game._refresh_figures(); actor = game.views.get(int(event.actor))
@@ -149,11 +178,12 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 					game.presentation_routes[int(event.actor)] = remainder
 					var remaining_segments24: Array = preload("res://scripts/w24_threat_route.gd").segments(game.mission, event.get("path", [event.to]), event.from).slice(points.size()) if game.mission.has_method("route_segments24") else []
 					game.presentation_route_meta24[int(event.actor)] = {"dash":bool(event.get("dash24", false)), "segments":remaining_segments24}
-				if not game.cam.skip_requested:
+				if not game.cam.skip_requested and not quiet_offscreen and not game.cam.fast_forward_w34c:
 					var route24: Array = event.get("path", [event.to])
 					var segments24: Array = preload("res://scripts/w24_threat_route.gd").segments(game.mission, route24, event.from) if game.mission.has_method("route_segments24") else []
 					if actor.has_method("travel24"): actor.travel24(points, bool(event.get("dash24", false)), segments24.slice(0, points.size()))
 					else: actor.travel(points)
+					if game.playing_enemy_events and actor.motion != null: actor.motion.set_speed_scale(EnemyTiming.move_speed_scale())
 					if not game.quiet_motions.has(actor): game.quiet_motions.append(actor)
 					game.quiet_targets[int(event.actor)] = _point(game.mission, stop)
 				else: actor.position = _point(game.mission, stop)
@@ -161,10 +191,11 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 			await impact(game, event)
 		"overwatch", "reload":
 			if actor != null:
-				await game.cam.frame(actor.position, actor.position, "reveal")
+				if not quiet_offscreen: await game.cam.frame(actor.position, actor.position, "reveal")
 				game.fx.float_text(actor.position + Vector3.UP * 1.7, kind.to_upper(), Color("f2ba47"))
 				if kind == "reload": actor.act("reload")
-			await game.cam.wait(0.2)
+			if kind == "overwatch": await game.cam.hold_drama_w34c()
+			elif not quiet_offscreen: await game.cam.wait(0.2)
 		"cover_break":
 			FeelBeats24.clutch(game, event, _point(game.mission, event.get("at", Vector2i.ZERO)))
 			FeelBeats24.cue(game, "cover_break", _point(game.mission, event.get("at", Vector2i.ZERO)))
@@ -199,7 +230,7 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 	if mode == "push": game.fx.shockwave(from, to); game.sound.play("push")
 	elif mode == "strike": game.fx.saber(from, to); game.sound.play("saber")
 	else: game.fx.bolt(from, to, bool(event.get("enemy", false)), int(event.damage) == 0); game.sound.play("shot")
-	await game.cam.wait(0.28 if mode == "push" else 0.16 if mode == "strike" else clampf(from.distance_to(to) / 38.0, 0.11, 0.31))
+	await game.cam.wait(0.28 if mode == "push" else 0.16 if mode == "strike" else clampf(from.distance_to(to) / 38.0, 0.11, 0.31), game.playing_enemy_events)
 	var damage := int(event.damage)
 	var outcome := str(event.get("outcome", ""))
 	if damage > 0:
@@ -223,6 +254,11 @@ static func impact(game: Node3D, event: Dictionary) -> void:
 	var word := "DEFLECT" if "deflected" in outcome else "MISS" if damage == 0 and mode != "push" else "KILL -%d" % damage if bool(event.get("killed", false)) else "CRIT %d" % damage if outcome == "crits" else "GRAZE %d" % damage if outcome == "grazes" else "-%d" % damage if damage > 0 else "PUSH"
 	if game.playing_enemy_events: W31ECard.result(game, int(event.actor), "KILL" if bool(event.get("killed", false)) else "HIT" if damage > 0 else "MISS" if mode != "push" else "PUSH")
 	game.fx.float_text(to + Vector3.UP * 0.6, word, Color("ffca70") if outcome == "crits" or bool(event.get("killed", false)) else Color("a8eaff") if outcome == "grazes" else Color.WHITE, outcome == "crits" or bool(event.get("killed", false)))
+	if game.playing_enemy_events:
+		game.cam.trace.append("result_visible_%d" % int(event.actor))
+		if Time.get_ticks_msec() - int(game.get_meta("w34c_drama_started_ms", Time.get_ticks_msec())) >= 800:
+			await game.get_tree().process_frame
+		game.cam.trace.append("result_held_%d" % int(event.actor))
 	if int(event.get("armor_lost", 0)) > 0: game.fx.float_text(to + Vector3.UP * 0.15, "SHRED -%d" % int(event.armor_lost), Color("f0c68b"))
 	if victim != null:
 		if mode == "push": victim.stagger_to(_point(game.mission, event.destination))

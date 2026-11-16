@@ -1,6 +1,7 @@
 extends Node
 ## One camera owner; completion (or an explicit skip) gates attack resolution.
 const Shot = preload("res://scripts/shot.gd")
+const EnemyTiming = preload("res://scripts/w34c_enemy_timing.gd")
 const BLEND := 0.16
 const REPEAT_BLEND := 0.08
 const PLAYER_SHOT_BLEND := 0.36
@@ -9,6 +10,7 @@ const RETURN_BLEND24 := 0.28
 const TACTICAL_V_OFFSET := -0.5
 var g
 var skip_requested := false
+var fast_forward_w34c := false
 var return_pivot := Vector3.ZERO
 var trace: Array[String] = []
 var touch = preload("res://scripts/touch_input.gd").new()
@@ -150,18 +152,37 @@ func frame_selected_move28() -> void:
 	preload("res://scripts/w29a_phone_frame.gd").frame(g, _map_rect28())
 
 func _input(event: InputEvent) -> void:
+	if g != null and g.playing_enemy_events and ((event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)):
+		fast_forward_w34c = true
+		trace.append("enemy_fast_forward")
+		g.get_viewport().set_input_as_handled()
+		return
 	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
 		g.set_process_unhandled_input(false)
 	if event is InputEventScreenTouch or event is InputEventScreenDrag:
 		touch.handle(event)
 
-func wait(seconds: float) -> void:
+func wait(seconds: float, dramatic: bool = false) -> void:
+	if g.playing_enemy_events and not dramatic:
+		if fast_forward_w34c: return
+		seconds *= EnemyTiming.QUIET_WAIT_SCALE
 	seconds /= float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if g.playing_enemy_events else 1.0)
 	var elapsed := 0.0
-	while elapsed < seconds and not skip_requested and is_instance_valid(g) and g.is_inside_tree():
+	var start_ms := Time.get_ticks_msec()
+	while elapsed < seconds and not skip_requested and (dramatic or not fast_forward_w34c) and is_instance_valid(g) and g.is_inside_tree():
 		await g.get_tree().process_frame
 		if not is_instance_valid(g) or not g.is_inside_tree(): return
-		elapsed += get_process_delta_time() / maxf(Engine.time_scale, 0.01)
+		elapsed = float(Time.get_ticks_msec() - start_ms) / 1000.0 if g.playing_enemy_events else elapsed + get_process_delta_time() / maxf(Engine.time_scale, 0.01)
+
+func hold_drama_w34c(seconds: float = EnemyTiming.MIN_DRAMA) -> void:
+	var start := Time.get_ticks_msec()
+	await hold_drama_until_w34c(start, seconds)
+
+func hold_drama_until_w34c(start_ms: int, seconds: float = EnemyTiming.MIN_DRAMA) -> void:
+	while is_instance_valid(g) and g.is_inside_tree():
+		var remaining := seconds - float(Time.get_ticks_msec() - start_ms) / 1000.0
+		if remaining <= 0.0: return
+		await g.get_tree().create_timer(remaining).timeout
 
 func preview(actor: Dictionary, target: Dictionary) -> void:
 	if g.player_attack_pending or g.playing_enemy_events: return
@@ -366,6 +387,9 @@ func impact_beat(point: Vector3) -> void:
 	if drag_serial == g.camera_drag_serial24: g.camera.fov = original_fov
 
 func frame(from: Vector3, to: Vector3, style: String = "shoot") -> void:
+	if g.playing_enemy_events and style in ["shoot", "strike"] and not g.cinematic and EnemyTiming.on_screen(g, from) and EnemyTiming.on_screen(g, to):
+		trace.append("camera_already_visible")
+		return
 	if return_tween24 != null and return_tween24.is_running(): return_tween24.kill()
 	_clear_preview_visuals()
 	if preview_active: g.camera.fov = preview_fov; return_fov24 = preview_fov
@@ -402,11 +426,11 @@ func frame(from: Vector3, to: Vector3, style: String = "shoot") -> void:
 	shoulder = preload("res://scripts/battle11_camera.gd").safe_position(g.mission, shoulder)
 	var initial_look: Vector3 = g.camera.position - g.camera.global_basis.z * 8.0
 	g.action_tween = g.create_tween().set_parallel(true).set_speed_scale(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if g.playing_enemy_events else 1.0))
-	var duration := REPEAT_BLEND if g.playing_enemy_events and Time.get_ticks_msec() / 1000.0 - last_frame_at < 1.0 else PLAYER_SHOT_BLEND if not g.playing_enemy_events and style in ["shoot", "strike"] else BLEND
+	var duration := 0.05 if g.playing_enemy_events and Time.get_ticks_msec() / 1000.0 - last_frame_at < 1.0 else 0.10 if g.playing_enemy_events else PLAYER_SHOT_BLEND if style in ["shoot", "strike"] else BLEND
 	last_frame_at = Time.get_ticks_msec() / 1000.0
 	g.action_tween.tween_property(g.camera, "position", shoulder, duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	g.action_tween.tween_method(func(value: Vector3): g.camera.look_at(value, Vector3.UP), initial_look, look, duration)
-	await wait(duration)
+	await wait(duration, g.playing_enemy_events)
 	if not skip_requested and frame_drag_serial24 == g.camera_drag_serial24:
 		g.camera.position = shoulder; g.camera.look_at(look, Vector3.UP)
 	trace.append("camera_ready")
