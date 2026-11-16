@@ -16,7 +16,7 @@ func _animation_running(g) -> bool:
 func _process(_delta: float) -> void:
 	if hud == null or not is_instance_valid(hud.overlay): return
 	var g = hud.g
-	if g == null or g.mission == null or g.mission.phase != "player" or g.mission.result != "":
+	if g == null or g.mission == null or g.mission.phase != "player" or g.mission.result != "" or g.demo_mode:
 		idle_since_ms = -1
 		return
 	if _animation_running(g):
