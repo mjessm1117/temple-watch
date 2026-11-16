@@ -167,7 +167,7 @@ static func relayout(h) -> void:
 	end_button.add_theme_font_size_override("font_size", 15)
 	if end_confirm: end_button.set_pressed_no_signal(true)
 	ability_scroll.custom_minimum_size = Vector2(124, 44)
-	momentum_plate.visible = true
+	momentum_plate.visible = false
 	ability_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	ability_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	# The fixed column has no scrolling. Keep the legacy container for layout,
