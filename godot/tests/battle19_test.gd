@@ -115,7 +115,7 @@ func touch_scroll(phone, label: String) -> void:
 	actions._gui_input(action_press)
 	var action_drag := InputEventScreenDrag.new(); action_drag.position = action_start + Vector2(-100, 0); action_drag.relative = Vector2(-100, 0)
 	actions._gui_input(action_drag)
-	check(actions.scroll_horizontal > 0, label + " ability scroll drags from button")
+	check(actions.scroll_horizontal == 0, label + " ability bar fixed column, no horizontal scroll (A34)")
 	var action_position: int = actions.scroll_horizontal
 	phone.refresh(); await process_frame
 	check(actions.scroll_horizontal == action_position, label + " ability scroll holds mid-drag")
