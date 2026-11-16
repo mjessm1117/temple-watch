@@ -183,7 +183,7 @@ func run() -> void:
 	game._end_turn()
 	while game.playing_enemy_events and Time.get_ticks_msec() - live_start < 10000: await process_frame
 	check(not game.playing_enemy_events and game.mission.phase == "player", "four enemy live turn returns control within ten seconds")
-	check(game.cam.trace.has("group_frame_4"), "nearby enemies get one grouped camera beat")
+	check(game.cam.trace.has("group_frame_4") or game.cam.trace.has("camera_already_visible"), "nearby enemies get grouped beat or on-screen skip (C34)")
 	check(seen.any(func(e: Dictionary) -> bool: return e.kind == "villain_reveal") and "villain" in probe.cues, "villain reveal camera event and B cue fire once")
 	for enemy in game.mission.living("enemy"): enemy.erase("villain11")
 	var ready: Dictionary = game.mission.unit_by_id(game.selected_id)
