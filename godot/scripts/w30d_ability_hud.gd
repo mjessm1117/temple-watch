@@ -19,7 +19,7 @@ static func setup_action_bar(h, layout: Dictionary, abilities: HFlowContainer) -
 	var more_button: Button
 	var action_art: Control
 	var tray := PanelContainer.new(); tray.name = "AbilityTray"; ability_tray = tray
-	tray.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tray.mouse_filter = Control.MOUSE_FILTER_STOP
 	preload("res://scripts/hud_phone_layout.gd").place(tray, Rect2(layout.tray.position, layout.tray.size - Vector2(8, 0)))
 	var tray_style: StyleBoxFlat = night.panel_style(); tray_style.set_content_margin_all(0)
 	tray.add_theme_stylebox_override("panel", tray_style); overlay.add_child(tray)
