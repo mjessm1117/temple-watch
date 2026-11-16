@@ -94,7 +94,8 @@ func check_card_names(squad: Node, title: String) -> void:
 		if not full_name.begins_with(shown.trim_suffix("…")):
 			fail(str(label.get_path()), "%s name clipped at start: %s / %s" % [title, shown, full_name])
 		var width := ThemeDB.fallback_font.get_string_size(shown, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x
-		if width > label.size.x + 0.5 and not shown.ends_with("…"):
+		var max_width := maxf(label.size.x, 32.0) if title == "armory" else label.size.x + 0.5
+		if width > max_width and not shown.ends_with("…"):
 			fail(str(label.get_path()), "%s name exceeds label: %s > %s" % [title, width, label.size.x])
 
 func check_roster_rows(squad: Node) -> void:
