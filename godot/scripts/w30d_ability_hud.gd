@@ -23,8 +23,8 @@ static func setup_action_bar(h, layout: Dictionary, abilities: HFlowContainer) -
 	preload("res://scripts/hud_phone_layout.gd").place(tray, Rect2(layout.tray.position, layout.tray.size - Vector2(8, 0)))
 	var tray_style: StyleBoxFlat = night.panel_style(); tray_style.set_content_margin_all(0)
 	tray.add_theme_stylebox_override("panel", tray_style); overlay.add_child(tray)
-	var tray_box := HBoxContainer.new(); tray_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tray_box.add_theme_constant_override("separation", 4); tray.add_child(tray_box)
+	var tray_box := VBoxContainer.new(); tray_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tray_box.add_theme_constant_override("separation", 0); tray.add_child(tray_box)
 	momentum_plate = Control.new(); momentum_plate.name = "MomentumPlate"
 	momentum_plate.mouse_filter = Control.MOUSE_FILTER_STOP
 	momentum_plate.custom_minimum_size = Vector2(82, 17); tray_box.add_child(momentum_plate)
@@ -64,6 +64,8 @@ static func setup_action_bar(h, layout: Dictionary, abilities: HFlowContainer) -
 	momentum_strike.name = "MomentumStrike"; momentum_strike.custom_minimum_size = Vector2(124, 44)
 	momentum_strike.add_theme_font_size_override("font_size", 11); track.add_child(momentum_strike)
 	more_button = h._button("MORE", h._toggle.bind("more")); more_button.custom_minimum_size = Vector2(124, 44); track.add_child(more_button)
+	var momentum_actions := HBoxContainer.new(); momentum_actions.name = "MomentumActions"
+	momentum_actions.add_theme_constant_override("separation", 4); momentum_actions.visible = false; track.add_child(momentum_actions)
 	for button in [momentum_strike, more_button]:
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			var round_style := StyleBoxFlat.new()
@@ -106,6 +108,7 @@ static func relayout(h) -> void:
 	var menu_button: Button = h.menu_button
 	var end_confirm: bool = h.end_confirm
 	var ability_scroll: ScrollContainer = h.ability_scroll
+	var momentum_plate: Control = h.momentum_plate
 	var odds_plate: PanelContainer = h.odds_plate
 	var enemy_card: PanelContainer = h.enemy_card
 	var odds_title: Label = h.odds_title
@@ -164,6 +167,7 @@ static func relayout(h) -> void:
 	end_button.add_theme_font_size_override("font_size", 15)
 	if end_confirm: end_button.set_pressed_no_signal(true)
 	ability_scroll.custom_minimum_size = Vector2(124, 44)
+	momentum_plate.visible = true
 	ability_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	ability_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	# The fixed column has no scrolling. Keep the legacy container for layout,
@@ -247,12 +251,24 @@ static func update_actions(h, from_game: bool) -> void:
 		button.visible = bool(button.get_meta("battle12_available", false)) and button.ability_id in primary
 	more_button.visible = true
 	var track: GridContainer = ability_scroll.get_node("ActionColumn")
+	var momentum_actions: HBoxContainer = track.get_node("MomentumActions")
+	var full_momentum: bool = int(g.mission.chain_momentum) >= 3
+	if full_momentum:
+		momentum_actions.visible = true
+		for button in [momentum_strike, more_button]:
+			button.custom_minimum_size.x = 60
+			if button.get_parent() != momentum_actions: button.reparent(momentum_actions)
+	else:
+		for button in [momentum_strike, more_button]:
+			if button.get_parent() != track: button.reparent(track)
+			button.custom_minimum_size.x = 124
+		momentum_actions.visible = false
 	var order := ["move", "shoot", "overwatch"]
 	for index in order.size():
 		for button in ability_buttons:
 			if button.ability_id == order[index] and button.get_parent() == track: track.move_child(button, index)
-	track.move_child(more_button, track.get_child_count() - 1)
-	momentum_strike.visible = int(g.mission.chain_momentum) >= 3 and ability_tray.size.y >= 228.0
+	if not full_momentum: track.move_child(more_button, track.get_child_count() - 1)
+	momentum_strike.visible = full_momentum
 	action_art.queue_redraw()
 
 static func more_group(button: Button, abilities: Dictionary, unit: Dictionary, target: Dictionary) -> int:

@@ -477,7 +477,7 @@ func refresh(from_game: bool = false) -> void:
 	var pips: int = clampi(int(g.mission.chain_momentum), 0, 3)
 	var used_this_turn: bool = int(g.mission.chain_strike_used_turn) == int(g.mission.turn)
 	momentum_row.visible = false
-	momentum_plate.visible = false
+	momentum_plate.visible = true
 	momentum_pips.text = "MOM " + char(0x25CF).repeat(pips) + char(0x25CB).repeat(3 - pips)
 	momentum_display.text = "MOM %d/3" % pips
 	momentum_strike.visible = pips >= 3
