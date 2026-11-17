@@ -179,14 +179,14 @@ static func relayout(h) -> void:
 		if child.gui_input.is_connected(ability_scroll._gui_input):
 			child.gui_input.disconnect(ability_scroll._gui_input)
 	unit_portrait.custom_minimum_size = Vector2(52, 52)
-	layout.place(odds_plate, Rect2(column.end.x + 8, 104 if portrait else 50, minf(150.0, area.x - (column.end.x + 68.0)), 114 if portrait else 96))
+	layout.place(odds_plate, Rect2(column.end.x + 8, 125 if portrait else 50, minf(150.0, area.x - (column.end.x + 68.0)), 90 if portrait else 96))
 	layout.place(enemy_card, Rect2(column.end.x + 8, 150 if portrait else 50, minf(250.0 if portrait else 350.0, area.x - (column.end.x + 68.0)), 76))
 	h.popup.anchor_left = 0.0; h.popup.anchor_right = 0.0
 	h.popup.offset_left = column.end.x + 8; h.popup.offset_right = area.x - 8
 	odds_title.add_theme_font_size_override("font_size", 12 if portrait else 14)
 	odds_hit.add_theme_font_size_override("font_size", 24)
-	odds_badge.visible = true
-	odds_scroll.custom_minimum_size.y = 40 if portrait else 20
+	odds_badge.visible = not portrait
+	odds_scroll.custom_minimum_size.y = 20
 	odds_scroll.custom_minimum_size.x = 140 if portrait else 300
 	odds_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if portrait else ScrollContainer.SCROLL_MODE_AUTO
 	odds_modifiers.custom_minimum_size.x = 134 if portrait else 294
