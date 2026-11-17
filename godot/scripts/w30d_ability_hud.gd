@@ -188,7 +188,7 @@ static func relayout(h) -> void:
 	odds_badge.visible = not portrait
 	odds_scroll.custom_minimum_size.y = 20
 	odds_scroll.custom_minimum_size.x = 140 if portrait else 300
-	odds_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if portrait else ScrollContainer.SCROLL_MODE_AUTO
+	odds_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER if portrait else ScrollContainer.SCROLL_MODE_AUTO
 	odds_modifiers.custom_minimum_size.x = 134 if portrait else 294
 	odds_modifiers.add_theme_font_size_override("font_size", 14)
 	odds_scroll.visible = true
