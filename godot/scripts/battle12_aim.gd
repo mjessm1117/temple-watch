@@ -6,6 +6,8 @@ var g
 var panel: PanelContainer
 var targets: HBoxContainer
 var target_row: PanelContainer
+var target_name: Label
+var target_hp_fill: ColorRect
 var odds: Label
 var odds_detail: Label
 var cancel: Button
@@ -47,7 +49,8 @@ func setup(game, root: Control, on_phone: bool) -> void:
 		panel.offset_top = -62; panel.offset_bottom = -4
 		if root.size.x < root.size.y:
 			panel.anchor_left = 0.0; panel.anchor_right = 1.0
-			panel.offset_left = 12; panel.offset_right = -12
+			panel.offset_left = 6; panel.offset_right = -12
+			panel.offset_top = -64; panel.offset_bottom = 0
 	else:
 		panel.anchor_top = 1.0; panel.anchor_bottom = 1.0
 		panel.offset_top = -94; panel.offset_bottom = -8
@@ -73,18 +76,45 @@ func setup(game, root: Control, on_phone: bool) -> void:
 		odds.add_theme_color_override("font_color", Color("f2d99a")); odds_box.add_child(odds)
 		odds_detail = Label.new(); odds_detail.name = "AimOddsDetail"; odds_detail.add_theme_font_size_override("font_size", 12)
 		odds_detail.add_theme_color_override("font_color", Color("e7edf0")); odds_box.add_child(odds_detail)
-		confirm = _button("CONFIRM", 105, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
-		if root.size.x < 600: confirm.add_theme_font_size_override("font_size", 12)
+		var portrait := root.size.x < root.size.y
+		odds_box.visible = not portrait
+		confirm = _button("SHOOT", 105, _confirm); confirm.name = "FireButton"; row.add_child(confirm)
 		cancel = _button("CANCEL", 70 if root.size.x < 600 else 76, g._cancel_order); cancel.name = "AimCancel"; row.add_child(cancel)
+		if portrait:
+			for button in [confirm, cancel]:
+				button.custom_minimum_size = Vector2(0, 56)
+				button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				button.add_theme_font_size_override("font_size", 18)
+			_style_action(confirm, Color("205c3c"), Color("e7ffed"))
+			_style_action(cancel, Color("39454d"), Color("f0f2f2"))
 		target_row = PanelContainer.new(); target_row.name = "AimTargetRow"
 		target_row.anchor_left = 1.0; target_row.anchor_right = 1.0
 		target_row.offset_left = -minf(340.0, root.size.x * 0.48); target_row.offset_right = -6
 		target_row.offset_top = 48; target_row.offset_bottom = 102
+		if portrait:
+			target_row.offset_left = 6
 		target_row.add_theme_stylebox_override("panel", style.duplicate()); root.add_child(target_row)
 		var target_box := HBoxContainer.new(); target_box.add_theme_constant_override("separation", 3); target_row.add_child(target_box)
 		target_box.add_child(_button("‹", 44, func() -> void: g._cycle_target(-1)))
 		targets = HBoxContainer.new(); targets.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		targets.add_theme_constant_override("separation", 2); target_box.add_child(targets)
+		target_name = Label.new(); target_name.name = "AimEnemyName"
+		target_name.custom_minimum_size.x = 66; target_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		target_name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		target_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		target_name.add_theme_font_size_override("font_size", 12)
+		target_name.add_theme_color_override("font_color", Color("f2e5ca"))
+		target_name.visible = portrait; target_box.add_child(target_name)
+		var hp_slot := Control.new(); hp_slot.name = "AimHpSlot"
+		hp_slot.custom_minimum_size = Vector2(76, 44); hp_slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		hp_slot.visible = portrait; target_box.add_child(hp_slot)
+		var hp_bg := ColorRect.new(); hp_bg.color = Color("33434a")
+		hp_bg.anchor_right = 1; hp_bg.anchor_top = 0.5; hp_bg.anchor_bottom = 0.5
+		hp_bg.offset_top = -4; hp_bg.offset_bottom = 4; hp_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		hp_slot.add_child(hp_bg)
+		target_hp_fill = ColorRect.new(); target_hp_fill.color = Color("68c98a")
+		target_hp_fill.anchor_bottom = 1; target_hp_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		hp_bg.add_child(target_hp_fill)
 		target_box.add_child(_button("›", 44, func() -> void: g._cycle_target(1)))
 		details = _button("ODDS", 44, _details); target_box.add_child(details)
 		details.visible = root.size.x >= 600
@@ -94,6 +124,7 @@ func setup(game, root: Control, on_phone: bool) -> void:
 		aim_momentum.add_theme_font_size_override("font_size", 11)
 		aim_momentum.add_theme_color_override("font_color", Color("e9ca83"))
 		target_box.add_child(aim_momentum)
+		aim_momentum.visible = not portrait
 		cine_toggle = _button("Cinematics: On", 116, _toggle_cine); cine_toggle.visible = false
 		target_box.add_child(cine_toggle)
 	else:
@@ -114,10 +145,21 @@ func setup(game, root: Control, on_phone: bool) -> void:
 
 func _button(value: String, width: float, action: Callable) -> Button:
 	var b := Button.new(); b.text = value; b.focus_mode = Control.FOCUS_NONE
-	b.custom_minimum_size = Vector2(width, 50 if phone and value in ["CONFIRM", "CANCEL"] else 44 if phone else 50)
+	b.custom_minimum_size = Vector2(width, 50 if phone and value in ["SHOOT", "CONFIRM", "CANCEL"] else 44 if phone else 50)
 	b.add_theme_font_size_override("font_size", 14 if phone else 13)
 	b.pressed.connect(action)
 	return b
+
+func _style_action(button: Button, background: Color, foreground: Color) -> void:
+	var box := StyleBoxFlat.new(); box.bg_color = background
+	box.set_corner_radius_all(5)
+	button.add_theme_stylebox_override("normal", box)
+	var hover := box.duplicate(); hover.bg_color = background.lightened(0.12)
+	button.add_theme_stylebox_override("hover", hover)
+	button.add_theme_stylebox_override("pressed", hover)
+	button.add_theme_color_override("font_color", foreground)
+	button.add_theme_color_override("font_hover_color", foreground)
+	button.add_theme_color_override("font_pressed_color", foreground)
 
 func refresh() -> void:
 	if panel == null: return
@@ -160,6 +202,9 @@ func refresh() -> void:
 		targets.add_child(chip)
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	confirm.disabled = target.is_empty() or g.player_attack_pending
+	if target_name != null:
+		target_name.text = str(target.get("name", ""))
+		target_hp_fill.anchor_right = clampf(float(target.get("hp", 0)) / maxf(1.0, float(target.get("max_hp", 1))), 0.0, 1.0)
 	if target.is_empty(): return
 	g.cam.preview(actor, target)
 	lighting.sync(actor, target)
@@ -167,12 +212,18 @@ func refresh() -> void:
 	if g.action in ["shoot", "strike"]:
 		var info: Dictionary = Shot.calculate(g.mission, actor, target, g.action == "strike")
 		var damage: Dictionary = Shot.damage_preview(actor, target)
-		confirm.text = "CONFIRM %s\nHIT · DMG" % ("FIRE" if g.action == "shoot" else "STRIKE") if phone else "%s · %d%% HIT\n%d–%d DMG" % ["FIRE" if g.action == "shoot" else "STRIKE", int(info.hit), int(damage.normal[0]), int(damage.normal[1])]
+		confirm.text = ("SHOOT" if g.action == "shoot" else "STRIKE") if phone else "%s · %d%% HIT\n%d–%d DMG" % ["FIRE" if g.action == "shoot" else "STRIKE", int(info.hit), int(damage.normal[0]), int(damage.normal[1])]
+		if phone and g.hud_controls.phone != null and g.get_viewport().get_visible_rect().size.y > g.get_viewport().get_visible_rect().size.x:
+			var cover_icon := "◼ " if int(info.cover) >= 40 else "◩ " if int(info.cover) >= 20 else ""
+			var title: Label = g.hud_controls.phone.odds_title
+			if title != null:
+				var plain := title.text.trim_prefix("◼ ").trim_prefix("◩ ")
+				title.text = cover_icon + plain
 		if phone:
 			odds.text = "%d%% HIT" % int(info.hit)
 			odds_detail.text = "%d%% CRIT · %d–%d DMG" % [int(info.crit), int(damage.normal[0]), int(damage.normal[1])]
 	else:
-		confirm.text = "CONFIRM\n%s" % str(g.mission.abilities.get(g.action, {}).get("name", g.action)).to_upper()
+		confirm.text = "CONFIRM" if phone else "CONFIRM\n%s" % str(g.mission.abilities.get(g.action, {}).get("name", g.action)).to_upper()
 	var chain: Dictionary = g.mission.abilities.get(g.action, {}).get("chain", {})
 	var marks: Array[String] = []
 	var ready := false
@@ -182,7 +233,12 @@ func refresh() -> void:
 			marks.append(("−" if kind == "consume" else "+") + str(preload("res://scripts/hud18_icon.gd").GLYPHS.get(tag, "•")))
 			if kind == "consume" and target.get("combo_tags", {}).has(tag): ready = true
 	if not marks.is_empty() and not phone: confirm.text += "  " + " ".join(marks)
-	confirm.modulate = Color("b2ffc1") if ready else Color.WHITE
+	if not phone: confirm.modulate = Color("b2ffc1") if ready else Color.WHITE
+	if phone and portrait: _restore_phone_action.call_deferred()
+
+func _restore_phone_action() -> void:
+	if is_instance_valid(confirm) and panel.visible and phone:
+		confirm.text = "SHOOT" if g.action == "shoot" else "STRIKE" if g.action == "strike" else "CONFIRM"
 
 func _confirm() -> void:
 	if g.target_id < 0: return
