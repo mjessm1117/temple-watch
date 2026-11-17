@@ -4,9 +4,17 @@ const Effects = preload("res://scripts/fx.gd")
 const Audio = preload("res://scripts/audio.gd")
 const UnitView = preload("res://scripts/unit_view.gd")
 const Campaign = preload("res://scripts/campaign/state.gd")
+const Impact35 = preload("res://scripts/w31c_impact.gd")
+class ImpactMission:
+	extends RefCounted
+	var spec := {}
+	func unit_by_id(_id: int) -> Dictionary: return {}
 class ImpactHost:
 	extends Node3D
+	signal battle_event(kind: String, actor_id: String, target_id: String, context: Dictionary)
 	var views: Dictionary = {}
+	var camera: Camera3D
+	var mission := ImpactMission.new()
 var checks := 0
 var failures := 0
 
@@ -115,6 +123,42 @@ func run() -> void:
 	check(playing_steps <= 2, "B14 footsteps cap at two concurrent voices")
 	for step_view in step_views: step_view.queue_free()
 	check(UnitView.choose_fall24(Vector3(0, 0, -1)) == 0 and UnitView.choose_fall24(Vector3(0, 0, 1)) == 1 and UnitView.choose_fall24(Vector3(1, 0, 0)) == 2, "B9 hit direction selects three fall variants")
+	var phone35 := SubViewport.new()
+	phone35.size = Vector2i(390, 844)
+	root.add_child(phone35)
+	var host35 := ImpactHost.new()
+	phone35.add_child(host35)
+	var camera35 := Camera3D.new()
+	phone35.add_child(camera35)
+	camera35.current = true
+	camera35.position = Vector3(0, 3, 8)
+	camera35.look_at(Vector3(0, 1, 0))
+	host35.camera = camera35
+	var figures35 := Node3D.new()
+	host35.add_child(figures35)
+	var victim35 := UnitView.new()
+	figures35.add_child(victim35)
+	victim35.setup({"id": 35, "side": "enemy", "class_name": "Soldier", "model": "trooper"}, load("res://assets/models/units/trooper.glb"), Vector3.ZERO)
+	host35.views[35] = victim35
+	var shooter35 := UnitView.new()
+	figures35.add_child(shooter35)
+	shooter35.setup({"id": 36, "side": "player", "class_name": "Soldier", "model": "trooper"}, load("res://assets/models/units/trooper.glb"), Vector3(-2, 0, 0))
+	host35.views[36] = shooter35
+	host35.battle_event.emit("hit", "36", "35", {"damage": 2})
+	var flashed35: Array[MeshInstance3D] = []
+	Impact35._meshes(victim35.model, flashed35)
+	check(flashed35.any(func(mesh: MeshInstance3D): return mesh.has_meta("d35_flash_active")), "D35 successful shot flashes target mesh")
+	check(victim35.impact_motion35 != null and victim35.impact_motion35.is_running(), "D35 successful shot starts directional flinch")
+	check(Impact35.spark_pool != null and Impact35.spark_pool.amount == 6, "D35 hit reuses six faction particles")
+	host35.battle_event.emit("crit", "36", "35", {"damage": 4})
+	check(int(camera35.get_meta("d35_shake_serial", 0)) > 0 and camera35.v_offset != 0.0, "D35 crit starts additive screen shake")
+	await create_timer(0.28).timeout
+	check(not flashed35.any(func(mesh: MeshInstance3D): return mesh.has_meta("d35_flash_active")), "D35 flash restores material after fade")
+	check(absf(camera35.h_offset) < 0.001 and absf(camera35.v_offset) < 0.001, "D35 shake restores camera offsets")
+	host35.battle_event.emit("miss", "36", "35", {"damage": 0})
+	check(phone35.get_children().any(func(node: Node): return node is CPUParticles2D and node.name == "D35MissPuff"), "D35 missed shot emits dust puff")
+	check(phone35.size == Vector2i(390, 844) and Impact35.spark_pool != null and phone35.get_children().filter(func(node: Node): return node is CPUParticles2D or node is GPUParticles2D).size() == 2, "D35 portrait impact uses two particle emitters within six draw calls")
+	phone35.queue_free()
 	view.fall24(99, Vector3.RIGHT)
 	check(view.alive, "Contract 5 unknown fall variant has no effect")
 	view.queue_free()

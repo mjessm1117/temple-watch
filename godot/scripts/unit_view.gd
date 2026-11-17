@@ -3,6 +3,7 @@ extends Node3D
 const Audio = preload("res://scripts/audio.gd")
 const Trail31 = preload("res://scripts/w31c_trail.gd")
 const Facing34 = preload("res://scripts/w34b_facing.gd")
+const Impact35 = preload("res://scripts/w31c_impact.gd")
 const W17_ROOT := "res://assets/units/w17/"
 const W17_KINDS := ["sniper", "heavy", "tech", "droid", "officer"]
 const ALLY_COLOR26 := Color("00d4ff")
@@ -21,6 +22,8 @@ var last_idle_target_w34b := Vector2i(-1, -1)
 var last_idle_origin_w34b := Vector2i(-1, -1)
 var idle_lock_until_w34b := 0
 var pose_motion: Tween
+var impact_motion35: Tween
+var impact_kind35 := "soldier"
 var alive := true
 var ring: MeshInstance3D
 var foot: AudioStreamPlayer
@@ -47,7 +50,11 @@ const FALL_SECONDS := 0.78
 
 func setup(u: Dictionary, scene: PackedScene, at: Vector3) -> void:
 	unit_id = int(u.id)
+	impact_kind35 = "jedi" if str(u.get("class_name", "")) in ["Guardian", "Consular"] or str(u.get("model", "")) == "jedi" else "droid" if "droid" in str(u.get("class_name", "")).to_lower() or "droid" in str(u.get("model", "")).to_lower() else "soldier"
 	enemy_side = str(u.side) == "enemy"
+	var game := get_parent().get_parent() if get_parent() != null else null
+	if game != null and game.has_signal("battle_event"):
+		game.battle_event.connect(_impact_event35.bind(game))
 	position = at
 	var kind := w17_kind(u)
 	var selected := battle_model_scene(u, scene)
@@ -290,11 +297,11 @@ func act(clip: String) -> void:
 	if pose_motion != null and pose_motion.is_running(): pose_motion.kill()
 	if clip == "hit":
 		play("hit")
-		pose_motion = _paced_tween()
-		pose_motion.tween_property(model, "rotation:z", 0.32, 0.09)
-		pose_motion.parallel().tween_property(model, "position:x", -0.16, 0.09)
-		pose_motion.tween_property(model, "rotation:z", 0.0, 0.30).set_trans(Tween.TRANS_BACK)
-		pose_motion.parallel().tween_property(model, "position:x", 0.0, 0.30)
+		# The hit event already started the directional flinch. Keep the animation cue.
+		if impact_motion35 == null or not impact_motion35.is_running():
+			pose_motion = _paced_tween()
+			pose_motion.tween_property(model, "rotation:x", -0.08, 0.07)
+			pose_motion.tween_property(model, "rotation:x", 0.0, 0.08)
 	else:
 		var delay := 0.12 if turn_motion != null and turn_motion.is_running() else 0.0
 		get_tree().create_timer(delay/(float(preload("res://scripts/campaign/strat_preferences.gd").get_value("speed")) * (RescueSettings.enemy_speed() if enemy_side else 1.0))).timeout.connect(func() -> void:
@@ -312,6 +319,41 @@ func flinch24() -> void:
 	pose_motion = _paced_tween()
 	pose_motion.tween_property(model, "rotation:z", -0.18, 0.09)
 	pose_motion.tween_property(model, "rotation:z", 0.0, 0.18).set_trans(Tween.TRANS_BACK)
+
+func _impact_event35(kind: String, actor_id: String, target_id: String, context: Dictionary, game: Node) -> void:
+	if target_id != str(unit_id) or not alive or model == null: return
+	if kind not in ["hit", "crit", "miss"]: return
+	var shooter: Node3D = game.views.get(int(actor_id)) if game.get("views") is Dictionary else null
+	var source := shooter.global_position if shooter != null else global_position - Vector3.RIGHT
+	var camera: Camera3D = game.get("camera")
+	Impact35.battle_event(self, kind, source, camera, int(context.get("damage", 0)))
+	if kind == "hit" and game.get("mission") != null:
+		var attacker: Dictionary = game.mission.unit_by_id(int(actor_id))
+		var base_damage: Variant = attacker.get("damage", [])
+		if base_damage is Array and not base_damage.is_empty() and int(base_damage[0]) > 0 and int(context.get("damage", 0)) >= int(base_damage[0]) * 2:
+			Impact35.apply_hit_shake(camera, 4.0, 250)
+
+func hit_flinch35(shooter_position: Vector3, camera: Camera3D) -> void:
+	if not alive or downed or model == null or motion != null and motion.is_running(): return
+	if impact_motion35 != null and impact_motion35.is_running(): impact_motion35.kill()
+	var away := global_position - shooter_position
+	away.y = 0.0
+	if away.length_squared() < 0.001: away = Vector3.RIGHT
+	away = away.normalized()
+	var pixel_world := 0.02
+	if camera != null and is_instance_valid(camera):
+		var height := maxf(1.0, camera.get_viewport().get_visible_rect().size.y)
+		pixel_world = camera.size / height if camera.projection == Camera3D.PROJECTION_ORTHOGONAL else 2.0 * camera.global_position.distance_to(global_position) * tan(deg_to_rad(camera.fov) * 0.5) / height
+	var local_away := model.global_basis.inverse() * away
+	var origin := model.position
+	var angle := deg_to_rad(2.0) * (1.0 if local_away.x >= 0.0 else -1.0) if impact_kind35 == "jedi" else 0.0
+	var initial_z := model.rotation.z
+	impact_motion35 = _paced_tween().set_parallel(true)
+	impact_motion35.tween_property(model, "position", origin + local_away * (6.0 * pixel_world), 0.06)
+	impact_motion35.tween_property(model, "rotation:z", initial_z + angle, 0.06)
+	impact_motion35.chain().set_parallel(true)
+	impact_motion35.tween_property(model, "position", origin, 0.09)
+	impact_motion35.tween_property(model, "rotation:z", initial_z, 0.09)
 
 func face(point: Vector3) -> void:
 	last_idle_target_w34b = Vector2i(-1, -1)
