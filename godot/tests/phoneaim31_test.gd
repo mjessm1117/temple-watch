@@ -97,6 +97,8 @@ func run() -> void:
 		if grid == null:
 			for child in game.highlights.get_children():
 				if child.has_method("move_preview_state28"): grid = child
+		game.mission.objective_state.phase = "evac"
+		for i in 2: await process_frame
 		check(grid != null and grid.evac_label28.visible, "EVAC label is visible")
 		if grid != null:
 			var evac: Vector2i = Maps.point(game.mission.spec.evac[0])
