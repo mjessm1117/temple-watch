@@ -102,7 +102,7 @@ func exercise(size: Vector2i) -> void:
 	check(Rect2(Vector2.ZERO, Vector2(size)).has_point(target_center) and not aim.panel.get_global_rect().has_point(target_center), "aim target visible and clear of card at %s" % size)
 	check(aim.sight.visible and aim.sight.source_point.distance_to(aim.sight.target_point) > 25.0, "reticle and sightline connect units at %s" % size)
 	check(game.views[int(actor.id)].aim_ready, "shooter takes a ready pose at %s" % size)
-	check(aim.confirm.text.contains("HIT") and aim.confirm.text.contains("DMG"), "fire, hit chance and damage remain visible at %s" % size)
+	check((aim.odds.text.contains("HIT") and aim.odds_detail.text.contains("DMG")) if aim.phone else (aim.confirm.text.contains("HIT") and aim.confirm.text.contains("DMG")), "fire, hit chance and damage remain visible at %s" % size)
 	check(not game.scene_view.world.environment.ssao_enabled and not game.scene_view.sun.shadow_enabled, "Low lighting and post settings unchanged at %s" % size)
 	if phone:
 		check(shooter_bounds.size.y >= 55 and target_bounds.size.y >= 55, "both phone units are at least 55 px tall")

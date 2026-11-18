@@ -22,9 +22,9 @@ func run() -> void:
 	var camera := Camera3D.new()
 	root.add_child(camera)
 	Impact31.apply_hit_shake(camera, 2.0, 50)
-	check(camera.has_meta("w31c_shake_active") and bool(camera.get_meta("w31c_shake_active")), "hit shake active on camera")
-	for i in 4: await process_frame
-	check(not camera.has_meta("w31c_shake_active") and camera.position.length() < 0.001, "shake returns camera within three frames")
+	check(camera.has_meta("d35_shake_serial") and int(camera.get_meta("d35_shake_serial", 0)) > 0 and camera.v_offset != 0.0, "hit shake active on camera")
+	for i in 8: await process_frame
+	check(not camera.has_meta("d35_shake_serial") and absf(camera.v_offset) < 0.001 and absf(camera.h_offset) < 0.001, "shake restores camera offsets")
 	check(Presentation.kill_hold_ms >= 300, "kill hold lasts 300 ms")
 	var sprite := Node3D.new()
 	root.add_child(sprite)

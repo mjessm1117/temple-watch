@@ -224,7 +224,7 @@ func exercise(size: Vector2i) -> void:
 			check(game.hud_controls.aim_ui.panel.visible, tag + " aim strip visible")
 			var chip: Button = game.hud_controls.aim_ui.targets.get_child(0)
 			check(chip.text.contains("% HIT"), tag + " hit chance shown on target")
-			check(game.hud_controls.aim_ui.confirm.text.begins_with("CONFIRM"), tag + " single Confirm")
+			check(game.hud_controls.aim_ui.confirm.text in ["SHOOT", "STRIKE", "CONFIRM"], tag + " single Confirm")
 			await geometry(game, tag + " aim")
 			await shot("aim-" + tag)
 			game._cancel_order()

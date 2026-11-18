@@ -211,8 +211,9 @@ static func relayout(h) -> void:
 			aim.panel.offset_left = 12 + safe.x; aim.panel.offset_right = -12 - safe.z
 			aim.panel.offset_top = -72 - safe.w; aim.panel.offset_bottom = -8 - safe.w
 			aim.confirm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			aim.target_row.anchor_left = 1.0; aim.target_row.anchor_right = 1.0
-			aim.target_row.offset_left = -minf(190.0, area.x * 0.49) - safe.z; aim.target_row.offset_right = -12 - safe.z
+			# D34 portrait row carries name + HP bar, so it spans the phone width.
+			aim.target_row.anchor_left = 0.0; aim.target_row.anchor_right = 1.0
+			aim.target_row.offset_left = 12 + safe.x; aim.target_row.offset_right = -12 - safe.z
 			aim.target_row.offset_top = 64 + safe.y; aim.target_row.offset_bottom = 118 + safe.y
 			aim.aim_momentum.visible = false
 		else:

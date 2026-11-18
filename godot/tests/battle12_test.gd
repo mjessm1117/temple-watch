@@ -61,7 +61,8 @@ func run() -> void:
 		game._frame_target(); game._refresh()
 		for i in range(30): await process_frame
 		check(game.hud_controls.aim_ui.panel.visible, "aim strip opens for a valid target")
-		check(game.hud_controls.aim_ui.confirm.text.contains("HIT") and game.hud_controls.aim_ui.confirm.text.contains("DMG"), "confirm shows hit and damage")
+		var aim_ui = game.hud_controls.aim_ui
+		check((aim_ui.odds.text.contains("HIT") and aim_ui.odds_detail.text.contains("DMG")) if aim_ui.phone else (aim_ui.confirm.text.contains("HIT") and aim_ui.confirm.text.contains("DMG")), "confirm shows hit and damage")
 		check(game.hud_controls.aim_ui.targets.get_child_count() == 1, "phone strip shows one target chip")
 		var strip: PanelContainer = game.hud_controls.aim_ui.panel
 		var target: Dictionary = m.unit_by_id(game.target_id)
