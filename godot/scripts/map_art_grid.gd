@@ -163,7 +163,7 @@ func _process(_delta: float) -> void:
 	mm.visible_instance_count = index; view.multimesh = mm
 
 func _ensure_objective36() -> void:
-	if objective_cue36 != null or not is_instance_valid(game) or not is_instance_valid(game.overlay): return
+	if objective_cue36 != null or not is_instance_valid(game) or game.get("overlay") == null: return
 	objective_cue36 = preload("res://scripts/w36route_objective.gd").new()
 	objective_cue36.name = "ObjectiveCue36"
 	objective_cue36.set("game", game); objective_cue36.set("world_label", objective_label36)
@@ -398,7 +398,8 @@ func _update_overwatch36() -> void:
 		overwatch_key36 = key
 		overwatch_lane36.mesh = preload("res://scripts/w36route_overwatch.gd").mesh(game.mission)
 	overwatch_lane36.visible = overwatch_lane36.mesh != null and overwatch_lane36.mesh.get_surface_count() > 0
-	var art: Node = game.terrain.get_child(0) if game.terrain.get_child_count() > 0 else null
+	var terrain_node: Node = game.get("terrain")
+	var art: Node = terrain_node.get_child(0) if terrain_node != null and terrain_node.get_child_count() > 0 else null
 	if art == null or art.get("marker_root") == null: return
 	for visual in art.marker_root.get_children():
 		if not visual is MeshInstance3D or not visual.mesh is ImmediateMesh: continue
