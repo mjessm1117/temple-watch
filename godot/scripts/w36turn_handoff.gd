@@ -14,6 +14,7 @@ static func after_action(g: Node3D) -> void:
 	if not RescueSettings.battle_value("auto_select") or current.is_empty(): return
 	var next_id: int = InputControls.next_squad(g.mission, g.selected_id, 1, true)
 	if next_id < 0 or next_id == g.selected_id: return
+	if bool(g.get("demo_mode")): g._select.call_deferred(next_id); return
 	var serial: int = int(g.get_meta("w36turn_handoff_serial", 0)) + 1
 	g.set_meta("w36turn_handoff_serial", serial)
 	handoff(g, next_id, serial)
