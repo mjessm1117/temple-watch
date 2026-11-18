@@ -256,18 +256,10 @@ func _select(id: int) -> void:
 	sound.play("click")
 	var u: Dictionary = mission.unit_by_id(id)
 	if mission.identity != null: mission.identity.voice(mission,u,"select")
-	if not u.is_empty(): _glide_to(BattleCamera.phone_focus(Vector3(int(u.x), 0, int(u.y)),yaw,1.55), 0.35, BattleCamera.selected_zoom(mission))
+	if not u.is_empty(): _glide_to(BattleCamera.phone_focus(Vector3(int(u.x), 0, int(u.y)),yaw,1.55), preload("res://scripts/w36turn_handoff.gd").PAN_SECONDS, BattleCamera.selected_zoom(mission))
 	_refresh()
 func _after_action() -> void:
-	preview_tile = Vector2i(-1, -1)
-	target_id = -1
-	action = "move"
-	end_turn_armed = false
-	warning_label.text = ""
-	var current: Dictionary = mission.unit_by_id(selected_id)
-	if RescueSettings.battle_value("auto_select") and not current.is_empty():
-		var next_id: int = InputControls.next_squad(mission, selected_id, 1, true)
-		if next_id >= 0 and next_id != selected_id: _select.call_deferred(next_id)
+	preload("res://scripts/w36turn_handoff.gd").after_action(self)
 func _cycle_target(direction: int) -> void:
 	var options: Array[Dictionary] = InputControls.valid_targets(mission, mission.unit_by_id(selected_id), action)
 	if options.is_empty():
@@ -309,12 +301,10 @@ func _glide_to(point: Vector3, seconds: float, target_zoom: float = -1.0) -> voi
 		_update_camera(); return
 	seconds /= float(Prefs.get_value("speed"))
 	if camera_tween != null and camera_tween.is_running(): camera_tween.kill()
-	camera_tween = create_tween()
-	camera_tween.set_parallel(true)
+	camera_tween = create_tween().set_parallel(true)
 	camera_tween.tween_property(self, "pivot", point, seconds).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	if target_zoom > 0.0: camera_tween.tween_property(self, "zoom", target_zoom, seconds).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	camera_tween.tween_callback(_update_camera)
-	set_process(true)
+	camera_tween.tween_callback(_update_camera); set_process(true)
 func cancel_camera_glide24() -> void:
 	camera_drag_serial24 += 1
 	if camera_tween != null and camera_tween.is_running(): camera_tween.kill()
@@ -458,20 +448,13 @@ func _attack(id: int, mode: String) -> void:
 	cam.trace.append("resolve_%d" % selected_id)
 	var flank_info: Dictionary = Shot.calculate(mission, actor, target, mode == "strike") if mode != "push" else {}
 	var success: bool = mission.push(selected_id, id) if mode == "push" else mission.shot(selected_id, id, mode)
-	var killed_shot := false
 	if success and not mission.action_events.is_empty():
 		var event: Dictionary = mission.action_events.pop_front(); event.framed = true
 		event.flanked = bool(flank_info.get("flanked", false))
-		killed_shot = bool(event.get("killed", false))
 		await AttackPresentation.play(self, event)
 	await EnemyPresentation.drain(self)
-	var ready_focus := Vector3.INF
-	if killed_shot:
-		var ready_id: int = InputControls.next_squad(mission, selected_id, 1, true)
-		if ready_id >= 0:
-			var ready: Dictionary = mission.unit_by_id(ready_id)
-			ready_focus = BattleCamera.phone_focus(Vector3(ready.x, 0, ready.y), yaw, 1.55)
-	cam.finish(ready_focus)
+	var result_focus := BattleCamera.phone_focus(Vector3(target.x, 0, target.y), yaw, 1.55)
+	cam.finish(result_focus)
 	await cam.await_return24()
 	player_attack_pending = false
 	mission.presentation_active = false
@@ -606,6 +589,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event is InputEventKey and event.pressed and event.keycode in [KEY_SPACE, KEY_ESCAPE, KEY_ENTER]: _skip_activity()
 		elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT: _skip_activity()
 		return
+	if event is InputEventMouseMotion and drag_button in [MOUSE_BUTTON_MIDDLE, MOUSE_BUTTON_RIGHT] and event.relative.length_squared() > 0.0:
+		cancel_camera_glide24()
 	if event is InputEventMouseMotion and drag_button == MOUSE_BUTTON_RIGHT:
 		var scaled: InputEventMouseMotion = event.duplicate()
 		scaled.relative *= camera_sensitivity24

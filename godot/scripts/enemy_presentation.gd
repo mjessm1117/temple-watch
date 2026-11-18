@@ -68,6 +68,8 @@ static func play(game: Node3D, events: Array[Dictionary], _sequence: int) -> voi
 static func show_event(game: Node3D, event: Dictionary) -> void:
 	var actor: Node3D = game.views.get(int(event.get("actor", -1)))
 	var kind := str(event.kind)
+	var reaction := kind == "intent" and bool(event.get("reaction", false))
+	var reaction_names := {"watcher": "", "target": ""}
 	if game.cam.skip_requested: W31ECard.clear(game, true)
 	var quiet_offscreen := false
 	if game.playing_enemy_events and kind in ["move", "reload"] and actor != null:
@@ -98,12 +100,17 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 		var a: Dictionary = game.mission.unit_by_id(int(event.actor))
 		var t: Dictionary = game.mission.unit_by_id(int(event.target))
 		if int(a.get("hp", 0)) <= 0 or int(t.get("hp", 0)) <= 0: return
-		if bool(event.get("reaction", false)):
+		if reaction:
+			reaction_names = {"watcher": str(a.get("name", "Watcher")), "target": str(t.get("name", "Target"))}
+			game.cam.trace.append("reaction_%s_to_%s" % [reaction_names.watcher, reaction_names.target])
 			game.phase_banner.text = "REACTION FIRE"; game.phase_banner.visible = true
 			var victim: Node3D = game.views.get(int(event.target))
 			if victim != null:
 				if victim.motion != null and victim.motion.is_running(): victim.motion.kill()
 				victim.position = _point(game.mission, event.to)
+			if not game.cam.skip_requested:
+				await game.cam.frame(_point(game.mission, event.from), _point(game.mission, event.from), "reveal")
+				await game.cam.wait(0.14, true)
 		await game.cam.frame(_point(game.mission, event.from), _point(game.mission, event.to), str(event.mode))
 		game.cam.trace.append("resolve_%d" % int(event.actor))
 		var intent_info: Dictionary = event.get("info", {})
@@ -189,6 +196,8 @@ static func show_event(game: Node3D, event: Dictionary) -> void:
 				else: actor.position = _point(game.mission, stop)
 		"attack", "push":
 			await impact(game, event)
+			if reaction and game.hud_controls.phone != null and game.hud_controls.phone.has_method("w36_show_enemy_callout"):
+				game.hud_controls.phone.call("w36_show_enemy_callout", reaction_names.watcher, "%s reacts" % reaction_names.target, "Hit" if int(event.get("damage", 0)) > 0 else "Miss")
 		"overwatch", "reload":
 			if actor != null:
 				if not quiet_offscreen: await game.cam.frame(actor.position, actor.position, "reveal")
