@@ -182,7 +182,9 @@ static func relayout(h) -> void:
 	layout.place(odds_plate, Rect2(column.end.x + 8, 125 if portrait else 50, minf(150.0, area.x - (column.end.x + 68.0)), 90 if portrait else 96))
 	layout.place(enemy_card, Rect2(column.end.x + 8, 150 if portrait else 50, minf(250.0 if portrait else 350.0, area.x - (column.end.x + 68.0)), 76))
 	h.popup.anchor_left = 0.0; h.popup.anchor_right = 0.0
-	h.popup.offset_left = column.end.x + 8; h.popup.offset_right = area.x - 8
+	var phone_size: Vector2 = preload("res://scripts/phone_layout.gd").logical_size(preload("res://scripts/phone_layout.gd").window_size())
+	h.popup.offset_left = 8 if phone_size.y > phone_size.x else column.end.x + 8
+	h.popup.offset_right = minf(area.x - 8, phone_size.x - 8) if phone_size.y > phone_size.x else area.x - 8
 	odds_title.add_theme_font_size_override("font_size", 12 if portrait else 14)
 	odds_hit.add_theme_font_size_override("font_size", 24)
 	odds_badge.visible = not portrait
@@ -294,10 +296,7 @@ static func build_more_list(h) -> void:
 	var g = h.g
 	var popup_body: VBoxContainer = h.popup_body
 	var night = h.night
-	popup_body.add_child(night.label("MORE ACTIONS", 16, Color("efd49b")))
-	var reason_label: Label = night.label("", 14, Color("f2d99a"))
-	reason_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	reason_label.hide(); popup_body.add_child(reason_label)
+	popup_body.add_child(night.label("ACTIONS NOW", 16, Color("efd49b")))
 	var unit: Dictionary = g.mission.unit_by_id(g.selected_id)
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	if int(g.mission.chain_momentum) >= 3 and not h.momentum_strike.visible:
@@ -309,14 +308,47 @@ static func build_more_list(h) -> void:
 		if button.visible or not bool(button.get_meta("battle12_available", false)) or button.ability_id == "": continue
 		candidates.append(button)
 	candidates.sort_custom(func(a: Button, b: Button) -> bool: return more_before(a, b, g.mission.abilities, unit, target))
+	var usable: Array[Button] = []
+	var objective: Array[Button] = []
+	var other: Array[Button] = []
 	for button in candidates:
-		var mode: String = button.ability_id
-		var def: Dictionary = g.mission.abilities.get(mode, {})
-		var item: Button = h._button("%s %s  ·  %s AP%s" % [button.display_name, preload("res://scripts/hud18_icon.gd").marks(def), button.cost, "  ·  %d TURN CD" % button.cooldown if button.cooldown > 0 else ""], func() -> void:
-			if button.disabled:
-				h.feedback.show_ability(button)
-				reason_label.text = button.tooltip_text; reason_label.show()
-			else: g._choose_action(mode); h._close())
-		item.set_meta("ability_id", mode)
-		item.modulate = Color("9aa9ac") if button.disabled else Color.WHITE
-		popup_body.add_child(item)
+		var id: String = button.ability_id.to_lower()
+		var named_objective := ["free", "rescue", "hack", "evac", "extract"].any(func(word: String) -> bool: return id.contains(word) or button.display_name.to_lower().contains(word))
+		if named_objective: objective.append(button)
+		elif not button.disabled and button.cooldown <= 0 and usable.size() < 2: usable.append(button)
+		else: other.append(button)
+	if not objective.is_empty() and usable.size() > 1: other.push_front(usable.pop_back())
+	for button in usable: _more_item(h, button)
+	if not objective.is_empty():
+		popup_body.add_child(night.label("OBJECTIVE", 13, Color("efd49b")))
+		for button in objective: _more_item(h, button)
+	if not other.is_empty():
+		h.more_other_button.text = "Other (%d)  %s" % [other.size(), "▲" if h.more_other_expanded else "▼"]
+		h.more_other_button.show()
+		if h.more_other_expanded:
+			for button in other: _more_item(h, button)
+	else: h.more_other_button.hide()
+
+static func _more_item(h, button: Button) -> void:
+	var reason := ""
+	if button.disabled:
+		reason = str(h.g.mission.ability_reason(h.g.selected_id, button.ability_id)).strip_edges()
+		if reason == "": reason = "Unavailable"
+		if reason.length() > 42: reason = reason.substr(0, 39) + "…"
+	var mode: String = button.ability_id
+	var title := "%s  ·  %s AP" % [button.display_name, button.cost]
+	if reason != "": title += "\n" + reason
+	var item: Button = h._button(title, func() -> void:
+		if not button.disabled: h.g._choose_action(mode); h._close())
+	item.name = "MoreAbility_" + mode
+	item.set_meta("ability_id", mode)
+	item.custom_minimum_size.y = 48 if reason != "" else 44
+	item.modulate = Color("a8b3b5") if button.disabled else Color.WHITE
+	h.popup_body.add_child(item)
+
+static func more_key(h) -> String:
+	var parts := [str(h.g.selected_id), str(h.g.target_id), str(h.g.mission.turn), str(h.more_other_expanded)]
+	for button in h.ability_buttons:
+		if bool(button.get_meta("battle12_available", false)):
+			parts.append("%s:%s:%s" % [button.ability_id, button.disabled, button.cooldown])
+	return "|".join(parts)

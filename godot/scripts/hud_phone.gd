@@ -1,5 +1,4 @@
 extends RefCounted
-## Compact battle controls. The full desktop HUD remains available at wide sizes.
 var g
 var night
 var overlay: Control
@@ -54,6 +53,10 @@ var odds_badge: Label
 var alerts: Control
 var enemy_card: PanelContainer
 var enemy_text: Label
+var more_other_expanded := false
+var more_list_key := ""
+var more_back_button: Button
+var more_other_button: Button
 var deferred_radio: Array[Dictionary] = []
 var deferred_story_comms: Dictionary = {}
 var enemy_was_active := false
@@ -211,10 +214,12 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	var popup_half := minf(250.0, (safe_size.x - 16.0) * 0.5)
 	popup.offset_left = -popup_half; popup.offset_right = popup_half; popup.offset_top = 48; popup.offset_bottom = -96
 	popup.add_theme_stylebox_override("panel", night.panel_style()); overlay.add_child(popup)
-	detail_scroll = preload("res://scripts/touch_scroll.gd").new(); detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	popup.add_child(detail_scroll)
-	popup_body = VBoxContainer.new(); popup_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	popup_body.add_theme_constant_override("separation", 8); detail_scroll.add_child(popup_body)
+	var popup_shell := VBoxContainer.new(); popup_shell.add_theme_constant_override("separation", 4); popup.add_child(popup_shell)
+	detail_scroll = preload("res://scripts/touch_scroll.gd").new(); detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; detail_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL; popup_shell.add_child(detail_scroll)
+	popup_body = VBoxContainer.new(); popup_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL; popup_body.add_theme_constant_override("separation", 8); detail_scroll.add_child(popup_body)
+	more_other_button = _button("Other (0)", func() -> void: more_other_expanded = not more_other_expanded; more_list_key = ""; refresh())
+	more_other_button.name = "MoreOtherToggle"; more_other_button.custom_minimum_size.y = 44; more_other_button.hide(); popup_shell.add_child(more_other_button)
+	more_back_button = _button("BACK TO BATTLE", _close); more_back_button.name = "MoreBackToBattle"; more_back_button.custom_minimum_size.y = 44; more_back_button.hide(); popup_shell.add_child(more_back_button)
 	odds_plate = PanelContainer.new(); odds_plate.name = "DecisionOdds"; odds_plate.visible = false
 	odds_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var odds_style: StyleBoxFlat = preload("res://scripts/campaign/ui.gd").style(preload("res://scripts/campaign/ui.gd").SURFACE_RAISED, preload("res://scripts/campaign/ui.gd").LINE); odds_style.set_content_margin_all(3)
@@ -246,6 +251,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 		alerts.setup(g, night, overlay)
 	var guard := preload("res://scripts/w27c_phone_overlay_guard.gd").new()
 	guard.name = "PhoneOverlayGuard27"; guard.hud = self; overlay.add_child(guard)
+	var card_guard := preload("res://scripts/w36hud_card_guard.gd").new(); card_guard.hud = self; overlay.add_child(card_guard)
 	var recovery := preload("res://scripts/w34a_action_recovery.gd").new()
 	recovery.name = "PhoneActionRecovery34"; recovery.hud = self; overlay.add_child(recovery)
 	var move_controls = preload("res://scripts/w29a_move_controls.gd").new(); move_controls.g = g; overlay.add_child(move_controls)
@@ -268,7 +274,6 @@ func hud_scale28() -> float:
 	return root_control.get_window().content_scale_factor if is_instance_valid(root_control) else 1.0
 func _place_reinforcement() -> void:
 	if feedback.reinforcement == null: return
-	# The same alert lives in the top strip; a floating map label blocks taps.
 	feedback.reinforcement.hide()
 func _refresh_odds() -> void:
 	if odds_plate == null: return
@@ -331,7 +336,6 @@ func _show_ability(button: Button) -> void:
 func _ability_input(event: InputEvent, button: Button) -> void:
 	if event is InputEventScreenTouch and event.pressed or event is InputEventMouseButton and event.pressed: _show_ability(button)
 	if event is InputEventScreenDrag:
-		# An ability drag belongs to the HUD; only touches begun on the map pan it.
 		if g.cam.touch.has_method("gesture_owns_touch24") and g.cam.touch.gesture_owns_touch24(): return
 		return
 
@@ -346,7 +350,12 @@ func _plate_input(event: InputEvent) -> void:
 
 func _toggle(card: String) -> void:
 	open_card = "" if open_card == card else card
+	if open_card == "more": more_other_expanded = false; more_list_key = ""; detail_scroll.scroll_vertical = 0
+	popup.offset_top = 8 if open_card == "more" else 48; popup.offset_bottom = -8 if open_card == "more" else -96
 	refresh()
+
+func w36_show_enemy_callout(actor_name: String, reason: String, result: String) -> void:
+	preload("res://scripts/w36hud_enemy_card.gd").show_callout(self, actor_name, reason, result)
 
 func _show_menu() -> void:
 	open_card = "menu"; refresh()
@@ -369,22 +378,10 @@ func _update_group_reveal() -> void:
 	if not is_instance_valid(overlay): return
 	if g.hud_controls != null and g.hud_controls.preview_card26 != null:
 		g.hud_controls.preview_card26.hide()
-	var enemy_active: bool = g.mission.phase == "enemy" or g.playing_enemy_events
-	if enemy_active:
-		enemy_was_active = true
-		var reason := str(g.phase_banner.text).strip_edges()
-		var outcome := str(night.activity.text).strip_edges() if night.activity != null else ""
-		if reason.is_empty(): reason = "Enemy is acting"
-		if outcome == reason: outcome = ""
-		enemy_text.text = reason + ("\n" + outcome if outcome != "" else "")
-		enemy_card.show()
-		g.phase_banner.hide()
-		night.phase_plate.hide(); night.activity_plate.hide()
-		group_reveal.hide()
-		if is_instance_valid(alerts): alerts.card.hide()
-		return
+	if preload("res://scripts/w36hud_enemy_card.gd").update_enemy(self): return
 	_place_reinforcement()
 	enemy_card.hide()
+	if enemy_card.has_meta("w36_hook"): enemy_card.remove_meta("w36_hook")
 	night.phase_plate.hide(); night.activity_plate.hide()
 	if enemy_was_active:
 		enemy_was_active = false
@@ -520,17 +517,21 @@ func refresh(from_game: bool = false) -> void:
 		portrait_path = wanted; unit_portrait.texture = load(wanted)
 	var hp: int = int(unit.get("hp", 0))
 	var display_name := str(unit.get("name", "UNIT"))
-	# Legacy readers inspect the hidden button text; the visible readout uses ASCII.
 	var legacy_ap := char(0x25CF) + char(0x25CB) if int(unit.get("ap", 0)) == 1 else ""
 	unit_card.text = "%s\nHP%d/%d AP%s %s" % [str(unit.get("name", "UNIT")), hp, int(unit.get("max_hp", 0)), g.hud_controls.ap_pips(unit), legacy_ap]
 	unit_card_readout.text = "%s\nHP%d/%d AP%d" % [display_name, hp, int(unit.get("max_hp", 0)), int(unit.get("ap", 0))]
 	var target: Dictionary = g.mission.unit_by_id(g.target_id)
 	target_card.text = "%s  %s  v" % [str(target.get("name", "TARGET")), g.hit_big_label.text]
-	popup.visible = open_card != ""
+	popup.visible = open_card != ""; more_back_button.visible = open_card == "more"
+	if open_card != "more": more_other_button.hide()
 	if is_instance_valid(alerts): alerts.visible = open_card == ""
 	if open_card == "": return
 	if open_card == "settings": return
-	if detail_scroll.touch_dragging: return
+	if detail_scroll.touch_dragging or detail_scroll.finger_down: return
+	if open_card == "more":
+		var key: String = AbilityHUD.more_key(self)
+		if key == more_list_key and popup_body.get_child_count() > 0: return
+		more_list_key = key
 	var saved_scroll: int = detail_scroll.scroll_vertical
 	for child in popup_body.get_children(): child.queue_free()
 	if open_card == "more":
@@ -572,7 +573,7 @@ func refresh(from_game: bool = false) -> void:
 			g.Prefs.set_value("numbers", not bool(g.Prefs.get_value("numbers"))); g._refresh(); refresh()))
 		popup_body.add_child(_button("RESTART MISSION", func() -> void: g.get_tree().reload_current_scene()))
 		popup_body.add_child(_button("MAIN MENU", func() -> void: g.get_node("/root/CampaignFlow").go("menu")))
-	popup_body.add_child(_button("CLOSE", _close))
+	if open_card != "more": popup_body.add_child(_button("CLOSE", _close))
 	detail_scroll.set_deferred("scroll_vertical", saved_scroll)
 
 func _update_actions(from_game: bool) -> void:
