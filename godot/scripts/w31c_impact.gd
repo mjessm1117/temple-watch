@@ -132,24 +132,21 @@ static func apply_hit_shake(camera: Camera3D, intensity: float, duration_ms: int
 	var height := maxf(1.0, camera.get_viewport().get_visible_rect().size.y)
 	var pixel_world := camera.size / height if camera.projection == Camera3D.PROJECTION_ORTHOGONAL else 20.0 * tan(deg_to_rad(camera.fov) * 0.5) / height
 	var amplitude := minf(intensity, 4.0) * pixel_world
-	var previous: Vector2 = camera.get_meta("d35_shake_offset", Vector2.ZERO)
-	var elapsed := 0.0
 	var duration := float(duration_ms) / 1000.0
-	while elapsed < duration:
-		if not is_instance_valid(camera) or not camera.is_inside_tree() or int(camera.get_meta("d35_shake_serial", 0)) != serial: return
-		var phase := elapsed / duration * TAU * 8.0
-		var next := Vector2(sin(phase), cos(phase)) * amplitude * (1.0 - elapsed / duration)
-		camera.h_offset += next.x - previous.x
-		camera.v_offset += next.y - previous.y
-		camera.set_meta("d35_shake_offset", next)
-		previous = next
-		await camera.get_tree().process_frame
-		elapsed += camera.get_process_delta_time()
-	if is_instance_valid(camera) and int(camera.get_meta("d35_shake_serial", 0)) == serial:
-		camera.h_offset -= previous.x
-		camera.v_offset -= previous.y
-		camera.remove_meta("d35_shake_offset")
-		camera.remove_meta("d35_shake_serial")
+	var step := duration / 10.0
+	# Pre-kick: set v_offset immediately so the shake is visible on the same frame
+	camera.v_offset = amplitude
+	# Tween: oscillate with decaying amplitude back to 0
+	var t := camera.create_tween()
+	t.set_process_mode(Tween.TWEEN_PROCESS_IDLE)
+	for v in [-amplitude * 0.65, amplitude * 0.4, -amplitude * 0.22, amplitude * 0.1, 0.0]:
+		t.tween_property(camera, "v_offset", v, step * 2.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.finished.connect(func() -> void:
+		if not is_instance_valid(camera) or int(camera.get_meta("d35_shake_serial", 0)) != serial: return
+		camera.v_offset = 0.0
+		camera.h_offset = 0.0
+		if camera.has_meta("d35_shake_serial"): camera.remove_meta("d35_shake_serial")
+	)
 
 static func enlarge_contact_flash(fx_node: Node3D, zoom_factor: float) -> MeshInstance3D:
 	if fx_node == null or not is_instance_valid(fx_node): return null
