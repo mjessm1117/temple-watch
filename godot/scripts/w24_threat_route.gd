@@ -15,6 +15,20 @@ static func reaction_info(m: RefCounted, watcher: Dictionary, mover: Dictionary,
 	var info: Dictionary = Shot.calculate(m, watcher, probe, false, -15)
 	return info if bool(info.los) and bool(info.range_ok) else {}
 
+static func watchers_for(m: RefCounted, tile: Vector2i) -> Array:
+	var out: Array = []
+	if not m.in_bounds(tile): return out
+	var watcher_side := "player" if m.phase == "enemy" else "enemy"
+	var mover_side := "enemy" if watcher_side == "player" else "player"
+	for watcher in m.living(watcher_side):
+		if not bool(watcher.get("overwatch", false)) and not bool(watcher.get("hold_line", false)): continue
+		var opposing: Array = m.living(mover_side)
+		for mover in opposing:
+			if reaction_info(m, watcher, mover, tile).is_empty(): continue
+			out.append(watcher)
+			break
+	return out
+
 static func segments(m: RefCounted, path: Array, start: Vector2i) -> Array:
 	var out: Array = []
 	var previous := start
