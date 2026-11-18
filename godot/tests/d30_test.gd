@@ -67,6 +67,18 @@ func run() -> void:
 			game._refresh()
 			hud.open_card = "more"
 			hud.refresh()
+			var collapsed_ids: Array[String] = []
+			for child in hud.popup_body.get_children():
+				if child is Button and child.has_meta("ability_id"):
+					collapsed_ids.append(str(child.get_meta("ability_id")))
+			var overflow_count := 0
+			for button in hud.ability_buttons:
+				if not button.visible and bool(button.get_meta("battle12_available", false)) and button.ability_id != "":
+					overflow_count += 1
+			var other_count := overflow_count - collapsed_ids.size()
+			check(hud.more_other_button.visible and not hud.more_other_expanded, "%s Other collapsed by default" % size)
+			check(hud.more_other_button.text.contains("Other (%d)" % other_count), "%s Other label matches hidden ability count" % size)
+			hud.more_other_button.pressed.emit()
 			var ids: Array[String] = []
 			for child in hud.popup_body.get_children():
 				if child is Button and child.has_meta("ability_id"):
