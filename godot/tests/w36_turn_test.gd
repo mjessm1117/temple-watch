@@ -36,7 +36,7 @@ func run() -> void:
 	var game: Node3D = load("res://scenes/rescue.tscn").instantiate()
 	root.add_child(game)
 	await process_frame
-	game.demo_mode = true
+	game.demo_mode = false
 	game.animate_headless = true
 	game.set_process(false)
 	game.cam.set_process(false)
