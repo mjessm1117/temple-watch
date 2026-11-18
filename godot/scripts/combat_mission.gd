@@ -23,6 +23,9 @@ func route_segments24(path: Array, actor_id: int = -1) -> Array:
 	var start: Vector2i = Shot.pos(actor) if not actor.is_empty() else (path[0] if not path.is_empty() else Vector2i.ZERO)
 	return ThreatRoute24.segments(self, path, start)
 
+func w36_overwatch_watchers_for(tile: Vector2i) -> Array:
+	return ThreatRoute24.watchers_for(self, tile)
+
 func route_threat24(path: Array, actor_id: int) -> Dictionary:
 	var actor := unit_by_id(actor_id)
 	var overwatch_tiles: Array = []

@@ -10,6 +10,7 @@ var view: MultiMeshInstance3D
 var focus := Vector2i(-999,-999)
 var route_destination24 := Vector2i(-999, -999)
 var route_unit24 := -1
+var route_signature36 := ""
 var move_controls24: Control
 var hover_view24: MultiMeshInstance3D
 var hover_source24: Node3D
@@ -23,9 +24,15 @@ var reach_key28 := ""
 var reach_edges28 := 0
 var ap_label28: Label3D
 var evac_label28: Label3D
+var objective_cue36: Control
+var objective_label36: Label3D
+var overwatch_lane36: MeshInstance3D
+var overwatch_key36 := ""
 var evac_batches_hidden28 := 0
 var cover_full33: MultiMeshInstance3D
 var cover_half33: MultiMeshInstance3D
+var cover_focus36: MeshInstance3D
+var cover_focus_text36: Label3D
 var silhouette33: MeshInstance3D
 var silhouette_tick33 := 0.0
 
@@ -46,6 +53,20 @@ func bind(original: Node3D, owner_game: Node = null) -> void:
 	reach_view28.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	cover_full33 = _cover_view33("FullCover33", true)
 	cover_half33 = _cover_view33("HalfCover33", false)
+	for quiet in [cover_full33, cover_half33]:
+		var quiet_mat: StandardMaterial3D = quiet.material_override.duplicate()
+		quiet_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		quiet_mat.albedo_color = Color(1, 1, 1, 0.38)
+		quiet.material_override = quiet_mat
+	cover_focus36 = MeshInstance3D.new(); cover_focus36.name = "DestinationCover36"; add_child(cover_focus36)
+	cover_focus36.material_override = Read33.shield_material()
+	cover_focus36.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	cover_focus36.visible = false
+	cover_focus_text36 = Label3D.new(); cover_focus_text36.name = "DestinationCoverText36"; add_child(cover_focus_text36)
+	cover_focus_text36.font_size = 30; cover_focus_text36.pixel_size = 0.014
+	cover_focus_text36.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	cover_focus_text36.outline_size = 9; cover_focus_text36.outline_modulate = Color("102337")
+	cover_focus_text36.visible = false
 	silhouette33 = MeshInstance3D.new(); silhouette33.name = "OccludedUnit33"; add_child(silhouette33)
 	silhouette33.mesh = Read33.silhouette_mesh(); silhouette33.material_override = Read33.shield_material()
 	silhouette33.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; silhouette33.visible = false
@@ -68,6 +89,21 @@ func bind(original: Node3D, owner_game: Node = null) -> void:
 	evac_label28.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	evac_label28.modulate = Color("b8f6d7"); evac_label28.outline_size = 10
 	evac_label28.outline_modulate = Color("102337"); evac_label28.visible = false
+	objective_label36 = Label3D.new(); objective_label36.name = "ObjectiveWorld36"; get_parent().add_child(objective_label36)
+	objective_label36.font_size = 38; objective_label36.pixel_size = 0.018
+	objective_label36.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	objective_label36.modulate = Color("ffe09b"); objective_label36.outline_size = 10
+	objective_label36.outline_modulate = Color("102337"); objective_label36.visible = false
+	overwatch_lane36 = MeshInstance3D.new(); overwatch_lane36.name = "OverwatchLane36"; get_parent().add_child(overwatch_lane36)
+	var lane_mat := StandardMaterial3D.new()
+	lane_mat.vertex_color_use_as_albedo = true
+	lane_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	lane_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	lane_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	lane_mat.no_depth_test = true
+	overwatch_lane36.material_override = lane_mat
+	overwatch_lane36.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	overwatch_lane36.visible = false
 
 func changed(_child: Node) -> void: dirty = true
 
@@ -80,6 +116,7 @@ func _cover_view33(label: String, full: bool) -> MultiMeshInstance3D:
 	return node
 
 func _process(_delta: float) -> void:
+	_ensure_objective36()
 	if is_instance_valid(game):
 		var aiming: bool = game.action not in ["move", "free", "overwatch", "hunker", "interact"]
 		var moving: bool = game.action == "move"
@@ -100,6 +137,7 @@ func _process(_delta: float) -> void:
 	silhouette_tick33 += _delta
 	if silhouette_tick33 >= 0.12: silhouette_tick33 = 0.0; _update_silhouette33()
 	if evac_label28 != null: evac_batches_hidden28 = preload("res://scripts/w28e_evac_marker.gd").apply(game, evac_label28)
+	_update_overwatch36()
 	_update_reach28()
 	style_hover()
 	_refresh_hover24()
@@ -123,6 +161,19 @@ func _process(_delta: float) -> void:
 			tint.a *= focus_alpha(child.position,focus)
 		mm.set_instance_color(index,tint); index += 1
 	mm.visible_instance_count = index; view.multimesh = mm
+
+func _ensure_objective36() -> void:
+	if objective_cue36 != null or not is_instance_valid(game) or not is_instance_valid(game.overlay): return
+	objective_cue36 = preload("res://scripts/w36route_objective.gd").new()
+	objective_cue36.name = "ObjectiveCue36"
+	objective_cue36.set("game", game); objective_cue36.set("world_label", objective_label36)
+	objective_cue36.set("evac_label", evac_label28)
+	game.overlay.add_child(objective_cue36)
+
+func _exit_tree() -> void:
+	if is_instance_valid(objective_cue36): objective_cue36.queue_free()
+	if is_instance_valid(objective_label36): objective_label36.queue_free()
+	if is_instance_valid(overwatch_lane36): overwatch_lane36.queue_free()
 
 func style_hover() -> void:
 	if not is_instance_valid(game) or not is_instance_valid(game.hover_highlights): return
@@ -170,7 +221,7 @@ func _refresh_hover24() -> void:
 		var p: Vector2i = marker.tile
 		var height: float = marker.height
 		var at := Vector3(p.x, preload("res://scripts/shot.gd").elevation(game.mission, p) * 0.7 + height, p.y)
-		mm.set_instance_transform(meshes.size() + i, Transform3D(Basis.from_scale(Vector3(0.62, 0.08, 0.62) if height < 0.3 else Vector3(0.25, 0.7, 0.25)), at))
+		mm.set_instance_transform(meshes.size() + i, Transform3D(Basis.from_scale(Vector3(0.44, 0.18, 0.44) if str(marker.get("kind", "")) == "first_threat" else Vector3(0.62, 0.08, 0.62) if height < 0.3 else Vector3(0.25, 0.7, 0.25)), at))
 		mm.set_instance_color(meshes.size() + i, marker.color)
 	hover_view24.multimesh = mm
 	hover_view24.visible = mm.instance_count > 0
@@ -187,6 +238,7 @@ func _update_reach28() -> void:
 	var active: bool = game.action == "move" and game.mission.phase == "player" and game.mission.result == "" and not actor.is_empty() and int(actor.get("ap", 0)) > 0
 	reach_view28.visible = active
 	cover_full33.visible = active; cover_half33.visible = active
+	if not active: cover_focus36.visible = false; cover_focus_text36.visible = false
 	if not active: return
 	var key := "%d:%d:%d:%d:%d" % [game.selected_id, int(actor.x), int(actor.y), int(actor.ap), int(game.mission.terrain_revision)]
 	if key == reach_key28: return
@@ -210,9 +262,9 @@ func _update_reach28() -> void:
 		var edge: Dictionary = edges[i]
 		var tile: Vector2i = edge.tile
 		var height: float = preload("res://scripts/shot.gd").elevation(game.mission, tile) * 0.7 + 0.25
-		var size := Vector3(0.90, 0.08, 0.12) if edge.horizontal else Vector3(0.12, 0.08, 0.90)
+		var size := Vector3(0.90, 0.035, 0.055) if edge.horizontal else Vector3(0.055, 0.035, 0.90)
 		mm.set_instance_transform(i, Transform3D(Basis.from_scale(size), Vector3(tile.x, height, tile.y) + edge.offset))
-		mm.set_instance_color(i, Color("57d6ff") if edge.blue else Color("ffd05a"))
+		mm.set_instance_color(i, Color(0.34, 0.76, 0.92, 0.34) if edge.blue else Color(0.94, 0.72, 0.31, 0.34))
 	reach_edges28 = edges.size()
 	reach_view28.multimesh = mm
 
@@ -247,24 +299,41 @@ func update_route24() -> void:
 		move_controls24.visible = game.action == "move" and game.preview_tile.x >= 0 and not game.cinematic
 		_place_controls28()
 	ap_label28.visible = destination.x >= 0 and not game.cinematic
-	if destination == route_destination24 and selected == route_unit24: return
-	route_destination24 = destination; route_unit24 = selected
+	if destination.x < 0 or game.cinematic:
+		cover_focus36.visible = false; cover_focus_text36.visible = false
+	var state: Array = [destination, selected, game.mission.terrain_revision]
+	for unit in game.mission.living("player") + game.mission.living("enemy"):
+		state.append([unit.id, unit.x, unit.y, unit.hp, unit.ap, unit.get("awake", false), unit.get("overwatch", false), unit.get("ammo", 1)])
+	var signature := str(hash(state))
+	if destination == route_destination24 and selected == route_unit24 and signature == route_signature36:
+		if destination.x >= 0 and not game.cinematic:
+			cover_focus_text36.visible = true
+			cover_focus36.visible = cover_focus36.mesh != null
+		return
+	route_destination24 = destination; route_unit24 = selected; route_signature36 = signature
 	route_markers_current24.clear()
 	hover_dirty24 = true
 	if destination.x < 0 or not game.mission.has_method("decision_preview27"): return
 	var actor: Dictionary = game.mission.unit_by_id(selected)
 	if actor.is_empty(): return
-	var decision: Dictionary = game.hud_controls.move_tactical27 if game.hud_controls.move_destination == destination else game.mission.decision_preview27(selected, destination)
+	var decision: Dictionary = game.mission.decision_preview27(selected, destination)
 	var path: Array = decision.get("path", [])
 	if path.is_empty(): ap_label28.visible = false; return
+	var cover: String = str(decision.get("cover", "none"))
+	var cover_at := Vector3(destination.x, Shot33.elevation(game.mission, destination) * 0.7 + 1.8, destination.y)
+	cover_focus36.visible = cover in ["full", "half"]
+	cover_focus36.mesh = Read33.shield_mesh(cover == "full", 1.55) if cover_focus36.visible else null
+	cover_focus36.position = cover_at
+	cover_focus_text36.visible = true
+	cover_focus_text36.text = "FULL COVER" if cover == "full" else "HALF COVER" if cover == "half" else "NO COVER"
+	cover_focus_text36.modulate = Color("e9fbff") if cover == "full" else Color("ffde81") if cover == "half" else Color("ff8b74")
+	cover_focus_text36.position = cover_at - Vector3.UP * 1.45
 	ap_label28.text = "%d AP" % int(decision.get("ap", 1))
 	ap_label28.modulate = Color("69d9ff") if int(decision.get("ap", 1)) == 1 else Color("ffd05a")
 	ap_label28.position = Vector3(destination.x, preload("res://scripts/shot.gd").elevation(game.mission, destination) * 0.7 + 0.9, destination.y)
-	route_markers_current24 = route_markers27(decision.get("events", []))
 	if game.mission.phase == "player" and not game.playing_enemy_events:
 		var move: Dictionary = preload("res://scripts/input_controls.gd").move_preview(game.mission, actor, destination)
-		var danger: Vector2i = move.get("first_danger_tile", Vector2i(-1, -1))
-		if danger.x >= 0: route_markers_current24.append({"tile": danger, "color": Color("ff655a"), "height": 0.18})
+		route_markers_current24 = first_threat_markers36(move)
 	_refresh_hover24()
 	# Keep the preview tile under the finger for the confirming tap on phones.
 	if game.preview_tile == destination and not preload("res://scripts/phone_layout.gd").narrow(Vector2i(game.get_viewport().get_visible_rect().size)) and game.has_method("preview_route24"):
@@ -283,6 +352,10 @@ static func route_markers27(events: Array) -> Array:
 		if i == first_overwatch and event.get("source") is Vector2i:
 			markers.append({"tile":event.source, "color":Color("ff655a"), "height":0.48})
 	return markers
+
+static func first_threat_markers36(preview: Dictionary) -> Array:
+	var tile: Vector2i = preview.get("first_danger_tile", Vector2i(-1, -1))
+	return [{"tile": tile, "color": Color("ff6a4f"), "height": 0.19, "kind": "first_threat"}] if tile.x >= 0 else []
 
 static func route_markers24(risk: Dictionary, path: Array, danger: Dictionary = {}) -> Array:
 	var markers: Array = []
@@ -309,6 +382,37 @@ static func danger_tiles_for26(m: RefCounted, actor: Dictionary) -> Dictionary:
 
 func _update_danger26() -> void:
 	if danger_view26 != null: danger_view26.visible = false
+
+func _update_overwatch36() -> void:
+	if overwatch_lane36 == null or not is_instance_valid(game) or not is_instance_valid(game.mission): return
+	var active: bool = game.mission.result == "" and not game.cinematic
+	overwatch_lane36.visible = active
+	if not active: return
+	var signature: Array = [game.mission.terrain_revision]
+	var watchers: Array = []
+	for unit in game.mission.living("player") + game.mission.living("enemy"):
+		signature.append([unit.id, unit.x, unit.y, unit.hp, unit.get("overwatch", false), unit.get("spotted", false), unit.get("ammo", 1)])
+		if bool(unit.get("overwatch", false)) and (str(unit.side) == "player" or bool(unit.get("spotted", false))): watchers.append(unit)
+	var key := str(hash(signature))
+	if key != overwatch_key36:
+		overwatch_key36 = key
+		overwatch_lane36.mesh = preload("res://scripts/w36route_overwatch.gd").mesh(game.mission)
+	overwatch_lane36.visible = overwatch_lane36.mesh != null and overwatch_lane36.mesh.get_surface_count() > 0
+	var art: Node = game.terrain.get_child(0) if game.terrain.get_child_count() > 0 else null
+	if art == null or art.get("marker_root") == null: return
+	for visual in art.marker_root.get_children():
+		if not visual is MeshInstance3D or not visual.mesh is ImmediateMesh: continue
+		var fill_material: Material = visual.mesh.surface_get_material(0)
+		if fill_material is StandardMaterial3D:
+			var tint: Color = fill_material.albedo_color
+			if tint.g > tint.r and tint.g > tint.b: continue
+		var bounds: AABB = visual.mesh.get_aabb()
+		var center := Vector2(bounds.get_center().x, bounds.get_center().z)
+		for watcher in watchers:
+			var radius: float = minf(float(watcher.range), 8.0)
+			if center.distance_to(Vector2(watcher.x, watcher.y)) < 0.25 and absf(bounds.size.x - radius * 2.0) < 0.5:
+				visual.visible = false
+				break
 
 func _build_controls24() -> void:
 	move_controls24 = preload("res://scripts/w24_command_move_controls.gd").new()
