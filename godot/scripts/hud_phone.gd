@@ -214,7 +214,7 @@ func setup(game, night_hud, root: Control, top: Control, left: Control, right: C
 	var popup_half := minf(250.0, (safe_size.x - 16.0) * 0.5)
 	popup.offset_left = -popup_half; popup.offset_right = popup_half; popup.offset_top = 48; popup.offset_bottom = -96
 	popup.add_theme_stylebox_override("panel", night.panel_style()); overlay.add_child(popup)
-	var popup_shell := VBoxContainer.new(); popup_shell.add_theme_constant_override("separation", 4); popup.add_child(popup_shell)
+	var popup_shell := VBoxContainer.new(); popup_shell.add_theme_constant_override("separation", 8); popup.add_child(popup_shell)
 	detail_scroll = preload("res://scripts/touch_scroll.gd").new(); detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; detail_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL; popup_shell.add_child(detail_scroll)
 	popup_body = VBoxContainer.new(); popup_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL; popup_body.add_theme_constant_override("separation", 8); detail_scroll.add_child(popup_body)
 	more_other_button = _button("Other (0)", func() -> void: more_other_expanded = not more_other_expanded; more_list_key = ""; refresh())
