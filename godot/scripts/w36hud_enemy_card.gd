@@ -11,7 +11,7 @@ static func place(game: Node3D, card: Control, actor_id: int = -1) -> void:
 	var height := 76.0
 	var top := safe.y + (74.0 if portrait else 54.0)
 	var left := safe.x + (8.0 if portrait else 150.0)
-	if not portrait and game.hud_controls != null and game.hud_controls.phone != null:
+	if game.hud_controls != null and game.hud_controls.phone != null:
 		var tray: Control = game.hud_controls.phone.ability_tray
 		if is_instance_valid(tray): left = maxf(left, tray.get_global_rect().end.x + 8.0)
 	var right := viewport.x - safe.z - width - (60.0 if portrait else 60.0)
