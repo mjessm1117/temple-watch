@@ -60,7 +60,7 @@ static func debrief(s: Dictionary, result: Dictionary, mission: Dictionary = {})
 		for id in result.get("squad", []):
 			if roster.has(str(id)): named = roster[str(id)]; break
 	var mission_type := str(mission.get("type", ""))
-	var objective_default := "Prisoner" if mission_type == "rescue" else "Data" if mission_type == "investigate" else "Convoy" if mission_type == "escort" else str(mission.get("n", "the objective"))
+	var objective_default := "Mira Tal" if mission_type == "rescue" else "Data" if mission_type == "investigate" else "Convoy" if mission_type == "escort" else str(mission.get("n", "the objective"))
 	var objective := str(result.get("objective", mission.get("objName", objective_default)))
 	var outcome := ("evacuated" if mission_type == "rescue" else "recovered" if mission_type == "investigate" else "held" if mission_type == "defend" else "secured") if bool(result.get("won", false)) else "lost"
 	var decision := str(s.get("beat_decision", ""))

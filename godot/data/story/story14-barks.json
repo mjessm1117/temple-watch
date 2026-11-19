@@ -19,6 +19,8 @@
       "promotion": ["A new rank means another watch. I am ready."]
     },
     "Tor Saalen": {
+      "mira_reached": ["Mira Tal, we are here."],
+      "mira_freed": ["Mira Tal is free."],
       "contact": ["Enemy contact. I can feel them ahead.", "They see us. Stay where I can reach you.", "Their line is awake. We move together."],
       "ally_down": ["One of ours is down. I can feel them ahead.", "Get to our wounded. Stay where I can reach you.", "We are bringing them home. We move together.", "I am coming. Keep a path to them open."],
       "objective_done": ["The objective is ours. I can feel them ahead.", "The work is done here. Stay where I can reach you.", "Now find the way out. We move together."],
@@ -50,6 +52,7 @@
       "kill": ["Target down. Check the second exit."]
     },
     "Ilsa Myr": {
+      "rescue_contact": ["Contact. I have them."],
       "contact": ["Enemy contact. I have their position.", "They see us. I am marking the way out.", "Their line is awake. Count who is still moving."],
       "ally_down": ["One of ours is down. I have their position.", "Get to our wounded. I am marking the way out.", "We are bringing them home. Count who is still moving.", "I hear them breathing. Bren, this way."],
       "objective_done": ["The objective is ours. I have their position.", "The work is done here. I am marking the way out.", "Now find the way out. Count who is still moving."],
@@ -63,6 +66,7 @@
       "kill": ["Target stopped. The channel stays open."]
     },
     "Doc Bren": {
+      "rescue_casualty": ["One down. I am coming."],
       "contact": ["Enemy contact. I am with the wounded.", "They see us. Leave me a path through.", "Their line is awake. I have one more kit."],
       "ally_down": ["One of ours is down. I am with the wounded.", "Get to our wounded. Leave me a path through.", "We are bringing them home. I have one more kit.", "I am here. Keep them breathing."],
       "objective_done": ["The objective is ours. I am with the wounded.", "The work is done here. Leave me a path through.", "Now find the way out. I have one more kit."],

@@ -3,7 +3,11 @@ const Shot = preload("res://scripts/shot.gd")
 const Maps = preload("res://scripts/map_catalog.gd")
 const Families11 = preload("res://scripts/mission11_families.gd")
 
+static func mira_rescue(m: RefCounted) -> bool:
+	return str(m.spec.get("id", "")) == "rescue" or str(m.spec.get("web_source", {}).get("base", "")) == "rescue"
+
 static func setup(m: RefCounted) -> void:
+	if mira_rescue(m): m.prisoner.name = "Mira Tal"
 	var f := str(m.spec.family)
 	if str(m.difficulty.name) == "Normal" and int(m.spec.get("normal_turn_limit",0)) > 0: m.spec.turn_limit = int(m.spec.normal_turn_limit)
 	var relay_hp := int(m.spec.objective.hp)
@@ -56,6 +60,7 @@ static func interact(m: RefCounted, u: Dictionary, p: Vector2i) -> Dictionary:
 	match f:
 		"rescue", "vip_extract":
 			m.prisoner.freed = true; m.prisoner.escort_id = u.id
+			if mira_rescue(m): m.message("Mira Tal is free. Escort her to evac.")
 			primary_done(m)
 		"hack_terminal", "sabotage":
 			m.objective_state.done[p] = true
@@ -88,7 +93,7 @@ static func primary_done(m: RefCounted) -> void:
 		return
 	m.objective_state.phase = "evac"; m.objective_state.evac_start = m.turn
 	m.metrics.objective_turn = m.turn
-	m.message("Escort the envoy to the blue evacuation zone." if bool(m.spec.get("envoy_extract",false)) else "Main objective complete. Reach the blue evacuation zone.")
+	m.message("Escort the envoy to the blue evacuation zone." if bool(m.spec.get("envoy_extract",false)) else "Escort Mira Tal to the blue evacuation zone." if mira_rescue(m) else "Main objective complete. Reach the blue evacuation zone.")
 	m.queue_reinforcement(["trooper","heavy"],1,"Evac pursuit")
 
 static func fail(m: RefCounted, why: String) -> void:
@@ -107,7 +112,7 @@ static func check(m: RefCounted) -> void:
 	if bool(m.objective_state.get("objective_ready",false)) or f == "pursuit": primary_done(m)
 	if f == "operation": check_step(m)
 	elif f in ["rescue","vip_extract"] or bool(m.spec.get("envoy_extract",false)):
-		if int(m.prisoner.get("hp",8)) <= 0: fail(m,"The evacuee is lost."); return
+		if int(m.prisoner.get("hp",8)) <= 0: fail(m,"Mira Tal is lost." if mira_rescue(m) else "The evacuee is lost."); return
 		if bool(m.prisoner.freed) and m.objective_state.phase == "primary": primary_done(m)
 	elif f == "ambush":
 		var runner: Dictionary = m.unit_by_id(int(m.objective_state.runner_id))
@@ -131,7 +136,7 @@ static func enemy_end(m: RefCounted) -> void:
 		for e in m.living("enemy"):
 			if not bool(e.awake) or bool(e.get("stunned",false)) or Shot.distance(Shot.pos(e),vip) > 4.0 or not Shot.los(m,Shot.pos(e),vip): continue
 			m.prisoner.hp = maxi(0,int(m.prisoner.get("hp",8))-2)
-			m.message("The exposed evacuee takes 2 damage.")
+			m.message("Mira Tal takes 2 damage." if mira_rescue(m) else "The exposed evacuee takes 2 damage.")
 			m.action_events.append({"kind":"vip_attack","actor":e.id,"to":vip,"damage":2})
 			break
 	if f == "defend" and m.objective_state.phase == "primary":
@@ -231,11 +236,11 @@ static func runner_turn(m: RefCounted, u: Dictionary) -> bool:
 
 static func status(m: RefCounted) -> Dictionary:
 	var s: Dictionary = m.objective_state
-	var label := ("Escort the envoy to evac" if bool(m.spec.get("envoy_extract",false)) else "Extract the squad") if s.phase == "evac" else str(m.spec.family).replace("_"," ").capitalize()
+	var label := ("Escort the envoy to evac" if bool(m.spec.get("envoy_extract",false)) else "Escort Mira Tal to evac" if mira_rescue(m) else "Extract the squad") if s.phase == "evac" else str(m.spec.family).replace("_"," ").capitalize()
 	if Families11.applies(m): label = Families11.status(m)
 	if s.phase == "primary":
 		match str(m.spec.family):
-			"rescue": label = "Free the prisoner, then escort to evac"
+			"rescue": label = "Free Mira Tal, then escort to evac" if mira_rescue(m) else "Free the prisoner, then escort to evac"
 			"vip_extract": label = "Escort the VIP to the far evac"
 			"hack_terminal", "sabotage": label = ("Intercept the envoy's transmission" if bool(m.spec.get("envoy_extract",false)) else label) + " %d/%d" % [s.done.size(),int(m.spec.objective.required)]
 			"destroy_relay": label += " · Relay %d HP" % int(s.relay_hp)
