@@ -14,13 +14,14 @@ static func place(game: Node3D, card: Control, actor_id: int = -1) -> void:
 	if game.hud_controls != null and game.hud_controls.phone != null:
 		var tray: Control = game.hud_controls.phone.ability_tray
 		if is_instance_valid(tray): left = maxf(left, tray.get_global_rect().end.x + 8.0)
+	if portrait: width = minf(width, maxf(80.0, viewport.x - safe.z - left))
 	var right := viewport.x - safe.z - width - (60.0 if portrait else 60.0)
 	var choices := [Rect2(Vector2(left, top), Vector2(width, height)), Rect2(Vector2(right, top), Vector2(width, height))]
 	var actor := Vector2(-10000, -10000)
 	if actor_id >= 0 and game.views.has(actor_id):
 		var view: Node3D = game.views[actor_id]
 		if is_instance_valid(view): actor = game.camera.unproject_position(view.global_position + Vector3.UP * 1.0)
-	var chosen: Rect2 = choices[1]
+	var chosen: Rect2 = choices[0 if portrait else 1]
 	if not chosen.grow(10).has_point(actor): pass
 	elif not choices[0].grow(10).has_point(actor): chosen = choices[0]
 	else:
