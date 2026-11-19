@@ -91,8 +91,8 @@
       "lose": "Starlight Beacon falls. The last signals from its decks carry names, coordinates, and voices trying to guide others toward escape pods. Avar Kriss orders every available ship to the debris field and refuses to call the search finished while a rescue beacon still answers.\nRo's attack has destroyed a station that was meant to make the frontier feel less distant from the Republic. The Nameless leaves the Jedi with a fear they must learn to understand without letting it define them.\nThe Council's record will include the squad's attempt, the people saved, and the failure to stop the fall. No sentence can make the loss smaller. The work that follows is to carry survivors home and decide how to face a galaxy that has seen its brightest beacon go dark."
     },
     "rescue": {
-      "win": "Tor links the prisoner’s account to the gate convoy. Gnost-Dural sends the route to the envoy team.",
-      "lose": "The gate convoy leaves with the witness. Tor preserves its route; the envoy team will have to work from that trace."
+      "win": "Mira Tal names the gate convoy’s route. Tor sends her account to Gnost-Dural and the envoy team.",
+      "lose": "Mira Tal is lost before she can name the gate convoy’s route. Tor preserves the transport code; the envoy team must work from that trace."
     },
     "shrine": {
       "win": "The pilgrims identify a courier mark seen at the gate. Gnost-Dural follows it toward the envoy.",
