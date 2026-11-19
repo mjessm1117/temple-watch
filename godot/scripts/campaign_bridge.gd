@@ -7,6 +7,7 @@ const Settings = preload("res://scripts/settings.gd")
 const Villain11Battle = preload("res://scripts/villain11_battle.gd")
 const SaveSlots = preload("res://scripts/campaign/save_slots.gd")
 const Beats22 = preload("res://scripts/story/story14_beats.gd")
+const ReturnQueue = preload("res://scripts/w37C_return_queue.gd")
 class SettingsTouchShield extends Control:
 	var owner_scroll: ScrollContainer
 	var start := Vector2.ZERO
@@ -200,7 +201,7 @@ func continue_campaign() -> void:
 func _resume_loaded() -> void:
 	var stage: String = campaign.state.get("flow_stage", "temple")
 	if stage == "opening": go("opening")
-	elif stage in ["briefing", "debrief", "interlude", "arc_transition"]:
+	elif stage in ["briefing", "debrief", "interlude", "arc_transition", "return_queue"]:
 		screen = campaign.state.get("pending", {})
 		screen_return = "squad" if stage == "briefing" else "result" if stage == "debrief" else "era_transition" if stage == "arc_transition" else "temple"
 		go("briefing" if stage == "briefing" else "dialogue")
@@ -330,17 +331,25 @@ func temple_story() -> void:
 	if not active: return
 	if suppress_story_once:
 		suppress_story_once = false
+		if ReturnQueue.active(campaign.state):
+			campaign.state.erase("pending")
+			campaign.state.flow_stage = "temple"
+			save()
 		return
 	var s: Dictionary = campaign.state
-	screen = s.get("pending", {})
-	if screen.get("kind", "") not in ["talk", "event", "vote", "villain11", "scene11", "grief"]: screen = preload("res://scripts/story/rank19_beats.gd").next(s)
-	if screen.is_empty(): screen = story.next_villain_beat(s)
-	if screen.is_empty() and show_sith_events(): return
-	if screen.is_empty(): screen = story.next_story_event(s)
-	if screen.is_empty() and int(s.get("vote_month", 0)) < int(s.month):
-		screen = story.next_council_vote(s)
-		if not screen.is_empty(): s.vote_month = int(s.month)
-	if screen.is_empty(): screen = story.next_temple_talk(s)
+	if ReturnQueue.active(s):
+		screen = ReturnQueue.next(s,story)
+		s.flow_stage = "return_queue" if not screen.is_empty() else "temple"
+	else:
+		screen = s.get("pending", {})
+		if screen.get("kind", "") not in ["talk", "event", "vote", "villain11", "scene11", "grief"]: screen = preload("res://scripts/story/rank19_beats.gd").next(s)
+		if screen.is_empty(): screen = story.next_villain_beat(s)
+		if screen.is_empty() and show_sith_events(): return
+		if screen.is_empty(): screen = story.next_story_event(s)
+		if screen.is_empty() and int(s.get("vote_month", 0)) < int(s.month):
+			screen = story.next_council_vote(s)
+			if not screen.is_empty(): s.vote_month = int(s.month)
+		if screen.is_empty(): screen = story.next_temple_talk(s)
 	if screen.is_empty(): return
 	screen_return = "temple"
 	save()
@@ -518,6 +527,7 @@ func finish_result() -> void:
 	campaign.state.erase("battle_result")
 	campaign.state.erase("pending")
 	campaign.state.flow_stage = "temple"
+	ReturnQueue.begin(campaign.state,str(result.get("mission_id", "")))
 	save()
 	go("temple")
 func advance_era() -> void:

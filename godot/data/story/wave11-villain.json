@@ -2,24 +2,20 @@
   "records": {
     "W11_VILLAIN": [
       {
-        "id": "v01",
+        "id": "v00",
         "era": 1,
         "done": 1,
-        "speaker": "Lord Kaan",
-        "title": "The equal throne",
-        "text": "A Force vision shows a future Sith Lord named Kaan. He promises every Lord a throne in a Brotherhood of Darkness."
+        "speaker": "Darth Malgus",
+        "title": "The threat at the gate",
+        "text": "Darth Malgus commands the strike aimed at the Jedi Temple. He wants a path through Coruscant before the treaty can hold. 'You guard one gate. I will find another.'"
       },
       {
-        "id": "v02",
+        "id": "v01",
         "era": 1,
-        "done": 4,
-        "speaker": "Darth Bane",
-        "title": "A listener in the dark",
-        "text": "The vision returns: one voice does not join the applause. Bane records the names of the Lords and the cost of making all of them equal.",
-        "react": {
-          "light": "He hears your order spare prisoners, and calls mercy a weakness he cannot yet explain.",
-          "dark": "He hears how fear bought obedience, and recognizes Kaan’s bargain in your ranks."
-        }
+        "done": 2,
+        "speaker": "Lord Kaan",
+        "title": "A vision of what is coming",
+        "text": "A vision shows Lord Kaan in an age yet to come. He promises every Sith Lord a throne in a Brotherhood of Darkness."
       },
       {
         "id": "v03",
