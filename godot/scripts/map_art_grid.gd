@@ -301,6 +301,9 @@ func update_route24() -> void:
 	ap_label28.visible = destination.x >= 0 and not game.cinematic
 	if destination.x < 0 or game.cinematic:
 		cover_focus36.visible = false; cover_focus_text36.visible = false
+	if bool(game.get("animate_headless", false)):
+		if destination == route_destination24 and selected == route_unit24: return
+		route_destination24 = destination; route_unit24 = selected; route_signature36 = ""; return
 	var state: Array = [destination, selected, game.mission.terrain_revision]
 	for unit in game.mission.living("player") + game.mission.living("enemy"):
 		state.append([unit.id, unit.x, unit.y, unit.hp, unit.ap, unit.get("awake", false), unit.get("overwatch", false), unit.get("ammo", 1)])
