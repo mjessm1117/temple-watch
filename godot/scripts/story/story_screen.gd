@@ -399,6 +399,7 @@ func _show_decisions(focus: bool = true) -> void:
 	if focus and is_instance_valid(story_scroll): _focus_first_choice.call_deferred()
 
 func _focus_first_choice() -> void:
+	if get_tree() == null: return
 	await get_tree().process_frame
 	if not is_instance_valid(story_scroll): return
 	var target: Control = choice_buttons[0] if not choice_buttons.is_empty() else choices_box
