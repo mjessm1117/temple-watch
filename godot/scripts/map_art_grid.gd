@@ -301,7 +301,7 @@ func update_route24() -> void:
 	ap_label28.visible = destination.x >= 0 and not game.cinematic
 	if destination.x < 0 or game.cinematic:
 		cover_focus36.visible = false; cover_focus_text36.visible = false
-	if bool(game.get("animate_headless", false)):
+	if bool(game.get("animate_headless")):
 		if destination == route_destination24 and selected == route_unit24: return
 		route_destination24 = destination; route_unit24 = selected; route_signature36 = ""
 		route_markers_current24.clear(); hover_dirty24 = true
