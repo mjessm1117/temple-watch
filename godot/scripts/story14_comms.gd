@@ -288,7 +288,7 @@ func _build(g: Node) -> void:
 	card = PanelContainer.new()
 	card.custom_minimum_size = Vector2(minf(312.0,width-24.0),68)
 	card.add_theme_stylebox_override("panel",UI.style(Color(0.04,0.075,0.085,0.96),UI.ACCENT))
-	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.mouse_filter = Control.MOUSE_FILTER_STOP
 	layer.add_child(card)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation",8)
