@@ -280,6 +280,10 @@ func dismiss() -> void:
 	if is_instance_valid(card): card.visible = false
 	if fade != null and fade.is_running(): fade.kill()
 
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch and event.pressed or event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		dismiss()
+
 func _build(g: Node) -> void:
 	var width := float(g.get_viewport().get_visible_rect().size.x)
 	layer = CanvasLayer.new()
@@ -289,6 +293,7 @@ func _build(g: Node) -> void:
 	card.custom_minimum_size = Vector2(minf(312.0,width-24.0),68)
 	card.add_theme_stylebox_override("panel",UI.style(Color(0.04,0.075,0.085,0.96),UI.ACCENT))
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
+	card.gui_input.connect(_gui_input)
 	layer.add_child(card)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation",8)
