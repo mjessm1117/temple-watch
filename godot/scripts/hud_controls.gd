@@ -9,6 +9,7 @@ const Threat22 = preload("res://scripts/decision22_threat.gd")
 const ChainSignature = preload("res://scripts/w27d_ability_signature.gd")
 const W31ECard = preload("res://scripts/w31e_enemy_card.gd")
 const Read33 = preload("res://scripts/w33d_readability.gd")
+const Objectives = preload("res://scripts/mission_objectives.gd")
 var g
 var techniques: HFlowContainer
 var techniques_open := false
@@ -228,6 +229,9 @@ func _build_ui() -> void:
 	g.hud = CanvasLayer.new(); g.add_child(g.hud)
 	var root := Control.new(); root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); root.mouse_filter = Control.MOUSE_FILTER_IGNORE; g.hud.add_child(root)
 	g.overlay = root
+	var mira_cue := preload("res://scripts/w37B_objective_cue.gd").new()
+	mira_cue.game = g
+	root.add_child(mira_cue)
 	# --- wave10 story ---
 	var bond_lines := preload("res://scripts/campaign/bond_overlay.gd").new()
 	bond_lines.name = "BondLines"; bond_lines.game = g
@@ -377,8 +381,8 @@ func _refresh() -> void:
 	var objective: Dictionary = g.mission.objective_status()
 	var clock_note := " · %d turns left" % int(objective.turns_left) if int(objective.turns_left) >= 0 else " · clock starts on reveal" if objective.get("clock_trigger", "") == "concealment" else ""
 	if phone != null:
-		var brief: String = str(objective.label).replace("Rescue Mira and escort to evac", "Rescue Mira to evac" if Phone.touch_device() else "Rescue Mira → evac")
-		if Phone.window_size().x < 600: brief = "RESCUE" if brief.begins_with("Rescue Mira") else brief.get_slice(" · ", 0)
+		var brief: String = str(objective.label).replace("Free Mira Tal, then escort to evac", "Free Mira Tal").replace("Escort Mira Tal to evac", "Escort Mira Tal").replace("Rescue Mira and escort to evac", "Rescue Mira Tal")
+		if Phone.window_size().x < 600: brief = "MIRA TAL" if Objectives.mira_rescue(g.mission) else brief.get_slice(" · ", 0)
 		g.objective_label.text = "T%d · %s · %d left" % [g.mission.turn, brief, int(objective.turns_left)] if int(objective.turns_left) >= 0 else "T%d · %s" % [g.mission.turn, brief]
 	else:
 		g.objective_label.text = "TURN %d · %s%s · %s" % [g.mission.turn,objective.label,clock_note,str(objective.phase).to_upper()]

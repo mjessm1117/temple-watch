@@ -3,6 +3,7 @@ extends RefCounted
 const Portraits = preload("res://scripts/story14_portraits.gd")
 const UI = preload("res://scripts/campaign/ui.gd")
 const Beats = preload("res://scripts/story/story14_beats.gd")
+const Objectives = preload("res://scripts/mission_objectives.gd")
 var game: WeakRef
 var lines: Dictionary
 var legacy_barks: Dictionary
@@ -25,6 +26,7 @@ var next_bark_at := 0
 var event_mode := false
 var unit_snapshots: Dictionary = {}
 var triggered_named := 0
+var cue_seen: Dictionary = {}
 
 func _init(g: Node) -> void:
 	game = weakref(g)
@@ -40,14 +42,16 @@ func _init(g: Node) -> void:
 func _battle_event(kind: String, actor_id: String, target_id: String, _context: Dictionary) -> void:
 	var g: Node = game.get_ref()
 	if g == null or g.mission == null: return
-	var event: String = {"reveal":"opening_contact", "flank":"flanked", "hurt":"first_wound", "kill":"kill", "heal":"recovery", "revive":"recovery", "promotion":"promotion", "ally_down":"ally_down"}.get(kind, "")
-	if event.is_empty(): return
 	if kind == "reveal":
-		if not seen.has("opening_contact"):
-			seen.opening_contact = true
-			for ally in g.mission.living("player"):
-				if lines.has(str(ally.get("name", ""))): pending.append("opening_contact|" + str(ally.get("name", ""))); break
+		_action_cue(g, "contact")
+		_suppress_flow_bark(g, actor_id)
 		return
+	if kind == "ally_down":
+		_action_cue(g, "casualty")
+		_suppress_flow_bark(g, actor_id)
+		return
+	var event: String = {"flank":"flanked", "hurt":"first_wound", "kill":"kill", "heal":"recovery", "revive":"recovery", "promotion":"promotion"}.get(kind, "")
+	if event.is_empty(): return
 	var id := target_id if kind in ["hurt", "heal", "revive", "ally_down", "flank"] else actor_id
 	for unit in g.mission.units:
 		if str(unit.get("side", "")) != "player" or id not in [str(unit.get("id", "")), str(unit.get("rid", ""))]: continue
@@ -59,8 +63,8 @@ func _battle_event(kind: String, actor_id: String, target_id: String, _context: 
 	if kind == "kill":
 		for unit in g.mission.units:
 			if str(unit.get("side", "")) == "player" and target_id in [str(unit.get("id", "")), str(unit.get("rid", ""))]:
-				for ally in g.mission.living("player"):
-					if int(ally.get("hp", 0)) > 0 and lines.has(str(ally.get("name", ""))): pending.append("ally_down|" + str(ally.get("name", ""))); break
+				_action_cue(g, "casualty")
+				_suppress_flow_bark(g, actor_id)
 				return
 	if kind == "flank":
 		for unit in g.mission.units:
@@ -80,6 +84,7 @@ func sample() -> void:
 	last_sample = now
 	if g.mission == null or g.demo_mode: return
 	var players: Array = g.mission.units.filter(func(u): return str(u.get("side","")) == "player")
+	_sample_action_cues(g, players)
 	if event_mode:
 		for ally in players:
 			var id := str(ally.get("id", ""))
@@ -99,7 +104,7 @@ func sample() -> void:
 		if (bool(foe.get("boss",false)) or bool(foe.get("duel_boss",false)) or bool(foe.get("villain11",false)) or str(foe.get("kind","")) in ["sith_lord","marchion_ro","lourna_dee"]) and (bool(foe.get("awake",false)) or bool(foe.get("spotted",false))): boss_visible = true
 	if visible and not contact:
 		contact = true
-		triggers.append("opening_contact")
+		_action_cue(g, "contact")
 	if boss_visible and not villain:
 		villain = true
 		triggers.append("villain")
@@ -120,9 +125,9 @@ func sample() -> void:
 		if str(ally.get("status","")) == "down" or int(ally.get("hp",1)) <= 0:
 			if not seen.has(id):
 				seen[id] = true
-				triggers.append("ally_down")
+				_action_cue(g, "casualty")
 	var completed: int = g.mission.objective_state.get("done",{}).size()
-	if completed > previous_objectives: triggers.append("objective_done")
+	if completed > previous_objectives: _action_cue(g, "objective")
 	previous_objectives = completed
 	if enemies.size() == 1 and previous_enemy_count > 1: triggers.append("last_enemy")
 	previous_enemy_count = enemies.size()
@@ -130,6 +135,57 @@ func sample() -> void:
 	if now >= next_bark_at and not pending.is_empty():
 		_show(g,pending.pop_front(),players)
 		next_bark_at = now + 4000
+
+func _sample_action_cues(g: Node, players: Array) -> void:
+	if not cue_seen.has("contact"):
+		for enemy in g.mission.living("enemy"):
+			if bool(enemy.get("awake", false)) or bool(enemy.get("spotted", false)):
+				_action_cue(g, "contact")
+				break
+	if not cue_seen.has("casualty"):
+		for ally in players:
+			if str(ally.get("status", "")) == "down" or int(ally.get("hp", 1)) <= 0:
+				_action_cue(g, "casualty")
+				break
+	if cue_seen.has("objective"): return
+	var mission: RefCounted = g.mission
+	if Objectives.mira_rescue(mission):
+		var target := Vector2i(int(mission.prisoner.x), int(mission.prisoner.y))
+		if bool(mission.prisoner.get("freed", false)) or players.any(func(u): return int(u.get("hp", 0)) > 0 and maxi(absi(int(u.x)-target.x), absi(int(u.y)-target.y)) <= 1):
+			_action_cue(g, "objective")
+	elif mission.objective_state.get("done", {}).size() > 0 or str(mission.objective_state.get("phase", "primary")) == "evac" or str(mission.result) == "win":
+		_action_cue(g, "objective")
+
+func _action_cue(g: Node, kind: String) -> void:
+	if cue_seen.has(kind): return
+	var heroes: Array = g.mission.living("player")
+	var name := "Jace Malcom"
+	var preferred := ""
+	if Objectives.mira_rescue(g.mission): preferred = str({"contact":"Ilsa Myr", "objective":"Tor Saalen", "casualty":"Doc Bren"}.get(kind, ""))
+	for ally in heroes:
+		if lines.has(str(ally.get("name", ""))):
+			if name == "Jace Malcom": name = str(ally.name)
+			if str(ally.name) == preferred:
+				name = preferred
+				break
+	var key := ("opening_contact" if str(g.mission.spec.get("id", "")) == "relay" else "contact") if kind == "contact" else "ally_down" if kind == "casualty" else "objective_done"
+	var options: Array = lines.get(name, {}).get(key, [])
+	var sentence := str(options[0]) if not options.is_empty() else "Contact. Hold the line." if kind == "contact" else "One of ours is down. Get to them." if kind == "casualty" else "Objective reached. Move to evac."
+	if Objectives.mira_rescue(g.mission):
+		var rescue_key := "rescue_contact" if kind == "contact" else "rescue_casualty" if kind == "casualty" else "mira_freed" if bool(g.mission.prisoner.get("freed", false)) else "mira_reached"
+		var rescue_options: Array = lines.get(name, {}).get(rescue_key, [])
+		sentence = str(rescue_options[0]) if not rescue_options.is_empty() else "Contact. Mark them." if kind == "contact" else "One down. Get to them." if kind == "casualty" else "Mira Tal is free." if bool(g.mission.prisoner.get("freed", false)) else "Mira Tal, we are here."
+	cue_seen[kind] = true
+	triggered_named += 1
+	show_radio(name, name, sentence, 2)
+
+func _suppress_flow_bark(g: Node, actor_id: String) -> void:
+	var flow: Node = g.get_node_or_null("/root/CampaignFlow")
+	if flow == null or not flow.get("active"): return
+	flow.set("last_bark_at", Time.get_ticks_msec())
+	var actor_turn: Dictionary = flow.get("actor_bark_turn")
+	actor_turn[actor_id] = g.mission.turn
+	flow.set("actor_bark_turn", actor_turn)
 
 func fallback(kind: String, actor_id: String, target_id: String) -> Dictionary:
 	var g: Node = game.get_ref()
@@ -224,6 +280,10 @@ func dismiss() -> void:
 	if is_instance_valid(card): card.visible = false
 	if fade != null and fade.is_running(): fade.kill()
 
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch and event.pressed or event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		dismiss()
+
 func _build(g: Node) -> void:
 	var width := float(g.get_viewport().get_visible_rect().size.x)
 	layer = CanvasLayer.new()
@@ -233,8 +293,7 @@ func _build(g: Node) -> void:
 	card.custom_minimum_size = Vector2(minf(312.0,width-24.0),68)
 	card.add_theme_stylebox_override("panel",UI.style(Color(0.04,0.075,0.085,0.96),UI.ACCENT))
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
-	card.gui_input.connect(func(event: InputEvent):
-		if event is InputEventMouseButton and event.pressed or event is InputEventScreenTouch and event.pressed: dismiss())
+	card.gui_input.connect(_gui_input)
 	layer.add_child(card)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation",8)
@@ -248,7 +307,9 @@ func _build(g: Node) -> void:
 	who_label = UI.label("",14,UI.ACCENT)
 	column.add_child(who_label)
 	text_label = UI.label("",14,UI.TEXT)
+	text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text_label.max_lines_visible = 2
 	text_label.clip_text = true
 	text_label.custom_minimum_size.y = 36
 	column.add_child(text_label)
+	for child in card.find_children("*", "Control", true, false): child.mouse_filter = Control.MOUSE_FILTER_IGNORE

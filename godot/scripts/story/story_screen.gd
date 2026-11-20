@@ -21,6 +21,7 @@ var bond_meter: ProgressBar
 var bond_label: Label
 var choices_box: VBoxContainer
 var phone_decisions: VBoxContainer
+var story_scroll: ScrollContainer
 var choice_buttons: Array[Button] = []
 var typed := 0.0
 var decision_recorded := false
@@ -94,6 +95,7 @@ func _build() -> void:
 	bond_meter = null
 	portrait_count = 0
 	phone_decisions = null
+	story_scroll = null
 	big_speaker_portrait = null
 	big_speaker_caption = null
 	var bg := World.new()
@@ -127,7 +129,8 @@ func _build() -> void:
 func _header(title: String, detail: String) -> void:
 	var head := HBoxContainer.new()
 	body.add_child(head)
-	head.add_child(UI.icon("holocron", UI.ICON_LARGE, UI.GOLD))
+	var compact_story := mode != "codex" and Phone.narrow(Phone.window_size())
+	if not compact_story: head.add_child(UI.icon("holocron", UI.ICON_LARGE, UI.GOLD))
 	var mark := UI.label(title,18 if Phone.narrow(Phone.window_size()) else 24,UI.ACCENT)
 	mark.size_flags_horizontal = SIZE_EXPAND_FILL
 	head.add_child(mark)
@@ -140,6 +143,7 @@ func _build_story() -> void:
 	var kind: String = scene_data.get("kind","briefing")
 	var is_talk := kind in ["talk","beat","grief","scene11"]
 	var phone := Phone.narrow(Phone.window_size())
+	if phone: body.add_theme_constant_override("separation", 6)
 	_header("TEMPLE WATCH", "%s  /  %s BBY" % ["OLD REPUBLIC" if int(campaign_state.era)==1 else "RUUSAN" if int(campaign_state.era)==2 else "HIGH REPUBLIC",str(campaign_state.story.bby)])
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation",20)
@@ -186,7 +190,10 @@ func _build_story() -> void:
 	var content := UI.column(8 if phone else 12)
 	content.size_flags_horizontal = SIZE_EXPAND_FILL
 	var scroll := preload("res://scripts/touch_scroll.gd").new()
+	story_scroll = scroll
+	scroll.name = "StoryScroll"
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll.size_flags_vertical = SIZE_EXPAND_FILL
 	frame.add_child(scroll)
 	scroll.add_child(content)
@@ -204,7 +211,7 @@ func _build_story() -> void:
 	speaking.add_theme_constant_override("separation",12)
 	content.add_child(speaking)
 	if phone:
-		speaker_portrait = Portraits14.picture(speaker,Vector2(60,70))
+		speaker_portrait = Portraits14.picture(speaker,Vector2(52,60))
 		speaking.add_child(speaker_portrait)
 	speaker_plate = UI.label(speaker.to_upper() if phone else "SPEAKER  " + speaker.to_upper(),14,UI.ACCENT)
 	speaker_plate.size_flags_horizontal = SIZE_EXPAND_FILL
@@ -217,8 +224,11 @@ func _build_story() -> void:
 	var fast := UI.button("FAST ››",_fast_forward)
 	fast.custom_minimum_size = Vector2(72,44)
 	speaking.add_child(fast)
-	content.add_child(UI.label(str(scene_data.get("eyebrow","TEMPLE")).to_upper(),14,UI.GOLD))
-	content.add_child(UI.label(scene_data.get("title","The Temple"),23 if phone else 32,UI.GOLD))
+	var eyebrow := UI.label(str(scene_data.get("eyebrow","TEMPLE")).to_upper(),14,UI.GOLD)
+	var title := UI.label(scene_data.get("title","The Temple"),23 if phone else 32,UI.GOLD)
+	if not phone:
+		content.add_child(eyebrow)
+		content.add_child(title)
 	dialogue_lines = PackedStringArray()
 	for source_line in str(scene_data.get("text","")).split("\n",false):
 		for passage in Paging.pages(source_line): dialogue_lines.append(passage)
@@ -228,12 +238,16 @@ func _build_story() -> void:
 	content.add_child(page_counter)
 	narrative = UI.label(_dialogue_text(dialogue_lines[0]),16 if phone else 18)
 	content.add_child(narrative)
+	if phone:
+		content.add_child(eyebrow)
+		content.add_child(title)
 	typed = 0
 	narrative.visible_characters = 0
 	var reveal := UI.button("TAP TO ADVANCE  ›",_advance_dialogue)
 	reveal.custom_minimum_size.y = 56 if phone else 30
 	reveal.add_theme_font_size_override("font_size",14 if phone else 12)
-	content.add_child(reveal)
+	if phone: body.add_child(reveal)
+	else: content.add_child(reveal)
 	if scene_data.get("goal","") != "":
 		var goal := str(scene_data.goal)
 		if phone: goal = goal.get_slice(".",0)
@@ -245,7 +259,7 @@ func _build_story() -> void:
 	var decision_host: VBoxContainer = content
 	if phone:
 		decision_host = UI.column(4)
-		body.add_child(decision_host)
+		content.add_child(decision_host)
 		phone_decisions = decision_host
 	if not scene_data.get("choices", []).is_empty():
 		decision_host.add_child(UI.label("YOUR DECISION",14,UI.ACCENT))
@@ -271,6 +285,10 @@ func _build_story() -> void:
 		choices_box.add_child(UI.button("Return to Temple" if kind == "debrief" else "Continue",_finish))
 	result_label = UI.label("",15,UI.ACCENT)
 	content.add_child(result_label)
+	if phone:
+		var back_button := content.get_node_or_null("BriefingBack")
+		if back_button == null: back_button = content.get_node_or_null("StoryBack")
+		if back_button != null: content.move_child(back_button, content.get_child_count() - 1)
 	var foot := HBoxContainer.new()
 	body.add_child(foot)
 	var hint := UI.label("Every choice leaves a record in the Temple archive.",14 if phone else 13,UI.MUTED)
@@ -360,8 +378,7 @@ func _advance_dialogue() -> void:
 		_reveal()
 		return
 	if dialogue_index + 1 >= dialogue_lines.size():
-		choices_box.visible = true
-		if is_instance_valid(phone_decisions): phone_decisions.visible = true
+		_show_decisions()
 		return
 	dialogue_index += 1
 	page_counter.text = "PAGE %d / %d" % [dialogue_index + 1,dialogue_lines.size()]
@@ -374,8 +391,20 @@ func _advance_dialogue() -> void:
 	narrative.visible_characters = 0
 	typed = 0
 	if dialogue_index + 1 == dialogue_lines.size():
-		choices_box.visible = true
-		if is_instance_valid(phone_decisions): phone_decisions.visible = true
+		_show_decisions(false)
+
+func _show_decisions(focus: bool = true) -> void:
+	choices_box.visible = true
+	if is_instance_valid(phone_decisions): phone_decisions.visible = true
+	if focus and is_instance_valid(story_scroll): _focus_first_choice.call_deferred()
+
+func _focus_first_choice() -> void:
+	if not is_inside_tree(): return
+	await get_tree().process_frame
+	if not is_instance_valid(story_scroll): return
+	var target: Control = choice_buttons[0] if not choice_buttons.is_empty() else choices_box
+	story_scroll.ensure_control_visible(target)
+	story_scroll.scroll_vertical += 12
 
 func _skip_dialogue() -> void:
 	dialogue_index = dialogue_lines.size()-1
@@ -385,8 +414,7 @@ func _skip_dialogue() -> void:
 	if cut > 0 and cut < 40: _set_speaker(line.substr(0,cut))
 	narrative.text = _dialogue_text(line)
 	_reveal()
-	choices_box.visible = true
-	if is_instance_valid(phone_decisions): phone_decisions.visible = true
+	_show_decisions()
 
 func _fast_forward() -> void:
 	if narrative.visible_characters != -1:

@@ -31,6 +31,7 @@
     "SOURCE_LITERALS": 683
   },
   "records": {
+    "CODEX": {"character": {"mira": {"n": "Mira Tal"}}},
     "FOES": {
       "malgus": {
         "n": "Darth Malgus",
@@ -3458,10 +3459,10 @@
             10
           ]
         ],
-        "brief": "Sith raiders hold a prisoner in a locked cell. A Medic can Hack the door from 4 tiles; a Jedi can try the console. Then walk the prisoner to an evac zone (E).\nThe gate is repaired enough to close, but its intercepted signals point to a prisoner transfer on Ord Mantell. Tor recognizes the transport code from the damaged vehicles left in the avenue. The prisoner may have seen who issued the order to withdraw; the convoy is already preparing to leave.\nThe Council asks your squad to bring that witness home before the trail reaches the peace delegation. A medic can open the cell remotely, but the rescue is complete only when the prisoner reaches the evacuation zone.",
-        "goal": "Open the cell (Hack or console), then get the prisoner to an evac zone. Threat rises after turn 5; at Threat 6 they fly the prisoner out.",
-        "win": "The prisoner is out. The shuttle lifts off under fire.",
-        "lose": "The prisoner is lost.",
+        "brief": "Mira Tal is a Senate aide who saw the convoy leave the Temple gate. The Sith seized her to keep her account of the attack from reaching the Council.\nFree Mira Tal before the convoy leaves. Her account may identify who ordered the attack and warn the peace delegation. A Medic can open the cell remotely; a Jedi can use the console.\nEscort Mira Tal to the blue evacuation zone. Keep a path clear for her and your squad. The Council needs her testimony intact. The convoy is preparing to depart.",
+        "goal": "Free Mira Tal, then escort her to an evac zone before the convoy leaves.",
+        "win": "Mira Tal is safe. Her account reaches the Council.",
+        "lose": "Mira Tal is lost. The convoy trail goes cold.",
         "reward": {
           "credits": 90,
           "favor": 5
@@ -4295,7 +4296,7 @@
         "kind": "Rescue",
         "src": "Senate request",
         "mission": "rescue",
-        "text": "Sith raiders seized a Senate aide at a supply depot. The Senate wants her back.",
+        "text": "Sith raiders seized Senate aide Mira Tal at a supply depot. The Senate wants her back.",
         "ignore": {
           "favor": -8
         }

@@ -1,6 +1,5 @@
 extends RefCounted
 ## Campaign-owned story state. The caller serializes `state` as a Dictionary.
-
 const BOND_NEED := [8, 10, 12, 14, 16, 18, 20, 22]
 const SOURCES := ["data-story", "data-era2", "data-era3", "data-saga", "data-codex", "data-life", "story-era3", "ui-codex", "tutorial", "wave10-choices", "wave10-talks", "night1-callbacks", "night1-arcs", "wave11-villain", "wave11-scenes"]
 const ChoiceScenes = preload("res://scripts/story/story_choices.gd")
@@ -14,7 +13,6 @@ const Early29 = preload("res://scripts/story/w29e_early_story.gd")
 var state: Dictionary
 var data: Dictionary = {}
 var story20: Dictionary = {}
-
 func _init(initial_state: Dictionary = {}) -> void:
 	state = initial_state
 	for source in SOURCES:
@@ -24,7 +22,6 @@ func _init(initial_state: Dictionary = {}) -> void:
 	var expansion: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/story/story20-expansion.json"))
 	story20 = expansion if expansion is Dictionary else {}
 	ensure_state(state)
-
 func table(name: String) -> Variant:
 	var merged: Variant = null
 	for source in SOURCES:
@@ -38,21 +35,17 @@ func table(name: String) -> Variant:
 			_merge_deep(merged,value)
 		else: merged = value
 	return merged if merged != null else {}
-
 func _merge_deep(target: Dictionary, source: Dictionary) -> void:
 	for key in source:
 		if target.get(key) is Dictionary and source[key] is Dictionary:
 			_merge_deep(target[key],source[key])
 		else: target[key] = source[key]
-
 func era_data(era: int) -> Dictionary:
 	return data[["data-story", "data-era2", "data-era3"][clampi(era, 1, 3)-1]].get("ERA%d" % era, {})
-
 func mission(mission_id: String) -> Dictionary:
 	var all_missions: Dictionary = table("BASE_MISSIONS")
 	all_missions.merge(table("MISSIONS"), true)
 	return all_missions.get(mission_id, {})
-
 func ensure_state(s: Dictionary) -> void:
 	if not s.has("era"): s.era = 1
 	if not s.has("month"): s.month = 1
@@ -88,7 +81,6 @@ func ensure_state(s: Dictionary) -> void:
 			for soldier in s.roster:
 				if soldier.get("n") == table("CAST")[key].get("n"): s.saga.id[key] = soldier.get("id")
 		if not s.saga.t.has(key): s.saga.t[key] = 0
-
 func start_briefing(mission_id: String) -> Dictionary:
 	var m := mission(mission_id)
 	if m.is_empty(): return {}
@@ -115,7 +107,6 @@ func start_briefing(mission_id: String) -> Dictionary:
 	unlock_codex(state,"mission",mission_id)
 	_unlock_lore_for_mission(state,mission_id)
 	return scene
-
 func _brief_text(id: String, m: Dictionary) -> String:
 	var result: String = m.get("brief","")
 	var addition: String = story20.get("missions", {}).get(id, {}).get("brief", "")
@@ -420,7 +411,9 @@ func journal(s: Dictionary) -> Dictionary:
 
 func next_villain_beat(s: Dictionary) -> Dictionary:
 	ensure_state(s)
-	return Villain11.next(s,table("W11_VILLAIN"))
+	var beat: Dictionary = Villain11.next(s,table("W11_VILLAIN"))
+	if beat.get("id", "") == "v00": beat.eyebrow = "Current threat · Coruscant"
+	return beat
 
 func era_interlude(s: Dictionary, from_era: int) -> Dictionary:
 	var scene := Journal.interlude(s,from_era,table("N1_CALLBACKS"))

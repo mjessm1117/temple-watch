@@ -1,0 +1,40 @@
+{
+  "endings": [
+    {
+      "id": "dark_council",
+      "title": "The Dark Council",
+      "condition": "orderDark >= 20",
+      "text": "The Jedi win, then take the Republic for themselves. The vision did not come true. Something worse did."
+    },
+    {
+      "id": "dawn_unbroken",
+      "title": "Dawn Unbroken",
+      "condition": "sith_arrested and chips_all and shadow <= 3",
+      "text": "The Sith are exposed and arrested. Every clone is freed from the chips. The vision is sealed in the Archive, unfulfilled."
+    },
+    {
+      "id": "vision_fades",
+      "title": "The Vision Fades",
+      "condition": "e2_bane_dead and shadow <= 4",
+      "text": "Bane died at Ruusan. No Sith line came after him. The war ends in a hard, uneasy peace."
+    },
+    {
+      "id": "long_exile",
+      "title": "The Long Exile",
+      "condition": "not sith_arrested and shadow <= 6",
+      "text": "The Order escapes before the command comes. The Temple stands empty. Far from Coruscant, the Jedi begin again."
+    },
+    {
+      "id": "grey_peace",
+      "title": "Grey Peace",
+      "condition": "sith_arrested and not chips_all",
+      "text": "The Sith fall. Some clones still carry the chips. Peace holds with a weapon left in the room."
+    },
+    {
+      "id": "the_fire",
+      "title": "The Fire",
+      "condition": "otherwise",
+      "text": "The vision comes true. The Order is lost in the fire. The names of the fallen enter the Archive of Legends."
+    }
+  ]
+}
