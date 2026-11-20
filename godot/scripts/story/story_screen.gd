@@ -211,7 +211,7 @@ func _build_story() -> void:
 	speaking.add_theme_constant_override("separation",12)
 	content.add_child(speaking)
 	if phone:
-		speaker_portrait = Portraits14.picture(speaker,Vector2(38,44))
+		speaker_portrait = Portraits14.picture(speaker,Vector2(52,60))
 		speaking.add_child(speaker_portrait)
 	speaker_plate = UI.label(speaker.to_upper() if phone else "SPEAKER  " + speaker.to_upper(),14,UI.ACCENT)
 	speaker_plate.size_flags_horizontal = SIZE_EXPAND_FILL
